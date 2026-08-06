@@ -4,8 +4,9 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Atr, Dema, Ema, Imi, Macd, MacdFix, Mama, Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr,
-    Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator, Tema, Trange, Trima, Wma,
+    self, Atr, Dema, Ema, Imi, Macd, MacdExt, MacdFix, Mama, Midpoint, Midprice, Mom, Natr, Roc,
+    Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator, Tema, Trange,
+    Trima, Wma,
 };
 use taflow::MaType;
 
@@ -1786,6 +1787,11 @@ pub struct StatefulMacdFix {
 }
 
 #[pyclass]
+pub struct StatefulMacdExt {
+    inner: MacdExt,
+}
+
+#[pyclass]
 pub struct StatefulStochf {
     inner: Stochf,
 }
@@ -2144,6 +2150,81 @@ impl StatefulStochrsi {
     #[getter]
     fn value(&self) -> Option<(f64, f64)> {
         self.inner.value().map(|value| (value.fastk, value.fastd))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
+
+#[pymethods]
+impl StatefulMacdExt {
+    #[new]
+    #[pyo3(signature = (fastperiod=12, fastmatype=1, slowperiod=26, slowmatype=1, signalperiod=9, signalmatype=1))]
+    fn new(
+        fastperiod: usize,
+        fastmatype: i32,
+        slowperiod: usize,
+        slowmatype: i32,
+        signalperiod: usize,
+        signalmatype: i32,
+    ) -> PyResult<Self> {
+        let fast_type = MaType::try_from(fastmatype).map_err(py_value_error)?;
+        let slow_type = MaType::try_from(slowmatype).map_err(py_value_error)?;
+        let signal_type = MaType::try_from(signalmatype).map_err(py_value_error)?;
+        Ok(Self {
+            inner: MacdExt::new(
+                fastperiod,
+                fast_type,
+                slowperiod,
+                slow_type,
+                signalperiod,
+                signal_type,
+            )
+            .map_err(py_value_error)?,
+        })
+    }
+
+    fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
+        self.inner
+            .append(input)
+            .map(|value| (value.macd, value.signal, value.histogram))
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        input: PyReadonlyArray1<f64>,
+    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+        let mut macd = Vec::with_capacity(input.len()?);
+        let mut signal = Vec::with_capacity(input.len()?);
+        let mut histogram = Vec::with_capacity(input.len()?);
+        for input in input.as_slice()?.iter().copied() {
+            match self.inner.append(input) {
+                Some(value) => {
+                    macd.push(value.macd);
+                    signal.push(value.signal);
+                    histogram.push(value.histogram);
+                }
+                None => {
+                    macd.push(f64::NAN);
+                    signal.push(f64::NAN);
+                    histogram.push(f64::NAN);
+                }
+            }
+        }
+        Ok((
+            to_py_array(py, macd),
+            to_py_array(py, signal),
+            to_py_array(py, histogram),
+        ))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|value| (value.macd, value.signal, value.histogram))
     }
 
     fn reset(&mut self) {

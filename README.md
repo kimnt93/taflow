@@ -101,6 +101,7 @@ from taflow import (
     FastStochasticOscillator,
     IntradayMomentumIndex,
     MovingAverage,
+    MovingAverageConvergenceDivergenceExtended,
     MovingAverageConvergenceDivergenceFixed,
     StochasticOscillator,
     StochasticRelativeStrengthIndex,
@@ -120,6 +121,16 @@ latest_imi = imi.append(next_open, next_close)
 macd_fixed = MovingAverageConvergenceDivergenceFixed(signal_period=9)
 macd_fixed.extend(history)
 macd, signal, histogram = macd_fixed.append(next_close)
+
+macd_extended = MovingAverageConvergenceDivergenceExtended(
+    fast_period=7,
+    fast_average_type=1,
+    slow_period=13,
+    slow_average_type=1,
+    signal_period=5,
+    signal_average_type=1,
+)
+macd, signal, histogram = macd_extended.extend(history)
 
 stochastic = FastStochasticOscillator(
     fast_k_period=5,

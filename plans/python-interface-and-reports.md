@@ -36,6 +36,7 @@ batch API; it must not duplicate numerical implementations.
 | SAREXT | ParabolicSarExtended | `parabolic_sar_extended.py` | stateful |
 | IMI | IntradayMomentumIndex | `intraday_momentum_index.py` | stateful |
 | MACDFIX | MovingAverageConvergenceDivergenceFixed | `moving_average_convergence_divergence_fixed.py` | stateful |
+| MACDEXT | MovingAverageConvergenceDivergenceExtended | `moving_average_convergence_divergence_extended.py` | stateful |
 | STOCHF | FastStochasticOscillator | `fast_stochastic_oscillator.py` | stateful |
 | STOCH | StochasticOscillator | `stochastic_oscillator.py` | stateful |
 | STOCHRSI | StochasticRelativeStrengthIndex | `stochastic_relative_strength_index.py` | stateful |

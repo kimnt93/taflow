@@ -48,6 +48,31 @@ def test_talib_compatibility_namespace_preserves_old_style_functions():
             rtol=1e-8,
             atol=1e-10,
         )
+    for fast_matype in range(9):
+        for slow_matype in range(9):
+            for signal_matype in range(9):
+                assert_outputs_equal(
+                    talib.MACDEXT(
+                        close,
+                        7,
+                        fast_matype,
+                        13,
+                        slow_matype,
+                        5,
+                        signal_matype,
+                    ),
+                    original_talib.MACDEXT(
+                        close,
+                        7,
+                        fast_matype,
+                        13,
+                        slow_matype,
+                        5,
+                        signal_matype,
+                    ),
+                    rtol=1e-8,
+                    atol=1e-10,
+                )
     for slowk_matype in range(9):
         for slowd_matype in range(9):
             assert_outputs_equal(
@@ -203,6 +228,27 @@ def test_descriptive_stochastic_relative_strength_index():
         )
 
 
+def test_descriptive_extended_macd():
+    _, _, close = price_data(700)
+    for fast_matype in range(9):
+        for slow_matype in range(9):
+            for signal_matype in range(9):
+                indicator = taflow.MovingAverageConvergenceDivergenceExtended(
+                    fast_period=7,
+                    fast_average_type=fast_matype,
+                    slow_period=13,
+                    slow_average_type=slow_matype,
+                    signal_period=5,
+                    signal_average_type=signal_matype,
+                )
+                expected = original_talib.MACDEXT(
+                    close, 7, fast_matype, 13, slow_matype, 5, signal_matype
+                )
+                assert_outputs_equal(
+                    indicator.extend(close), expected, rtol=1e-8, atol=1e-10
+                )
+
+
 def test_descriptive_classes_are_defined_in_individual_modules():
     assert taflow.MovingAverage.__module__ == "taflow.moving_average"
     assert taflow.BollingerBands.__module__ == "taflow.bollinger_bands"
@@ -211,6 +257,10 @@ def test_descriptive_classes_are_defined_in_individual_modules():
     assert (
         taflow.MovingAverageConvergenceDivergenceFixed.__module__
         == "taflow.moving_average_convergence_divergence_fixed"
+    )
+    assert (
+        taflow.MovingAverageConvergenceDivergenceExtended.__module__
+        == "taflow.moving_average_convergence_divergence_extended"
     )
     assert taflow.ParabolicSar.__module__ == "taflow.parabolic_sar"
     assert (

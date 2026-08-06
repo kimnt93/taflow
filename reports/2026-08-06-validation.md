@@ -4,7 +4,7 @@
 
 | Component | Value |
 |---|---|
-| Commit baseline | `cfa51e9` plus this iteration's STOCHRSI work |
+| Commit baseline | `372f2e5` plus this iteration's MACDEXT work |
 | OS | Linux 6.18.7, x86_64 |
 | Rust | 1.97.1 |
 | Python | 3.12.3 |
@@ -23,6 +23,7 @@
 | STOCHF | Rust + Python state | rolling extrema plus selectable fast-D MA | 500 per MA type / 1,010,000 benchmark | pass |
 | STOCH | Rust + Python state | rolling extrema plus selectable slow-K/slow-D MAs | 500 per MA pair / 1,010,000 benchmark | pass |
 | STOCHRSI | Rust + Python state | exact RSI pipeline into selectable STOCHF smoothing | 500 per MA type; benchmark deferred | pass |
+| MACDEXT | Rust + Python state | three selectable MAs with shared-largest-lookback alignment | 700 per MA combination; benchmark deferred | pass |
 | AVGDEV | batch Python/Rust | per-window mean absolute deviation | 3,000 values | pass |
 | SMA | Rust + Python state | O(1) rolling sum | 128 state test / 1,010,000 benchmark | pass |
 | EMA | Rust + Python state | SMA seed then EMA recurrence | 128 / 1,010,000 | pass |
@@ -53,14 +54,15 @@
 
 | Command | Result |
 |---|---|
-| `cargo test --workspace` | 89 passed |
-| `python -m pytest tests/test_stateful.py -q` | 215 passed |
+| `cargo test --workspace` | 91 passed |
+| `python -m pytest tests/test_stateful.py -q` | 220 passed (within combined run) |
 | `python -m pytest tests/test_exhaustive.py -q -k 'ACCBANDS or AVGDEV or IMI'` | 3 passed, 246 deselected |
 | `cargo bench -p taflow --bench stream_bench -- --quick` | completed; measurements below |
-| `python -m pytest tests/test_exhaustive.py tests/test_stateful.py tests/test_taflow_interface.py -q` | 473 passed |
+| `python -m pytest tests/test_exhaustive.py tests/test_stateful.py tests/test_taflow_interface.py -q` | 479 passed |
 | `python -m pytest tests/test_full_coverage.py -q` | 620 passed, 310 optional benchmarks skipped |
 | `python -m pytest tests/accuracy -q` | 20,270 passed, 1 skipped |
 | `python -m pytest tests/accuracy -q -k 'RSI or KAMA or STOCH'` | 752 passed, 19,519 deselected after shared numerical updates |
+| `python -m pytest tests/accuracy -q -k 'MACD'` | 388 passed, 19,883 deselected |
 | `python benches/python_benches/benchmark_function_reports.py --repeats 5` | nine functions × five sizes × four available modes |
 
 The exhaustive suite is green after correcting BBANDS' variance-centre rule and
@@ -94,8 +96,8 @@ uppercase batch-compatible surface, while top-level `taflow` exports the
 descriptive state classes. Per-function correctness and benchmark artifacts
 for the updated surface are in `reports/MA.*`, `reports/BBANDS.*`,
 `reports/ACCBANDS.*`, `reports/SAR.*`, `reports/SAREXT.*`, `reports/IMI.*`,
-`reports/MACDFIX.*`, `reports/STOCHF.*`, `reports/STOCH.*`, and
-`reports/STOCHRSI.*`.
+`reports/MACDFIX.*`, `reports/STOCHF.*`, `reports/STOCH.*`,
+`reports/STOCHRSI.*`, and `reports/MACDEXT.*`.
 
 The benchmarked JSON artifacts through STOCH use schema v2 and retain all five wall/CPU
 samples and p50/p95/p99/max summaries for 100, 1K, 10K, 100K, and 1M bars,
@@ -104,7 +106,7 @@ Python append latency. The future multi-indicator Pipeline is explicitly
 reported unavailable; state `extend` is measured separately and is not
 misrepresented as a shared execution plan.
 
-Starting with STOCHRSI, the implementation-first phase records required
+Starting with STOCHRSI and continuing through MACDEXT, the implementation-first phase records required
 benchmark cells as explicitly deferred. This preserves the aggregation schema
 while function/state/Python coverage is completed before the next benchmark
 pass.

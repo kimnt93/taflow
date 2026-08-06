@@ -628,6 +628,57 @@ def test_rsi_and_kama_edge_conventions_match_oracle():
     np.testing.assert_array_equal(state.KAMA(1).extend(close), original_talib.KAMA(close, 1))
 
 
+def test_macdext_matches_oracle_for_every_ma_combination():
+    close = close_data(700)
+    for fast_matype in range(9):
+        for slow_matype in range(9):
+            for signal_matype in range(9):
+                expected = original_talib.MACDEXT(
+                    close, 7, fast_matype, 13, slow_matype, 5, signal_matype
+                )
+                actual = state.MACDEXT(
+                    7, fast_matype, 13, slow_matype, 5, signal_matype
+                ).extend(close)
+                for ours, theirs in zip(actual, expected):
+                    np.testing.assert_allclose(
+                        ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+                    )
+
+
+@pytest.mark.parametrize(
+    ("fast_matype", "slow_matype", "signal_matype"),
+    [(1, 1, 1), (0, 8, 7), (6, 4, 3), (7, 6, 8)],
+)
+def test_macdext_chunk_continuation_and_reset(
+    fast_matype, slow_matype, signal_matype
+):
+    close = close_data(700)
+    expected = original_talib.MACDEXT(
+        close, 7, fast_matype, 13, slow_matype, 5, signal_matype
+    )
+    indicator = state.MACDEXT(
+        7, fast_matype, 13, slow_matype, 5, signal_matype
+    )
+    first = indicator.extend(close[:50])
+    remaining = indicator.extend(close[50:])
+    actual = tuple(np.concatenate(parts) for parts in zip(first, remaining))
+    for ours, theirs in zip(actual, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+    indicator.reset()
+    replayed = [indicator.append(input) for input in close]
+    replayed = [
+        (np.nan, np.nan, np.nan) if value is None else value for value in replayed
+    ]
+    replayed = tuple(np.asarray(values) for values in zip(*replayed))
+    for ours, theirs in zip(replayed, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+
 def test_stochastic_states_reject_unequal_input_lengths():
     with pytest.raises(ValueError):
         state.STOCH(5, 13, 0, 11, 0).extend(
@@ -688,3 +739,15 @@ def test_invalid_parameters_are_rejected():
         state.STOCHRSI(14, 5, 0, 0)
     with pytest.raises(ValueError):
         state.STOCHRSI(14, 5, 3, 9)
+    with pytest.raises(ValueError):
+        state.MACDEXT(1, 1, 26, 1, 9, 1)
+    with pytest.raises(ValueError):
+        state.MACDEXT(12, 1, 1, 1, 9, 1)
+    with pytest.raises(ValueError):
+        state.MACDEXT(12, 1, 26, 1, 0, 1)
+    with pytest.raises(ValueError):
+        state.MACDEXT(12, 9, 26, 1, 9, 1)
+    with pytest.raises(ValueError):
+        state.MACDEXT(12, 1, 26, 9, 9, 1)
+    with pytest.raises(ValueError):
+        state.MACDEXT(12, 1, 26, 1, 9, 9)

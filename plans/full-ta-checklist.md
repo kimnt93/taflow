@@ -8,7 +8,7 @@ merely because the legacy batch function exists.
 
 The completed stateful surface is tracked function-by-function below, including
 the price transforms, math transforms, and pointwise arithmetic operators.
-`MACDEXT` still needs distinct state semantics and therefore remains open.
+`MACDEXT` now has distinct aligned moving-average state semantics.
 
 ## Overlap Studies
 
@@ -36,7 +36,7 @@ the price transforms, math transforms, and pointwise arithmetic operators.
 - [x] IMI
 - [x] RSI
 - [x] MACD
-- [ ] MACDEXT
+- [x] MACDEXT
 - [x] MACDFIX
 - [x] STOCH
 - [x] STOCHF

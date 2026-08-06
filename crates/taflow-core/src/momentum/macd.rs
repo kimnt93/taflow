@@ -1,20 +1,11 @@
-use crate::error::{TaError, TaResult};
-use crate::ma_type::{compute_ma, MaType};
+//! Batch Moving Average Convergence/Divergence.
+//!
+//! MACD aligns the fast EMA seed to the slow EMA seed window before applying
+//! the signal EMA, matching TA-Lib's dedicated MACD seeding convention.
 
-/// MACD (Moving Average Convergence/Divergence)
-///
-/// 返回 (macd_line, signal_line, histogram)
-/// macd_line = EMA(fast) - EMA(slow)
-/// signal = EMA(macd_line, signalperiod)
-/// histogram = macd_line - signal
-///
-/// C TA-Lib 兼容：MACD 内部的 fast/slow EMA 与独立 EMA 不同。
-/// - slow EMA seed = SMA(close[0..slowperiod])
-/// - fast EMA seed = SMA(close[slowperiod-fastperiod..slowperiod])
-/// - 两条 EMA 从 bar slowperiod 开始递推
-/// - MACD line 第一个值 (bar slowperiod-1) = fast_seed - slow_seed
-///
-/// lookback = slowperiod - 1 + signalperiod - 1
+use crate::error::{TaError, TaResult};
+
+/// Computes aligned MACD, signal, and histogram arrays.
 pub fn macd(
     input: &[f64],
     fastperiod: usize,
@@ -93,87 +84,6 @@ pub fn macd(
         macd_line[bar] = macd_values[i];
         signal_line[bar] = signal_ema;
         histogram[bar] = macd_values[i] - signal_ema;
-    }
-
-    Ok((macd_line, signal_line, histogram))
-}
-
-/// MACD with controllable MA Type
-///
-/// Fast path for all-EMA: inline single-pass (eliminates 5 Vec allocations).
-/// Generic path seeds every MA at the shared largest lookback, matching
-/// TA-Lib's `TA_MA(startIdx, ...)` calls inside MACDEXT.
-fn ma_from_aligned_start(
-    input: &[f64],
-    start: usize,
-    period: usize,
-    ma_type: MaType,
-) -> TaResult<Vec<f64>> {
-    let lookback = ma_type.lookback(period);
-    let source_start = start - lookback;
-    let values = compute_ma(&input[source_start..], period, ma_type)?;
-    Ok(values[lookback..].to_vec())
-}
-
-pub fn macd_ext(
-    input: &[f64],
-    fastperiod: usize,
-    fastmatype: MaType,
-    slowperiod: usize,
-    slowmatype: MaType,
-    signalperiod: usize,
-    signalmatype: MaType,
-) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
-    if fastperiod < 2 || slowperiod < 2 || signalperiod == 0 {
-        return Err(TaError::InvalidParameter {
-            name: "fastperiod/slowperiod/signalperiod",
-            value: format!("{fastperiod}/{slowperiod}/{signalperiod}"),
-            reason: "fastperiod >= 2, slowperiod >= 2, signalperiod >= 1",
-        });
-    }
-    let (fp, fmt, sp, smt) = if fastperiod < slowperiod {
-        (fastperiod, fastmatype, slowperiod, slowmatype)
-    } else {
-        (slowperiod, slowmatype, fastperiod, fastmatype)
-    };
-
-    // C TA-Lib MACDEXT(all-EMA) produces identical results to MACD —
-    // it uses MACD-style aligned seeding, not independent EMA seeding.
-    // Delegate to macd() which already has correct aligned seeding.
-    if fastmatype == MaType::Ema && slowmatype == MaType::Ema && signalmatype == MaType::Ema {
-        return macd(input, fastperiod, slowperiod, signalperiod);
-    }
-
-    let len = input.len();
-    let largest_lookback = fmt.lookback(fp).max(smt.lookback(sp));
-    let signal_lookback = signalmatype.lookback(signalperiod);
-    let total_lookback = largest_lookback + signal_lookback;
-    if len <= total_lookback {
-        return Err(TaError::InsufficientData {
-            need: total_lookback + 1,
-            got: len,
-        });
-    }
-
-    let fast_ma = ma_from_aligned_start(input, largest_lookback, fp, fmt)?;
-    let slow_ma = ma_from_aligned_start(input, largest_lookback, sp, smt)?;
-    let macd_valid: Vec<f64> = fast_ma
-        .iter()
-        .zip(slow_ma.iter())
-        .map(|(f, s)| f - s)
-        .collect();
-
-    let signal_ma = compute_ma(&macd_valid, signalperiod, signalmatype)?;
-
-    let mut macd_line = vec![f64::NAN; len];
-    let mut signal_line = vec![f64::NAN; len];
-    let mut histogram = vec![f64::NAN; len];
-
-    for j in signal_lookback..signal_ma.len() {
-        let orig = largest_lookback + j;
-        macd_line[orig] = macd_valid[j];
-        signal_line[orig] = signal_ma[j];
-        histogram[orig] = macd_valid[j] - signal_ma[j];
     }
 
     Ok((macd_line, signal_line, histogram))
