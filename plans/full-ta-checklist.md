@@ -200,7 +200,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLSHORTLINE
 - [ ] CDLSPINNINGTOP
 - [ ] CDLSTALLEDPATTERN
-- [ ] CDLSTICKSANDWICH
+- [x] CDLSTICKSANDWICH
 - [ ] CDLTAKURI
 - [ ] CDLTASUKIGAP
 - [ ] CDLTHRUSTING

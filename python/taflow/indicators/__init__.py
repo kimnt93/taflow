@@ -18,6 +18,7 @@ from ..minus_directional_movement import MINUS_DM, MinusDirectionalMovement
 from ..plus_directional_indicator import PLUS_DI, PlusDirectionalIndicator
 from ..plus_directional_movement import PLUS_DM, PlusDirectionalMovement
 from ..triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
+from ..stick_sandwich import CDLSTICKSANDWICH, StickSandwich
 from ..three_black_crows import CDL3BLACKCROWS, ThreeBlackCrows
 from ..three_inside import CDL3INSIDE, ThreeInside
 from ..three_line_strike import CDL3LINESTRIKE, ThreeLineStrike
@@ -47,5 +48,6 @@ __all__ = [
     "ThreeInside", "CDL3INSIDE",
     "ThreeLineStrike", "CDL3LINESTRIKE",
     "ThreeOutside", "CDL3OUTSIDE",
+    "StickSandwich", "CDLSTICKSANDWICH",
     "TwoCrows", "CDL2CROWS",
 ]

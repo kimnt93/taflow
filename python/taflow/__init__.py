@@ -39,6 +39,7 @@ from .plus_directional_indicator import PLUS_DI, PlusDirectionalIndicator
 from .plus_directional_movement import PLUS_DM, PlusDirectionalMovement
 from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
+from .stick_sandwich import CDLSTICKSANDWICH, StickSandwich
 from .triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
 from .three_black_crows import CDL3BLACKCROWS, ThreeBlackCrows
 from .three_inside import CDL3INSIDE, ThreeInside
@@ -83,6 +84,8 @@ __all__ = [
     "HT_TRENDMODE",
     "StochasticOscillator",
     "StochasticRelativeStrengthIndex",
+    "StickSandwich",
+    "CDLSTICKSANDWICH",
     "TripleExponentialRateOfChange",
     "TRIX",
     "ThreeBlackCrows",
