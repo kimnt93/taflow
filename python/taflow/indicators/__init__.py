@@ -20,6 +20,7 @@ from ..plus_directional_movement import PLUS_DM, PlusDirectionalMovement
 from ..triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
 from ..three_black_crows import CDL3BLACKCROWS, ThreeBlackCrows
 from ..three_inside import CDL3INSIDE, ThreeInside
+from ..three_line_strike import CDL3LINESTRIKE, ThreeLineStrike
 from ..three_outside import CDL3OUTSIDE, ThreeOutside
 from ..two_crows import CDL2CROWS, TwoCrows
 from ..ultimate_oscillator import ULTOSC, UltimateOscillator
@@ -44,6 +45,7 @@ __all__ = [
     "UpDownSideGapThreeMethods", "CDLXSIDEGAP3METHODS",
     "ThreeBlackCrows", "CDL3BLACKCROWS",
     "ThreeInside", "CDL3INSIDE",
+    "ThreeLineStrike", "CDL3LINESTRIKE",
     "ThreeOutside", "CDL3OUTSIDE",
     "TwoCrows", "CDL2CROWS",
 ]
