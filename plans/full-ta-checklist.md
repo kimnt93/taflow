@@ -1,19 +1,22 @@
-# Full TA stateful-extension checklist
+# Full unified TA-Lib checklist
 
-This is the authoritative TA-Lib implementation checklist. A checked item
-means its batch implementation, Rust state, Python compatibility mapping, and
-descriptive Python interface exist with implementation-level parity tests.
-Benchmarking and generated reports are a later phase and do not block this
-implementation checklist. A `B✓` annotation records a separately verified
-batch function. Do not check an item merely because the inherited batch
-function exists.
+This is the authoritative inventory for the unified TAFlow indicator API. The
+existing check marks are inherited core-state progress and must not be treated
+as completion of the new public surface. During the migration, every item is
+pending until it has its persistent Rust state, optimized
+bulk-initialization/extend path, scalar continuation, Python class,
+descriptive public name, and uppercase TA-Lib alias. The former separate batch
+compatibility implementation is not a completion criterion: `taflow.talib`
+will forward to this same stateful surface.
 
-The completed stateful surface is tracked function-by-function below, including
-the price transforms, math transforms, and pointwise arithmetic operators.
-`MACDEXT` now has distinct aligned moving-average state semantics.
+Complete the whole inventory before the exhaustive external TA-Lib comparison,
+benchmark, and per-function report pass. During implementation, use focused
+lifecycle tests (construction, `append`, `extend`, `compute`, and `reset`) but
+do not delay a checklist item for its final oracle report. A check must never
+mean merely that an old batch function exists.
 
-The additional non-TA-Lib functions from the shared design discussion are
-tracked in [`operator-library-checklist.md`](operator-library-checklist.md).
+This delivery is intentionally limited to TA-Lib. The separate operator
+checklist is deferred and is not linked to this implementation gate.
 
 ## Overlap Studies
 

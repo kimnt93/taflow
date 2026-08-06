@@ -1,10 +1,9 @@
 # TAFlow operator-library checklist
 
-This is the post-TA-Lib extension inventory derived from the shared design
-discussion. It is deliberately separate from `full-ta-checklist.md`: classic
-TA-Lib compatibility is implemented first. During the current phase, a check
-means Rust/Python implementation and tests exist; benchmarks and reports are a
-later pass.
+This is a deferred, post-TA-Lib inventory derived from the shared design
+discussion. It is outside the current unified realtime TA-Lib delivery and
+must not block it. Its entries are retained for future consideration only;
+benchmarks and reports are a later pass.
 
 ## Core series operations
 
@@ -92,13 +91,6 @@ later pass.
 - [ ] rolling_entropy / rolling_autocorr
 - [ ] hurst / fractal_dimension
 - [ ] rolling_alpha / rolling_information_ratio / rolling_ic
-
-## Factor library
-
-- [ ] Alpha101
-- [ ] Alpha158
-- [ ] licensed WorldQuant-style operators
-- [ ] academic quantitative factors
 
 ## Execution and adapters
 

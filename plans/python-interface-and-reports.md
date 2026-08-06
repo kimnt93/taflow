@@ -1,131 +1,111 @@
-# Python interface and per-function report plan
+# Unified Python indicator API and deferred validation plan
 
-## Public namespaces
+## Decision
 
-TAFlow exposes two deliberate Python surfaces:
+TAFlow has one public indicator model: a persistent, extendable indicator
+object.  It replaces the former split between a TA-Lib-style batch namespace
+and separately named streaming wrappers.
 
-1. `taflow.talib` is the compatibility namespace. It preserves TA-Lib's
-   uppercase function names, argument names, NumPy array inputs, aligned `NaN`
-   warm-up, and tuple-of-array outputs.
-2. `taflow` is the descriptive stateful namespace. It exposes CamelCase types
-   such as `MovingAverage`, `BollingerBands`, and `ParabolicSar` with
-   `append`, `extend`, `value`, and `reset`.
+`taflow.indicators` is the canonical namespace.  `taflow.talib` is a
+compatibility alias that exports the *same classes*, not a second functional
+implementation.  There must be one Rust state machine and one Python adapter
+per TA-Lib indicator. Non-TA operator work is not part of this delivery.
 
-The installed distribution and native extension are `taflow` and
-`taflow._native`; new implementation code must not depend on the former
-package name.
+The canonical descriptive names are explicit and readable, for example
+`ExponentialMovingAverage`, `RelativeStrengthIndex`, and
+`AverageTrueRange`.  TA-Lib uppercase names such as `EMA`, `RSI`, and `ATR`
+are aliases to those same classes in both namespaces.  `Ema`, `StatefulEma`,
+and the current one-file-per-descriptive-wrapper surface are transitional
+names and will not be extended.
 
-## Python source-layout rule
+```python
+from taflow import ExponentialMovingAverage
 
-Every descriptive public indicator belongs in one file under `python/taflow/`.
-The file name is snake_case and the public type is imported explicitly by
-`python/taflow/__init__.py`. Implementation details do not belong in either
-package `__init__.py`.
+ema = ExponentialMovingAverage(series_numpy_or_list_or_polars_or_df, timeperiod=20)
+values = ema.compute()                    # full, aligned NumPy result
 
-The compatibility namespace is a thin re-export layer over the verified native
-batch API; it must not duplicate numerical implementations.
+ema.append(next_value)                    # persistent O(1) state update
+# or: ema.extend(next_series)
+updated_values = ema.compute()            # no numerical replay of old bars
+latest = ema.value                         # latest value without materializing history
+```
 
-## Naming and behavior
+`compute()` returns the complete output accumulated by that object, with NaN
+in the TA-Lib warm-up positions.  It does not recalculate already processed
+bars.  Returning a full NumPy result is necessarily O(n) to expose n values;
+the calculation for each newly appended scalar is O(1) where the indicator
+has a constant-space recurrence.  `value` is the realtime O(1) latest-value
+path.  Multi-output indicators return a tuple of aligned NumPy arrays from
+`compute()` and a tuple of latest optional scalars from `value`.
 
-| TA-Lib name | Descriptive name | Python file | Mode |
-|---|---|---|---|
-| MA | MovingAverage | `moving_average.py` | stateful |
-| BBANDS | BollingerBands | `bollinger_bands.py` | stateful |
-| ACCBANDS | AccelerationBands | `acceleration_bands.py` | stateful |
-| SAR | ParabolicSar | `parabolic_sar.py` | stateful |
-| SAREXT | ParabolicSarExtended | `parabolic_sar_extended.py` | stateful |
-| IMI | IntradayMomentumIndex | `intraday_momentum_index.py` | stateful |
-| MACDFIX | MovingAverageConvergenceDivergenceFixed | `moving_average_convergence_divergence_fixed.py` | stateful |
-| MACDEXT | MovingAverageConvergenceDivergenceExtended | `moving_average_convergence_divergence_extended.py` | stateful |
-| MAVP | VariablePeriodMovingAverage | `variable_period_moving_average.py` | stateful |
-| HT_TRENDLINE | HilbertTransformTrendline | `hilbert_transform_trendline.py` | stateful |
-| ADX | AverageDirectionalIndex | `average_directional_index.py` | stateful |
-| ADXR | AverageDirectionalIndexRating | `average_directional_index_rating.py` | stateful |
-| DX | DirectionalMovementIndex | `directional_movement_index.py` | stateful |
-| STOCHF | FastStochasticOscillator | `fast_stochastic_oscillator.py` | stateful |
-| STOCH | StochasticOscillator | `stochastic_oscillator.py` | stateful |
-| STOCHRSI | StochasticRelativeStrengthIndex | `stochastic_relative_strength_index.py` | stateful |
+## Inputs and lifecycle
 
-Each descriptive wrapper uses composition around the PyO3 state class. This
-gives stable public names without subclassing extension types and keeps all
-numerical work in the Rust implementation.
+- Constructors accept initial data plus the indicator's TA-Lib parameters;
+  initial data is optional, so `ExponentialMovingAverage(timeperiod=20)` is a
+  valid empty realtime state.
+- `append(...)` accepts one scalar per required input stream and mutates the
+  object. `extend(...)` accepts the same supported collection types as the
+  constructor and processes only the supplied new bars.
+- NumPy one-dimensional float64 input is read without a copy when contiguous.
+  Python lists, Polars `Series`, and supported one-column dataframe selections
+  normalize to float64 once at the API boundary.
+- For OHLCV indicators, callers may provide positional series
+  (`AverageTrueRange(high, low, close, timeperiod=14)`) or a dataframe plus
+  explicit column names.  The public API never guesses columns silently;
+  standard names are defaults and ambiguous/missing columns raise `ValueError`.
+- `reset()` clears state and accumulated outputs. Input length mismatches,
+  invalid periods, and non-numeric input fail before any partial mutation.
 
-## Required implementation tests per function
+The public output contract is NumPy float64 arrays and tuples of those arrays,
+regardless of whether the source was list, NumPy, Polars, or dataframe. This
+keeps numerical behavior and downstream interoperability consistent.  Native
+Polars output and broader dataframe ergonomics are explicitly postponed.
 
-- compatibility output from `taflow.talib` versus original TA-Lib;
-- descriptive `extend` output versus the same oracle;
-- scalar `append` and reset/replay parity;
-- exact warm-up placement and multi-output ordering;
-- invalid parameters and unequal input lengths where applicable;
-- Rust batch/state parity.
+## Implementation rules
 
-Benchmark and report generation is deferred until every TA-Lib function and
-public mapping is implemented. During the implementation phase, do not create
-new per-function report artifacts or block a checklist item on benchmark data.
+1. Each TA-Lib function has one persistent Rust state type under
+   `crates/taflow-core/src/stream/`. It supports construction, scalar append,
+   chunked extend, current value, reset, and a bulk-initialization path.
+2. The Python extension owns the output cache and exposes the unified class;
+   no Python numerical loops and no duplicate batch wrapper are permitted.
+3. Empty-state `extend` may use the optimized bulk path. Once history exists,
+   `append` and `extend` continue the exact same state without replaying prior
+   input.
+4. TA-Lib aliases are generated from metadata, so names, defaults, input
+   arity, output ordering, and warm-up rules cannot drift between namespaces.
+5. Only TA-Lib inventory items are in the current implementation plan. The
+   separate `operator-library-checklist.md` is deferred and is not a release
+   gate.
 
-## Per-function reporting contract
+## Implementation-first order
 
-Every completed or updated function owns two files in `reports/`:
+Do not pause the implementation for per-function TA-Lib comparison reports.
+Build every TA-Lib indicator first, then run a single exhaustive comparison and
+benchmark pass across the completed surface.
 
-- `<FUNCTION>.md`: algorithm summary, correctness evidence, stream behavior,
-  benchmark method, speed, series sizes, and limitations;
-- `<FUNCTION>.json`: machine-readable numerical results using the schema below.
+1. Establish the shared state, output-cache, input-normalization, metadata,
+   and alias-generation infrastructure with EMA as the reference class.
+2. Migrate all overlap, price-transform, math-transform, math-operator, and
+   statistic functions.
+3. Implement all momentum, volatility, and volume functions, including each
+   multi-input and multi-output state.
+4. Implement the Hilbert/cycle and candlestick-pattern families with bounded
+   per-bar state.
+5. Export every descriptive class and uppercase TA-Lib alias from
+   `taflow.indicators`, then make `taflow.talib` a forwarding alias.
+6. Only after every item is implemented: execute exhaustive TA-Lib oracle
+   comparisons, batch/stream parity, real-data alignment, and benchmarks.
 
-The benchmark schema is append-only so a later aggregator can combine every
-function without parsing Markdown. Required top-level fields are
-`schema_version`, `function`, `date`, `environment`, `correctness`,
-`benchmark_protocol`, `benchmark_matrix`, and `rust_stream_benchmark`.
-Every numerical result records its unit; unavailable modes use `available:
-false` plus a reason and never a fabricated zero.
+## Final validation and benchmark pass
 
-For each size, a mode records repeated end-to-end call latency (`min`, `mean`,
-`p50`, `p95`, `p99`, and `max` milliseconds), CPU time, throughput in bars per
-second, and peak resident-memory delta. Input-array allocation and deterministic
-data generation happen before measurement. The raw repeated samples are kept in
-JSON so aggregate reports can recompute percentiles.
+The final pass is deliberately global rather than an implementation blocker.
+It must cover random, constant, NaN/Inf-policy, minimum-period, chunked
+`extend`, reset/replay, and backfill-then-append cases for every function.
+Compare all outputs and exact warm-up placement with the original TA-Lib
+package where it defines the function.
 
-## Reproducible benchmark matrix
-
-Use deterministic float64 inputs and the sizes `100`, `1_000`, `10_000`,
-`100_000`, and `1_000_000`; additionally run `10_000_000` in the dedicated
-scaling job rather than making it a per-commit gate. Run every timed scenario
-at least five times after one untimed process warm-up.
-
-| Mode | Definition | Per-function availability |
-|---|---|---|
-| TA-Lib | original `talib` batch call | required |
-| TAFlow | `taflow.talib` batch call | required |
-| TAFlow state extend | one descriptive-state `extend` call | required for checked states |
-| TAFlow streaming | 10,000-bar backfill, then scalar `append` updates | required for checked states |
-| TAFlow Pipeline | type-erased multi-indicator Rust execution plan | unavailable until pipeline phase |
-
-`extend` is a state backfill and must not be mislabeled as the future Pipeline.
-The Pipeline row remains explicitly unavailable until it performs a shared
-execution plan in Rust. Once implemented, benchmark 1, 20, 50, and 100
-indicators over the same sizes, plus 1, 10, and 100 symbols.
-
-For live-update latency, collect per-append samples independently from the
-throughput loop and report mean/p50/p95/p99/max. Also maintain the continuous
-backfill comparison: begin with 10,000 history bars, append new bars, and
-compare TA-Lib full-history recomputation with persistent TAFlow state. Cap
-that quadratic oracle case separately and record the cap.
-
-Correctness gates cover random, constant, NaN/Inf policy, warm-up alignment,
-float64, chunked `extend`, and backfill-then-append continuation. Float32 input
-behavior is recorded as conversion/API compatibility because the numerical
-engine intentionally computes float64.
-
-Implementation checklist items are checked after both Python interfaces,
-native parity, and oracle parity exist. Report and benchmark completeness is
-tracked separately in the later reporting phase.
-
-## Migration order
-
-1. Establish the package and report contract with MA, BBANDS, ACCBANDS, SAR,
-   and SAREXT.
-2. Add one descriptive Python file whenever an existing checked state is next
-   touched.
-3. Backfill the remaining checked states family-by-family.
-4. Complete the unchecked TA-Lib states, then the operator-library extensions.
-5. After implementation coverage is complete, generate benchmarks and report
-   pairs for every function in a dedicated pass.
+Benchmark initial bulk `compute`, backfill via `extend`, and realtime scalar
+`append` independently at 1K, 10K, 100K, and 1M bars.  Record Python-to-Rust
+and Rust-only append latency separately.  Per-function reports and generated
+benchmark JSON are produced only after the entire TA-Lib surface passes this
+final validation.
