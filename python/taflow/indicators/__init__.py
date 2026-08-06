@@ -5,6 +5,7 @@ from ..exponential_moving_average import EMA, ExponentialMovingAverage
 from ..hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
 from ..hilbert_transform_dominant_cycle_phase import HT_DCPHASE, HilbertTransformDominantCyclePhase
 from ..hilbert_transform_phasor import HT_PHASOR, HilbertTransformPhasor
+from ..hilbert_transform_sine_wave import HT_SINE, HilbertTransformSineWave
 from ..money_flow_index import MFI, MoneyFlowIndex
 from ..minus_directional_indicator import MINUS_DI, MinusDirectionalIndicator
 from ..minus_directional_movement import MINUS_DM, MinusDirectionalMovement
@@ -18,6 +19,7 @@ __all__ = [
     "HilbertTransformDominantCyclePeriod", "HT_DCPERIOD",
     "HilbertTransformDominantCyclePhase", "HT_DCPHASE",
     "HilbertTransformPhasor", "HT_PHASOR",
+    "HilbertTransformSineWave", "HT_SINE",
     "MoneyFlowIndex", "MFI", "MinusDirectionalIndicator", "MINUS_DI",
     "MinusDirectionalMovement", "MINUS_DM", "PlusDirectionalIndicator", "PLUS_DI",
     "PlusDirectionalMovement", "PLUS_DM", "TripleExponentialRateOfChange", "TRIX",

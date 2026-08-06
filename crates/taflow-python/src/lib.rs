@@ -21,6 +21,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::HilbertTransformDominantCyclePeriod>()?;
     m.add_class::<indicators::HilbertTransformDominantCyclePhase>()?;
     m.add_class::<indicators::HilbertTransformPhasor>()?;
+    m.add_class::<indicators::HilbertTransformSineWave>()?;
     m.add_class::<indicators::CommodityChannelIndex>()?;
     m.add_class::<indicators::MoneyFlowIndex>()?;
     m.add_class::<indicators::PlusDirectionalIndicator>()?;
