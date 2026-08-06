@@ -69,7 +69,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [x] ULTOSC
 - [x] DX
 - [x] PLUS_DI
-- [ ] MINUS_DI
+- [x] MINUS_DI
 - [ ] PLUS_DM
 - [ ] MINUS_DM
 
