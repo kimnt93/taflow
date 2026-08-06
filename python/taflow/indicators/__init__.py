@@ -22,6 +22,7 @@ from ..stick_sandwich import CDLSTICKSANDWICH, StickSandwich
 from ..three_black_crows import CDL3BLACKCROWS, ThreeBlackCrows
 from ..three_inside import CDL3INSIDE, ThreeInside
 from ..three_line_strike import CDL3LINESTRIKE, ThreeLineStrike
+from ..three_stars_in_south import CDL3STARSINSOUTH, ThreeStarsInSouth
 from ..three_outside import CDL3OUTSIDE, ThreeOutside
 from ..two_crows import CDL2CROWS, TwoCrows
 from ..ultimate_oscillator import ULTOSC, UltimateOscillator
@@ -47,6 +48,7 @@ __all__ = [
     "ThreeBlackCrows", "CDL3BLACKCROWS",
     "ThreeInside", "CDL3INSIDE",
     "ThreeLineStrike", "CDL3LINESTRIKE",
+    "ThreeStarsInSouth", "CDL3STARSINSOUTH",
     "ThreeOutside", "CDL3OUTSIDE",
     "StickSandwich", "CDLSTICKSANDWICH",
     "TwoCrows", "CDL2CROWS",

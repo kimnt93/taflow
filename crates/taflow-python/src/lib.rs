@@ -29,6 +29,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::ThreeBlackCrows>()?;
     m.add_class::<indicators::ThreeInside>()?;
     m.add_class::<indicators::ThreeLineStrike>()?;
+    m.add_class::<indicators::ThreeStarsInSouth>()?;
     m.add_class::<indicators::ThreeOutside>()?;
     m.add_class::<indicators::HilbertTransformDominantCyclePeriod>()?;
     m.add_class::<indicators::HilbertTransformDominantCyclePhase>()?;

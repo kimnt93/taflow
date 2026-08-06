@@ -155,7 +155,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [x] CDL3INSIDE
 - [x] CDL3LINESTRIKE
 - [x] CDL3OUTSIDE
-- [ ] CDL3STARSINSOUTH
+- [x] CDL3STARSINSOUTH
 - [ ] CDL3WHITESOLDIERS
 - [ ] CDLABANDONEDBABY
 - [ ] CDLADVANCEBLOCK
