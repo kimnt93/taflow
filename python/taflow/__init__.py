@@ -9,6 +9,7 @@ from .average_directional_index_rating import AverageDirectionalIndexRating
 from .bollinger_bands import BollingerBands
 from .commodity_channel_index import CCI, CommodityChannelIndex
 from .directional_movement_index import DirectionalMovementIndex
+from .doji import CDLDOJI, Doji
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
@@ -76,6 +77,8 @@ __all__ = [
     "AverageDirectionalIndex",
     "AverageDirectionalIndexRating",
     "DirectionalMovementIndex",
+    "Doji",
+    "CDLDOJI",
     "ExponentialMovingAverage",
     "EMA",
     "ParabolicSar",

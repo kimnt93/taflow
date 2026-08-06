@@ -1,6 +1,7 @@
 //! Unified Python indicator objects.
 
 mod commodity_channel_index;
+mod doji;
 mod exponential_moving_average;
 mod hilbert_transform_dominant_cycle_period;
 mod hilbert_transform_dominant_cycle_phase;
@@ -16,6 +17,7 @@ mod triple_exponential_rate_of_change;
 mod ultimate_oscillator;
 
 pub use commodity_channel_index::CommodityChannelIndex;
+pub use doji::Doji;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use hilbert_transform_dominant_cycle_period::HilbertTransformDominantCyclePeriod;
 pub use hilbert_transform_dominant_cycle_phase::HilbertTransformDominantCyclePhase;
