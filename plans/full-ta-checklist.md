@@ -141,7 +141,7 @@ checklist is deferred and is not linked to this implementation gate.
 
 - [x] HT_DCPERIOD
 - [ ] HT_DCPHASE
-- [ ] HT_PHASOR
+- [x] HT_PHASOR
 - [ ] HT_SINE
 - [ ] HT_TRENDMODE
 

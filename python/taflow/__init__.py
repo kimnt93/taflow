@@ -13,6 +13,7 @@ from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
 from .hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
+from .hilbert_transform_phasor import HT_PHASOR, HilbertTransformPhasor
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
 from .minus_directional_indicator import MINUS_DI, MinusDirectionalIndicator
@@ -52,6 +53,8 @@ __all__ = [
     "HilbertTransformTrendline",
     "HilbertTransformDominantCyclePeriod",
     "HT_DCPERIOD",
+    "HilbertTransformPhasor",
+    "HT_PHASOR",
     "StochasticOscillator",
     "StochasticRelativeStrengthIndex",
     "TripleExponentialRateOfChange",
