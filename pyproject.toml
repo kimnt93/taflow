@@ -1,0 +1,23 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "taflow"
+version = "0.1.2"
+description = "Rust-powered batch and streaming technical analysis library"
+requires-python = ">=3.9"
+license = { text = "BSD-3-Clause" }
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = ["numpy>=1.20"]
+
+[tool.maturin]
+manifest-path = "crates/taflow-python/Cargo.toml"
+python-source = "python"
+module-name = "taflow._native"
+features = ["pyo3/extension-module"]

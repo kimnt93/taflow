@@ -1,0 +1,31 @@
+[package]
+name = "taflow"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Rust core for TAFlow batch and streaming technical analysis"
+repository.workspace = true
+readme = "../../README.md"
+keywords = ["technical-analysis", "finance", "trading", "ta-lib"]
+categories = ["science", "mathematics"]
+
+[dependencies]
+thiserror.workspace = true
+num-traits.workspace = true
+wide = { version = "0.7", optional = true }
+
+[features]
+default = ["simd"]
+simd = ["wide"]
+
+[dev-dependencies]
+approx = "0.5"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "simd_bench"
+harness = false
+
+[[bench]]
+name = "stream_bench"
+harness = false

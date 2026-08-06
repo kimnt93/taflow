@@ -1,0 +1,16 @@
+[package]
+name = "taflow-python"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Python bindings for TAFlow"
+publish = false
+
+[lib]
+name = "_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+taflow = { path = "../taflow-core" }
+pyo3 = { version = "0.23", features = ["extension-module"] }
+numpy = "0.23"
