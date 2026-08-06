@@ -165,7 +165,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLCONCEALBABYSWALL
 - [ ] CDLCOUNTERATTACK
 - [ ] CDLDARKCLOUDCOVER
-- [ ] CDLDOJISTAR
+- [x] CDLDOJISTAR
 - [x] CDLDRAGONFLYDOJI
 - [ ] CDLEVENINGDOJISTAR
 - [ ] CDLEVENINGSTAR

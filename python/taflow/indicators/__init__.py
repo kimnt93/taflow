@@ -13,6 +13,7 @@ from ..gravestone_doji import CDLGRAVESTONEDOJI, GravestoneDoji
 from ..short_line import CDLSHORTLINE, ShortLine
 from ..spinning_top import CDLSPINNINGTOP, SpinningTop
 from ..long_line import CDLLONGLINE, LongLine
+from ..doji_star import CDLDOJISTAR, DojiStar
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
@@ -53,6 +54,7 @@ __all__ = [
     "ShortLine", "CDLSHORTLINE",
     "SpinningTop", "CDLSPINNINGTOP",
     "LongLine", "CDLLONGLINE",
+    "DojiStar", "CDLDOJISTAR",
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",
