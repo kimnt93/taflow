@@ -65,7 +65,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [x] AROON
 - [x] AROONOSC
 - [x] MFI
-- [ ] TRIX
+- [x] TRIX
 - [ ] ULTOSC
 - [x] DX
 - [ ] PLUS_DI

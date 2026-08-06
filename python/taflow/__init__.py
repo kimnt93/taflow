@@ -25,6 +25,7 @@ from .parabolic_sar import ParabolicSar
 from .parabolic_sar_extended import ParabolicSarExtended
 from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
+from .triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
 from .variable_period_moving_average import VariablePeriodMovingAverage
 
 __all__ = [
@@ -41,6 +42,8 @@ __all__ = [
     "HilbertTransformTrendline",
     "StochasticOscillator",
     "StochasticRelativeStrengthIndex",
+    "TripleExponentialRateOfChange",
+    "TRIX",
     "VariablePeriodMovingAverage",
     "IntradayMomentumIndex",
     "AccelerationBands",
