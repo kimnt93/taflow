@@ -39,6 +39,7 @@ from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
 from .triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
 from .three_black_crows import CDL3BLACKCROWS, ThreeBlackCrows
+from .three_inside import CDL3INSIDE, ThreeInside
 from .two_crows import CDL2CROWS, TwoCrows
 from .ultimate_oscillator import ULTOSC, UltimateOscillator
 from .variable_period_moving_average import VariablePeriodMovingAverage
@@ -77,6 +78,8 @@ __all__ = [
     "TRIX",
     "ThreeBlackCrows",
     "CDL3BLACKCROWS",
+    "ThreeInside",
+    "CDL3INSIDE",
     "TwoCrows",
     "CDL2CROWS",
     "UltimateOscillator",

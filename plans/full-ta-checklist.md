@@ -152,7 +152,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [x] CDLENGULFING
 - [x] CDL2CROWS
 - [x] CDL3BLACKCROWS
-- [ ] CDL3INSIDE
+- [x] CDL3INSIDE
 - [ ] CDL3LINESTRIKE
 - [ ] CDL3OUTSIDE
 - [ ] CDL3STARSINSOUTH
