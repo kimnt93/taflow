@@ -16,6 +16,7 @@ from .hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransfo
 from .hilbert_transform_dominant_cycle_phase import HT_DCPHASE, HilbertTransformDominantCyclePhase
 from .hilbert_transform_phasor import HT_PHASOR, HilbertTransformPhasor
 from .hilbert_transform_sine_wave import HT_SINE, HilbertTransformSineWave
+from .hilbert_transform_trend_mode import HT_TRENDMODE, HilbertTransformTrendMode
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
 from .minus_directional_indicator import MINUS_DI, MinusDirectionalIndicator
@@ -61,6 +62,8 @@ __all__ = [
     "HT_PHASOR",
     "HilbertTransformSineWave",
     "HT_SINE",
+    "HilbertTransformTrendMode",
+    "HT_TRENDMODE",
     "StochasticOscillator",
     "StochasticRelativeStrengthIndex",
     "TripleExponentialRateOfChange",

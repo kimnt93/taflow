@@ -182,6 +182,15 @@ impl HtDcphase {
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+    pub(crate) fn current_phase(&self) -> f64 {
+        self.phase
+    }
+    pub(crate) fn current_smooth_period(&self) -> f64 {
+        self.smooth_period
+    }
+    pub(crate) fn current_smooth_price(&self) -> f64 {
+        self.smooth_prices[(self.smooth_idx + 49) % 50]
+    }
     pub fn reset(&mut self) {
         *self = Self::new();
     }

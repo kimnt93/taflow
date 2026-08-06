@@ -6,6 +6,7 @@ mod hilbert_transform_dominant_cycle_period;
 mod hilbert_transform_dominant_cycle_phase;
 mod hilbert_transform_phasor;
 mod hilbert_transform_sine_wave;
+mod hilbert_transform_trend_mode;
 mod money_flow_index;
 mod minus_directional_indicator;
 mod minus_directional_movement;
@@ -20,6 +21,7 @@ pub use hilbert_transform_dominant_cycle_period::HilbertTransformDominantCyclePe
 pub use hilbert_transform_dominant_cycle_phase::HilbertTransformDominantCyclePhase;
 pub use hilbert_transform_phasor::HilbertTransformPhasor;
 pub use hilbert_transform_sine_wave::HilbertTransformSineWave;
+pub use hilbert_transform_trend_mode::HilbertTransformTrendMode;
 pub use money_flow_index::MoneyFlowIndex;
 pub use minus_directional_indicator::MinusDirectionalIndicator;
 pub use minus_directional_movement::MinusDirectionalMovement;
