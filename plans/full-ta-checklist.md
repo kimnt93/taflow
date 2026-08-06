@@ -71,7 +71,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [x] PLUS_DI
 - [x] MINUS_DI
 - [x] PLUS_DM
-- [ ] MINUS_DM
+- [x] MINUS_DM
 
 ## Volatility Indicators
 

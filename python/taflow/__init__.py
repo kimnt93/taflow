@@ -15,6 +15,7 @@ from .hilbert_transform_trendline import HilbertTransformTrendline
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
 from .minus_directional_indicator import MINUS_DI, MinusDirectionalIndicator
+from .minus_directional_movement import MINUS_DM, MinusDirectionalMovement
 from .money_flow_index import MFI, MoneyFlowIndex
 from .moving_average_convergence_divergence_fixed import (
     MovingAverageConvergenceDivergenceFixed,
@@ -37,6 +38,8 @@ __all__ = [
     "MovingAverage",
     "MinusDirectionalIndicator",
     "MINUS_DI",
+    "MinusDirectionalMovement",
+    "MINUS_DM",
     "MoneyFlowIndex",
     "MFI",
     "MovingAverageConvergenceDivergenceFixed",

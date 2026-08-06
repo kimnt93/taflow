@@ -41,4 +41,12 @@ impl PlusDirectionalMovement {
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
         to_py_array(py, self.outputs.clone())
     }
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.outputs.clear()
+    }
 }
