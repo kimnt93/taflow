@@ -148,7 +148,7 @@ checklist is deferred and is not linked to this implementation gate.
 ## Pattern Recognition
 
 - [x] CDLDOJI
-- [ ] CDLHAMMER
+- [x] CDLHAMMER
 - [ ] CDLENGULFING
 - [ ] CDL2CROWS
 - [ ] CDL3BLACKCROWS
