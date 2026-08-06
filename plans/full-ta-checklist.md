@@ -161,7 +161,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLADVANCEBLOCK
 - [ ] CDLBELTHOLD
 - [ ] CDLBREAKAWAY
-- [ ] CDLCLOSINGMARUBOZU
+- [x] CDLCLOSINGMARUBOZU
 - [ ] CDLCONCEALBABYSWALL
 - [ ] CDLCOUNTERATTACK
 - [ ] CDLDARKCLOUDCOVER

@@ -20,6 +20,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::ExponentialMovingAverage>()?;
     m.add_class::<indicators::Doji>()?;
     m.add_class::<indicators::Takuri>()?;
+    m.add_class::<indicators::ClosingMarubozu>()?;
     m.add_class::<indicators::Engulfing>()?;
     m.add_class::<indicators::Hammer>()?;
     m.add_class::<indicators::Hikkake>()?;

@@ -12,6 +12,7 @@ from .directional_movement_index import DirectionalMovementIndex
 from .doji import CDLDOJI, Doji
 from .takuri import CDLTAKURI, Takuri
 from .marubozu import CDLMARUBOZU, Marubozu
+from .closing_marubozu import CDLCLOSINGMARUBOZU, ClosingMarubozu
 from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -118,6 +119,8 @@ __all__ = [
     "CDLTAKURI",
     "Marubozu",
     "CDLMARUBOZU",
+    "ClosingMarubozu",
+    "CDLCLOSINGMARUBOZU",
     "CDLDOJI",
     "Engulfing",
     "CDLENGULFING",

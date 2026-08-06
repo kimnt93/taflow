@@ -4,6 +4,7 @@ from ..commodity_channel_index import CCI, CommodityChannelIndex
 from ..doji import CDLDOJI, Doji
 from ..takuri import CDLTAKURI, Takuri
 from ..marubozu import CDLMARUBOZU, Marubozu
+from ..closing_marubozu import CDLCLOSINGMARUBOZU, ClosingMarubozu
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
@@ -35,6 +36,7 @@ __all__ = [
     "Doji", "CDLDOJI",
     "Takuri", "CDLTAKURI",
     "Marubozu", "CDLMARUBOZU",
+    "ClosingMarubozu", "CDLCLOSINGMARUBOZU",
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",

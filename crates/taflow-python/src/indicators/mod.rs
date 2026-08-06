@@ -1,6 +1,7 @@
 //! Unified Python indicator objects.
 
 mod commodity_channel_index;
+mod closing_marubozu;
 mod doji;
 mod takuri;
 mod engulfing;
@@ -31,6 +32,7 @@ mod ultimate_oscillator;
 mod up_down_side_gap_three_methods;
 
 pub use commodity_channel_index::CommodityChannelIndex;
+pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;
 pub use takuri::Takuri;
 pub use engulfing::Engulfing;
