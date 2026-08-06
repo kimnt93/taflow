@@ -159,7 +159,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDL3WHITESOLDIERS
 - [ ] CDLABANDONEDBABY
 - [ ] CDLADVANCEBLOCK
-- [ ] CDLBELTHOLD
+- [x] CDLBELTHOLD
 - [ ] CDLBREAKAWAY
 - [x] CDLCLOSINGMARUBOZU
 - [ ] CDLCONCEALBABYSWALL

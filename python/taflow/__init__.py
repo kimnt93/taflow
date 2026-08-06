@@ -22,6 +22,7 @@ from .short_line import CDLSHORTLINE, ShortLine
 from .spinning_top import CDLSPINNINGTOP, SpinningTop
 from .long_line import CDLLONGLINE, LongLine
 from .doji_star import CDLDOJISTAR, DojiStar
+from .belt_hold import CDLBELTHOLD, BeltHold
 from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -144,6 +145,7 @@ __all__ = [
     "SpinningTop", "CDLSPINNINGTOP",
     "LongLine", "CDLLONGLINE",
     "DojiStar", "CDLDOJISTAR",
+    "BeltHold", "CDLBELTHOLD",
     "CDLDOJI",
     "Engulfing",
     "CDLENGULFING",

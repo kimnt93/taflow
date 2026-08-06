@@ -1,6 +1,7 @@
 //! Unified Python indicator objects.
 
 mod commodity_channel_index;
+mod belt_hold;
 mod closing_marubozu;
 mod doji;
 mod doji_star;
@@ -41,6 +42,7 @@ mod ultimate_oscillator;
 mod up_down_side_gap_three_methods;
 
 pub use commodity_channel_index::CommodityChannelIndex;
+pub use belt_hold::BeltHold;
 pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;
 pub use doji_star::DojiStar;

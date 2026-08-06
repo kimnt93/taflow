@@ -14,6 +14,7 @@ from ..short_line import CDLSHORTLINE, ShortLine
 from ..spinning_top import CDLSPINNINGTOP, SpinningTop
 from ..long_line import CDLLONGLINE, LongLine
 from ..doji_star import CDLDOJISTAR, DojiStar
+from ..belt_hold import CDLBELTHOLD, BeltHold
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
@@ -55,6 +56,7 @@ __all__ = [
     "SpinningTop", "CDLSPINNINGTOP",
     "LongLine", "CDLLONGLINE",
     "DojiStar", "CDLDOJISTAR",
+    "BeltHold", "CDLBELTHOLD",
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",
