@@ -23,6 +23,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::Hammer>()?;
     m.add_class::<indicators::Hikkake>()?;
     m.add_class::<indicators::HikkakeModified>()?;
+    m.add_class::<indicators::UpDownSideGapThreeMethods>()?;
     m.add_class::<indicators::TwoCrows>()?;
     m.add_class::<indicators::ThreeBlackCrows>()?;
     m.add_class::<indicators::ThreeInside>()?;

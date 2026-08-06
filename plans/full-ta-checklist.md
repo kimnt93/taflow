@@ -207,4 +207,4 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLTRISTAR
 - [ ] CDLUNIQUE3RIVER
 - [ ] CDLUPSIDEGAP2CROWS
-- [ ] CDLXSIDEGAP3METHODS
+- [x] CDLXSIDEGAP3METHODS

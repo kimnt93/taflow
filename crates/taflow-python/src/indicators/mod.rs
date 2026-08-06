@@ -23,6 +23,7 @@ mod three_inside;
 mod three_outside;
 mod two_crows;
 mod ultimate_oscillator;
+mod up_down_side_gap_three_methods;
 
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use doji::Doji;
@@ -47,3 +48,4 @@ pub use three_inside::ThreeInside;
 pub use three_outside::ThreeOutside;
 pub use two_crows::TwoCrows;
 pub use ultimate_oscillator::UltimateOscillator;
+pub use up_down_side_gap_three_methods::UpDownSideGapThreeMethods;

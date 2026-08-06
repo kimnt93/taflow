@@ -46,6 +46,7 @@ from .three_outside import CDL3OUTSIDE, ThreeOutside
 from .two_crows import CDL2CROWS, TwoCrows
 from .ultimate_oscillator import ULTOSC, UltimateOscillator
 from .variable_period_moving_average import VariablePeriodMovingAverage
+from .up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
 
 __all__ = [
     "talib",
@@ -94,6 +95,8 @@ __all__ = [
     "UltimateOscillator",
     "ULTOSC",
     "VariablePeriodMovingAverage",
+    "UpDownSideGapThreeMethods",
+    "CDLXSIDEGAP3METHODS",
     "IntradayMomentumIndex",
     "AccelerationBands",
     "AverageDirectionalIndex",

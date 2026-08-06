@@ -23,6 +23,7 @@ from ..three_inside import CDL3INSIDE, ThreeInside
 from ..three_outside import CDL3OUTSIDE, ThreeOutside
 from ..two_crows import CDL2CROWS, TwoCrows
 from ..ultimate_oscillator import ULTOSC, UltimateOscillator
+from ..up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -40,6 +41,7 @@ __all__ = [
     "MinusDirectionalMovement", "MINUS_DM", "PlusDirectionalIndicator", "PLUS_DI",
     "PlusDirectionalMovement", "PLUS_DM", "TripleExponentialRateOfChange", "TRIX",
     "UltimateOscillator", "ULTOSC",
+    "UpDownSideGapThreeMethods", "CDLXSIDEGAP3METHODS",
     "ThreeBlackCrows", "CDL3BLACKCROWS",
     "ThreeInside", "CDL3INSIDE",
     "ThreeOutside", "CDL3OUTSIDE",
