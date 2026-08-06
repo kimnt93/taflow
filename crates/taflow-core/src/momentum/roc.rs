@@ -12,7 +12,11 @@ pub fn roc(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
             .iter()
             .zip(input[..len - timeperiod].iter())
             .map(|(&cur, &prev)| {
-                if prev != 0.0 { ((cur - prev) / prev) * 100.0 } else { 0.0 }
+                if prev != 0.0 {
+                    ((cur - prev) / prev) * 100.0
+                } else {
+                    0.0
+                }
             }),
     );
     Ok(output)
@@ -30,7 +34,11 @@ pub fn rocp(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
             .iter()
             .zip(input[..len - timeperiod].iter())
             .map(|(&cur, &prev)| {
-                if prev != 0.0 { (cur - prev) / prev } else { 0.0 }
+                if prev != 0.0 {
+                    (cur - prev) / prev
+                } else {
+                    0.0
+                }
             }),
     );
     Ok(output)
@@ -47,9 +55,7 @@ pub fn rocr(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
         input[timeperiod..]
             .iter()
             .zip(input[..len - timeperiod].iter())
-            .map(|(&cur, &prev)| {
-                if prev != 0.0 { cur / prev } else { 0.0 }
-            }),
+            .map(|(&cur, &prev)| if prev != 0.0 { cur / prev } else { 0.0 }),
     );
     Ok(output)
 }
@@ -66,7 +72,11 @@ pub fn rocr100(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
             .iter()
             .zip(input[..len - timeperiod].iter())
             .map(|(&cur, &prev)| {
-                if prev != 0.0 { (cur / prev) * 100.0 } else { 0.0 }
+                if prev != 0.0 {
+                    (cur / prev) * 100.0
+                } else {
+                    0.0
+                }
             }),
     );
     Ok(output)

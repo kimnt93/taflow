@@ -238,7 +238,9 @@ pub fn plus_dm(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64
     }
 
     let mut output = vec![0.0_f64; len];
-    if timeperiod > 1 { output[..timeperiod - 1].fill(f64::NAN); }
+    if timeperiod > 1 {
+        output[..timeperiod - 1].fill(f64::NAN);
+    }
     let pf = timeperiod as f64;
 
     // Seed: sum +DM for bars 1..timeperiod-1
@@ -283,7 +285,9 @@ pub fn minus_dm(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f6
     }
 
     let mut output = vec![0.0_f64; len];
-    if timeperiod > 1 { output[..timeperiod - 1].fill(f64::NAN); }
+    if timeperiod > 1 {
+        output[..timeperiod - 1].fill(f64::NAN);
+    }
     let pf = timeperiod as f64;
 
     // Seed: sum -DM for bars 1..timeperiod-1
