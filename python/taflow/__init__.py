@@ -18,6 +18,7 @@ from .rickshawman import CDLRICKSHAWMAN, Rickshawman
 from .high_wave import CDLHIGHWAVE, HighWave
 from .dragonfly_doji import CDLDRAGONFLYDOJI, DragonflyDoji
 from .gravestone_doji import CDLGRAVESTONEDOJI, GravestoneDoji
+from .short_line import CDLSHORTLINE, ShortLine
 from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -136,6 +137,7 @@ __all__ = [
     "CDLDRAGONFLYDOJI",
     "GravestoneDoji",
     "CDLGRAVESTONEDOJI",
+    "ShortLine", "CDLSHORTLINE",
     "CDLDOJI",
     "Engulfing",
     "CDLENGULFING",

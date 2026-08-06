@@ -10,6 +10,7 @@ from ..rickshawman import CDLRICKSHAWMAN, Rickshawman
 from ..high_wave import CDLHIGHWAVE, HighWave
 from ..dragonfly_doji import CDLDRAGONFLYDOJI, DragonflyDoji
 from ..gravestone_doji import CDLGRAVESTONEDOJI, GravestoneDoji
+from ..short_line import CDLSHORTLINE, ShortLine
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
@@ -47,6 +48,7 @@ __all__ = [
     "HighWave", "CDLHIGHWAVE",
     "DragonflyDoji", "CDLDRAGONFLYDOJI",
     "GravestoneDoji", "CDLGRAVESTONEDOJI",
+    "ShortLine", "CDLSHORTLINE",
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",

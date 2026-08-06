@@ -197,7 +197,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLRISEFALL3METHODS
 - [ ] CDLSEPARATINGLINES
 - [ ] CDLSHOOTINGSTAR
-- [ ] CDLSHORTLINE
+- [x] CDLSHORTLINE
 - [ ] CDLSPINNINGTOP
 - [ ] CDLSTALLEDPATTERN
 - [x] CDLSTICKSANDWICH
