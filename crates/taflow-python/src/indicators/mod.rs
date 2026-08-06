@@ -18,6 +18,7 @@ mod plus_directional_movement;
 mod triple_exponential_rate_of_change;
 mod three_black_crows;
 mod three_inside;
+mod three_outside;
 mod two_crows;
 mod ultimate_oscillator;
 
@@ -39,5 +40,6 @@ pub use plus_directional_movement::PlusDirectionalMovement;
 pub use triple_exponential_rate_of_change::TripleExponentialRateOfChange;
 pub use three_black_crows::ThreeBlackCrows;
 pub use three_inside::ThreeInside;
+pub use three_outside::ThreeOutside;
 pub use two_crows::TwoCrows;
 pub use ultimate_oscillator::UltimateOscillator;
