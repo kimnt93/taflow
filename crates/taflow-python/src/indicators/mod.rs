@@ -3,6 +3,7 @@
 mod commodity_channel_index;
 mod closing_marubozu;
 mod doji;
+mod dragonfly_doji;
 mod takuri;
 mod engulfing;
 mod hammer;
@@ -37,6 +38,7 @@ mod up_down_side_gap_three_methods;
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;
+pub use dragonfly_doji::DragonflyDoji;
 pub use takuri::Takuri;
 pub use engulfing::Engulfing;
 pub use hammer::Hammer;
