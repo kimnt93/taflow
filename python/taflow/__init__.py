@@ -14,6 +14,7 @@ from .takuri import CDLTAKURI, Takuri
 from .marubozu import CDLMARUBOZU, Marubozu
 from .closing_marubozu import CDLCLOSINGMARUBOZU, ClosingMarubozu
 from .long_legged_doji import CDLLONGLEGGEDDOJI, LongLeggedDoji
+from .rickshawman import CDLRICKSHAWMAN, Rickshawman
 from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -124,6 +125,8 @@ __all__ = [
     "CDLCLOSINGMARUBOZU",
     "LongLeggedDoji",
     "CDLLONGLEGGEDDOJI",
+    "Rickshawman",
+    "CDLRICKSHAWMAN",
     "CDLDOJI",
     "Engulfing",
     "CDLENGULFING",

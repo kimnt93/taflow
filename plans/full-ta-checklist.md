@@ -193,7 +193,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLMORNINGSTAR
 - [ ] CDLONNECK
 - [ ] CDLPIERCING
-- [ ] CDLRICKSHAWMAN
+- [x] CDLRICKSHAWMAN
 - [ ] CDLRISEFALL3METHODS
 - [ ] CDLSEPARATINGLINES
 - [ ] CDLSHOOTINGSTAR
