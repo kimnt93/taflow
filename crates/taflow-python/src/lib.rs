@@ -21,6 +21,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::Doji>()?;
     m.add_class::<indicators::Engulfing>()?;
     m.add_class::<indicators::Hammer>()?;
+    m.add_class::<indicators::TwoCrows>()?;
     m.add_class::<indicators::HilbertTransformDominantCyclePeriod>()?;
     m.add_class::<indicators::HilbertTransformDominantCyclePhase>()?;
     m.add_class::<indicators::HilbertTransformPhasor>()?;

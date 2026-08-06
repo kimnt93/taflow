@@ -38,6 +38,7 @@ from .plus_directional_movement import PLUS_DM, PlusDirectionalMovement
 from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
 from .triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
+from .two_crows import CDL2CROWS, TwoCrows
 from .ultimate_oscillator import ULTOSC, UltimateOscillator
 from .variable_period_moving_average import VariablePeriodMovingAverage
 
@@ -73,6 +74,8 @@ __all__ = [
     "StochasticRelativeStrengthIndex",
     "TripleExponentialRateOfChange",
     "TRIX",
+    "TwoCrows",
+    "CDL2CROWS",
     "UltimateOscillator",
     "ULTOSC",
     "VariablePeriodMovingAverage",

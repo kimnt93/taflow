@@ -16,6 +16,7 @@ mod minus_directional_movement;
 mod plus_directional_indicator;
 mod plus_directional_movement;
 mod triple_exponential_rate_of_change;
+mod two_crows;
 mod ultimate_oscillator;
 
 pub use commodity_channel_index::CommodityChannelIndex;
@@ -34,4 +35,5 @@ pub use minus_directional_movement::MinusDirectionalMovement;
 pub use plus_directional_indicator::PlusDirectionalIndicator;
 pub use plus_directional_movement::PlusDirectionalMovement;
 pub use triple_exponential_rate_of_change::TripleExponentialRateOfChange;
+pub use two_crows::TwoCrows;
 pub use ultimate_oscillator::UltimateOscillator;

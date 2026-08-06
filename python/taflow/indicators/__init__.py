@@ -16,6 +16,7 @@ from ..minus_directional_movement import MINUS_DM, MinusDirectionalMovement
 from ..plus_directional_indicator import PLUS_DI, PlusDirectionalIndicator
 from ..plus_directional_movement import PLUS_DM, PlusDirectionalMovement
 from ..triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
+from ..two_crows import CDL2CROWS, TwoCrows
 from ..ultimate_oscillator import ULTOSC, UltimateOscillator
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "MinusDirectionalMovement", "MINUS_DM", "PlusDirectionalIndicator", "PLUS_DI",
     "PlusDirectionalMovement", "PLUS_DM", "TripleExponentialRateOfChange", "TRIX",
     "UltimateOscillator", "ULTOSC",
+    "TwoCrows", "CDL2CROWS",
 ]

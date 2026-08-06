@@ -150,7 +150,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [x] CDLDOJI
 - [x] CDLHAMMER
 - [x] CDLENGULFING
-- [ ] CDL2CROWS
+- [x] CDL2CROWS
 - [ ] CDL3BLACKCROWS
 - [ ] CDL3INSIDE
 - [ ] CDL3LINESTRIKE
