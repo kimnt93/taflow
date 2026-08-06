@@ -14,6 +14,7 @@ from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
+from .money_flow_index import MFI, MoneyFlowIndex
 from .moving_average_convergence_divergence_fixed import (
     MovingAverageConvergenceDivergenceFixed,
 )
@@ -29,6 +30,8 @@ from .variable_period_moving_average import VariablePeriodMovingAverage
 __all__ = [
     "talib",
     "MovingAverage",
+    "MoneyFlowIndex",
+    "MFI",
     "MovingAverageConvergenceDivergenceFixed",
     "MovingAverageConvergenceDivergenceExtended",
     "BollingerBands",

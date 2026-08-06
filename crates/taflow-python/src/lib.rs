@@ -19,6 +19,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // owns its accumulated outputs so compute() never replays prior input.
     m.add_class::<indicators::ExponentialMovingAverage>()?;
     m.add_class::<indicators::CommodityChannelIndex>()?;
+    m.add_class::<indicators::MoneyFlowIndex>()?;
 
     // Transitional state classes remain available while their indicators move
     // to the unified object surface above.
