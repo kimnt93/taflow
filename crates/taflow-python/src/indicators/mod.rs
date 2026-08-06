@@ -3,6 +3,7 @@
 mod commodity_channel_index;
 mod exponential_moving_average;
 mod hilbert_transform_dominant_cycle_period;
+mod hilbert_transform_dominant_cycle_phase;
 mod hilbert_transform_phasor;
 mod money_flow_index;
 mod minus_directional_indicator;
@@ -15,6 +16,7 @@ mod ultimate_oscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use hilbert_transform_dominant_cycle_period::HilbertTransformDominantCyclePeriod;
+pub use hilbert_transform_dominant_cycle_phase::HilbertTransformDominantCyclePhase;
 pub use hilbert_transform_phasor::HilbertTransformPhasor;
 pub use money_flow_index::MoneyFlowIndex;
 pub use minus_directional_indicator::MinusDirectionalIndicator;
