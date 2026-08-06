@@ -174,7 +174,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLHANGINGMAN
 - [ ] CDLHARAMI
 - [ ] CDLHARAMICROSS
-- [ ] CDLHIGHWAVE
+- [x] CDLHIGHWAVE
 - [x] CDLHIKKAKE
 - [x] CDLHIKKAKEMOD
 - [ ] CDLHOMINGPIGEON

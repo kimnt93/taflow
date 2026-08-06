@@ -28,6 +28,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::Marubozu>()?;
     m.add_class::<indicators::LongLeggedDoji>()?;
     m.add_class::<indicators::Rickshawman>()?;
+    m.add_class::<indicators::HighWave>()?;
     m.add_class::<indicators::UpDownSideGapThreeMethods>()?;
     m.add_class::<indicators::StickSandwich>()?;
     m.add_class::<indicators::TwoCrows>()?;

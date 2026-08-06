@@ -7,6 +7,7 @@ from ..marubozu import CDLMARUBOZU, Marubozu
 from ..closing_marubozu import CDLCLOSINGMARUBOZU, ClosingMarubozu
 from ..long_legged_doji import CDLLONGLEGGEDDOJI, LongLeggedDoji
 from ..rickshawman import CDLRICKSHAWMAN, Rickshawman
+from ..high_wave import CDLHIGHWAVE, HighWave
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
@@ -41,6 +42,7 @@ __all__ = [
     "ClosingMarubozu", "CDLCLOSINGMARUBOZU",
     "LongLeggedDoji", "CDLLONGLEGGEDDOJI",
     "Rickshawman", "CDLRICKSHAWMAN",
+    "HighWave", "CDLHIGHWAVE",
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",
