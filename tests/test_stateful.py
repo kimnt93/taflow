@@ -753,6 +753,38 @@ def test_ht_trendline_chunk_continuation_and_reset():
     )
 
 
+@pytest.mark.parametrize("period", [2, 3, 14, 30])
+def test_adx_chunk_continuation_and_reset(period):
+    close = close_data(700)
+    high = close + 1.3
+    low = close - 1.1
+    expected = original_talib.ADX(high, low, close, period)
+    indicator = state.ADX(period)
+    actual = np.concatenate(
+        [
+            indicator.extend(high[:80], low[:80], close[:80]),
+            indicator.extend(high[80:], low[80:], close[80:]),
+        ]
+    )
+    np.testing.assert_allclose(
+        actual, expected, rtol=1e-10, atol=1e-12, equal_nan=True
+    )
+
+    indicator.reset()
+    replayed = np.asarray(
+        [
+            np.nan if value is None else value
+            for value in (
+                indicator.append(high, low, close)
+                for high, low, close in zip(high, low, close)
+            )
+        ]
+    )
+    np.testing.assert_allclose(
+        replayed, expected, rtol=1e-10, atol=1e-12, equal_nan=True
+    )
+
+
 def test_stochastic_states_reject_unequal_input_lengths():
     with pytest.raises(ValueError):
         state.STOCH(5, 13, 0, 11, 0).extend(
@@ -833,3 +865,7 @@ def test_invalid_parameters_are_rejected():
         state.MAVP(2, 30, 9)
     with pytest.raises(ValueError):
         state.MAVP().extend(np.arange(5.0), np.arange(4.0))
+    with pytest.raises(ValueError):
+        state.ADX(1)
+    with pytest.raises(ValueError):
+        state.ADX().extend(np.arange(5.0), np.arange(4.0), np.arange(5.0))

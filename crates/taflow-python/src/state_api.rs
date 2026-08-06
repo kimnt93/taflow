@@ -4,9 +4,9 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Atr, Dema, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama, Mavp, Midpoint, Midprice,
-    Mom, Natr, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator,
-    Tema, Trange, Trima, Wma,
+    self, Adx, Atr, Dema, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama, Mavp, Midpoint,
+    Midprice, Mom, Natr, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi,
+    StreamingIndicator, Tema, Trange, Trima, Wma,
 };
 use taflow::MaType;
 
@@ -1802,6 +1802,11 @@ pub struct StatefulHtTrendline {
 }
 
 #[pyclass]
+pub struct StatefulAdx {
+    inner: Adx,
+}
+
+#[pyclass]
 pub struct StatefulStochf {
     inner: Stochf,
 }
@@ -2314,6 +2319,57 @@ impl StatefulHtTrendline {
                 .as_slice()?
                 .iter()
                 .map(|&input| self.inner.append(input).unwrap_or(f64::NAN))
+                .collect(),
+        ))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
+
+#[pymethods]
+impl StatefulAdx {
+    #[new]
+    #[pyo3(signature = (timeperiod=14))]
+    fn new(timeperiod: usize) -> PyResult<Self> {
+        Ok(Self {
+            inner: Adx::new(timeperiod).map_err(py_value_error)?,
+        })
+    }
+
+    fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
+        self.inner.append(high, low, close)
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<Py<PyArray1<f64>>> {
+        let high = high.as_slice()?;
+        let low = low.as_slice()?;
+        let close = close.as_slice()?;
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(PyValueError::new_err(
+                "high, low, and close must have equal lengths",
+            ));
+        }
+        Ok(to_py_array(
+            py,
+            high.iter()
+                .zip(low)
+                .zip(close)
+                .map(|((&high, &low), &close)| {
+                    self.inner.append(high, low, close).unwrap_or(f64::NAN)
+                })
                 .collect(),
         ))
     }

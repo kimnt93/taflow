@@ -98,6 +98,7 @@ Rust state between updates:
 ```python
 from taflow import (
     BollingerBands,
+    AverageDirectionalIndex,
     FastStochasticOscillator,
     HilbertTransformTrendline,
     IntradayMomentumIndex,
@@ -143,6 +144,9 @@ values = variable_average.extend(history, period_history)
 
 trendline = HilbertTransformTrendline()
 trend_values = trendline.extend(history)
+
+adx = AverageDirectionalIndex(period=14)
+adx_values = adx.extend(high_history, low_history, close_history)
 
 stochastic = FastStochasticOscillator(
     fast_k_period=5,

@@ -8,9 +8,11 @@ use std::collections::VecDeque;
 use crate::error::{TaError, TaResult};
 
 mod accbands;
+mod adx;
 mod apo;
 mod bbands;
 mod cmo;
+mod directional;
 mod imi;
 mod ht_trendline;
 mod kama;
@@ -31,6 +33,7 @@ mod stochrsi;
 mod t3;
 
 pub use accbands::{Accbands, AccbandsValue};
+pub use adx::Adx;
 pub use apo::Apo;
 pub use bbands::{Bbands, BbandsValue};
 pub use cmo::Cmo;

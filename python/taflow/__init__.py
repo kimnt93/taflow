@@ -4,6 +4,7 @@ __version__ = "0.1.2"
 
 from . import talib
 from .acceleration_bands import AccelerationBands
+from .average_directional_index import AverageDirectionalIndex
 from .bollinger_bands import BollingerBands
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
@@ -34,6 +35,7 @@ __all__ = [
     "VariablePeriodMovingAverage",
     "IntradayMomentumIndex",
     "AccelerationBands",
+    "AverageDirectionalIndex",
     "ParabolicSar",
     "ParabolicSarExtended",
     "__version__",

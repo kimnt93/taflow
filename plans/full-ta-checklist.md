@@ -46,7 +46,7 @@ tracked in [`operator-library-checklist.md`](operator-library-checklist.md).
 - [x] STOCH
 - [x] STOCHF
 - [x] STOCHRSI
-- [ ] ADX
+- [x] ADX
 - [ ] ADXR
 - [ ] CCI
 - [x] MOM
