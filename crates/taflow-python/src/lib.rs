@@ -19,6 +19,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // owns its accumulated outputs so compute() never replays prior input.
     m.add_class::<indicators::ExponentialMovingAverage>()?;
     m.add_class::<indicators::Doji>()?;
+    m.add_class::<indicators::Engulfing>()?;
     m.add_class::<indicators::Hammer>()?;
     m.add_class::<indicators::HilbertTransformDominantCyclePeriod>()?;
     m.add_class::<indicators::HilbertTransformDominantCyclePhase>()?;

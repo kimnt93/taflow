@@ -10,6 +10,7 @@ from .bollinger_bands import BollingerBands
 from .commodity_channel_index import CCI, CommodityChannelIndex
 from .directional_movement_index import DirectionalMovementIndex
 from .doji import CDLDOJI, Doji
+from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
@@ -82,6 +83,8 @@ __all__ = [
     "DirectionalMovementIndex",
     "Doji",
     "CDLDOJI",
+    "Engulfing",
+    "CDLENGULFING",
     "ExponentialMovingAverage",
     "EMA",
     "ParabolicSar",

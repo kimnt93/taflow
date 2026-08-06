@@ -2,6 +2,7 @@
 
 mod commodity_channel_index;
 mod doji;
+mod engulfing;
 mod hammer;
 mod exponential_moving_average;
 mod hilbert_transform_dominant_cycle_period;
@@ -19,6 +20,7 @@ mod ultimate_oscillator;
 
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use doji::Doji;
+pub use engulfing::Engulfing;
 pub use hammer::Hammer;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use hilbert_transform_dominant_cycle_period::HilbertTransformDominantCyclePeriod;

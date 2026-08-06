@@ -2,6 +2,7 @@
 
 from ..commodity_channel_index import CCI, CommodityChannelIndex
 from ..doji import CDLDOJI, Doji
+from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..exponential_moving_average import EMA, ExponentialMovingAverage
 from ..hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
@@ -20,6 +21,7 @@ from ..ultimate_oscillator import ULTOSC, UltimateOscillator
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
     "Doji", "CDLDOJI",
+    "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "HilbertTransformDominantCyclePeriod", "HT_DCPERIOD",
     "HilbertTransformDominantCyclePhase", "HT_DCPHASE",
