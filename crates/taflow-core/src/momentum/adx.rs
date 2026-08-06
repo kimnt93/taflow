@@ -123,28 +123,6 @@ pub fn adx(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaRes
     Ok(output)
 }
 
-/// Average Directional Movement Index Rating (ADXR)
-///
-/// ADXR = (ADX_today + ADX_period_ago) / 2
-pub fn adxr(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let adx_values = adx(high, low, close, timeperiod)?;
-    let len = adx_values.len();
-    let mut output = vec![0.0_f64; len];
-    // ADXR lookback = 3*timeperiod - 2 (ADX lookback + timeperiod - 1)
-    let adxr_lookback = 3 * timeperiod - 2;
-    output[..adxr_lookback.min(len)].fill(f64::NAN);
-
-    for i in 0..len {
-        if !adx_values[i].is_nan() && i >= timeperiod {
-            if !adx_values[i - timeperiod + 1].is_nan() {
-                output[i] = (adx_values[i] + adx_values[i - timeperiod + 1]) / 2.0;
-            }
-        }
-    }
-
-    Ok(output)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -9,6 +9,7 @@ use crate::error::{TaError, TaResult};
 
 mod accbands;
 mod adx;
+mod adxr;
 mod apo;
 mod bbands;
 mod cmo;
@@ -34,6 +35,7 @@ mod t3;
 
 pub use accbands::{Accbands, AccbandsValue};
 pub use adx::Adx;
+pub use adxr::Adxr;
 pub use apo::Apo;
 pub use bbands::{Bbands, BbandsValue};
 pub use cmo::Cmo;

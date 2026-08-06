@@ -1,4 +1,5 @@
 mod adx;
+mod adxr;
 mod apo;
 mod aroon;
 mod bop;
@@ -21,7 +22,8 @@ mod trix;
 mod ultosc;
 mod willr;
 
-pub use adx::{adx, adxr};
+pub use adx::adx;
+pub use adxr::adxr;
 pub use apo::apo;
 pub use aroon::{aroon, aroon_osc};
 pub use bop::bop;

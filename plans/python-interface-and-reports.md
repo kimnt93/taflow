@@ -40,6 +40,7 @@ batch API; it must not duplicate numerical implementations.
 | MAVP | VariablePeriodMovingAverage | `variable_period_moving_average.py` | stateful |
 | HT_TRENDLINE | HilbertTransformTrendline | `hilbert_transform_trendline.py` | stateful |
 | ADX | AverageDirectionalIndex | `average_directional_index.py` | stateful |
+| ADXR | AverageDirectionalIndexRating | `average_directional_index_rating.py` | stateful |
 | STOCHF | FastStochasticOscillator | `fast_stochastic_oscillator.py` | stateful |
 | STOCH | StochasticOscillator | `stochastic_oscillator.py` | stateful |
 | STOCHRSI | StochasticRelativeStrengthIndex | `stochastic_relative_strength_index.py` | stateful |
