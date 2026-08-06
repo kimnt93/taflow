@@ -93,6 +93,14 @@ FUNCTIONS = {
         {"signalperiod": 9},
         ("close",),
     ),
+    "STOCHF": FunctionSpec(
+        "STOCHF",
+        taflow.FastStochasticOscillator,
+        (5, 13, 0),
+        (),
+        {"fastk_period": 5, "fastd_period": 13, "fastd_matype": 0},
+        ("high", "low", "close"),
+    ),
 }
 
 

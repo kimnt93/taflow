@@ -98,6 +98,7 @@ Rust state between updates:
 ```python
 from taflow import (
     BollingerBands,
+    FastStochasticOscillator,
     IntradayMomentumIndex,
     MovingAverage,
     MovingAverageConvergenceDivergenceFixed,
@@ -117,6 +118,13 @@ latest_imi = imi.append(next_open, next_close)
 macd_fixed = MovingAverageConvergenceDivergenceFixed(signal_period=9)
 macd_fixed.extend(history)
 macd, signal, histogram = macd_fixed.append(next_close)
+
+stochastic = FastStochasticOscillator(
+    fast_k_period=5,
+    fast_d_period=13,
+    fast_d_average_type=0,
+)
+fast_k, fast_d = stochastic.extend(high_history, low_history, close_history)
 ```
 
 Use `taflow.talib` for uppercase TA-Lib-compatible batch calls and top-level

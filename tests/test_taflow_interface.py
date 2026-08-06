@@ -41,6 +41,13 @@ def test_talib_compatibility_namespace_preserves_old_style_functions():
     assert_outputs_equal(talib.SAREXT(high, low), original_talib.SAREXT(high, low))
     assert_outputs_equal(talib.IMI(open_, close, 14), original_talib.IMI(open_, close, 14))
     assert_outputs_equal(talib.MACDFIX(close, 9), original_talib.MACDFIX(close, 9))
+    for matype in range(9):
+        assert_outputs_equal(
+            talib.STOCHF(high, low, close, 5, 13, matype),
+            original_talib.STOCHF(high, low, close, 5, 13, matype),
+            rtol=1e-8,
+            atol=1e-10,
+        )
 
 
 def test_descriptive_moving_average_and_bollinger_bands():
@@ -123,6 +130,23 @@ def test_descriptive_fixed_macd():
     assert_outputs_equal(replayed, expected, rtol=1e-12, atol=1e-12)
 
 
+def test_descriptive_fast_stochastic_oscillator():
+    high, low, close = price_data(500)
+    for matype in range(9):
+        indicator = taflow.FastStochasticOscillator(
+            fast_k_period=5,
+            fast_d_period=13,
+            fast_d_average_type=matype,
+        )
+        expected = original_talib.STOCHF(high, low, close, 5, 13, matype)
+        assert_outputs_equal(
+            indicator.extend(high, low, close),
+            expected,
+            rtol=1e-8,
+            atol=1e-10,
+        )
+
+
 def test_descriptive_classes_are_defined_in_individual_modules():
     assert taflow.MovingAverage.__module__ == "taflow.moving_average"
     assert taflow.BollingerBands.__module__ == "taflow.bollinger_bands"
@@ -133,6 +157,10 @@ def test_descriptive_classes_are_defined_in_individual_modules():
         == "taflow.moving_average_convergence_divergence_fixed"
     )
     assert taflow.ParabolicSar.__module__ == "taflow.parabolic_sar"
+    assert (
+        taflow.FastStochasticOscillator.__module__
+        == "taflow.fast_stochastic_oscillator"
+    )
     assert (
         taflow.ParabolicSarExtended.__module__
         == "taflow.parabolic_sar_extended"

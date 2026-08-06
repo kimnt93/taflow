@@ -504,6 +504,48 @@ def test_imi_rejects_unequal_input_lengths():
         state.IMI(14).extend(np.ones(20), np.ones(19))
 
 
+@pytest.mark.parametrize("matype", range(9))
+def test_stochf_matches_oracle_for_every_ma_type(matype):
+    close = close_data(500)
+    index = np.arange(close.size, dtype=np.float64)
+    high = close + 1.0 + np.abs(np.sin(index * 0.17))
+    low = close - 0.8 - np.abs(np.cos(index * 0.13))
+    expected = ta.STOCHF(high, low, close, 5, 13, matype)
+
+    indicator = state.STOCHF(5, 13, matype)
+    actual = indicator.extend(high, low, close)
+    for ours, theirs in zip(actual, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+    chunked = state.STOCHF(5, 13, matype)
+    first = chunked.extend(high[:20], low[:20], close[:20])
+    remaining = chunked.extend(high[20:], low[20:], close[20:])
+    for ours, theirs in zip(
+        (np.concatenate(parts) for parts in zip(first, remaining)), expected
+    ):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+    indicator.reset()
+    replayed = [indicator.append(*bar) for bar in zip(high, low, close)]
+    replayed = [(np.nan, np.nan) if value is None else value for value in replayed]
+    replayed = tuple(np.asarray(values) for values in zip(*replayed))
+    for ours, theirs in zip(replayed, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+
+def test_stochf_rejects_unequal_input_lengths():
+    with pytest.raises(ValueError):
+        state.STOCHF(5, 13, 0).extend(
+            np.ones(20), np.ones(19), np.ones(20)
+        )
+
+
 def test_invalid_parameters_are_rejected():
     with pytest.raises(ValueError):
         state.SMA(0)
@@ -529,3 +571,9 @@ def test_invalid_parameters_are_rejected():
         state.BBANDS(13, 2.0, 2.0, 9)
     with pytest.raises(ValueError):
         state.BBANDS(1, 2.0, 2.0, 0)
+    with pytest.raises(ValueError):
+        state.STOCHF(0, 3, 0)
+    with pytest.raises(ValueError):
+        state.STOCHF(5, 0, 0)
+    with pytest.raises(ValueError):
+        state.STOCHF(5, 3, 9)

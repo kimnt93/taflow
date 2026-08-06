@@ -21,6 +21,7 @@ mod moving_average;
 mod ppo;
 mod sar;
 mod sarext;
+mod stochf;
 mod t3;
 
 pub use accbands::{Accbands, AccbandsValue};
@@ -36,6 +37,7 @@ pub use mama::{Mama, MamaValue};
 pub use ppo::Ppo;
 pub use sar::Sar;
 pub use sarext::Sarext;
+pub use stochf::{Stochf, StochfValue};
 pub use t3::T3;
 
 pub(super) fn invalid_period(name: &'static str, period: usize, minimum: usize) -> TaError {

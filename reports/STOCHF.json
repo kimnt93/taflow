@@ -1,0 +1,1099 @@
+{
+  "schema_version": 2,
+  "function": "STOCHF",
+  "date": "2026-08-06",
+  "environment": {
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib_python": "0.7.1"
+  },
+  "correctness_benchmark": {
+    "oracle": "TA-Lib Python 0.7.1",
+    "bars": 100000,
+    "comparisons": {
+      "taflow_batch": {
+        "outputs": 2,
+        "nan_mismatches": 0,
+        "max_absolute_error": 1.1155520951433573e-12,
+        "allclose_rtol": 1e-08,
+        "allclose_atol": 1e-10,
+        "passed": true
+      },
+      "taflow_state_extend": {
+        "outputs": 2,
+        "nan_mismatches": 0,
+        "max_absolute_error": 4.263256414560601e-13,
+        "allclose_rtol": 1e-08,
+        "allclose_atol": 1e-10,
+        "passed": true
+      }
+    }
+  },
+  "benchmark_protocol": {
+    "sizes": [
+      100,
+      1000,
+      10000,
+      100000,
+      1000000
+    ],
+    "repeats": 5,
+    "process_warmup_runs": 1,
+    "stream_history_warmup_bars": 10000,
+    "input_dtype": "float64",
+    "input_generation": "deterministic trend plus sinusoidal components",
+    "peak_memory_metric": "isolated-process peak RSS delta after input allocation",
+    "latency_percentiles": "linear interpolation over repeated end-to-end calls"
+  },
+  "benchmark_matrix": {
+    "100": {
+      "talib_batch": {
+        "available": true,
+        "bars": 100,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.010037,
+            0.007083,
+            0.005423,
+            0.005853,
+            0.004774
+          ],
+          "min": 0.004774,
+          "mean": 0.006633999999999999,
+          "p50": 0.005853,
+          "p95": 0.0094462,
+          "p99": 0.00991884,
+          "max": 0.010037
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.012738,
+            0.009017,
+            0.006996,
+            0.007642,
+            0.00616
+          ],
+          "min": 0.00616,
+          "mean": 0.0085106,
+          "p50": 0.007642,
+          "p95": 0.011993799999999999,
+          "p99": 0.012589159999999999,
+          "max": 0.012738
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 16110695.256445304,
+          "p50": 17085255.424568597,
+          "min": 9963136.395337252,
+          "max": 20946795.14034353
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3817472,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_batch": {
+        "available": true,
+        "bars": 100,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.01245,
+            0.006085,
+            0.00501,
+            0.023376,
+            0.005472
+          ],
+          "min": 0.00501,
+          "mean": 0.010478600000000001,
+          "p50": 0.006085,
+          "p95": 0.0211908,
+          "p99": 0.02293896,
+          "max": 0.023376
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.015219,
+            0.00791,
+            0.006108,
+            0.024902,
+            0.006779
+          ],
+          "min": 0.006108,
+          "mean": 0.0121836,
+          "p50": 0.00791,
+          "p95": 0.022965399999999997,
+          "p99": 0.02451468,
+          "max": 0.024902
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 13395761.549828162,
+          "p50": 16433853.738701725,
+          "min": 4277891.854893908,
+          "max": 19960079.840319365
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3768320,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_state_extend": {
+        "available": true,
+        "bars": 100,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.018719,
+            0.019675,
+            0.009752,
+            0.009126,
+            0.008391
+          ],
+          "min": 0.008391,
+          "mean": 0.0131326,
+          "p50": 0.009752,
+          "p95": 0.019483800000000003,
+          "p99": 0.019636760000000003,
+          "max": 0.019675
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.021638,
+            0.022209,
+            0.011021,
+            0.010578,
+            0.009905
+          ],
+          "min": 0.009905,
+          "mean": 0.0150702,
+          "p50": 0.011021,
+          "p95": 0.0220948,
+          "p99": 0.02218616,
+          "max": 0.022209
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 8710859.719571894,
+          "p50": 10254306.80885972,
+          "min": 5082592.121982211,
+          "max": 11917530.68764152
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3764224,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_streaming": {
+        "available": true,
+        "bars": 100,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.049269,
+            0.03852,
+            0.038202,
+            0.037747,
+            0.037872
+          ],
+          "min": 0.037747,
+          "mean": 0.040322000000000004,
+          "p50": 0.038202,
+          "p95": 0.0471192,
+          "p99": 0.04883904,
+          "max": 0.049269
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.052153,
+            0.040284,
+            0.039675,
+            0.03926,
+            0.03982
+          ],
+          "min": 0.03926,
+          "mean": 0.042238399999999995,
+          "p50": 0.03982,
+          "p95": 0.049779199999999996,
+          "p99": 0.05167824,
+          "max": 0.052153
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 2506616.4310221416,
+          "p50": 2617663.99664939,
+          "min": 2029673.8314152916,
+          "max": 2649217.156330304
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 2908160,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_pipeline": {
+        "available": false,
+        "reason": "The shared multi-indicator Rust Pipeline is scheduled but not implemented."
+      }
+    },
+    "1000": {
+      "talib_batch": {
+        "available": true,
+        "bars": 1000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.020299,
+            0.0119,
+            0.011569,
+            0.010946,
+            0.011195
+          ],
+          "min": 0.010946,
+          "mean": 0.013181799999999999,
+          "p50": 0.011569,
+          "p95": 0.0186192,
+          "p99": 0.01996304,
+          "max": 0.020299
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.02296,
+            0.013615,
+            0.013633,
+            0.012071,
+            0.012729
+          ],
+          "min": 0.012071,
+          "mean": 0.0150016,
+          "p50": 0.013615,
+          "p95": 0.021094599999999998,
+          "p99": 0.02258692,
+          "max": 0.02296
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 80083636.7321846,
+          "p50": 86437894.37289308,
+          "min": 49263510.517759494,
+          "max": 91357573.54284671
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3858432,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_batch": {
+        "available": true,
+        "bars": 1000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.024969,
+            0.018785,
+            0.017357,
+            0.016407,
+            0.015881
+          ],
+          "min": 0.015881,
+          "mean": 0.018679800000000003,
+          "p50": 0.017357,
+          "p95": 0.023732200000000002,
+          "p99": 0.024721640000000003,
+          "max": 0.024969
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.028049,
+            0.020787,
+            0.018853,
+            0.017663,
+            0.017224
+          ],
+          "min": 0.017224,
+          "mean": 0.0205152,
+          "p50": 0.018853,
+          "p95": 0.026596599999999998,
+          "p99": 0.027758520000000002,
+          "max": 0.028049
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 54963037.875263,
+          "p50": 57613642.91064124,
+          "min": 40049661.580359645,
+          "max": 62968326.93155343
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3792896,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_state_extend": {
+        "available": true,
+        "bars": 1000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.054442,
+            0.039565,
+            0.040824,
+            0.038108,
+            0.038537
+          ],
+          "min": 0.038108,
+          "mean": 0.0422952,
+          "p50": 0.039565,
+          "p95": 0.0517184,
+          "p99": 0.05389728,
+          "max": 0.054442
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.05747,
+            0.041638,
+            0.042021,
+            0.039368,
+            0.040678
+          ],
+          "min": 0.039368,
+          "mean": 0.044235000000000003,
+          "p50": 0.041638,
+          "p95": 0.0543802,
+          "p99": 0.05685204,
+          "max": 0.05747
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 24065745.54600931,
+          "p50": 25274864.147605203,
+          "min": 18368171.632195733,
+          "max": 26241209.1949197
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3788800,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_streaming": {
+        "available": true,
+        "bars": 1000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.325682,
+            0.459766,
+            0.377931,
+            0.324288,
+            0.32495
+          ],
+          "min": 0.324288,
+          "mean": 0.36252340000000005,
+          "p50": 0.325682,
+          "p95": 0.443399,
+          "p99": 0.4564926,
+          "max": 0.459766
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.328798,
+            0.462036,
+            0.380012,
+            0.326652,
+            0.327148
+          ],
+          "min": 0.326652,
+          "mean": 0.3649292,
+          "p50": 0.328798,
+          "p95": 0.4456312,
+          "p99": 0.45875504,
+          "max": 0.462036
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 2810512.0260737734,
+          "p50": 3070479.7931724805,
+          "min": 2175019.4664242244,
+          "max": 3083678.7053483324
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 2908160,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_pipeline": {
+        "available": false,
+        "reason": "The shared multi-indicator Rust Pipeline is scheduled but not implemented."
+      }
+    },
+    "10000": {
+      "talib_batch": {
+        "available": true,
+        "bars": 10000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.074311,
+            0.069928,
+            0.107158,
+            0.112591,
+            0.072127
+          ],
+          "min": 0.069928,
+          "mean": 0.08722300000000001,
+          "p50": 0.074311,
+          "p95": 0.1115044,
+          "p99": 0.11237368,
+          "max": 0.112591
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.077637,
+            0.072032,
+            0.109564,
+            0.114937,
+            0.074687
+          ],
+          "min": 0.072032,
+          "mean": 0.0897714,
+          "p50": 0.077637,
+          "p95": 0.1138624,
+          "p99": 0.11472208,
+          "max": 0.114937
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 119671067.53312242,
+          "p50": 134569579.20092583,
+          "min": 88817045.76742369,
+          "max": 143004232.92529458
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3497984,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_batch": {
+        "available": true,
+        "bars": 10000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.137707,
+            0.135508,
+            0.129543,
+            0.130732,
+            0.130142
+          ],
+          "min": 0.129543,
+          "mean": 0.1327264,
+          "p50": 0.130732,
+          "p95": 0.1372672,
+          "p99": 0.13761904,
+          "max": 0.137707
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.140534,
+            0.138198,
+            0.131903,
+            0.132572,
+            0.132433
+          ],
+          "min": 0.131903,
+          "mean": 0.135128,
+          "p50": 0.132572,
+          "p95": 0.1400668,
+          "p99": 0.14044056,
+          "max": 0.140534
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 75388057.36277525,
+          "p50": 76492366.06186703,
+          "min": 72617949.70480804,
+          "max": 77194445.08773148
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3424256,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_state_extend": {
+        "available": true,
+        "bars": 10000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            0.338281,
+            0.327842,
+            0.325826,
+            0.32636,
+            0.325423
+          ],
+          "min": 0.325423,
+          "mean": 0.3287464,
+          "p50": 0.32636,
+          "p95": 0.3361932,
+          "p99": 0.33786344,
+          "max": 0.338281
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            0.354802,
+            0.329797,
+            0.327073,
+            0.327507,
+            0.326915
+          ],
+          "min": 0.326915,
+          "mean": 0.3332188,
+          "p50": 0.327507,
+          "p95": 0.34980100000000003,
+          "p99": 0.3538018,
+          "max": 0.354802
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 30425038.834663153,
+          "p50": 30641009.927687217,
+          "min": 29561222.770418674,
+          "max": 30729235.487350307
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3432448,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_streaming": {
+        "available": true,
+        "bars": 10000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            3.358785,
+            3.456954,
+            3.548233,
+            3.67963,
+            3.369119
+          ],
+          "min": 3.358785,
+          "mean": 3.4825442000000004,
+          "p50": 3.456954,
+          "p95": 3.6533506,
+          "p99": 3.67437412,
+          "max": 3.67963
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            3.353435,
+            3.458851,
+            3.550012,
+            3.681883,
+            3.370887
+          ],
+          "min": 3.353435,
+          "mean": 3.4830136000000005,
+          "p50": 3.458851,
+          "p95": 3.6555088000000002,
+          "p99": 3.6766081600000002,
+          "max": 3.681883
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 2874818.1669787727,
+          "p50": 2892720.0072665126,
+          "min": 2717664.5477942075,
+          "max": 2977267.0772317965
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 2818048,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_pipeline": {
+        "available": false,
+        "reason": "The shared multi-indicator Rust Pipeline is scheduled but not implemented."
+      }
+    },
+    "100000": {
+      "talib_batch": {
+        "available": true,
+        "bars": 100000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            1.027431,
+            0.959868,
+            0.945293,
+            0.977662,
+            0.979316
+          ],
+          "min": 0.945293,
+          "mean": 0.977914,
+          "p50": 0.977662,
+          "p95": 1.017808,
+          "p99": 1.0255064,
+          "max": 1.027431
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            1.030864,
+            0.962307,
+            0.947041,
+            0.979424,
+            0.981277
+          ],
+          "min": 0.947041,
+          "mean": 0.9801826,
+          "p50": 0.979424,
+          "p95": 1.0209466,
+          "p99": 1.02888052,
+          "max": 1.030864
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 102339071.96902254,
+          "p50": 102284838.72749478,
+          "min": 97330137.01163386,
+          "max": 105787306.15798487
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 2957312,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_batch": {
+        "available": true,
+        "bars": 100000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            1.950102,
+            2.034585,
+            1.88777,
+            1.851776,
+            1.844465
+          ],
+          "min": 1.844465,
+          "mean": 1.9137396,
+          "p50": 1.88777,
+          "p95": 2.0176884,
+          "p99": 2.03120568,
+          "max": 2.034585
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            1.95315,
+            2.037404,
+            1.890281,
+            1.853663,
+            1.846955
+          ],
+          "min": 1.846955,
+          "mean": 1.9162906,
+          "p50": 1.890281,
+          "p95": 2.0205532,
+          "p99": 2.03403384,
+          "max": 2.037404
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 52324094.2904927,
+          "p50": 52972554.91929631,
+          "min": 49150072.37348157,
+          "max": 54216263.252487846
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3416064,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_state_extend": {
+        "available": true,
+        "bars": 100000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            3.52694,
+            3.623634,
+            3.546131,
+            3.666388,
+            3.574145
+          ],
+          "min": 3.52694,
+          "mean": 3.5874476,
+          "p50": 3.574145,
+          "p95": 3.6578372,
+          "p99": 3.66467784,
+          "max": 3.666388
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            3.530252,
+            3.625979,
+            3.547999,
+            3.668364,
+            3.576702
+          ],
+          "min": 3.530252,
+          "mean": 3.5898592000000002,
+          "p50": 3.576702,
+          "p95": 3.659887,
+          "p99": 3.6666686,
+          "max": 3.668364
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 27880612.69156767,
+          "p50": 27978719.386034984,
+          "min": 27274800.157539245,
+          "max": 28353190.01740886
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 3416064,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_streaming": {
+        "available": true,
+        "bars": 100000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            33.188197,
+            36.104631,
+            35.039224,
+            33.764151,
+            33.76748
+          ],
+          "min": 33.188197,
+          "mean": 34.372736599999996,
+          "p50": 33.76748,
+          "p95": 35.8915496,
+          "p99": 36.06201472,
+          "max": 36.104631
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            33.191712,
+            36.109464,
+            35.043955,
+            33.766759,
+            33.771964
+          ],
+          "min": 33.191712,
+          "mean": 34.376770799999996,
+          "p50": 33.771964,
+          "p95": 35.8963622,
+          "p99": 36.06684364,
+          "max": 36.109464
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 2911988.3956639203,
+          "p50": 2961429.1620221585,
+          "min": 2769727.794752978,
+          "max": 3013119.3930179453
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 2990080,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_pipeline": {
+        "available": false,
+        "reason": "The shared multi-indicator Rust Pipeline is scheduled but not implemented."
+      }
+    },
+    "1000000": {
+      "talib_batch": {
+        "available": true,
+        "bars": 1000000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            9.175011,
+            9.218783,
+            9.059996,
+            9.444356,
+            9.613889
+          ],
+          "min": 9.059996,
+          "mean": 9.302406999999999,
+          "p50": 9.218783,
+          "p95": 9.5799824,
+          "p99": 9.60710768,
+          "max": 9.613889
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            9.180843,
+            9.223455,
+            9.064749,
+            9.448807,
+            9.619791
+          ],
+          "min": 9.064749,
+          "mean": 9.307528999999999,
+          "p50": 9.223455,
+          "p95": 9.5855942,
+          "p99": 9.612951639999999,
+          "max": 9.619791
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 107548146.23626709,
+          "p50": 108474187.97036442,
+          "min": 104016179.09256077,
+          "max": 110375324.66901751
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 15835136,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_batch": {
+        "available": true,
+        "bars": 1000000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            20.573847,
+            19.388607,
+            20.532766,
+            21.558142,
+            19.90193
+          ],
+          "min": 19.388607,
+          "mean": 20.3910584,
+          "p50": 20.532766,
+          "p95": 21.361283,
+          "p99": 21.5187702,
+          "max": 21.558142
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            20.579844,
+            19.39316,
+            20.536657,
+            21.514388,
+            19.906008
+          ],
+          "min": 19.39316,
+          "mean": 20.3860114,
+          "p50": 20.536657,
+          "p95": 21.3274792,
+          "p99": 21.47700624,
+          "max": 21.514388
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 49103458.44601446,
+          "p50": 48702644.34903705,
+          "min": 46386186.71312213,
+          "max": 51576681.089054
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 31866880,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_state_extend": {
+        "available": true,
+        "bars": 1000000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            38.418326,
+            36.391508,
+            36.511683,
+            36.53078,
+            37.250388
+          ],
+          "min": 36.391508,
+          "mean": 37.020537000000004,
+          "p50": 36.53078,
+          "p95": 38.1847384,
+          "p99": 38.37160848,
+          "max": 38.418326
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            38.423605,
+            36.39671,
+            36.490686,
+            36.534855,
+            37.224739
+          ],
+          "min": 36.39671,
+          "mean": 37.014119,
+          "p50": 36.534855,
+          "p95": 38.1838318,
+          "p99": 38.37565036,
+          "max": 38.423605
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 27023242.066521455,
+          "p50": 27374175.968867898,
+          "min": 26029244.48087613,
+          "max": 27478938.218223877
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 21782528,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_streaming": {
+        "available": true,
+        "bars": 1000000,
+        "repeats": 5,
+        "wall_latency": {
+          "unit": "ms",
+          "samples": [
+            345.174786,
+            347.950091,
+            348.453329,
+            343.335104,
+            343.254626
+          ],
+          "min": 343.254626,
+          "mean": 345.63358719999997,
+          "p50": 345.174786,
+          "p95": 348.3526814,
+          "p99": 348.43319948,
+          "max": 348.453329
+        },
+        "cpu_time": {
+          "unit": "ms",
+          "samples": [
+            345.135161,
+            347.875523,
+            348.442444,
+            343.292736,
+            343.227389
+          ],
+          "min": 343.227389,
+          "mean": 345.5946506,
+          "p50": 345.135161,
+          "p95": 348.32905980000004,
+          "p99": 348.41976716000005,
+          "max": 348.442444
+        },
+        "throughput_bars_per_second": {
+          "unit": "bars/s",
+          "mean": 2893355.7439103583,
+          "p50": 2897082.9868204803,
+          "min": 2869824.7850575135,
+          "max": 2913289.2152194916
+        },
+        "peak_rss_delta_bytes": {
+          "unit": "bytes",
+          "value": 21577728,
+          "inputs_excluded": true
+        }
+      },
+      "taflow_pipeline": {
+        "available": false,
+        "reason": "The shared multi-indicator Rust Pipeline is scheduled but not implemented."
+      }
+    }
+  },
+  "streaming_append_latency": {
+    "unit": "ns/append",
+    "sample_count": 10000,
+    "timer_overhead_included": true,
+    "mean": 293.2125,
+    "p50": 287.0,
+    "p95": 312.0,
+    "p99": 453.0100000000002,
+    "max": 6582.0
+  },
+  "correctness": {
+    "rust_batch_parity": true,
+    "python_talib_oracle_parity": true,
+    "compatibility_namespace_parity": true,
+    "descriptive_namespace_parity": true,
+    "moving_average_types_tested": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "moving_average_specific_lookbacks": true,
+    "chunked_backfill_continuation": true,
+    "reset_replay": true,
+    "invalid_period_and_ma_type_validation": true,
+    "unequal_input_length_validation": true
+  },
+  "series_sizes": {
+    "rust_parity_values_per_ma_type": 500,
+    "python_oracle_values_per_ma_type": 500,
+    "benchmark_correctness_values": 100000
+  },
+  "rust_stream_benchmark": {
+    "configuration": "STOCHF(5,13,SMA)",
+    "warmup_bars": 10000,
+    "update_bars": 1000000,
+    "time_ms_low": 33.072,
+    "time_ms_estimate": 33.337,
+    "time_ms_high": 34.399,
+    "nanoseconds_per_update": 33.3
+  }
+}

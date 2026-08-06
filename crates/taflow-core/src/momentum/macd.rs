@@ -103,24 +103,13 @@ pub fn macd(
 /// Fast path for all-EMA: inline single-pass (eliminates 5 Vec allocations).
 /// Generic path seeds every MA at the shared largest lookback, matching
 /// TA-Lib's `TA_MA(startIdx, ...)` calls inside MACDEXT.
-fn ma_lookback(period: usize, ma_type: MaType) -> usize {
-    match ma_type {
-        MaType::Sma | MaType::Ema | MaType::Wma | MaType::Trima => period - 1,
-        MaType::Dema => 2 * (period - 1),
-        MaType::Tema => 3 * (period - 1),
-        MaType::Kama => period,
-        MaType::Mama => 32,
-        MaType::T3 => 6 * (period - 1),
-    }
-}
-
 fn ma_from_aligned_start(
     input: &[f64],
     start: usize,
     period: usize,
     ma_type: MaType,
 ) -> TaResult<Vec<f64>> {
-    let lookback = ma_lookback(period, ma_type);
+    let lookback = ma_type.lookback(period);
     let source_start = start - lookback;
     let values = compute_ma(&input[source_start..], period, ma_type)?;
     Ok(values[lookback..].to_vec())
@@ -156,8 +145,8 @@ pub fn macd_ext(
     }
 
     let len = input.len();
-    let largest_lookback = ma_lookback(fp, fmt).max(ma_lookback(sp, smt));
-    let signal_lookback = ma_lookback(signalperiod, signalmatype);
+    let largest_lookback = fmt.lookback(fp).max(smt.lookback(sp));
+    let signal_lookback = signalmatype.lookback(signalperiod);
     let total_lookback = largest_lookback + signal_lookback;
     if len <= total_lookback {
         return Err(TaError::InsufficientData {

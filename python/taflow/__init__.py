@@ -5,6 +5,7 @@ __version__ = "0.1.2"
 from . import talib
 from .acceleration_bands import AccelerationBands
 from .bollinger_bands import BollingerBands
+from .fast_stochastic_oscillator import FastStochasticOscillator
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
 from .moving_average_convergence_divergence_fixed import (
@@ -18,6 +19,7 @@ __all__ = [
     "MovingAverage",
     "MovingAverageConvergenceDivergenceFixed",
     "BollingerBands",
+    "FastStochasticOscillator",
     "IntradayMomentumIndex",
     "AccelerationBands",
     "ParabolicSar",

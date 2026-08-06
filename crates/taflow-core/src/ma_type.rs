@@ -38,6 +38,20 @@ impl TryFrom<i32> for MaType {
     }
 }
 
+impl MaType {
+    /// Returns TA-Lib's warm-up length when this type is used by `MA`.
+    pub fn lookback(self, period: usize) -> usize {
+        match self {
+            Self::Sma | Self::Ema | Self::Wma | Self::Trima => period.saturating_sub(1),
+            Self::Dema => 2 * period.saturating_sub(1),
+            Self::Tema => 3 * period.saturating_sub(1),
+            Self::Kama => period,
+            Self::Mama => 32,
+            Self::T3 => 6 * period.saturating_sub(1),
+        }
+    }
+}
+
 /// 根据 MaType 调度到对应的移动平均计算函数
 pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec<f64>> {
     use crate::overlap;

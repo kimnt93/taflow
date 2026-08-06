@@ -50,8 +50,12 @@ pub fn stoch(
         for j in start..=i {
             let h = high[j];
             let l = low[j];
-            if h > hh { hh = h; }
-            if l < ll { ll = l; }
+            if h > hh {
+                hh = h;
+            }
+            if l < ll {
+                ll = l;
+            }
         }
         let range = hh - ll;
         if range > 0.0 {
@@ -99,79 +103,6 @@ pub fn stoch(
     }
 
     Ok((slowk_out, slowd_out))
-}
-
-/// Fast Stochastic (STOCHF)
-///
-/// 返回 (fastk, fastd)
-pub fn stochf(
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-    fastk_period: usize,
-    fastd_period: usize,
-    fastd_matype: MaType,
-) -> TaResult<(Vec<f64>, Vec<f64>)> {
-    let len = high.len();
-    if len != low.len() || len != close.len() {
-        return Err(TaError::LengthMismatch {
-            expected: len,
-            got: low.len().min(close.len()),
-        });
-    }
-
-    let lookback = fastk_period - 1 + fastd_period - 1;
-    if len <= lookback {
-        return Err(TaError::InsufficientData {
-            need: lookback + 1,
-            got: len,
-        });
-    }
-
-    let mut fastk_values = Vec::with_capacity(len - (fastk_period - 1));
-    for i in (fastk_period - 1)..len {
-        let start = i + 1 - fastk_period;
-        let mut hh = f64::NEG_INFINITY;
-        let mut ll = f64::INFINITY;
-        for j in start..=i {
-            let h = high[j];
-            let l = low[j];
-            if h > hh { hh = h; }
-            if l < ll { ll = l; }
-        }
-        let range = hh - ll;
-        if range > 0.0 {
-            fastk_values.push(100.0 * (close[i] - ll) / range);
-        } else {
-            fastk_values.push(50.0);
-        }
-    }
-
-    let fastd_arr = compute_ma(&fastk_values, fastd_period, fastd_matype)?;
-
-    let mut fastk_out = vec![0.0_f64; len];
-    let mut fastd_out = vec![0.0_f64; len];
-    let aligned_start = fastk_period - 1 + fastd_period - 1;
-    fastk_out[..aligned_start.min(len)].fill(f64::NAN);
-    fastd_out[..aligned_start.min(len)].fill(f64::NAN);
-
-    let k_skip = fastd_period - 1;
-    for (j, i) in (aligned_start..len).enumerate() {
-        let idx = k_skip + j;
-        if idx < fastk_values.len() {
-            fastk_out[i] = fastk_values[idx];
-        }
-    }
-
-    let d_skip = fastd_period - 1;
-    for (j, i) in (aligned_start..len).enumerate() {
-        let idx = d_skip + j;
-        if idx < fastd_arr.len() {
-            fastd_out[i] = fastd_arr[idx];
-        }
-    }
-
-    Ok((fastk_out, fastd_out))
 }
 
 /// Stochastic RSI (STOCHRSI)
@@ -265,7 +196,8 @@ mod tests {
         let close: Vec<f64> = (0..30)
             .map(|i| 50.0 + (i as f64 * 0.3).sin() * 5.0)
             .collect();
-        let (slowk, _slowd) = stoch(&high, &low, &close, 5, 3, MaType::Sma, 3, MaType::Sma).unwrap();
+        let (slowk, _slowd) =
+            stoch(&high, &low, &close, 5, 3, MaType::Sma, 3, MaType::Sma).unwrap();
         assert_eq!(slowk.len(), 30);
     }
 }
