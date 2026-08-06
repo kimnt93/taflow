@@ -5,7 +5,7 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
     self, Atr, Dema, Ema, Imi, Macd, MacdFix, Mama, Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr,
-    Rocr100, Rsi, Sma, Stochf, StreamingIndicator, Tema, Trange, Trima, Wma,
+    Rocr100, Rsi, Sma, Stoch, Stochf, StreamingIndicator, Tema, Trange, Trima, Wma,
 };
 use taflow::MaType;
 
@@ -1791,6 +1791,11 @@ pub struct StatefulStochf {
 }
 
 #[pyclass]
+pub struct StatefulStoch {
+    inner: Stoch,
+}
+
+#[pyclass]
 pub struct StatefulMama {
     inner: Mama,
 }
@@ -2006,6 +2011,79 @@ impl StatefulStochf {
     #[getter]
     fn value(&self) -> Option<(f64, f64)> {
         self.inner.value().map(|value| (value.fastk, value.fastd))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
+
+#[pymethods]
+impl StatefulStoch {
+    #[new]
+    #[pyo3(signature = (fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0))]
+    fn new(
+        fastk_period: usize,
+        slowk_period: usize,
+        slowk_matype: i32,
+        slowd_period: usize,
+        slowd_matype: i32,
+    ) -> PyResult<Self> {
+        let slowk_type = MaType::try_from(slowk_matype).map_err(py_value_error)?;
+        let slowd_type = MaType::try_from(slowd_matype).map_err(py_value_error)?;
+        Ok(Self {
+            inner: Stoch::new(
+                fastk_period,
+                slowk_period,
+                slowk_type,
+                slowd_period,
+                slowd_type,
+            )
+            .map_err(py_value_error)?,
+        })
+    }
+
+    fn append(&mut self, high: f64, low: f64, close: f64) -> Option<(f64, f64)> {
+        self.inner
+            .append(high, low, close)
+            .map(|value| (value.slowk, value.slowd))
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+        let high = high.as_slice()?;
+        let low = low.as_slice()?;
+        let close = close.as_slice()?;
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(PyValueError::new_err(
+                "high, low, and close must have equal lengths",
+            ));
+        }
+        let mut slowk = Vec::with_capacity(high.len());
+        let mut slowd = Vec::with_capacity(high.len());
+        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+            match self.inner.append(high, low, close) {
+                Some(value) => {
+                    slowk.push(value.slowk);
+                    slowd.push(value.slowd);
+                }
+                None => {
+                    slowk.push(f64::NAN);
+                    slowd.push(f64::NAN);
+                }
+            }
+        }
+        Ok((to_py_array(py, slowk), to_py_array(py, slowd)))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|value| (value.slowk, value.slowd))
     }
 
     fn reset(&mut self) {

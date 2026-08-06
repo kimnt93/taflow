@@ -37,6 +37,7 @@ batch API; it must not duplicate numerical implementations.
 | IMI | IntradayMomentumIndex | `intraday_momentum_index.py` | stateful |
 | MACDFIX | MovingAverageConvergenceDivergenceFixed | `moving_average_convergence_divergence_fixed.py` | stateful |
 | STOCHF | FastStochasticOscillator | `fast_stochastic_oscillator.py` | stateful |
+| STOCH | StochasticOscillator | `stochastic_oscillator.py` | stateful |
 
 Each descriptive wrapper uses composition around the PyO3 state class. This
 gives stable public names without subclassing extension types and keeps all

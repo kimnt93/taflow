@@ -102,6 +102,7 @@ from taflow import (
     IntradayMomentumIndex,
     MovingAverage,
     MovingAverageConvergenceDivergenceFixed,
+    StochasticOscillator,
 )
 
 average = MovingAverage(period=20, moving_average_type=1)
@@ -125,6 +126,15 @@ stochastic = FastStochasticOscillator(
     fast_d_average_type=0,
 )
 fast_k, fast_d = stochastic.extend(high_history, low_history, close_history)
+
+slow_stochastic = StochasticOscillator(
+    fast_k_period=5,
+    slow_k_period=13,
+    slow_d_period=11,
+)
+slow_k, slow_d = slow_stochastic.extend(
+    high_history, low_history, close_history
+)
 ```
 
 Use `taflow.talib` for uppercase TA-Lib-compatible batch calls and top-level

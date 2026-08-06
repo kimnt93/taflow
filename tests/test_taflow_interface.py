@@ -48,6 +48,18 @@ def test_talib_compatibility_namespace_preserves_old_style_functions():
             rtol=1e-8,
             atol=1e-10,
         )
+    for slowk_matype in range(9):
+        for slowd_matype in range(9):
+            assert_outputs_equal(
+                talib.STOCH(
+                    high, low, close, 5, 13, slowk_matype, 11, slowd_matype
+                ),
+                original_talib.STOCH(
+                    high, low, close, 5, 13, slowk_matype, 11, slowd_matype
+                ),
+                rtol=1e-8,
+                atol=1e-10,
+            )
 
 
 def test_descriptive_moving_average_and_bollinger_bands():
@@ -147,6 +159,28 @@ def test_descriptive_fast_stochastic_oscillator():
         )
 
 
+def test_descriptive_stochastic_oscillator():
+    high, low, close = price_data(500)
+    for slowk_matype in range(9):
+        for slowd_matype in range(9):
+            indicator = taflow.StochasticOscillator(
+                fast_k_period=5,
+                slow_k_period=13,
+                slow_k_average_type=slowk_matype,
+                slow_d_period=11,
+                slow_d_average_type=slowd_matype,
+            )
+            expected = original_talib.STOCH(
+                high, low, close, 5, 13, slowk_matype, 11, slowd_matype
+            )
+            assert_outputs_equal(
+                indicator.extend(high, low, close),
+                expected,
+                rtol=1e-8,
+                atol=1e-10,
+            )
+
+
 def test_descriptive_classes_are_defined_in_individual_modules():
     assert taflow.MovingAverage.__module__ == "taflow.moving_average"
     assert taflow.BollingerBands.__module__ == "taflow.bollinger_bands"
@@ -161,6 +195,7 @@ def test_descriptive_classes_are_defined_in_individual_modules():
         taflow.FastStochasticOscillator.__module__
         == "taflow.fast_stochastic_oscillator"
     )
+    assert taflow.StochasticOscillator.__module__ == "taflow.stochastic_oscillator"
     assert (
         taflow.ParabolicSarExtended.__module__
         == "taflow.parabolic_sar_extended"

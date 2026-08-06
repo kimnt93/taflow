@@ -101,6 +101,20 @@ FUNCTIONS = {
         {"fastk_period": 5, "fastd_period": 13, "fastd_matype": 0},
         ("high", "low", "close"),
     ),
+    "STOCH": FunctionSpec(
+        "STOCH",
+        taflow.StochasticOscillator,
+        (5, 13, 0, 11, 0),
+        (),
+        {
+            "fastk_period": 5,
+            "slowk_period": 13,
+            "slowk_matype": 0,
+            "slowd_period": 11,
+            "slowd_matype": 0,
+        },
+        ("high", "low", "close"),
+    ),
 }
 
 

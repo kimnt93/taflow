@@ -21,6 +21,7 @@ mod moving_average;
 mod ppo;
 mod sar;
 mod sarext;
+mod stoch;
 mod stochf;
 mod t3;
 
@@ -37,6 +38,7 @@ pub use mama::{Mama, MamaValue};
 pub use ppo::Ppo;
 pub use sar::Sar;
 pub use sarext::Sarext;
+pub use stoch::{Stoch, StochValue};
 pub use stochf::{Stochf, StochfValue};
 pub use t3::T3;
 

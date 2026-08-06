@@ -43,7 +43,7 @@ impl Stochf {
             if range > 0.0 {
                 100.0 * (close - lowest) / range
             } else {
-                50.0
+                0.0
             }
         });
         self.value = fastk.and_then(|fastk| {

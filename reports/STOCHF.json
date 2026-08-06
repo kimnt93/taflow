@@ -1077,6 +1077,7 @@
     "descriptive_namespace_parity": true,
     "moving_average_types_tested": [0, 1, 2, 3, 4, 5, 6, 7, 8],
     "moving_average_specific_lookbacks": true,
+    "flat_range_zero_convention": true,
     "chunked_backfill_continuation": true,
     "reset_replay": true,
     "invalid_period_and_ma_type_validation": true,

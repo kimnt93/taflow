@@ -54,7 +54,7 @@ pub fn stochf(
         fastk_values.push(if range > 0.0 {
             100.0 * (close[today] - lowest) / range
         } else {
-            50.0
+            0.0
         });
     }
 

@@ -23,6 +23,8 @@ Python exposes `taflow.talib.STOCHF` for compatible batch use and
   call for every MA type.
 - Reset/replay, invalid periods, invalid MA type, and unequal input-length
   checks pass.
+- Flat high/low ranges return zero, matching TA-Lib's zero-denominator
+  convention.
 - Batch, stream, and descriptive wrapper code are isolated in `stochf.rs`,
   `stream/stochf.rs`, and `fast_stochastic_oscillator.py` respectively.
 

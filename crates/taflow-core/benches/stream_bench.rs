@@ -1,8 +1,8 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use taflow::stream::{
     self, Accbands, Apo, Atr, Bbands, Dema, Ema, Imi, Ma, Macd, MacdFix, Mama, Midpoint, Midprice,
-    Mom, Natr, Ppo, Roc, Rocp, Rocr, Rocr100, Rsi, Sar, Sarext, Sma, Stochf, StreamingIndicator,
-    Tema, Trange, Trima, Wma, T3,
+    Mom, Natr, Ppo, Roc, Rocp, Rocr, Rocr100, Rsi, Sar, Sarext, Sma, Stoch, Stochf,
+    StreamingIndicator, Tema, Trange, Trima, Wma, T3,
 };
 use taflow::MaType;
 
@@ -291,6 +291,17 @@ fn append_benchmark(criterion: &mut Criterion) {
     group.bench_function(BenchmarkId::new("stochf", updates.len()), |bench| {
         bench.iter(|| {
             let mut state = Stochf::new(5, 13, MaType::Sma).unwrap();
+            for value in warmup {
+                state.append(*value + 1.0, *value - 1.0, *value);
+            }
+            for value in updates {
+                black_box(state.append(*value + 1.0, *value - 1.0, *value));
+            }
+        })
+    });
+    group.bench_function(BenchmarkId::new("stoch", updates.len()), |bench| {
+        bench.iter(|| {
+            let mut state = Stoch::new(5, 13, MaType::Sma, 11, MaType::Sma).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }

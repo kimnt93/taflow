@@ -38,7 +38,7 @@ the price transforms, math transforms, and pointwise arithmetic operators.
 - [x] MACD
 - [ ] MACDEXT
 - [x] MACDFIX
-- [ ] STOCH
+- [x] STOCH
 - [x] STOCHF
 - [ ] STOCHRSI
 - [ ] ADX

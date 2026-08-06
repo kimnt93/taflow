@@ -6,6 +6,7 @@ make sure append/extend state transitions preserve that compatibility.
 
 import numpy as np
 import pytest
+import talib as original_talib
 from taflow import talib as ta
 
 from taflow.talib import (
@@ -539,7 +540,61 @@ def test_stochf_matches_oracle_for_every_ma_type(matype):
         )
 
 
-def test_stochf_rejects_unequal_input_lengths():
+@pytest.mark.parametrize("slowk_matype", range(9))
+@pytest.mark.parametrize("slowd_matype", range(9))
+def test_stoch_matches_oracle_for_every_ma_pair(slowk_matype, slowd_matype):
+    close = close_data(500)
+    index = np.arange(close.size, dtype=np.float64)
+    high = close + 1.0 + np.abs(np.sin(index * 0.17))
+    low = close - 0.8 - np.abs(np.cos(index * 0.13))
+    expected = original_talib.STOCH(
+        high, low, close, 5, 13, slowk_matype, 11, slowd_matype
+    )
+
+    indicator = state.STOCH(5, 13, slowk_matype, 11, slowd_matype)
+    actual = indicator.extend(high, low, close)
+    for ours, theirs in zip(actual, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+    chunked = state.STOCH(5, 13, slowk_matype, 11, slowd_matype)
+    first = chunked.extend(high[:20], low[:20], close[:20])
+    remaining = chunked.extend(high[20:], low[20:], close[20:])
+    for ours, theirs in zip(
+        (np.concatenate(parts) for parts in zip(first, remaining)), expected
+    ):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+    indicator.reset()
+    replayed = [indicator.append(*bar) for bar in zip(high, low, close)]
+    replayed = [(np.nan, np.nan) if value is None else value for value in replayed]
+    replayed = tuple(np.asarray(values) for values in zip(*replayed))
+    for ours, theirs in zip(replayed, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+
+def test_stochastic_flat_range_matches_zero_convention():
+    values = np.full(100, 42.0)
+    for constructor, oracle in (
+        (lambda: state.STOCH(5, 3, 0, 3, 0), original_talib.STOCH),
+        (lambda: state.STOCHF(5, 3, 0), original_talib.STOCHF),
+    ):
+        expected = oracle(values, values, values)
+        actual = constructor().extend(values, values, values)
+        for ours, theirs in zip(actual, expected):
+            np.testing.assert_allclose(ours, theirs, equal_nan=True)
+
+
+def test_stochastic_states_reject_unequal_input_lengths():
+    with pytest.raises(ValueError):
+        state.STOCH(5, 13, 0, 11, 0).extend(
+            np.ones(20), np.ones(19), np.ones(20)
+        )
     with pytest.raises(ValueError):
         state.STOCHF(5, 13, 0).extend(
             np.ones(20), np.ones(19), np.ones(20)
@@ -577,3 +632,13 @@ def test_invalid_parameters_are_rejected():
         state.STOCHF(5, 0, 0)
     with pytest.raises(ValueError):
         state.STOCHF(5, 3, 9)
+    with pytest.raises(ValueError):
+        state.STOCH(0, 3, 0, 3, 0)
+    with pytest.raises(ValueError):
+        state.STOCH(5, 0, 0, 3, 0)
+    with pytest.raises(ValueError):
+        state.STOCH(5, 3, 0, 0, 0)
+    with pytest.raises(ValueError):
+        state.STOCH(5, 3, 9, 3, 0)
+    with pytest.raises(ValueError):
+        state.STOCH(5, 3, 0, 3, 9)
