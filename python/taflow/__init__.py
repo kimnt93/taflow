@@ -7,6 +7,7 @@ from .acceleration_bands import AccelerationBands
 from .average_directional_index import AverageDirectionalIndex
 from .average_directional_index_rating import AverageDirectionalIndexRating
 from .bollinger_bands import BollingerBands
+from .directional_movement_index import DirectionalMovementIndex
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
 from .intraday_momentum_index import IntradayMomentumIndex
@@ -38,6 +39,7 @@ __all__ = [
     "AccelerationBands",
     "AverageDirectionalIndex",
     "AverageDirectionalIndexRating",
+    "DirectionalMovementIndex",
     "ParabolicSar",
     "ParabolicSarExtended",
     "__version__",

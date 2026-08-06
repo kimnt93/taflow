@@ -89,6 +89,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulHtTrendline>()?;
     m.add_class::<state_api::StatefulAdx>()?;
     m.add_class::<state_api::StatefulAdxr>()?;
+    m.add_class::<state_api::StatefulDx>()?;
     m.add_class::<state_api::StatefulMacdFix>()?;
     m.add_class::<state_api::StatefulStoch>()?;
     m.add_class::<state_api::StatefulStochf>()?;

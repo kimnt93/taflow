@@ -100,6 +100,7 @@ from taflow import (
     BollingerBands,
     AverageDirectionalIndex,
     AverageDirectionalIndexRating,
+    DirectionalMovementIndex,
     FastStochasticOscillator,
     HilbertTransformTrendline,
     IntradayMomentumIndex,
@@ -151,6 +152,9 @@ adx_values = adx.extend(high_history, low_history, close_history)
 
 adxr = AverageDirectionalIndexRating(period=14)
 adxr_values = adxr.extend(high_history, low_history, close_history)
+
+dx = DirectionalMovementIndex(period=14)
+dx_values = dx.extend(high_history, low_history, close_history)
 
 stochastic = FastStochasticOscillator(
     fast_k_period=5,

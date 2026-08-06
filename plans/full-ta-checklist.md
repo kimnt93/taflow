@@ -64,7 +64,7 @@ tracked in [`operator-library-checklist.md`](operator-library-checklist.md).
 - [ ] MFI
 - [ ] TRIX
 - [ ] ULTOSC
-- [ ] DX
+- [x] DX
 - [ ] PLUS_DI
 - [ ] MINUS_DI
 - [ ] PLUS_DM
