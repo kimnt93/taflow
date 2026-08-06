@@ -185,7 +185,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLKICKINGBYLENGTH
 - [ ] CDLLADDERBOTTOM
 - [x] CDLLONGLEGGEDDOJI
-- [ ] CDLLONGLINE
+- [x] CDLLONGLINE
 - [x] CDLMARUBOZU
 - [ ] CDLMATCHINGLOW
 - [ ] CDLMATHOLD

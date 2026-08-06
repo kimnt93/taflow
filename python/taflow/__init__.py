@@ -20,6 +20,7 @@ from .dragonfly_doji import CDLDRAGONFLYDOJI, DragonflyDoji
 from .gravestone_doji import CDLGRAVESTONEDOJI, GravestoneDoji
 from .short_line import CDLSHORTLINE, ShortLine
 from .spinning_top import CDLSPINNINGTOP, SpinningTop
+from .long_line import CDLLONGLINE, LongLine
 from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -140,6 +141,7 @@ __all__ = [
     "CDLGRAVESTONEDOJI",
     "ShortLine", "CDLSHORTLINE",
     "SpinningTop", "CDLSPINNINGTOP",
+    "LongLine", "CDLLONGLINE",
     "CDLDOJI",
     "Engulfing",
     "CDLENGULFING",
