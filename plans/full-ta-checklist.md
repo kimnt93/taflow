@@ -51,7 +51,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [x] STOCHRSI
 - [x] ADX
 - [x] ADXR
-- [ ] CCI
+- [x] CCI
 - [x] MOM
 - [x] ROC
 - [x] ROCP

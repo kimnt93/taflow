@@ -7,6 +7,7 @@ from .acceleration_bands import AccelerationBands
 from .average_directional_index import AverageDirectionalIndex
 from .average_directional_index_rating import AverageDirectionalIndexRating
 from .bollinger_bands import BollingerBands
+from .commodity_channel_index import CCI, CommodityChannelIndex
 from .directional_movement_index import DirectionalMovementIndex
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -31,6 +32,8 @@ __all__ = [
     "MovingAverageConvergenceDivergenceFixed",
     "MovingAverageConvergenceDivergenceExtended",
     "BollingerBands",
+    "CommodityChannelIndex",
+    "CCI",
     "FastStochasticOscillator",
     "HilbertTransformTrendline",
     "StochasticOscillator",

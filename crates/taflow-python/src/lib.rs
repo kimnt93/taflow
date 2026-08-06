@@ -18,6 +18,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Unified indicator objects. Each TA binding lives in its own module and
     // owns its accumulated outputs so compute() never replays prior input.
     m.add_class::<indicators::ExponentialMovingAverage>()?;
+    m.add_class::<indicators::CommodityChannelIndex>()?;
 
     // Transitional state classes remain available while their indicators move
     // to the unified object surface above.
@@ -54,6 +55,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulLinearregAngle>()?;
     m.add_class::<state_api::StatefulTsf>()?;
     m.add_class::<state_api::StatefulCmo>()?;
+    m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::StatefulAd>()?;
     m.add_class::<state_api::StatefulAdosc>()?;

@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from taflow import EMA, ExponentialMovingAverage
+from taflow import CCI, EMA, CommodityChannelIndex, ExponentialMovingAverage
 from taflow.indicators import EMA as NamespacedEMA
 from taflow.talib import EMA as batch_ema
 
@@ -77,3 +77,31 @@ def test_ema_reset_clears_state_and_output_history():
     assert len(indicator) == 0
     assert indicator.value is None
     assert indicator.compute().size == 0
+
+
+def test_cci_unified_lifecycle_continues_without_replay():
+    close = np.linspace(100.0, 130.0, 64) + np.sin(np.arange(64) * 0.31)
+    high = close + 1.2
+    low = close - 0.8
+    from taflow.talib import CCI as batch_cci
+
+    expected = batch_cci(high, low, close, 14)
+    indicator = CommodityChannelIndex(high[:41], low[:41], close[:41], 14)
+    indicator.append(high[41], low[41], close[41]).extend(
+        high[42:], low[42:], close[42:]
+    )
+    np.testing.assert_allclose(
+        indicator.compute(), expected, rtol=1e-10, atol=1e-10, equal_nan=True
+    )
+    assert indicator.value == pytest.approx(expected[-1])
+    assert CCI is CommodityChannelIndex
+
+
+def test_cci_dataframe_input_and_mismatched_extend_are_transactional():
+    close = np.linspace(100.0, 110.0, 20)
+    frame = DataFrameLike(high=close + 1.0, low=close - 1.0, close=close)
+    indicator = CommodityChannelIndex(frame, timeperiod=5)
+    before = indicator.compute()
+    with pytest.raises(ValueError):
+        indicator.extend(close, close[:-1], close)
+    np.testing.assert_array_equal(indicator.compute(), before)

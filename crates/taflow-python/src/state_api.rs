@@ -4,7 +4,8 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Adx, Adxr, Atr, Dema, Dx, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama, Mavp,
+    self, Adx, Adxr, Atr, Cci, Dema, Dx, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama,
+    Mavp,
     Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi,
     StreamingIndicator, Tema, Trange, Trima, Wma,
 };
@@ -87,6 +88,49 @@ scalar_state_class!(StatefulLinearregSlope, stream::LinearregSlope, 14);
 scalar_state_class!(StatefulLinearregIntercept, stream::LinearregIntercept, 14);
 scalar_state_class!(StatefulLinearregAngle, stream::LinearregAngle, 14);
 scalar_state_class!(StatefulTsf, stream::Tsf, 14);
+
+#[pyclass]
+pub struct StatefulCci {
+    inner: Cci,
+}
+
+#[pymethods]
+impl StatefulCci {
+    #[new]
+    #[pyo3(signature = (timeperiod=14))]
+    fn new(timeperiod: usize) -> PyResult<Self> {
+        Ok(Self {
+            inner: Cci::new(timeperiod).map_err(py_value_error)?,
+        })
+    }
+
+    fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
+        self.inner.append(high, low, close)
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<Py<PyArray1<f64>>> {
+        let values = self
+            .inner
+            .extend_slice(high.as_slice()?, low.as_slice()?, close.as_slice()?)
+            .map_err(py_value_error)?;
+        Ok(to_py_array(py, values_from(values)))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
 
 #[pyclass]
 pub struct StatefulImi {

@@ -115,6 +115,25 @@ def test_midprice_extend_and_append_match_batch():
     np.testing.assert_allclose(replayed, expected, rtol=1e-12, atol=1e-12, equal_nan=True)
 
 
+def test_cci_extend_and_append_match_batch():
+    close = close_data()
+    high = close + 1.25
+    low = close - 0.75
+    expected = ta.CCI(high, low, close, 14)
+    indicator = state.CCI(14)
+
+    first = indicator.extend(high[:39], low[:39], close[:39])
+    second = indicator.extend(high[39:], low[39:], close[39:])
+    np.testing.assert_allclose(
+        np.concatenate((first, second)), expected, rtol=1e-10, atol=1e-10, equal_nan=True
+    )
+
+    indicator.reset()
+    replayed = [indicator.append(h, l, c) for h, l, c in zip(high, low, close)]
+    replayed = np.asarray([np.nan if value is None else value for value in replayed])
+    np.testing.assert_allclose(replayed, expected, rtol=1e-10, atol=1e-10, equal_nan=True)
+
+
 @pytest.mark.parametrize(
     "name",
     [
