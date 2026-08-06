@@ -32,6 +32,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::DragonflyDoji>()?;
     m.add_class::<indicators::GravestoneDoji>()?;
     m.add_class::<indicators::ShortLine>()?;
+    m.add_class::<indicators::SpinningTop>()?;
     m.add_class::<indicators::UpDownSideGapThreeMethods>()?;
     m.add_class::<indicators::StickSandwich>()?;
     m.add_class::<indicators::TwoCrows>()?;
