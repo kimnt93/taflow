@@ -21,6 +21,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::CommodityChannelIndex>()?;
     m.add_class::<indicators::MoneyFlowIndex>()?;
     m.add_class::<indicators::PlusDirectionalIndicator>()?;
+    m.add_class::<indicators::PlusDirectionalMovement>()?;
     m.add_class::<indicators::MinusDirectionalIndicator>()?;
     m.add_class::<indicators::TripleExponentialRateOfChange>()?;
     m.add_class::<indicators::UltimateOscillator>()?;
