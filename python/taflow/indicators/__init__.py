@@ -5,6 +5,7 @@ from ..doji import CDLDOJI, Doji
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
+from ..hikkake_modified import CDLHIKKAKEMOD, HikkakeModified
 from ..exponential_moving_average import EMA, ExponentialMovingAverage
 from ..hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
 from ..hilbert_transform_dominant_cycle_phase import HT_DCPHASE, HilbertTransformDominantCyclePhase
@@ -29,6 +30,7 @@ __all__ = [
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",
+    "HikkakeModified", "CDLHIKKAKEMOD",
     "HilbertTransformDominantCyclePeriod", "HT_DCPERIOD",
     "HilbertTransformDominantCyclePhase", "HT_DCPHASE",
     "HilbertTransformPhasor", "HT_PHASOR",

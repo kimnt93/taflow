@@ -15,6 +15,7 @@ from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
 from .hikkake import CDLHIKKAKE, Hikkake
+from .hikkake_modified import CDLHIKKAKEMOD, HikkakeModified
 from .hammer import CDLHAMMER, Hammer
 from .hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
 from .hilbert_transform_dominant_cycle_phase import HT_DCPHASE, HilbertTransformDominantCyclePhase
@@ -64,6 +65,8 @@ __all__ = [
     "HilbertTransformTrendline",
     "Hikkake",
     "CDLHIKKAKE",
+    "HikkakeModified",
+    "CDLHIKKAKEMOD",
     "Hammer",
     "CDLHAMMER",
     "HilbertTransformDominantCyclePeriod",
