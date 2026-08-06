@@ -45,7 +45,13 @@ impl MaType {
             Self::Sma | Self::Ema | Self::Wma | Self::Trima => period.saturating_sub(1),
             Self::Dema => 2 * period.saturating_sub(1),
             Self::Tema => 3 * period.saturating_sub(1),
-            Self::Kama => period,
+            Self::Kama => {
+                if period == 1 {
+                    0
+                } else {
+                    period
+                }
+            }
             Self::Mama => 32,
             Self::T3 => 6 * period.saturating_sub(1),
         }

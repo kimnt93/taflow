@@ -3,8 +3,8 @@
 //! STOCHRSI applies a rolling stochastic range to RSI values, then smooths
 //! fast %K with a selectable TA-Lib moving average to produce fast %D.
 
-use crate::error::{TaError, TaResult};
-use crate::ma_type::{compute_ma, MaType};
+use crate::error::TaResult;
+use crate::ma_type::MaType;
 
 /// Computes aligned stochastic-RSI fast %K and fast %D arrays.
 pub fn stochrsi(
@@ -14,50 +14,41 @@ pub fn stochrsi(
     fastd_period: usize,
     fastd_matype: MaType,
 ) -> TaResult<(Vec<f64>, Vec<f64>)> {
-    let rsi_values = crate::momentum::rsi::rsi(input, timeperiod)?;
-    let rsi_valid: Vec<f64> = rsi_values
-        .iter()
-        .copied()
-        .filter(|value| !value.is_nan())
-        .collect();
-
-    if rsi_valid.len() <= fastk_period {
-        return Err(TaError::InsufficientData {
-            need: timeperiod + fastk_period + 1,
-            got: input.len(),
-        });
-    }
-
-    let rsi_len = rsi_valid.len();
-    let mut fastk_values = Vec::new();
-    for index in (fastk_period - 1)..rsi_len {
-        let start = index + 1 - fastk_period;
-        let highest = rsi_valid[start..=index]
-            .iter()
-            .copied()
-            .fold(f64::NEG_INFINITY, f64::max);
-        let lowest = rsi_valid[start..=index]
-            .iter()
-            .copied()
-            .fold(f64::INFINITY, f64::min);
-        let range = highest - lowest;
-        fastk_values.push(if range > 0.0 {
-            100.0 * (rsi_valid[index] - lowest) / range
-        } else {
-            0.0
-        });
-    }
-
-    let fastd_arr = compute_ma(&fastk_values, fastd_period, fastd_matype)?;
+    let rsi_values = super::rsi::rsi(input, timeperiod)?;
+    let rsi_valid = &rsi_values[timeperiod..];
+    let (stochastic_k, stochastic_d) = super::stochf::stochf(
+        rsi_valid,
+        rsi_valid,
+        rsi_valid,
+        fastk_period,
+        fastd_period,
+        fastd_matype,
+    )?;
     let len = input.len();
-    let fastd_lookback = fastd_matype.lookback(fastd_period);
-    let aligned_start = timeperiod + fastk_period - 1 + fastd_lookback;
     let mut fastk_out = vec![f64::NAN; len];
     let mut fastd_out = vec![f64::NAN; len];
-    for (offset, bar) in (aligned_start..len).enumerate() {
-        let value_index = fastd_lookback + offset;
-        fastk_out[bar] = fastk_values[value_index];
-        fastd_out[bar] = fastd_arr[value_index];
-    }
+    fastk_out[timeperiod..].copy_from_slice(&stochastic_k);
+    fastd_out[timeperiod..].copy_from_slice(&stochastic_d);
     Ok((fastk_out, fastd_out))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn uses_selected_ma_lookback() {
+        let input: Vec<f64> = (0..500)
+            .map(|index| 100.0 + (index as f64 * 0.17).sin() * 8.0)
+            .collect();
+        for code in 0..=8 {
+            let ma_type = MaType::try_from(code).unwrap();
+            let (fastk, fastd) = stochrsi(&input, 14, 5, 13, ma_type).unwrap();
+            let expected_start = 14 + 4 + ma_type.lookback(13);
+            assert!(fastk[..expected_start].iter().all(|value| value.is_nan()));
+            assert!(fastd[..expected_start].iter().all(|value| value.is_nan()));
+            assert!(!fastk[expected_start].is_nan());
+            assert!(!fastd[expected_start].is_nan());
+        }
+    }
 }

@@ -59,9 +59,9 @@ pub fn stoch(
                 ll = l;
             }
         }
-        let range = hh - ll;
-        if range > 0.0 {
-            fastk.push(100.0 * (close[i] - ll) / range);
+        let divisor = (hh - ll) / 100.0;
+        if divisor.abs() >= 1.0e-14 {
+            fastk.push((close[i] - ll) / divisor);
         } else {
             fastk.push(0.0);
         }

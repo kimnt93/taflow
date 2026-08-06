@@ -38,6 +38,7 @@ batch API; it must not duplicate numerical implementations.
 | MACDFIX | MovingAverageConvergenceDivergenceFixed | `moving_average_convergence_divergence_fixed.py` | stateful |
 | STOCHF | FastStochasticOscillator | `fast_stochastic_oscillator.py` | stateful |
 | STOCH | StochasticOscillator | `stochastic_oscillator.py` | stateful |
+| STOCHRSI | StochasticRelativeStrengthIndex | `stochastic_relative_strength_index.py` | stateful |
 
 Each descriptive wrapper uses composition around the PyO3 state class. This
 gives stable public names without subclassing extension types and keeps all

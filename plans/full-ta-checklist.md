@@ -40,7 +40,7 @@ the price transforms, math transforms, and pointwise arithmetic operators.
 - [x] MACDFIX
 - [x] STOCH
 - [x] STOCHF
-- [ ] STOCHRSI
+- [x] STOCHRSI
 - [ ] ADX
 - [ ] ADXR
 - [ ] CCI

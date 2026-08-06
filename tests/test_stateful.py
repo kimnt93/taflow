@@ -590,6 +590,44 @@ def test_stochastic_flat_range_matches_zero_convention():
             np.testing.assert_allclose(ours, theirs, equal_nan=True)
 
 
+@pytest.mark.parametrize("matype", range(9))
+def test_stochrsi_matches_oracle_for_every_ma_type(matype):
+    close = close_data(500)
+    expected = original_talib.STOCHRSI(close, 14, 5, 13, matype)
+    indicator = state.STOCHRSI(14, 5, 13, matype)
+    actual = indicator.extend(close)
+    for ours, theirs in zip(actual, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+    chunked = state.STOCHRSI(14, 5, 13, matype)
+    first = chunked.extend(close[:30])
+    remaining = chunked.extend(close[30:])
+    for ours, theirs in zip(
+        (np.concatenate(parts) for parts in zip(first, remaining)), expected
+    ):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+    indicator.reset()
+    replayed = [indicator.append(input) for input in close]
+    replayed = [(np.nan, np.nan) if value is None else value for value in replayed]
+    replayed = tuple(np.asarray(values) for values in zip(*replayed))
+    for ours, theirs in zip(replayed, expected):
+        np.testing.assert_allclose(
+            ours, theirs, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+
+def test_rsi_and_kama_edge_conventions_match_oracle():
+    flat = np.full(100, 42.0)
+    np.testing.assert_array_equal(state.RSI(14).extend(flat), original_talib.RSI(flat, 14))
+    close = close_data(100)
+    np.testing.assert_array_equal(state.KAMA(1).extend(close), original_talib.KAMA(close, 1))
+
+
 def test_stochastic_states_reject_unequal_input_lengths():
     with pytest.raises(ValueError):
         state.STOCH(5, 13, 0, 11, 0).extend(
@@ -642,3 +680,11 @@ def test_invalid_parameters_are_rejected():
         state.STOCH(5, 3, 9, 3, 0)
     with pytest.raises(ValueError):
         state.STOCH(5, 3, 0, 3, 9)
+    with pytest.raises(ValueError):
+        state.STOCHRSI(1, 5, 3, 0)
+    with pytest.raises(ValueError):
+        state.STOCHRSI(14, 0, 3, 0)
+    with pytest.raises(ValueError):
+        state.STOCHRSI(14, 5, 0, 0)
+    with pytest.raises(ValueError):
+        state.STOCHRSI(14, 5, 3, 9)

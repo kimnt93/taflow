@@ -4,7 +4,7 @@
 
 | Component | Value |
 |---|---|
-| Commit baseline | `442c7c9` plus this iteration's STOCH work |
+| Commit baseline | `cfa51e9` plus this iteration's STOCHRSI work |
 | OS | Linux 6.18.7, x86_64 |
 | Rust | 1.97.1 |
 | Python | 3.12.3 |
@@ -22,6 +22,7 @@
 | MACDFIX | Rust + Python state | fixed 0.15/0.075 EMAs plus signal EMA | batch parity / 1,010,000 benchmark | pass |
 | STOCHF | Rust + Python state | rolling extrema plus selectable fast-D MA | 500 per MA type / 1,010,000 benchmark | pass |
 | STOCH | Rust + Python state | rolling extrema plus selectable slow-K/slow-D MAs | 500 per MA pair / 1,010,000 benchmark | pass |
+| STOCHRSI | Rust + Python state | exact RSI pipeline into selectable STOCHF smoothing | 500 per MA type; benchmark deferred | pass |
 | AVGDEV | batch Python/Rust | per-window mean absolute deviation | 3,000 values | pass |
 | SMA | Rust + Python state | O(1) rolling sum | 128 state test / 1,010,000 benchmark | pass |
 | EMA | Rust + Python state | SMA seed then EMA recurrence | 128 / 1,010,000 | pass |
@@ -52,13 +53,14 @@
 
 | Command | Result |
 |---|---|
-| `cargo test --workspace` | 85 passed |
-| `python -m pytest tests/test_stateful.py -q` | 205 passed |
+| `cargo test --workspace` | 89 passed |
+| `python -m pytest tests/test_stateful.py -q` | 215 passed |
 | `python -m pytest tests/test_exhaustive.py -q -k 'ACCBANDS or AVGDEV or IMI'` | 3 passed, 246 deselected |
 | `cargo bench -p taflow --bench stream_bench -- --quick` | completed; measurements below |
-| `python -m pytest tests/test_exhaustive.py tests/test_stateful.py tests/test_taflow_interface.py -q` | 462 passed |
+| `python -m pytest tests/test_exhaustive.py tests/test_stateful.py tests/test_taflow_interface.py -q` | 473 passed |
 | `python -m pytest tests/test_full_coverage.py -q` | 620 passed, 310 optional benchmarks skipped |
 | `python -m pytest tests/accuracy -q` | 20,270 passed, 1 skipped |
+| `python -m pytest tests/accuracy -q -k 'RSI or KAMA or STOCH'` | 752 passed, 19,519 deselected after shared numerical updates |
 | `python benches/python_benches/benchmark_function_reports.py --repeats 5` | nine functions × five sizes × four available modes |
 
 The exhaustive suite is green after correcting BBANDS' variance-centre rule and
@@ -91,15 +93,21 @@ The public Python package is now `taflow`: `taflow.talib` provides the
 uppercase batch-compatible surface, while top-level `taflow` exports the
 descriptive state classes. Per-function correctness and benchmark artifacts
 for the updated surface are in `reports/MA.*`, `reports/BBANDS.*`,
-`reports/ACCBANDS.*`, `reports/SAR.*`, `reports/SAREXT.*`, `reports/IMI.*`, and
-`reports/MACDFIX.*`, `reports/STOCHF.*`, and `reports/STOCH.*`.
+`reports/ACCBANDS.*`, `reports/SAR.*`, `reports/SAREXT.*`, `reports/IMI.*`,
+`reports/MACDFIX.*`, `reports/STOCHF.*`, `reports/STOCH.*`, and
+`reports/STOCHRSI.*`.
 
-Those JSON artifacts use benchmark schema v2. They retain all five wall/CPU
+The benchmarked JSON artifacts through STOCH use schema v2 and retain all five wall/CPU
 samples and p50/p95/p99/max summaries for 100, 1K, 10K, 100K, and 1M bars,
 throughput, isolated-process peak RSS delta, 100K oracle error, and sampled
 Python append latency. The future multi-indicator Pipeline is explicitly
 reported unavailable; state `extend` is measured separately and is not
 misrepresented as a shared execution plan.
+
+Starting with STOCHRSI, the implementation-first phase records required
+benchmark cells as explicitly deferred. This preserves the aggregation schema
+while function/state/Python coverage is completed before the next benchmark
+pass.
 
 ## Streaming benchmark
 

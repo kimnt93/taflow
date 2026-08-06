@@ -39,9 +39,9 @@ impl Stochf {
         let highest = self.highest.append(high);
         let lowest = self.lowest.append(low);
         let fastk = highest.zip(lowest).map(|(highest, lowest)| {
-            let range = highest - lowest;
-            if range > 0.0 {
-                100.0 * (close - lowest) / range
+            let divisor = (highest - lowest) / 100.0;
+            if divisor.abs() >= 1.0e-14 {
+                (close - lowest) / divisor
             } else {
                 0.0
             }

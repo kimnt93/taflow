@@ -5,17 +5,23 @@ use crate::error::{TaError, TaResult};
 /// Uses C TA-Lib formulation for the serial chain:
 /// prev_kama += sc² × (input[i] - prev_kama)
 pub fn kama(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if timeperiod < 2 {
+    if timeperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
             value: timeperiod.to_string(),
-            reason: "must be >= 2",
+            reason: "must be >= 1",
         });
     }
     let len = input.len();
+    if timeperiod == 1 {
+        return Ok(input.to_vec());
+    }
     let lookback = timeperiod;
     if len <= lookback {
-        return Err(TaError::InsufficientData { need: lookback + 1, got: len });
+        return Err(TaError::InsufficientData {
+            need: lookback + 1,
+            got: len,
+        });
     }
 
     let mut output = vec![0.0_f64; len];
@@ -31,19 +37,27 @@ pub fn kama(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
         volatility += (input[j] - input[j - 1]).abs();
     }
 
-    let direction = (input[lookback] - input[0]).abs();
-    let er = if volatility > 0.0 { direction / volatility } else { 0.0 };
-    let sc = er * sc_diff + slow_sc;
-    prev_kama += (sc * sc) * (input[lookback] - prev_kama);
+    let direction = input[lookback] - input[0];
+    let efficiency = if volatility <= direction || volatility.abs() < 1.0e-14 {
+        1.0
+    } else {
+        (direction / volatility).abs()
+    };
+    let sc = efficiency.mul_add(sc_diff, slow_sc);
+    prev_kama = (input[lookback] - prev_kama).mul_add(sc * sc, prev_kama);
     output[lookback] = prev_kama;
 
     for i in (lookback + 1)..len {
-        volatility += (input[i] - input[i - 1]).abs()
-            - (input[i - timeperiod] - input[i - timeperiod - 1]).abs();
-        let direction = (input[i] - input[i - timeperiod]).abs();
-        let er = if volatility > 0.0 { direction / volatility } else { 0.0 };
-        let sc = er * sc_diff + slow_sc;
-        prev_kama += (sc * sc) * (input[i] - prev_kama);
+        volatility -= (input[i - timeperiod - 1] - input[i - timeperiod]).abs();
+        volatility += (input[i] - input[i - 1]).abs();
+        let direction = input[i] - input[i - timeperiod];
+        let efficiency = if volatility <= direction || volatility.abs() < 1.0e-14 {
+            1.0
+        } else {
+            (direction / volatility).abs()
+        };
+        let sc = efficiency.mul_add(sc_diff, slow_sc);
+        prev_kama = (input[i] - prev_kama).mul_add(sc * sc, prev_kama);
         output[i] = prev_kama;
     }
 
@@ -60,5 +74,11 @@ mod tests {
         let result = kama(&input, 10).unwrap();
         assert!(result[9].is_nan());
         assert!(!result[10].is_nan());
+    }
+
+    #[test]
+    fn period_one_is_identity() {
+        let input = vec![3.0, 1.0, 4.0, 1.0, 5.0];
+        assert_eq!(kama(&input, 1).unwrap(), input);
     }
 }

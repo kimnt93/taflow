@@ -50,9 +50,9 @@ impl Stoch {
                 .append(high)
                 .zip(self.lowest.append(low))
                 .map(|(highest, lowest)| {
-                    let range = highest - lowest;
-                    if range > 0.0 {
-                        100.0 * (close - lowest) / range
+                    let divisor = (highest - lowest) / 100.0;
+                    if divisor.abs() >= 1.0e-14 {
+                        (close - lowest) / divisor
                     } else {
                         0.0
                     }

@@ -60,6 +60,13 @@ def test_talib_compatibility_namespace_preserves_old_style_functions():
                 rtol=1e-8,
                 atol=1e-10,
             )
+    for matype in range(9):
+        assert_outputs_equal(
+            talib.STOCHRSI(close, 14, 5, 13, matype),
+            original_talib.STOCHRSI(close, 14, 5, 13, matype),
+            rtol=1e-8,
+            atol=1e-10,
+        )
 
 
 def test_descriptive_moving_average_and_bollinger_bands():
@@ -181,6 +188,21 @@ def test_descriptive_stochastic_oscillator():
             )
 
 
+def test_descriptive_stochastic_relative_strength_index():
+    _, _, close = price_data(500)
+    for matype in range(9):
+        indicator = taflow.StochasticRelativeStrengthIndex(
+            time_period=14,
+            fast_k_period=5,
+            fast_d_period=13,
+            fast_d_average_type=matype,
+        )
+        expected = original_talib.STOCHRSI(close, 14, 5, 13, matype)
+        assert_outputs_equal(
+            indicator.extend(close), expected, rtol=1e-8, atol=1e-10
+        )
+
+
 def test_descriptive_classes_are_defined_in_individual_modules():
     assert taflow.MovingAverage.__module__ == "taflow.moving_average"
     assert taflow.BollingerBands.__module__ == "taflow.bollinger_bands"
@@ -196,6 +218,10 @@ def test_descriptive_classes_are_defined_in_individual_modules():
         == "taflow.fast_stochastic_oscillator"
     )
     assert taflow.StochasticOscillator.__module__ == "taflow.stochastic_oscillator"
+    assert (
+        taflow.StochasticRelativeStrengthIndex.__module__
+        == "taflow.stochastic_relative_strength_index"
+    )
     assert (
         taflow.ParabolicSarExtended.__module__
         == "taflow.parabolic_sar_extended"

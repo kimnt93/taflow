@@ -50,9 +50,9 @@ pub fn stochf(
             .iter()
             .copied()
             .fold(f64::INFINITY, f64::min);
-        let range = highest - lowest;
-        fastk_values.push(if range > 0.0 {
-            100.0 * (close[today] - lowest) / range
+        let divisor = (highest - lowest) / 100.0;
+        fastk_values.push(if divisor.abs() >= 1.0e-14 {
+            (close[today] - lowest) / divisor
         } else {
             0.0
         });

@@ -87,6 +87,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulMacdFix>()?;
     m.add_class::<state_api::StatefulStoch>()?;
     m.add_class::<state_api::StatefulStochf>()?;
+    m.add_class::<state_api::StatefulStochrsi>()?;
     m.add_class::<state_api::StatefulMama>()?;
     m.add_class::<state_api::StatefulT3>()?;
     m.add_class::<state_api::StatefulApo>()?;

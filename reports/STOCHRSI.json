@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "function": "STOCHRSI",
+  "date": "2026-08-06",
+  "environment": {
+    "oracle": "TA-Lib Python 0.7.1",
+    "input_dtype": "float64"
+  },
+  "correctness": {
+    "rust_batch_state_parity": true,
+    "python_talib_oracle_parity": true,
+    "compatibility_namespace_parity": true,
+    "descriptive_namespace_parity": true,
+    "moving_average_types_tested": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "chunked_backfill_continuation": true,
+    "reset_replay": true,
+    "invalid_parameter_validation": true
+  },
+  "series_sizes": {
+    "rust_parity_values_per_ma_type": 500,
+    "python_oracle_values_per_ma_type": 500
+  },
+  "benchmark_protocol": {
+    "status": "deferred",
+    "reason": "Implementation-first phase; benchmark pass follows full function mapping.",
+    "planned_sizes": [100, 1000, 10000, 100000, 1000000],
+    "planned_repeats": 5
+  },
+  "benchmark_matrix": {
+    "100": {
+      "talib_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_state_extend": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_streaming": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_pipeline": {"available": false, "reason": "Pipeline is not implemented."}
+    },
+    "1000": {
+      "talib_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_state_extend": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_streaming": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_pipeline": {"available": false, "reason": "Pipeline is not implemented."}
+    },
+    "10000": {
+      "talib_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_state_extend": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_streaming": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_pipeline": {"available": false, "reason": "Pipeline is not implemented."}
+    },
+    "100000": {
+      "talib_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_state_extend": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_streaming": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_pipeline": {"available": false, "reason": "Pipeline is not implemented."}
+    },
+    "1000000": {
+      "talib_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_batch": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_state_extend": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_streaming": {"available": false, "reason": "Deferred to benchmark pass."},
+      "taflow_pipeline": {"available": false, "reason": "Pipeline is not implemented."}
+    }
+  },
+  "rust_stream_benchmark": {
+    "available": false,
+    "reason": "Deferred to benchmark pass."
+  }
+}

@@ -1,11 +1,11 @@
+//! Batch Relative Strength Index.
+//!
+//! RSI uses Wilder smoothing and TA-Lib's exact output operation order and
+//! epsilon convention, including zero for a flat gain/loss sum.
+
 use crate::error::{TaError, TaResult};
 
-/// Relative Strength Index (RSI)
-///
-/// 使用 Wilder 平滑（与 TA-Lib 一致）。
-/// 初始 avg_gain/avg_loss = SMA(前 timeperiod 个变化值)
-/// 之后使用指数平滑: avg = (prev_avg * (period-1) + current) / period
-/// lookback = timeperiod
+/// Computes an aligned Wilder RSI output array.
 pub fn rsi(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
@@ -42,11 +42,11 @@ pub fn rsi(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut avg_loss = sum_loss / timeperiod as f64;
 
     // 第一个 RSI 值
-    if avg_loss == 0.0 {
-        output[timeperiod] = 100.0;
+    let sum = avg_gain + avg_loss;
+    if sum.abs() < 1.0e-14 {
+        output[timeperiod] = 0.0;
     } else {
-        let rs = avg_gain / avg_loss;
-        output[timeperiod] = 100.0 - (100.0 / (1.0 + rs));
+        output[timeperiod] = 100.0 * (avg_gain / sum);
     }
 
     // Wilder 平滑递推
@@ -62,11 +62,11 @@ pub fn rsi(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
         avg_gain = (avg_gain * (period_f - 1.0) + gain) / period_f;
         avg_loss = (avg_loss * (period_f - 1.0) + loss) / period_f;
 
-        if avg_loss == 0.0 {
-            output[i] = 100.0;
+        let sum = avg_gain + avg_loss;
+        if sum.abs() < 1.0e-14 {
+            output[i] = 0.0;
         } else {
-            let rs = avg_gain / avg_loss;
-            output[i] = 100.0 - (100.0 / (1.0 + rs));
+            output[i] = 100.0 * (avg_gain / sum);
         }
     }
 
@@ -96,5 +96,11 @@ mod tests {
         for v in &result[14..] {
             assert!(*v >= 0.0 && *v <= 100.0, "RSI out of range: {}", v);
         }
+    }
+
+    #[test]
+    fn flat_input_returns_zero() {
+        let result = rsi(&vec![42.0; 100], 14).unwrap();
+        assert!(result[14..].iter().all(|value| *value == 0.0));
     }
 }

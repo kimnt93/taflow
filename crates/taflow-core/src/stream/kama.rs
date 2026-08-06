@@ -21,10 +21,10 @@ pub struct Kama {
 }
 
 impl Kama {
-    /// Creates a KAMA state with a period of at least two bars.
+    /// Creates a KAMA state with a positive period.
     pub fn new(period: usize) -> TaResult<Self> {
-        if period < 2 {
-            return Err(invalid_period("timeperiod", period, 2));
+        if period == 0 {
+            return Err(invalid_period("timeperiod", period, 1));
         }
         Ok(Self {
             period,
@@ -41,11 +41,16 @@ impl StreamingIndicator for Kama {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
+        if self.period == 1 {
+            self.value = Some(input);
+            return self.value;
+        }
         if let Some(previous) = self.prices.back().copied() {
             let change = (input - previous).abs();
             if self.changes.len() == self.period {
                 let old = self.changes.pop_front().expect("change window is full");
-                self.volatility += change - old;
+                self.volatility -= old;
+                self.volatility += change;
             } else {
                 self.volatility += change;
             }
@@ -60,18 +65,18 @@ impl StreamingIndicator for Kama {
         }
 
         let oldest = *self.prices.front().expect("full price window has a front");
-        let direction = (input - oldest).abs();
-        let efficiency = if self.volatility > 0.0 {
-            direction / self.volatility
+        let direction = input - oldest;
+        let efficiency = if self.volatility <= direction || self.volatility.abs() < 1.0e-14 {
+            1.0
         } else {
-            0.0
+            (direction / self.volatility).abs()
         };
         let slow = 2.0 / 31.0;
-        let smoothing = efficiency * (2.0 / 3.0 - slow) + slow;
+        let smoothing = efficiency.mul_add(2.0 / 3.0 - slow, slow);
         let previous = self
             .previous_kama
             .unwrap_or_else(|| self.prices[self.period - 1]);
-        let next = previous + smoothing * smoothing * (input - previous);
+        let next = (input - previous).mul_add(smoothing * smoothing, previous);
         self.previous_kama = Some(next);
         self.value = Some(next);
         self.value

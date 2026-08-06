@@ -13,6 +13,8 @@ and `taflow.MovingAverage` for persistent streaming.
 - Python state versus original TA-Lib 0.7.1: `extend` and reset/replay for all
   9 MA types, pass.
 - Warm-up is inherited from the selected MA, including MAMA and T3.
+- KAMA now matches TA-Lib's epsilon/update-order semantics and treats period
+  one as the required identity transform.
 - One implementation file: `crates/taflow-core/src/stream/ma.rs`.
 - One descriptive Python file: `python/taflow/moving_average.py`.
 

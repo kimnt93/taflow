@@ -14,6 +14,7 @@ from .moving_average_convergence_divergence_fixed import (
 from .parabolic_sar import ParabolicSar
 from .parabolic_sar_extended import ParabolicSarExtended
 from .stochastic_oscillator import StochasticOscillator
+from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
 
 __all__ = [
     "talib",
@@ -22,6 +23,7 @@ __all__ = [
     "BollingerBands",
     "FastStochasticOscillator",
     "StochasticOscillator",
+    "StochasticRelativeStrengthIndex",
     "IntradayMomentumIndex",
     "AccelerationBands",
     "ParabolicSar",

@@ -5,7 +5,7 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
     self, Atr, Dema, Ema, Imi, Macd, MacdFix, Mama, Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr,
-    Rocr100, Rsi, Sma, Stoch, Stochf, StreamingIndicator, Tema, Trange, Trima, Wma,
+    Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator, Tema, Trange, Trima, Wma,
 };
 use taflow::MaType;
 
@@ -1796,6 +1796,11 @@ pub struct StatefulStoch {
 }
 
 #[pyclass]
+pub struct StatefulStochrsi {
+    inner: Stochrsi,
+}
+
+#[pyclass]
 pub struct StatefulMama {
     inner: Mama,
 }
@@ -2084,6 +2089,61 @@ impl StatefulStoch {
     #[getter]
     fn value(&self) -> Option<(f64, f64)> {
         self.inner.value().map(|value| (value.slowk, value.slowd))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
+
+#[pymethods]
+impl StatefulStochrsi {
+    #[new]
+    #[pyo3(signature = (timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0))]
+    fn new(
+        timeperiod: usize,
+        fastk_period: usize,
+        fastd_period: usize,
+        fastd_matype: i32,
+    ) -> PyResult<Self> {
+        let ma_type = MaType::try_from(fastd_matype).map_err(py_value_error)?;
+        Ok(Self {
+            inner: Stochrsi::new(timeperiod, fastk_period, fastd_period, ma_type)
+                .map_err(py_value_error)?,
+        })
+    }
+
+    fn append(&mut self, input: f64) -> Option<(f64, f64)> {
+        self.inner
+            .append(input)
+            .map(|value| (value.fastk, value.fastd))
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        input: PyReadonlyArray1<f64>,
+    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+        let mut fastk = Vec::with_capacity(input.len()?);
+        let mut fastd = Vec::with_capacity(input.len()?);
+        for input in input.as_slice()?.iter().copied() {
+            match self.inner.append(input) {
+                Some(value) => {
+                    fastk.push(value.fastk);
+                    fastd.push(value.fastd);
+                }
+                None => {
+                    fastk.push(f64::NAN);
+                    fastd.push(f64::NAN);
+                }
+            }
+        }
+        Ok((to_py_array(py, fastk), to_py_array(py, fastd)))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|value| (value.fastk, value.fastd))
     }
 
     fn reset(&mut self) {
