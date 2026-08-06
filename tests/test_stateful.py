@@ -456,6 +456,16 @@ def test_imi_matches_oracle_and_reset_replay():
     indicator = state.IMI(14)
     actual = indicator.extend(open_, close)
     np.testing.assert_allclose(actual, expected, rtol=1e-10, atol=1e-12, equal_nan=True)
+    chunked = state.IMI(14)
+    first = chunked.extend(open_[:20], close[:20])
+    remaining = chunked.extend(open_[20:], close[20:])
+    np.testing.assert_allclose(
+        np.concatenate((first, remaining)),
+        expected,
+        rtol=1e-10,
+        atol=1e-12,
+        equal_nan=True,
+    )
     indicator.reset()
     replayed = np.asarray(
         [np.nan if (value := indicator.append(*bar)) is None else value for bar in zip(open_, close)]

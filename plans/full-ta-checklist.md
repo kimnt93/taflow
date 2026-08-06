@@ -33,7 +33,7 @@ the price transforms, math transforms, and pointwise arithmetic operators.
 
 ## Momentum Indicators
 
-- [ ] IMI (B✓; stateful extension pending)
+- [x] IMI
 - [x] RSI
 - [x] MACD
 - [ ] MACDEXT

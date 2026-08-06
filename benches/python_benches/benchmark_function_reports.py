@@ -330,7 +330,9 @@ def main() -> None:
         path = args.output_dir / f"{name}.json"
         previous = json.loads(path.read_text()) if path.exists() else {}
         generated = generate(name, args.repeats)
-        if "stream_benchmark" in previous:
+        if "rust_stream_benchmark" in previous:
+            generated["rust_stream_benchmark"] = previous["rust_stream_benchmark"]
+        elif "stream_benchmark" in previous:
             generated["rust_stream_benchmark"] = previous["stream_benchmark"]
         generated["correctness"] = previous.get("correctness", {})
         generated["series_sizes"] = previous.get("series_sizes", {})
