@@ -11,6 +11,7 @@ from .commodity_channel_index import CCI, CommodityChannelIndex
 from .directional_movement_index import DirectionalMovementIndex
 from .doji import CDLDOJI, Doji
 from .takuri import CDLTAKURI, Takuri
+from .marubozu import CDLMARUBOZU, Marubozu
 from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -115,6 +116,8 @@ __all__ = [
     "Doji",
     "Takuri",
     "CDLTAKURI",
+    "Marubozu",
+    "CDLMARUBOZU",
     "CDLDOJI",
     "Engulfing",
     "CDLENGULFING",

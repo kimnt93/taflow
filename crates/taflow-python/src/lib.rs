@@ -24,6 +24,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::Hammer>()?;
     m.add_class::<indicators::Hikkake>()?;
     m.add_class::<indicators::HikkakeModified>()?;
+    m.add_class::<indicators::Marubozu>()?;
     m.add_class::<indicators::UpDownSideGapThreeMethods>()?;
     m.add_class::<indicators::StickSandwich>()?;
     m.add_class::<indicators::TwoCrows>()?;

@@ -3,6 +3,7 @@
 from ..commodity_channel_index import CCI, CommodityChannelIndex
 from ..doji import CDLDOJI, Doji
 from ..takuri import CDLTAKURI, Takuri
+from ..marubozu import CDLMARUBOZU, Marubozu
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
@@ -33,6 +34,7 @@ __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
     "Doji", "CDLDOJI",
     "Takuri", "CDLTAKURI",
+    "Marubozu", "CDLMARUBOZU",
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",
