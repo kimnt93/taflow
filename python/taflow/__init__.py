@@ -26,6 +26,7 @@ from .parabolic_sar_extended import ParabolicSarExtended
 from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
 from .triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
+from .ultimate_oscillator import ULTOSC, UltimateOscillator
 from .variable_period_moving_average import VariablePeriodMovingAverage
 
 __all__ = [
@@ -44,6 +45,8 @@ __all__ = [
     "StochasticRelativeStrengthIndex",
     "TripleExponentialRateOfChange",
     "TRIX",
+    "UltimateOscillator",
+    "ULTOSC",
     "VariablePeriodMovingAverage",
     "IntradayMomentumIndex",
     "AccelerationBands",

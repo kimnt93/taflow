@@ -42,6 +42,7 @@ mod t3;
 mod tema;
 mod trix;
 mod trima;
+mod ultosc;
 mod window;
 mod wma;
 
@@ -78,6 +79,7 @@ pub use t3::T3;
 pub use tema::Tema;
 pub use trix::Trix;
 pub use trima::Trima;
+pub use ultosc::Ultosc;
 pub use window::Window;
 pub use wma::Wma;
 
