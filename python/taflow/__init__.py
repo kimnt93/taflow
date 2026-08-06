@@ -10,6 +10,7 @@ from .bollinger_bands import BollingerBands
 from .commodity_channel_index import CCI, CommodityChannelIndex
 from .directional_movement_index import DirectionalMovementIndex
 from .doji import CDLDOJI, Doji
+from .takuri import CDLTAKURI, Takuri
 from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -112,6 +113,8 @@ __all__ = [
     "AverageDirectionalIndexRating",
     "DirectionalMovementIndex",
     "Doji",
+    "Takuri",
+    "CDLTAKURI",
     "CDLDOJI",
     "Engulfing",
     "CDLENGULFING",

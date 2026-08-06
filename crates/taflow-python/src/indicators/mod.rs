@@ -2,6 +2,7 @@
 
 mod commodity_channel_index;
 mod doji;
+mod takuri;
 mod engulfing;
 mod hammer;
 mod hikkake;
@@ -30,6 +31,7 @@ mod up_down_side_gap_three_methods;
 
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use doji::Doji;
+pub use takuri::Takuri;
 pub use engulfing::Engulfing;
 pub use hammer::Hammer;
 pub use hikkake::Hikkake;

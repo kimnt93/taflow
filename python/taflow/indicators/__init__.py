@@ -2,6 +2,7 @@
 
 from ..commodity_channel_index import CCI, CommodityChannelIndex
 from ..doji import CDLDOJI, Doji
+from ..takuri import CDLTAKURI, Takuri
 from ..engulfing import CDLENGULFING, Engulfing
 from ..hammer import CDLHAMMER, Hammer
 from ..hikkake import CDLHIKKAKE, Hikkake
@@ -31,6 +32,7 @@ from ..up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapT
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
     "Doji", "CDLDOJI",
+    "Takuri", "CDLTAKURI",
     "Engulfing", "CDLENGULFING",
     "Hammer", "CDLHAMMER",
     "Hikkake", "CDLHIKKAKE",

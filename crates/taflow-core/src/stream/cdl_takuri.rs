@@ -1,0 +1,97 @@
+//! Incremental Takuri candlestick recognition (CDLTAKURI).
+
+use std::collections::VecDeque;
+
+/// Incremental CDLTAKURI state using TA-Lib's body and shadow averages.
+pub struct CdlTakuri {
+    bodies: VecDeque<f64>,
+    body_sum: f64,
+    ranges: VecDeque<f64>,
+    range_sum: f64,
+    value: Option<i32>,
+}
+
+impl Default for CdlTakuri {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CdlTakuri {
+    pub fn new() -> Self {
+        Self {
+            bodies: VecDeque::with_capacity(10),
+            body_sum: 0.0,
+            ranges: VecDeque::with_capacity(10),
+            range_sum: 0.0,
+            value: None,
+        }
+    }
+
+    fn push(window: &mut VecDeque<f64>, sum: &mut f64, value: f64) {
+        if window.len() == 10 {
+            *sum -= window.pop_front().expect("window is full");
+        }
+        window.push_back(value);
+        *sum += value;
+    }
+
+    /// Appends OHLC data and returns +100 for a takuri after the ten-bar warmup.
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
+        let body = (close - open).abs();
+        let range = high - low;
+        let output = if self.bodies.len() == 10 && self.ranges.len() == 10 {
+            let upper_shadow = high - open.max(close);
+            let lower_shadow = open.min(close) - low;
+            Some(
+                (body <= self.body_sum / 10.0
+                    && upper_shadow < self.range_sum * 0.01
+                    && lower_shadow > body) as i32
+                    * 100,
+            )
+        } else {
+            None
+        };
+        Self::push(&mut self.bodies, &mut self.body_sum, body);
+        Self::push(&mut self.ranges, &mut self.range_sum, range);
+        self.value = output;
+        output
+    }
+
+    pub fn value(&self) -> Option<i32> {
+        self.value
+    }
+    pub fn reset(&mut self) {
+        *self = Self::new();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn matches_batch() {
+        let open: Vec<f64> = (0..40).map(|i| 100.0 + i as f64 * 0.2).collect();
+        let high: Vec<f64> = open.iter().map(|x| x + 2.0).collect();
+        let low: Vec<f64> = open.iter().map(|x| x - 2.0).collect();
+        let close: Vec<f64> = open
+            .iter()
+            .enumerate()
+            .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
+            .collect();
+        let expected = crate::pattern::cdl_takuri(&open, &high, &low, &close).unwrap();
+        let mut state = CdlTakuri::new();
+        for (((&o, &h), &l), (&c, &expected)) in open
+            .iter()
+            .zip(&high)
+            .zip(&low)
+            .zip(close.iter().zip(&expected))
+        {
+            match state.append(o, h, l, c) {
+                Some(value) => assert_eq!(value, expected),
+                None => assert_eq!(expected, 0),
+            }
+        }
+    }
+}

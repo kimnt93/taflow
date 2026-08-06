@@ -201,7 +201,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLSPINNINGTOP
 - [ ] CDLSTALLEDPATTERN
 - [x] CDLSTICKSANDWICH
-- [ ] CDLTAKURI
+- [x] CDLTAKURI
 - [ ] CDLTASUKIGAP
 - [ ] CDLTHRUSTING
 - [ ] CDLTRISTAR
