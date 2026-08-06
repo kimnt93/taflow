@@ -84,6 +84,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulTrange>()?;
     m.add_class::<state_api::StatefulNatr>()?;
     m.add_class::<state_api::StatefulMacd>()?;
+    m.add_class::<state_api::StatefulMacdFix>()?;
     m.add_class::<state_api::StatefulMama>()?;
     m.add_class::<state_api::StatefulT3>()?;
     m.add_class::<state_api::StatefulApo>()?;

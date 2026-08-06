@@ -4,7 +4,7 @@
 
 | Component | Value |
 |---|---|
-| Commit baseline | `7cc2111` plus this iteration's IMI report work |
+| Commit baseline | `10d0ec4` plus this iteration's MACDFIX work |
 | OS | Linux 6.18.7, x86_64 |
 | Rust | 1.97.1 |
 | Python | 3.12.3 |
@@ -19,6 +19,7 @@
 | SAR | Rust + Python state | two-bar initialization, acceleration and reversal recurrence | batch parity / 1,010,000 benchmark | pass |
 | SAREXT | Rust + Python state | asymmetric acceleration, reversal offset, signed output | batch parity / 1,010,000 benchmark | pass |
 | IMI | Rust + Python state | two rolling candle-body sums | batch parity / 1,010,000 benchmark | pass |
+| MACDFIX | Rust + Python state | fixed 0.15/0.075 EMAs plus signal EMA | batch parity / 1,010,000 benchmark | pass |
 | AVGDEV | batch Python/Rust | per-window mean absolute deviation | 3,000 values | pass |
 | SMA | Rust + Python state | O(1) rolling sum | 128 state test / 1,010,000 benchmark | pass |
 | EMA | Rust + Python state | SMA seed then EMA recurrence | 128 / 1,010,000 | pass |
@@ -49,14 +50,14 @@
 
 | Command | Result |
 |---|---|
-| `cargo test --workspace` | 79 passed |
-| `python -m pytest tests/test_stateful.py -q` | 110 passed |
+| `cargo test --workspace` | 82 passed |
+| `python -m pytest tests/test_stateful.py -q` | 113 passed |
 | `python -m pytest tests/test_exhaustive.py -q -k 'ACCBANDS or AVGDEV or IMI'` | 3 passed, 246 deselected |
 | `cargo bench -p taflow --bench stream_bench -- --quick` | completed; measurements below |
-| `python -m pytest tests/test_exhaustive.py tests/test_stateful.py tests/test_taflow_interface.py -q` | 364 passed |
+| `python -m pytest tests/test_exhaustive.py tests/test_stateful.py tests/test_taflow_interface.py -q` | 368 passed |
 | `python -m pytest tests/test_full_coverage.py -q` | 620 passed, 310 optional benchmarks skipped |
 | `python -m pytest tests/accuracy -q` | 20,270 passed, 1 skipped |
-| `python benches/python_benches/benchmark_function_reports.py --repeats 5` | six functions × five sizes × four available modes |
+| `python benches/python_benches/benchmark_function_reports.py --repeats 5` | seven functions × five sizes × four available modes |
 
 The exhaustive suite is green after correcting BBANDS' variance-centre rule and
 MACDEXT's aligned-MA seed rule. Its relative tolerance is documented in the
@@ -88,7 +89,8 @@ The public Python package is now `taflow`: `taflow.talib` provides the
 uppercase batch-compatible surface, while top-level `taflow` exports the
 descriptive state classes. Per-function correctness and benchmark artifacts
 for the updated surface are in `reports/MA.*`, `reports/BBANDS.*`,
-`reports/ACCBANDS.*`, `reports/SAR.*`, `reports/SAREXT.*`, and `reports/IMI.*`.
+`reports/ACCBANDS.*`, `reports/SAR.*`, `reports/SAREXT.*`, `reports/IMI.*`, and
+`reports/MACDFIX.*`.
 
 Those JSON artifacts use benchmark schema v2. They retain all five wall/CPU
 samples and p50/p95/p99/max summaries for 100, 1K, 10K, 100K, and 1M bars,
@@ -122,6 +124,7 @@ an end-to-end Rust-core measurement, not a Python-call latency claim.
 | SAR(0.02,0.2) | 8.74–9.07 ms | 8.8 |
 | SAREXT(defaults) | 8.66–8.88 ms | 8.7 |
 | IMI(14) | 15.03–15.46 ms | 15.1 |
+| MACDFIX(9) | 10.34–10.81 ms | 10.4 |
 | MIDPOINT(20) | 12.56–13.23 ms | 12.7 |
 | MIDPRICE(20) | 24.83–25.11 ms | 24.9 |
 | MOM(10) | 2.62–2.66 ms | 2.7 |

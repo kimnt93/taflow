@@ -4,8 +4,8 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Atr, Dema, Ema, Imi, Macd, Mama, Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr, Rocr100,
-    Rsi, Sma, StreamingIndicator, Tema, Trange, Trima, Wma,
+    self, Atr, Dema, Ema, Imi, Macd, MacdFix, Mama, Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr,
+    Rocr100, Rsi, Sma, StreamingIndicator, Tema, Trange, Trima, Wma,
 };
 use taflow::MaType;
 
@@ -1781,6 +1781,11 @@ pub struct StatefulMacd {
 }
 
 #[pyclass]
+pub struct StatefulMacdFix {
+    inner: MacdFix,
+}
+
+#[pyclass]
 pub struct StatefulMama {
     inner: Mama,
 }
@@ -1837,6 +1842,63 @@ impl StatefulMacd {
     fn new(fastperiod: usize, slowperiod: usize, signalperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: Macd::new(fastperiod, slowperiod, signalperiod).map_err(py_value_error)?,
+        })
+    }
+
+    fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
+        self.inner
+            .append(input)
+            .map(|value| (value.macd, value.signal, value.histogram))
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        input: PyReadonlyArray1<f64>,
+    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+        let mut macd = Vec::with_capacity(input.len()?);
+        let mut signal = Vec::with_capacity(input.len()?);
+        let mut histogram = Vec::with_capacity(input.len()?);
+        for value in input.as_slice()?.iter().copied() {
+            match self.inner.append(value) {
+                Some(value) => {
+                    macd.push(value.macd);
+                    signal.push(value.signal);
+                    histogram.push(value.histogram);
+                }
+                None => {
+                    macd.push(f64::NAN);
+                    signal.push(f64::NAN);
+                    histogram.push(f64::NAN);
+                }
+            }
+        }
+        Ok((
+            to_py_array(py, macd),
+            to_py_array(py, signal),
+            to_py_array(py, histogram),
+        ))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|value| (value.macd, value.signal, value.histogram))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
+
+#[pymethods]
+impl StatefulMacdFix {
+    #[new]
+    #[pyo3(signature = (signalperiod=9))]
+    fn new(signalperiod: usize) -> PyResult<Self> {
+        Ok(Self {
+            inner: MacdFix::new(signalperiod).map_err(py_value_error)?,
         })
     }
 

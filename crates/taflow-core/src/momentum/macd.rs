@@ -69,8 +69,7 @@ pub fn macd(
 
     // Signal line = EMA(macd_values, signalperiod)
     // seed = SMA(macd_values[0..signalperiod])
-    let signal_seed: f64 =
-        macd_values[..signalperiod].iter().sum::<f64>() / signalperiod as f64;
+    let signal_seed: f64 = macd_values[..signalperiod].iter().sum::<f64>() / signalperiod as f64;
 
     // 构建输出
     let out_start = sp - 1 + signalperiod - 1; // = lookback
@@ -186,73 +185,6 @@ pub fn macd_ext(
         macd_line[orig] = macd_valid[j];
         signal_line[orig] = signal_ma[j];
         histogram[orig] = macd_valid[j] - signal_ma[j];
-    }
-
-    Ok((macd_line, signal_line, histogram))
-}
-
-/// MACD Fix (12, 26 固定参数)
-///
-/// C TA-Lib MACDFIX 使用固定 k 值（k_fast=0.15, k_slow=0.075），
-/// 且采用与 MACD 相同的对齐式 EMA：
-/// - slow seed = SMA(close[0..26])
-/// - fast seed = SMA(close[14..26])  (从 slow 窗口末尾取 fast 长度)
-/// - 两条 EMA 都从 bar 26 开始递推
-pub fn macd_fix(input: &[f64], signalperiod: usize) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
-    let len = input.len();
-    let fp = 12usize;
-    let sp = 26usize;
-    let k_fast: f64 = 0.15;  // C TA-Lib fixed k for period 12
-    let k_slow: f64 = 0.075; // C TA-Lib fixed k for period 26
-
-    let lookback = sp - 1 + signalperiod - 1;
-    if len <= lookback {
-        return Err(TaError::InsufficientData {
-            need: lookback + 1,
-            got: len,
-        });
-    }
-
-    let k_signal = 2.0 / (signalperiod as f64 + 1.0);
-
-    // 对齐式 EMA seed (same as MACD internal):
-    let slow_seed: f64 = input[..sp].iter().sum::<f64>() / sp as f64;
-    let fast_seed: f64 = input[sp - fp..sp].iter().sum::<f64>() / fp as f64;
-
-    let mut macd_values = Vec::with_capacity(len - sp + 1);
-    macd_values.push(fast_seed - slow_seed);
-
-    let mut slow_ema = slow_seed;
-    let mut fast_ema = fast_seed;
-    for i in sp..len {
-        slow_ema = k_slow.mul_add(input[i] - slow_ema, slow_ema);
-        fast_ema = k_fast.mul_add(input[i] - fast_ema, fast_ema);
-        macd_values.push(fast_ema - slow_ema);
-    }
-
-    let signal_seed: f64 =
-        macd_values[..signalperiod].iter().sum::<f64>() / signalperiod as f64;
-
-    let out_start = sp - 1 + signalperiod - 1;
-    let mut macd_line = vec![0.0_f64; len];
-    macd_line[..out_start].fill(f64::NAN);
-    let mut signal_line = vec![0.0_f64; len];
-    signal_line[..out_start].fill(f64::NAN);
-    let mut histogram = vec![0.0_f64; len];
-    histogram[..out_start].fill(f64::NAN);
-
-    let mut sig_ema = signal_seed;
-    let macd_at_out = macd_values[signalperiod - 1];
-    macd_line[out_start] = macd_at_out;
-    signal_line[out_start] = signal_seed;
-    histogram[out_start] = macd_at_out - signal_seed;
-
-    for i in signalperiod..macd_values.len() {
-        let bar = sp - 1 + i;
-        sig_ema = k_signal.mul_add(macd_values[i] - sig_ema, sig_ema);
-        macd_line[bar] = macd_values[i];
-        signal_line[bar] = sig_ema;
-        histogram[bar] = macd_values[i] - sig_ema;
     }
 
     Ok((macd_line, signal_line, histogram))

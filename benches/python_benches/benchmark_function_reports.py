@@ -85,6 +85,14 @@ FUNCTIONS = {
         {"timeperiod": 14},
         ("open", "close"),
     ),
+    "MACDFIX": FunctionSpec(
+        "MACDFIX",
+        taflow.MovingAverageConvergenceDivergenceFixed,
+        (9,),
+        (),
+        {"signalperiod": 9},
+        ("close",),
+    ),
 }
 
 

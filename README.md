@@ -96,7 +96,12 @@ Each descriptive indicator is defined in its own Python module and keeps its
 Rust state between updates:
 
 ```python
-from taflow import BollingerBands, IntradayMomentumIndex, MovingAverage
+from taflow import (
+    BollingerBands,
+    IntradayMomentumIndex,
+    MovingAverage,
+    MovingAverageConvergenceDivergenceFixed,
+)
 
 average = MovingAverage(period=20, moving_average_type=1)
 average.extend(history)
@@ -108,6 +113,10 @@ upper, middle, lower = bands.extend(history)
 imi = IntradayMomentumIndex(period=14)
 imi.extend(open_history, close_history)
 latest_imi = imi.append(next_open, next_close)
+
+macd_fixed = MovingAverageConvergenceDivergenceFixed(signal_period=9)
+macd_fixed.extend(history)
+macd, signal, histogram = macd_fixed.append(next_close)
 ```
 
 Use `taflow.talib` for uppercase TA-Lib-compatible batch calls and top-level

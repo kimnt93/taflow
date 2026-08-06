@@ -322,6 +322,32 @@ def test_macd_extend_and_warmup_match_batch():
     )
 
 
+@pytest.mark.parametrize("signalperiod", [1, 5, 9])
+def test_macdfix_matches_oracle_continuation_and_reset(signalperiod):
+    close = close_data(300)
+    expected = ta.MACDFIX(close, signalperiod)
+    indicator = state.MACDFIX(signalperiod)
+    actual = indicator.extend(close)
+    for ours, theirs in zip(actual, expected):
+        np.testing.assert_allclose(ours, theirs, rtol=1e-12, atol=1e-12, equal_nan=True)
+
+    chunked = state.MACDFIX(signalperiod)
+    first = chunked.extend(close[:20])
+    remaining = chunked.extend(close[20:])
+    for ours, theirs in zip(
+        tuple(np.concatenate((left, right)) for left, right in zip(first, remaining)),
+        expected,
+    ):
+        np.testing.assert_allclose(ours, theirs, rtol=1e-12, atol=1e-12, equal_nan=True)
+
+    indicator.reset()
+    replayed = [indicator.append(value) for value in close]
+    replayed = [(np.nan, np.nan, np.nan) if value is None else value for value in replayed]
+    replayed = tuple(np.asarray(values) for values in zip(*replayed))
+    for ours, theirs in zip(replayed, expected):
+        np.testing.assert_allclose(ours, theirs, rtol=1e-12, atol=1e-12, equal_nan=True)
+
+
 def test_mama_extend_reset_and_warmup_match_oracle():
     close = close_data()
     expected = ta.MAMA(close, 0.5, 0.05)
@@ -495,6 +521,8 @@ def test_invalid_parameters_are_rejected():
         state.ATR(0)
     with pytest.raises(ValueError):
         state.MACD(1, 26, 9)
+    with pytest.raises(ValueError):
+        state.MACDFIX(0)
     with pytest.raises(ValueError):
         state.MA(13, 9)
     with pytest.raises(ValueError):

@@ -7,12 +7,16 @@ from .acceleration_bands import AccelerationBands
 from .bollinger_bands import BollingerBands
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
+from .moving_average_convergence_divergence_fixed import (
+    MovingAverageConvergenceDivergenceFixed,
+)
 from .parabolic_sar import ParabolicSar
 from .parabolic_sar_extended import ParabolicSarExtended
 
 __all__ = [
     "talib",
     "MovingAverage",
+    "MovingAverageConvergenceDivergenceFixed",
     "BollingerBands",
     "IntradayMomentumIndex",
     "AccelerationBands",

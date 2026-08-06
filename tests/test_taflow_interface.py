@@ -40,6 +40,7 @@ def test_talib_compatibility_namespace_preserves_old_style_functions():
     assert_outputs_equal(talib.SAR(high, low), original_talib.SAR(high, low))
     assert_outputs_equal(talib.SAREXT(high, low), original_talib.SAREXT(high, low))
     assert_outputs_equal(talib.IMI(open_, close, 14), original_talib.IMI(open_, close, 14))
+    assert_outputs_equal(talib.MACDFIX(close, 9), original_talib.MACDFIX(close, 9))
 
 
 def test_descriptive_moving_average_and_bollinger_bands():
@@ -110,11 +111,27 @@ def test_descriptive_intraday_momentum_index():
     assert_outputs_equal(replayed, expected)
 
 
+def test_descriptive_fixed_macd():
+    _, _, close = price_data()
+    indicator = taflow.MovingAverageConvergenceDivergenceFixed(signal_period=9)
+    expected = original_talib.MACDFIX(close, 9)
+    assert_outputs_equal(indicator.extend(close), expected, rtol=1e-12, atol=1e-12)
+    indicator.reset()
+    replayed = [indicator.append(value) for value in close]
+    replayed = [(np.nan, np.nan, np.nan) if value is None else value for value in replayed]
+    replayed = tuple(np.asarray(values) for values in zip(*replayed))
+    assert_outputs_equal(replayed, expected, rtol=1e-12, atol=1e-12)
+
+
 def test_descriptive_classes_are_defined_in_individual_modules():
     assert taflow.MovingAverage.__module__ == "taflow.moving_average"
     assert taflow.BollingerBands.__module__ == "taflow.bollinger_bands"
     assert taflow.AccelerationBands.__module__ == "taflow.acceleration_bands"
     assert taflow.IntradayMomentumIndex.__module__ == "taflow.intraday_momentum_index"
+    assert (
+        taflow.MovingAverageConvergenceDivergenceFixed.__module__
+        == "taflow.moving_average_convergence_divergence_fixed"
+    )
     assert taflow.ParabolicSar.__module__ == "taflow.parabolic_sar"
     assert (
         taflow.ParabolicSarExtended.__module__

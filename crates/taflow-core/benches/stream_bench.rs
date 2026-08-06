@@ -1,8 +1,8 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use taflow::stream::{
-    self, Accbands, Apo, Atr, Bbands, Dema, Ema, Imi, Ma, Macd, Mama, Midpoint, Midprice, Mom,
-    Natr, Ppo, Roc, Rocp, Rocr, Rocr100, Rsi, Sar, Sarext, Sma, StreamingIndicator, Tema, Trange,
-    Trima, Wma, T3,
+    self, Accbands, Apo, Atr, Bbands, Dema, Ema, Imi, Ma, Macd, MacdFix, Mama, Midpoint, Midprice,
+    Mom, Natr, Ppo, Roc, Rocp, Rocr, Rocr100, Rsi, Sar, Sarext, Sma, StreamingIndicator, Tema,
+    Trange, Trima, Wma, T3,
 };
 use taflow::MaType;
 
@@ -269,6 +269,17 @@ fn append_benchmark(criterion: &mut Criterion) {
     group.bench_function(BenchmarkId::new("macd", updates.len()), |bench| {
         bench.iter(|| {
             let mut state = Macd::new(12, 26, 9).unwrap();
+            for value in warmup {
+                state.append(*value);
+            }
+            for value in updates {
+                black_box(state.append(*value));
+            }
+        })
+    });
+    group.bench_function(BenchmarkId::new("macdfix", updates.len()), |bench| {
+        bench.iter(|| {
+            let mut state = MacdFix::new(9).unwrap();
             for value in warmup {
                 state.append(*value);
             }
