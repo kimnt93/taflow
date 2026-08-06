@@ -41,6 +41,9 @@ impl TryFrom<i32> for MaType {
 impl MaType {
     /// Returns TA-Lib's warm-up length when this type is used by `MA`.
     pub fn lookback(self, period: usize) -> usize {
+        if period == 1 {
+            return 0;
+        }
         match self {
             Self::Sma | Self::Ema | Self::Wma | Self::Trima => period.saturating_sub(1),
             Self::Dema => 2 * period.saturating_sub(1),
@@ -60,6 +63,9 @@ impl MaType {
 
 /// 根据 MaType 调度到对应的移动平均计算函数
 pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec<f64>> {
+    if period == 1 {
+        return Ok(input.to_vec());
+    }
     use crate::overlap;
     match ma_type {
         MaType::Sma => overlap::sma(input, period),
@@ -77,5 +83,20 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
             Ok(mama)
         }
         MaType::T3 => overlap::t3(input, period, 0.7),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn period_one_is_identity_for_every_dispatched_type() {
+        let input = [1.0, 3.0, 2.0, 8.0];
+        for code in 0..=8 {
+            let ma_type = MaType::try_from(code).unwrap();
+            assert_eq!(ma_type.lookback(1), 0);
+            assert_eq!(compute_ma(&input, 1, ma_type).unwrap(), input);
+        }
     }
 }

@@ -45,13 +45,21 @@ pub fn mavp(
     }
 
     let mut output = vec![f64::NAN; len];
-    let mut averages = HashMap::<usize, Vec<f64>>::new();
+    let mut averages = HashMap::<usize, (usize, Vec<f64>)>::new();
     for index in lookback..len {
         let period = selected_period(periods[index], minperiod, maxperiod);
         if !averages.contains_key(&period) {
-            averages.insert(period, compute_ma(input, period, matype)?);
+            let source_start = lookback - matype.lookback(period);
+            averages.insert(
+                period,
+                (
+                    source_start,
+                    compute_ma(&input[source_start..], period, matype)?,
+                ),
+            );
         }
-        output[index] = averages[&period][index];
+        let (source_start, values) = &averages[&period];
+        output[index] = values[index - source_start];
     }
     Ok(output)
 }

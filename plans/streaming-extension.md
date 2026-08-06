@@ -95,11 +95,12 @@ Work in phases 1--4 is the first releasable streaming vertical slice.  Phases
 before indicator state semantics are proved, and dataframes must not dictate
 the core memory model.
 
-The per-function delivery state lives in
-[`full-ta-checklist.md`](full-ta-checklist.md).  Mark an item only after its
-implementation, parity tests, Python adapter, and benchmark coverage are
-landed.  This avoids treating the inherited batch implementation as completed
-streaming work.
+The per-function implementation state lives in
+[`full-ta-checklist.md`](full-ta-checklist.md). Mark an item after its isolated
+implementation, parity tests, and Python adapters land. Benchmark and report
+coverage follows in a dedicated pass after all mappings are implemented. This
+avoids treating the inherited batch implementation as completed streaming
+work.
 
 The post-compatibility operator roadmap is tracked separately in
 [`operator-library-checklist.md`](operator-library-checklist.md).  It covers
@@ -156,9 +157,8 @@ same measurement: publish both Python-to-Rust and Rust-only append results.
 
 ## Completion criteria
 
-The first release is complete only when the phase 1--4 indicators have exact
-streaming-to-batch parity, all workspace tests pass, C TA-Lib oracle tests pass
-when its dependency is available, and reproducible streaming benchmarks are
-checked in.  Later phases are completed per family only with the same parity,
-test, and benchmark gates; no claim of "all strategies" is made before all
-listed families have passed them.
+The implementation phase is complete only when the phase 1--4 indicators have
+exact streaming-to-batch parity, all workspace tests pass, and C TA-Lib oracle
+tests pass when its dependency is available. Reproducible benchmarks and
+reports are generated afterward as a separate phase; no claim of "all
+strategies" is made before both phases have passed.

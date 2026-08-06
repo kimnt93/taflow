@@ -679,6 +679,59 @@ def test_macdext_chunk_continuation_and_reset(
         )
 
 
+def test_mavp_matches_oracle_for_every_ma_type_and_period_one():
+    close = close_data(700)
+    periods = np.resize(np.array([1.9, 2.9, 3.8, 7.2, 11.9, 50.0, -4.2]), 700)
+    for matype in range(9):
+        expected = original_talib.MAVP(close, periods, 2, 12, matype)
+        actual = state.MAVP(2, 12, matype).extend(close, periods)
+        np.testing.assert_allclose(
+            actual, expected, rtol=1e-8, atol=1e-10, equal_nan=True
+        )
+
+        ones = np.ones(close.size)
+        expected_identity = original_talib.MAVP(close, ones, 1, 1, matype)
+        actual_identity = state.MAVP(1, 1, matype).extend(close, ones)
+        np.testing.assert_allclose(
+            actual_identity,
+            expected_identity,
+            rtol=1e-8,
+            atol=1e-10,
+            equal_nan=True,
+        )
+
+
+@pytest.mark.parametrize("matype", range(9))
+def test_mavp_chunk_continuation_and_reset(matype):
+    close = close_data(700)
+    periods = np.resize(np.array([2.9, 4.1, 8.8, 12.9]), 700)
+    expected = original_talib.MAVP(close, periods, 2, 12, matype)
+    indicator = state.MAVP(2, 12, matype)
+    actual = np.concatenate(
+        [
+            indicator.extend(close[:80], periods[:80]),
+            indicator.extend(close[80:], periods[80:]),
+        ]
+    )
+    np.testing.assert_allclose(
+        actual, expected, rtol=1e-8, atol=1e-10, equal_nan=True
+    )
+
+    indicator.reset()
+    replayed = np.asarray(
+        [
+            np.nan if value is None else value
+            for value in (
+                indicator.append(input, period)
+                for input, period in zip(close, periods)
+            )
+        ]
+    )
+    np.testing.assert_allclose(
+        replayed, expected, rtol=1e-8, atol=1e-10, equal_nan=True
+    )
+
+
 def test_stochastic_states_reject_unequal_input_lengths():
     with pytest.raises(ValueError):
         state.STOCH(5, 13, 0, 11, 0).extend(
@@ -751,3 +804,11 @@ def test_invalid_parameters_are_rejected():
         state.MACDEXT(12, 1, 26, 9, 9, 1)
     with pytest.raises(ValueError):
         state.MACDEXT(12, 1, 26, 1, 9, 9)
+    with pytest.raises(ValueError):
+        state.MAVP(0, 30, 0)
+    with pytest.raises(ValueError):
+        state.MAVP(30, 2, 0)
+    with pytest.raises(ValueError):
+        state.MAVP(2, 30, 9)
+    with pytest.raises(ValueError):
+        state.MAVP().extend(np.arange(5.0), np.arange(4.0))

@@ -37,6 +37,7 @@ batch API; it must not duplicate numerical implementations.
 | IMI | IntradayMomentumIndex | `intraday_momentum_index.py` | stateful |
 | MACDFIX | MovingAverageConvergenceDivergenceFixed | `moving_average_convergence_divergence_fixed.py` | stateful |
 | MACDEXT | MovingAverageConvergenceDivergenceExtended | `moving_average_convergence_divergence_extended.py` | stateful |
+| MAVP | VariablePeriodMovingAverage | `variable_period_moving_average.py` | stateful |
 | STOCHF | FastStochasticOscillator | `fast_stochastic_oscillator.py` | stateful |
 | STOCH | StochasticOscillator | `stochastic_oscillator.py` | stateful |
 | STOCHRSI | StochasticRelativeStrengthIndex | `stochastic_relative_strength_index.py` | stateful |
@@ -45,14 +46,18 @@ Each descriptive wrapper uses composition around the PyO3 state class. This
 gives stable public names without subclassing extension types and keeps all
 numerical work in the Rust implementation.
 
-## Required tests per function
+## Required implementation tests per function
 
 - compatibility output from `taflow.talib` versus original TA-Lib;
 - descriptive `extend` output versus the same oracle;
 - scalar `append` and reset/replay parity;
 - exact warm-up placement and multi-output ordering;
 - invalid parameters and unequal input lengths where applicable;
-- Rust batch/state parity and a one-million-update Rust benchmark.
+- Rust batch/state parity.
+
+Benchmark and report generation is deferred until every TA-Lib function and
+public mapping is implemented. During the implementation phase, do not create
+new per-function report artifacts or block a checklist item on benchmark data.
 
 ## Per-function reporting contract
 
@@ -106,16 +111,17 @@ float64, chunked `extend`, and backfill-then-append continuation. Float32 input
 behavior is recorded as conversion/API compatibility because the numerical
 engine intentionally computes float64.
 
-Checklist items are checked only after both report files, both Python
-interfaces, native parity, oracle parity, and benchmark evidence exist.
+Implementation checklist items are checked after both Python interfaces,
+native parity, and oracle parity exist. Report and benchmark completeness is
+tracked separately in the later reporting phase.
 
 ## Migration order
 
 1. Establish the package and report contract with MA, BBANDS, ACCBANDS, SAR,
    and SAREXT.
-2. Add one descriptive Python file and report pair whenever an existing
-   checked state is next touched.
+2. Add one descriptive Python file whenever an existing checked state is next
+   touched.
 3. Backfill the remaining checked states family-by-family.
 4. Complete the unchecked TA-Lib states, then the operator-library extensions.
-5. Audit that every checked function has native source, both Python surfaces,
-   tests, benchmark registration, and its Markdown/JSON report pair.
+5. After implementation coverage is complete, generate benchmarks and report
+   pairs for every function in a dedicated pass.

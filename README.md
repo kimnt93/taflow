@@ -105,6 +105,7 @@ from taflow import (
     MovingAverageConvergenceDivergenceFixed,
     StochasticOscillator,
     StochasticRelativeStrengthIndex,
+    VariablePeriodMovingAverage,
 )
 
 average = MovingAverage(period=20, moving_average_type=1)
@@ -131,6 +132,13 @@ macd_extended = MovingAverageConvergenceDivergenceExtended(
     signal_average_type=1,
 )
 macd, signal, histogram = macd_extended.extend(history)
+
+variable_average = VariablePeriodMovingAverage(
+    min_period=2,
+    max_period=30,
+    average_type=0,
+)
+values = variable_average.extend(history, period_history)
 
 stochastic = FastStochasticOscillator(
     fast_k_period=5,

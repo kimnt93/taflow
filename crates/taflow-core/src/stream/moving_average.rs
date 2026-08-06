@@ -22,6 +22,9 @@ pub(super) enum MovingAverage {
 
 impl MovingAverage {
     pub(super) fn new(period: usize, ma_type: MaType) -> TaResult<Self> {
+        if period == 1 {
+            return Ok(Self::Sma(Sma::new(1)?));
+        }
         Ok(match ma_type {
             MaType::Sma => Self::Sma(Sma::new(period)?),
             MaType::Ema => Self::Ema(Ema::new(period)?),

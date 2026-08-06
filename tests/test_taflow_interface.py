@@ -41,6 +41,14 @@ def test_talib_compatibility_namespace_preserves_old_style_functions():
     assert_outputs_equal(talib.SAREXT(high, low), original_talib.SAREXT(high, low))
     assert_outputs_equal(talib.IMI(open_, close, 14), original_talib.IMI(open_, close, 14))
     assert_outputs_equal(talib.MACDFIX(close, 9), original_talib.MACDFIX(close, 9))
+    periods = np.resize(np.array([1.9, 2.9, 4.1, 8.8, 12.9, 40.0]), close.size)
+    for matype in range(9):
+        assert_outputs_equal(
+            talib.MAVP(close, periods, 2, 12, matype),
+            original_talib.MAVP(close, periods, 2, 12, matype),
+            rtol=1e-8,
+            atol=1e-10,
+        )
     for matype in range(9):
         assert_outputs_equal(
             talib.STOCHF(high, low, close, 5, 13, matype),
@@ -249,6 +257,19 @@ def test_descriptive_extended_macd():
                 )
 
 
+def test_descriptive_variable_period_moving_average():
+    _, _, close = price_data(700)
+    periods = np.resize(np.array([1.9, 2.9, 4.1, 8.8, 12.9, 40.0]), 700)
+    for matype in range(9):
+        indicator = taflow.VariablePeriodMovingAverage(
+            min_period=2, max_period=12, average_type=matype
+        )
+        expected = original_talib.MAVP(close, periods, 2, 12, matype)
+        assert_outputs_equal(
+            indicator.extend(close, periods), expected, rtol=1e-8, atol=1e-10
+        )
+
+
 def test_descriptive_classes_are_defined_in_individual_modules():
     assert taflow.MovingAverage.__module__ == "taflow.moving_average"
     assert taflow.BollingerBands.__module__ == "taflow.bollinger_bands"
@@ -261,6 +282,10 @@ def test_descriptive_classes_are_defined_in_individual_modules():
     assert (
         taflow.MovingAverageConvergenceDivergenceExtended.__module__
         == "taflow.moving_average_convergence_divergence_extended"
+    )
+    assert (
+        taflow.VariablePeriodMovingAverage.__module__
+        == "taflow.variable_period_moving_average"
     )
     assert taflow.ParabolicSar.__module__ == "taflow.parabolic_sar"
     assert (

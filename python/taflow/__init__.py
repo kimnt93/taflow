@@ -18,6 +18,7 @@ from .parabolic_sar import ParabolicSar
 from .parabolic_sar_extended import ParabolicSarExtended
 from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
+from .variable_period_moving_average import VariablePeriodMovingAverage
 
 __all__ = [
     "talib",
@@ -28,6 +29,7 @@ __all__ = [
     "FastStochasticOscillator",
     "StochasticOscillator",
     "StochasticRelativeStrengthIndex",
+    "VariablePeriodMovingAverage",
     "IntradayMomentumIndex",
     "AccelerationBands",
     "ParabolicSar",

@@ -4,8 +4,8 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Atr, Dema, Ema, Imi, Macd, MacdExt, MacdFix, Mama, Midpoint, Midprice, Mom, Natr, Roc,
-    Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator, Tema, Trange,
+    self, Atr, Dema, Ema, Imi, Macd, MacdExt, MacdFix, Mama, Mavp, Midpoint, Midprice, Mom, Natr,
+    Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator, Tema, Trange,
     Trima, Wma,
 };
 use taflow::MaType;
@@ -1792,6 +1792,11 @@ pub struct StatefulMacdExt {
 }
 
 #[pyclass]
+pub struct StatefulMavp {
+    inner: Mavp,
+}
+
+#[pyclass]
 pub struct StatefulStochf {
     inner: Stochf,
 }
@@ -2225,6 +2230,54 @@ impl StatefulMacdExt {
         self.inner
             .value()
             .map(|value| (value.macd, value.signal, value.histogram))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
+
+#[pymethods]
+impl StatefulMavp {
+    #[new]
+    #[pyo3(signature = (minperiod=2, maxperiod=30, matype=0))]
+    fn new(minperiod: usize, maxperiod: usize, matype: i32) -> PyResult<Self> {
+        let ma_type = MaType::try_from(matype).map_err(py_value_error)?;
+        Ok(Self {
+            inner: Mavp::new(minperiod, maxperiod, ma_type).map_err(py_value_error)?,
+        })
+    }
+
+    fn append(&mut self, input: f64, period: f64) -> Option<f64> {
+        self.inner.append(input, period)
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        input: PyReadonlyArray1<f64>,
+        periods: PyReadonlyArray1<f64>,
+    ) -> PyResult<Py<PyArray1<f64>>> {
+        let input = input.as_slice()?;
+        let periods = periods.as_slice()?;
+        if input.len() != periods.len() {
+            return Err(PyValueError::new_err(
+                "input and periods must have equal lengths",
+            ));
+        }
+        Ok(to_py_array(
+            py,
+            input
+                .iter()
+                .zip(periods)
+                .map(|(&input, &period)| self.inner.append(input, period).unwrap_or(f64::NAN))
+                .collect(),
+        ))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
     }
 
     fn reset(&mut self) {

@@ -1,14 +1,19 @@
 # Full TA stateful-extension checklist
 
-This is the authoritative delivery checklist.  A checked item means its
-stateful extension exists in Rust and Python, has batch-parity tests, and is
-included in the streaming benchmark where applicable.  A `B✓` annotation
-records a separately verified batch function.  Do not check a stateful item
-merely because the legacy batch function exists.
+This is the authoritative TA-Lib implementation checklist. A checked item
+means its batch implementation, Rust state, Python compatibility mapping, and
+descriptive Python interface exist with implementation-level parity tests.
+Benchmarking and generated reports are a later phase and do not block this
+implementation checklist. A `B✓` annotation records a separately verified
+batch function. Do not check an item merely because the inherited batch
+function exists.
 
 The completed stateful surface is tracked function-by-function below, including
 the price transforms, math transforms, and pointwise arithmetic operators.
 `MACDEXT` now has distinct aligned moving-average state semantics.
+
+The additional non-TA-Lib functions from the shared design discussion are
+tracked in [`operator-library-checklist.md`](operator-library-checklist.md).
 
 ## Overlap Studies
 
@@ -27,7 +32,7 @@ the price transforms, math transforms, and pointwise arithmetic operators.
 - [x] SAREXT
 - [x] MIDPOINT
 - [x] MIDPRICE
-- [ ] MAVP
+- [x] MAVP
 - [ ] HT_TRENDLINE
 - [x] MA
 
