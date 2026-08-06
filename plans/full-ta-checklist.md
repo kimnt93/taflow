@@ -139,7 +139,7 @@ checklist is deferred and is not linked to this implementation gate.
 
 ## Cycle Indicators
 
-- [ ] HT_DCPERIOD
+- [x] HT_DCPERIOD
 - [ ] HT_DCPHASE
 - [ ] HT_PHASOR
 - [ ] HT_SINE

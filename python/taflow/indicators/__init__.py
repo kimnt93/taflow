@@ -2,6 +2,7 @@
 
 from ..commodity_channel_index import CCI, CommodityChannelIndex
 from ..exponential_moving_average import EMA, ExponentialMovingAverage
+from ..hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
 from ..money_flow_index import MFI, MoneyFlowIndex
 from ..minus_directional_indicator import MINUS_DI, MinusDirectionalIndicator
 from ..minus_directional_movement import MINUS_DM, MinusDirectionalMovement
@@ -12,6 +13,7 @@ from ..ultimate_oscillator import ULTOSC, UltimateOscillator
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
+    "HilbertTransformDominantCyclePeriod", "HT_DCPERIOD",
     "MoneyFlowIndex", "MFI", "MinusDirectionalIndicator", "MINUS_DI",
     "MinusDirectionalMovement", "MINUS_DM", "PlusDirectionalIndicator", "PLUS_DI",
     "PlusDirectionalMovement", "PLUS_DM", "TripleExponentialRateOfChange", "TRIX",
