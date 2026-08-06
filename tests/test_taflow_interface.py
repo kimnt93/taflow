@@ -270,6 +270,17 @@ def test_descriptive_variable_period_moving_average():
         )
 
 
+def test_descriptive_hilbert_transform_trendline():
+    _, _, close = price_data(700)
+    indicator = taflow.HilbertTransformTrendline()
+    assert_outputs_equal(
+        indicator.extend(close),
+        original_talib.HT_TRENDLINE(close),
+        rtol=1e-10,
+        atol=1e-12,
+    )
+
+
 def test_descriptive_classes_are_defined_in_individual_modules():
     assert taflow.MovingAverage.__module__ == "taflow.moving_average"
     assert taflow.BollingerBands.__module__ == "taflow.bollinger_bands"
@@ -286,6 +297,10 @@ def test_descriptive_classes_are_defined_in_individual_modules():
     assert (
         taflow.VariablePeriodMovingAverage.__module__
         == "taflow.variable_period_moving_average"
+    )
+    assert (
+        taflow.HilbertTransformTrendline.__module__
+        == "taflow.hilbert_transform_trendline"
     )
     assert taflow.ParabolicSar.__module__ == "taflow.parabolic_sar"
     assert (

@@ -33,7 +33,7 @@ tracked in [`operator-library-checklist.md`](operator-library-checklist.md).
 - [x] MIDPOINT
 - [x] MIDPRICE
 - [x] MAVP
-- [ ] HT_TRENDLINE
+- [x] HT_TRENDLINE
 - [x] MA
 
 ## Momentum Indicators

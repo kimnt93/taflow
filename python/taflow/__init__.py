@@ -6,6 +6,7 @@ from . import talib
 from .acceleration_bands import AccelerationBands
 from .bollinger_bands import BollingerBands
 from .fast_stochastic_oscillator import FastStochasticOscillator
+from .hilbert_transform_trendline import HilbertTransformTrendline
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
 from .moving_average_convergence_divergence_fixed import (
@@ -27,6 +28,7 @@ __all__ = [
     "MovingAverageConvergenceDivergenceExtended",
     "BollingerBands",
     "FastStochasticOscillator",
+    "HilbertTransformTrendline",
     "StochasticOscillator",
     "StochasticRelativeStrengthIndex",
     "VariablePeriodMovingAverage",

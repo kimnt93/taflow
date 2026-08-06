@@ -4,9 +4,9 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Atr, Dema, Ema, Imi, Macd, MacdExt, MacdFix, Mama, Mavp, Midpoint, Midprice, Mom, Natr,
-    Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator, Tema, Trange,
-    Trima, Wma,
+    self, Atr, Dema, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama, Mavp, Midpoint, Midprice,
+    Mom, Natr, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi, StreamingIndicator,
+    Tema, Trange, Trima, Wma,
 };
 use taflow::MaType;
 
@@ -1797,6 +1797,11 @@ pub struct StatefulMavp {
 }
 
 #[pyclass]
+pub struct StatefulHtTrendline {
+    inner: HtTrendline,
+}
+
+#[pyclass]
 pub struct StatefulStochf {
     inner: Stochf,
 }
@@ -2271,6 +2276,44 @@ impl StatefulMavp {
                 .iter()
                 .zip(periods)
                 .map(|(&input, &period)| self.inner.append(input, period).unwrap_or(f64::NAN))
+                .collect(),
+        ))
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+}
+
+#[pymethods]
+impl StatefulHtTrendline {
+    #[new]
+    fn new() -> Self {
+        Self {
+            inner: HtTrendline::new(),
+        }
+    }
+
+    fn append(&mut self, input: f64) -> Option<f64> {
+        self.inner.append(input)
+    }
+
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        input: PyReadonlyArray1<f64>,
+    ) -> PyResult<Py<PyArray1<f64>>> {
+        Ok(to_py_array(
+            py,
+            input
+                .as_slice()?
+                .iter()
+                .map(|&input| self.inner.append(input).unwrap_or(f64::NAN))
                 .collect(),
         ))
     }

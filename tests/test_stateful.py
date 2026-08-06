@@ -732,6 +732,27 @@ def test_mavp_chunk_continuation_and_reset(matype):
     )
 
 
+def test_ht_trendline_chunk_continuation_and_reset():
+    close = close_data(700)
+    expected = original_talib.HT_TRENDLINE(close)
+    indicator = state.HT_TRENDLINE()
+    actual = np.concatenate([indicator.extend(close[:80]), indicator.extend(close[80:])])
+    np.testing.assert_allclose(
+        actual, expected, rtol=1e-10, atol=1e-12, equal_nan=True
+    )
+
+    indicator.reset()
+    replayed = np.asarray(
+        [
+            np.nan if (value := indicator.append(input)) is None else value
+            for input in close
+        ]
+    )
+    np.testing.assert_allclose(
+        replayed, expected, rtol=1e-10, atol=1e-12, equal_nan=True
+    )
+
+
 def test_stochastic_states_reject_unequal_input_lengths():
     with pytest.raises(ValueError):
         state.STOCH(5, 13, 0, 11, 0).extend(
