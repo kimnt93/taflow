@@ -23,6 +23,7 @@ from .moving_average_convergence_divergence_extended import (
 )
 from .parabolic_sar import ParabolicSar
 from .parabolic_sar_extended import ParabolicSarExtended
+from .plus_directional_indicator import PLUS_DI, PlusDirectionalIndicator
 from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
 from .triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
@@ -57,5 +58,7 @@ __all__ = [
     "EMA",
     "ParabolicSar",
     "ParabolicSarExtended",
+    "PlusDirectionalIndicator",
+    "PLUS_DI",
     "__version__",
 ]

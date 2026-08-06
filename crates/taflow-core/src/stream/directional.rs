@@ -25,11 +25,11 @@ pub(super) struct DirectionalMovement {
 
 impl DirectionalMovement {
     pub(super) fn new(period: usize) -> TaResult<Self> {
-        if period < 2 {
+        if period == 0 {
             return Err(TaError::InvalidParameter {
                 name: "timeperiod",
                 value: period.to_string(),
-                reason: "must be >= 2",
+                reason: "must be >= 1",
             });
         }
         Ok(Self {
