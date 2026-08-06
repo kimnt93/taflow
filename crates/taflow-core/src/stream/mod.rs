@@ -1,7 +1,7 @@
-//! Stateful, incremental technical indicators.
+//! Persistent technical indicators for bulk history and realtime continuation.
 //!
-//! The batch API remains the TA-Lib-compatible surface.  These types are for
-//! applications that append bars over time and must not recompute history.
+//! Each TA implementation lives in its own module and retains only the bounded
+//! recurrence state required to process newly appended bars.
 
 use std::collections::VecDeque;
 
@@ -13,10 +13,13 @@ mod adxr;
 mod apo;
 mod bbands;
 mod cmo;
+mod dema;
 mod directional;
 mod dx;
+mod ema;
 mod ht_trendline;
 mod imi;
+mod indicator;
 mod kama;
 mod ma;
 mod macd;
@@ -29,10 +32,15 @@ mod ppo;
 mod rsi;
 mod sar;
 mod sarext;
+mod sma;
 mod stoch;
 mod stochf;
 mod stochrsi;
 mod t3;
+mod tema;
+mod trima;
+mod window;
+mod wma;
 
 pub use accbands::{Accbands, AccbandsValue};
 pub use adx::Adx;
@@ -40,9 +48,12 @@ pub use adxr::Adxr;
 pub use apo::Apo;
 pub use bbands::{Bbands, BbandsValue};
 pub use cmo::Cmo;
+pub use dema::Dema;
 pub use dx::Dx;
+pub use ema::Ema;
 pub use ht_trendline::HtTrendline;
 pub use imi::Imi;
+pub use indicator::StreamingIndicator;
 pub use kama::Kama;
 pub use ma::Ma;
 pub use macd::{Macd, MacdValue};
@@ -54,10 +65,15 @@ pub use ppo::Ppo;
 pub use rsi::Rsi;
 pub use sar::Sar;
 pub use sarext::Sarext;
+pub use sma::Sma;
 pub use stoch::{Stoch, StochValue};
 pub use stochf::{Stochf, StochfValue};
 pub use stochrsi::{Stochrsi, StochrsiValue};
 pub use t3::T3;
+pub use tema::Tema;
+pub use trima::Trima;
+pub use window::Window;
+pub use wma::Wma;
 
 pub(super) fn invalid_period(name: &'static str, period: usize, minimum: usize) -> TaError {
     TaError::InvalidParameter {
@@ -68,352 +84,6 @@ pub(super) fn invalid_period(name: &'static str, period: usize, minimum: usize) 
         } else {
             "must be >= 2"
         },
-    }
-}
-
-/// A fixed-capacity FIFO used by indicators that need a rolling window.
-///
-/// It allocates only during construction.  `VecDeque` is a safe baseline;
-/// replace it with a bespoke ring buffer only if profiling justifies that cost.
-#[derive(Debug, Clone)]
-pub struct Window {
-    values: VecDeque<f64>,
-    capacity: usize,
-}
-
-impl Window {
-    pub fn new(capacity: usize) -> TaResult<Self> {
-        if capacity == 0 {
-            return Err(invalid_period("capacity", capacity, 1));
-        }
-        Ok(Self {
-            values: VecDeque::with_capacity(capacity),
-            capacity,
-        })
-    }
-
-    /// Appends `value`, returning the value evicted from a full window.
-    pub fn push(&mut self, value: f64) -> Option<f64> {
-        let evicted = if self.values.len() == self.capacity {
-            self.values.pop_front()
-        } else {
-            None
-        };
-        self.values.push_back(value);
-        evicted
-    }
-
-    pub fn len(&self) -> usize {
-        self.values.len()
-    }
-
-    pub fn is_full(&self) -> bool {
-        self.len() == self.capacity
-    }
-
-    pub fn clear(&mut self) {
-        self.values.clear();
-    }
-}
-
-/// Common interface for scalar indicators.
-pub trait StreamingIndicator {
-    type Output: Copy;
-
-    /// Adds one observation and returns a value once the indicator is warm.
-    fn append(&mut self, input: f64) -> Option<Self::Output>;
-
-    /// Returns the most recently produced value, if warm.
-    fn value(&self) -> Option<Self::Output>;
-
-    /// Restores the post-construction state while retaining allocated buffers.
-    fn reset(&mut self);
-
-    fn extend<I>(&mut self, inputs: I) -> Vec<Option<Self::Output>>
-    where
-        I: IntoIterator<Item = f64>,
-    {
-        inputs.into_iter().map(|input| self.append(input)).collect()
-    }
-}
-
-/// Stateful simple moving average with O(1) updates.
-#[derive(Debug, Clone)]
-pub struct Sma {
-    period: usize,
-    window: Window,
-    sum: f64,
-    value: Option<f64>,
-}
-
-impl Sma {
-    pub fn new(period: usize) -> TaResult<Self> {
-        Ok(Self {
-            period,
-            window: Window::new(period)?,
-            sum: 0.0,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for Sma {
-    type Output = f64;
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        if let Some(old) = self.window.push(input) {
-            self.sum -= old;
-        }
-        self.sum += input;
-        self.value = self.window.is_full().then(|| self.sum / self.period as f64);
-        self.value
-    }
-
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.window.clear();
-        self.sum = 0.0;
-        self.value = None;
-    }
-}
-
-/// Stateful EMA with the same SMA seed as TA-Lib's batch EMA.
-#[derive(Debug, Clone)]
-pub struct Ema {
-    seed: Sma,
-    k: f64,
-    value: Option<f64>,
-}
-
-impl Ema {
-    pub fn new(period: usize) -> TaResult<Self> {
-        if period == 0 {
-            return Err(invalid_period("timeperiod", period, 1));
-        }
-        Ok(Self {
-            seed: Sma::new(period)?,
-            k: 2.0 / (period as f64 + 1.0),
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for Ema {
-    type Output = f64;
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = match self.value {
-            Some(previous) => Some(self.k.mul_add(input - previous, previous)),
-            None => self.seed.append(input),
-        };
-        self.value
-    }
-
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.seed.reset();
-        self.value = None;
-    }
-}
-
-/// Stateful weighted moving average with O(1) updates.
-#[derive(Debug, Clone)]
-pub struct Wma {
-    period: usize,
-    divider: f64,
-    window: Window,
-    sum: f64,
-    weighted_sum: f64,
-    value: Option<f64>,
-}
-
-impl Wma {
-    pub fn new(period: usize) -> TaResult<Self> {
-        let window = Window::new(period)?;
-        let period_f = period as f64;
-        Ok(Self {
-            period,
-            divider: period_f * (period_f + 1.0) / 2.0,
-            window,
-            sum: 0.0,
-            weighted_sum: 0.0,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for Wma {
-    type Output = f64;
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        if self.window.is_full() {
-            let previous_sum = self.sum;
-            let old = self
-                .window
-                .push(input)
-                .expect("a full window evicts one value");
-            self.weighted_sum += self.period as f64 * input - previous_sum;
-            self.sum += input - old;
-        } else {
-            let weight = self.window.len() + 1;
-            self.window.push(input);
-            self.sum += input;
-            self.weighted_sum += input * weight as f64;
-        }
-        self.value = self
-            .window
-            .is_full()
-            .then(|| self.weighted_sum / self.divider);
-        self.value
-    }
-
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.window.clear();
-        self.sum = 0.0;
-        self.weighted_sum = 0.0;
-        self.value = None;
-    }
-}
-
-/// Stateful double EMA composed from the shared EMA primitive.
-#[derive(Debug, Clone)]
-pub struct Dema {
-    ema1: Ema,
-    ema2: Ema,
-    value: Option<f64>,
-}
-
-impl Dema {
-    pub fn new(period: usize) -> TaResult<Self> {
-        if period < 2 {
-            return Err(invalid_period("timeperiod", period, 2));
-        }
-        Ok(Self {
-            ema1: Ema::new(period)?,
-            ema2: Ema::new(period)?,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for Dema {
-    type Output = f64;
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self
-            .ema1
-            .append(input)
-            .and_then(|ema1| self.ema2.append(ema1).map(|ema2| 2.0 * ema1 - ema2));
-        self.value
-    }
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-    fn reset(&mut self) {
-        self.ema1.reset();
-        self.ema2.reset();
-        self.value = None;
-    }
-}
-
-/// Stateful triple EMA composed from the shared EMA primitive.
-#[derive(Debug, Clone)]
-pub struct Tema {
-    ema1: Ema,
-    ema2: Ema,
-    ema3: Ema,
-    value: Option<f64>,
-}
-
-impl Tema {
-    pub fn new(period: usize) -> TaResult<Self> {
-        if period < 2 {
-            return Err(invalid_period("timeperiod", period, 2));
-        }
-        Ok(Self {
-            ema1: Ema::new(period)?,
-            ema2: Ema::new(period)?,
-            ema3: Ema::new(period)?,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for Tema {
-    type Output = f64;
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self.ema1.append(input).and_then(|ema1| {
-            self.ema2.append(ema1).and_then(|ema2| {
-                self.ema3
-                    .append(ema2)
-                    .map(|ema3| 3.0 * ema1 - 3.0 * ema2 + ema3)
-            })
-        });
-        self.value
-    }
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-    fn reset(&mut self) {
-        self.ema1.reset();
-        self.ema2.reset();
-        self.ema3.reset();
-        self.value = None;
-    }
-}
-
-/// Stateful triangular moving average as two cascaded SMA windows.
-#[derive(Debug, Clone)]
-pub struct Trima {
-    sma1: Sma,
-    sma2: Sma,
-    value: Option<f64>,
-}
-
-impl Trima {
-    pub fn new(period: usize) -> TaResult<Self> {
-        if period == 0 {
-            return Err(invalid_period("timeperiod", period, 1));
-        }
-        let (p1, p2) = if period % 2 == 1 {
-            let half = (period + 1) / 2;
-            (half, half)
-        } else {
-            (period / 2 + 1, period / 2)
-        };
-        Ok(Self {
-            sma1: Sma::new(p1)?,
-            sma2: Sma::new(p2)?,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for Trima {
-    type Output = f64;
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self
-            .sma1
-            .append(input)
-            .and_then(|first| self.sma2.append(first));
-        self.value
-    }
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-    fn reset(&mut self) {
-        self.sma1.reset();
-        self.sma2.reset();
-        self.value = None;
     }
 }
 
@@ -1210,9 +880,8 @@ impl StreamingIndicator for Avgdev {
         self.window.push(input);
         self.value = self.window.is_full().then(|| {
             let period = self.period as f64;
-            let mean = self.window.values.iter().rev().sum::<f64>() / period;
+            let mean = self.window.iter().rev().sum::<f64>() / period;
             self.window
-                .values
                 .iter()
                 .rev()
                 .map(|value| (*value - mean).abs())
@@ -1448,7 +1117,7 @@ impl RegressionCore {
             if !self.window.is_full() {
                 return None;
             }
-            let values: Vec<f64> = self.window.values.iter().copied().collect();
+            let values: Vec<f64> = self.window.iter().copied().collect();
             self.sum_y = crate::simd::sum_f64(&values);
             self.weighted_sum = values
                 .iter()

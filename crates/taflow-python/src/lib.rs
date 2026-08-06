@@ -4,6 +4,7 @@ use pyo3::prelude::*;
 
 mod conversion;
 mod func_api;
+mod indicators;
 mod metadata;
 mod state_api;
 
@@ -14,8 +15,12 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(metadata::get_functions, m)?)?;
     m.add_function(wrap_pyfunction!(metadata::get_function_groups, m)?)?;
 
-    // Incremental stateful API.  It is kept separate from the functional
-    // TA-Lib-compatible namespace to preserve established batch semantics.
+    // Unified indicator objects. Each TA binding lives in its own module and
+    // owns its accumulated outputs so compute() never replays prior input.
+    m.add_class::<indicators::ExponentialMovingAverage>()?;
+
+    // Transitional state classes remain available while their indicators move
+    // to the unified object surface above.
     m.add_class::<state_api::StatefulSma>()?;
     m.add_class::<state_api::StatefulEma>()?;
     m.add_class::<state_api::StatefulWma>()?;
