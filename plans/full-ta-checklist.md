@@ -175,7 +175,7 @@ checklist is deferred and is not linked to this implementation gate.
 - [ ] CDLHARAMI
 - [ ] CDLHARAMICROSS
 - [ ] CDLHIGHWAVE
-- [ ] CDLHIKKAKE
+- [x] CDLHIKKAKE
 - [ ] CDLHIKKAKEMOD
 - [ ] CDLHOMINGPIGEON
 - [ ] CDLIDENTICAL3CROWS

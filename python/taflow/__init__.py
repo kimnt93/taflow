@@ -14,6 +14,7 @@ from .engulfing import CDLENGULFING, Engulfing
 from .exponential_moving_average import EMA, ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
+from .hikkake import CDLHIKKAKE, Hikkake
 from .hammer import CDLHAMMER, Hammer
 from .hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
 from .hilbert_transform_dominant_cycle_phase import HT_DCPHASE, HilbertTransformDominantCyclePhase
@@ -61,6 +62,8 @@ __all__ = [
     "CCI",
     "FastStochasticOscillator",
     "HilbertTransformTrendline",
+    "Hikkake",
+    "CDLHIKKAKE",
     "Hammer",
     "CDLHAMMER",
     "HilbertTransformDominantCyclePeriod",
