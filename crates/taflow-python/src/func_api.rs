@@ -43,7 +43,7 @@ pub fn ACCBANDS(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `SMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -51,15 +51,15 @@ pub fn ACCBANDS(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn SMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::simple_moving_average(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::simple_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `EMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -67,15 +67,15 @@ pub fn SMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn EMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::exponential_moving_average(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::exponential_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `WMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -83,15 +83,15 @@ pub fn EMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn WMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::weighted_moving_average(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::weighted_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `DEMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -99,15 +99,15 @@ pub fn WMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn DEMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::double_exponential_moving_average(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::double_exponential_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `TEMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -115,15 +115,15 @@ pub fn DEMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn TEMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::triple_exponential_moving_average(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::triple_exponential_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `TRIMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -131,15 +131,15 @@ pub fn TEMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn TRIMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::triangular_moving_average(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::triangular_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `KAMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -147,15 +147,15 @@ pub fn TRIMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn KAMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::kaufman_adaptive_moving_average(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::kaufman_adaptive_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=5, vfactor=0.7))]
+#[pyo3(signature = (_input, timeperiod=5, vfactor=0.7))]
 /// Computes or updates `TripleExponentialAverage` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -163,16 +163,16 @@ pub fn KAMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn TripleExponentialAverage(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
     vfactor: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::triple_exponential_average(input.as_slice()?, timeperiod, vfactor))?;
+    let result = ta_err!(core::overlap::triple_exponential_average(_input.as_slice()?, timeperiod, vfactor))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, fastlimit=0.5, slowlimit=0.05))]
+#[pyo3(signature = (_input, fastlimit=0.5, slowlimit=0.05))]
 /// Computes or updates `MAMA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -180,16 +180,16 @@ pub fn TripleExponentialAverage(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MAMA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     fastlimit: f64,
     slowlimit: f64,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (mama, fama) = ta_err!(core::overlap::mesa_adaptive_moving_average(input.as_slice()?, fastlimit, slowlimit))?;
+    let (mama, fama) = ta_err!(core::overlap::mesa_adaptive_moving_average(_input.as_slice()?, fastlimit, slowlimit))?;
     Ok((to_py_array(py, mama), to_py_array(py, fama)))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0))]
+#[pyo3(signature = (_input, timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0))]
 /// Computes or updates `BBANDS` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -197,7 +197,7 @@ pub fn MAMA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn BBANDS(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
     nbdevup: f64,
     nbdevdn: f64,
@@ -206,7 +206,7 @@ pub fn BBANDS(
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let (upper, middle, lower) = ta_err!(core::overlap::bollinger_bands(
-        input.as_slice()?,
+        _input.as_slice()?,
         timeperiod,
         nbdevup,
         nbdevdn,
@@ -278,7 +278,7 @@ pub fn SAREXT(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `MIDPOINT` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -286,10 +286,10 @@ pub fn SAREXT(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MIDPOINT(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::midpoint(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::midpoint(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -315,7 +315,7 @@ pub fn MIDPRICE(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, periods, minperiod=2, maxperiod=30, matype=0))]
+#[pyo3(signature = (_input, periods, minperiod=2, maxperiod=30, matype=0))]
 /// Computes or updates `MAVP` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -323,7 +323,7 @@ pub fn MIDPRICE(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MAVP(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     periods: PyReadonlyArray1<f64>,
     minperiod: usize,
     maxperiod: usize,
@@ -332,7 +332,7 @@ pub fn MAVP(
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let result = ta_err!(core::overlap::moving_average_variable_period(
-        input.as_slice()?,
+        _input.as_slice()?,
         periods.as_slice()?,
         minperiod,
         maxperiod,
@@ -347,13 +347,13 @@ pub fn MAVP(
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn HT_TRENDLINE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::hilbert_transform_trendline(input.as_slice()?))?;
+pub fn HT_TRENDLINE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
+    let result = ta_err!(core::overlap::hilbert_transform_trendline(_input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30, matype=0))]
+#[pyo3(signature = (_input, timeperiod=30, matype=0))]
 /// Computes or updates `MA` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -361,13 +361,13 @@ pub fn HT_TRENDLINE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MA(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
     matype: i32,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::overlap::moving_average(input.as_slice()?, timeperiod, ma))?;
+    let result = ta_err!(core::overlap::moving_average(_input.as_slice()?, timeperiod, ma))?;
     Ok(to_py_array(py, result))
 }
 
@@ -376,7 +376,7 @@ pub fn MA(
 // ============================================================
 
 #[pyfunction]
-#[pyo3(signature = (open, close, timeperiod=14))]
+#[pyo3(signature = (_open, close, timeperiod=14))]
 /// Computes or updates `IMI` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -384,12 +384,12 @@ pub fn MA(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn IMI(
     py: Python<'_>,
-    open: PyReadonlyArray1<f64>,
+    _open: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::momentum::intraday_momentum_index(
-        open.as_slice()?,
+        _open.as_slice()?,
         close.as_slice()?,
         timeperiod
     ))?;
@@ -397,7 +397,7 @@ pub fn IMI(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `RSI` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -405,15 +405,15 @@ pub fn IMI(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn RSI(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::relative_strength_index(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::relative_strength_index(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, fastperiod=12, slowperiod=26, signalperiod=9))]
+#[pyo3(signature = (_input, fastperiod=12, slowperiod=26, signalperiod=9))]
 /// Computes or updates `MACD` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -421,13 +421,13 @@ pub fn RSI(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MACD(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     fastperiod: usize,
     slowperiod: usize,
     signalperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
     let (m, s, h) = ta_err!(core::momentum::moving_average_convergence_divergence(
-        input.as_slice()?,
+        _input.as_slice()?,
         fastperiod,
         slowperiod,
         signalperiod
@@ -436,7 +436,7 @@ pub fn MACD(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, fastperiod=12, fastmatype=1, slowperiod=26, slowmatype=1, signalperiod=9, signalmatype=1))]
+#[pyo3(signature = (_input, fastperiod=12, fastmatype=1, slowperiod=26, slowmatype=1, signalperiod=9, signalmatype=1))]
 /// Computes or updates `MACDEXT` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -444,7 +444,7 @@ pub fn MACD(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MACDEXT(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     fastperiod: usize,
     fastmatype: i32,
     slowperiod: usize,
@@ -459,7 +459,7 @@ pub fn MACDEXT(
     let sigmt = core::MaType::try_from(signalmatype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let (m, s, h) = ta_err!(core::momentum::moving_average_convergence_divergence_extended(
-        input.as_slice()?,
+        _input.as_slice()?,
         fastperiod,
         fmt,
         slowperiod,
@@ -471,7 +471,7 @@ pub fn MACDEXT(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, signalperiod=9))]
+#[pyo3(signature = (_input, signalperiod=9))]
 /// Computes or updates `MACDFIX` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -479,10 +479,10 @@ pub fn MACDEXT(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MACDFIX(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     signalperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (m, s, h) = ta_err!(core::momentum::moving_average_convergence_divergence_fixed(input.as_slice()?, signalperiod))?;
+    let (m, s, h) = ta_err!(core::momentum::moving_average_convergence_divergence_fixed(_input.as_slice()?, signalperiod))?;
     Ok((to_py_array(py, m), to_py_array(py, s), to_py_array(py, h)))
 }
 
@@ -551,7 +551,7 @@ pub fn STOCHF(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0))]
+#[pyo3(signature = (_input, timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0))]
 /// Computes or updates `STOCHRSI` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -559,7 +559,7 @@ pub fn STOCHF(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn STOCHRSI(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
     fastk_period: usize,
     fastd_period: usize,
@@ -568,7 +568,7 @@ pub fn STOCHRSI(
     let fdm = core::MaType::try_from(fastd_matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let (k, d) = ta_err!(core::momentum::stochastic_relative_strength_index(
-        input.as_slice()?,
+        _input.as_slice()?,
         timeperiod,
         fastk_period,
         fastd_period,
@@ -647,7 +647,7 @@ pub fn CCI(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=10))]
+#[pyo3(signature = (_input, timeperiod=10))]
 /// Computes or updates `MOM` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -655,15 +655,15 @@ pub fn CCI(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MOM(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::momentum(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::momentum(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=10))]
+#[pyo3(signature = (_input, timeperiod=10))]
 /// Computes or updates `ROC` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -671,15 +671,15 @@ pub fn MOM(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn ROC(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::rate_of_change(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=10))]
+#[pyo3(signature = (_input, timeperiod=10))]
 /// Computes or updates `ROCP` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -687,15 +687,15 @@ pub fn ROC(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn ROCP(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change_percent(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::rate_of_change_percent(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=10))]
+#[pyo3(signature = (_input, timeperiod=10))]
 /// Computes or updates `ROCR` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -703,15 +703,15 @@ pub fn ROCP(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn ROCR(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change_ratio(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::rate_of_change_ratio(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=10))]
+#[pyo3(signature = (_input, timeperiod=10))]
 /// Computes or updates `ROCR100` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -719,10 +719,10 @@ pub fn ROCR(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn ROCR100(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change_ratio_percent(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::rate_of_change_ratio_percent(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -750,7 +750,7 @@ pub fn WILLR(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, fastperiod=12, slowperiod=26, matype=0))]
+#[pyo3(signature = (_input, fastperiod=12, slowperiod=26, matype=0))]
 /// Computes or updates `APO` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -758,7 +758,7 @@ pub fn WILLR(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn APO(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     fastperiod: usize,
     slowperiod: usize,
     matype: i32,
@@ -766,7 +766,7 @@ pub fn APO(
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let result = ta_err!(core::momentum::absolute_price_oscillator(
-        input.as_slice()?,
+        _input.as_slice()?,
         fastperiod,
         slowperiod,
         ma
@@ -775,7 +775,7 @@ pub fn APO(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, fastperiod=12, slowperiod=26, matype=0))]
+#[pyo3(signature = (_input, fastperiod=12, slowperiod=26, matype=0))]
 /// Computes or updates `PPO` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -783,7 +783,7 @@ pub fn APO(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn PPO(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     fastperiod: usize,
     slowperiod: usize,
     matype: i32,
@@ -791,7 +791,7 @@ pub fn PPO(
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let result = ta_err!(core::momentum::percentage_price_oscillator(
-        input.as_slice()?,
+        _input.as_slice()?,
         fastperiod,
         slowperiod,
         ma
@@ -807,13 +807,13 @@ pub fn PPO(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn BOP(
     py: Python<'_>,
-    open: PyReadonlyArray1<f64>,
+    _open: PyReadonlyArray1<f64>,
     high: PyReadonlyArray1<f64>,
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::momentum::balance_of_power(
-        open.as_slice()?,
+        _open.as_slice()?,
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -822,7 +822,7 @@ pub fn BOP(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `CMO` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -830,10 +830,10 @@ pub fn BOP(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn CMO(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::chande_momentum_oscillator(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::chande_momentum_oscillator(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -905,7 +905,7 @@ pub fn MFI(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `TRIX` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -913,10 +913,10 @@ pub fn MFI(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn TRIX(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::triple_exponential_rate_of_change(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::momentum::triple_exponential_rate_of_change(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1208,13 +1208,13 @@ pub fn OBV(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn AVGPRICE(
     py: Python<'_>,
-    open: PyReadonlyArray1<f64>,
+    _open: PyReadonlyArray1<f64>,
     high: PyReadonlyArray1<f64>,
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::price_transform::average_price(
-        open.as_slice()?,
+        _open.as_slice()?,
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -1285,7 +1285,7 @@ pub fn WCLPRICE(
 // ============================================================
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `AVGDEV` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1293,15 +1293,15 @@ pub fn WCLPRICE(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn AVGDEV(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::avgdev(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::statistic::avgdev(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=5, nbdev=1.0))]
+#[pyo3(signature = (_input, timeperiod=5, nbdev=1.0))]
 /// Computes or updates `STDDEV` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1309,12 +1309,12 @@ pub fn AVGDEV(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn STDDEV(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
     nbdev: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::statistic::stddev(
-        input.as_slice()?,
+        _input.as_slice()?,
         timeperiod,
         nbdev
     ))?;
@@ -1322,7 +1322,7 @@ pub fn STDDEV(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=5, nbdev=1.0))]
+#[pyo3(signature = (_input, timeperiod=5, nbdev=1.0))]
 /// Computes or updates `VAR` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1330,11 +1330,11 @@ pub fn STDDEV(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn VAR(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
     nbdev: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::var(input.as_slice()?, timeperiod, nbdev))?;
+    let result = ta_err!(core::statistic::var(_input.as_slice()?, timeperiod, nbdev))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1381,7 +1381,7 @@ pub fn CORREL(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `LINEARREG` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1389,15 +1389,15 @@ pub fn CORREL(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::linearreg(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::statistic::linearreg(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `LINEARREG_SLOPE` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1405,18 +1405,18 @@ pub fn LINEARREG(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG_SLOPE(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::statistic::linearreg_slope(
-        input.as_slice()?,
+        _input.as_slice()?,
         timeperiod
     ))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `LINEARREG_INTERCEPT` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1424,18 +1424,18 @@ pub fn LINEARREG_SLOPE(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG_INTERCEPT(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::statistic::linearreg_intercept(
-        input.as_slice()?,
+        _input.as_slice()?,
         timeperiod
     ))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `LINEARREG_ANGLE` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1443,18 +1443,18 @@ pub fn LINEARREG_INTERCEPT(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG_ANGLE(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::statistic::linearreg_angle(
-        input.as_slice()?,
+        _input.as_slice()?,
         timeperiod
     ))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=14))]
+#[pyo3(signature = (_input, timeperiod=14))]
 /// Computes or updates `TSF` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1462,10 +1462,10 @@ pub fn LINEARREG_ANGLE(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn TSF(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::tsf(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::statistic::tsf(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1481,8 +1481,8 @@ macro_rules! math_transform_py {
         /// Parameters are the typed series and configuration values in the signature.
         ///
         /// Returns the computed value, aligned history, or a validation error.
-        pub fn $name(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-            let result = $func(input.as_slice()?);
+        pub fn $name(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
+            let result = $func(_input.as_slice()?);
             Ok(to_py_array(py, result))
         }
     };
@@ -1581,7 +1581,7 @@ pub fn DIV(
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `MAX` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1589,15 +1589,15 @@ pub fn DIV(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MAX(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::max(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::math_operator::max(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `MAXINDEX` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1605,15 +1605,15 @@ pub fn MAX(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MAXINDEX(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::maxindex(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::math_operator::maxindex(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `MIN` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1621,15 +1621,15 @@ pub fn MAXINDEX(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MIN(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::min(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::math_operator::min(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `MININDEX` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1637,15 +1637,15 @@ pub fn MIN(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MININDEX(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::minindex(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::math_operator::minindex(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `SUM` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1653,15 +1653,15 @@ pub fn MININDEX(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn SUM(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::sum(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::math_operator::sum(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `MINMAX` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1669,15 +1669,15 @@ pub fn SUM(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MINMAX(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (min_arr, max_arr) = ta_err!(core::math_operator::minmax(input.as_slice()?, timeperiod))?;
+    let (min_arr, max_arr) = ta_err!(core::math_operator::minmax(_input.as_slice()?, timeperiod))?;
     Ok((to_py_array(py, min_arr), to_py_array(py, max_arr)))
 }
 
 #[pyfunction]
-#[pyo3(signature = (input, timeperiod=30))]
+#[pyo3(signature = (_input, timeperiod=30))]
 /// Computes or updates `MINMAXINDEX` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -1685,11 +1685,11 @@ pub fn MINMAX(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn MINMAXINDEX(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
     let (minidx, maxidx) = ta_err!(core::math_operator::minmaxindex(
-        input.as_slice()?,
+        _input.as_slice()?,
         timeperiod
     ))?;
     Ok((to_py_array(py, minidx), to_py_array(py, maxidx)))
@@ -1705,8 +1705,8 @@ pub fn MINMAXINDEX(
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn HT_DCPERIOD(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_period(input.as_slice()?))?;
+pub fn HT_DCPERIOD(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
+    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_period(_input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1716,8 +1716,8 @@ pub fn HT_DCPERIOD(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn HT_DCPHASE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_phase(input.as_slice()?))?;
+pub fn HT_DCPHASE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
+    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_phase(_input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1729,9 +1729,9 @@ pub fn HT_DCPHASE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<P
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_PHASOR(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (inphase, quadrature) = ta_err!(core::cycle::hilbert_transform_phasor(input.as_slice()?))?;
+    let (inphase, quadrature) = ta_err!(core::cycle::hilbert_transform_phasor(_input.as_slice()?))?;
     Ok((to_py_array(py, inphase), to_py_array(py, quadrature)))
 }
 
@@ -1743,9 +1743,9 @@ pub fn HT_PHASOR(
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_SINE(
     py: Python<'_>,
-    input: PyReadonlyArray1<f64>,
+    _input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (sine, leadsine) = ta_err!(core::cycle::hilbert_transform_sine_wave(input.as_slice()?))?;
+    let (sine, leadsine) = ta_err!(core::cycle::hilbert_transform_sine_wave(_input.as_slice()?))?;
     Ok((to_py_array(py, sine), to_py_array(py, leadsine)))
 }
 
@@ -1755,8 +1755,8 @@ pub fn HT_SINE(
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn HT_TRENDMODE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<i32>>> {
-    let result = ta_err!(core::cycle::hilbert_transform_trend_mode(input.as_slice()?))?;
+pub fn HT_TRENDMODE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<i32>>> {
+    let result = ta_err!(core::cycle::hilbert_transform_trend_mode(_input.as_slice()?))?;
     Ok(crate::conversion::to_py_array_i32(py, result))
 }
 
@@ -1774,13 +1774,13 @@ macro_rules! cdl_pyfunction {
         /// Returns the computed value, aligned history, or a validation error.
         pub fn $name(
             py: Python<'_>,
-            open: PyReadonlyArray1<f64>,
+            _open: PyReadonlyArray1<f64>,
             high: PyReadonlyArray1<f64>,
             low: PyReadonlyArray1<f64>,
             close: PyReadonlyArray1<f64>,
         ) -> PyResult<Py<PyArray1<i32>>> {
             let result = ta_err!($func(
-                open.as_slice()?,
+                _open.as_slice()?,
                 high.as_slice()?,
                 low.as_slice()?,
                 close.as_slice()?,
@@ -1798,10 +1798,10 @@ macro_rules! cdl_pyfunction_penetration {
         /// The optional `penetration` value is accepted with TA-Lib's
         /// compatibility default; the shared native pattern kernel performs
         /// the aligned computation.
-        #[pyo3(signature = (open, high, low, close, penetration = $default))]
+        #[pyo3(signature = (_open, high, low, close, penetration = $default))]
         pub fn $name(
             py: Python<'_>,
-            open: PyReadonlyArray1<f64>,
+            _open: PyReadonlyArray1<f64>,
             high: PyReadonlyArray1<f64>,
             low: PyReadonlyArray1<f64>,
             close: PyReadonlyArray1<f64>,
@@ -1809,7 +1809,7 @@ macro_rules! cdl_pyfunction_penetration {
         ) -> PyResult<Py<PyArray1<i32>>> {
             let _ = penetration;
             let result = ta_err!($func(
-                open.as_slice()?,
+                _open.as_slice()?,
                 high.as_slice()?,
                 low.as_slice()?,
                 close.as_slice()?,

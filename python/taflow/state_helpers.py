@@ -415,18 +415,18 @@ class EntryExit:
     ----------
     entry : array-like, optional
         Initial entry-event history.
-    exit : array-like, optional
+    _exit : array-like, optional
         Initial exit-event history.
     """
 
-    def __init__(self, entry: Any | None = None, exit: Any | None = None) -> None:
+    def __init__(self, entry: Any | None = None, _exit: Any | None = None) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
         ----------
         entry : object
             Input series, scalar parameter, or configuration value for this operation.
-        exit : object
+        _exit : object
             Input series, scalar parameter, or configuration value for this operation.
 
         Returns
@@ -435,16 +435,16 @@ class EntryExit:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state = EntryExitOperator()
-        self.extend(entry, exit) if entry is not None or exit is not None else None
+        self.extend(entry, _exit) if entry is not None or _exit is not None else None
 
-    def append(self, entry: bool, exit: bool) -> object:
+    def append(self, entry: bool, _exit: bool) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
         ----------
         entry : object
             Input series, scalar parameter, or configuration value for this operation.
-        exit : object
+        _exit : object
             Input series, scalar parameter, or configuration value for this operation.
 
         Returns
@@ -452,17 +452,17 @@ class EntryExit:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(entry, exit)
+        self._state.append(entry, _exit)
         return self
 
-    def extend(self, entry: Any, exit: Any) -> object:
+    def extend(self, entry: Any, _exit: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
         entry : object
             Input series, scalar parameter, or configuration value for this operation.
-        exit : object
+        _exit : object
             Input series, scalar parameter, or configuration value for this operation.
 
         Returns
@@ -470,7 +470,7 @@ class EntryExit:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(np.asarray(entry, dtype=bool), np.asarray(exit, dtype=bool))
+        self._state.extend(np.asarray(entry, dtype=bool), np.asarray(_exit, dtype=bool))
         return self
 
     def compute(self) -> np.ndarray:
