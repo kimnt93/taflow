@@ -150,6 +150,7 @@ from .session import SessionExtrema, session_flags
 from .zones import ActiveZoneList
 from .fvg import Fvg
 from .bos_choch import BosChoch
+from .hedge_ratio import HedgeRatio
 
 __all__ = [
     "talib",
@@ -303,5 +304,6 @@ __all__ = [
     "ActiveZoneList",
     "Fvg",
     "BosChoch",
+    "HedgeRatio",
     "__version__",
 ]

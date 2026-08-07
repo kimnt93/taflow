@@ -122,6 +122,54 @@ since_extreme!(HighestSince,f64::max); since_extreme!(LowestSince,f64::min);
 pub fn rising(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Rising::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn falling(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Falling::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
+/// Rolling OLS slope of price-level `y` on price-level `x`.
+pub fn hedge_ratio(x: &[f64], y: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if x.len() != y.len() {
+        return Err(TaError::LengthMismatch { expected: x.len(), got: y.len() });
+    }
+    let mut state = HedgeRatio::new(timeperiod)?;
+    Ok(x.iter().zip(y).map(|(&x, &y)| state.append(x, y).unwrap_or(f64::NAN)).collect())
+}
+
+#[derive(Debug, Clone)]
+pub struct HedgeRatio {
+    values: VecDeque<(f64, f64)>,
+    period: usize,
+    value: Option<f64>,
+}
+
+impl HedgeRatio {
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self { values: VecDeque::with_capacity(period), period, value: None })
+    }
+
+    pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
+        if self.values.len() == self.period {
+            self.values.pop_front();
+        }
+        self.values.push_back((x, y));
+        self.value = if self.values.len() == self.period {
+            let n = self.period as f64;
+            let mean_x = self.values.iter().map(|&(x, _)| x).sum::<f64>() / n;
+            let mean_y = self.values.iter().map(|&(_, y)| y).sum::<f64>() / n;
+            let covariance = self.values.iter().map(|&(x, y)| (x - mean_x) * (y - mean_y)).sum::<f64>();
+            let variance = self.values.iter().map(|&(x, _)| (x - mean_x).powi(2)).sum::<f64>();
+            Some(if variance > 0.0 { covariance / variance } else { 0.0 })
+        } else {
+            None
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
+    }
+}
+
 /// Running high and low values reset by an explicit session boundary.
 ///
 /// The boundary is supplied as an aligned boolean input. The first bar is
