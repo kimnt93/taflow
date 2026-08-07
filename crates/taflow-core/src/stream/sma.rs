@@ -14,6 +14,11 @@ pub struct SimpleMovingAverage {
 }
 
 impl SimpleMovingAverage {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period,

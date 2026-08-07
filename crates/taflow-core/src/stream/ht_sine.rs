@@ -23,6 +23,11 @@ impl Default for HilbertTransformSineWave {
     }
 }
 impl HilbertTransformSineWave {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             phase: HilbertTransformDominantCyclePhase::new(),
@@ -37,6 +42,11 @@ impl HilbertTransformSineWave {
         });
         self.value
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<HtSineValue> {
         self.value
     }

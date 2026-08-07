@@ -31,12 +31,22 @@ impl Default for CandleUpsideGap2Crows {
     }
 }
 impl CandleUpsideGap2Crows {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
             value: None,
         }
     }
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
         let value = if self.candles.len() == 12 {
@@ -66,6 +76,11 @@ impl CandleUpsideGap2Crows {
         self.value = value;
         value
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<i32> {
         self.value
     }

@@ -45,6 +45,11 @@ impl Default for HilbertTransformPhasor {
 }
 
 impl HilbertTransformPhasor {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             index: 0,
@@ -157,6 +162,11 @@ impl HilbertTransformPhasor {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<HtPhasorValue> {
         self.value
     }

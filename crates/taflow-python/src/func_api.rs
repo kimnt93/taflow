@@ -17,6 +17,11 @@ macro_rules! ta_err {
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=20))]
+/// Computes or updates `ACCBANDS` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ACCBANDS(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -39,6 +44,11 @@ pub fn ACCBANDS(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `SMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn SMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -50,6 +60,11 @@ pub fn SMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `EMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn EMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -61,6 +76,11 @@ pub fn EMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `WMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn WMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -72,6 +92,11 @@ pub fn WMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `DEMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn DEMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -83,6 +108,11 @@ pub fn DEMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `TEMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn TEMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -94,6 +124,11 @@ pub fn TEMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `TRIMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn TRIMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -105,6 +140,11 @@ pub fn TRIMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `KAMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn KAMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -116,6 +156,11 @@ pub fn KAMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=5, vfactor=0.7))]
+/// Computes or updates `TripleExponentialAverage` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn TripleExponentialAverage(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -128,6 +173,11 @@ pub fn TripleExponentialAverage(
 
 #[pyfunction]
 #[pyo3(signature = (input, fastlimit=0.5, slowlimit=0.05))]
+/// Computes or updates `MAMA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MAMA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -140,6 +190,11 @@ pub fn MAMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0))]
+/// Computes or updates `BBANDS` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn BBANDS(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -166,6 +221,11 @@ pub fn BBANDS(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, acceleration=0.02, maximum=0.2))]
+/// Computes or updates `SAR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn SAR(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -184,6 +244,11 @@ pub fn SAR(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, startvalue=0.0, offsetonreverse=0.0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2))]
+/// Computes or updates `SAREXT` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn SAREXT(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -214,6 +279,11 @@ pub fn SAREXT(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `MIDPOINT` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MIDPOINT(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -225,6 +295,11 @@ pub fn MIDPOINT(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, timeperiod=14))]
+/// Computes or updates `MIDPRICE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MIDPRICE(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -241,6 +316,11 @@ pub fn MIDPRICE(
 
 #[pyfunction]
 #[pyo3(signature = (input, periods, minperiod=2, maxperiod=30, matype=0))]
+/// Computes or updates `MAVP` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MAVP(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -262,6 +342,11 @@ pub fn MAVP(
 }
 
 #[pyfunction]
+/// Computes or updates `HT_TRENDLINE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn HT_TRENDLINE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::overlap::hilbert_transform_trendline(input.as_slice()?))?;
     Ok(to_py_array(py, result))
@@ -269,6 +354,11 @@ pub fn HT_TRENDLINE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30, matype=0))]
+/// Computes or updates `MA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MA(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -287,6 +377,11 @@ pub fn MA(
 
 #[pyfunction]
 #[pyo3(signature = (open, close, timeperiod=14))]
+/// Computes or updates `IMI` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn IMI(
     py: Python<'_>,
     open: PyReadonlyArray1<f64>,
@@ -303,6 +398,11 @@ pub fn IMI(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `RSI` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn RSI(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -314,6 +414,11 @@ pub fn RSI(
 
 #[pyfunction]
 #[pyo3(signature = (input, fastperiod=12, slowperiod=26, signalperiod=9))]
+/// Computes or updates `MACD` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MACD(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -332,6 +437,11 @@ pub fn MACD(
 
 #[pyfunction]
 #[pyo3(signature = (input, fastperiod=12, fastmatype=1, slowperiod=26, slowmatype=1, signalperiod=9, signalmatype=1))]
+/// Computes or updates `MACDEXT` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MACDEXT(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -362,6 +472,11 @@ pub fn MACDEXT(
 
 #[pyfunction]
 #[pyo3(signature = (input, signalperiod=9))]
+/// Computes or updates `MACDFIX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MACDFIX(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -373,6 +488,11 @@ pub fn MACDFIX(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0))]
+/// Computes or updates `STOCH` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn STOCH(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -403,6 +523,11 @@ pub fn STOCH(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, fastk_period=5, fastd_period=3, fastd_matype=0))]
+/// Computes or updates `STOCHF` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn STOCHF(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -427,6 +552,11 @@ pub fn STOCHF(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0))]
+/// Computes or updates `STOCHRSI` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn STOCHRSI(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -449,6 +579,11 @@ pub fn STOCHRSI(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `ADX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ADX(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -467,6 +602,11 @@ pub fn ADX(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `ADXR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ADXR(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -485,6 +625,11 @@ pub fn ADXR(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `CCI` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn CCI(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -503,6 +648,11 @@ pub fn CCI(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=10))]
+/// Computes or updates `MOM` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MOM(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -514,6 +664,11 @@ pub fn MOM(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=10))]
+/// Computes or updates `ROC` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ROC(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -525,6 +680,11 @@ pub fn ROC(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=10))]
+/// Computes or updates `ROCP` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ROCP(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -536,6 +696,11 @@ pub fn ROCP(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=10))]
+/// Computes or updates `ROCR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ROCR(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -547,6 +712,11 @@ pub fn ROCR(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=10))]
+/// Computes or updates `ROCR100` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ROCR100(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -558,6 +728,11 @@ pub fn ROCR100(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `WILLR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn WILLR(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -576,6 +751,11 @@ pub fn WILLR(
 
 #[pyfunction]
 #[pyo3(signature = (input, fastperiod=12, slowperiod=26, matype=0))]
+/// Computes or updates `APO` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn APO(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -596,6 +776,11 @@ pub fn APO(
 
 #[pyfunction]
 #[pyo3(signature = (input, fastperiod=12, slowperiod=26, matype=0))]
+/// Computes or updates `PPO` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn PPO(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -615,6 +800,11 @@ pub fn PPO(
 }
 
 #[pyfunction]
+/// Computes or updates `BOP` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn BOP(
     py: Python<'_>,
     open: PyReadonlyArray1<f64>,
@@ -633,6 +823,11 @@ pub fn BOP(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `CMO` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn CMO(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -644,6 +839,11 @@ pub fn CMO(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, timeperiod=14))]
+/// Computes or updates `AROON` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn AROON(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -660,6 +860,11 @@ pub fn AROON(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, timeperiod=14))]
+/// Computes or updates `AROONOSC` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn AROONOSC(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -676,6 +881,11 @@ pub fn AROONOSC(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, volume, timeperiod=14))]
+/// Computes or updates `MFI` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MFI(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -696,6 +906,11 @@ pub fn MFI(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `TRIX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn TRIX(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -707,6 +922,11 @@ pub fn TRIX(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod1=7, timeperiod2=14, timeperiod3=28))]
+/// Computes or updates `ULTOSC` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ULTOSC(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -729,6 +949,11 @@ pub fn ULTOSC(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `DX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn DX(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -747,6 +972,11 @@ pub fn DX(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `PLUS_DI` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn PLUS_DI(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -765,6 +995,11 @@ pub fn PLUS_DI(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `MINUS_DI` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MINUS_DI(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -783,6 +1018,11 @@ pub fn MINUS_DI(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, timeperiod=14))]
+/// Computes or updates `PLUS_DM` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn PLUS_DM(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -799,6 +1039,11 @@ pub fn PLUS_DM(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, timeperiod=14))]
+/// Computes or updates `MINUS_DM` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MINUS_DM(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -819,6 +1064,11 @@ pub fn MINUS_DM(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `ATR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ATR(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -837,6 +1087,11 @@ pub fn ATR(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, timeperiod=14))]
+/// Computes or updates `NATR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn NATR(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -854,6 +1109,11 @@ pub fn NATR(
 }
 
 #[pyfunction]
+/// Computes or updates `TRANGE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn TRANGE(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -873,6 +1133,11 @@ pub fn TRANGE(
 // ============================================================
 
 #[pyfunction]
+/// Computes or updates `AD` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn AD(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -891,6 +1156,11 @@ pub fn AD(
 
 #[pyfunction]
 #[pyo3(signature = (high, low, close, volume, fastperiod=3, slowperiod=10))]
+/// Computes or updates `ADOSC` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ADOSC(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -912,6 +1182,11 @@ pub fn ADOSC(
 }
 
 #[pyfunction]
+/// Computes or updates `OBV` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn OBV(
     py: Python<'_>,
     close: PyReadonlyArray1<f64>,
@@ -926,6 +1201,11 @@ pub fn OBV(
 // ============================================================
 
 #[pyfunction]
+/// Computes or updates `AVGPRICE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn AVGPRICE(
     py: Python<'_>,
     open: PyReadonlyArray1<f64>,
@@ -943,6 +1223,11 @@ pub fn AVGPRICE(
 }
 
 #[pyfunction]
+/// Computes or updates `MEDPRICE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MEDPRICE(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -956,6 +1241,11 @@ pub fn MEDPRICE(
 }
 
 #[pyfunction]
+/// Computes or updates `TYPPRICE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn TYPPRICE(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -971,6 +1261,11 @@ pub fn TYPPRICE(
 }
 
 #[pyfunction]
+/// Computes or updates `WCLPRICE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn WCLPRICE(
     py: Python<'_>,
     high: PyReadonlyArray1<f64>,
@@ -991,6 +1286,11 @@ pub fn WCLPRICE(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `AVGDEV` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn AVGDEV(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1002,6 +1302,11 @@ pub fn AVGDEV(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=5, nbdev=1.0))]
+/// Computes or updates `STDDEV` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn STDDEV(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1018,6 +1323,11 @@ pub fn STDDEV(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=5, nbdev=1.0))]
+/// Computes or updates `VAR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn VAR(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1030,6 +1340,11 @@ pub fn VAR(
 
 #[pyfunction]
 #[pyo3(signature = (input0, input1, timeperiod=5))]
+/// Computes or updates `BETA` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn BETA(
     py: Python<'_>,
     input0: PyReadonlyArray1<f64>,
@@ -1046,6 +1361,11 @@ pub fn BETA(
 
 #[pyfunction]
 #[pyo3(signature = (input0, input1, timeperiod=30))]
+/// Computes or updates `CORREL` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn CORREL(
     py: Python<'_>,
     input0: PyReadonlyArray1<f64>,
@@ -1062,6 +1382,11 @@ pub fn CORREL(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `LINEARREG` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1073,6 +1398,11 @@ pub fn LINEARREG(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `LINEARREG_SLOPE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG_SLOPE(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1087,6 +1417,11 @@ pub fn LINEARREG_SLOPE(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `LINEARREG_INTERCEPT` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG_INTERCEPT(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1101,6 +1436,11 @@ pub fn LINEARREG_INTERCEPT(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `LINEARREG_ANGLE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn LINEARREG_ANGLE(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1115,6 +1455,11 @@ pub fn LINEARREG_ANGLE(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=14))]
+/// Computes or updates `TSF` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn TSF(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1131,6 +1476,11 @@ pub fn TSF(
 macro_rules! math_transform_py {
     ($name:ident, $func:path) => {
         #[pyfunction]
+        /// Computes or updates `operation` through the native Rust kernel.
+        ///
+        /// Parameters are the typed series and configuration values in the signature.
+        ///
+        /// Returns the computed value, aligned history, or a validation error.
         pub fn $name(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
             let result = $func(input.as_slice()?);
             Ok(to_py_array(py, result))
@@ -1159,6 +1509,11 @@ math_transform_py!(TANH, core::math_transform::tanh);
 // ============================================================
 
 #[pyfunction]
+/// Computes or updates `ADD` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn ADD(
     py: Python<'_>,
     input0: PyReadonlyArray1<f64>,
@@ -1172,6 +1527,11 @@ pub fn ADD(
 }
 
 #[pyfunction]
+/// Computes or updates `SUB` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn SUB(
     py: Python<'_>,
     input0: PyReadonlyArray1<f64>,
@@ -1185,6 +1545,11 @@ pub fn SUB(
 }
 
 #[pyfunction]
+/// Computes or updates `MULT` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MULT(
     py: Python<'_>,
     input0: PyReadonlyArray1<f64>,
@@ -1198,6 +1563,11 @@ pub fn MULT(
 }
 
 #[pyfunction]
+/// Computes or updates `DIV` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn DIV(
     py: Python<'_>,
     input0: PyReadonlyArray1<f64>,
@@ -1212,6 +1582,11 @@ pub fn DIV(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `MAX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MAX(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1223,6 +1598,11 @@ pub fn MAX(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `MAXINDEX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MAXINDEX(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1234,6 +1614,11 @@ pub fn MAXINDEX(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `MIN` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MIN(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1245,6 +1630,11 @@ pub fn MIN(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `MININDEX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MININDEX(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1256,6 +1646,11 @@ pub fn MININDEX(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `SUM` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn SUM(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1267,6 +1662,11 @@ pub fn SUM(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `MINMAX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MINMAX(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1278,6 +1678,11 @@ pub fn MINMAX(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=30))]
+/// Computes or updates `MINMAXINDEX` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn MINMAXINDEX(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1295,18 +1700,33 @@ pub fn MINMAXINDEX(
 // ============================================================
 
 #[pyfunction]
+/// Computes or updates `HT_DCPERIOD` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn HT_DCPERIOD(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_period(input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
+/// Computes or updates `HT_DCPHASE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn HT_DCPHASE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
     let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_phase(input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
+/// Computes or updates `HT_PHASOR` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn HT_PHASOR(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1316,6 +1736,11 @@ pub fn HT_PHASOR(
 }
 
 #[pyfunction]
+/// Computes or updates `HT_SINE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn HT_SINE(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
@@ -1325,6 +1750,11 @@ pub fn HT_SINE(
 }
 
 #[pyfunction]
+/// Computes or updates `HT_TRENDMODE` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn HT_TRENDMODE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<i32>>> {
     let result = ta_err!(core::cycle::hilbert_transform_trend_mode(input.as_slice()?))?;
     Ok(crate::conversion::to_py_array_i32(py, result))
@@ -1337,6 +1767,11 @@ pub fn HT_TRENDMODE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py
 macro_rules! cdl_pyfunction {
     ($name:ident, $func:path) => {
         #[pyfunction]
+        /// Computes or updates `operation` through the native Rust kernel.
+        ///
+        /// Parameters are the typed series and configuration values in the signature.
+        ///
+        /// Returns the computed value, aligned history, or a validation error.
         pub fn $name(
             py: Python<'_>,
             open: PyReadonlyArray1<f64>,

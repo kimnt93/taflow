@@ -16,6 +16,11 @@ pub struct MoneyFlowIndex {
 }
 
 impl MoneyFlowIndex {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -64,6 +69,11 @@ impl MoneyFlowIndex {
         self.value
     }
 
+    /// Computes or updates `extend_slice` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn extend_slice(
         &mut self,
         high: &[f64],
@@ -86,10 +96,20 @@ impl MoneyFlowIndex {
             .collect())
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.previous_typical_price = None;
         self.positive_flow.clear();

@@ -15,6 +15,11 @@ impl Default for CandleBeltHold {
     }
 }
 impl CandleBeltHold {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             b: VecDeque::with_capacity(10),
@@ -31,6 +36,11 @@ impl CandleBeltHold {
         q.push_back(v);
         *s += v;
     }
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let body = (c - o).abs();
         let range = h - l;
@@ -54,6 +64,11 @@ impl CandleBeltHold {
         self.value = v;
         v
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<i32> {
         self.value
     }

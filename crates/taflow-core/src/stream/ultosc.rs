@@ -57,6 +57,11 @@ pub struct UltimateOscillator {
     value: Option<f64>,
 }
 impl UltimateOscillator {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(timeperiod1: usize, timeperiod2: usize, timeperiod3: usize) -> TaResult<Self> {
         if timeperiod1 == 0 || timeperiod2 == 0 || timeperiod3 == 0 {
             return Err(TaError::InvalidParameter {
@@ -73,6 +78,11 @@ impl UltimateOscillator {
             value: None,
         })
     }
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
         let Some(previous) = self.previous_close.replace(close) else {
             return None;
@@ -90,6 +100,11 @@ impl UltimateOscillator {
         });
         self.value
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }

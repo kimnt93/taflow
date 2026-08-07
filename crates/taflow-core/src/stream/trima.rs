@@ -13,6 +13,11 @@ pub struct TriangularMovingAverage {
 }
 
 impl TriangularMovingAverage {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(invalid_period("timeperiod", period, 1));

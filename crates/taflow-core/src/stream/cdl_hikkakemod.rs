@@ -24,6 +24,11 @@ impl Default for CandleHikkakeMod {
     }
 }
 impl CandleHikkakeMod {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(8),
@@ -41,6 +46,11 @@ impl CandleHikkakeMod {
             .sum::<f64>()
             * 0.04
     }
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, _open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
         let current = Candle { high, low, close };
         let i = self.index;
@@ -77,6 +87,11 @@ impl CandleHikkakeMod {
         self.value = (i >= 10).then_some(result);
         self.value
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<i32> {
         self.value
     }

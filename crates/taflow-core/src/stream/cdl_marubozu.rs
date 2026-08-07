@@ -16,6 +16,11 @@ impl Default for CandleMarubozu {
     }
 }
 impl CandleMarubozu {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -53,6 +58,11 @@ impl CandleMarubozu {
         self.value = output;
         output
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<i32> {
         self.value
     }

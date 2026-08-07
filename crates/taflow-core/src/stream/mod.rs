@@ -311,6 +311,11 @@ macro_rules! lagged_indicator {
         }
 
         impl $name {
+            /// Computes or updates `new` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn new(period: usize) -> TaResult<Self> {
                 Ok(Self {
                     lag: LaggedValue::new(period)?,
@@ -440,6 +445,11 @@ macro_rules! rolling_extrema_indicator {
         }
 
         impl $name {
+            /// Computes or updates `new` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn new(period: usize) -> TaResult<Self> {
                 Ok(Self {
                     extrema: RollingExtrema::new(period)?,
@@ -484,6 +494,11 @@ pub struct RollingMinmax {
 }
 
 impl RollingMinmax {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             extrema: RollingExtrema::new(period)?,
@@ -491,6 +506,11 @@ impl RollingMinmax {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, input: f64) -> Option<RollingMinmaxValue> {
         self.value = self
             .extrema
@@ -499,10 +519,20 @@ impl RollingMinmax {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<RollingMinmaxValue> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.extrema.reset();
         self.value = None;
@@ -594,6 +624,11 @@ macro_rules! rolling_index_indicator {
         }
 
         impl $name {
+            /// Computes or updates `new` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn new(period: usize) -> TaResult<Self> {
                 Ok(Self {
                     extrema: RollingIndexExtrema::new(period)?,
@@ -633,6 +668,11 @@ pub struct RollingMinmaxIndex {
 }
 
 impl RollingMinmaxIndex {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             extrema: RollingIndexExtrema::new(period)?,
@@ -640,16 +680,31 @@ impl RollingMinmaxIndex {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, input: f64) -> RollingMinmaxIndexValue {
         let value = self.extrema.append(input);
         self.value = Some(value);
         value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<RollingMinmaxIndexValue> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.extrema.reset();
         self.value = None;
@@ -664,6 +719,11 @@ pub struct RollingMidpoint {
 }
 
 impl RollingMidpoint {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             extrema: RollingExtrema::new(period)?,
@@ -702,6 +762,11 @@ pub struct RollingMidprice {
 }
 
 impl RollingMidprice {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             highs: RollingExtrema::new(period)?,
@@ -710,6 +775,11 @@ impl RollingMidprice {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
         let maximum = self.highs.append(high).map(|values| values.0);
         let minimum = self.lows.append(low).map(|values| values.1);
@@ -717,10 +787,20 @@ impl RollingMidprice {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.highs.reset();
         self.lows.reset();
@@ -736,6 +816,11 @@ macro_rules! unary_indicator {
         }
 
         impl $name {
+            /// Computes or updates `new` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn new() -> Self {
                 Self::default()
             }
@@ -784,20 +869,40 @@ macro_rules! binary_indicator {
         }
 
         impl $name {
+            /// Computes or updates `new` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn new() -> Self {
                 Self::default()
             }
 
+            /// Computes or updates `append` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn append(&mut self, left: f64, right: f64) -> f64 {
                 let value = $operation(left, right);
                 self.value = Some(value);
                 value
             }
 
+            /// Computes or updates `value` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn value(&self) -> Option<f64> {
                 self.value
             }
 
+            /// Computes or updates `reset` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn reset(&mut self) {
                 self.value = None;
             }
@@ -817,20 +922,40 @@ pub struct AveragePrice {
 }
 
 impl AveragePrice {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> f64 {
         let value = (open + high + low + close) * 0.25;
         self.value = Some(value);
         value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.value = None;
     }
@@ -846,20 +971,40 @@ macro_rules! price3_indicator {
         }
 
         impl $name {
+            /// Computes or updates `new` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn new() -> Self {
                 Self::default()
             }
 
+            /// Computes or updates `append` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn append(&mut self, high: f64, low: f64, close: f64) -> f64 {
                 let value = $operation(high, low, close);
                 self.value = Some(value);
                 value
             }
 
+            /// Computes or updates `value` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn value(&self) -> Option<f64> {
                 self.value
             }
 
+            /// Computes or updates `reset` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn reset(&mut self) {
                 self.value = None;
             }
@@ -929,6 +1074,11 @@ pub struct RollingVariance {
 }
 
 impl RollingVariance {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize, _nbdev: f64) -> TaResult<Self> {
         Ok(Self {
             moments: RollingMoments::new(period)?,
@@ -964,6 +1114,11 @@ pub struct RollingStandardDeviation {
 }
 
 impl RollingStandardDeviation {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize, nbdev: f64) -> TaResult<Self> {
         Ok(Self {
             moments: RollingMoments::new(period)?,
@@ -1003,6 +1158,11 @@ pub struct RollingAverageDeviation {
 }
 
 impl RollingAverageDeviation {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -1126,6 +1286,11 @@ pub struct RollingCorrelation {
 }
 
 impl RollingCorrelation {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period: period as f64,
@@ -1135,6 +1300,11 @@ impl RollingCorrelation {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
         let moments = self.moments.append(x, y).map(|moments| {
             if self.seeded {
@@ -1157,10 +1327,20 @@ impl RollingCorrelation {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.moments.reset();
         self.seeded = false;
@@ -1178,6 +1358,11 @@ pub struct RollingBeta {
 }
 
 impl RollingBeta {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period: period as f64,
@@ -1187,6 +1372,11 @@ impl RollingBeta {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, input0: f64, input1: f64) -> Option<f64> {
         let Some((previous0, previous1)) = self.previous.replace((input0, input1)) else {
             return None;
@@ -1204,10 +1394,20 @@ impl RollingBeta {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.previous = None;
         self.returns.reset();
@@ -1296,6 +1496,11 @@ macro_rules! regression_indicator {
         }
 
         impl $name {
+            /// Computes or updates `new` through the native Rust kernel.
+            ///
+            /// Parameters are the typed series and configuration values in the signature.
+            ///
+            /// Returns the computed value, aligned history, or a validation error.
             pub fn new(period: usize) -> TaResult<Self> {
                 Ok(Self {
                     core: RegressionCore::new(period)?,
@@ -1358,20 +1563,40 @@ pub struct AccumulationDistribution {
 }
 
 impl AccumulationDistribution {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> f64 {
         self.total += ad_increment(high, low, close, volume);
         self.value = Some(self.total);
         self.total
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.total = 0.0;
         self.value = None;
@@ -1392,6 +1617,11 @@ pub struct AccumulationDistributionOscillator {
 }
 
 impl AccumulationDistributionOscillator {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(fast_period: usize, slow_period: usize) -> TaResult<Self> {
         if fast_period < 2 || slow_period < 2 {
             return Err(TaError::InvalidParameter {
@@ -1412,6 +1642,11 @@ impl AccumulationDistributionOscillator {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
         self.ad += ad_increment(high, low, close, volume);
         match (self.fast_ema, self.slow_ema) {
@@ -1434,10 +1669,20 @@ impl AccumulationDistributionOscillator {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.index = 0;
         self.ad = 0.0;
@@ -1456,10 +1701,20 @@ pub struct OnBalanceVolume {
 }
 
 impl OnBalanceVolume {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, close: f64, volume: f64) -> f64 {
         match self.previous_close.replace(close) {
             None => self.total = volume,
@@ -1471,10 +1726,20 @@ impl OnBalanceVolume {
         self.total
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.previous_close = None;
         self.total = 0.0;
@@ -1489,10 +1754,20 @@ pub struct BalanceOfPower {
 }
 
 impl BalanceOfPower {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> f64 {
         let range = high - low;
         let value = if range > 0.0 {
@@ -1504,10 +1779,20 @@ impl BalanceOfPower {
         value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.value = None;
     }
@@ -1522,6 +1807,11 @@ pub struct WilliamsPercentR {
 }
 
 impl WilliamsPercentR {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -1533,6 +1823,11 @@ impl WilliamsPercentR {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
         let maximum = self.highs.append(high).map(|value| value.0);
         let minimum = self.lows.append(low).map(|value| value.1);
@@ -1547,10 +1842,20 @@ impl WilliamsPercentR {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.highs.reset();
         self.lows.reset();
@@ -1576,6 +1881,11 @@ pub struct Aroon {
 }
 
 impl Aroon {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -1590,6 +1900,11 @@ impl Aroon {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64) -> Option<AroonValue> {
         let current = self.index;
         self.index += 1;
@@ -1602,10 +1917,20 @@ impl Aroon {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<AroonValue> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.index = 0;
         self.highs.reset();
@@ -1621,6 +1946,11 @@ pub struct AroonOscillator {
 }
 
 impl AroonOscillator {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             aroon: Aroon::new(period)?,
@@ -1628,6 +1958,11 @@ impl AroonOscillator {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
         self.value = self
             .aroon
@@ -1636,10 +1971,20 @@ impl AroonOscillator {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.aroon.reset();
         self.value = None;
@@ -1664,6 +2009,11 @@ pub struct TrueRange {
 }
 
 impl TrueRange {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             previous_close: None,
@@ -1671,6 +2021,11 @@ impl TrueRange {
         }
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
         let previous = self.previous_close.replace(close)?;
         self.value = Some(
@@ -1681,10 +2036,20 @@ impl TrueRange {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.previous_close = None;
         self.value = None;
@@ -1705,6 +2070,11 @@ pub struct NormalizedAverageTrueRange {
 }
 
 impl NormalizedAverageTrueRange {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             atr: AverageTrueRange::new(period)?,
@@ -1712,6 +2082,11 @@ impl NormalizedAverageTrueRange {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
         self.value = self.atr.append(high, low, close).map(|atr| {
             if close == 0.0 {
@@ -1723,10 +2098,20 @@ impl NormalizedAverageTrueRange {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.atr.reset();
         self.value = None;
@@ -1734,6 +2119,11 @@ impl NormalizedAverageTrueRange {
 }
 
 impl AverageTrueRange {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(invalid_period("timeperiod", period, 1));
@@ -1747,6 +2137,11 @@ impl AverageTrueRange {
         })
     }
 
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
         let Some(previous_close) = self.previous_close.replace(close) else {
             return None;
@@ -1770,10 +2165,20 @@ impl AverageTrueRange {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.previous_close = None;
         self.tr_count = 0;

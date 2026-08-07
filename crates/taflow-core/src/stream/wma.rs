@@ -16,6 +16,11 @@ pub struct WeightedMovingAverage {
 }
 
 impl WeightedMovingAverage {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(period: usize) -> TaResult<Self> {
         let window = Window::new(period)?;
         let period_f = period as f64;

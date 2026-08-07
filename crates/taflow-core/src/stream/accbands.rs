@@ -61,10 +61,20 @@ impl AccelerationBands {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<AccbandsValue> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.upper.reset();
         self.middle.reset();

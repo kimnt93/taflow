@@ -8,6 +8,11 @@ pub struct MinusDirectionalMovement {
     v: Option<f64>,
 }
 impl MinusDirectionalMovement {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new(p: usize) -> TaResult<Self> {
         if p == 0 {
             return Err(TaError::InvalidParameter {
@@ -24,6 +29,11 @@ impl MinusDirectionalMovement {
             v: None,
         })
     }
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, h: f64, l: f64) -> Option<f64> {
         let Some((ph, pl)) = self.prev.replace((h, l)) else {
             return if self.p == 1.0 {
@@ -50,6 +60,11 @@ impl MinusDirectionalMovement {
         self.v = Some(self.sum);
         self.v
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.v
     }

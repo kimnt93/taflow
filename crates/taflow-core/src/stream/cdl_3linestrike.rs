@@ -30,6 +30,11 @@ impl Default for Candle3LineStrike {
     }
 }
 impl Candle3LineStrike {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(8),
@@ -45,6 +50,11 @@ impl Candle3LineStrike {
             .sum::<f64>()
             * 0.04
     }
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
         let current = Candle {
             open,
@@ -90,6 +100,11 @@ impl Candle3LineStrike {
         self.value = output;
         output
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<i32> {
         self.value
     }

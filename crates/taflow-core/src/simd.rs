@@ -41,6 +41,11 @@ pub fn sum_f64(data: &[f64]) -> f64 {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `sum_f64` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn sum_f64(data: &[f64]) -> f64 {
     data.iter().sum()
 }
@@ -81,6 +86,11 @@ pub fn sum_sq_diff(data: &[f64], mean: f64) -> f64 {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `sum_sq_diff` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn sum_sq_diff(data: &[f64], mean: f64) -> f64 {
     data.iter()
         .map(|&x| {
@@ -123,6 +133,11 @@ pub fn add_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `add_arrays` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn add_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     a.iter().zip(b.iter()).map(|(x, y)| x + y).collect()
 }
@@ -156,6 +171,11 @@ pub fn sub_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `sub_arrays` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn sub_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     a.iter().zip(b.iter()).map(|(x, y)| x - y).collect()
 }
@@ -189,6 +209,11 @@ pub fn mult_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `mult_arrays` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn mult_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     a.iter().zip(b.iter()).map(|(x, y)| x * y).collect()
 }
@@ -222,6 +247,11 @@ pub fn div_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `div_arrays` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn div_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     a.iter().zip(b.iter()).map(|(x, y)| x / y).collect()
 }
@@ -262,6 +292,11 @@ pub fn sqrt_array(input: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `sqrt_array` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn sqrt_array(input: &[f64]) -> Vec<f64> {
     input.iter().map(|&v| v.sqrt()).collect()
 }
@@ -298,6 +333,11 @@ pub fn abs_array(input: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `abs_array` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn abs_array(input: &[f64]) -> Vec<f64> {
     input.iter().map(|&v| v.abs()).collect()
 }
@@ -400,6 +440,11 @@ pub fn slice_max_with_index(data: &[f64]) -> (f64, usize) {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `slice_max_with_index` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn slice_max_with_index(data: &[f64]) -> (f64, usize) {
     let mut best = data[0];
     let mut best_idx = 0;
@@ -461,6 +506,11 @@ pub fn slice_min_with_index(data: &[f64]) -> (f64, usize) {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `slice_min_with_index` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn slice_min_with_index(data: &[f64]) -> (f64, usize) {
     let mut best = data[0];
     let mut best_idx = 0;
@@ -515,6 +565,11 @@ pub fn true_range_simd(high: &[f64], low: &[f64], close: &[f64], output: &mut [f
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `true_range_simd` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn true_range_simd(high: &[f64], low: &[f64], close: &[f64], output: &mut [f64], start: usize) {
     let len = high.len();
     for i in start..len {
@@ -561,6 +616,11 @@ pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: 
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `bop_simd` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: &mut [f64]) {
     for i in 0..open.len() {
         let range = high[i] - low[i];
@@ -598,6 +658,11 @@ pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> 
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `avgprice_simd` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
     (0..open.len()).map(|i| (open[i] + high[i] + low[i] + close[i]) / 4.0).collect()
 }
@@ -630,6 +695,11 @@ pub fn medprice_simd(high: &[f64], low: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `medprice_simd` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn medprice_simd(high: &[f64], low: &[f64]) -> Vec<f64> {
     (0..high.len()).map(|i| (high[i] + low[i]) / 2.0).collect()
 }
@@ -663,6 +733,11 @@ pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `typprice_simd` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
     (0..high.len()).map(|i| (high[i] + low[i] + close[i]) / 3.0).collect()
 }
@@ -697,6 +772,11 @@ pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `wclprice_simd` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
     (0..high.len()).map(|i| (high[i] + low[i] + 2.0 * close[i]) / 4.0).collect()
 }
@@ -728,6 +808,11 @@ pub fn sub_offset_simd(input: &[f64], output: &mut [f64], offset: usize) {
 }
 
 #[cfg(not(feature = "simd"))]
+/// Computes or updates `sub_offset_simd` through the native Rust kernel.
+///
+/// Parameters are the typed series and configuration values in the signature.
+///
+/// Returns the computed value, aligned history, or a validation error.
 pub fn sub_offset_simd(input: &[f64], output: &mut [f64], offset: usize) {
     for i in offset..input.len() {
         output[i] = input[i] - input[i - offset];

@@ -39,6 +39,11 @@ impl Default for HilbertTransformDominantCyclePeriod {
 }
 
 impl HilbertTransformDominantCyclePeriod {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             index: 0,
@@ -166,6 +171,11 @@ impl HilbertTransformDominantCyclePeriod {
         self.value
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }

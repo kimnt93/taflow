@@ -109,10 +109,20 @@ impl ParabolicSar {
         }
     }
 
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         *self = Self::new(self.acceleration, self.maximum);
     }

@@ -41,6 +41,11 @@ impl Default for HilbertTransformDominantCyclePhase {
     }
 }
 impl HilbertTransformDominantCyclePhase {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             index: 0,
@@ -179,6 +184,11 @@ impl HilbertTransformDominantCyclePhase {
         self.smooth_idx = (self.smooth_idx + 1) % 50;
         self.value
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
@@ -191,6 +201,11 @@ impl HilbertTransformDominantCyclePhase {
     pub(crate) fn current_smooth_price(&self) -> f64 {
         self.smooth_prices[(self.smooth_idx + 49) % 50]
     }
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         *self = Self::new();
     }

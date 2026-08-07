@@ -27,6 +27,11 @@ impl Default for CandleDojiStar {
     }
 }
 impl CandleDojiStar {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -54,6 +59,11 @@ impl CandleDojiStar {
         self.value = value;
         value
     }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<i32> {
         self.value
     }
