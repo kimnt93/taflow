@@ -346,8 +346,8 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | squeeze_pro | squeeze_pro | _ |
 | [x] | schaff_trend_cycle | stc | _ |
 | [x] | vortex | vortex | _ |
-| [ ] | kst | kst | _ |
-| [ ] | mass_index | mass_index | _ |
+| [x] | kst | kst | _ |
+| [x] | mass_index | mass_index | _ |
 | [ ] | dpo | dpo | _ |
 | [ ] | cmf | cmf | _ |
 | [ ] | kvo | kvo | _ |

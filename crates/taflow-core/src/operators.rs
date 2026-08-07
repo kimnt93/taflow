@@ -4505,6 +4505,88 @@ rolling_risk_operator!(RollingCalmar, |values: &VecDeque<f64>| {
     if drawdown < 0.0 { average / -drawdown } else { 0.0 }
 });
 
+/// Stateful Mass Index (Dorsey): rolling sum of the ratio between a short EMA
+/// of the high-low range and an EMA of that EMA.
+#[derive(Debug, Clone)]
+pub struct MassIndex {
+    ema_range: MassEma,
+    ema_signal: MassEma,
+    ratio_sum: crate::stream::Sum,
+    value: Option<f64>,
+}
+
+#[derive(Debug, Clone)]
+struct MassEma {
+    period: usize,
+    alpha: f64,
+    count: usize,
+    value: Option<f64>,
+}
+
+impl MassEma {
+    fn new(period: usize) -> Self {
+        Self { period, alpha: 2.0 / (period as f64 + 1.0), count: 0, value: None }
+    }
+
+    fn append(&mut self, input: f64) -> Option<f64> {
+        self.count += 1;
+        let value = self.value.map_or(input, |previous| previous + self.alpha * (input - previous));
+        self.value = Some(value);
+        (self.count >= self.period).then_some(value)
+    }
+
+    fn reset(&mut self) {
+        self.count = 0;
+        self.value = None;
+    }
+}
+
+impl MassIndex {
+    pub fn new(ema_period: usize, sum_period: usize) -> TaResult<Self> {
+        validate_period(ema_period)?;
+        validate_period(sum_period)?;
+        Ok(Self {
+            ema_range: MassEma::new(ema_period),
+            ema_signal: MassEma::new(ema_period),
+            ratio_sum: crate::stream::Sum::new(sum_period)?,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+        let range_ema = self.ema_range.append(high - low);
+        let signal_ema = range_ema.and_then(|value| self.ema_signal.append(value));
+        self.value = signal_ema.and_then(|signal| {
+            let range = range_ema?;
+            let ratio = if signal == 0.0 { 0.0 } else { range / signal };
+            self.ratio_sum.append(ratio)
+        });
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.ema_range.reset();
+        self.ema_signal.reset();
+        self.ratio_sum.reset();
+        self.value = None;
+    }
+}
+
+pub fn mass_index(
+    high: &[f64],
+    low: &[f64],
+    ema_period: usize,
+    sum_period: usize,
+) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() {
+        return Err(TaError::LengthMismatch { expected: high.len(), got: low.len() });
+    }
+    let mut state = MassIndex::new(ema_period, sum_period)?;
+    Ok(high.iter().zip(low).map(|(&h, &l)| state.append(h, l).unwrap_or(f64::NAN)).collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -5032,5 +5114,26 @@ mod tests {
     fn kst_rejects_bad_params() {
         assert!(Kst::new(0, 15, 20, 30, 10, 10, 10, 15, 9).is_err());
         assert!(Kst::new(10, 15, 20, 30, 10, 10, 10, 15, 0).is_err());
+    }
+
+    #[test]
+    fn mass_index_batch_and_stream_match() {
+        let high: Vec<f64> = (0..200)
+            .map(|i| 100.0 + i as f64 * 0.2 + (i as f64 * 0.13).sin())
+            .collect();
+        let low: Vec<f64> = high.iter().map(|value| value - 2.0).collect();
+        let batch = mass_index(&high, &low, 9, 25).unwrap();
+        let mut state = MassIndex::new(9, 25).unwrap();
+        let replayed: Vec<f64> = high
+            .iter()
+            .zip(&low)
+            .map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN))
+            .collect();
+        assert_eq!(
+            batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+            replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
+        );
+        assert!(batch[..40].iter().all(|value| value.is_nan()));
+        assert!(batch[40..].iter().all(|value| value.is_finite()));
     }
 }

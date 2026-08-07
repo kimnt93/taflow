@@ -186,6 +186,7 @@ from .squeeze_pro import SqueezePro
 from .stc import Stc
 from .vortex import Vortex
 from .kst import Kst
+from .mass_index import MassIndex
 
 __all__ = [
     "talib",
@@ -361,5 +362,6 @@ __all__ = [
     "Stc",
     "Vortex",
     "Kst",
+    "MassIndex",
     "__version__",
 ]
