@@ -1,13 +1,13 @@
-"""Rolling regression alpha and information ratio features."""
+"""Rolling information-ratio feature."""
 
 from typing import Any
 import numpy as np
-from ._native import RollingAlphaOperator
+from ._native import RollingInformationRatioOperator as _Native
 from ._series import as_float64_series
 
 
-class RollingAlpha:
-    """Stateful RollingAlpha indicator.
+class RollingInformationRatio:
+    """Stateful RollingInformationRatio indicator.
     Parameters are documented by the constructor signature; scalar
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
@@ -35,7 +35,7 @@ class RollingAlpha:
         None
             The constructor initializes the adapter and returns no value.
         """
-        self._state = RollingAlphaOperator(timeperiod)
+        self._state = _Native(timeperiod)
         (
             self.extend(_input, benchmark)
             if _input is not None or benchmark is not None
