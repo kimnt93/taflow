@@ -79,6 +79,8 @@ from ..lag import Lag
 from ..log_return import LogReturn
 from ..cumsum import Cumsum
 from ..cumprod import Cumprod
+from ..rolling_median import RollingMedian
+from ..rolling_mode import RollingMode
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -152,5 +154,5 @@ __all__ = [
     "TriStar", "CDLTRISTAR",
     "UniqueThreeRiver", "CDLUNIQUE3RIVER",
     "UpsideGapTwoCrows", "CDLUPSIDEGAP2CROWS",
-    "Lag", "LogReturn", "Cumsum", "Cumprod",
+    "Lag", "LogReturn", "Cumsum", "Cumprod", "RollingMedian", "RollingMode",
 ]

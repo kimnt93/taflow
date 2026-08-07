@@ -45,6 +45,22 @@ pub fn cumprod(input: &[f64]) -> Vec<f64> {
     input.iter().map(|&value| { total *= value; total }).collect()
 }
 
+/// Rolling median. Warm-up values are `NaN`; even windows average the two
+/// central values.
+pub fn rolling_median(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    validate_period(timeperiod)?;
+    let mut state = RollingMedian::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+/// Rolling mode. Warm-up values are `NaN`; exact-value ties keep the earliest
+/// value in the current window.
+pub fn rolling_mode(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    validate_period(timeperiod)?;
+    let mut state = RollingMode::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 #[derive(Debug, Clone)]
 pub struct Lag {
     values: VecDeque<f64>,
@@ -83,6 +99,71 @@ impl LogReturn {
     }
     pub fn value(&self) -> Option<f64> { self.value }
     pub fn reset(&mut self) { self.lag.reset(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingMedian {
+    values: VecDeque<f64>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl RollingMedian {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+    }
+
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = if self.values.len() == self.timeperiod {
+            let mut sorted: Vec<f64> = self.values.iter().copied().collect();
+            sorted.sort_by(f64::total_cmp);
+            let middle = self.timeperiod / 2;
+            Some(if self.timeperiod % 2 == 1 {
+                sorted[middle]
+            } else {
+                (sorted[middle - 1] + sorted[middle]) * 0.5
+            })
+        } else { None };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingMode {
+    values: VecDeque<f64>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl RollingMode {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+    }
+
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = if self.values.len() == self.timeperiod {
+            let mut best = self.values[0];
+            let mut best_count = 0;
+            for &candidate in &self.values {
+                let count = self.values.iter().filter(|&&value| value == candidate).count();
+                if count > best_count { best = candidate; best_count = count; }
+            }
+            Some(best)
+        } else { None };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
 macro_rules! cumulative_operator {
@@ -132,5 +213,21 @@ mod tests {
         sum.reset(); product.reset();
         assert_eq!(sum.append(3.0), 3.0);
         assert_eq!(product.append(3.0), 3.0);
+    }
+
+    #[test]
+    fn rolling_statistics_match_batch_and_reset() {
+        let input = vec![1.0, 4.0, 2.0, 2.0, 9.0, 4.0];
+        let median = rolling_median(&input, 3).unwrap();
+        let mode = rolling_mode(&input, 3).unwrap();
+        assert!(median[0].is_nan() && median[1].is_nan());
+        assert_eq!(&median[2..], &[2.0, 2.0, 2.0, 4.0]);
+        assert!(mode[0].is_nan() && mode[1].is_nan());
+        assert_eq!(&mode[2..], &[1.0, 2.0, 2.0, 2.0]);
+
+        let mut state = RollingMedian::new(3).unwrap();
+        for &value in &input { state.append(value); }
+        state.reset();
+        assert!(state.append(7.0).is_none());
     }
 }
