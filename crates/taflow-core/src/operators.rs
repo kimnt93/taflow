@@ -97,6 +97,7 @@ pub fn alma(input: &[f64], timeperiod: usize, offset: f64, sigma: f64) -> TaResu
 pub fn tsi(input: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { let mut state=Tsi::new(fast,slow)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn awesome_oscillator(high: &[f64], low: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=AwesomeOscillator::new(fast,slow)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 pub fn fisher_transform(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=FisherTransform::new(timeperiod)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
+pub fn ulcer_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=UlcerIndex::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
 /// Rolling median. Warm-up values are `NaN`; even windows average the two
 /// central values.
@@ -666,6 +667,16 @@ impl AwesomeOscillator { pub fn new(fast:usize,slow:usize)->TaResult<Self>{valid
 #[derive(Debug, Clone)]
 pub struct FisherTransform { period: usize, values: VecDeque<f64>, previous: f64, value: Option<f64> }
 impl FisherTransform { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{period,values:VecDeque::with_capacity(period),previous:0.0,value:None})}pub fn append(&mut self,high:f64,low:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back((high+low)*0.5);self.value=(self.values.len()==self.period).then(||{let high=self.values.iter().copied().fold(f64::NEG_INFINITY,f64::max);let low=self.values.iter().copied().fold(f64::INFINITY,f64::min);let normalized=if high!=low{2.0*((self.values.back().copied().unwrap()-low)/(high-low)-0.5)}else{0.0};let x=(0.66*normalized+0.67*self.previous).clamp(-0.999, 0.999);self.previous=x;0.5*((1.0+x)/(1.0-x)).ln()});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.previous=0.0;self.value=None;}}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct DonchianValue { pub upper: f64, pub lower: f64, pub middle: f64 }
+#[derive(Debug, Clone)]
+pub struct Donchian { highs: VecDeque<f64>, lows: VecDeque<f64>, period: usize, value: Option<DonchianValue> }
+impl Donchian { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{highs:VecDeque::with_capacity(period),lows:VecDeque::with_capacity(period),period,value:None})}pub fn append(&mut self,high:f64,low:f64)->Option<DonchianValue>{if self.highs.len()==self.period{self.highs.pop_front();self.lows.pop_front();}self.highs.push_back(high);self.lows.push_back(low);self.value=(self.highs.len()==self.period).then(||{let upper=self.highs.iter().copied().fold(f64::NEG_INFINITY,f64::max);let lower=self.lows.iter().copied().fold(f64::INFINITY,f64::min);DonchianValue{upper,lower,middle:(upper+lower)*0.5}});self.value}pub fn value(&self)->Option<DonchianValue>{self.value}pub fn reset(&mut self){self.highs.clear();self.lows.clear();self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct UlcerIndex { values: VecDeque<f64>, period: usize, value: Option<f64> }
+impl UlcerIndex { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{values:VecDeque::with_capacity(period),period,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back(input);self.value=(self.values.len()==self.period).then(||{let mut peak=f64::NEG_INFINITY;let sum=self.values.iter().map(|&v|{peak=peak.max(v);let drawdown=if peak!=0.0{100.0*(v-peak)/peak}else{0.0};drawdown*drawdown}).sum::<f64>();(sum/self.period as f64).sqrt()});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}
 
 rolling_risk_operator!(RollingSharpe, |values: &VecDeque<f64>| {
     let average = mean(values);

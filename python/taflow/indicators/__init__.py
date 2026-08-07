@@ -108,6 +108,8 @@ from ..alma import Alma
 from ..tsi import Tsi
 from ..awesome_oscillator import AwesomeOscillator
 from ..fisher_transform import FisherTransform
+from ..donchian import Donchian
+from ..ulcer_index import UlcerIndex
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -191,4 +193,5 @@ __all__ = [
     "RollingSharpe", "RollingSortino", "RollingCalmar",
     "Hma", "Vwma", "Zlema", "Alma",
     "Tsi", "AwesomeOscillator", "FisherTransform",
+    "Donchian", "UlcerIndex",
 ]

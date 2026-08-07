@@ -55,10 +55,10 @@ they are not re-proposed later.
 ## Extended volatility indicators
 
 - [ ] Keltner Channels
-- [ ] Donchian Channels (3 outputs: upper/lower/mid; named channel, worth
+- [x] Donchian Channels (3 outputs: upper/lower/mid; named channel, worth
       more than its MAX/MIN composition)
 - [ ] Chaikin Volatility
-- [ ] Ulcer Index
+- [x] Ulcer Index
 
 ## Extended volume indicators
 
