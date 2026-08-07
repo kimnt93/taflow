@@ -171,6 +171,11 @@ from .garman_klass import GarmanKlass
 from .rogers_satchell import RogersSatchell
 from .gk_yang_zhang import GkYangZhang
 from .yang_zhang import YangZhang
+from .adv import Adv
+from .amihud import Amihud
+from .roll_spread import RollSpread
+from .ou_half_life import OuHalfLife
+from .cusum import Cusum
 
 __all__ = [
     "talib",
@@ -335,5 +340,6 @@ __all__ = [
     "Hurst", "FractalDimension",
     "RollingAlpha", "RollingInformationRatio",
     "CloseToCloseSigma", "Parkinson", "GarmanKlass", "RogersSatchell", "GkYangZhang", "YangZhang",
+    "Adv", "Amihud", "RollSpread", "OuHalfLife", "Cusum",
     "__version__",
 ]

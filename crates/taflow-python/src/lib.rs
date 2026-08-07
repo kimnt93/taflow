@@ -125,6 +125,11 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RogersSatchellOperator>()?;
     m.add_class::<indicators::GkYangZhangOperator>()?;
     m.add_class::<indicators::YangZhangOperator>()?;
+    m.add_class::<indicators::AdvOperator>()?;
+    m.add_class::<indicators::AmihudOperator>()?;
+    m.add_class::<indicators::RollSpreadOperator>()?;
+    m.add_class::<indicators::OuHalfLifeOperator>()?;
+    m.add_class::<indicators::CusumOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;

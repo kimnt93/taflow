@@ -374,15 +374,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | gk_yang_zhang | gk_yang_zhang | _ |
 | [x] | yang_zhang | yang_zhang | _ |
 | [x] | close_to_close_sigma | close_to_close_sigma | _ |
-| [ ] | ts_rank | ts_rank | _ |
-| [ ] | signedpower | signedpower | _ |
+| [x] | ts_rank | ts_rank | _ |
+| [x] | signedpower | signedpower | _ |
+| [x] | adv | adv | _ |
 | [ ] | kalman_hedge_ratio | kalman_hedge_ratio | _ |
-| [ ] | ou_half_life | ou_half_life | _ |
+| [x] | ou_half_life | ou_half_life | _ |
 | [ ] | spread_zscore | spread_zscore | _ |
-| [ ] | cusum | cusum | _ |
+| [x] | cusum | cusum | _ |
 | [ ] | frac_diff | frac_diff | _ |
-| [ ] | amihud | amihud | _ |
-| [ ] | roll_spread | roll_spread | _ |
+| [x] | amihud | amihud | _ |
+| [x] | roll_spread | roll_spread | _ |
 
 ## 3. Per-function review checklist
 

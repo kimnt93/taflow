@@ -155,22 +155,22 @@ tier does not (see non-goals).
 
 | Done | Function | Reference | Implementation & speed note |
 |---|---|---|---|
-| [ ] | `ts_rank(x, d)` | A.1; yli188 `ts_rank` | O(w) branchless SIMD count of `values < x` over ring buffer — beats trees for w≤64; Fenwick-over-ranks O(log w) only if large windows prove hot. Shares machinery with planned `rolling_rank`. |
-| [ ] | `signedpower(x, a)` | A.1 | pointwise `sign(x)·|x|^a`; special-case a=2 as `x·|x|` (no `powf`). |
-| [ ] | `decay_linear(x, d)` | A.1 | **Alias of WMA** (verified) — re-export, zero code. |
-| [ ] | `adv(d)` | paper §2 | SMA of `close×volume` — composition. |
+| [x] | `ts_rank(x, d)` | A.1; yli188 `ts_rank` | O(w) branchless SIMD count of `values < x` over ring buffer — beats trees for w≤64; Fenwick-over-ranks O(log w) only if large windows prove hot. Shares machinery with planned `rolling_rank`. |
+| [x] | `signedpower(x, a)` | A.1 | pointwise `sign(x)·|x|^a`; special-case a=2 as `x·|x|` (no `powf`). |
+| [x] | `decay_linear(x, d)` | A.1 | **Alias of WMA** (verified) — re-export, zero code. |
+| [x] | `adv(d)` | paper §2 | SMA of `close×volume` — composition. |
 
 ## P7 — stat-arb primitives (`quant`)
 
 | Done | Function | Reference | Implementation & speed note |
 |---|---|---|---|
 | [ ] | Kalman hedge ratio (online regression) | Theory: state (α,β), random-walk transition, obs `y=α+βx+v`; Impl: QuantStart "Dynamic Hedge Ratio Between ETF Pairs Using the Kalman Filter"; letianzj.github.io/kalman-filter-pairs-trading.html (pykalman `filter_update`) | Two input series → same-size outputs α, β, innovation, `√S` (fits contract like BETA/CORREL). O(1)/bar: hand-rolled 2-state filter (~a dozen FLOPs), no linalg dep. Oracle: pykalman. |
-| [ ] | OU half-life | Theory: `−ln(2)/λ`, λ from regressing Δp on lagged p; Impl: robotwealth "Mean Reversion and Cointegration pt 2" | O(1): `RollingPairMoments(Δp, p_lag)` slope → closed form; λ≥0 → NaN. |
+| [x] | OU half-life | Theory: `−ln(2)/λ`, λ from regressing Δp on lagged p; Impl: robotwealth "Mean Reversion and Cointegration pt 2" | O(1): `RollingPairMoments(Δp, p_lag)` slope → closed form; λ≥0 → NaN. |
 | [ ] | Rolling spread z-score | composition | `(spread − mean)/std` over rolling window given hedge ratio — pure composition. |
-| [ ] | CUSUM event flags | Theory: *AFML* §2.5.2; Impl: mlfinlab `filters.cusum_filter` | Same-size 0/±1 flag series, O(1): two accumulators + reset. (Reclassified here from the ML family — as a flag series it fits the contract.) |
+| [x] | CUSUM event flags | Theory: *AFML* §2.5.2; Impl: mlfinlab `filters.cusum_filter` | Same-size 0/±1 flag series, O(1): two accumulators + reset. (Reclassified here from the ML family — as a flag series it fits the contract.) |
 | [ ] | Fractional differentiation (FFD) | Theory: *AFML* ch. 5; Impl: mlfinlab `frac_diff_ffd(d, thres)` | Same-size output. Precompute truncated weights (`w_k = −w_{k−1}(d−k+1)/k`, stop at |w|<thres); per bar = dot product over ring buffer — O(w) fixed, SIMD FMA loop shaped like WMA bulk. `min_ffd` (ADF scan) stays Python-layer. |
-| [ ] | Amihud illiquidity | Amihud (2002), *J. Fin. Markets* 5:31-56 | O(1): rolling mean of `|ret|/(close×volume)` — `Sma` composition. |
-| [ ] | Roll spread | Roll (1984), *J. Finance* 39:1127-1139 | O(1): `2√max(0, −cov(Δp_t, Δp_{t−1}))` via `RollingPairMoments`. |
+| [x] | Amihud illiquidity | Amihud (2002), *J. Fin. Markets* 5:31-56 | O(1): rolling mean of `|ret|/(close×volume)` — `Sma` composition. |
+| [x] | Roll spread | Roll (1984), *J. Finance* 39:1127-1139 | O(1): `2√max(0, −cov(Δp_t, Δp_{t−1}))` via `RollingPairMoments`. |
 
 ## Out of scope under the same-size series contract (explicit non-goals)
 

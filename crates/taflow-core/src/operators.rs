@@ -1755,6 +1755,340 @@ pub fn yang_zhang(
         .collect())
 }
 
+/// WorldQuant Alpha101 `ts_rank(x, d)`: the rank of the current value within
+/// the trailing `d`-bar window as a fraction in `(0, 1]`. Shares the rolling
+/// rank kernel. Warm-up values are `NaN`.
+pub fn ts_rank(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    rolling_rank(input, timeperiod)
+}
+
+/// WorldQuant Alpha101 `signedpower(x, a)`: pointwise `sign(x)·|x|^a`.
+/// `a == 2` is special-cased to `x·|x|` to avoid `powf`.
+pub fn signedpower(input: &[f64], exponent: f64) -> Vec<f64> {
+    input
+        .iter()
+        .map(|&value| {
+            if exponent == 2.0 {
+                value * value.abs()
+            } else {
+                value.signum() * value.abs().powf(exponent)
+            }
+        })
+        .collect()
+}
+
+/// WorldQuant Alpha101 `decay_linear(x, d)`: verified alias of the weighted
+/// moving average with weights `d..=1` — re-exported, zero additional code.
+pub fn decay_linear(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    crate::overlap::wma(input, timeperiod)
+}
+
+/// Average daily dollar value traded: SMA of `close × volume`.
+#[derive(Debug, Clone)]
+pub struct Adv {
+    sum: f64,
+    window: VecDeque<f64>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl Adv {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { sum: 0.0, window: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+    }
+
+    pub fn append(&mut self, close: f64, volume: f64) -> Option<f64> {
+        let term = close * volume;
+        if self.window.len() == self.timeperiod {
+            self.sum -= self.window.pop_front().expect("ring is full");
+        }
+        self.window.push_back(term);
+        self.sum += term;
+        self.value = if self.window.len() == self.timeperiod {
+            Some(self.sum / self.timeperiod as f64)
+        } else {
+            None
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.sum = 0.0;
+        self.window.clear();
+        self.value = None;
+    }
+}
+
+pub fn adv(close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if close.len() != volume.len() {
+        return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() });
+    }
+    let mut state = Adv::new(timeperiod)?;
+    Ok(close
+        .iter()
+        .zip(volume)
+        .map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN))
+        .collect())
+}
+
+/// Amihud illiquidity: rolling mean of `|ret| / (close × volume)`.
+#[derive(Debug, Clone)]
+pub struct Amihud {
+    mean: RollingMean,
+    previous_close: Option<f64>,
+    value: Option<f64>,
+}
+
+impl Amihud {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self { mean: RollingMean::new(timeperiod)?, previous_close: None, value: None })
+    }
+
+    pub fn append(&mut self, close: f64, volume: f64) -> Option<f64> {
+        if let Some(previous_close) = self.previous_close.replace(close) {
+            let term = if close > 0.0 && previous_close > 0.0 && volume > 0.0 {
+                ((close - previous_close) / previous_close).abs() / (close * volume)
+            } else {
+                0.0
+            };
+            self.value = self.mean.append(term);
+        }
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.mean.reset();
+        self.previous_close = None;
+        self.value = None;
+    }
+}
+
+pub fn amihud(close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if close.len() != volume.len() {
+        return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() });
+    }
+    let mut state = Amihud::new(timeperiod)?;
+    Ok(close
+        .iter()
+        .zip(volume)
+        .map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN))
+        .collect())
+}
+
+/// Roll spread estimate: `2√max(0, −cov(Δp_t, Δp_{t−1}))`.
+#[derive(Debug, Clone)]
+pub struct RollSpread {
+    previous_price: Option<f64>,
+    delta_previous: Option<f64>,
+    moments: RollingPairMoments,
+    value: Option<f64>,
+}
+
+#[derive(Debug, Clone)]
+struct RollingPairMoments {
+    x: VecDeque<f64>,
+    y: VecDeque<f64>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl RollingPairMoments {
+    fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self {
+            x: VecDeque::with_capacity(timeperiod),
+            y: VecDeque::with_capacity(timeperiod),
+            timeperiod,
+            value: None,
+        })
+    }
+
+    fn append(&mut self, x: f64, y: f64) -> Option<f64> {
+        if self.x.len() == self.timeperiod {
+            self.x.pop_front();
+            self.y.pop_front();
+        }
+        self.x.push_back(x);
+        self.y.push_back(y);
+        self.value = if self.x.len() == self.timeperiod {
+            let n = self.timeperiod as f64;
+            let mean_x = self.x.iter().sum::<f64>() / n;
+            let mean_y = self.y.iter().sum::<f64>() / n;
+            let mut cov = 0.0;
+            for (x, y) in self.x.iter().zip(self.y.iter()) {
+                cov += (x - mean_x) * (y - mean_y);
+            }
+            Some(cov / (n - 1.0))
+        } else {
+            None
+        };
+        self.value
+    }
+
+    fn value(&self) -> Option<f64> { self.value }
+
+    fn reset(&mut self) {
+        self.x.clear();
+        self.y.clear();
+        self.value = None;
+    }
+}
+
+impl RollSpread {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self {
+            previous_price: None,
+            delta_previous: None,
+            moments: RollingPairMoments::new(timeperiod)?,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, price: f64) -> Option<f64> {
+        let delta = if let Some(previous_price) = self.previous_price.replace(price) {
+            price - previous_price
+        } else {
+            0.0
+        };
+        if let Some(delta_previous) = self.delta_previous {
+            let _ = self.moments.append(delta, delta_previous);
+        }
+        self.delta_previous = Some(delta);
+        self.value = self.moments.value().map(|cov| 2.0 * (0.0f64 - cov).max(0.0).sqrt());
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.previous_price = None;
+        self.delta_previous = None;
+        self.moments.reset();
+        self.value = None;
+    }
+}
+
+pub fn roll_spread(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollSpread::new(timeperiod)?;
+    Ok(input.iter().map(|&price| state.append(price).unwrap_or(f64::NAN)).collect())
+}
+
+/// OU half-life: `−ln(2)/λ` where `λ` is the slope of `Δp` on lagged `p`.
+/// `λ ≥ 0` yields `NaN`.
+#[derive(Debug, Clone)]
+pub struct OuHalfLife {
+    moments: RollingPairMoments,
+    previous_price: Option<f64>,
+    value: Option<f64>,
+}
+
+impl OuHalfLife {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self {
+            moments: RollingPairMoments::new(timeperiod)?,
+            previous_price: None,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, price: f64) -> Option<f64> {
+        if let Some(previous_price) = self.previous_price.replace(price) {
+            let delta = price - previous_price;
+            let _ = self.moments.append(delta, previous_price);
+        }
+        self.value = if let Some(cov) = self.moments.value() {
+            let n = self.moments.timeperiod as f64;
+            let mean_y = self.moments.y.iter().sum::<f64>() / n;
+            let var_y = self
+                .moments
+                .y
+                .iter()
+                .map(|&y| (y - mean_y) * (y - mean_y))
+                .sum::<f64>()
+                / (n - 1.0);
+            if var_y > 0.0 {
+                let lambda = -cov / var_y;
+                (lambda > 0.0).then_some(2.0f64.ln() / lambda)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.moments.reset();
+        self.previous_price = None;
+        self.value = None;
+    }
+}
+
+pub fn ou_half_life(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = OuHalfLife::new(timeperiod)?;
+    Ok(input.iter().map(|&price| state.append(price).unwrap_or(f64::NAN)).collect())
+}
+
+/// CUSUM event flags (AFML §2.5.2): `+1` when the cumulative deviation from
+/// `threshold` (daily volatility) exceeds it, `-1` on the downside, else `0`.
+#[derive(Debug, Clone)]
+pub struct Cusum {
+    threshold: f64,
+    s_positive: f64,
+    s_negative: f64,
+    value: Option<f64>,
+}
+
+impl Cusum {
+    pub fn new(threshold: f64) -> TaResult<Self> {
+        if threshold < 0.0 {
+            return Err(TaError::InvalidParameter {
+                name: "threshold",
+                value: threshold.to_string(),
+                reason: "must be >= 0",
+            });
+        }
+        Ok(Self { threshold, s_positive: 0.0, s_negative: 0.0, value: None })
+    }
+
+    pub fn append(&mut self, change: f64) -> f64 {
+        self.s_positive = (self.s_positive + change).max(0.0);
+        self.s_negative = (self.s_negative - change).max(0.0);
+        let flag = if self.s_positive > self.threshold {
+            self.s_positive = 0.0;
+            1.0
+        } else if self.s_negative > self.threshold {
+            self.s_negative = 0.0;
+            -1.0
+        } else {
+            0.0
+        };
+        self.value = Some(flag);
+        flag
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.s_positive = 0.0;
+        self.s_negative = 0.0;
+        self.value = None;
+    }
+}
+
+pub fn cusum(input: &[f64], threshold: f64) -> TaResult<Vec<f64>> {
+    let mut state = Cusum::new(threshold)?;
+    Ok(input.iter().map(|&change| state.append(change)).collect())
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
@@ -2691,5 +3025,59 @@ mod tests {
         assert_eq!(rolling_winsorize(&input, 3, 0.0, 0.5).unwrap()[2], 2.0);
         assert_eq!(ewm_var(&input, 2).unwrap()[0], 0.0);
         assert_eq!(ewm_std(&input, 2).unwrap()[0], 0.0);
+    }
+
+    #[test]
+    fn quant_family_batch_and_stream_match() {
+        let close = vec![100.0, 102.0, 101.0, 105.0, 107.0, 106.0];
+        let volume = vec![1000.0, 1100.0, 900.0, 1200.0, 1300.0, 950.0];
+
+        assert_eq!(
+            ts_rank(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>(),
+            rolling_rank(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>()
+        );
+        assert_eq!(
+            decay_linear(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>(),
+            crate::overlap::wma(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>()
+        );
+        assert_eq!(signedpower(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
+
+        let adv_batch = adv(&close, &volume, 3).unwrap();
+        let mut adv_state = Adv::new(3).unwrap();
+        for ((close, volume), expected) in close.iter().zip(&volume).zip(&adv_batch) {
+            assert_eq!(adv_state.append(*close, *volume).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
+        }
+
+        let amihud_batch = amihud(&close, &volume, 3).unwrap();
+        let mut amihud_state = Amihud::new(3).unwrap();
+        for ((close, volume), expected) in close.iter().zip(&volume).zip(&amihud_batch) {
+            assert_eq!(amihud_state.append(*close, *volume).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
+        }
+
+        let spread_batch = roll_spread(&close, 3).unwrap();
+        let mut spread_state = RollSpread::new(3).unwrap();
+        for (price, expected) in close.iter().zip(&spread_batch) {
+            assert_eq!(spread_state.append(*price).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
+        }
+
+        let hl_batch = ou_half_life(&close, 3).unwrap();
+        let mut hl_state = OuHalfLife::new(3).unwrap();
+        for (price, expected) in close.iter().zip(&hl_batch) {
+            assert_eq!(hl_state.append(*price).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
+        }
+
+        let cusum_batch = cusum(&[0.5, -0.5, 2.0, -1.0], 1.0).unwrap();
+        assert_eq!(cusum_batch, vec![0.0, 0.0, 1.0, 0.0]);
+
+        assert_eq!(adv(&close, &volume[..5], 3), Err(TaError::LengthMismatch { expected: 6, got: 5 }));
+    }
+
+    #[test]
+    fn quant_family_rejects_bad_periods() {
+        assert!(Adv::new(0).is_err());
+        assert!(Amihud::new(0).is_err());
+        assert!(RollSpread::new(0).is_err());
+        assert!(OuHalfLife::new(0).is_err());
+        assert!(Cusum::new(-1.0).is_err());
     }
 }
