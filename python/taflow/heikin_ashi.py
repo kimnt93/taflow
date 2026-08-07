@@ -1,23 +1,49 @@
-"""Causal Heikin–Ashi OHLC transform."""
+"""Native Heikin-Ashi OHLC transform interface."""
+
+from typing import Any
+
 import numpy as np
 
+from ._native import StatefulHeikinAshi
+
+
 class HeikinAshi:
-    """Stateful HeikinAshi indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute causal transformed open, high, low, and close values.
+
+    Parameters
+    ----------
+    open, high, low, close : array-like, optional
+        Initial aligned OHLC history.
     """
-    def __init__(self, open=None, high=None, low=None, close=None):
-        self.reset()
-        if open is not None: self.extend(open, high, low, close)
-    def append(self, open, high, low, close):
-        c=(float(open)+float(high)+float(low)+float(close))/4
-        o=(float(open)+float(close))/2 if self._prev_open is None else (self._prev_open+self._prev_close)/2
-        v=(o,max(float(high),o,c),min(float(low),o,c),c); self._prev_open,self._prev_close=o,c; self._values.append(v); return v
-    def extend(self, open, high, low, close):
-        for row in zip(open,high,low,close): self.append(*row)
+
+    def __init__(self, open: Any | None = None, high: Any | None = None,
+                 low: Any | None = None, close: Any | None = None):
+        self._state = StatefulHeikinAshi()
+        if open is not None or high is not None or low is not None or close is not None:
+            self.extend(open, high, low, close)
+
+    def append(self, open: float, high: float, low: float, close: float):
+        """Process one OHLC bar and return transformed OHLC values."""
+        return self._state.append(float(open), float(high), float(low), float(close))
+
+    def extend(self, open: Any, high: Any, low: Any, close: Any):
+        """Process aligned OHLC history and return this indicator."""
+        self._state.extend(np.asarray(open, dtype=np.float64),
+                           np.asarray(high, dtype=np.float64),
+                           np.asarray(low, dtype=np.float64),
+                           np.asarray(close, dtype=np.float64))
         return self
-    def compute(self): return tuple(np.asarray(v) for v in zip(*self._values)) if self._values else (np.array([]),)*4
+
+    def compute(self):
+        """Return transformed open, high, low, and close histories."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._values[-1] if self._values else None
-    def reset(self): self._prev_open=self._prev_close=None; self._values=[]; return self
+    def value(self):
+        """Return the latest transformed OHLC tuple."""
+        return self._state.value
+
+    def reset(self):
+        """Clear previous-candle state and output history."""
+        self._state.reset()
+        return self

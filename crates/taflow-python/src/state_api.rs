@@ -12,7 +12,7 @@ use taflow::stream::{
     LaguerreRelativeStrengthIndex,
     EvenBetterSinewave,
     JurikMovingAverage,
-    SmoothedTrendChannel, PremiumDiscount,
+    SmoothedTrendChannel, PremiumDiscount, HeikinAshi,
 };
 use taflow::MaType;
 
@@ -164,6 +164,40 @@ impl StatefulPremiumDiscount {
     #[getter]
     fn value(&self) -> Option<(i32, f64)> { self.inner.value() }
     fn reset(&mut self) { self.inner.reset(); self.zones.clear(); self.equilibrium.clear(); }
+}
+
+/// Native state adapter for Heikin-Ashi OHLC transformation.
+#[pyclass]
+pub struct StatefulHeikinAshi {
+    inner: HeikinAshi,
+    open: Vec<f64>,
+    high: Vec<f64>,
+    low: Vec<f64>,
+    close: Vec<f64>,
+}
+
+#[pymethods]
+impl StatefulHeikinAshi {
+    #[new]
+    fn new() -> PyResult<Self> {
+        Ok(Self { inner: HeikinAshi::new().map_err(py_value_error)?, open: Vec::new(), high: Vec::new(), low: Vec::new(), close: Vec::new() })
+    }
+    fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> (f64, f64, f64, f64) {
+        let value = self.inner.append(open, high, low, close);
+        self.open.push(value.0); self.high.push(value.1); self.low.push(value.2); self.close.push(value.3); value
+    }
+    fn extend(&mut self, open: PyReadonlyArray1<f64>, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let (open, high, low, close) = (open.as_slice()?, high.as_slice()?, low.as_slice()?, close.as_slice()?);
+        if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
+        for (((&open, &high), &low), &close) in open.iter().zip(high).zip(low).zip(close) { self.append(open, high, low, close); }
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (PyArray1::from_vec(py, self.open.clone()), PyArray1::from_vec(py, self.high.clone()), PyArray1::from_vec(py, self.low.clone()), PyArray1::from_vec(py, self.close.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64, f64)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.open.clear(); self.high.clear(); self.low.clear(); self.close.clear(); }
 }
 
 #[pymethods]

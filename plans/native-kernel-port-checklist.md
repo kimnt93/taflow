@@ -32,7 +32,8 @@ For each item:
   warm-up behavior.
 - [ ] `ParabolicMovingAverageStop` (`pmax`)
 - [ ] `TDSequential` (`td_sequential`)
-- [ ] `HeikinAshi` (`heikin_ashi`)
+- [x] `HeikinAshi` (`heikin_ashi`) — Rust causal OHLC transform, native
+  four-output adapter, and constructor-history runtime check verified.
 - [ ] `AnchoredVolumeWeightedAveragePrice` (`anchored_vwap`)
 - [ ] `PivotPoints` (`pivot_points`)
 - [ ] `OpeningRange` (`opening_range`)
