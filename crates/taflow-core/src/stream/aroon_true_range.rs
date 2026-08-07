@@ -4,6 +4,33 @@ use crate::error::TaResult;
 
 use super::{invalid_period, RollingExtrema};
 
+/// Computes aligned true-range values from HLC slices.
+pub fn true_range(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+    }
+    let mut state = TrueRange::new();
+    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
+}
+
+/// Computes an aligned Average True Range vector from HLC slices.
+pub fn average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+    }
+    let mut state = AverageTrueRange::new(timeperiod)?;
+    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
+}
+
+/// Computes an aligned Normalized Average True Range vector from HLC slices.
+pub fn normalized_average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+    }
+    let mut state = NormalizedAverageTrueRange::new(timeperiod)?;
+    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct AroonValue {
     pub down: f64,
@@ -327,4 +354,3 @@ impl AverageTrueRange {
         self.value = None;
     }
 }
-
