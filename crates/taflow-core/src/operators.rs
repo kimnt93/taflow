@@ -122,6 +122,112 @@ since_extreme!(HighestSince,f64::max); since_extreme!(LowestSince,f64::min);
 pub fn rising(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Rising::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn falling(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Falling::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
+/// Causal swing-point confirmation.
+///
+/// The center bar of a `2 * swing_length + 1` window is confirmed at the
+/// current bar. A signal is emitted only after the required future bars have
+/// arrived, so no output uses lookahead when it is observed.
+pub fn swing_highs_lows(
+    high: &[f64],
+    low: &[f64],
+    swing_length: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len(),
+        });
+    }
+    let mut state = Swing::new(swing_length)?;
+    let mut signal = Vec::with_capacity(high.len());
+    let mut level = Vec::with_capacity(high.len());
+    let mut bars_since = Vec::with_capacity(high.len());
+    for (&high, &low) in high.iter().zip(low) {
+        let value = state.append(high, low);
+        signal.push(value.map_or(f64::NAN, |value| value.signal));
+        level.push(value.map_or(f64::NAN, |value| value.level));
+        bars_since.push(value.map_or(f64::NAN, |value| value.bars_since));
+    }
+    Ok((signal, level, bars_since))
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SwingValue {
+    pub signal: f64,
+    pub level: f64,
+    pub bars_since: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct Swing {
+    highs: VecDeque<f64>,
+    lows: VecDeque<f64>,
+    length: usize,
+    bars_since: Option<usize>,
+    value: Option<SwingValue>,
+}
+
+impl Swing {
+    pub fn new(length: usize) -> TaResult<Self> {
+        validate_period(length)?;
+        let capacity = length.saturating_mul(2).saturating_add(1);
+        Ok(Self {
+            highs: VecDeque::with_capacity(capacity),
+            lows: VecDeque::with_capacity(capacity),
+            length,
+            bars_since: None,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64) -> Option<SwingValue> {
+        let capacity = self.length * 2 + 1;
+        if self.highs.len() == capacity {
+            self.highs.pop_front();
+            self.lows.pop_front();
+        }
+        self.highs.push_back(high);
+        self.lows.push_back(low);
+
+        if self.highs.len() < capacity {
+            self.value = None;
+            return None;
+        }
+        let center_high = self.highs[self.length];
+        let center_low = self.lows[self.length];
+        let is_high = center_high >= self.highs.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+        let is_low = center_low <= self.lows.iter().copied().fold(f64::INFINITY, f64::min);
+        let (signal, level) = match (is_high, is_low) {
+            (true, false) => (1.0, center_high),
+            (false, true) => (-1.0, center_low),
+            _ => (f64::NAN, f64::NAN),
+        };
+        self.bars_since = if signal.is_nan() {
+            self.bars_since.map(|bars| bars + 1)
+        } else {
+            Some(0)
+        };
+        let value = SwingValue {
+            signal,
+            level,
+            bars_since: self.bars_since.map_or(f64::NAN, |bars| bars as f64),
+        };
+        self.value = Some(value);
+        Some(value)
+    }
+
+    pub fn value(&self) -> Option<SwingValue> { self.value }
+
+    pub fn bars_since(&self) -> Option<f64> { self.bars_since.map(|bars| bars as f64) }
+
+    pub fn reset(&mut self) {
+        self.highs.clear();
+        self.lows.clear();
+        self.bars_since = None;
+        self.value = None;
+    }
+}
+
 /// Rolling median. Warm-up values are `NaN`; even windows average the two
 /// central values.
 pub fn rolling_median(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {

@@ -22,7 +22,7 @@ chunk invariance (benchmark plan S4).
 
 ## P0 — shared infrastructure (build once, unblocks everything)
 
-- [ ] **Causal swing/pivot state** — a bar is a confirmed swing high when
+- [x] **Causal swing/pivot state** — a bar is a confirmed swing high when
   `swing_length` bars have passed without a higher high. Outputs (same
   length as input, all causal): `swing_signal` (+1/-1/NaN **at the
   confirmation bar**), `swing_level` (price of the confirmed swing),
@@ -66,7 +66,7 @@ package, stated once here and in every docstring:
 | Done | Function | Outputs (same-size series) | Reference | Implementation & speed note |
 |---|---|---|---|---|
 | [ ] | `fvg` | `fvg` (+1/-1/NaN), `top`, `bottom`, `mitigated` flag | Impl: `smc.py::fvg` — bullish: `high[i-2] < low[i]` AND middle candle `close > open`, mirrored bearish | Fully causal with 1-bar lag already (3-bar pattern detected at bar `i`, attributed to bar `i-1` in the package — taflow emits at `i`; oracle test shifts by 1). O(1): 3-bar shift registers; mitigation via zone list. Bulk path = one pass over 3 shifted slices. |
-| [ ] | `swing_highs_lows` | `swing_signal`, `swing_level`, `bars_since_swing` | see P0 | Thin wrapper over the P0 swing state. |
+| [x] | `swing_highs_lows` | `swing_signal`, `swing_level`, `bars_since_swing` | see P0 | Thin wrapper over the P0 swing state. |
 | [ ] | `bos_choch` | `bos` (+1/-1/NaN at confirmation), `choch` (same), `level`, `broken` flag at break bar | Impl: `smc.py::bos_choch` lines ~222-370 — 4-swing inequality patterns (bullish BOS: swings `[-1,1,-1,1]` with `low[-4]<low[-2]<high[-3]<high[-1]`), break = close (or high/low) crossing the level. LuxAlgo variant (Pine mirror, gist niquedegraaff): same trigger, classified by trend state | Ring of last 4 confirmed swings; per bar O(1) pattern + level-cross check. `variant=` selects classifier; crossover detector shared. |
 | [ ] | `ob` | `ob` (+1/-1/NaN), `top`, `bottom`, `ob_volume`, `mitigated` flag | Impl: `smc.py::ob`; LuxAlgo variant: dual pivot scales (50/5), volatile-bar exclusion `(high-low) ≥ 2×ATR(200)` | Reuse `Atr(200)` for the filter; block located at structure break from extrema state; zone list for mitigation. Inherits swing confirmation lag. |
 | [ ] | `liquidity` | `liquidity` (+1/-1/NaN), `level`, `swept` flag at sweep bar | Impl: `smc.py::liquidity(range_percent=0.01)` | Cluster incrementally as swings confirm (nearest pool within tolerance else new pool) — avoids the package's O(n²) rescan and is chunk-invariant by construction. |

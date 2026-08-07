@@ -90,7 +90,7 @@ they are not re-proposed later.
 
 ## Extended pattern recognition
 
-- [ ] swing_high / swing_low (causal confirmation-lag semantics — shares
+- [x] swing_high / swing_low (causal confirmation-lag semantics — shares
       the P0 swing state in `recommend-functions-checklist.md`; the
       textbook centered-window definition is lookahead and is not
       implemented. `pivot_high` / `pivot_low` are aliases of the same
