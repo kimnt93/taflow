@@ -33,7 +33,9 @@ For each item:
 - [x] `ParabolicMovingAverageStop` (`pmax`) — Rust EMA/rolling-range stop
   kernel, native two-output adapter, and constructor-history runtime check
   verified.
-- [ ] `TDSequential` (`td_sequential`)
+- [x] `TomDeMarkSequential` (`td_sequential`, previously `TDSequential`) —
+  acronym-free Rust setup-count kernel, native two-output adapter, and
+  constructor-history runtime check verified.
 - [x] `HeikinAshi` (`heikin_ashi`) — Rust causal OHLC transform, native
   four-output adapter, and constructor-history runtime check verified.
 - [ ] `AnchoredVolumeWeightedAveragePrice` (`anchored_vwap`)

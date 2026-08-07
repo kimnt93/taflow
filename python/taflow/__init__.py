@@ -71,7 +71,7 @@ from .rmi import RelativeMomentumIndex
 from .ssl_channel import SmoothedTrendChannel
 from .jma import JurikMovingAverage
 from .pmax import ParabolicMovingAverageStop
-from .td_sequential import TDSequential
+from .td_sequential import TomDeMarkSequential
 from .ebsw import EvenBetterSinewave
 from .premium_discount import PremiumDiscount
 from .opening_range import OpeningRange
@@ -261,7 +261,7 @@ __all__ = [
     "SmoothedTrendChannel",
     "JurikMovingAverage",
     "ParabolicMovingAverageStop",
-    "TDSequential",
+    "TomDeMarkSequential",
     "EvenBetterSinewave",
     "PremiumDiscount",
     "OpeningRange",

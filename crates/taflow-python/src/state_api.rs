@@ -18,6 +18,7 @@ use taflow::stream::{
     SessionVolumeLevels,
     KlingerVolumeOscillator,
     ParabolicMovingAverageStop,
+    TomDeMarkSequential,
 };
 use taflow::MaType;
 
@@ -220,6 +221,32 @@ pub struct StatefulParabolicMovingAverageStop {
     inner: ParabolicMovingAverageStop,
     stops: Vec<f64>,
     trends: Vec<i32>,
+}
+
+/// Native state adapter for Tom DeMark Sequential setup counts.
+#[pyclass]
+pub struct StatefulTomDeMarkSequential {
+    inner: TomDeMarkSequential,
+    buys: Vec<i32>,
+    sells: Vec<i32>,
+}
+
+#[pymethods]
+impl StatefulTomDeMarkSequential {
+    #[new]
+    fn new() -> Self { Self { inner: TomDeMarkSequential::new(), buys: Vec::new(), sells: Vec::new() } }
+    fn append(&mut self, close: f64) -> (i32, i32) {
+        let value = self.inner.append(close); self.buys.push(value.0); self.sells.push(value.1); value
+    }
+    fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        for &value in close.as_slice()? { self.append(value); } Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<i32>>) {
+        (PyArray1::from_vec(py, self.buys.clone()), PyArray1::from_vec(py, self.sells.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(i32, i32)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.buys.clear(); self.sells.clear(); }
 }
 
 #[pymethods]
