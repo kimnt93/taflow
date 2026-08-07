@@ -32,14 +32,10 @@ def main() -> None:
     inventory = json.loads((HERE / "function_inventory.json").read_text())
     external = {row["function"]: row for row in json.loads((HERE / "report.json").read_text())}
     self_rows = {row["name"]: row for row in json.loads((HERE / "ALL_INTERFACES.json").read_text())}
-    # Native state aliases provide a reliable canonical -> TA-Lib mapping for
-    # the scalar state adapters (e.g. RateOfChange -> StatefulRoc -> ROC).
-    import taflow.talib.state as state
+    # TAFlow no longer exposes a TA-Lib compatibility namespace. External
+    # TA-Lib rows are therefore not synthesized here; pandas/native rows are
+    # still reported when present in the generated artifacts.
     state_to_ta = {}
-    for alias in external:
-        cls = getattr(state, alias, None)
-        if cls is not None:
-            state_to_ta[getattr(cls, "__name__", "")] = alias
 
     # Exact-parameter pandas-ta-classic checks for extensions that expose the
     # same definition and defaults.  Other extension rows remain explicitly

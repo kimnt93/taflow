@@ -8,11 +8,9 @@ One script implements the whole plan in ``plans/benchmark-plan.md``:
   S3  correctness vs TA-Lib   NaN placement, max abs error, chunk invariance
   S4  functions not in TA-Lib same grids, self-oracle only
 
-Zero-edit registry: functions are discovered from ``taflow.talib`` /
-``taflow.talib.state``; inputs, default parameters, and lookback come from
-TA-Lib's ``abstract`` metadata. Adding a new indicator to taflow requires no
-change here. Functions whose TA-Lib alias does not exist in the installed
-TA-Lib automatically run as S4.
+This legacy batch comparison is retained only for historical reports and is
+disabled for the canonical package. Use ``adapter_bench.py`` for native
+streaming/vectorized measurements.
 
 Usage:
   python benches/bench.py                # reports legacy batch compatibility
@@ -915,8 +913,8 @@ def main() -> int:
         print(f"wrote {out}")
         return 0
 
-    # The package no longer exports one-shot ``taflow.talib`` functions.  Keep
-    # this historical runner importable for old reports, but direct live-feed
+    # The package no longer exports a TA-Lib compatibility namespace. Keep this
+    # historical runner importable for old reports, but direct live-feed
     # measurements to the continuous adapter benchmark.
     print("bench.py is a legacy one-shot TA-Lib comparison and is disabled for "
           "the continuous-only API. Use benches/adapter_bench.py instead.",

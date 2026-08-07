@@ -1,9 +1,8 @@
 {
-  "root_exports": 251,
-  "root_indicators": 249,
-  "root_indicators_with_lifecycle": 248,
+  "root_exports": 285,
+  "root_indicators": 282,
+  "root_indicators_with_lifecycle": 282,
   "native_one_shot_functions": [],
-  "taflow_talib_one_shot_exports": [],
   "rows": [
     {
       "name": "MovingAverage",
@@ -1098,6 +1097,244 @@
       "compute_or_value": true
     },
     {
+      "name": "RollingStandardDeviation",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingAverageDeviation",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMidpoint",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMidprice",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingVariance",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingLinearRegression",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingLinearRegressionAngle",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingLinearRegressionIntercept",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingLinearRegressionSlope",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingTimeSeriesForecast",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingBeta",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingCorrelation",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MesaAdaptiveMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMinMax",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMinMaxIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathAcos",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathAsin",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathAtan",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathCeil",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathCos",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathCosh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathExp",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathFloor",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathLn",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathLog10",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathSin",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathSinh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathSqrt",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathTan",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathTanh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathAdd",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathSubtract",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathMultiply",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathDivide",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
       "name": "ExponentiallyWeightedVariance",
       "append": true,
       "extend": true,
@@ -1439,13 +1676,6 @@
       "extend": true,
       "reset": true,
       "compute_or_value": true
-    },
-    {
-      "name": "ActiveZoneList",
-      "append": false,
-      "extend": false,
-      "reset": true,
-      "compute_or_value": false
     },
     {
       "name": "FairValueGap",

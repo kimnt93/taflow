@@ -33,14 +33,14 @@ def _timed(fn, repeats=5):
 
 def _pipeline(values):
     pipeline = taflow.executions.TAPipeline()
-    ema = pipeline.indicator("ema", EMA(20), pipeline.source("close"))
+    ema = pipeline.indicator("ema", EMA(timeperiod=20), pipeline.source("close"))
     pipeline.output("ema", ema)
     return pipeline.extend({"close": values})
 
 
 def _streaming(values):
     pipeline = taflow.executions.TAPipeline()
-    ema = pipeline.indicator("ema", EMA(20), pipeline.source("close"))
+    ema = pipeline.indicator("ema", EMA(timeperiod=20), pipeline.source("close"))
     pipeline.output("ema", ema)
     pipeline.extend({"close": values})
     return pipeline

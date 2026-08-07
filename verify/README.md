@@ -16,9 +16,9 @@ With 10,000 seeded bars:
    9k+1k output is compared to:
    - the oracle 10k result.
 
-TA-Lib one-shot migration checks are intentionally disabled. The package
-keeps TA-Lib-named state aliases only under `taflow.talib.state`; canonical
-users should import CamelCase classes from `taflow`.
+TA-Lib one-shot migration checks are intentionally disabled. TAFlow has no
+TA-Lib compatibility package; canonical users import native-backed CamelCase
+classes from `taflow`.
 
 Verdict is `MATCH` when NaN placement is identical and values agree within
 `rtol=1e-8, atol=1e-10`; the report also records the max absolute error so

@@ -155,7 +155,7 @@ def main() -> None:
         refs = "yes" if r["pandas_ta_reference"] else "—"
         symbols = ", ".join(f"`{x}`" for x in r.get("native_symbols", [])) or "—"
         lines.append(f"| {status} | `{r['name']}` | {r['kind']} | `{r['module']}` | {symbols} | {'yes' if (r['native_binding'] or r['rust_export']) else '—'} | `{r['talib_alias']}` | {refs} | {'yes' if r['smc_reference'] else '—'} |")
-    lines += ["", "## TA-Lib compatibility", "", "TA-Lib is an external oracle only. One-shot uppercase functions are intentionally not exported by `taflow.talib`; use persistent CamelCase classes from `taflow` (or optional state aliases from `taflow.talib.state`)."]
+    lines += ["", "## TA compatibility", "", "TA-Lib is an external oracle only. TAFlow exports native-backed CamelCase classes directly from `taflow`; no TA-Lib compatibility package is shipped."]
     OUT_MD.write_text("\n".join(lines) + "\n")
     print(f"wrote {OUT_JSON} and {OUT_MD}: {len(rows)} exports")
 

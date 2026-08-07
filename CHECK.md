@@ -48,8 +48,8 @@ Two public surfaces, ONE implementation:
 - **`taflow`** — our style. Descriptive CamelCase indicator classes, persistent state
   objects with continue-update compute:
   `append(...) / extend(...) / value / compute() / reset()`.
-- **`taflow.talib`** — optional continuous state aliases only. It intentionally
-  exposes no one-shot uppercase TA-Lib functions or migration layer.
+- TAFlow has no `taflow.talib` compatibility package. The canonical API is
+  native-backed CamelCase classes directly under `taflow`.
 - **`taflow.executions`** — explicitly named execution graph and adapter
   helpers (`TAPipeline`, `TAExpr`, `AdaptInput`, `AdaptOutput`, …). These are
   not indicator exports from the root namespace.
@@ -64,8 +64,7 @@ Rules:
 - Functions with no TA-Lib counterpart (SMC, rolling_median, …) exist only
   in `taflow` and never get a fake uppercase alias.
 - Canonical interface names are descriptive CamelCase words, not TA-Lib
-  acronyms. TA-Lib-style state aliases, when useful for migration, live only
-  in `taflow.talib.state`.
+  acronyms.
 - Every Python stateful indicator constructor accepts its complete input
   series signature (for example `high`, `low`, `close`, and `volume`) in
   addition to configuration parameters. Passing those series at construction
@@ -102,23 +101,21 @@ Rules:
 
 ### Rolling rename rule (the important one)
 
-Rolling-window operators are implemented ONCE and exposed as
-`taflow.rolling_*`; the un-prefixed name does NOT exist in `taflow` (it
-would shadow Python builtins like `min`/`max`/`sum` anyway). The TA-Lib
-uppercase name lives only in `taflow.talib`, bound to the same kernel:
+Rolling-window TA functions use descriptive CamelCase classes in `taflow`;
+the un-prefixed name does NOT exist (it would shadow Python builtins).
 
-| taflow (canonical) | taflow.talib alias |
+| taflow (canonical) | TA function |
 |---|---|
-| `rolling_min` | `MIN` |
-| `rolling_max` | `MAX` |
-| `rolling_sum` | `SUM` |
-| `rolling_argmin` | `MININDEX` |
-| `rolling_argmax` | `MAXINDEX` |
-| `rolling_minmax` | `MINMAX` |
-| `rolling_minmax_index` | `MINMAXINDEX` |
-| `rolling_midpoint` | `MIDPOINT` |
-| `rolling_std` | `STDDEV` |
-| `rolling_var` | `VAR` |
+| `RollingMin` | `MIN` |
+| `RollingMax` | `MAX` |
+| `RollingSum` | `SUM` |
+| `RollingArgmin` | `MININDEX` |
+| `RollingArgmax` | `MAXINDEX` |
+| `RollingMinMax` | `MINMAX` |
+| `RollingMinMaxIndex` | `MINMAXINDEX` |
+| `RollingMidpoint` | `MIDPOINT` |
+| `RollingStandardDeviation` | `STDDEV` |
+| `RollingVariance` | `VAR` |
 | `rolling_avgdev` | `AVGDEV` |
 | `rolling_corr` | `CORREL` |
 | `rolling_beta` | `BETA` |
@@ -149,15 +146,13 @@ operators use `CumulativeSum`, `CumulativeProduct`, `CumulativeMaximum`, and
 `CumulativeMinimum`; the control-chart accumulator is
 `CumulativeSumControlChart`; and structure/rolling names use
 `BreakOfStructureChangeOfCharacter`, `RollingInterquartileRange`, and
-`RollingZScore`. TA-Lib compatibility names remain confined to
-`taflow.talib`; these canonical names are the only names on `taflow`.
+`RollingZScore`. These canonical names are the only public indicator names.
 
 ## 2.5 Master function table (live status)
 
-One row per function: canonical Rust/Python name and the `taflow.talib`
-alias (`_` = no TA-Lib counterpart — taflow-only). `[x]` means both the
-batch alias and the persistent state exist in the current build; it does
-NOT yet certify the §3 gates. The implementing agent updates this table
+One row per function: canonical Rust/Python name and TA function (`_` = no
+TA counterpart — taflow-only). `[x]` means the persistent Rust state and
+Python adapter exist; it does NOT yet certify the §3 gates. The implementing agent updates this table
 as functions land; regenerate statuses any time by running the checks in
 §5.
 
@@ -487,8 +482,7 @@ For every function claimed done, verify ALL of:
       `ArrayLike`/`np.ndarray`, scalars typed, return types explicit)
 - [ ] Selector parameters use enums, not magic ints: `MaType` is an
       `enum.IntEnum` (exported from `taflow`), mirrored by a Rust `MaType`
-      enum. `taflow.talib` still accepts raw ints for TA-Lib compat and
-      converts at the boundary.
+      enum and converts at the boundary.
 
 ### 3.4 Docs and style
 

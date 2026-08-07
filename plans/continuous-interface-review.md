@@ -16,16 +16,15 @@ TAFlow's primary contract is a persistent, causal indicator object:
 | PyO3 one-shot functions | 0 registered functions | former `func_api` module is not compiled into the extension |
 | Root `taflow` exports | 251 names | no callable snake_case functions; no uppercase TA-Lib functions |
 | `taflow.executions` | 15 canonical helpers | `TAPipeline`, `TAExpr`, adapters, conversions, and helper wrappers |
-| `taflow.talib` | `MaType`/`MA_Type` only | no one-shot functions; persistent aliases are isolated in `taflow.talib.state` |
+| canonical `taflow` | CamelCase classes and `MaType` | sole public indicator surface |
 
 ## Target contract
 
 1. `taflow`: CamelCase persistent indicator classes only (plus the `talib`
    module handle, `MaType`, version metadata, and `executions` namespace).
 2. `taflow.executions`: explicitly named execution/adaptation helpers.
-3. `taflow.talib`: no one-shot uppercase functions, registry, abstract API, or
-   stream recomputation wrappers. If retained, it contains only optional
-   state aliases for migration and is not used by canonical code.
+3. No TA-Lib compatibility package is shipped. External TA-Lib may be used as
+   an oracle by verification tooling, but never as a runtime API dependency.
 4. Rust/PyO3 one-shot `func_api` bindings are not part of the public extension
    module; persistent state classes remain registered.
 

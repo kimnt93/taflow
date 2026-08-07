@@ -295,6 +295,11 @@ class _Indicator(Expr):
         """
         args = [_evaluate(dep, row, cache) for dep in self.inputs]
         value = self.state.append(*args)
+        # Canonical Python adapters use fluent ``append`` and expose the
+        # latest scalar through ``value``; native states may return it
+        # directly. Normalize both forms for graph execution.
+        if value is self.state:
+            value = getattr(self.state, "value", None)
         self._value = np.nan if value is None else value
         return self._value
 

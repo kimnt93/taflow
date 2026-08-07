@@ -1,4 +1,4 @@
-# Python-interface benchmark plan: TAFlow vs TA-Lib
+# Python-interface benchmark plan: TAFlow streaming/vectorized API
 
 Successor to the ad-hoc scripts in `benches/python_benches/` and the
 schema-v2 reports. One harness, one function registry, four scenarios,
@@ -6,12 +6,9 @@ per-function reports plus one aggregate report.
 
 ## Ground rules
 
-- **Python interface only.** Both sides are measured through their public
-  Python APIs: `talib.SMA(...)` (C TA-Lib via its Python binding) versus
-  `taflow.talib.SMA(...)` and the taflow state classes. We never benchmark
-  the Rust core directly against C — the product is the Python surface, so
-  boundary cost is part of the number. (Criterion Rust-core benches stay,
-  but they are out of scope for these reports.)
+- **Canonical Python interface only.** Benchmark native-backed `taflow`
+  classes and their `.extend`/`.append` continuation paths. TA-Lib is not a
+  runtime dependency or compatibility target.
 - **TA-Lib is the baseline.** Every comparable cell reports
   `speedup = talib_time / taflow_time` (>1 means TAFlow is faster).
 - **Averages over repeated runs.** Default `repeats = 20` for the timed

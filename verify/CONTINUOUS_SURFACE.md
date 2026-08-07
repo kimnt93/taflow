@@ -1,10 +1,9 @@
 # Continuous-update surface audit
 
-- Root exports: **251**
-- Root indicator classes: **249**
-- Root classes with append/extend/reset/compute-or-value: **248**
+- Root exports: **285**
+- Root indicator classes: **282**
+- Root classes with append/extend/reset/compute-or-value: **282**
 - Native one-shot functions still compiled: **0**
-- One-shot functions visible at `taflow.talib`: **0**
 
 | Layer | Name | Lifecycle |
 |---|---|---|
@@ -164,6 +163,40 @@
 | taflow | `RollingInterquartileRange` | PASS |
 | taflow | `RollingCov` | PASS |
 | taflow | `RollingWinsorize` | PASS |
+| taflow | `RollingStandardDeviation` | PASS |
+| taflow | `RollingAverageDeviation` | PASS |
+| taflow | `RollingMidpoint` | PASS |
+| taflow | `RollingMidprice` | PASS |
+| taflow | `RollingVariance` | PASS |
+| taflow | `RollingLinearRegression` | PASS |
+| taflow | `RollingLinearRegressionAngle` | PASS |
+| taflow | `RollingLinearRegressionIntercept` | PASS |
+| taflow | `RollingLinearRegressionSlope` | PASS |
+| taflow | `RollingTimeSeriesForecast` | PASS |
+| taflow | `RollingBeta` | PASS |
+| taflow | `RollingCorrelation` | PASS |
+| taflow | `MesaAdaptiveMovingAverage` | PASS |
+| taflow | `RollingMinMax` | PASS |
+| taflow | `RollingMinMaxIndex` | PASS |
+| taflow | `MathAcos` | PASS |
+| taflow | `MathAsin` | PASS |
+| taflow | `MathAtan` | PASS |
+| taflow | `MathCeil` | PASS |
+| taflow | `MathCos` | PASS |
+| taflow | `MathCosh` | PASS |
+| taflow | `MathExp` | PASS |
+| taflow | `MathFloor` | PASS |
+| taflow | `MathLn` | PASS |
+| taflow | `MathLog10` | PASS |
+| taflow | `MathSin` | PASS |
+| taflow | `MathSinh` | PASS |
+| taflow | `MathSqrt` | PASS |
+| taflow | `MathTan` | PASS |
+| taflow | `MathTanh` | PASS |
+| taflow | `MathAdd` | PASS |
+| taflow | `MathSubtract` | PASS |
+| taflow | `MathMultiply` | PASS |
+| taflow | `MathDivide` | PASS |
 | taflow | `ExponentiallyWeightedVariance` | PASS |
 | taflow | `ExponentiallyWeightedStandardDeviation` | PASS |
 | taflow | `ExponentiallyWeightedCovariance` | PASS |
@@ -213,7 +246,6 @@
 | taflow | `SessionExtrema` | PASS |
 | taflow | `PreviousHighLow` | PASS |
 | taflow | `Sessions` | PASS |
-| taflow | `ActiveZoneList` | REVIEW |
 | taflow | `FairValueGap` | PASS |
 | taflow | `DonchianChannels` | PASS |
 | taflow | `RollingVolumeWeightedAveragePrice` | PASS |

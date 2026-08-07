@@ -6,10 +6,9 @@ TAFlow has one public indicator model: a persistent, extendable indicator
 object.  It replaces the former split between a TA-Lib-style batch namespace
 and separately named streaming wrappers.
 
-`taflow.indicators` is the canonical namespace.  `taflow.talib` is a
-compatibility alias that exports the *same classes*, not a second functional
-implementation.  There must be one Rust state machine and one Python adapter
-per TA-Lib indicator. Non-TA operator work is not part of this delivery.
+`taflow.indicators` and the root `taflow` namespace expose the canonical
+CamelCase classes. There is no `taflow.talib` compatibility package. There
+must be one Rust state machine and one Python adapter per TA function.
 
 The canonical descriptive names are explicit and readable, for example
 `ExponentialMovingAverage`, `RelativeStrengthIndex`, and

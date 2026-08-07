@@ -2,10 +2,9 @@
 
 ## Product contract
 
-TAFlow implements the complete TA-Lib function inventory as one persistent,
-fast indicator API. There is no separate batch TA-Lib implementation and
-extension library: every public TA-Lib name resolves to an extendable state
-object, and `taflow.talib` is an alias for that unified surface.
+TAFlow implements the complete TA function inventory as one persistent,
+fast vectorized/streaming API. There is no TA-Lib compatibility package;
+canonical CamelCase classes resolve directly to native extendable states.
 
 The first reference API is:
 
@@ -87,10 +86,8 @@ definitions, parameters, output ordering, and warm-up semantics.
    oscillators, stochastic, and MACD variants.
 4. **Advanced bounded-state families** — adaptive averages, Hilbert/cycle
    indicators, and every candlestick pattern recognizer.
-5. **Surface migration** — remove legacy duplicate Python wrappers, export all
-   classes in `taflow.indicators`, and make `taflow.talib` forward to the same
-   objects. Preserve the uppercase aliases but do not preserve functional
-   return semantics that conflict with the object contract.
+5. **Surface migration** — remove legacy compatibility wrappers and export all
+   canonical classes in `taflow.indicators` and `taflow`.
 6. **Final comparison** — only when every checklist item is implemented, run
    exhaustive TA-Lib oracle comparison, state-to-bulk parity, chunk/replay
    cases, and real-data alignment for the entire inventory.

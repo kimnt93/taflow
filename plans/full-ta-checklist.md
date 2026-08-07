@@ -5,9 +5,9 @@ existing check marks are inherited core-state progress and must not be treated
 as completion of the new public surface. During the migration, every item is
 pending until it has its persistent Rust state, optimized
 bulk-initialization/extend path, scalar continuation, Python class,
-descriptive public name, and uppercase TA-Lib alias. The former separate batch
-compatibility implementation is not a completion criterion: `taflow.talib`
-will forward to this same stateful surface.
+descriptive public name. The former separate TA-Lib compatibility package is
+not part of this project; these canonical classes are the public streaming and
+vectorized surface.
 
 Complete the whole inventory before the exhaustive external TA-Lib comparison,
 benchmark, and per-function report pass. During implementation, use focused
