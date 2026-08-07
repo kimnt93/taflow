@@ -156,7 +156,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | average_directional_index_rating | average_directional_index_rating | ADXR |
 | [x] | absolute_price_oscillator | absolute_price_oscillator | APO |
 | [x] | aroon | aroon | AROON |
-| [x] | aroonosc | aroonosc | AROONOSC |
+| [x] | aroon_oscillator | aroon_oscillator | AROONOSC |
 | [x] | balance_of_power | balance_of_power | BOP |
 | [x] | commodity_channel_index | commodity_channel_index | CCI |
 | [x] | chande_momentum_oscillator | chande_momentum_oscillator | CMO |
