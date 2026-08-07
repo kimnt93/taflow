@@ -49,6 +49,15 @@ pub fn balance_of_power(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) 
     Ok(open.iter().zip(high).zip(low).zip(close).map(|(((&open, &high), &low), &close)| state.append(open, high, low, close)).collect())
 }
 
+/// Computes an aligned Williams %R vector from HLC slices.
+pub fn williams_r(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+    }
+    let mut state = WilliamsR::new(timeperiod)?;
+    Ok(high.iter().zip(low).zip(close).map(|((&high, &low), &close)| state.append(high, low, close).unwrap_or(f64::NAN)).collect())
+}
+
 /// Stateful Chaikin accumulation/distribution line.
 #[derive(Debug, Clone, Default)]
 pub struct AccumulationDistribution {
