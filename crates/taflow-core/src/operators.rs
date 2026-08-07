@@ -4875,7 +4875,7 @@ mod tests {
         );
         assert_eq!(signedpower(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
 
-        let adv_batch = adv(&close, &volume, 3).unwrap();
+        let adv_batch = average_daily_dollar_value(&close, &volume, 3).unwrap();
         let mut adv_state = AverageDailyDollarValue::new(3).unwrap();
         for ((close, volume), expected) in close.iter().zip(&volume).zip(&adv_batch) {
             assert_eq!(adv_state.append(*close, *volume).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
@@ -4902,7 +4902,7 @@ mod tests {
         let cusum_batch = cusum(&[0.5, -0.5, 2.0, -1.0], 1.0).unwrap();
         assert_eq!(cusum_batch, vec![0.0, 0.0, 1.0, 0.0]);
 
-        assert_eq!(adv(&close, &volume[..5], 3), Err(TaError::LengthMismatch { expected: 6, got: 5 }));
+        assert_eq!(average_daily_dollar_value(&close, &volume[..5], 3), Err(TaError::LengthMismatch { expected: 6, got: 5 }));
     }
 
     #[test]
@@ -5234,7 +5234,7 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.07).sin() * 8.0 + (i as f64 * 0.013) * 2.0)
             .collect();
 
-        let (stc, macd, stoch) = stc(&close, 10, 12, 26, 0.5).unwrap();
+        let (stc, macd, stoch) = schaff_trend_cycle(&close, 10, 12, 26, 0.5).unwrap();
         assert_eq!(stc[0], 0.0);
         assert_eq!(stoch[0], 0.0);
         assert!(macd[..24].iter().all(|&v| v.is_nan()));
@@ -5253,8 +5253,8 @@ mod tests {
     #[test]
     fn stc_swaps_fast_slow_and_rejects_bad_params() {
         let close: Vec<f64> = (0..200).map(|i| 100.0 + (i as f64 * 0.03).cos()).collect();
-        let (a, _, _) = stc(&close, 10, 12, 26, 0.5).unwrap();
-        let (b, _, _) = stc(&close, 10, 26, 12, 0.5).unwrap();
+        let (a, _, _) = schaff_trend_cycle(&close, 10, 12, 26, 0.5).unwrap();
+        let (b, _, _) = schaff_trend_cycle(&close, 10, 26, 12, 0.5).unwrap();
         assert_eq!(a, b);
 
         assert!(SchaffTrendCycle::new(0, 12, 26, 0.5).is_err());
@@ -5308,7 +5308,7 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.05).sin() * 6.0 + i as f64 * 0.01)
             .collect();
 
-        let (kst, signal) = kst(&close, 10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
+        let (kst, signal) = know_sure_thing(&close, 10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
         assert!(kst[..43].iter().all(|&v| v.is_nan()));
         assert!(signal[..43].iter().all(|&v| v.is_nan()));
         assert!(kst[44..].iter().all(|&v| v.is_finite()));
@@ -5352,7 +5352,7 @@ mod tests {
     #[test]
     fn dpo_batch_and_stream_match() {
         let input: Vec<f64> = (0..100).map(|i| i as f64 + (i as f64 * 0.2).sin()).collect();
-        let batch = dpo(&input, 20).unwrap();
+        let batch = detrended_price_oscillator(&input, 20).unwrap();
         let mut state = DetrendedPriceOscillator::new(20).unwrap();
         let replayed: Vec<f64> = input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect();
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
@@ -5366,7 +5366,7 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.0).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 1.0).collect();
         let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
-        let batch = cmf(&high, &low, &close, &volume, 20).unwrap();
+        let batch = chaikin_money_flow(&high, &low, &close, &volume, 20).unwrap();
         let mut state = ChaikinMoneyFlow::new(20).unwrap();
         let replayed: Vec<f64> = high.iter().zip(&low).zip(&close).zip(&volume).map(|(((&h, &l), &c), &v)| state.append(h, l, c, v).unwrap_or(f64::NAN)).collect();
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
@@ -5378,7 +5378,7 @@ mod tests {
     fn vpt_batch_and_stream_match() {
         let close: Vec<f64> = (1..=100).map(|value| value as f64).collect();
         let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
-        let batch = vpt(&close, &volume).unwrap();
+        let batch = volume_price_trend(&close, &volume).unwrap();
         let mut state = VolumePriceTrend::new();
         let replayed: Vec<f64> = close.iter().zip(&volume).map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN)).collect();
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());

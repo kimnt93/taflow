@@ -231,6 +231,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulLinearregAngle>()?;
     m.add_class::<state_api::StatefulTsf>()?;
     m.add_class::<state_api::StatefulCmo>()?;
+    m.add_class::<state_api::StatefulRelativeMomentumIndex>()?;
     m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::StatefulAd>()?;

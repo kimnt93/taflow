@@ -1,28 +1,50 @@
-"""Relative Momentum Index with Wilder smoothing."""
+"""Native Relative Momentum Index interface."""
+
+from typing import Any
+
 import numpy as np
+
+from ._native import StatefulRelativeMomentumIndex
+
+
 class RelativeMomentumIndex:
-    """Stateful RelativeMomentumIndex indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute Wilder-smoothed momentum gains over an aligned price series.
+
+    Parameters
+    ----------
+    close : array-like, optional
+        Initial price history. Values are processed in input order.
+    length : int, default 14
+        Number of momentum observations used for Wilder smoothing.
+    mom : int, default 5
+        Lag, in bars, used to measure each momentum change.
     """
-    def __init__(self, close=None, length=14, mom=5):
-        self.length=int(length); self.mom=int(mom)
-        if self.length<1 or self.mom<1: raise ValueError("length and mom must be positive")
-        self.reset()
-        if close is not None: self.extend(close)
-    def append(self, close):
-        x=float(close); self._close.append(x); i=len(self._close)-1; out=np.nan
-        if i>=self.mom:
-            delta=x-self._close[i-self.mom]; up=max(delta,0.); dn=max(-delta,0.)
-            if self._count<self.length: self._up+=up; self._dn+=dn; self._count+=1
-            else: self._up=((self._up*(self.length-1))+up)/self.length; self._dn=((self._dn*(self.length-1))+dn)/self.length
-            if self._count==self.length: out=100*self._up/(self._up+self._dn) if self._up+self._dn else 50.
-        self._values.append(out); return out
-    def extend(self, close):
-        for x in close: self.append(x)
+
+    def __init__(self, close: Any | None = None, length: int = 14,
+                 mom: int = 5):
+        self._state = StatefulRelativeMomentumIndex(length, mom)
+        if close is not None:
+            self.extend(close)
+
+    def append(self, close: float):
+        """Process one close and return the current RMI value when warm."""
+        return self._state.append(float(close))
+
+    def extend(self, close: Any):
+        """Process an aligned close history and return this indicator."""
+        self._state.extend(np.asarray(close, dtype=np.float64))
         return self
-    def compute(self): return np.asarray(self._values,dtype=float)
+
+    def compute(self) -> np.ndarray:
+        """Return all processed values with NaN warm-up entries."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._values[-1] if self._values else None
-    def reset(self): self._close=[]; self._up=self._dn=0.; self._count=0; self._values=[]; return self
+    def value(self):
+        """Return the most recently computed value, or ``None`` if cold."""
+        return self._state.value
+
+    def reset(self):
+        """Clear state and previously computed output values."""
+        self._state.reset()
+        return self

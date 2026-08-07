@@ -21,7 +21,8 @@ For each item:
 
 - [ ] `VariableIndexDynamicAverage` (`vidya`)
 - [ ] `LaguerreRelativeStrengthIndex` (`laguerre_rsi`)
-- [ ] `RelativeMomentumIndex` (`rmi`)
+- [x] `RelativeMomentumIndex` (`rmi`) — Rust streaming kernel and native
+  Python adapter verified with warm-up and monotonic-input checks.
 - [ ] `JurikMovingAverage` (`jma`)
 - [ ] `SSLChannel` (`ssl_channel`)
 - [ ] `ParabolicMovingAverageStop` (`pmax`)
