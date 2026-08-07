@@ -151,6 +151,8 @@ from .zones import ActiveZoneList
 from .fvg import Fvg
 from .bos_choch import BosChoch
 from .hedge_ratio import HedgeRatio
+from .rolling_entropy import RollingEntropy
+from .rolling_autocorr import RollingAutocorr
 
 __all__ = [
     "talib",
@@ -305,5 +307,6 @@ __all__ = [
     "Fvg",
     "BosChoch",
     "HedgeRatio",
+    "RollingEntropy", "RollingAutocorr",
     "__version__",
 ]

@@ -120,6 +120,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;
     m.add_class::<indicators::HedgeRatioOperator>()?;
+    m.add_class::<indicators::RollingEntropyOperator>()?;
+    m.add_class::<indicators::RollingAutocorrOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

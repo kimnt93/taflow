@@ -122,6 +122,94 @@ since_extreme!(HighestSince,f64::max); since_extreme!(LowestSince,f64::min);
 pub fn rising(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Rising::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn falling(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Falling::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
+pub fn rolling_entropy(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingEntropy::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_autocorr(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingAutocorr::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingEntropy {
+    values: VecDeque<f64>,
+    period: usize,
+    value: Option<f64>,
+}
+
+impl RollingEntropy {
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self { values: VecDeque::with_capacity(period), period, value: None })
+    }
+
+    /// Shannon entropy of exact-value frequencies in the rolling window.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.period { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = (self.values.len() == self.period).then(|| {
+            let n = self.period as f64;
+            let mut entropy = 0.0;
+            let mut seen = Vec::new();
+            for &candidate in &self.values {
+                if seen.contains(&candidate) { continue; }
+                seen.push(candidate);
+                let count = self.values.iter().filter(|&&value| value == candidate).count();
+                let probability = count as f64 / n;
+                entropy -= probability * probability.ln();
+            }
+            entropy
+        });
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingAutocorr {
+    values: VecDeque<f64>,
+    period: usize,
+    value: Option<f64>,
+}
+
+impl RollingAutocorr {
+    pub fn new(period: usize) -> TaResult<Self> {
+        if period < 2 {
+            return Err(TaError::InvalidParameter { name: "timeperiod", value: period.to_string(), reason: "must be >= 2" });
+        }
+        Ok(Self { values: VecDeque::with_capacity(period), period, value: None })
+    }
+
+    /// Lag-one Pearson autocorrelation over the rolling window.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.period { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = (self.values.len() == self.period).then(|| {
+            let n = self.period as f64;
+            let left_n = (self.period - 1) as f64;
+            let left_mean = self.values.iter().take(self.period - 1).sum::<f64>() / left_n;
+            let right_mean = self.values.iter().skip(1).sum::<f64>() / left_n;
+            let left_variance = self.values.iter().take(self.period - 1)
+                .map(|&value| (value - left_mean).powi(2)).sum::<f64>();
+            let right_variance = self.values.iter().skip(1)
+                .map(|&value| (value - right_mean).powi(2)).sum::<f64>();
+            if left_variance == 0.0 || right_variance == 0.0 { return 0.0; }
+            let covariance = self.values.iter().take(self.period - 1)
+                .zip(self.values.iter().skip(1))
+                .map(|(&left, &right)| (left - left_mean) * (right - right_mean)).sum::<f64>();
+            covariance / (left_variance * right_variance).sqrt()
+        });
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
 /// Rolling OLS slope of price-level `y` on price-level `x`.
 pub fn hedge_ratio(x: &[f64], y: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if x.len() != y.len() {
