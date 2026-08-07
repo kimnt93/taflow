@@ -125,6 +125,7 @@ from ..state_helpers import BarsSince, ValueWhen, HighestSince, LowestSince, Sig
 from ..swing import SwingHighLow, SwingHigh, SwingLow
 from ..session import SessionExtrema, session_flags
 from ..zones import ActiveZoneList
+from ..fvg import Fvg
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -220,4 +221,5 @@ __all__ = [
     "SwingHighLow", "SwingHigh", "SwingLow",
     "SessionExtrema", "session_flags",
     "ActiveZoneList",
+    "Fvg",
 ]

@@ -220,7 +220,7 @@ pub use tema::Tema;
 pub use trix::Trix;
 pub use trima::Trima;
 pub use ultosc::Ultosc;
-pub use crate::operators::{ActiveZoneList, Alma, AwesomeOscillator, BarsSince, ChaikinVolatility, Cross, Crossover, Crossunder, Cumsum, Cummax, Cummin, Cumprod, Donchian, DonchianValue, Drawdown, EaseOfMovement, EntryExit, EwmCorr, EwmCov, EwmStd, EwmVar, Falling, FisherTransform, ForceIndex, GapDown, GapUp, HighestSince, Hma, HigherHigh, InsideBar, KeltnerChannels, KeltnerValue, Lag, LogReturn, LowerLow, LowestSince, OutsideBar, PositionHold, Rising, RollingCalmar, RollingCov, RollingIqr, RollingKurtosis, RollingMedian, RollingMode, RollingQuantile, RollingRank, RollingSharpe, RollingSkew, RollingSortino, RollingWinsorize, RollingZscore, SessionExtrema, SessionExtremaValue, SignalDelay, Swing, SwingValue, Tsi, UlcerIndex, ValueWhen, Vwap, Vwma, Zlema};
+pub use crate::operators::{ActiveZoneList, Alma, AwesomeOscillator, BarsSince, ChaikinVolatility, Cross, Crossover, Crossunder, Cumsum, Cummax, Cummin, Cumprod, Donchian, DonchianValue, Drawdown, EaseOfMovement, EntryExit, EwmCorr, EwmCov, EwmStd, EwmVar, Falling, Fvg, FvgValue, FisherTransform, ForceIndex, GapDown, GapUp, HighestSince, Hma, HigherHigh, InsideBar, KeltnerChannels, KeltnerValue, Lag, LogReturn, LowerLow, LowestSince, OutsideBar, PositionHold, Rising, RollingCalmar, RollingCov, RollingIqr, RollingKurtosis, RollingMedian, RollingMode, RollingQuantile, RollingRank, RollingSharpe, RollingSkew, RollingSortino, RollingWinsorize, RollingZscore, SessionExtrema, SessionExtremaValue, SignalDelay, Swing, SwingValue, Tsi, UlcerIndex, ValueWhen, Vwap, Vwma, Zlema};
 pub use window::Window;
 pub use wma::Wma;
 

@@ -37,6 +37,7 @@ mod state_helpers;
 mod swing;
 mod session;
 mod zones;
+mod fvg;
 mod belt_hold;
 mod closing_marubozu;
 mod doji;
@@ -149,6 +150,7 @@ pub use state_helpers::{BarsSinceOperator, EntryExitOperator, HighestSinceOperat
 pub use swing::SwingHighLowOperator;
 pub use session::SessionExtremaOperator;
 pub use zones::ActiveZoneListOperator;
+pub use fvg::FvgOperator;
 pub use belt_hold::BeltHold;
 pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;

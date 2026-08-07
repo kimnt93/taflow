@@ -177,6 +177,107 @@ pub struct ActiveZoneList {
     index: usize,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct FvgValue {
+    pub signal: f64,
+    pub top: f64,
+    pub bottom: f64,
+    pub mitigated: f64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct FvgZone {
+    direction: f64,
+    top: f64,
+    bottom: f64,
+}
+
+/// Causal fair-value-gap detection with directional mitigation events.
+#[derive(Debug, Clone, Default)]
+pub struct Fvg {
+    bars: VecDeque<(f64, f64, f64, f64)>,
+    zones: Vec<FvgZone>,
+    value: Option<FvgValue>,
+}
+
+impl Fvg {
+    pub fn new() -> Self { Self::default() }
+
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<FvgValue> {
+        let previous = self.bars.back().copied();
+        let two_back = self.bars.front().copied();
+        let mut signal = f64::NAN;
+        let mut top = f64::NAN;
+        let mut bottom = f64::NAN;
+        if let (Some((middle_open, _, _, middle_close)), Some((_, old_high, old_low, _))) =
+            (previous, two_back)
+        {
+            if old_high < low && middle_close > middle_open {
+                signal = 1.0;
+                top = low;
+                bottom = old_high;
+                self.zones.push(FvgZone { direction: signal, top, bottom });
+            } else if old_low > high && middle_close < middle_open {
+                signal = -1.0;
+                top = old_low;
+                bottom = high;
+                self.zones.push(FvgZone { direction: signal, top, bottom });
+            }
+        }
+        let mut mitigated = f64::NAN;
+        self.zones.retain(|zone| {
+            let filled = (zone.direction > 0.0 && low <= zone.bottom)
+                || (zone.direction < 0.0 && high >= zone.top);
+            if filled {
+                mitigated = zone.direction;
+            }
+            !filled
+        });
+        if signal.is_nan() && !mitigated.is_nan() {
+            signal = f64::NAN;
+        }
+        if self.bars.len() == 2 {
+            self.bars.pop_front();
+        }
+        self.bars.push_back((open, high, low, close));
+        let value = FvgValue { signal, top, bottom, mitigated };
+        self.value = Some(value);
+        Some(value)
+    }
+
+    pub fn value(&self) -> Option<FvgValue> { self.value }
+
+    pub fn reset(&mut self) {
+        self.bars.clear();
+        self.zones.clear();
+        self.value = None;
+    }
+}
+
+pub fn fvg(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
+        return Err(TaError::LengthMismatch { expected: open.len(), got: high.len().max(low.len()).max(close.len()) });
+    }
+    let mut state = Fvg::new();
+    let mut signal = Vec::with_capacity(open.len());
+    let mut top = Vec::with_capacity(open.len());
+    let mut bottom = Vec::with_capacity(open.len());
+    let mut mitigated = Vec::with_capacity(open.len());
+    for (((&open, &high), &low), &close) in open.iter().zip(high).zip(low).zip(close) {
+        let value = state.append(open, high, low, close).expect("FVG always emits an aligned value");
+        signal.push(value.signal);
+        top.push(value.top);
+        bottom.push(value.bottom);
+        mitigated.push(value.mitigated);
+    }
+    Ok((signal, top, bottom, mitigated))
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
