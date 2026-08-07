@@ -4,6 +4,12 @@ use crate::error::TaResult;
 
 use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
+/// Computes an aligned Triple Exponential Moving Average vector.
+pub fn triple_exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = TripleExponentialMovingAverage::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 /// Stateful triple EMA composed from the shared EMA primitive.
 #[derive(Debug, Clone)]
 pub struct TripleExponentialMovingAverage {
