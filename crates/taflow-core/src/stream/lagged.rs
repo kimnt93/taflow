@@ -20,6 +20,63 @@ pub fn momentum(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+fn validate_rate_of_change(input: &[f64], timeperiod: usize) -> TaResult<()> {
+    if timeperiod == 0 {
+        return Err(TaError::InvalidParameter {
+            name: "timeperiod",
+            value: "0".to_string(),
+            reason: "must be >= 1",
+        });
+    }
+    if input.len() <= timeperiod {
+        return Err(TaError::InsufficientData {
+            need: timeperiod + 1,
+            got: input.len(),
+        });
+    }
+    Ok(())
+}
+
+/// Computes percentage rate of change over a fixed lag.
+pub fn rate_of_change(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    validate_rate_of_change(input, timeperiod)?;
+    let mut output = vec![f64::NAN; timeperiod];
+    output.extend(input[timeperiod..].iter().zip(&input[..input.len() - timeperiod]).map(
+        |(&current, &previous)| if previous != 0.0 { (current - previous) / previous * 100.0 } else { 0.0 },
+    ));
+    Ok(output)
+}
+
+/// Computes fractional rate of change over a fixed lag.
+pub fn rate_of_change_percent(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    validate_rate_of_change(input, timeperiod)?;
+    let mut output = vec![f64::NAN; timeperiod];
+    output.extend(input[timeperiod..].iter().zip(&input[..input.len() - timeperiod]).map(
+        |(&current, &previous)| if previous != 0.0 { (current - previous) / previous } else { 0.0 },
+    ));
+    Ok(output)
+}
+
+/// Computes the ratio of a value to its lagged value.
+pub fn rate_of_change_ratio(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    validate_rate_of_change(input, timeperiod)?;
+    let mut output = vec![f64::NAN; timeperiod];
+    output.extend(input[timeperiod..].iter().zip(&input[..input.len() - timeperiod]).map(
+        |(&current, &previous)| if previous != 0.0 { current / previous } else { 0.0 },
+    ));
+    Ok(output)
+}
+
+/// Computes the lagged value ratio scaled by one hundred.
+pub fn rate_of_change_ratio_percent(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    validate_rate_of_change(input, timeperiod)?;
+    let mut output = vec![f64::NAN; timeperiod];
+    output.extend(input[timeperiod..].iter().zip(&input[..input.len() - timeperiod]).map(
+        |(&current, &previous)| if previous != 0.0 { current / previous * 100.0 } else { 0.0 },
+    ));
+    Ok(output)
+}
+
 #[derive(Debug, Clone)]
 struct LaggedValue {
     period: usize,
