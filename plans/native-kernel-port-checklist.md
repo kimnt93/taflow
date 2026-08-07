@@ -21,7 +21,8 @@ For each item:
 
 - [x] `VariableIndexDynamicAverage` (`vidya`) — Rust streaming kernel,
   native adapter, and causal history smoke check verified.
-- [ ] `LaguerreRelativeStrengthIndex` (`laguerre_rsi`)
+- [x] `LaguerreRelativeStrengthIndex` (`laguerre_rsi`) — Rust streaming
+  kernel, native adapter, and bounded-output smoke check verified.
 - [x] `RelativeMomentumIndex` (`rmi`) — Rust streaming kernel and native
   Python adapter verified with warm-up and monotonic-input checks.
 - [ ] `JurikMovingAverage` (`jma`)
