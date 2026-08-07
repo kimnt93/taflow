@@ -1,7 +1,9 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{HilbertTransformPhasor as NativeHilbertTransformPhasor, HilbertTransformPhasorValue};
+use taflow::stream::{
+    HilbertTransformPhasor as NativeHilbertTransformPhasor, HilbertTransformPhasorValue,
+};
 
 #[pyclass]
 pub struct HilbertTransformPhasor {

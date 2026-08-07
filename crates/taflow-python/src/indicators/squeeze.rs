@@ -26,12 +26,7 @@ impl SqueezeOperator {
     ) -> PyResult<Self> {
         Ok(Self {
             inner: Squeeze::new(
-                bb_length,
-                bb_std,
-                kc_length,
-                kc_scalar,
-                mom_length,
-                mom_smooth,
+                bb_length, bb_std, kc_length, kc_scalar, mom_length, mom_smooth,
             )
             .map_err(|error| PyValueError::new_err(error.to_string()))?,
             squeeze: Vec::new(),
@@ -85,14 +80,9 @@ impl SqueezeOperator {
 
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64, f64)> {
-        self.inner.value().map(|value| {
-            (
-                value.squeeze,
-                value.on,
-                value.off,
-                value.no,
-            )
-        })
+        self.inner
+            .value()
+            .map(|value| (value.squeeze, value.on, value.off, value.no))
     }
 
     fn reset(&mut self) {

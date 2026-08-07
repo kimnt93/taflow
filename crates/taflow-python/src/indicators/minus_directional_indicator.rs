@@ -14,7 +14,8 @@ impl MinusDirectionalIndicator {
     #[pyo3(signature=(timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: NativeMinusDirectionalIndicator::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: NativeMinusDirectionalIndicator::new(timeperiod)
+                .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

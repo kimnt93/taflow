@@ -4,25 +4,7 @@ use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, RollingExtrema};
 
-/// Compute the on balance volume result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `close` - Input series or configuration value.
-/// * `volume` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn on_balance_volume(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
-    if close.len() != volume.len() {
-        return Err(crate::TaError::LengthMismatch { expected: close.len(), got: volume.len() });
-    }
-    let mut state = OnBalanceVolume::new();
-    Ok(close.iter().zip(volume).map(|(&close, &volume)| state.append(close, volume)).collect())
-}
-
-fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {
+pub(crate) fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {
     let range = high - low;
     if range > 0.0 {
         ((close - low) - (high - close)) / range * volume
@@ -31,90 +13,12 @@ fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {
     }
 }
 
-/// Compute the accumulation distribution result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `volume` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn accumulation_distribution(high: &[f64], low: &[f64], close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
-    }
-    let mut state = AccumulationDistribution::new();
-    Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume)).collect())
-}
-
-/// Compute the accumulation distribution oscillator result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `volume` - Input series or configuration value.
-/// * `fastperiod` - Input series or configuration value.
-/// * `slowperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn accumulation_distribution_oscillator(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], fastperiod: usize, slowperiod: usize) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
-    }
-    let mut state = AccumulationDistributionOscillator::new(fastperiod, slowperiod)?;
-    Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume).unwrap_or(f64::NAN)).collect())
-}
-
-/// Compute the balance of power result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn balance_of_power(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
-    if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch { expected: open.len(), got: high.len().min(low.len()).min(close.len()) });
-    }
-    let mut state = BalanceOfPower::new();
-    Ok(open.iter().zip(high).zip(low).zip(close).map(|(((&open, &high), &low), &close)| state.append(open, high, low, close)).collect())
-}
-
-/// Compute the williams r result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn williams_percent_r(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
-    }
-    let mut state = WilliamsPercentR::new(timeperiod)?;
-    Ok(high.iter().zip(low).zip(close).map(|((&high, &low), &close)| state.append(high, low, close).unwrap_or(f64::NAN)).collect())
-}
-
 /// Stateful Chaikin accumulation/distribution line.
 #[derive(Debug, Clone, Default)]
+/// Persistent Rust state or aligned output type for `AccumulationDistribution`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AccumulationDistribution {
     total: f64,
     value: Option<f64>,
@@ -163,6 +67,10 @@ impl AccumulationDistribution {
 
 /// Stateful Chaikin A/D oscillator with first-value EMA seeds.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `AccumulationDistributionOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AccumulationDistributionOscillator {
     lookback: usize,
     index: usize,
@@ -252,6 +160,10 @@ impl AccumulationDistributionOscillator {
 
 /// Stateful on-balance volume.
 #[derive(Debug, Clone, Default)]
+/// Persistent Rust state or aligned output type for `OnBalanceVolume`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct OnBalanceVolume {
     previous_close: Option<f64>,
     total: f64,
@@ -307,6 +219,10 @@ impl OnBalanceVolume {
 
 /// Stateful balance of power.
 #[derive(Debug, Clone, Default)]
+/// Persistent Rust state or aligned output type for `BalanceOfPower`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct BalanceOfPower {
     value: Option<f64>,
 }
@@ -358,6 +274,10 @@ impl BalanceOfPower {
 
 /// Stateful Williams %R.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `WilliamsPercentR`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct WilliamsPercentR {
     highs: RollingExtrema,
     lows: RollingExtrema,

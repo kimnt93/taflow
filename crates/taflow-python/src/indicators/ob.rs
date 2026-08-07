@@ -34,14 +34,26 @@ impl OrderBlockOperator {
         })
     }
 
-    fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> (f64, f64, f64, f64, f64) {
+    fn append(
+        &mut self,
+        high: f64,
+        low: f64,
+        close: f64,
+        volume: f64,
+    ) -> (f64, f64, f64, f64, f64) {
         let value = self.inner.append(high, low, close, volume);
         self.ob.push(value.ob);
         self.top.push(value.top);
         self.bottom.push(value.bottom);
         self.ob_volume.push(value.ob_volume);
         self.mitigated.push(value.mitigated);
-        (value.ob, value.top, value.bottom, value.ob_volume, value.mitigated)
+        (
+            value.ob,
+            value.top,
+            value.bottom,
+            value.ob_volume,
+            value.mitigated,
+        )
     }
 
     fn extend(
@@ -88,7 +100,13 @@ impl OrderBlockOperator {
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64, f64, f64)> {
         self.inner.value().map(|value| {
-            (value.ob, value.top, value.bottom, value.ob_volume, value.mitigated)
+            (
+                value.ob,
+                value.top,
+                value.bottom,
+                value.ob_volume,
+                value.mitigated,
+            )
         })
     }
 

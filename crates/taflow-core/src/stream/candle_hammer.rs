@@ -2,7 +2,13 @@
 
 use std::collections::VecDeque;
 
+use super::pattern::*;
+use crate::error::TaResult;
 /// Incremental CDLHAMMER state using TA-Lib's body, range, and near windows.
+/// Persistent Rust state or aligned output type for `CandleHammer`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleHammer {
     bodies: VecDeque<f64>,
     body_sum: f64,
@@ -17,6 +23,89 @@ impl Default for CandleHammer {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle hammer result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_hammer(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = *[
+        BODY_SHORT.avg_period,
+        SHADOW_LONG.avg_period,
+        SHADOW_VERY_SHORT.avg_period,
+        NEAR.avg_period,
+    ]
+    .iter()
+    .max()
+    .unwrap()
+        + 1;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut body_sum = 0.0;
+    let mut shadow_long_sum = 0.0;
+    let mut shadow_vs_sum = 0.0;
+    let mut near_sum = 0.0;
+
+    let start = lookback;
+    // BODY_SHORT: RealBody, SHADOW_LONG: RealBody(avg=0), SHADOW_VERY_SHORT: HighLow, NEAR: HighLow
+    for i in (start - BODY_SHORT.avg_period)..start {
+        body_sum += cr_realbody(open, high, low, close, i);
+    }
+    for i in (start - SHADOW_VERY_SHORT.avg_period)..start {
+        shadow_vs_sum += cr_highlow(open, high, low, close, i);
+    }
+    for i in (start - 1 - NEAR.avg_period)..(start - 1) {
+        near_sum += cr_highlow(open, high, low, close, i);
+    }
+
+    for i in start..len {
+        output[i] = (real_body(open[i], close[i])
+            < ca_realbody(BODY_SHORT, body_sum, open, high, low, close, i)
+            && lower_shadow(open[i], low[i], close[i])
+                > ca_realbody(SHADOW_LONG, shadow_long_sum, open, high, low, close, i)
+            && upper_shadow(open[i], high[i], close[i])
+                < ca_highlow(SHADOW_VERY_SHORT, shadow_vs_sum, open, high, low, close, i)
+            && open[i].min(close[i])
+                <= low[i - 1] + ca_highlow(NEAR, near_sum, open, high, low, close, i - 1))
+            as i32
+            * 100;
+        // Update sums — monomorphized: no match dispatch
+        if BODY_SHORT.avg_period > 0 {
+            body_sum += cr_realbody(open, high, low, close, i)
+                - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
+        }
+        if SHADOW_VERY_SHORT.avg_period > 0 {
+            shadow_vs_sum += cr_highlow(open, high, low, close, i)
+                - cr_highlow(open, high, low, close, i - SHADOW_VERY_SHORT.avg_period);
+        }
+        if NEAR.avg_period > 0 {
+            near_sum += cr_highlow(open, high, low, close, i - 1)
+                - cr_highlow(open, high, low, close, i - 1 - NEAR.avg_period);
+        }
+    }
+    Ok(output)
 }
 impl CandleHammer {
     /// Computes or updates `new` through the native Rust kernel.

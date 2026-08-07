@@ -6,7 +6,9 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverageDispatcher, RollingStandardDeviation, StreamingIndicator};
+use super::{
+    moving_average::MovingAverageDispatcher, RollingStandardDeviation, StreamingIndicator,
+};
 
 /// Computes aligned upper, middle, and lower Bollinger Band vectors.
 ///
@@ -45,6 +47,10 @@ pub fn bollinger_bands(
 
 /// One aligned upper, middle, and lower Bollinger Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `BollingerBandsValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct BollingerBandsValue {
     pub upper: f64,
     pub middle: f64,
@@ -52,6 +58,10 @@ pub struct BollingerBandsValue {
 }
 
 /// Incremental Bollinger Bands with constant per-bar work.
+/// Persistent Rust state or aligned output type for `BollingerBands`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct BollingerBands {
     middle: MovingAverageDispatcher,
     deviation: RollingStandardDeviation,
@@ -108,7 +118,6 @@ impl StreamingIndicator for BollingerBands {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {

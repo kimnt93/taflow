@@ -9,6 +9,10 @@ use super::MovingAverageConvergenceDivergenceValue;
 
 /// Incremental MACDFIX with fixed 12/26 smoothing and configurable signal EMA.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergenceFixed`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MovingAverageConvergenceDivergenceFixed {
     signal_period: usize,
     warmup: Vec<f64>,
@@ -118,13 +122,13 @@ impl MovingAverageConvergenceDivergenceFixed {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_fixed_constants_and_reset_replay() {
         let input: Vec<f64> = (0..300)
             .map(|index| 100.0 + (index as f64 * 0.21).sin() * 12.0 + index as f64 * 0.01)
             .collect();
-        let expected = crate::stream::moving_average_convergence_divergence_fixed(&input, 9).unwrap();
+        let expected =
+            crate::stream::moving_average_convergence_divergence_fixed(&input, 9).unwrap();
         let mut state = MovingAverageConvergenceDivergenceFixed::new(9).unwrap();
         for (index, input) in input.iter().copied().enumerate() {
             match state.append(input) {
@@ -159,7 +163,10 @@ mod tests {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn moving_average_convergence_divergence_fixed(input: &[f64], signalperiod: usize) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+pub fn moving_average_convergence_divergence_fixed(
+    input: &[f64],
+    signalperiod: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
     if signalperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "signalperiod",

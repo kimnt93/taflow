@@ -1,4 +1,6 @@
 //! Incremental Three Outside pattern recognition (CDL3OUTSIDE).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -6,6 +8,10 @@ struct Candle {
     close: f64,
 }
 /// Incremental CDL3OUTSIDE state.
+/// Persistent Rust state or aligned output type for `CandleThreeOutside`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleThreeOutside {
     candles: VecDeque<Candle>,
     value: Option<i32>,
@@ -68,6 +74,58 @@ impl CandleThreeOutside {
     pub fn reset(&mut self) {
         *self = Self::new()
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle three outside result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_three_outside(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    // lookback = 3
+    if len < 3 {
+        return Ok(output);
+    }
+
+    for i in 2..len {
+        // Bullish: 1st black, 2nd white engulfs, 3rd closes higher
+        let bull = candle_color(open[i - 2], close[i - 2]) == -1
+            && candle_color(open[i - 1], close[i - 1]) == 1
+            && close[i - 1] >= open[i - 2]
+            && open[i - 1] <= close[i - 2]
+            && close[i] > close[i - 1];
+        // Bearish: 1st white, 2nd black engulfs, 3rd closes lower
+        let bear = candle_color(open[i - 2], close[i - 2]) == 1
+            && candle_color(open[i - 1], close[i - 1]) == -1
+            && open[i - 1] >= close[i - 2]
+            && close[i - 1] <= open[i - 2]
+            && close[i] < close[i - 1];
+        output[i] = (bull as i32) * 100 - (bear as i32) * 100;
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

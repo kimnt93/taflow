@@ -16,11 +16,20 @@ pub struct FairValueGapOperator {
 impl FairValueGapOperator {
     #[new]
     fn new() -> Self {
-        Self { inner: FairValueGap::new(), signal: Vec::new(), top: Vec::new(), bottom: Vec::new(), mitigated: Vec::new() }
+        Self {
+            inner: FairValueGap::new(),
+            signal: Vec::new(),
+            top: Vec::new(),
+            bottom: Vec::new(),
+            mitigated: Vec::new(),
+        }
     }
 
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> (f64, f64, f64, f64) {
-        let value = self.inner.append(open, high, low, close).expect("FVG always emits an aligned value");
+        let value = self
+            .inner
+            .append(open, high, low, close)
+            .expect("FVG always emits an aligned value");
         self.signal.push(value.signal);
         self.top.push(value.top);
         self.bottom.push(value.bottom);
@@ -35,7 +44,12 @@ impl FairValueGapOperator {
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (open, high, low, close) = (open.as_slice()?, high.as_slice()?, low.as_slice()?, close.as_slice()?);
+        let (open, high, low, close) = (
+            open.as_slice()?,
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+        );
         if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
@@ -45,7 +59,10 @@ impl FairValueGapOperator {
         Ok(())
     }
 
-    fn compute<'py>(&self, py: Python<'py>) -> (
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
         Bound<'py, PyArray1<f64>>,
         Bound<'py, PyArray1<f64>>,
         Bound<'py, PyArray1<f64>>,
@@ -61,7 +78,9 @@ impl FairValueGapOperator {
 
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64, f64)> {
-        self.inner.value().map(|value| (value.signal, value.top, value.bottom, value.mitigated))
+        self.inner
+            .value()
+            .map(|value| (value.signal, value.top, value.bottom, value.mitigated))
     }
 
     fn reset(&mut self) {

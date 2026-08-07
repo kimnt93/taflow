@@ -2,7 +2,13 @@
 
 use std::collections::VecDeque;
 
+use super::pattern::*;
+use crate::error::TaResult;
 /// Incremental CDLLONGLINE state using TA-Lib's long-body and short-shadow averages.
+/// Persistent Rust state or aligned output type for `CandleLongLine`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleLongLine {
     bodies: VecDeque<f64>,
     body_sum: f64,
@@ -73,6 +79,73 @@ impl CandleLongLine {
     }
 }
 
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle long line result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_long_line(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = BODY_LONG.avg_period.max(SHADOW_SHORT.avg_period);
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut body_sum = 0.0;
+    let mut shadow_sum = 0.0;
+    let start = lookback;
+    for i in (start - BODY_LONG.avg_period)..start {
+        body_sum += cr(BODY_LONG, open, high, low, close, i);
+    }
+    for i in (start - SHADOW_SHORT.avg_period)..start {
+        shadow_sum += cr(SHADOW_SHORT, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        output[i] =
+            (real_body(open[i], close[i]) > ca(BODY_LONG, body_sum, open, high, low, close, i)
+                && upper_shadow(open[i], high[i], close[i])
+                    < ca(SHADOW_SHORT, shadow_sum, open, high, low, close, i)
+                && lower_shadow(open[i], low[i], close[i])
+                    < ca(SHADOW_SHORT, shadow_sum, open, high, low, close, i)) as i32
+                * candle_color(open[i], close[i])
+                * 100;
+        body_sum += cr(BODY_LONG, open, high, low, close, i)
+            - cr(BODY_LONG, open, high, low, close, i - BODY_LONG.avg_period);
+        shadow_sum += cr(SHADOW_SHORT, open, high, low, close, i)
+            - cr(
+                SHADOW_SHORT,
+                open,
+                high,
+                low,
+                close,
+                i - SHADOW_SHORT.avg_period,
+            );
+    }
+    Ok(output)
+}
 #[cfg(test)]
 mod tests {
     use super::*;

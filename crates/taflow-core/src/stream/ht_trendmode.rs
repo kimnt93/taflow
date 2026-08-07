@@ -6,6 +6,10 @@ use std::collections::VecDeque;
 const DEG2RAD: f64 = std::f64::consts::PI / 180.0;
 
 /// Incremental HT_TRENDMODE state.
+/// Persistent Rust state or aligned output type for `HilbertTransformTrendMode`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct HilbertTransformTrendMode {
     index: usize,
     phase: HilbertTransformDominantCyclePhase,

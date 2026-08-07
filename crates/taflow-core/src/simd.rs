@@ -414,7 +414,12 @@ pub fn slice_max_with_index(data: &[f64]) -> (f64, usize) {
     let mut acc = f64x4::new([data[0], data[1], data[2], data[3]]);
     for i in 1..chunks {
         let offset = i * 4;
-        let v = f64x4::new([data[offset], data[offset + 1], data[offset + 2], data[offset + 3]]);
+        let v = f64x4::new([
+            data[offset],
+            data[offset + 1],
+            data[offset + 2],
+            data[offset + 3],
+        ]);
         acc = acc.max(v);
     }
     let arr = acc.to_array();
@@ -481,7 +486,12 @@ pub fn slice_min_with_index(data: &[f64]) -> (f64, usize) {
     let mut acc = f64x4::new([data[0], data[1], data[2], data[3]]);
     for i in 1..chunks {
         let offset = i * 4;
-        let v = f64x4::new([data[offset], data[offset + 1], data[offset + 2], data[offset + 3]]);
+        let v = f64x4::new([
+            data[offset],
+            data[offset + 1],
+            data[offset + 2],
+            data[offset + 3],
+        ]);
         acc = acc.min(v);
     }
     let arr = acc.to_array();
@@ -540,7 +550,12 @@ pub fn true_range_simd(high: &[f64], low: &[f64], close: &[f64], output: &mut [f
         let base = start + i * 4;
         let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
         let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vpc = f64x4::new([close[base - 1], close[base], close[base + 1], close[base + 2]]);
+        let vpc = f64x4::new([
+            close[base - 1],
+            close[base],
+            close[base + 1],
+            close[base + 2],
+        ]);
 
         let hl = vh - vl;
         let hc = (vh - vpc).abs();
@@ -594,7 +609,12 @@ pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: 
         let vo = f64x4::new([open[base], open[base + 1], open[base + 2], open[base + 3]]);
         let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
         let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([close[base], close[base + 1], close[base + 2], close[base + 3]]);
+        let vc = f64x4::new([
+            close[base],
+            close[base + 1],
+            close[base + 2],
+            close[base + 3],
+        ]);
 
         let num = vc - vo;
         let den = vh - vl;
@@ -611,7 +631,11 @@ pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: 
     let tail_start = chunks * 4;
     for i in tail_start..len {
         let range = high[i] - low[i];
-        output[i] = if range > 0.0 { (close[i] - open[i]) / range } else { 0.0 };
+        output[i] = if range > 0.0 {
+            (close[i] - open[i]) / range
+        } else {
+            0.0
+        };
     }
 }
 
@@ -624,7 +648,11 @@ pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: 
 pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: &mut [f64]) {
     for i in 0..open.len() {
         let range = high[i] - low[i];
-        output[i] = if range > 0.0 { (close[i] - open[i]) / range } else { 0.0 };
+        output[i] = if range > 0.0 {
+            (close[i] - open[i]) / range
+        } else {
+            0.0
+        };
     }
 }
 
@@ -641,7 +669,12 @@ pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> 
         let vo = f64x4::new([open[base], open[base + 1], open[base + 2], open[base + 3]]);
         let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
         let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([close[base], close[base + 1], close[base + 2], close[base + 3]]);
+        let vc = f64x4::new([
+            close[base],
+            close[base + 1],
+            close[base + 2],
+            close[base + 3],
+        ]);
         let vr = (vo + vh + vl + vc) * quarter;
         let arr = vr.to_array();
         result[base] = arr[0];
@@ -664,7 +697,9 @@ pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> 
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    (0..open.len()).map(|i| (open[i] + high[i] + low[i] + close[i]) / 4.0).collect()
+    (0..open.len())
+        .map(|i| (open[i] + high[i] + low[i] + close[i]) / 4.0)
+        .collect()
 }
 
 /// SIMD MEDPRICE: (H + L) / 2
@@ -716,7 +751,12 @@ pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
         let base = i * 4;
         let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
         let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([close[base], close[base + 1], close[base + 2], close[base + 3]]);
+        let vc = f64x4::new([
+            close[base],
+            close[base + 1],
+            close[base + 2],
+            close[base + 3],
+        ]);
         let vr = (vh + vl + vc) * third;
         let arr = vr.to_array();
         result[base] = arr[0];
@@ -739,7 +779,9 @@ pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    (0..high.len()).map(|i| (high[i] + low[i] + close[i]) / 3.0).collect()
+    (0..high.len())
+        .map(|i| (high[i] + low[i] + close[i]) / 3.0)
+        .collect()
 }
 
 /// SIMD WCLPRICE: (H + L + 2*C) / 4
@@ -755,7 +797,12 @@ pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
         let base = i * 4;
         let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
         let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([close[base], close[base + 1], close[base + 2], close[base + 3]]);
+        let vc = f64x4::new([
+            close[base],
+            close[base + 1],
+            close[base + 2],
+            close[base + 3],
+        ]);
         let vr = (vh + vl + two * vc) * quarter;
         let arr = vr.to_array();
         result[base] = arr[0];
@@ -778,7 +825,9 @@ pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    (0..high.len()).map(|i| (high[i] + low[i] + 2.0 * close[i]) / 4.0).collect()
+    (0..high.len())
+        .map(|i| (high[i] + low[i] + 2.0 * close[i]) / 4.0)
+        .collect()
 }
 
 /// SIMD offset subtraction: output[i] = a[i] - a[i-offset] for i in [offset..len)
@@ -791,8 +840,18 @@ pub fn sub_offset_simd(input: &[f64], output: &mut [f64], offset: usize) {
 
     for i in 0..chunks {
         let base = offset + i * 4;
-        let va = f64x4::new([input[base], input[base + 1], input[base + 2], input[base + 3]]);
-        let vb = f64x4::new([input[base - offset], input[base - offset + 1], input[base - offset + 2], input[base - offset + 3]]);
+        let va = f64x4::new([
+            input[base],
+            input[base + 1],
+            input[base + 2],
+            input[base + 3],
+        ]);
+        let vb = f64x4::new([
+            input[base - offset],
+            input[base - offset + 1],
+            input[base - offset + 2],
+            input[base - offset + 3],
+        ]);
         let vr = va - vb;
         let arr = vr.to_array();
         output[base] = arr[0];

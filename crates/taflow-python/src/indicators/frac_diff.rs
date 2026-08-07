@@ -15,7 +15,8 @@ impl FracDiffOperator {
     #[pyo3(signature = (d=0.5, threshold=1e-5))]
     fn new(d: f64, threshold: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: FracDiff::new(d, threshold).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: FracDiff::new(d, threshold)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

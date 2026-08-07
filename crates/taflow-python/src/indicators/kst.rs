@@ -50,10 +50,7 @@ impl KnowSureThingOperator {
     fn compute<'py>(
         &self,
         py: Python<'py>,
-    ) -> (
-        Bound<'py, PyArray1<f64>>,
-        Bound<'py, PyArray1<f64>>,
-    ) {
+    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
         (
             PyArray1::from_vec(py, self.kst.clone()),
             PyArray1::from_vec(py, self.signal.clone()),

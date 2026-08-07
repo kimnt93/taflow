@@ -19,11 +19,18 @@ use super::{invalid_period, StreamingIndicator};
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn chande_momentum_oscillator(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = ChandeMomentumOscillator::new(timeperiod)?;
-    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental Chande Momentum Oscillator with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `ChandeMomentumOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct ChandeMomentumOscillator {
     period: usize,
     previous_input: Option<f64>,

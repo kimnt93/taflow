@@ -33,7 +33,12 @@ impl EqualHighsLowsOperator {
         (value.eqh, value.eql, value.level)
     }
 
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
         if high.len() != low.len() || low.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
@@ -61,7 +66,9 @@ impl EqualHighsLowsOperator {
 
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64)> {
-        self.inner.value().map(|value| (value.eqh, value.eql, value.level))
+        self.inner
+            .value()
+            .map(|value| (value.eqh, value.eql, value.level))
     }
 
     fn reset(&mut self) {

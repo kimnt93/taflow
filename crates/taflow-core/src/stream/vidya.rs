@@ -2,11 +2,15 @@
 
 use std::collections::VecDeque;
 
-use crate::error::{TaError, TaResult};
 use super::StreamingIndicator;
+use crate::error::{TaError, TaResult};
 
 /// CMO-modulated exponential average with causal warm-up from the first bar.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `VariableIndexDynamicAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct VariableIndexDynamicAverage {
     period: usize,
     alpha: f64,
@@ -18,12 +22,25 @@ impl VariableIndexDynamicAverage {
     /// Creates VIDYA from a positive period and alpha in `(0, 1]`.
     pub fn new(period: usize, alpha: f64) -> TaResult<Self> {
         if period < 1 {
-            return Err(TaError::InvalidParameter { name: "length", value: period.to_string(), reason: "must be positive" });
+            return Err(TaError::InvalidParameter {
+                name: "length",
+                value: period.to_string(),
+                reason: "must be positive",
+            });
         }
         if !(0.0..=1.0).contains(&alpha) || alpha == 0.0 {
-            return Err(TaError::InvalidParameter { name: "alpha", value: alpha.to_string(), reason: "must be in (0, 1]" });
+            return Err(TaError::InvalidParameter {
+                name: "alpha",
+                value: alpha.to_string(),
+                reason: "must be in (0, 1]",
+            });
         }
-        Ok(Self { period, alpha, closes: VecDeque::with_capacity(period + 1), value: None })
+        Ok(Self {
+            period,
+            alpha,
+            closes: VecDeque::with_capacity(period + 1),
+            value: None,
+        })
     }
 }
 
@@ -44,17 +61,31 @@ impl StreamingIndicator for VariableIndexDynamicAverage {
         let mut previous = self.closes.front().copied().unwrap_or(input);
         for &close in self.closes.iter().skip(1) {
             let change = close - previous;
-            if change > 0.0 { up += change; } else { down -= change; }
+            if change > 0.0 {
+                up += change;
+            } else {
+                down -= change;
+            }
             previous = close;
         }
         let total = up + down;
-        let weight = if total == 0.0 { 0.0 } else { (up - down).abs() / total };
+        let weight = if total == 0.0 {
+            0.0
+        } else {
+            (up - down).abs() / total
+        };
         let previous_value = self.value.expect("initialized above");
-        self.value = Some(self.alpha * weight * input + (1.0 - self.alpha * weight) * previous_value);
+        self.value =
+            Some(self.alpha * weight * input + (1.0 - self.alpha * weight) * previous_value);
         self.value
     }
 
-    fn value(&self) -> Option<f64> { self.value }
+    fn value(&self) -> Option<f64> {
+        self.value
+    }
 
-    fn reset(&mut self) { self.closes.clear(); self.value = None; }
+    fn reset(&mut self) {
+        self.closes.clear();
+        self.value = None;
+    }
 }

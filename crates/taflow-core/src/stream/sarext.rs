@@ -16,7 +16,7 @@ use crate::TaResult;
 ///
 /// An aligned vector of signed extended Parabolic SAR values.
 #[allow(clippy::too_many_arguments)]
-pub fn extended_parabolic_sar(
+pub fn parabolic_sar_extended(
     high: &[f64],
     low: &[f64],
     startvalue: f64,
@@ -29,7 +29,10 @@ pub fn extended_parabolic_sar(
     accelerationmaxshort: f64,
 ) -> TaResult<Vec<f64>> {
     if high.len() != low.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len() });
+        return Err(crate::TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len(),
+        });
     }
     let mut state = ParabolicSarExtended::new(
         startvalue,
@@ -41,11 +44,19 @@ pub fn extended_parabolic_sar(
         accelerationshort,
         accelerationmaxshort,
     );
-    Ok(high.iter().zip(low).map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN)).collect())
+    Ok(high
+        .iter()
+        .zip(low)
+        .map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental extended Parabolic SAR with a one-bar lookback.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `ParabolicSarExtended`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct ParabolicSarExtended {
     start_value: f64,
     offset_on_reverse: f64,
@@ -233,7 +244,6 @@ impl Default for ParabolicSarExtended {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_with_asymmetric_parameters_and_reversals() {
         let center: Vec<f64> = (0..300)
@@ -242,7 +252,8 @@ mod tests {
         let high: Vec<f64> = center.iter().map(|value| value + 1.5).collect();
         let low: Vec<f64> = center.iter().map(|value| value - 1.2).collect();
         let expected =
-            extended_parabolic_sar(&high, &low, 0.0, 0.01, 0.03, 0.02, 0.25, 0.04, 0.03, 0.3).unwrap();
+            parabolic_sar_extended(&high, &low, 0.0, 0.01, 0.03, 0.02, 0.25, 0.04, 0.03, 0.3)
+                .unwrap();
         let mut state = ParabolicSarExtended::new(0.0, 0.01, 0.03, 0.02, 0.25, 0.04, 0.03, 0.3);
         for index in 0..center.len() {
             let actual = state.append(high[index], low[index]);

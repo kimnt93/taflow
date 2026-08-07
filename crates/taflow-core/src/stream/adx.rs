@@ -8,6 +8,10 @@ use crate::error::TaResult;
 use super::directional::DirectionalMovement;
 
 /// Incremental ADX with TA-Lib-compatible seeding and lookback.
+/// Persistent Rust state or aligned output type for `AverageDirectionalIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AverageDirectionalIndex {
     period: usize,
     period_f: f64,
@@ -64,7 +68,6 @@ impl AverageDirectionalIndex {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_and_reset_replay() {
         let close: Vec<f64> = (0..700)
@@ -73,7 +76,8 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.3).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
-            let expected = crate::stream::average_directional_index(&high, &low, &close, period).unwrap();
+            let expected =
+                crate::stream::average_directional_index(&high, &low, &close, period).unwrap();
             let mut state = AverageDirectionalIndex::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
@@ -116,7 +120,12 @@ use crate::error::TaError;
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn average_directional_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn average_directional_index(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {

@@ -7,7 +7,7 @@ use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator};
 
 #[derive(Debug, Clone)]
-pub(super) struct RollingExtrema {
+pub(crate) struct RollingExtrema {
     period: usize,
     index: usize,
     maximum: VecDeque<(usize, f64)>,
@@ -119,12 +119,20 @@ rolling_extrema_indicator!(RollingMax, |(maximum, _)| maximum);
 rolling_extrema_indicator!(RollingMin, |(_, minimum)| minimum);
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `RollingMinmaxValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingMinmaxValue {
     pub minimum: f64,
     pub maximum: f64,
 }
 
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingMinmax`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingMinmax {
     extrema: RollingExtrema,
     value: Option<RollingMinmaxValue>,
@@ -177,6 +185,10 @@ impl RollingMinmax {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `RollingMinmaxIndexValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingMinmaxIndexValue {
     pub minimum: usize,
     pub maximum: usize,
@@ -295,10 +307,16 @@ macro_rules! rolling_index_indicator {
     };
 }
 
-rolling_index_indicator!(RollingArgmax, |value: RollingMinmaxIndexValue| value.maximum);
-rolling_index_indicator!(RollingArgmin, |value: RollingMinmaxIndexValue| value.minimum);
+rolling_index_indicator!(RollingArgmax, |value: RollingMinmaxIndexValue| value
+    .maximum);
+rolling_index_indicator!(RollingArgmin, |value: RollingMinmaxIndexValue| value
+    .minimum);
 
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingMinmaxIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingMinmaxIndex {
     extrema: RollingIndexExtrema,
     value: Option<RollingMinmaxIndexValue>,

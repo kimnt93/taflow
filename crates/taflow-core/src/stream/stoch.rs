@@ -11,12 +11,20 @@ use super::{moving_average::MovingAverageDispatcher, RollingMax, RollingMin, Str
 
 /// One aligned slow %K and slow %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `StochasticOscillatorValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct StochasticOscillatorValue {
     pub slowk: f64,
     pub slowd: f64,
 }
 
 /// Incremental STOCH with amortized constant work per bar.
+/// Persistent Rust state or aligned output type for `StochasticOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct StochasticOscillator {
     highest: RollingMax,
     lowest: RollingMin,
@@ -86,7 +94,6 @@ impl StochasticOscillator {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_for_all_moving_average_pairs() {
         let close: Vec<f64> = (0..500)
@@ -106,10 +113,12 @@ mod tests {
             for slowd_code in 0..=8 {
                 let slowk_type = MaType::try_from(slowk_code).unwrap();
                 let slowd_type = MaType::try_from(slowd_code).unwrap();
-                let expected =
-                    crate::stream::stochastic_oscillator(&high, &low, &close, 5, 13, slowk_type, 11, slowd_type)
-                        .unwrap();
-                let mut state = StochasticOscillator::new(5, 13, slowk_type, 11, slowd_type).unwrap();
+                let expected = crate::stream::stochastic_oscillator(
+                    &high, &low, &close, 5, 13, slowk_type, 11, slowd_type,
+                )
+                .unwrap();
+                let mut state =
+                    StochasticOscillator::new(5, 13, slowk_type, 11, slowd_type).unwrap();
                 for index in 0..close.len() {
                     match state.append(high[index], low[index], close[index]) {
                         Some(actual) => {

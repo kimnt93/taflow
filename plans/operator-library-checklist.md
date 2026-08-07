@@ -1,9 +1,8 @@
 # TAFlow operator-library checklist
 
-This is a deferred, post-TA-Lib inventory derived from the shared design
-discussion. It is outside the current unified realtime TA-Lib delivery and
-must not block it. Its entries are retained for future consideration only;
-benchmarks and reports are a later pass.
+This inventory is derived from the shared design discussion. The execution
+and adapter entries below are implemented as part of the unified realtime
+delivery; indicator-specific reports remain a separate follow-up pass.
 
 Every entry must satisfy the taflow contract: aligned time series in, same-
 length series out, causal (bar `i` uses only bars `<= i`), chunk-invariant.
@@ -138,11 +137,11 @@ remain covered by the operator tests.
       checks; rolling-indicator gates do not apply)
 - [x] checklist updated
 
-## Deferred benchmark and report gates
+## Benchmark and report gates
 
 - [x] dataset-size benchmarks (1K, 10K, 100K, 1M)
 - [x] continuous-backfill and streaming latency benchmarks (`adapter_bench.py`)
-- [ ] per-function reports and aggregate validation report
+- [ ] per-function reports and aggregate validation report (deferred)
 
 ## Renamed, not duplicated (one kernel, two surfaces — see `CHECK.md` §2)
 

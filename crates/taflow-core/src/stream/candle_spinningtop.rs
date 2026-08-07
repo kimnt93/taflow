@@ -2,7 +2,13 @@
 
 use std::collections::VecDeque;
 
+use super::pattern::*;
+use crate::error::TaResult;
 /// Incremental CDLSPINNINGTOP state using TA-Lib's ten-bar short-body average.
+/// Persistent Rust state or aligned output type for `CandleSpinningTop`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleSpinningTop {
     bodies: VecDeque<f64>,
     sum: f64,
@@ -63,6 +69,67 @@ impl CandleSpinningTop {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle spinningtop result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_spinningtop(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = BODY_SHORT.avg_period;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut body_sum = 0.0;
+    let start = lookback;
+    for i in (start - BODY_SHORT.avg_period)..start {
+        body_sum += cr(BODY_SHORT, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        output[i] = (real_body(open[i], close[i])
+            < ca(BODY_SHORT, body_sum, open, high, low, close, i)
+            && upper_shadow(open[i], high[i], close[i]) > real_body(open[i], close[i])
+            && lower_shadow(open[i], low[i], close[i]) > real_body(open[i], close[i]))
+            as i32
+            * candle_color(open[i], close[i])
+            * 100;
+        body_sum += cr(BODY_SHORT, open, high, low, close, i)
+            - cr(
+                BODY_SHORT,
+                open,
+                high,
+                low,
+                close,
+                i - BODY_SHORT.avg_period,
+            );
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

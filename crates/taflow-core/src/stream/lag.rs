@@ -2,11 +2,15 @@
 
 use std::collections::VecDeque;
 
-use crate::TaResult;
 use super::operator_states::validate_period;
+use crate::TaResult;
 
 /// Delays a scalar series by a fixed number of bars.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `Lag`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct Lag {
     values: VecDeque<f64>,
     timeperiod: usize,
@@ -49,4 +53,23 @@ impl Lag {
         self.values.clear();
         self.value = None;
     }
+}
+
+/// Compute the lag result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn lag(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    validate_period(timeperiod)?;
+    let mut output = vec![f64::NAN; input.len()];
+    for index in timeperiod..input.len() {
+        output[index] = input[index - timeperiod];
+    }
+    Ok(output)
 }

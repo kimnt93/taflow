@@ -14,7 +14,8 @@ impl HedgeRatioOperator {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: HedgeRatio::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: HedgeRatio::new(timeperiod)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
         })
     }
@@ -41,7 +42,9 @@ impl HedgeRatioOperator {
     }
 
     #[getter]
-    fn value(&self) -> Option<f64> { self.inner.value() }
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
 
     fn reset(&mut self) {
         self.inner.reset();

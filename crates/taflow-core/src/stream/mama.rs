@@ -6,8 +6,8 @@
 
 use std::collections::VecDeque;
 
-use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars, WmaState};
 use crate::error::{TaError, TaResult};
+use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars, WmaState};
 
 use super::StreamingIndicator;
 
@@ -16,12 +16,20 @@ const LOOKBACK: usize = 32;
 
 /// One aligned MAMA/FAMA observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `MesaAdaptiveMovingAverageValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MesaAdaptiveMovingAverageValue {
     pub mama: f64,
     pub fama: f64,
 }
 
 /// Incremental MAMA with the same warm-up and recurrence as TA-Lib.
+/// Persistent Rust state or aligned output type for `MesaAdaptiveMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MesaAdaptiveMovingAverage {
     fast_limit: f64,
     slow_limit: f64,
@@ -259,13 +267,13 @@ impl StreamingIndicator for MesaAdaptiveMovingAverage {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_and_reset_replay() {
         let input: Vec<f64> = (0..200)
             .map(|index| 100.0 + (index as f64 * 0.23).sin() * 9.0 + index as f64 * 0.04)
             .collect();
-        let (expected_mama, expected_fama) = crate::stream::mesa_adaptive_moving_average(&input, 0.5, 0.05).unwrap();
+        let (expected_mama, expected_fama) =
+            crate::stream::mesa_adaptive_moving_average(&input, 0.5, 0.05).unwrap();
         let mut state = MesaAdaptiveMovingAverage::new(0.5, 0.05).unwrap();
         for ((&input, expected_mama), expected_fama) in input
             .iter()
@@ -309,7 +317,11 @@ mod tests {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn mesa_adaptive_moving_average(input: &[f64], fastlimit: f64, slowlimit: f64) -> TaResult<(Vec<f64>, Vec<f64>)> {
+pub fn mesa_adaptive_moving_average(
+    input: &[f64],
+    fastlimit: f64,
+    slowlimit: f64,
+) -> TaResult<(Vec<f64>, Vec<f64>)> {
     let len = input.len();
     let lookback = 32;
 
@@ -395,24 +407,14 @@ pub fn mesa_adaptive_moving_average(input: &[f64], fastlimit: f64, slowlimit: f6
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            q1 = do_hilbert_even(
-                &mut q1_vars,
-                detrender,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            q1 = do_hilbert_even(&mut q1_vars, detrender, hilbert_idx, adjusted_prev_period);
             let _ji = do_hilbert_even(
                 &mut ji_vars,
                 i1_for_even_prev3,
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            let _jq = do_hilbert_even(
-                &mut jq_vars,
-                q1,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            let _jq = do_hilbert_even(&mut jq_vars, q1, hilbert_idx, adjusted_prev_period);
             hilbert_idx += 1;
             if hilbert_idx == 3 {
                 hilbert_idx = 0;
@@ -434,24 +436,14 @@ pub fn mesa_adaptive_moving_average(input: &[f64], fastlimit: f64, slowlimit: f6
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            q1 = do_hilbert_odd(
-                &mut q1_vars,
-                detrender,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            q1 = do_hilbert_odd(&mut q1_vars, detrender, hilbert_idx, adjusted_prev_period);
             let _ji = do_hilbert_odd(
                 &mut ji_vars,
                 i1_for_odd_prev3,
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            let _jq = do_hilbert_odd(
-                &mut jq_vars,
-                q1,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            let _jq = do_hilbert_odd(&mut jq_vars, q1, hilbert_idx, adjusted_prev_period);
 
             q2 = 0.2 * (q1 + _ji) + 0.8 * prev_q2;
             i2 = 0.2 * (i1_for_odd_prev3 - _jq) + 0.8 * prev_i2;

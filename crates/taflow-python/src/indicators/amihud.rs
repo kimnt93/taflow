@@ -15,7 +15,8 @@ impl AmihudOperator {
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Amihud::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: Amihud::new(timeperiod)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }
@@ -26,7 +27,11 @@ impl AmihudOperator {
         value
     }
 
-    fn extend(&mut self, close: PyReadonlyArray1<f64>, volume: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        close: PyReadonlyArray1<f64>,
+        volume: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (close, volume) = (close.as_slice()?, volume.as_slice()?);
         if close.len() != volume.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));

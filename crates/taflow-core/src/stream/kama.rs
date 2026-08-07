@@ -21,11 +21,18 @@ use super::{invalid_period, StreamingIndicator};
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn kaufman_adaptive_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = KaufmanAdaptiveMovingAverage::new(timeperiod)?;
-    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental KAMA with the same seed and recurrence as TA-Lib.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `KaufmanAdaptiveMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct KaufmanAdaptiveMovingAverage {
     period: usize,
     prices: VecDeque<f64>,

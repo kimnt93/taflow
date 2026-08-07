@@ -2,11 +2,15 @@
 
 use std::collections::VecDeque;
 
-use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator};
+use crate::error::TaResult;
 
 /// Computes Relative Momentum Index using Wilder-smoothed momentum gains.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RelativeMomentumIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RelativeMomentumIndex {
     period: usize,
     momentum: usize,
@@ -20,9 +24,21 @@ pub struct RelativeMomentumIndex {
 impl RelativeMomentumIndex {
     /// Creates an RMI with a positive smoothing period and momentum lag.
     pub fn new(period: usize, momentum: usize) -> TaResult<Self> {
-        if period < 1 { return Err(invalid_period("timeperiod", period, 1)); }
-        if momentum < 1 { return Err(invalid_period("momentum", momentum, 1)); }
-        Ok(Self { period, momentum, prices: VecDeque::with_capacity(momentum + 1), count: 0, up: 0.0, down: 0.0, value: None })
+        if period < 1 {
+            return Err(invalid_period("timeperiod", period, 1));
+        }
+        if momentum < 1 {
+            return Err(invalid_period("momentum", momentum, 1));
+        }
+        Ok(Self {
+            period,
+            momentum,
+            prices: VecDeque::with_capacity(momentum + 1),
+            count: 0,
+            up: 0.0,
+            down: 0.0,
+            value: None,
+        })
     }
 }
 
@@ -31,7 +47,9 @@ impl StreamingIndicator for RelativeMomentumIndex {
 
     fn append(&mut self, input: f64) -> Option<f64> {
         self.prices.push_back(input);
-        if self.prices.len() <= self.momentum { return None; }
+        if self.prices.len() <= self.momentum {
+            return None;
+        }
         let previous = self.prices.pop_front().expect("momentum history exists");
         let change = input - previous;
         let gain = change.max(0.0);
@@ -40,21 +58,33 @@ impl StreamingIndicator for RelativeMomentumIndex {
         if self.count <= self.period {
             self.up += gain;
             self.down += loss;
-            if self.count < self.period { return None; }
+            if self.count < self.period {
+                return None;
+            }
         } else {
             let period = self.period as f64;
             self.up = (self.up * (period - 1.0) + gain) / period;
             self.down = (self.down * (period - 1.0) + loss) / period;
         }
         let total = self.up + self.down;
-        self.value = Some(if total == 0.0 { 50.0 } else { 100.0 * self.up / total });
+        self.value = Some(if total == 0.0 {
+            50.0
+        } else {
+            100.0 * self.up / total
+        });
         self.value
     }
 
-    fn value(&self) -> Option<f64> { self.value }
+    fn value(&self) -> Option<f64> {
+        self.value
+    }
 
     fn reset(&mut self) {
-        self.prices.clear(); self.count = 0; self.up = 0.0; self.down = 0.0; self.value = None;
+        self.prices.clear();
+        self.count = 0;
+        self.up = 0.0;
+        self.down = 0.0;
+        self.value = None;
     }
 }
 
@@ -67,6 +97,8 @@ mod tests {
         let mut state = RelativeMomentumIndex::new(3, 2).unwrap();
         let values: Vec<_> = (1..=12).map(|value| state.append(value as f64)).collect();
         assert!(values[..4].iter().all(Option::is_none));
-        assert!(values[4..].iter().all(|value| matches!(value, Some(v) if (*v - 100.0).abs() < 1e-12)));
+        assert!(values[4..]
+            .iter()
+            .all(|value| matches!(value, Some(v) if (*v - 100.0).abs() < 1e-12)));
     }
 }

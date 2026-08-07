@@ -1,4 +1,6 @@
 //! Incremental Three Line Strike recognition (CDL3LINESTRIKE).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -19,7 +21,104 @@ impl Candle {
         }
     }
 }
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle three line strike result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_three_line_strike(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = NEAR.avg_period + 3;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut near_sum = [0.0f64; 4];
+    let start = lookback;
+    // Init near sums for bars i-3 and i-2
+    for k in [2usize, 3] {
+        let bar = start - k;
+        if bar >= NEAR.avg_period {
+            for j in (bar - NEAR.avg_period)..bar {
+                near_sum[k] += cr(NEAR, open, high, low, close, j);
+            }
+        }
+    }
+
+    for i in start..len {
+        let c3 = candle_color(open[i - 3], close[i - 3]);
+        let c2 = candle_color(open[i - 2], close[i - 2]);
+        let c1 = candle_color(open[i - 1], close[i - 1]);
+        let c0 = candle_color(open[i], close[i]);
+
+        if c3 == c2 && c2 == c1 && c0 != c1 {
+            // Three same-color, 4th opposite
+            let progressive = if c3 == 1 {
+                close[i - 2] > close[i - 3] && close[i - 1] > close[i - 2]
+            } else {
+                close[i - 2] < close[i - 3] && close[i - 1] < close[i - 2]
+            };
+            let opens_near = if c3 == 1 {
+                open[i - 2] >= open[i - 3].min(close[i - 3])
+                    && open[i - 2]
+                        <= close[i - 3] + ca(NEAR, near_sum[3], open, high, low, close, i - 3)
+                    && open[i - 1] >= open[i - 2].min(close[i - 2])
+                    && open[i - 1]
+                        <= close[i - 2] + ca(NEAR, near_sum[2], open, high, low, close, i - 2)
+            } else {
+                open[i - 2] <= open[i - 3].max(close[i - 3])
+                    && open[i - 2]
+                        >= close[i - 3] - ca(NEAR, near_sum[3], open, high, low, close, i - 3)
+                    && open[i - 1] <= open[i - 2].max(close[i - 2])
+                    && open[i - 1]
+                        >= close[i - 2] - ca(NEAR, near_sum[2], open, high, low, close, i - 2)
+            };
+            let strike = if c3 == 1 {
+                open[i] >= close[i - 1] && close[i] <= open[i - 3]
+            } else {
+                open[i] <= close[i - 1] && close[i] >= open[i - 3]
+            };
+            output[i] = (progressive && opens_near && strike) as i32 * c3 * 100;
+        }
+        // Update near sums
+        for k in [2usize, 3] {
+            let bar = i - k;
+            if bar >= NEAR.avg_period && NEAR.avg_period > 0 {
+                near_sum[k] += cr(NEAR, open, high, low, close, bar)
+                    - cr(NEAR, open, high, low, close, bar - NEAR.avg_period);
+            }
+        }
+    }
+    Ok(output)
+}
 /// Incremental CDL3LINESTRIKE state.
+/// Persistent Rust state or aligned output type for `CandleThreeLineStrike`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleThreeLineStrike {
     candles: VecDeque<Candle>,
     value: Option<i32>,

@@ -9,6 +9,10 @@ use super::{invalid_period, Window};
 
 /// Incremental Intraday Momentum Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `IntradayMomentumIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct IntradayMomentumIndex {
     gains: Window,
     losses: Window,
@@ -78,7 +82,6 @@ impl IntradayMomentumIndex {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_and_reset_replay() {
         let open: Vec<f64> = (0..300)
@@ -125,7 +128,11 @@ use crate::error::TaError;
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn intraday_momentum_index(open: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn intraday_momentum_index(
+    open: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
     let len = open.len();
     if len != close.len() {
         return Err(TaError::LengthMismatch {

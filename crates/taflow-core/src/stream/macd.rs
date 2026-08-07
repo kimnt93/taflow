@@ -7,6 +7,10 @@ use crate::error::{TaError, TaResult};
 
 /// The three values produced by a warmed MACD state machine.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergenceValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MovingAverageConvergenceDivergenceValue {
     pub macd: f64,
     pub signal: f64,
@@ -15,6 +19,10 @@ pub struct MovingAverageConvergenceDivergenceValue {
 
 /// Stateful MACD matching the batch function's aligned EMA seeds.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergence`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MovingAverageConvergenceDivergence {
     fast_period: usize,
     slow_period: usize,
@@ -132,13 +140,13 @@ impl MovingAverageConvergenceDivergence {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_and_reset_replay() {
         let input: Vec<f64> = (0..300)
             .map(|index| 100.0 + (index as f64 * 0.21).sin() * 12.0 + index as f64 * 0.01)
             .collect();
-        let expected = crate::stream::moving_average_convergence_divergence(&input, 12, 26, 9).unwrap();
+        let expected =
+            crate::stream::moving_average_convergence_divergence(&input, 12, 26, 9).unwrap();
         let mut state = MovingAverageConvergenceDivergence::new(12, 26, 9).unwrap();
         for (index, input) in input.iter().copied().enumerate() {
             match state.append(input) {

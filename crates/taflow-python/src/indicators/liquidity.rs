@@ -61,7 +61,9 @@ impl LiquidityOperator {
 
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64)> {
-        self.inner.value().map(|value| (value.liquidity, value.level, value.swept))
+        self.inner
+            .value()
+            .map(|value| (value.liquidity, value.level, value.swept))
     }
 
     fn reset(&mut self) {

@@ -1,6 +1,641 @@
 [
  {
+  "function": "ACCBANDS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ACOS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AD",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ADD",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ADOSC",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4901161193847656e-08
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4901161193847656e-08
+  }
+ },
+ {
+  "function": "ADX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "ADXR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.1316282072803006e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.1316282072803006e-14
+  }
+ },
+ {
+  "function": "APO",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AROON",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AROONOSC",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "ASIN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ATAN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ATR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AVGDEV",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AVGPRICE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "BBANDS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.926814760139678e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.926814760139678e-10
+  }
+ },
+ {
+  "function": "BETA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.6630256040079985e-12
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.6630256040079985e-12
+  }
+ },
+ {
+  "function": "BOP",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CCI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.609965576994e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.609965576994e-10
+  }
+ },
+ {
+  "function": "CDL2CROWS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDL3BLACKCROWS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDL3INSIDE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDL3LINESTRIKE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDL3OUTSIDE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDL3STARSINSOUTH",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDL3WHITESOLDIERS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLABANDONEDBABY",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLADVANCEBLOCK",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLBELTHOLD",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLBREAKAWAY",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLCLOSINGMARUBOZU",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLCONCEALBABYSWALL",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLCOUNTERATTACK",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLDARKCLOUDCOVER",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLDOJI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLDOJISTAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLDRAGONFLYDOJI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLENGULFING",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLEVENINGDOJISTAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLEVENINGSTAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLGAPSIDESIDEWHITE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLGRAVESTONEDOJI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLHAMMER",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLHANGINGMAN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLHARAMI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLHARAMICROSS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLHIGHWAVE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLHIKKAKE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
   "function": "CDLHIKKAKEMOD",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLHOMINGPIGEON",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLIDENTICAL3CROWS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLINNECK",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLINVERTEDHAMMER",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLKICKING",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLKICKINGBYLENGTH",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
    "passed": true,
@@ -16,6 +651,206 @@
    "passed": false,
    "nan_mismatches": 0,
    "max_abs_error": 100.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLLONGLEGGEDDOJI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLLONGLINE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLMARUBOZU",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLMATCHINGLOW",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLMATHOLD",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLMORNINGDOJISTAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLMORNINGSTAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLONNECK",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLPIERCING",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLRICKSHAWMAN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLRISEFALL3METHODS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLSEPARATINGLINES",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLSHOOTINGSTAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLSHORTLINE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLSPINNINGTOP",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLSTALLEDPATTERN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLSTICKSANDWICH",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLTAKURI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLTASUKIGAP",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLTHRUSTING",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
   },
   "state": "missing"
  },
@@ -38,5 +873,1285 @@
    "max_abs_error": 0.0
   },
   "state": "missing"
+ },
+ {
+  "function": "CDLUPSIDEGAP2CROWS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CDLXSIDEGAP3METHODS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "CEIL",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CMO",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.816769371198461e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.816769371198461e-14
+  }
+ },
+ {
+  "function": "CORREL",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.616695997190391e-11
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.616695997190391e-11
+  }
+ },
+ {
+  "function": "COS",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "COSH",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "DEMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "DIV",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "DX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "EMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "EXP",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "FLOOR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "HT_DCPERIOD",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "HT_DCPHASE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "HT_PHASOR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "HT_SINE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "HT_TRENDLINE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "HT_TRENDMODE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "IMI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "KAMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "LINEARREG",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.0833147712219215e-09
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.0833147712219215e-09
+  }
+ },
+ {
+  "function": "LINEARREG_ANGLE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 9.513690724105572e-09
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 9.513690724105572e-09
+  }
+ },
+ {
+  "function": "LINEARREG_INTERCEPT",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.0840324193850392e-09
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.0840324193850392e-09
+  }
+ },
+ {
+  "function": "LINEARREG_SLOPE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.6671880542773465e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.6671880542773465e-10
+  }
+ },
+ {
+  "function": "LN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "LOG10",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MACD",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "MACDEXT",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MACDFIX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "MAMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MAVP",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MAX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MAXINDEX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MEDPRICE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MFI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "state": "missing"
+ },
+ {
+  "function": "MIDPOINT",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MIDPRICE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MIN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MININDEX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MINMAX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MINMAXINDEX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MINUS_DI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "state": "missing"
+ },
+ {
+  "function": "MINUS_DM",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "MOM",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MULT",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "NATR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "OBV",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "PLUS_DI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "state": "missing"
+ },
+ {
+  "function": "PLUS_DM",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "state": "missing"
+ },
+ {
+  "function": "PPO",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ROC",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "ROCP",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ROCR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ROCR100",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "RSI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SAREXT",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SIN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SINH",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SQRT",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "STDDEV",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.9633842041642e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.9633842041642e-10
+  }
+ },
+ {
+  "function": "STOCH",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "STOCHF",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "STOCHRSI",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SUB",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SUM",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TAN",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TANH",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TEMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TRANGE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TRIMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.821210263296962e-13
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.821210263296962e-13
+  }
+ },
+ {
+  "function": "TRIX",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.1102230246251565e-14
+  },
+  "state": "missing"
+ },
+ {
+  "function": "TSF",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.2500294133133139e-09
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.2500294133133139e-09
+  }
+ },
+ {
+  "function": "TYPPRICE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "ULTOSC",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "state": "missing"
+ },
+ {
+  "function": "VAR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.055902197957039e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.055902197957039e-10
+  }
+ },
+ {
+  "function": "WCLPRICE",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "WILLR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "WMA",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.8569323856354458e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.8569323856354458e-10
+  }
+ },
+ {
+  "function": "rolling_median",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "rolling_quantile",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "rolling_skew",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.837127398043094e-07
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.837127398043094e-07
+  }
+ },
+ {
+  "function": "rolling_kurtosis",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.000174941496062897
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.000174941496062897
+  }
+ },
+ {
+  "function": "rolling_zscore",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.426930099223682e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.426930099223682e-10
+  }
+ },
+ {
+  "function": "rolling_cov",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.2823520023630408e-11
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.2823520023630408e-11
+  }
+ },
+ {
+  "function": "ewm_std",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.815970093361102e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.815970093361102e-14
+  }
+ },
+ {
+  "function": "ewm_var",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.9042545318370685e-12
+  },
+  "continue_vs_batch_bitwise": true,
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.9042545318370685e-12
+  }
  }
 ]

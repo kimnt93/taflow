@@ -35,7 +35,12 @@ impl BreakOfStructureChangeOfCharacterOperator {
         (value.bos, value.choch, value.level, value.broken)
     }
 
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
         if high.len() != low.len() || low.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
@@ -46,7 +51,10 @@ impl BreakOfStructureChangeOfCharacterOperator {
         Ok(())
     }
 
-    fn compute<'py>(&self, py: Python<'py>) -> (
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
         Bound<'py, PyArray1<f64>>,
         Bound<'py, PyArray1<f64>>,
         Bound<'py, PyArray1<f64>>,
@@ -62,7 +70,9 @@ impl BreakOfStructureChangeOfCharacterOperator {
 
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64, f64)> {
-        self.inner.value().map(|value| (value.bos, value.choch, value.level, value.broken))
+        self.inner
+            .value()
+            .map(|value| (value.bos, value.choch, value.level, value.broken))
     }
 
     fn reset(&mut self) {

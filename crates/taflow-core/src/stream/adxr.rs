@@ -7,6 +7,10 @@ use crate::error::TaResult;
 use super::AverageDirectionalIndex;
 
 /// Incremental ADXR using the current and `period - 1` lagged ADX values.
+/// Persistent Rust state or aligned output type for `AverageDirectionalIndexRating`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AverageDirectionalIndexRating {
     period: usize,
     adx: AverageDirectionalIndex,
@@ -55,7 +59,6 @@ impl AverageDirectionalIndexRating {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_and_reset_replay() {
         let close: Vec<f64> = (0..700)
@@ -64,7 +67,9 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.3).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
-            let expected = crate::stream::average_directional_index_rating(&high, &low, &close, period).unwrap();
+            let expected =
+                crate::stream::average_directional_index_rating(&high, &low, &close, period)
+                    .unwrap();
             let mut state = AverageDirectionalIndexRating::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
@@ -83,7 +88,6 @@ mod tests {
 }
 // Batch Average Directional Movement Index Rating.
 
-
 /// Compute the average directional index rating result for the supplied aligned series.
 ///
 /// # Parameters
@@ -96,7 +100,12 @@ mod tests {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn average_directional_index_rating(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn average_directional_index_rating(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
     let adx_values = crate::stream::average_directional_index(high, low, close, timeperiod)?;
     let len = adx_values.len();
     let lookback = 3 * timeperiod - 2;

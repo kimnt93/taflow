@@ -6,12 +6,19 @@ use taflow::stream::{RollingAutocorr, RollingEntropy};
 macro_rules! rolling {
     ($name:ident, $inner:ty) => {
         #[pyclass]
-        pub struct $name { inner: $inner, outputs: Vec<f64> }
+        pub struct $name {
+            inner: $inner,
+            outputs: Vec<f64>,
+        }
         #[pymethods]
         impl $name {
             #[new]
             fn new(timeperiod: usize) -> PyResult<Self> {
-                Ok(Self { inner: <$inner>::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?, outputs: Vec::new() })
+                Ok(Self {
+                    inner: <$inner>::new(timeperiod)
+                        .map_err(|error| PyValueError::new_err(error.to_string()))?,
+                    outputs: Vec::new(),
+                })
             }
             fn append(&mut self, input: f64) -> Option<f64> {
                 let value = self.inner.append(input);
@@ -19,13 +26,22 @@ macro_rules! rolling {
                 value
             }
             fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-                for &input in input.as_slice()? { self.append(input); }
+                for &input in input.as_slice()? {
+                    self.append(input);
+                }
                 Ok(())
             }
-            fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> { PyArray1::from_vec(py, self.outputs.clone()) }
+            fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
+                PyArray1::from_vec(py, self.outputs.clone())
+            }
             #[getter]
-            fn value(&self) -> Option<f64> { self.inner.value() }
-            fn reset(&mut self) { self.inner.reset(); self.outputs.clear(); }
+            fn value(&self) -> Option<f64> {
+                self.inner.value()
+            }
+            fn reset(&mut self) {
+                self.inner.reset();
+                self.outputs.clear();
+            }
         }
     };
 }

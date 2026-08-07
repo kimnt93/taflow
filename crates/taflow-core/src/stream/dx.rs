@@ -16,15 +16,32 @@ use super::directional::DirectionalMovement;
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn directional_movement_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn directional_movement_index(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+        return Err(crate::TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
     }
     let mut state = DirectionalMovementIndex::new(timeperiod)?;
-    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
+    Ok(high
+        .iter()
+        .zip(low)
+        .zip(close)
+        .map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental DX with TA-Lib-compatible Wilder smoothing and lookback.
+/// Persistent Rust state or aligned output type for `DirectionalMovementIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct DirectionalMovementIndex {
     directional: DirectionalMovement,
     value: Option<f64>,
@@ -63,7 +80,6 @@ impl DirectionalMovementIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 
     #[test]
     fn matches_batch_and_reset_replay() {

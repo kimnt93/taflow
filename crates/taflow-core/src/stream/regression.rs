@@ -134,4 +134,3 @@ regression_indicator!(LinearregAngle, |value: RegressionValue, _| value
     .to_degrees());
 regression_indicator!(Tsf, |value: RegressionValue, period: usize| value.intercept
     + value.slope * period as f64);
-

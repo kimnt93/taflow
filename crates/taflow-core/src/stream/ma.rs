@@ -9,6 +9,10 @@ use crate::ma_type::{compute_ma, MaType};
 use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
 
 /// Incremental moving average selected by [`MaType`].
+/// Persistent Rust state or aligned output type for `MovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MovingAverage {
     inner: MovingAverageDispatcher,
     value: Option<f64>,
@@ -46,7 +50,6 @@ impl StreamingIndicator for MovingAverage {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {

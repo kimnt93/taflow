@@ -7,6 +7,5 @@ pub mod stream;
 pub mod traits;
 
 #[allow(unused_mut, unused_variables, unused_assignments, dead_code)]
-
 pub use error::{TaError, TaResult};
 pub use ma_type::MaType;

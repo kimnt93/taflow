@@ -17,16 +17,32 @@ use crate::TaResult;
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn parabolic_sar(high: &[f64], low: &[f64], acceleration: f64, maximum: f64) -> TaResult<Vec<f64>> {
+pub fn parabolic_sar(
+    high: &[f64],
+    low: &[f64],
+    acceleration: f64,
+    maximum: f64,
+) -> TaResult<Vec<f64>> {
     if high.len() != low.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len() });
+        return Err(crate::TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len(),
+        });
     }
     let mut state = ParabolicSar::new(acceleration, maximum);
-    Ok(high.iter().zip(low).map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN)).collect())
+    Ok(high
+        .iter()
+        .zip(low)
+        .map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental Parabolic SAR with a one-bar lookback.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `ParabolicSar`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct ParabolicSar {
     acceleration: f64,
     maximum: f64,
@@ -159,7 +175,6 @@ impl Default for ParabolicSar {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 
     #[test]
     fn matches_batch_through_multiple_reversals() {

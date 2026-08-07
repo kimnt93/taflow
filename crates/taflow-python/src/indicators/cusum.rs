@@ -15,7 +15,8 @@ impl CumulativeSumControlChartOperator {
     #[pyo3(signature = (threshold=1.0))]
     fn new(threshold: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: CumulativeSumControlChart::new(threshold).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: CumulativeSumControlChart::new(threshold)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

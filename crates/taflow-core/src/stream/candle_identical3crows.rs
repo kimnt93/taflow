@@ -1,4 +1,6 @@
 //! Incremental Identical Three Crows candlestick recognition (CDLIDENTICAL3CROWS).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -59,10 +61,31 @@ impl CandleIdenticalThreeCrows {
             let a = self.candles[10];
             let b = self.candles[11];
             let shadow0 = self.candles.iter().take(10).map(|x| x.range()).sum::<f64>() * 0.01;
-            let shadow1 = self.candles.iter().skip(1).take(10).map(|x| x.range()).sum::<f64>() * 0.01;
+            let shadow1 = self
+                .candles
+                .iter()
+                .skip(1)
+                .take(10)
+                .map(|x| x.range())
+                .sum::<f64>()
+                * 0.01;
             let shadow2 = self.candles.iter().skip(2).map(|x| x.range()).sum::<f64>() * 0.01;
-            let equal0 = self.candles.iter().skip(5).take(5).map(|x| x.range()).sum::<f64>() * 0.01;
-            let equal1 = self.candles.iter().skip(6).take(5).map(|x| x.range()).sum::<f64>() * 0.01;
+            let equal0 = self
+                .candles
+                .iter()
+                .skip(5)
+                .take(5)
+                .map(|x| x.range())
+                .sum::<f64>()
+                * 0.01;
+            let equal1 = self
+                .candles
+                .iter()
+                .skip(6)
+                .take(5)
+                .map(|x| x.range())
+                .sum::<f64>()
+                * 0.01;
             Some(
                 (a.color() == -1
                     && b.color() == -1
@@ -98,6 +121,96 @@ impl CandleIdenticalThreeCrows {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle identical three crows result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_identical_three_crows(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = SHADOW_VERY_SHORT.avg_period.max(EQUAL.avg_period) + 2;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut shadow_sum = [0.0f64; 3];
+    let mut equal_sum = [0.0f64; 3];
+    let start = lookback;
+    for k in 0..3 {
+        let bar = start - 2 + k;
+        if bar >= SHADOW_VERY_SHORT.avg_period {
+            for j in (bar - SHADOW_VERY_SHORT.avg_period)..bar {
+                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, j);
+            }
+        }
+        if k < 2 && bar >= EQUAL.avg_period {
+            for j in (bar - EQUAL.avg_period)..bar {
+                equal_sum[k] += cr(EQUAL, open, high, low, close, j);
+            }
+        }
+    }
+
+    for i in start..len {
+        output[i] = (candle_color(open[i-2], close[i-2]) == -1
+            && candle_color(open[i-1], close[i-1]) == -1
+            && candle_color(open[i], close[i]) == -1
+            && close[i-1] < close[i-2] && close[i] < close[i-1]
+            // Very short lower shadows
+            && lower_shadow(open[i-2], low[i-2], close[i-2]) < ca(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i-2)
+            && lower_shadow(open[i-1], low[i-1], close[i-1]) < ca(SHADOW_VERY_SHORT, shadow_sum[1], open, high, low, close, i-1)
+            && lower_shadow(open[i], low[i], close[i]) < ca(SHADOW_VERY_SHORT, shadow_sum[2], open, high, low, close, i)
+            // Each opens equal to prior close
+            && (open[i-1] - close[i-2]).abs() <= ca(EQUAL, equal_sum[0], open, high, low, close, i-2)
+            && (open[i] - close[i-1]).abs() <= ca(EQUAL, equal_sum[1], open, high, low, close, i-1))
+            as i32
+            * -100;
+        for k in 0..3 {
+            let bar = i - 2 + k;
+            if SHADOW_VERY_SHORT.avg_period > 0 && bar >= SHADOW_VERY_SHORT.avg_period {
+                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, bar)
+                    - cr(
+                        SHADOW_VERY_SHORT,
+                        open,
+                        high,
+                        low,
+                        close,
+                        bar - SHADOW_VERY_SHORT.avg_period,
+                    );
+            }
+        }
+        for k in 0..2 {
+            let bar = i - 2 + k;
+            if EQUAL.avg_period > 0 && bar >= EQUAL.avg_period {
+                equal_sum[k] += cr(EQUAL, open, high, low, close, bar)
+                    - cr(EQUAL, open, high, low, close, bar - EQUAL.avg_period);
+            }
+        }
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

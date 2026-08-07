@@ -1,4 +1,6 @@
 //! Incremental Stick Sandwich recognition (CDLSTICKSANDWICH).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -20,6 +22,10 @@ impl Candle {
     }
 }
 /// Incremental CDLSTICKSANDWICH state.
+/// Persistent Rust state or aligned output type for `CandleStickSandwich`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleStickSandwich {
     candles: VecDeque<Candle>,
     value: Option<i32>,
@@ -89,6 +95,60 @@ impl CandleStickSandwich {
     pub fn reset(&mut self) {
         *self = Self::new()
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle stick sandwich result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_stick_sandwich(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = EQUAL.avg_period + 2;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut equal_sum = 0.0;
+    let start = lookback;
+    for i in (start - 2 - EQUAL.avg_period)..(start - 2) {
+        equal_sum += cr(EQUAL, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        output[i] = (candle_color(open[i - 2], close[i - 2]) == -1
+            && candle_color(open[i - 1], close[i - 1]) == 1
+            && candle_color(open[i], close[i]) == -1
+            && low[i - 1] > close[i - 2]
+            && (close[i] - close[i - 2]).abs()
+                <= ca(EQUAL, equal_sum, open, high, low, close, i - 2)) as i32
+            * 100;
+        equal_sum += cr(EQUAL, open, high, low, close, i - 2)
+            - cr(EQUAL, open, high, low, close, i - 2 - EQUAL.avg_period);
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

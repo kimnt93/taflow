@@ -16,6 +16,10 @@ use super::{StreamingIndicator, Window};
 /// A state object whose latest value is `None` during warm-up and `Some(sum)`
 /// once the window is full.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingSum`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingSum {
     window: Window,
     sum: f64,

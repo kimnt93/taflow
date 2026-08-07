@@ -1,4 +1,6 @@
 //! Incremental Kicking candlestick recognition (CDLKICKING).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -98,6 +100,126 @@ impl CandleKicking {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle kicking result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_kicking(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = SHADOW_VERY_SHORT.avg_period.max(BODY_LONG.avg_period) + 1;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut shadow_sum = [0.0f64; 2];
+    let mut body_sum = [0.0f64; 2];
+    let start = lookback;
+    for i in (start - 1 - SHADOW_VERY_SHORT.avg_period)..(start - 1) {
+        shadow_sum[1] += cr(SHADOW_VERY_SHORT, open, high, low, close, i);
+    }
+    for i in (start - SHADOW_VERY_SHORT.avg_period)..start {
+        shadow_sum[0] += cr(SHADOW_VERY_SHORT, open, high, low, close, i);
+    }
+    for i in (start - 1 - BODY_LONG.avg_period)..(start - 1) {
+        body_sum[1] += cr(BODY_LONG, open, high, low, close, i);
+    }
+    for i in (start - BODY_LONG.avg_period)..start {
+        body_sum[0] += cr(BODY_LONG, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        let color_prev = candle_color(open[i - 1], close[i - 1]);
+        let color_curr = candle_color(open[i], close[i]);
+        if color_prev != color_curr
+            && real_body(open[i - 1], close[i - 1])
+                > ca(BODY_LONG, body_sum[1], open, high, low, close, i - 1)
+            && upper_shadow(open[i - 1], high[i - 1], close[i - 1])
+                < ca(
+                    SHADOW_VERY_SHORT,
+                    shadow_sum[1],
+                    open,
+                    high,
+                    low,
+                    close,
+                    i - 1,
+                )
+            && lower_shadow(open[i - 1], low[i - 1], close[i - 1])
+                < ca(
+                    SHADOW_VERY_SHORT,
+                    shadow_sum[1],
+                    open,
+                    high,
+                    low,
+                    close,
+                    i - 1,
+                )
+            && real_body(open[i], close[i]) > ca(BODY_LONG, body_sum[0], open, high, low, close, i)
+            && upper_shadow(open[i], high[i], close[i])
+                < ca(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i)
+            && lower_shadow(open[i], low[i], close[i])
+                < ca(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i)
+        {
+            // Gap: black then white = bullish, white then black = bearish
+            let bull = color_prev == -1 && color_curr == 1 && open[i] > open[i - 1];
+            let bear = color_prev == 1 && color_curr == -1 && open[i] < open[i - 1];
+            output[i] = (bull as i32) * 100 - (bear as i32) * 100;
+        }
+        shadow_sum[1] += cr(SHADOW_VERY_SHORT, open, high, low, close, i - 1)
+            - cr(
+                SHADOW_VERY_SHORT,
+                open,
+                high,
+                low,
+                close,
+                i - 1 - SHADOW_VERY_SHORT.avg_period,
+            );
+        shadow_sum[0] += cr(SHADOW_VERY_SHORT, open, high, low, close, i)
+            - cr(
+                SHADOW_VERY_SHORT,
+                open,
+                high,
+                low,
+                close,
+                i - SHADOW_VERY_SHORT.avg_period,
+            );
+        body_sum[1] += cr(BODY_LONG, open, high, low, close, i - 1)
+            - cr(
+                BODY_LONG,
+                open,
+                high,
+                low,
+                close,
+                i - 1 - BODY_LONG.avg_period,
+            );
+        body_sum[0] += cr(BODY_LONG, open, high, low, close, i)
+            - cr(BODY_LONG, open, high, low, close, i - BODY_LONG.avg_period);
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

@@ -1,10 +1,14 @@
 //! Stateful Ehlers Laguerre Relative Strength Index.
 
-use crate::error::{TaError, TaResult};
 use super::StreamingIndicator;
+use crate::error::{TaError, TaResult};
 
 /// Computes Laguerre RSI with four causal Laguerre stages.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `LaguerreRelativeStrengthIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct LaguerreRelativeStrengthIndex {
     gamma: f64,
     stages: [f64; 4],
@@ -15,9 +19,17 @@ impl LaguerreRelativeStrengthIndex {
     /// Creates the oscillator with `gamma` in the half-open interval `[0, 1)`.
     pub fn new(gamma: f64) -> TaResult<Self> {
         if !(0.0..1.0).contains(&gamma) {
-            return Err(TaError::InvalidParameter { name: "gamma", value: gamma.to_string(), reason: "must be in [0, 1)" });
+            return Err(TaError::InvalidParameter {
+                name: "gamma",
+                value: gamma.to_string(),
+                reason: "must be in [0, 1)",
+            });
         }
-        Ok(Self { gamma, stages: [0.0; 4], value: None })
+        Ok(Self {
+            gamma,
+            stages: [0.0; 4],
+            value: None,
+        })
     }
 }
 
@@ -38,6 +50,11 @@ impl StreamingIndicator for LaguerreRelativeStrengthIndex {
         self.value
     }
 
-    fn value(&self) -> Option<f64> { self.value }
-    fn reset(&mut self) { self.stages = [0.0; 4]; self.value = None; }
+    fn value(&self) -> Option<f64> {
+        self.value
+    }
+    fn reset(&mut self) {
+        self.stages = [0.0; 4];
+        self.value = None;
+    }
 }

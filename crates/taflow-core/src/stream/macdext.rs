@@ -10,6 +10,10 @@ use crate::ma_type::MaType;
 use super::{moving_average::MovingAverageDispatcher, MovingAverageConvergenceDivergenceValue};
 
 /// Incremental MACDEXT with aligned fast/slow seeds.
+/// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergenceExtended`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MovingAverageConvergenceDivergenceExtended {
     fast: MovingAverageDispatcher,
     slow: MovingAverageDispatcher,
@@ -72,11 +76,13 @@ impl MovingAverageConvergenceDivergenceExtended {
         };
         self.value = fast.zip(slow).and_then(|(fast, slow)| {
             let macd = fast - slow;
-            self.signal.append(macd).map(|signal| MovingAverageConvergenceDivergenceValue {
-                macd,
-                signal,
-                histogram: macd - signal,
-            })
+            self.signal
+                .append(macd)
+                .map(|signal| MovingAverageConvergenceDivergenceValue {
+                    macd,
+                    signal,
+                    histogram: macd - signal,
+                })
         });
         self.value
     }
@@ -100,7 +106,6 @@ impl MovingAverageConvergenceDivergenceExtended {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_for_every_moving_average_combination() {
         let input: Vec<f64> = (0..700)
@@ -112,11 +117,25 @@ mod tests {
                     let fast_type = MaType::try_from(fast_code).unwrap();
                     let slow_type = MaType::try_from(slow_code).unwrap();
                     let signal_type = MaType::try_from(signal_code).unwrap();
-                    let expected =
-                        crate::stream::moving_average_convergence_divergence_extended(&input, 7, fast_type, 13, slow_type, 5, signal_type)
-                            .unwrap();
-                    let mut state =
-                        MovingAverageConvergenceDivergenceExtended::new(7, fast_type, 13, slow_type, 5, signal_type).unwrap();
+                    let expected = crate::stream::moving_average_convergence_divergence_extended(
+                        &input,
+                        7,
+                        fast_type,
+                        13,
+                        slow_type,
+                        5,
+                        signal_type,
+                    )
+                    .unwrap();
+                    let mut state = MovingAverageConvergenceDivergenceExtended::new(
+                        7,
+                        fast_type,
+                        13,
+                        slow_type,
+                        5,
+                        signal_type,
+                    )
+                    .unwrap();
                     for (index, input) in input.iter().copied().enumerate() {
                         match state.append(input) {
                             Some(actual) => {
@@ -184,8 +203,16 @@ pub fn moving_average_convergence_divergence_extended(
         (slowperiod, slowmatype, fastperiod, fastmatype)
     };
 
-    if fastmatype == MaType::ExponentialMovingAverage && slowmatype == MaType::ExponentialMovingAverage && signalmatype == MaType::ExponentialMovingAverage {
-        return super::macd::moving_average_convergence_divergence(input, fastperiod, slowperiod, signalperiod);
+    if fastmatype == MaType::ExponentialMovingAverage
+        && slowmatype == MaType::ExponentialMovingAverage
+        && signalmatype == MaType::ExponentialMovingAverage
+    {
+        return super::macd::moving_average_convergence_divergence(
+            input,
+            fastperiod,
+            slowperiod,
+            signalperiod,
+        );
     }
 
     let len = input.len();

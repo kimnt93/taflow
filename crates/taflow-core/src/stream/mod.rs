@@ -3,24 +3,14 @@
 //! Each TA implementation lives in its own module and retains only the bounded
 //! recurrence state required to process newly appended bars.
 
-use crate::error::TaError;
-
 mod accbands;
-mod math_operator;
-mod math_transform;
-mod price_transform;
-mod statistic;
-mod cycle;
-mod pattern;
 mod adx;
 mod adxr;
 mod apo;
 mod aroon;
+pub use aroon::aroon;
+mod aroon_true_range;
 mod bbands;
-mod cci;
-mod candle_doji;
-mod candle_dojistar;
-mod candle_dragonflydoji;
 mod candle_2crows;
 mod candle_3blackcrows;
 mod candle_3inside;
@@ -36,6 +26,9 @@ mod candle_closingmarubozu;
 mod candle_concealbabyswall;
 mod candle_counterattack;
 mod candle_darkcloudcover;
+mod candle_doji;
+mod candle_dojistar;
+mod candle_dragonflydoji;
 mod candle_engulfing;
 mod candle_eveningdojistar;
 mod candle_eveningstar;
@@ -43,17 +36,17 @@ mod candle_gapsidesidewhite;
 mod candle_gravestonedoji;
 mod candle_hammer;
 mod candle_hangingman;
-mod candle_haramicross;
 mod candle_harami;
+mod candle_haramicross;
+mod candle_highwave;
 mod candle_hikkake;
 mod candle_hikkakemod;
-mod candle_highwave;
 mod candle_homingpigeon;
 mod candle_identical3crows;
 mod candle_inneck;
 mod candle_invertedhammer;
-mod candle_kickingbylength;
 mod candle_kicking;
+mod candle_kickingbylength;
 mod candle_ladderbottom;
 mod candle_longleggeddoji;
 mod candle_longline;
@@ -79,17 +72,19 @@ mod candle_tristar;
 mod candle_unique3river;
 mod candle_upsidegap2crows;
 mod candle_xsidegap3methods;
+mod cci;
 mod cmo;
+mod cycle;
 mod dema;
 mod directional;
 mod dx;
 mod ema;
-mod ht_trendline;
-mod ht_trendmode;
 mod ht_dcperiod;
 mod ht_dcphase;
 mod ht_phasor;
 mod ht_sine;
+mod ht_trendline;
+mod ht_trendmode;
 mod imi;
 mod indicator;
 mod kama;
@@ -98,91 +93,90 @@ mod macd;
 mod macdext;
 mod macdfix;
 mod mama;
+mod math_operator;
+mod math_price;
+mod math_transform;
 mod mavp;
 mod mfi;
 mod minus_di;
 mod minus_dm;
 mod moving_average;
-mod ppo;
+mod pattern;
 mod plus_di;
 mod plus_dm;
-mod rsi;
-mod rolling_sum;
+mod ppo;
+mod price_transform;
+mod regression;
 mod rolling_extrema;
 mod rolling_median;
 mod rolling_mode;
 mod rolling_price;
-mod volume_states;
-mod aroon_true_range;
 mod rolling_statistics;
-mod regression;
-mod math_price;
+mod rolling_sum;
+mod rsi;
 mod session_flags;
+mod statistic;
+mod volume_states;
 pub use session_flags::session_flags;
-mod cumulative_sum;
-mod cumulative_product;
 mod cumulative_maximum;
 mod cumulative_minimum;
-pub use cumulative_sum::CumulativeSum;
-pub use cumulative_product::CumulativeProduct;
+mod cumulative_product;
+mod cumulative_sum;
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
+pub use cumulative_product::CumulativeProduct;
+pub use cumulative_sum::CumulativeSum;
+mod anchored_volume_weighted_average_price;
+mod even_better_sinewave;
+mod fibonacci_retracement;
+mod heikin_ashi;
+mod helpers;
+mod jurik_moving_average;
+mod klinger_volume_oscillator;
+mod lag;
 mod lagged;
 mod lagged_common;
+mod laguerre_rsi;
+mod log_return;
 mod momentum;
+mod opening_range;
+mod operator_states;
+mod parabolic_moving_average_stop;
+mod pivot_points;
+mod premium_discount;
 mod rate_of_change;
 mod rate_of_change_percent;
 mod rate_of_change_ratio;
 mod rate_of_change_ratio_percent;
 mod rmi;
-mod laguerre_rsi;
-mod even_better_sinewave;
-mod jurik_moving_average;
-mod ssl_channel;
-mod premium_discount;
-mod heikin_ashi;
-mod fibonacci_retracement;
-mod opening_range;
-mod session_volume_levels;
-mod klinger_volume_oscillator;
-mod lag;
-mod log_return;
-mod parabolic_moving_average_stop;
-mod tom_de_mark_sequential;
-mod anchored_volume_weighted_average_price;
-mod pivot_points;
 mod sar;
 mod sarext;
+mod session_volume_levels;
 mod sma;
+mod ssl_channel;
 mod stoch;
 mod stochf;
 mod stochrsi;
 mod t3;
 mod tema;
-mod trix;
+mod tom_de_mark_sequential;
 mod trima;
+mod trix;
 mod ultosc;
-mod window;
-mod wma;
 mod vidya;
-mod operator_states;
+mod window;
+pub(crate) use helpers::invalid_period;
+mod wma;
 
-pub use accbands::{AccelerationBands, AccelerationBandsValue, acceleration_bands};
-pub use adx::{AverageDirectionalIndex, average_directional_index};
-pub use adxr::{AverageDirectionalIndexRating, average_directional_index_rating};
-pub use apo::{AbsolutePriceOscillator, absolute_price_oscillator};
-pub use math_operator::{add, sub, mult, div, rolling_max, rolling_argmax, rolling_min, rolling_argmin, rolling_sum, rolling_minmax, rolling_minmax_index};
-pub use math_transform::{acos, asin, atan, ceil, cos, cosh, exp, floor, ln, log10, sin, sinh, sqrt, tan, tanh};
-pub use price_transform::{average_price, median_price, typical_price, weighted_close};
-pub use statistic::{rolling_avgdev, rolling_std, rolling_var, rolling_beta, rolling_corr, rolling_linreg, rolling_linreg_angle, rolling_linreg_intercept, rolling_linreg_slope, rolling_tsf};
-pub use cycle::{hilbert_transform_dominant_cycle_period, hilbert_transform_dominant_cycle_phase, hilbert_transform_phasor, hilbert_transform_sine_wave, hilbert_transform_trend_mode};
-pub use pattern::{candle_doji, candle_hammer, candle_engulfing, candle_closing_marubozu, candle_dragonfly_doji, candle_gravestone_doji, candle_high_wave, candle_long_legged_doji, candle_long_line, candle_marubozu, candle_rickshawman, candle_short_line, candle_spinningtop, candle_takuri, candle_two_crows, candle_counterattack, candle_dark_cloud_cover, candle_doji_star, candle_hanging_man, candle_harami, candle_harami_cross, candle_hikkake, candle_hikkake_modified, candle_homing_pigeon, candle_in_neck, candle_inverted_hammer, candle_kicking, candle_kicking_by_length, candle_matching_low, candle_on_neck, candle_piercing, candle_separating_lines, candle_shooting_star, candle_stick_sandwich, candle_thrusting, candle_belt_hold, candle_three_black_crows, candle_three_inside, candle_three_line_strike, candle_three_outside, candle_three_stars_in_south, candle_three_white_soldiers, candle_abandoned_baby, candle_advance_block, candle_breakaway, candle_conceal_baby_swall, candle_evening_doji_star, candle_evening_star, candle_gap_side_side_white, candle_identical_three_crows, candle_ladder_bottom, candle_mat_hold, candle_morning_doji_star, candle_morning_star, candle_rise_fall_three_methods, candle_stalled_pattern, candle_tasuki_gap, candle_tri_star, candle_unique_three_river, candle_upside_gap_two_crows, candle_xside_gap_three_methods};
-pub use aroon::{aroon, aroon_oscillator};
-pub use bbands::{BollingerBands, BollingerBandsValue, bollinger_bands};
-pub use cci::{CommodityChannelIndex, commodity_channel_index};
-pub use candle_doji::CandleDoji;
-pub use candle_dojistar::CandleDojiStar;
-pub use candle_dragonflydoji::CandleDragonflyDoji;
+pub use accbands::{acceleration_bands, AccelerationBands, AccelerationBandsValue};
+pub use adx::{average_directional_index, AverageDirectionalIndex};
+pub use adxr::{average_directional_index_rating, AverageDirectionalIndexRating};
+pub use anchored_volume_weighted_average_price::AnchoredVolumeWeightedAveragePrice;
+pub use apo::{absolute_price_oscillator, AbsolutePriceOscillator};
+pub use aroon_true_range::{
+    Aroon, AroonOscillator, AroonValue, AverageTrueRange, NormalizedAverageTrueRange, TrueRange,
+};
+pub use bbands::{bollinger_bands, BollingerBands, BollingerBandsValue};
 pub use candle_2crows::CandleTwoCrows;
 pub use candle_3blackcrows::CandleThreeBlackCrows;
 pub use candle_3inside::CandleThreeInside;
@@ -198,6 +192,9 @@ pub use candle_closingmarubozu::CandleClosingMarubozu;
 pub use candle_concealbabyswall::CandleConcealBabySwall;
 pub use candle_counterattack::CandleCounterAttack;
 pub use candle_darkcloudcover::CandleDarkCloudCover;
+pub use candle_doji::CandleDoji;
+pub use candle_dojistar::CandleDojiStar;
+pub use candle_dragonflydoji::CandleDragonflyDoji;
 pub use candle_engulfing::CandleEngulfing;
 pub use candle_eveningdojistar::CandleEveningDojiStar;
 pub use candle_eveningstar::CandleEveningStar;
@@ -205,17 +202,17 @@ pub use candle_gapsidesidewhite::CandleGapSideSideWhite;
 pub use candle_gravestonedoji::CandleGravestoneDoji;
 pub use candle_hammer::CandleHammer;
 pub use candle_hangingman::CandleHangingMan;
-pub use candle_haramicross::CandleHaramiCross;
 pub use candle_harami::CandleHarami;
+pub use candle_haramicross::CandleHaramiCross;
+pub use candle_highwave::CandleHighWave;
 pub use candle_hikkake::CandleHikkake;
 pub use candle_hikkakemod::CandleHikkakeModified;
-pub use candle_highwave::CandleHighWave;
 pub use candle_homingpigeon::CandleHomingPigeon;
 pub use candle_identical3crows::CandleIdenticalThreeCrows;
 pub use candle_inneck::CandleInNeck;
 pub use candle_invertedhammer::CandleInvertedHammer;
-pub use candle_kickingbylength::CandleKickingByLength;
 pub use candle_kicking::CandleKicking;
+pub use candle_kickingbylength::CandleKickingByLength;
 pub use candle_ladderbottom::CandleLadderBottom;
 pub use candle_longleggeddoji::CandleLongLeggedDoji;
 pub use candle_longline::CandleLongLine;
@@ -241,88 +238,255 @@ pub use candle_tristar::CandleTriStar;
 pub use candle_unique3river::CandleUniqueThreeRiver;
 pub use candle_upsidegap2crows::CandleUpsideGapTwoCrows;
 pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
-pub use cmo::{ChandeMomentumOscillator, chande_momentum_oscillator};
-pub use dema::{DoubleExponentialMovingAverage, double_exponential_moving_average};
-pub use dx::{DirectionalMovementIndex, directional_movement_index};
-pub use ema::{ExponentialMovingAverage, exponential_moving_average};
-pub use ht_trendline::{HilbertTransformTrendline, hilbert_transform_trendline};
-pub use ht_trendmode::HilbertTransformTrendMode;
+pub use cci::{commodity_channel_index, CommodityChannelIndex};
+pub use cmo::{chande_momentum_oscillator, ChandeMomentumOscillator};
+pub use dema::{double_exponential_moving_average, DoubleExponentialMovingAverage};
+pub use dx::{directional_movement_index, DirectionalMovementIndex};
+pub use ema::{exponential_moving_average, ExponentialMovingAverage};
+pub use even_better_sinewave::EvenBetterSinewave;
+pub use fibonacci_retracement::FibonacciRetracement;
+pub use heikin_ashi::HeikinAshi;
 pub use ht_dcperiod::HilbertTransformDominantCyclePeriod;
 pub use ht_dcphase::HilbertTransformDominantCyclePhase;
 pub use ht_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
 pub use ht_sine::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
-pub use imi::{IntradayMomentumIndex, intraday_momentum_index};
+pub use ht_trendline::{hilbert_transform_trendline, HilbertTransformTrendline};
+pub use ht_trendmode::HilbertTransformTrendMode;
+pub use imi::{intraday_momentum_index, IntradayMomentumIndex};
 pub use indicator::StreamingIndicator;
-pub use kama::{KaufmanAdaptiveMovingAverage, kaufman_adaptive_moving_average};
-pub use ma::{MovingAverage, moving_average};
-pub use macd::{MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue, moving_average_convergence_divergence};
-pub use macdext::{MovingAverageConvergenceDivergenceExtended, moving_average_convergence_divergence_extended};
-pub use macdfix::{MovingAverageConvergenceDivergenceFixed, moving_average_convergence_divergence_fixed};
-pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue, mesa_adaptive_moving_average};
-pub use mavp::{VariablePeriodMovingAverage, moving_average_variable_period};
-pub use mfi::{MoneyFlowIndex, money_flow_index};
-pub use minus_di::{MinusDirectionalIndicator, minus_directional_indicator};
-pub use minus_dm::{MinusDirectionalMovement, minus_directional_movement};
-pub use ppo::{PercentagePriceOscillator, percentage_price_oscillator};
-pub use plus_di::{PlusDirectionalIndicator, plus_directional_indicator};
-pub use plus_dm::{PlusDirectionalMovement, plus_directional_movement};
-pub use rsi::{RelativeStrengthIndex, relative_strength_index};
-pub use rolling_sum::RollingSum;
-pub use math_price::{Acos, Add, AveragePrice, Asin, Atan, Ceil, Cos, Cosh, Div, Exp, Floor, Ln, Log10, MedianPrice, Mult, Sin, Sinh, Sqrt, Sub, Tan, Tanh, TypicalPrice, WeightedClose};
-pub use lagged::{Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent, momentum, rate_of_change, rate_of_change_percent, rate_of_change_ratio, rate_of_change_ratio_percent};
-pub use rolling_extrema::{RollingArgmax, RollingArgmin, RollingMax, RollingMin, RollingMinmax, RollingMinmaxIndex, RollingMinmaxIndexValue, RollingMinmaxValue};
-pub use rolling_median::RollingMedian;
-pub use rolling_mode::RollingMode;
-use rolling_extrema::RollingExtrema;
-pub use rolling_price::{RollingMidpoint, RollingMidprice, midpoint, midprice};
-pub use volume_states::{AccumulationDistribution, AccumulationDistributionOscillator, BalanceOfPower, OnBalanceVolume, WilliamsPercentR, accumulation_distribution, accumulation_distribution_oscillator, balance_of_power, on_balance_volume, williams_percent_r};
-pub use aroon_true_range::{Aroon, AroonOscillator, AroonValue, AverageTrueRange, NormalizedAverageTrueRange, TrueRange, average_true_range, normalized_average_true_range, true_range};
-pub use rolling_statistics::{RollingAverageDeviation, RollingBeta, RollingCorrelation, RollingStandardDeviation, RollingVariance};
+pub use jurik_moving_average::JurikMovingAverage;
+pub use kama::{kaufman_adaptive_moving_average, KaufmanAdaptiveMovingAverage};
+pub use klinger_volume_oscillator::KlingerVolumeOscillator;
+pub use lag::Lag;
+pub use lagged::{
+    momentum, rate_of_change, rate_of_change_percent, rate_of_change_ratio,
+    rate_of_change_ratio_percent, Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio,
+    RateOfChangeRatioPercent,
+};
+pub use laguerre_rsi::LaguerreRelativeStrengthIndex;
+pub use log_return::LogReturn;
+pub use ma::{moving_average, MovingAverage};
+pub use macd::{
+    moving_average_convergence_divergence, MovingAverageConvergenceDivergence,
+    MovingAverageConvergenceDivergenceValue,
+};
+pub use macdext::{
+    moving_average_convergence_divergence_extended, MovingAverageConvergenceDivergenceExtended,
+};
+pub use macdfix::{
+    moving_average_convergence_divergence_fixed, MovingAverageConvergenceDivergenceFixed,
+};
+pub use mama::{
+    mesa_adaptive_moving_average, MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue,
+};
+pub use math_operator::rolling_sum;
+pub use math_price::{
+    Acos, Add, Asin, Atan, AveragePrice, Ceil, Cos, Cosh, Div, Exp, Floor, Ln, Log10, MedianPrice,
+    Mult, Sin, Sinh, Sqrt, Sub, Tan, Tanh, TypicalPrice, WeightedClose,
+};
+pub use mavp::{variable_period_moving_average, VariablePeriodMovingAverage};
+pub use mfi::{money_flow_index, MoneyFlowIndex};
+pub use minus_di::{minus_directional_indicator, MinusDirectionalIndicator};
+pub use minus_dm::{minus_directional_movement, MinusDirectionalMovement};
+pub use opening_range::OpeningRange;
+pub use operator_states::{
+    ActiveZoneList, Amihud, ArnaudLegouxMovingAverage, AverageDailyDollarValue, AwesomeOscillator,
+    BarsSince, BreakOfStructureChangeOfCharacter, BreakOfStructureChangeOfCharacterValue,
+    ChaikinMoneyFlow, ChaikinVolatility, CloseToCloseSigma, Cross, Crossover, Crossunder,
+    CumulativeSumControlChart, DetrendedPriceOscillator, Donchian, DonchianValue, Drawdown,
+    EaseOfMovement, EntryExit, EqualHighsLows, EqualHighsLowsValue,
+    ExponentiallyWeightedCorrelation, ExponentiallyWeightedCovariance,
+    ExponentiallyWeightedStandardDeviation, ExponentiallyWeightedVariance, FairValueGap,
+    FairValueGapValue, Falling, FisherTransform, ForceIndex, FracDiff, GapDown, GapUp, GarmanKlass,
+    GarmanKlassYangZhang, HedgeRatio, HigherHigh, HighestSince, HullMovingAverage, Hurst, Ichimoku,
+    IchimokuValue, InsideBar, KalmanHedgeRatio, KeltnerChannels, KeltnerValue, KnowSureThing,
+    KnowSureThingValue, Liquidity, LiquidityValue, LowerLow, LowestSince, MassIndex,
+    McGinleyDynamic, NegativeVolumeIndex, OrderBlock, OrderBlockValue, OrnsteinUhlenbeckHalfLife,
+    OutsideBar, Parkinson, PositionHold, PositiveVolumeIndex, PreviousHighLow,
+    PreviousHighLowValue, Retracements, RetracementsValue, Rising, RogersSatchell, RollSpread,
+    RollingAlpha, RollingAutocorr, RollingCalmar, RollingCov, RollingEntropy,
+    RollingInformationRatio, RollingInterquartileRange, RollingKurtosis, RollingQuantile,
+    RollingRank, RollingSharpe, RollingSkew, RollingSortino, RollingVolumeWeightedAveragePrice,
+    RollingWinsorize, RollingZScore, SchaffTrendCycle, SchaffTrendCycleValue, SessionExtrema,
+    SessionExtremaValue, Sessions, SessionsValue, SignalDelay, SpreadZScore, Squeeze, SqueezePro,
+    SqueezeProValue, SqueezeValue, Supertrend, SupertrendValue, SwingHighLow, SwingValue,
+    TrueStrengthIndex, UlcerIndex, ValueWhen, VolumePriceTrend, VolumeWeightedMovingAverage,
+    Vortex, VortexValue, YangZhang, ZeroLagExponentialMovingAverage,
+};
+pub use parabolic_moving_average_stop::ParabolicMovingAverageStop;
+pub use pivot_points::PivotPoints;
+pub use plus_di::{plus_directional_indicator, PlusDirectionalIndicator};
+pub use plus_dm::{plus_directional_movement, PlusDirectionalMovement};
+pub use ppo::{percentage_price_oscillator, PercentagePriceOscillator};
+pub use premium_discount::PremiumDiscount;
 pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlope, Tsf};
 pub use rmi::RelativeMomentumIndex;
-pub use laguerre_rsi::LaguerreRelativeStrengthIndex;
-pub use lag::Lag;
-pub use log_return::LogReturn;
-pub use even_better_sinewave::EvenBetterSinewave;
-pub use jurik_moving_average::JurikMovingAverage;
-pub use ssl_channel::SmoothedTrendChannel;
-pub use premium_discount::PremiumDiscount;
-pub use heikin_ashi::HeikinAshi;
-pub use fibonacci_retracement::FibonacciRetracement;
-pub use opening_range::OpeningRange;
+pub(crate) use rolling_extrema::RollingExtrema;
+pub use rolling_extrema::{
+    RollingArgmax, RollingArgmin, RollingMax, RollingMin, RollingMinmax, RollingMinmaxIndex,
+    RollingMinmaxIndexValue, RollingMinmaxValue,
+};
+pub use rolling_median::RollingMedian;
+pub use rolling_mode::RollingMode;
+pub use rolling_price::{RollingMidpoint, RollingMidprice};
+pub use rolling_statistics::{
+    RollingAverageDeviation, RollingBeta, RollingCorrelation, RollingStandardDeviation,
+    RollingVariance,
+};
+pub use rolling_sum::RollingSum;
+pub use rsi::{relative_strength_index, RelativeStrengthIndex};
+pub use sar::{parabolic_sar, ParabolicSar};
+pub use sarext::{parabolic_sar_extended, ParabolicSarExtended};
 pub use session_volume_levels::SessionVolumeLevels;
-pub use klinger_volume_oscillator::KlingerVolumeOscillator;
-pub use parabolic_moving_average_stop::ParabolicMovingAverageStop;
+pub use sma::{simple_moving_average, SimpleMovingAverage};
+pub use ssl_channel::SmoothedTrendChannel;
+pub use stoch::{stochastic_oscillator, StochasticOscillator, StochasticOscillatorValue};
+pub use stochf::{
+    fast_stochastic_oscillator, FastStochasticOscillator, FastStochasticOscillatorValue,
+};
+pub use stochrsi::{
+    stochastic_relative_strength_index, StochasticRelativeStrengthIndex,
+    StochasticRelativeStrengthIndexValue,
+};
+pub use t3::{triple_exponential_average, TripleExponentialAverage};
+pub use tema::{triple_exponential_moving_average, TripleExponentialMovingAverage};
 pub use tom_de_mark_sequential::TomDeMarkSequential;
-pub use anchored_volume_weighted_average_price::AnchoredVolumeWeightedAveragePrice;
-pub use pivot_points::PivotPoints;
-pub use sar::{ParabolicSar, parabolic_sar};
-pub use sarext::{ParabolicSarExtended, extended_parabolic_sar};
-pub use sma::{SimpleMovingAverage, simple_moving_average};
-pub use stoch::{StochasticOscillator, StochasticOscillatorValue, stochastic_oscillator};
-pub use stochf::{FastStochasticOscillator, FastStochasticOscillatorValue, fast_stochastic_oscillator};
-pub use stochrsi::{StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue, stochastic_relative_strength_index};
-pub use t3::{TripleExponentialAverage, triple_exponential_average};
-pub use tema::{TripleExponentialMovingAverage, triple_exponential_moving_average};
-pub use trix::{TripleExponentialRateOfChange, triple_exponential_rate_of_change};
-pub use trima::{TriangularMovingAverage, triangular_moving_average};
-pub use ultosc::{UltimateOscillator, ultimate_oscillator};
-pub use operator_states::{ActiveZoneList, AverageDailyDollarValue, ArnaudLegouxMovingAverage, Amihud, AwesomeOscillator, BarsSince, BreakOfStructureChangeOfCharacter, BreakOfStructureChangeOfCharacterValue, ChaikinVolatility, ChaikinMoneyFlow, CloseToCloseSigma, Cross, Crossover, Crossunder, CumulativeSumControlChart, Donchian, DonchianValue, DetrendedPriceOscillator, Drawdown, EaseOfMovement, EntryExit, EqualHighsLows, EqualHighsLowsValue, ExponentiallyWeightedCorrelation, ExponentiallyWeightedCovariance, ExponentiallyWeightedStandardDeviation, ExponentiallyWeightedVariance, Falling, FairValueGap, FairValueGapValue, FisherTransform, ForceIndex, FracDiff, GarmanKlass, GapDown, GapUp, GarmanKlassYangZhang, HedgeRatio, HighestSince, HullMovingAverage, HigherHigh, Hurst, Ichimoku, IchimokuValue, InsideBar, KalmanHedgeRatio, KeltnerChannels, KeltnerValue, KnowSureThing, KnowSureThingValue, LowerLow, LowestSince, Liquidity, LiquidityValue, MassIndex, McGinleyDynamic, NegativeVolumeIndex, OrderBlock, OrderBlockValue, OutsideBar, OrnsteinUhlenbeckHalfLife, Parkinson, PositionHold, PreviousHighLow, PreviousHighLowValue, PositiveVolumeIndex, Retracements, RetracementsValue, Rising, RollingAlpha, RollingAutocorr, RollingCalmar, RollingCov, RollingEntropy, RollingInformationRatio, RollingInterquartileRange, RollingKurtosis, RollingQuantile, RollingRank, RollingSharpe, RollingSkew, RollingSortino, RollingWinsorize, RollingZScore, RogersSatchell, RollSpread, SessionExtrema, SessionExtremaValue, Sessions, SessionsValue, SignalDelay, SpreadZScore, Squeeze, SqueezePro, SqueezeProValue, SqueezeValue, SchaffTrendCycle, SchaffTrendCycleValue, Supertrend, SupertrendValue, SwingHighLow, SwingValue, TrueStrengthIndex, UlcerIndex, ValueWhen, Vortex, VortexValue, VolumePriceTrend, RollingVolumeWeightedAveragePrice, VolumeWeightedMovingAverage, YangZhang, ZeroLagExponentialMovingAverage};
-pub use window::Window;
-pub use wma::{WeightedMovingAverage, weighted_moving_average};
+pub use trima::{triangular_moving_average, TriangularMovingAverage};
+pub use trix::{triple_exponential_rate_of_change, TripleExponentialRateOfChange};
+pub use ultosc::{ultimate_oscillator, UltimateOscillator};
 pub use vidya::VariableIndexDynamicAverage;
+pub use window::Window;
+pub use wma::{weighted_moving_average, WeightedMovingAverage};
 
-pub(super) fn invalid_period(name: &'static str, period: usize, minimum: usize) -> TaError {
-    TaError::InvalidParameter {
-        name,
-        value: period.to_string(),
-        reason: if minimum == 1 {
-            "must be >= 1"
-        } else {
-            "must be >= 2"
-        },
-    }
-}
+mod true_range;
+pub use true_range::true_range;
+mod average_true_range;
+pub use average_true_range::average_true_range;
+mod normalized_average_true_range;
+pub use normalized_average_true_range::normalized_average_true_range;
+mod add;
+pub use add::add;
+mod sub;
+pub use sub::sub;
+mod mult;
+pub use mult::mult;
+mod div;
+pub use div::div;
+mod rolling_max;
+pub use rolling_max::rolling_max;
+mod rolling_argmax;
+pub use rolling_argmax::rolling_argmax;
+mod rolling_min;
+pub use rolling_min::rolling_min;
+mod rolling_argmin;
+pub use rolling_argmin::rolling_argmin;
+mod rolling_minmax;
+pub use rolling_minmax::rolling_minmax;
+mod rolling_minmax_index;
+pub use rolling_minmax_index::rolling_minmax_index;
+mod average_price;
+pub use average_price::average_price;
+mod median_price;
+pub use median_price::median_price;
+mod typical_price;
+pub use typical_price::typical_price;
+mod weighted_close;
+pub use weighted_close::weighted_close;
+mod rolling_avgdev;
+pub use rolling_avgdev::rolling_avgdev;
+mod rolling_std;
+pub use rolling_std::rolling_std;
+mod rolling_var;
+pub use rolling_var::rolling_var;
+mod rolling_beta;
+pub use rolling_beta::rolling_beta;
+mod rolling_corr;
+pub use rolling_corr::rolling_corr;
+mod rolling_linreg;
+pub use rolling_linreg::rolling_linreg;
+mod rolling_linreg_slope;
+pub use rolling_linreg_slope::rolling_linreg_slope;
+mod rolling_linreg_intercept;
+pub use rolling_linreg_intercept::rolling_linreg_intercept;
+mod rolling_linreg_angle;
+pub use rolling_linreg_angle::rolling_linreg_angle;
+mod rolling_tsf;
+pub use rolling_tsf::rolling_tsf;
+mod hilbert_transform_dominant_cycle_period;
+pub use hilbert_transform_dominant_cycle_period::hilbert_transform_dominant_cycle_period;
+mod hilbert_transform_phasor;
+pub use hilbert_transform_phasor::hilbert_transform_phasor;
+mod hilbert_transform_dominant_cycle_phase;
+pub use hilbert_transform_dominant_cycle_phase::hilbert_transform_dominant_cycle_phase;
+mod hilbert_transform_sine_wave;
+pub use hilbert_transform_sine_wave::hilbert_transform_sine_wave;
+mod hilbert_transform_trend_mode;
+pub use hilbert_transform_trend_mode::hilbert_transform_trend_mode;
+mod rolling_midpoint;
+pub use rolling_midpoint::rolling_midpoint;
+mod rolling_midprice;
+pub use candle_2crows::candle_two_crows;
+pub use candle_3blackcrows::candle_three_black_crows;
+pub use candle_3inside::candle_three_inside;
+pub use candle_3linestrike::candle_three_line_strike;
+pub use candle_3outside::candle_three_outside;
+pub use candle_3starsinsouth::candle_three_stars_in_south;
+pub use candle_3whitesoldiers::candle_three_white_soldiers;
+pub use candle_abandonedbaby::candle_abandoned_baby;
+pub use candle_advanceblock::candle_advance_block;
+pub use candle_belthold::candle_belt_hold;
+pub use candle_breakaway::candle_breakaway;
+pub use candle_closingmarubozu::candle_closing_marubozu;
+pub use candle_concealbabyswall::candle_conceal_baby_swall;
+pub use candle_counterattack::candle_counterattack;
+pub use candle_darkcloudcover::candle_dark_cloud_cover;
+pub use candle_doji::candle_doji;
+pub use candle_dojistar::candle_doji_star;
+pub use candle_dragonflydoji::candle_dragonfly_doji;
+pub use candle_engulfing::candle_engulfing;
+pub use candle_eveningdojistar::candle_evening_doji_star;
+pub use candle_eveningstar::candle_evening_star;
+pub use candle_gapsidesidewhite::candle_gap_side_side_white;
+pub use candle_gravestonedoji::candle_gravestone_doji;
+pub use candle_hammer::candle_hammer;
+pub use candle_hangingman::candle_hanging_man;
+pub use candle_harami::candle_harami;
+pub use candle_haramicross::candle_harami_cross;
+pub use candle_highwave::candle_high_wave;
+pub use candle_hikkake::candle_hikkake;
+pub use candle_hikkakemod::candle_hikkake_modified;
+pub use candle_homingpigeon::candle_homing_pigeon;
+pub use candle_identical3crows::candle_identical_three_crows;
+pub use candle_inneck::candle_in_neck;
+pub use candle_invertedhammer::candle_inverted_hammer;
+pub use candle_kicking::candle_kicking;
+pub use candle_kickingbylength::candle_kicking_by_length;
+pub use candle_ladderbottom::candle_ladder_bottom;
+pub use candle_longleggeddoji::candle_long_legged_doji;
+pub use candle_longline::candle_long_line;
+pub use candle_marubozu::candle_marubozu;
+pub use candle_matchinglow::candle_matching_low;
+pub use candle_mathold::candle_mat_hold;
+pub use candle_morningdojistar::candle_morning_doji_star;
+pub use candle_morningstar::candle_morning_star;
+pub use candle_onneck::candle_on_neck;
+pub use candle_piercing::candle_piercing;
+pub use candle_rickshawman::candle_rickshawman;
+pub use candle_risefall3methods::candle_rise_fall_three_methods;
+pub use candle_separatinglines::candle_separating_lines;
+pub use candle_shootingstar::candle_shooting_star;
+pub use candle_shortline::candle_short_line;
+pub use candle_spinningtop::candle_spinningtop;
+pub use candle_stalledpattern::candle_stalled_pattern;
+pub use candle_sticksandwich::candle_stick_sandwich;
+pub use candle_takuri::candle_takuri;
+pub use candle_tasukigap::candle_tasuki_gap;
+pub use candle_thrusting::candle_thrusting;
+pub use candle_tristar::candle_tri_star;
+pub use candle_unique3river::candle_unique_three_river;
+pub use candle_upsidegap2crows::candle_upside_gap_two_crows;
+pub use candle_xsidegap3methods::candle_xside_gap_three_methods;
+pub use rolling_midprice::rolling_midprice;
 
 #[cfg(test)]
 mod tests {
@@ -357,7 +521,7 @@ mod tests {
         let tema_batch = triple_exponential_moving_average(&input, 7).unwrap();
         let trima_batch = triangular_moving_average(&input, 7).unwrap();
         let kama_batch = kaufman_adaptive_moving_average(&input, 7).unwrap();
-        let midpoint_batch = midpoint(&input, 7).unwrap();
+        let midpoint_batch = rolling_midpoint(&input, 7).unwrap();
         let rsi_batch = relative_strength_index(&input, 14).unwrap();
         let cmo_batch = chande_momentum_oscillator(&input, 14).unwrap();
         let mom_batch = momentum(&input, 7).unwrap();
@@ -416,7 +580,7 @@ mod tests {
             .enumerate()
             .map(|(i, value)| value - 0.8 - (i % 4) as f64 * 0.15)
             .collect();
-        let expected = midprice(&high, &low, 7).unwrap();
+        let expected = rolling_midprice(&high, &low, 7).unwrap();
         let mut state = RollingMidprice::new(7).unwrap();
         for index in 0..close.len() {
             assert_optional_eq(state.append(high[index], low[index]), expected[index]);
@@ -648,7 +812,8 @@ mod tests {
             .map(|index| 1_000.0 + (index % 13) as f64 * 37.0)
             .collect();
         let ad_expected = accumulation_distribution(&high, &low, &close, &volumes).unwrap();
-        let adosc_expected = accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
+        let adosc_expected =
+            accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
         let obv_expected = on_balance_volume(&close, &volumes).unwrap();
         let mut ad = AccumulationDistribution::new();
         let mut adosc = AccumulationDistributionOscillator::new(3, 10).unwrap();
@@ -771,3 +936,215 @@ mod tests {
         assert_eq!(first, second);
     }
 }
+mod acos;
+pub use acos::acos;
+mod asin;
+pub use asin::asin;
+mod atan;
+pub use atan::atan;
+mod ceil;
+pub use ceil::ceil;
+mod cos;
+pub use cos::cos;
+mod cosh;
+pub use cosh::cosh;
+mod exp;
+pub use exp::exp;
+mod floor;
+pub use floor::floor;
+mod ln;
+pub use ln::ln;
+mod log10;
+pub use log10::log10;
+mod sin;
+pub use sin::sin;
+mod sinh;
+pub use sinh::sinh;
+mod sqrt;
+pub use sqrt::sqrt;
+mod tan;
+pub use tan::tan;
+mod tanh;
+pub use tanh::tanh;
+mod on_balance_volume;
+pub use on_balance_volume::on_balance_volume;
+pub use volume_states::{
+    AccumulationDistribution, AccumulationDistributionOscillator, BalanceOfPower, OnBalanceVolume,
+    WilliamsPercentR,
+};
+mod accumulation_distribution;
+pub use accumulation_distribution::accumulation_distribution;
+mod accumulation_distribution_oscillator;
+pub use accumulation_distribution_oscillator::accumulation_distribution_oscillator;
+mod balance_of_power;
+pub use balance_of_power::balance_of_power;
+mod williams_percent_r;
+pub use williams_percent_r::williams_percent_r;
+mod drawdown;
+pub use drawdown::drawdown;
+mod rolling_sharpe;
+pub use rolling_sharpe::rolling_sharpe;
+mod rolling_sortino;
+pub use rolling_sortino::rolling_sortino;
+mod rolling_calmar;
+pub use rolling_calmar::rolling_calmar;
+mod hull_moving_average;
+pub use hull_moving_average::hull_moving_average;
+mod volume_weighted_moving_average;
+pub use volume_weighted_moving_average::volume_weighted_moving_average;
+mod zero_lag_exponential_moving_average;
+pub use zero_lag_exponential_moving_average::zero_lag_exponential_moving_average;
+mod arnaud_legoux_moving_average;
+pub use arnaud_legoux_moving_average::arnaud_legoux_moving_average;
+mod true_strength_index;
+pub use true_strength_index::true_strength_index;
+mod awesome_oscillator;
+pub use awesome_oscillator::awesome_oscillator;
+mod fisher_transform;
+pub use fisher_transform::fisher_transform;
+mod ulcer_index;
+pub use ulcer_index::ulcer_index;
+mod chaikin_volatility;
+pub use chaikin_volatility::chaikin_volatility;
+mod rolling_volume_weighted_average_price;
+pub use rolling_volume_weighted_average_price::rolling_volume_weighted_average_price;
+mod force_index;
+pub use force_index::force_index;
+mod ease_of_movement;
+pub use ease_of_movement::ease_of_movement;
+mod rising;
+pub use rising::rising;
+mod falling;
+pub use falling::falling;
+mod rolling_entropy;
+pub use rolling_entropy::rolling_entropy;
+mod rolling_autocorr;
+pub use rolling_autocorr::rolling_autocorr;
+mod hurst;
+pub use hurst::hurst;
+mod fractal_dimension;
+pub use fractal_dimension::fractal_dimension;
+mod rolling_alpha;
+pub use rolling_alpha::rolling_alpha;
+mod rolling_information_ratio;
+pub use rolling_information_ratio::rolling_information_ratio;
+mod hedge_ratio;
+pub use hedge_ratio::hedge_ratio;
+mod session_extrema;
+pub use session_extrema::session_extrema;
+mod fair_value_gap;
+pub use fair_value_gap::fair_value_gap;
+mod break_of_structure_change_of_character;
+pub use break_of_structure_change_of_character::break_of_structure_change_of_character;
+mod order_block;
+pub use order_block::order_block;
+mod liquidity;
+pub use liquidity::liquidity;
+mod equal_highs_lows;
+pub use equal_highs_lows::equal_highs_lows;
+mod previous_high_low;
+pub use previous_high_low::previous_high_low;
+mod sessions;
+pub use sessions::sessions;
+mod retracements;
+pub use retracements::retracements;
+mod close_to_close_sigma;
+pub use close_to_close_sigma::close_to_close_sigma;
+mod parkinson;
+pub use parkinson::parkinson;
+mod garman_klass;
+pub use garman_klass::garman_klass;
+mod rogers_satchell;
+pub use rogers_satchell::rogers_satchell;
+mod garman_klass_yang_zhang;
+pub use garman_klass_yang_zhang::garman_klass_yang_zhang;
+mod yang_zhang;
+pub use yang_zhang::yang_zhang;
+mod time_series_rank;
+pub use time_series_rank::time_series_rank;
+mod signed_power;
+pub use signed_power::signed_power;
+mod decay_linear;
+pub use decay_linear::decay_linear;
+mod average_daily_dollar_value;
+pub use average_daily_dollar_value::average_daily_dollar_value;
+mod amihud;
+pub use amihud::amihud;
+mod roll_spread;
+pub use roll_spread::roll_spread;
+mod ornstein_uhlenbeck_half_life;
+pub use ornstein_uhlenbeck_half_life::ornstein_uhlenbeck_half_life;
+mod cumulative_sum_control_chart;
+pub use cumulative_sum_control_chart::cumulative_sum_control_chart;
+mod spread_zscore;
+pub use spread_zscore::spread_zscore;
+mod frac_diff;
+pub use frac_diff::frac_diff;
+mod kalman_hedge_ratio;
+pub use kalman_hedge_ratio::kalman_hedge_ratio;
+mod supertrend;
+pub use supertrend::supertrend;
+mod ichimoku;
+pub use ichimoku::ichimoku;
+mod squeeze;
+pub use squeeze::squeeze;
+mod squeeze_pro;
+pub use squeeze_pro::squeeze_pro;
+mod schaff_trend_cycle;
+pub use schaff_trend_cycle::schaff_trend_cycle;
+mod vortex;
+pub use vortex::vortex;
+mod know_sure_thing;
+pub use know_sure_thing::know_sure_thing;
+mod swing_highs_lows;
+pub use swing_highs_lows::swing_highs_lows;
+mod rolling_quantile;
+pub use rolling_quantile::rolling_quantile;
+mod rolling_percentile;
+pub use rolling_percentile::rolling_percentile;
+mod rolling_rank;
+pub use rolling_rank::rolling_rank;
+mod rolling_zscore;
+pub use rolling_zscore::rolling_zscore;
+mod rolling_skew;
+pub use rolling_skew::rolling_skew;
+mod rolling_kurtosis;
+pub use rolling_kurtosis::rolling_kurtosis;
+mod rolling_iqr;
+pub use rolling_iqr::rolling_iqr;
+mod rolling_cov;
+pub use rolling_cov::rolling_cov;
+mod rolling_winsorize;
+pub use rolling_winsorize::rolling_winsorize;
+mod ewm_var;
+pub use ewm_var::ewm_var;
+mod ewm_std;
+pub use ewm_std::ewm_std;
+mod ewm_cov;
+pub use ewm_cov::ewm_cov;
+mod ewm_corr;
+pub use ewm_corr::ewm_corr;
+mod mass_index;
+pub use mass_index::mass_index;
+mod detrended_price_oscillator;
+pub use detrended_price_oscillator::detrended_price_oscillator;
+mod chaikin_money_flow;
+pub use chaikin_money_flow::chaikin_money_flow;
+mod volume_price_trend;
+pub use volume_price_trend::volume_price_trend;
+mod negative_volume_index;
+pub use negative_volume_index::negative_volume_index;
+mod positive_volume_index;
+pub use positive_volume_index::positive_volume_index;
+mod mcginley_dynamic;
+pub use cumulative_maximum::cumulative_maximum;
+pub use cumulative_minimum::cumulative_minimum;
+pub use cumulative_product::cumulative_product;
+pub use cumulative_sum::cumulative_sum;
+pub use lag::lag;
+pub use log_return::log_return;
+pub use mcginley_dynamic::mcginley_dynamic;
+pub use rolling_median::rolling_median;
+pub use rolling_mode::rolling_mode;
+mod aroon_oscillator;
+pub use aroon_oscillator::aroon_oscillator;

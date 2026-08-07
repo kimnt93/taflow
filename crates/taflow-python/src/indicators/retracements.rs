@@ -28,12 +28,23 @@ impl RetracementsOperator {
     fn append(&mut self, high: f64, low: f64, close: f64) -> (f64, f64, f64) {
         let value = self.inner.append(high, low, close);
         self.direction.push(value.direction);
-        self.current_retracement_pct.push(value.current_retracement_pct);
-        self.deepest_retracement_pct.push(value.deepest_retracement_pct);
-        (value.direction, value.current_retracement_pct, value.deepest_retracement_pct)
+        self.current_retracement_pct
+            .push(value.current_retracement_pct);
+        self.deepest_retracement_pct
+            .push(value.deepest_retracement_pct);
+        (
+            value.direction,
+            value.current_retracement_pct,
+            value.deepest_retracement_pct,
+        )
     }
 
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
         if high.len() != low.len() || low.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
@@ -62,7 +73,11 @@ impl RetracementsOperator {
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64)> {
         self.inner.value().map(|value| {
-            (value.direction, value.current_retracement_pct, value.deepest_retracement_pct)
+            (
+                value.direction,
+                value.current_retracement_pct,
+                value.deepest_retracement_pct,
+            )
         })
     }
 

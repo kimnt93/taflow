@@ -19,9 +19,17 @@ use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn acceleration_bands(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+pub fn acceleration_bands(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
     if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+        return Err(crate::TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
     }
     let mut state = AccelerationBands::new(timeperiod)?;
     let mut upper = Vec::with_capacity(high.len());
@@ -43,6 +51,10 @@ pub fn acceleration_bands(high: &[f64], low: &[f64], close: &[f64], timeperiod: 
 
 /// One aligned upper, middle, and lower Acceleration Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `AccelerationBandsValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AccelerationBandsValue {
     pub upper: f64,
     pub middle: f64,
@@ -51,6 +63,10 @@ pub struct AccelerationBandsValue {
 
 /// Incremental Acceleration Bands with constant per-bar work.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `AccelerationBands`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AccelerationBands {
     upper: SimpleMovingAverage,
     middle: SimpleMovingAverage,
@@ -120,7 +136,6 @@ impl AccelerationBands {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 
     #[test]
     fn matches_batch_and_reset_replay() {

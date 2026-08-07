@@ -52,6 +52,10 @@ impl RollingMoments {
 
 /// Stateful population variance. TA-Lib accepts but ignores `nbdev` for VAR.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingVariance`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingVariance {
     moments: RollingMoments,
     value: Option<f64>,
@@ -91,6 +95,10 @@ impl StreamingIndicator for RollingVariance {
 
 /// Stateful population standard deviation multiplied by `nbdev`.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingStandardDeviation`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingStandardDeviation {
     moments: RollingMoments,
     nbdev: f64,
@@ -135,6 +143,10 @@ impl StreamingIndicator for RollingStandardDeviation {
 
 /// Stateful average absolute deviation with TA-Lib's newest-to-oldest summation order.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingAverageDeviation`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingAverageDeviation {
     period: usize,
     window: Window,
@@ -262,6 +274,10 @@ impl RollingPairMoments {
 
 /// Stateful Pearson correlation over paired observations.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingCorrelation`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingCorrelation {
     period: f64,
     moments: RollingPairMoments,
@@ -334,6 +350,10 @@ impl RollingCorrelation {
 
 /// Stateful TA-Lib BETA over percentage returns of two input series.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingBeta`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RollingBeta {
     period: f64,
     previous: Option<(f64, f64)>,
@@ -398,4 +418,3 @@ impl RollingBeta {
         self.value = None;
     }
 }
-

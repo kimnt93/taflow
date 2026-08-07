@@ -14,7 +14,8 @@ impl PlusDirectionalIndicator {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: NativePlusDirectionalIndicator::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: NativePlusDirectionalIndicator::new(timeperiod)
+                .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

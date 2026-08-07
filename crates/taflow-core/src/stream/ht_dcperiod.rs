@@ -8,6 +8,10 @@ const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 32;
 
 /// Incremental HT_DCPERIOD state.
+/// Persistent Rust state or aligned output type for `HilbertTransformDominantCyclePeriod`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct HilbertTransformDominantCyclePeriod {
     index: usize,
     prices: VecDeque<f64>,
@@ -193,7 +197,8 @@ mod tests {
         let input: Vec<f64> = (0..300)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let expected = crate::stream::cycle::hilbert_transform_dominant_cycle_period(&input).unwrap();
+        let expected =
+            crate::stream::cycle::hilbert_transform_dominant_cycle_period(&input).unwrap();
         let mut state = HilbertTransformDominantCyclePeriod::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {

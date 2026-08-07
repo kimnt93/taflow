@@ -111,6 +111,10 @@ binary_indicator!(Div, |left: f64, right: f64| left / right);
 
 /// Stateful average price `(open + high + low + close) / 4`.
 #[derive(Debug, Clone, Default)]
+/// Persistent Rust state or aligned output type for `AveragePrice`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AveragePrice {
     value: Option<f64>,
 }

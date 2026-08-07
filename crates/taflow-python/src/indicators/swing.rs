@@ -16,7 +16,8 @@ impl SwingHighLowOperator {
     #[new]
     fn new(swing_length: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: SwingHighLow::new(swing_length).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: SwingHighLow::new(swing_length)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             signal: Vec::new(),
             level: Vec::new(),
             bars_since: Vec::new(),
@@ -37,7 +38,9 @@ impl SwingHighLowOperator {
     fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>) -> PyResult<()> {
         let (high, low) = (high.as_slice()?, low.as_slice()?);
         if high.len() != low.len() {
-            return Err(PyValueError::new_err("high and low must have equal lengths"));
+            return Err(PyValueError::new_err(
+                "high and low must have equal lengths",
+            ));
         }
         for (&high, &low) in high.iter().zip(low) {
             self.append(high, low);
@@ -62,7 +65,9 @@ impl SwingHighLowOperator {
 
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64)> {
-        self.inner.value().map(|value| (value.signal, value.level, value.bars_since))
+        self.inner
+            .value()
+            .map(|value| (value.signal, value.level, value.bars_since))
     }
 
     fn reset(&mut self) {

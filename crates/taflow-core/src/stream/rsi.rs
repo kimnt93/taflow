@@ -35,6 +35,10 @@ pub fn relative_strength_index(input: &[f64], timeperiod: usize) -> TaResult<Vec
 
 /// Incremental Wilder RSI with TA-Lib-compatible warm-up and rounding.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RelativeStrengthIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct RelativeStrengthIndex {
     period: usize,
     previous_input: Option<f64>,

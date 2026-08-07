@@ -1,11 +1,15 @@
 //! Stateful Jurik-like adaptive moving average reconstruction.
 
-use std::collections::VecDeque;
-use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator};
+use crate::error::TaResult;
+use std::collections::VecDeque;
 
 /// Computes the documented adaptive Jurik-like moving-average recurrence.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `JurikMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct JurikMovingAverage {
     period: usize,
     _phase: f64,
@@ -16,8 +20,15 @@ pub struct JurikMovingAverage {
 impl JurikMovingAverage {
     /// Creates the adaptive average from a positive length and phase value.
     pub fn new(period: usize, phase: f64) -> TaResult<Self> {
-        if period < 1 { return Err(invalid_period("length", period, 1)); }
-        Ok(Self { period, _phase: phase, closes: VecDeque::with_capacity(period + 1), value: None })
+        if period < 1 {
+            return Err(invalid_period("length", period, 1));
+        }
+        Ok(Self {
+            period,
+            _phase: phase,
+            closes: VecDeque::with_capacity(period + 1),
+            value: None,
+        })
     }
 }
 
@@ -26,7 +37,9 @@ impl StreamingIndicator for JurikMovingAverage {
 
     fn append(&mut self, input: f64) -> Option<f64> {
         self.closes.push_back(input);
-        if self.closes.len() > self.period + 1 { self.closes.pop_front(); }
+        if self.closes.len() > self.period + 1 {
+            self.closes.pop_front();
+        }
         if self.value.is_none() {
             self.value = Some(input);
             return self.value;
@@ -45,6 +58,11 @@ impl StreamingIndicator for JurikMovingAverage {
         self.value
     }
 
-    fn value(&self) -> Option<f64> { self.value }
-    fn reset(&mut self) { self.closes.clear(); self.value = None; }
+    fn value(&self) -> Option<f64> {
+        self.value
+    }
+    fn reset(&mut self) {
+        self.closes.clear();
+        self.value = None;
+    }
 }

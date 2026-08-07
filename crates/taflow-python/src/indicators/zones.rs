@@ -12,7 +12,10 @@ pub struct ActiveZoneListOperator {
 impl ActiveZoneListOperator {
     #[new]
     fn new(capacity: usize) -> PyResult<Self> {
-        Ok(Self { inner: ActiveZoneList::new(capacity).map_err(|error| PyValueError::new_err(error.to_string()))? })
+        Ok(Self {
+            inner: ActiveZoneList::new(capacity)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
+        })
     }
 
     fn add(&mut self, top: f64, bottom: f64, flags: u32) -> usize {
@@ -30,7 +33,11 @@ impl ActiveZoneListOperator {
     }
 
     #[getter]
-    fn size(&self) -> usize { self.inner.zone_count() }
+    fn size(&self) -> usize {
+        self.inner.zone_count()
+    }
 
-    fn reset(&mut self) { self.inner.reset(); }
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
 }

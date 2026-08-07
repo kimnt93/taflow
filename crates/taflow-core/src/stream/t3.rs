@@ -18,13 +18,24 @@ use super::{ExponentialMovingAverage, StreamingIndicator};
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn triple_exponential_average(input: &[f64], timeperiod: usize, v_factor: f64) -> TaResult<Vec<f64>> {
+pub fn triple_exponential_average(
+    input: &[f64],
+    timeperiod: usize,
+    v_factor: f64,
+) -> TaResult<Vec<f64>> {
     let mut state = TripleExponentialAverage::new(timeperiod, v_factor)?;
-    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental TripleExponentialAverage with constant work and storage per appended bar.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `TripleExponentialAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct TripleExponentialAverage {
     ema1: ExponentialMovingAverage,
     ema2: ExponentialMovingAverage,
@@ -111,7 +122,6 @@ impl StreamingIndicator for TripleExponentialAverage {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 
     #[test]
     fn matches_batch_and_reset_replay() {

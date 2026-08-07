@@ -48,10 +48,7 @@ impl VortexOperator {
     fn compute<'py>(
         &self,
         py: Python<'py>,
-    ) -> (
-        Bound<'py, PyArray1<f64>>,
-        Bound<'py, PyArray1<f64>>,
-    ) {
+    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
         (
             PyArray1::from_vec(py, self.vp.clone()),
             PyArray1::from_vec(py, self.vn.clone()),

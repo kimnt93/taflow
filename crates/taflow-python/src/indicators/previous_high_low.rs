@@ -31,7 +31,12 @@ impl PreviousHighLowOperator {
         self.prev_low.push(value.prev_low);
         self.broken_high.push(value.broken_high);
         self.broken_low.push(value.broken_low);
-        (value.prev_high, value.prev_low, value.broken_high, value.broken_low)
+        (
+            value.prev_high,
+            value.prev_low,
+            value.broken_high,
+            value.broken_low,
+        )
     }
 
     fn extend(
@@ -40,8 +45,7 @@ impl PreviousHighLowOperator {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (new_session, high, low) =
-            (new_session.as_slice()?, high.as_slice()?, low.as_slice()?);
+        let (new_session, high, low) = (new_session.as_slice()?, high.as_slice()?, low.as_slice()?);
         if new_session.len() != high.len() || high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
@@ -71,7 +75,12 @@ impl PreviousHighLowOperator {
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64, f64)> {
         self.inner.value().map(|value| {
-            (value.prev_high, value.prev_low, value.broken_high, value.broken_low)
+            (
+                value.prev_high,
+                value.prev_low,
+                value.broken_high,
+                value.broken_low,
+            )
         })
     }
 

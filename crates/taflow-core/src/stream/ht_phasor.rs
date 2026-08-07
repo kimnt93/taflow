@@ -9,12 +9,20 @@ const LOOKBACK: usize = 32;
 
 /// In-phase and quadrature components returned by [`HilbertTransformPhasor`].
 #[derive(Clone, Copy, Debug, PartialEq)]
+/// Persistent Rust state or aligned output type for `HilbertTransformPhasorValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct HilbertTransformPhasorValue {
     pub inphase: f64,
     pub quadrature: f64,
 }
 
 /// Incremental HT_PHASOR state.
+/// Persistent Rust state or aligned output type for `HilbertTransformPhasor`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct HilbertTransformPhasor {
     index: usize,
     prices: VecDeque<f64>,
@@ -184,7 +192,8 @@ mod tests {
         let input: Vec<f64> = (0..300)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let (expected_i, expected_q) = crate::stream::cycle::hilbert_transform_phasor(&input).unwrap();
+        let (expected_i, expected_q) =
+            crate::stream::cycle::hilbert_transform_phasor(&input).unwrap();
         let mut state = HilbertTransformPhasor::new();
         for ((&input, &inphase), &quadrature) in input.iter().zip(&expected_i).zip(&expected_q) {
             match state.append(input) {

@@ -37,8 +37,7 @@ impl SessionsOperator {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (new_session, high, low) =
-            (new_session.as_slice()?, high.as_slice()?, low.as_slice()?);
+        let (new_session, high, low) = (new_session.as_slice()?, high.as_slice()?, low.as_slice()?);
         if new_session.len() != high.len() || high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
@@ -65,7 +64,9 @@ impl SessionsOperator {
 
     #[getter]
     fn value(&self) -> Option<(f64, f64, f64)> {
-        self.inner.value().map(|value| (value.active, value.session_high, value.session_low))
+        self.inner
+            .value()
+            .map(|value| (value.active, value.session_high, value.session_low))
     }
 
     fn reset(&mut self) {

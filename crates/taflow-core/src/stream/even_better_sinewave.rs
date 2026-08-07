@@ -2,11 +2,15 @@
 
 use std::collections::VecDeque;
 
-use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator};
+use crate::error::TaResult;
 
 /// Computes a causal detrended cycle value from close prices.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `EvenBetterSinewave`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct EvenBetterSinewave {
     _period: usize,
     closes: VecDeque<f64>,
@@ -18,8 +22,16 @@ pub struct EvenBetterSinewave {
 impl EvenBetterSinewave {
     /// Creates the oscillator with a positive nominal cycle period.
     pub fn new(period: usize) -> TaResult<Self> {
-        if period < 1 { return Err(invalid_period("length", period, 1)); }
-        Ok(Self { _period: period, closes: VecDeque::with_capacity(3), previous_high_pass: 0.0, previous_value: 0.0, value: None })
+        if period < 1 {
+            return Err(invalid_period("length", period, 1));
+        }
+        Ok(Self {
+            _period: period,
+            closes: VecDeque::with_capacity(3),
+            previous_high_pass: 0.0,
+            previous_value: 0.0,
+            value: None,
+        })
     }
 }
 
@@ -28,19 +40,32 @@ impl StreamingIndicator for EvenBetterSinewave {
 
     fn append(&mut self, input: f64) -> Option<f64> {
         self.closes.push_back(input);
-        if self.closes.len() > 3 { self.closes.pop_front(); }
+        if self.closes.len() > 3 {
+            self.closes.pop_front();
+        }
         let high_pass = if self.closes.len() < 3 {
             0.0
         } else {
             0.25 * (input - 2.0 * self.closes[1] + self.closes[0]) + self.previous_high_pass
         };
-        let output = if self.value.is_none() { high_pass } else { 0.5 * high_pass + 0.5 * self.previous_value };
+        let output = if self.value.is_none() {
+            high_pass
+        } else {
+            0.5 * high_pass + 0.5 * self.previous_value
+        };
         self.previous_high_pass = high_pass;
         self.previous_value = output;
         self.value = Some(output);
         self.value
     }
 
-    fn value(&self) -> Option<f64> { self.value }
-    fn reset(&mut self) { self.closes.clear(); self.previous_high_pass = 0.0; self.previous_value = 0.0; self.value = None; }
+    fn value(&self) -> Option<f64> {
+        self.value
+    }
+    fn reset(&mut self) {
+        self.closes.clear();
+        self.previous_high_pass = 0.0;
+        self.previous_value = 0.0;
+        self.value = None;
+    }
 }

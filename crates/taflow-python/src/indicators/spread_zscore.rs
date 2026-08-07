@@ -15,7 +15,8 @@ impl SpreadZScoreOperator {
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: SpreadZScore::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: SpreadZScore::new(timeperiod)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

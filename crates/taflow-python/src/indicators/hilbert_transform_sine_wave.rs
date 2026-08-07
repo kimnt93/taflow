@@ -1,7 +1,9 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{HilbertTransformSineWave as NativeHilbertTransformSineWave, HilbertTransformSineWaveValue};
+use taflow::stream::{
+    HilbertTransformSineWave as NativeHilbertTransformSineWave, HilbertTransformSineWaveValue,
+};
 
 #[pyclass]
 pub struct HilbertTransformSineWave {

@@ -14,7 +14,11 @@ pub struct SessionExtremaOperator {
 impl SessionExtremaOperator {
     #[new]
     fn new() -> Self {
-        Self { inner: SessionExtrema::new(), highs: Vec::new(), lows: Vec::new() }
+        Self {
+            inner: SessionExtrema::new(),
+            highs: Vec::new(),
+            lows: Vec::new(),
+        }
     }
 
     fn append(&mut self, new_session: bool, high: f64, low: f64) -> (f64, f64) {
@@ -30,8 +34,7 @@ impl SessionExtremaOperator {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (new_session, high, low) =
-            (new_session.as_slice()?, high.as_slice()?, low.as_slice()?);
+        let (new_session, high, low) = (new_session.as_slice()?, high.as_slice()?, low.as_slice()?);
         if new_session.len() != high.len() || high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }

@@ -26,6 +26,10 @@ pub fn exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<
 
 /// Stateful EMA with the same SMA seed as TA-Lib's batch EMA.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `ExponentialMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct ExponentialMovingAverage {
     seed: SimpleMovingAverage,
     k: f64,

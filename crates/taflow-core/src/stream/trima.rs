@@ -16,11 +16,18 @@ use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn triangular_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = TriangularMovingAverage::new(timeperiod)?;
-    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Stateful triangular moving average as two cascaded SMA windows.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `TriangularMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct TriangularMovingAverage {
     sma1: SimpleMovingAverage,
     sma2: SimpleMovingAverage,

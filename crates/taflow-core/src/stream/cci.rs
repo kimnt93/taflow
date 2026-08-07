@@ -20,9 +20,17 @@ use super::{invalid_period, Window};
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn commodity_channel_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn commodity_channel_index(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
-        return Err(TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
     }
     let mut state = CommodityChannelIndex::new(timeperiod)?;
     Ok(high
@@ -35,6 +43,10 @@ pub fn commodity_channel_index(high: &[f64], low: &[f64], close: &[f64], timeper
 
 /// Persistent Commodity Channel Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `CommodityChannelIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CommodityChannelIndex {
     period: usize,
     window: Window,

@@ -4,6 +4,10 @@ use crate::error::TaResult;
 
 /// Computes transformed open, high, low, and close values from OHLC bars.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `HeikinAshi`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct HeikinAshi {
     previous_open: Option<f64>,
     previous_close: Option<f64>,
@@ -13,7 +17,11 @@ pub struct HeikinAshi {
 impl HeikinAshi {
     /// Creates an empty Heikin-Ashi state.
     pub fn new() -> TaResult<Self> {
-        Ok(Self { previous_open: None, previous_close: None, value: None })
+        Ok(Self {
+            previous_open: None,
+            previous_close: None,
+            value: None,
+        })
     }
 
     /// Appends one OHLC bar and returns transformed OHLC values.
@@ -25,7 +33,12 @@ impl HeikinAshi {
         };
         let transformed_high = high.max(transformed_open).max(transformed_close);
         let transformed_low = low.min(transformed_open).min(transformed_close);
-        let value = (transformed_open, transformed_high, transformed_low, transformed_close);
+        let value = (
+            transformed_open,
+            transformed_high,
+            transformed_low,
+            transformed_close,
+        );
         self.previous_open = Some(transformed_open);
         self.previous_close = Some(transformed_close);
         self.value = Some(value);
@@ -33,8 +46,14 @@ impl HeikinAshi {
     }
 
     /// Returns the latest transformed OHLC tuple.
-    pub fn value(&self) -> Option<(f64, f64, f64, f64)> { self.value }
+    pub fn value(&self) -> Option<(f64, f64, f64, f64)> {
+        self.value
+    }
 
     /// Clears previous-candle state.
-    pub fn reset(&mut self) { self.previous_open = None; self.previous_close = None; self.value = None; }
+    pub fn reset(&mut self) {
+        self.previous_open = None;
+        self.previous_close = None;
+        self.value = None;
+    }
 }

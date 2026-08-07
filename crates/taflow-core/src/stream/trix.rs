@@ -6,6 +6,10 @@ use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
 /// Persistent TRIX with a triple TA-Lib-seeded EMA cascade and O(1) updates.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `TripleExponentialRateOfChange`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct TripleExponentialRateOfChange {
     ema1: ExponentialMovingAverage,
     ema2: ExponentialMovingAverage,

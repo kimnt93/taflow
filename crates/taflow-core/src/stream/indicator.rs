@@ -1,6 +1,10 @@
 //! Shared lifecycle for incremental single-input technical indicators.
 
 /// Common interface for scalar indicators.
+/// Common lifecycle contract for a persistent streaming indicator.
+///
+/// Implementations consume one chronological observation at a time and
+/// expose resettable state for continuation across batches.
 pub trait StreamingIndicator {
     type Output: Copy;
 

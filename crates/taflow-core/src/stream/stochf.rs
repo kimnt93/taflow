@@ -10,12 +10,20 @@ use super::{moving_average::MovingAverageDispatcher, RollingMax, RollingMin, Str
 
 /// One aligned fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `FastStochasticOscillatorValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct FastStochasticOscillatorValue {
     pub fastk: f64,
     pub fastd: f64,
 }
 
 /// Incremental STOCHF with amortized constant work per bar.
+/// Persistent Rust state or aligned output type for `FastStochasticOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct FastStochasticOscillator {
     highest: RollingMax,
     lowest: RollingMin,
@@ -35,7 +43,12 @@ impl FastStochasticOscillator {
     }
 
     /// Appends one high, low, and close bar.
-    pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<FastStochasticOscillatorValue> {
+    pub fn append(
+        &mut self,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> Option<FastStochasticOscillatorValue> {
         let highest = self.highest.append(high);
         let lowest = self.lowest.append(low);
         let fastk = highest.zip(lowest).map(|(highest, lowest)| {
@@ -72,7 +85,6 @@ impl FastStochasticOscillator {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_for_all_moving_average_types() {
         let close: Vec<f64> = (0..500)
@@ -90,7 +102,9 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = crate::stream::fast_stochastic_oscillator(&high, &low, &close, 5, 13, ma_type).unwrap();
+            let expected =
+                crate::stream::fast_stochastic_oscillator(&high, &low, &close, 5, 13, ma_type)
+                    .unwrap();
             let mut state = FastStochasticOscillator::new(5, 13, ma_type).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {

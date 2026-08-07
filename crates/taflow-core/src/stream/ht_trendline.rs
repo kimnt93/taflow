@@ -6,13 +6,17 @@
 
 use std::collections::VecDeque;
 
-use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 use crate::error::{TaError, TaResult};
+use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 63;
 
 /// Incremental HT_TRENDLINE state.
+/// Persistent Rust state or aligned output type for `HilbertTransformTrendline`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct HilbertTransformTrendline {
     index: usize,
     prices: VecDeque<f64>,
@@ -237,7 +241,6 @@ impl HilbertTransformTrendline {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_and_reset_replay() {
         let input: Vec<f64> = (0..700)
@@ -443,24 +446,14 @@ pub fn hilbert_transform_trendline(input: &[f64]) -> TaResult<Vec<f64>> {
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            q1 = batch_do_hilbert_even(
-                &mut q1_vars,
-                detrender,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            q1 = batch_do_hilbert_even(&mut q1_vars, detrender, hilbert_idx, adjusted_prev_period);
             let _ji = batch_do_hilbert_even(
                 &mut ji_vars,
                 i1_for_even_prev3,
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            let _jq = batch_do_hilbert_even(
-                &mut jq_vars,
-                q1,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            let _jq = batch_do_hilbert_even(&mut jq_vars, q1, hilbert_idx, adjusted_prev_period);
             hilbert_idx += 1;
             if hilbert_idx == 3 {
                 hilbert_idx = 0;
@@ -478,24 +471,14 @@ pub fn hilbert_transform_trendline(input: &[f64]) -> TaResult<Vec<f64>> {
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            q1 = batch_do_hilbert_odd(
-                &mut q1_vars,
-                detrender,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            q1 = batch_do_hilbert_odd(&mut q1_vars, detrender, hilbert_idx, adjusted_prev_period);
             let _ji = batch_do_hilbert_odd(
                 &mut ji_vars,
                 i1_for_odd_prev3,
                 hilbert_idx,
                 adjusted_prev_period,
             );
-            let _jq = batch_do_hilbert_odd(
-                &mut jq_vars,
-                q1,
-                hilbert_idx,
-                adjusted_prev_period,
-            );
+            let _jq = batch_do_hilbert_odd(&mut jq_vars, q1, hilbert_idx, adjusted_prev_period);
 
             q2 = 0.2 * (q1 + _ji) + 0.8 * prev_q2;
             i2 = 0.2 * (i1_for_odd_prev3 - _jq) + 0.8 * prev_i2;

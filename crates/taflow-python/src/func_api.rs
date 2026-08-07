@@ -54,7 +54,10 @@ pub fn SMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::simple_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::simple_moving_average(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -70,7 +73,10 @@ pub fn EMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::exponential_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::exponential_moving_average(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -86,7 +92,10 @@ pub fn WMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::weighted_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::weighted_moving_average(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -102,7 +111,10 @@ pub fn DEMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::double_exponential_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::double_exponential_moving_average(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -118,7 +130,10 @@ pub fn TEMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::triple_exponential_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::triple_exponential_moving_average(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -134,7 +149,10 @@ pub fn TRIMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::triangular_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::triangular_moving_average(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -150,7 +168,10 @@ pub fn KAMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::kaufman_adaptive_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::kaufman_adaptive_moving_average(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -167,7 +188,11 @@ pub fn TripleExponentialAverage(
     timeperiod: usize,
     vfactor: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::triple_exponential_average(_input.as_slice()?, timeperiod, vfactor))?;
+    let result = ta_err!(core::stream::triple_exponential_average(
+        _input.as_slice()?,
+        timeperiod,
+        vfactor
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -184,7 +209,11 @@ pub fn MAMA(
     fastlimit: f64,
     slowlimit: f64,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (mama, fama) = ta_err!(core::stream::mesa_adaptive_moving_average(_input.as_slice()?, fastlimit, slowlimit))?;
+    let (mama, fama) = ta_err!(core::stream::mesa_adaptive_moving_average(
+        _input.as_slice()?,
+        fastlimit,
+        slowlimit
+    ))?;
     Ok((to_py_array(py, mama), to_py_array(py, fama)))
 }
 
@@ -262,7 +291,7 @@ pub fn SAREXT(
     accelerationshort: f64,
     accelerationmaxshort: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::extended_parabolic_sar(
+    let result = ta_err!(core::stream::parabolic_sar_extended(
         high.as_slice()?,
         low.as_slice()?,
         startvalue,
@@ -289,7 +318,10 @@ pub fn MIDPOINT(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::midpoint(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_midpoint(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -306,7 +338,7 @@ pub fn MIDPRICE(
     low: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::midprice(
+    let result = ta_err!(core::stream::rolling_midprice(
         high.as_slice()?,
         low.as_slice()?,
         timeperiod
@@ -331,7 +363,7 @@ pub fn MAVP(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::stream::moving_average_variable_period(
+    let result = ta_err!(core::stream::variable_period_moving_average(
         _input.as_slice()?,
         periods.as_slice()?,
         minperiod,
@@ -348,7 +380,9 @@ pub fn MAVP(
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_TRENDLINE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::hilbert_transform_trendline(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_trendline(
+        _input.as_slice()?
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -367,7 +401,11 @@ pub fn MA(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::stream::moving_average(_input.as_slice()?, timeperiod, ma))?;
+    let result = ta_err!(core::stream::moving_average(
+        _input.as_slice()?,
+        timeperiod,
+        ma
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -408,7 +446,10 @@ pub fn RSI(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::relative_strength_index(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::relative_strength_index(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -458,15 +499,17 @@ pub fn MACDEXT(
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let sigmt = core::MaType::try_from(signalmatype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let (m, s, h) = ta_err!(core::stream::moving_average_convergence_divergence_extended(
-        _input.as_slice()?,
-        fastperiod,
-        fmt,
-        slowperiod,
-        smt,
-        signalperiod,
-        sigmt
-    ))?;
+    let (m, s, h) = ta_err!(
+        core::stream::moving_average_convergence_divergence_extended(
+            _input.as_slice()?,
+            fastperiod,
+            fmt,
+            slowperiod,
+            smt,
+            signalperiod,
+            sigmt
+        )
+    )?;
     Ok((to_py_array(py, m), to_py_array(py, s), to_py_array(py, h)))
 }
 
@@ -482,7 +525,10 @@ pub fn MACDFIX(
     _input: PyReadonlyArray1<f64>,
     signalperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (m, s, h) = ta_err!(core::stream::moving_average_convergence_divergence_fixed(_input.as_slice()?, signalperiod))?;
+    let (m, s, h) = ta_err!(core::stream::moving_average_convergence_divergence_fixed(
+        _input.as_slice()?,
+        signalperiod
+    ))?;
     Ok((to_py_array(py, m), to_py_array(py, s), to_py_array(py, h)))
 }
 
@@ -690,7 +736,10 @@ pub fn ROCP(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::rate_of_change_percent(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rate_of_change_percent(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -706,7 +755,10 @@ pub fn ROCR(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::rate_of_change_ratio(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rate_of_change_ratio(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -722,7 +774,10 @@ pub fn ROCR100(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::rate_of_change_ratio_percent(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rate_of_change_ratio_percent(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -833,7 +888,10 @@ pub fn CMO(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::chande_momentum_oscillator(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::chande_momentum_oscillator(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -916,7 +974,10 @@ pub fn TRIX(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::triple_exponential_rate_of_change(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::triple_exponential_rate_of_change(
+        _input.as_slice()?,
+        timeperiod
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1192,7 +1253,10 @@ pub fn OBV(
     close: PyReadonlyArray1<f64>,
     volume: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::on_balance_volume(close.as_slice()?, volume.as_slice()?))?;
+    let result = ta_err!(core::stream::on_balance_volume(
+        close.as_slice()?,
+        volume.as_slice()?
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1334,7 +1398,11 @@ pub fn VAR(
     timeperiod: usize,
     nbdev: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::rolling_var(_input.as_slice()?, timeperiod, nbdev))?;
+    let result = ta_err!(core::stream::rolling_var(
+        _input.as_slice()?,
+        timeperiod,
+        nbdev
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1519,10 +1587,7 @@ pub fn ADD(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::add(
-        input0.as_slice()?,
-        input1.as_slice()?
-    ))?;
+    let result = ta_err!(core::stream::add(input0.as_slice()?, input1.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1537,10 +1602,7 @@ pub fn SUB(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::sub(
-        input0.as_slice()?,
-        input1.as_slice()?
-    ))?;
+    let result = ta_err!(core::stream::sub(input0.as_slice()?, input1.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1555,10 +1617,7 @@ pub fn MULT(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::mult(
-        input0.as_slice()?,
-        input1.as_slice()?
-    ))?;
+    let result = ta_err!(core::stream::mult(input0.as_slice()?, input1.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1573,10 +1632,7 @@ pub fn DIV(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::div(
-        input0.as_slice()?,
-        input1.as_slice()?
-    ))?;
+    let result = ta_err!(core::stream::div(input0.as_slice()?, input1.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1706,7 +1762,9 @@ pub fn MINMAXINDEX(
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_DCPERIOD(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::hilbert_transform_dominant_cycle_period(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_dominant_cycle_period(
+        _input.as_slice()?
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1717,7 +1775,9 @@ pub fn HT_DCPERIOD(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_DCPHASE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::hilbert_transform_dominant_cycle_phase(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_dominant_cycle_phase(
+        _input.as_slice()?
+    ))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1731,7 +1791,8 @@ pub fn HT_PHASOR(
     py: Python<'_>,
     _input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (inphase, quadrature) = ta_err!(core::stream::hilbert_transform_phasor(_input.as_slice()?))?;
+    let (inphase, quadrature) =
+        ta_err!(core::stream::hilbert_transform_phasor(_input.as_slice()?))?;
     Ok((to_py_array(py, inphase), to_py_array(py, quadrature)))
 }
 
@@ -1745,7 +1806,9 @@ pub fn HT_SINE(
     py: Python<'_>,
     _input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (sine, leadsine) = ta_err!(core::stream::hilbert_transform_sine_wave(_input.as_slice()?))?;
+    let (sine, leadsine) = ta_err!(core::stream::hilbert_transform_sine_wave(
+        _input.as_slice()?
+    ))?;
     Ok((to_py_array(py, sine), to_py_array(py, leadsine)))
 }
 
@@ -1756,7 +1819,9 @@ pub fn HT_SINE(
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_TRENDMODE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<i32>>> {
-    let result = ta_err!(core::stream::hilbert_transform_trend_mode(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_trend_mode(
+        _input.as_slice()?
+    ))?;
     Ok(crate::conversion::to_py_array_i32(py, result))
 }
 
@@ -1837,12 +1902,23 @@ cdl_pyfunction!(CDLBREAKAWAY, core::stream::candle_breakaway);
 cdl_pyfunction!(CDLCLOSINGMARUBOZU, core::stream::candle_closing_marubozu);
 cdl_pyfunction!(CDLCONCEALBABYSWALL, core::stream::candle_conceal_baby_swall);
 cdl_pyfunction!(CDLCOUNTERATTACK, core::stream::candle_counterattack);
-cdl_pyfunction_penetration!(CDLDARKCLOUDCOVER, core::stream::candle_dark_cloud_cover, 0.5);
+cdl_pyfunction_penetration!(
+    CDLDARKCLOUDCOVER,
+    core::stream::candle_dark_cloud_cover,
+    0.5
+);
 cdl_pyfunction!(CDLDOJISTAR, core::stream::candle_doji_star);
 cdl_pyfunction!(CDLDRAGONFLYDOJI, core::stream::candle_dragonfly_doji);
-cdl_pyfunction_penetration!(CDLEVENINGDOJISTAR, core::stream::candle_evening_doji_star, 0.3);
+cdl_pyfunction_penetration!(
+    CDLEVENINGDOJISTAR,
+    core::stream::candle_evening_doji_star,
+    0.3
+);
 cdl_pyfunction_penetration!(CDLEVENINGSTAR, core::stream::candle_evening_star, 0.3);
-cdl_pyfunction!(CDLGAPSIDESIDEWHITE, core::stream::candle_gap_side_side_white);
+cdl_pyfunction!(
+    CDLGAPSIDESIDEWHITE,
+    core::stream::candle_gap_side_side_white
+);
 cdl_pyfunction!(CDLGRAVESTONEDOJI, core::stream::candle_gravestone_doji);
 cdl_pyfunction!(CDLHANGINGMAN, core::stream::candle_hanging_man);
 cdl_pyfunction!(CDLHARAMI, core::stream::candle_harami);
@@ -1851,7 +1927,10 @@ cdl_pyfunction!(CDLHIGHWAVE, core::stream::candle_high_wave);
 cdl_pyfunction!(CDLHIKKAKE, core::stream::candle_hikkake);
 cdl_pyfunction!(CDLHIKKAKEMOD, core::stream::candle_hikkake_modified);
 cdl_pyfunction!(CDLHOMINGPIGEON, core::stream::candle_homing_pigeon);
-cdl_pyfunction!(CDLIDENTICAL3CROWS, core::stream::candle_identical_three_crows);
+cdl_pyfunction!(
+    CDLIDENTICAL3CROWS,
+    core::stream::candle_identical_three_crows
+);
 cdl_pyfunction!(CDLINNECK, core::stream::candle_in_neck);
 cdl_pyfunction!(CDLINVERTEDHAMMER, core::stream::candle_inverted_hammer);
 cdl_pyfunction!(CDLKICKING, core::stream::candle_kicking);
@@ -1862,12 +1941,19 @@ cdl_pyfunction!(CDLLONGLINE, core::stream::candle_long_line);
 cdl_pyfunction!(CDLMARUBOZU, core::stream::candle_marubozu);
 cdl_pyfunction!(CDLMATCHINGLOW, core::stream::candle_matching_low);
 cdl_pyfunction_penetration!(CDLMATHOLD, core::stream::candle_mat_hold, 0.3);
-cdl_pyfunction_penetration!(CDLMORNINGDOJISTAR, core::stream::candle_morning_doji_star, 0.3);
+cdl_pyfunction_penetration!(
+    CDLMORNINGDOJISTAR,
+    core::stream::candle_morning_doji_star,
+    0.3
+);
 cdl_pyfunction_penetration!(CDLMORNINGSTAR, core::stream::candle_morning_star, 0.3);
 cdl_pyfunction!(CDLONNECK, core::stream::candle_on_neck);
 cdl_pyfunction!(CDLPIERCING, core::stream::candle_piercing);
 cdl_pyfunction!(CDLRICKSHAWMAN, core::stream::candle_rickshawman);
-cdl_pyfunction!(CDLRISEFALL3METHODS, core::stream::candle_rise_fall_three_methods);
+cdl_pyfunction!(
+    CDLRISEFALL3METHODS,
+    core::stream::candle_rise_fall_three_methods
+);
 cdl_pyfunction!(CDLSEPARATINGLINES, core::stream::candle_separating_lines);
 cdl_pyfunction!(CDLSHOOTINGSTAR, core::stream::candle_shooting_star);
 cdl_pyfunction!(CDLSHORTLINE, core::stream::candle_short_line);
@@ -1879,5 +1965,11 @@ cdl_pyfunction!(CDLTASUKIGAP, core::stream::candle_tasuki_gap);
 cdl_pyfunction!(CDLTHRUSTING, core::stream::candle_thrusting);
 cdl_pyfunction!(CDLTRISTAR, core::stream::candle_tri_star);
 cdl_pyfunction!(CDLUNIQUE3RIVER, core::stream::candle_unique_three_river);
-cdl_pyfunction!(CDLUPSIDEGAP2CROWS, core::stream::candle_upside_gap_two_crows);
-cdl_pyfunction!(CDLXSIDEGAP3METHODS, core::stream::candle_xside_gap_three_methods);
+cdl_pyfunction!(
+    CDLUPSIDEGAP2CROWS,
+    core::stream::candle_upside_gap_two_crows
+);
+cdl_pyfunction!(
+    CDLXSIDEGAP3METHODS,
+    core::stream::candle_xside_gap_three_methods
+);

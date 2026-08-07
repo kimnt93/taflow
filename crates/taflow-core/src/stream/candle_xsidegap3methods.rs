@@ -1,4 +1,6 @@
 //! Incremental Upside/Downside Gap Three Methods recognition (CDLXSIDEGAP3METHODS).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -6,6 +8,10 @@ struct Candle {
     close: f64,
 }
 /// Incremental CDLXSIDEGAP3METHODS state.
+/// Persistent Rust state or aligned output type for `CandleUpDownSideGapThreeMethods`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleUpDownSideGapThreeMethods {
     candles: VecDeque<Candle>,
     value: Option<i32>,
@@ -74,6 +80,60 @@ impl CandleUpDownSideGapThreeMethods {
     pub fn reset(&mut self) {
         *self = Self::new()
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle xside gap three methods result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_xside_gap_three_methods(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    // lookback = 2
+    if len < 3 {
+        return Ok(output);
+    }
+
+    for i in 2..len {
+        let c2 = candle_color(open[i - 2], close[i - 2]);
+        let c1 = candle_color(open[i - 1], close[i - 1]);
+        let c0 = candle_color(open[i], close[i]);
+
+        // 3rd opens within 2nd body, closes within 1st body
+        let opens_within =
+            open[i] > open[i - 1].min(close[i - 1]) && open[i] < open[i - 1].max(close[i - 1]);
+        let closes_within =
+            close[i] > open[i - 2].min(close[i - 2]) && close[i] < open[i - 2].max(close[i - 2]);
+        let base = c2 == c1 && c0 != c2 && opens_within && closes_within;
+        // Upside gap
+        let bull = base && c2 == 1 && real_body_gap_up(open, close, i - 1, i - 2);
+        // Downside gap
+        let bear = base && c2 == -1 && real_body_gap_down(open, close, i - 1, i - 2);
+        output[i] = (bull as i32) * 100 - (bear as i32) * 100;
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

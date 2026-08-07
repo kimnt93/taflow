@@ -2,7 +2,13 @@
 
 use std::collections::VecDeque;
 
+use super::pattern::*;
+use crate::error::TaResult;
 /// Incremental CDLDOJI state using TA-Lib's ten-bar High-Low average.
+/// Persistent Rust state or aligned output type for `CandleDoji`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleDoji {
     ranges: VecDeque<f64>,
     sum: f64,
@@ -55,6 +61,59 @@ impl CandleDoji {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// CDL_DOJI — copysign-based branchless output
+///
+/// Uses `100.0_f64.copysign(thresh - body).max(0.0) as i32` to produce 0 or 100
+/// without any conditional branch. This stays entirely in float registers (NEON fmaxnm),
+/// avoiding the conditional-store penalty that LLVM generates for bool→i32 patterns.
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle doji result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_doji(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = BODY_DOJI.avg_period; // 10
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let factor_div = BODY_DOJI.factor / lookback as f64; // 0.01
+
+    let mut sum = 0.0_f64;
+    for i in 0..lookback {
+        sum += high[i] - low[i];
+    }
+
+    for i in lookback..len {
+        let body = (close[i] - open[i]).abs();
+        let thresh = sum * factor_div;
+        // copysign(100, thresh-body): +100 if doji (body<=thresh), -100 if not
+        // max(0): clamp -100 to 0 → result is 0 or 100, zero branches
+        output[i] = 100.0_f64.copysign(thresh - body).max(0.0) as i32;
+        sum += (high[i] - low[i]) - (high[i - lookback] - low[i - lookback]);
+    }
+
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

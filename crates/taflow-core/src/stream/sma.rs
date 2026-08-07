@@ -16,11 +16,18 @@ use super::{StreamingIndicator, Window};
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn simple_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = SimpleMovingAverage::new(timeperiod)?;
-    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Stateful simple moving average with O(1) updates.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `SimpleMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct SimpleMovingAverage {
     period: usize,
     window: Window,

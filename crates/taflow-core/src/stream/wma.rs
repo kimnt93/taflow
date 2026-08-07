@@ -16,11 +16,18 @@ use super::{StreamingIndicator, Window};
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn weighted_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = WeightedMovingAverage::new(timeperiod)?;
-    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Stateful weighted moving average with O(1) updates.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `WeightedMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct WeightedMovingAverage {
     period: usize,
     divider: f64,

@@ -2,6 +2,10 @@
 
 /// Cumulative maximum of scalar observations.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `CumulativeMaximum`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CumulativeMaximum {
     extreme: f64,
     value: Option<f64>,
@@ -10,7 +14,10 @@ pub struct CumulativeMaximum {
 impl CumulativeMaximum {
     /// Create an empty cumulative maximum.
     pub fn new() -> Self {
-        Self { extreme: f64::NEG_INFINITY, value: None }
+        Self {
+            extreme: f64::NEG_INFINITY,
+            value: None,
+        }
     }
 
     /// Append one observation and return the cumulative maximum.
@@ -21,7 +28,9 @@ impl CumulativeMaximum {
     }
 
     /// Return the latest cumulative maximum.
-    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
 
     /// Reset the accumulated maximum.
     pub fn reset(&mut self) {
@@ -31,5 +40,33 @@ impl CumulativeMaximum {
 }
 
 impl Default for CumulativeMaximum {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Computes the running maximum of an aligned numeric series.
+///
+/// # Parameters
+/// `input`: numeric observations in chronological order.
+///
+/// # Returns
+/// Compute the cumulative maximum result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn cumulative_maximum(input: &[f64]) -> Vec<f64> {
+    let mut maximum = f64::NEG_INFINITY;
+    input
+        .iter()
+        .map(|&value| {
+            maximum = maximum.max(value);
+            maximum
+        })
+        .collect()
 }

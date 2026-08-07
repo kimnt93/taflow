@@ -1,4 +1,6 @@
 //! Incremental Upside Gap Two Crows candlestick recognition (CDLUPSIDEGAP2CROWS).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -53,7 +55,14 @@ impl CandleUpsideGapTwoCrows {
             let a = self.candles[10];
             let b = self.candles[11];
             let long = self.candles.iter().take(10).map(|x| x.body()).sum::<f64>() / 10.0;
-            let short = self.candles.iter().skip(1).take(10).map(|x| x.body()).sum::<f64>() / 10.0;
+            let short = self
+                .candles
+                .iter()
+                .skip(1)
+                .take(10)
+                .map(|x| x.body())
+                .sum::<f64>()
+                / 10.0;
             Some(
                 (a.color() == 1
                     && a.body() > long
@@ -88,6 +97,85 @@ impl CandleUpsideGapTwoCrows {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle upside gap two crows result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_upside_gap_two_crows(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = BODY_SHORT.avg_period.max(BODY_LONG.avg_period) + 2;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut body_long_sum = 0.0;
+    let mut body_short_sum = 0.0;
+    let start = lookback;
+    for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
+        body_long_sum += cr(BODY_LONG, open, high, low, close, i);
+    }
+    for i in (start - 1 - BODY_SHORT.avg_period)..(start - 1) {
+        body_short_sum += cr(BODY_SHORT, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        output[i] = (candle_color(open[i-2], close[i-2]) == 1
+            && real_body(open[i-2], close[i-2]) > ca(BODY_LONG, body_long_sum, open, high, low, close, i-2)
+            // 2nd: short black, gap up
+            && candle_color(open[i-1], close[i-1]) == -1
+            && real_body(open[i-1], close[i-1]) <= ca(BODY_SHORT, body_short_sum, open, high, low, close, i-1)
+            && real_body_gap_up(open, close, i-1, i-2)
+            // 3rd: black, engulfs 2nd body, close above 1st close
+            && candle_color(open[i], close[i]) == -1
+            && open[i] > open[i-1]
+            && close[i] < close[i-1]
+            && close[i] > close[i-2]) as i32
+            * -100;
+        body_long_sum += cr(BODY_LONG, open, high, low, close, i - 2)
+            - cr(
+                BODY_LONG,
+                open,
+                high,
+                low,
+                close,
+                i - 2 - BODY_LONG.avg_period,
+            );
+        body_short_sum += cr(BODY_SHORT, open, high, low, close, i - 1)
+            - cr(
+                BODY_SHORT,
+                open,
+                high,
+                low,
+                close,
+                i - 1 - BODY_SHORT.avg_period,
+            );
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

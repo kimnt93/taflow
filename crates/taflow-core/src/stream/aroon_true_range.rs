@@ -4,66 +4,11 @@ use crate::error::TaResult;
 
 use super::{invalid_period, RollingExtrema};
 
-/// Compute the true range result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn true_range(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
-    }
-    let mut state = TrueRange::new();
-    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
-}
-
-/// Compute the average true range result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
-    }
-    let mut state = AverageTrueRange::new(timeperiod)?;
-    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
-}
-
-/// Compute the normalized average true range result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn normalized_average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
-    }
-    let mut state = NormalizedAverageTrueRange::new(timeperiod)?;
-    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `AroonValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AroonValue {
     pub down: f64,
     pub up: f64,
@@ -71,6 +16,10 @@ pub struct AroonValue {
 
 /// Stateful Aroon down/up pair over a `period + 1` bar window.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `Aroon`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct Aroon {
     period: usize,
     inverse_period: f64,
@@ -140,6 +89,10 @@ impl Aroon {
 }
 
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `AroonOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AroonOscillator {
     aroon: Aroon,
     value: Option<f64>,
@@ -193,6 +146,10 @@ impl AroonOscillator {
 
 /// Stateful Average True Range.  Each appended bar is `(high, low, close)`.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `AverageTrueRange`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct AverageTrueRange {
     period: usize,
     previous_close: Option<f64>,
@@ -203,6 +160,10 @@ pub struct AverageTrueRange {
 
 /// Stateful true range. The first bar has no previous close and is not warm.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `TrueRange`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct TrueRange {
     previous_close: Option<f64>,
     value: Option<f64>,
@@ -264,6 +225,10 @@ impl Default for TrueRange {
 
 /// Stateful normalized ATR, matching `NATR = ATR / close * 100`.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `NormalizedAverageTrueRange`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct NormalizedAverageTrueRange {
     atr: AverageTrueRange,
     value: Option<f64>,

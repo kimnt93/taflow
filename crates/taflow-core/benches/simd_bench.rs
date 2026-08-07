@@ -99,13 +99,7 @@ fn bench_indicators(c: &mut Criterion) {
     });
     group.bench_function("BBANDS_20", |b| {
         b.iter(|| {
-            taflow::stream::bollinger_bands(
-                black_box(&close),
-                20,
-                2.0,
-                2.0,
-                taflow::MaType::Sma,
-            )
+            taflow::stream::bollinger_bands(black_box(&close), 20, 2.0, 2.0, taflow::MaType::Sma)
         });
     });
     group.bench_function("STDDEV_20", |b| {

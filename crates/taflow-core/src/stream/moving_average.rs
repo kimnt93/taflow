@@ -6,7 +6,11 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{DoubleExponentialMovingAverage, ExponentialMovingAverage, KaufmanAdaptiveMovingAverage, MesaAdaptiveMovingAverage, SimpleMovingAverage, StreamingIndicator, TripleExponentialMovingAverage, TriangularMovingAverage, WeightedMovingAverage, TripleExponentialAverage};
+use super::{
+    DoubleExponentialMovingAverage, ExponentialMovingAverage, KaufmanAdaptiveMovingAverage,
+    MesaAdaptiveMovingAverage, SimpleMovingAverage, StreamingIndicator, TriangularMovingAverage,
+    TripleExponentialAverage, TripleExponentialMovingAverage, WeightedMovingAverage,
+};
 
 pub(super) enum MovingAverageDispatcher {
     SimpleMovingAverage(SimpleMovingAverage),
@@ -26,15 +30,33 @@ impl MovingAverageDispatcher {
             return Ok(Self::SimpleMovingAverage(SimpleMovingAverage::new(1)?));
         }
         Ok(match ma_type {
-            MaType::SimpleMovingAverage => Self::SimpleMovingAverage(SimpleMovingAverage::new(period)?),
-            MaType::ExponentialMovingAverage => Self::ExponentialMovingAverage(ExponentialMovingAverage::new(period)?),
-            MaType::WeightedMovingAverage => Self::WeightedMovingAverage(WeightedMovingAverage::new(period)?),
-            MaType::DoubleExponentialMovingAverage => Self::DoubleExponentialMovingAverage(DoubleExponentialMovingAverage::new(period)?),
-            MaType::TripleExponentialMovingAverage => Self::TripleExponentialMovingAverage(TripleExponentialMovingAverage::new(period)?),
-            MaType::TriangularMovingAverage => Self::TriangularMovingAverage(TriangularMovingAverage::new(period)?),
-            MaType::KaufmanAdaptiveMovingAverage => Self::KaufmanAdaptiveMovingAverage(KaufmanAdaptiveMovingAverage::new(period)?),
-            MaType::MesaAdaptiveMovingAverage => Self::MesaAdaptiveMovingAverage(MesaAdaptiveMovingAverage::new(0.5, 0.05)?),
-            MaType::TripleExponentialAverage => Self::TripleExponentialAverage(TripleExponentialAverage::new(period, 0.7)?),
+            MaType::SimpleMovingAverage => {
+                Self::SimpleMovingAverage(SimpleMovingAverage::new(period)?)
+            }
+            MaType::ExponentialMovingAverage => {
+                Self::ExponentialMovingAverage(ExponentialMovingAverage::new(period)?)
+            }
+            MaType::WeightedMovingAverage => {
+                Self::WeightedMovingAverage(WeightedMovingAverage::new(period)?)
+            }
+            MaType::DoubleExponentialMovingAverage => {
+                Self::DoubleExponentialMovingAverage(DoubleExponentialMovingAverage::new(period)?)
+            }
+            MaType::TripleExponentialMovingAverage => {
+                Self::TripleExponentialMovingAverage(TripleExponentialMovingAverage::new(period)?)
+            }
+            MaType::TriangularMovingAverage => {
+                Self::TriangularMovingAverage(TriangularMovingAverage::new(period)?)
+            }
+            MaType::KaufmanAdaptiveMovingAverage => {
+                Self::KaufmanAdaptiveMovingAverage(KaufmanAdaptiveMovingAverage::new(period)?)
+            }
+            MaType::MesaAdaptiveMovingAverage => {
+                Self::MesaAdaptiveMovingAverage(MesaAdaptiveMovingAverage::new(0.5, 0.05)?)
+            }
+            MaType::TripleExponentialAverage => {
+                Self::TripleExponentialAverage(TripleExponentialAverage::new(period, 0.7)?)
+            }
         })
     }
 

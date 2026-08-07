@@ -17,16 +17,37 @@ use super::{invalid_period, Window};
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn money_flow_index(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn money_flow_index(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    volume: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
-        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
+        return Err(crate::TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()).min(volume.len()),
+        });
     }
     let mut state = MoneyFlowIndex::new(timeperiod)?;
-    Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume).unwrap_or(f64::NAN)).collect())
+    Ok(high
+        .iter()
+        .zip(low)
+        .zip(close)
+        .zip(volume)
+        .map(|(((&high, &low), &close), &volume)| {
+            state.append(high, low, close, volume).unwrap_or(f64::NAN)
+        })
+        .collect())
 }
 
 /// Persistent Money Flow Index with O(1) updates after each HLCV bar.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `MoneyFlowIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct MoneyFlowIndex {
     previous_typical_price: Option<f64>,
     positive_flow: Window,

@@ -21,7 +21,7 @@ use super::moving_average::MovingAverageDispatcher;
 /// # Returns
 ///
 /// An aligned vector with NaN warm-up values and validated parameters.
-pub fn moving_average_variable_period(
+pub fn variable_period_moving_average(
     input: &[f64],
     periods: &[f64],
     minperiod: usize,
@@ -29,13 +29,24 @@ pub fn moving_average_variable_period(
     matype: MaType,
 ) -> TaResult<Vec<f64>> {
     if input.len() != periods.len() {
-        return Err(crate::TaError::LengthMismatch { expected: input.len(), got: periods.len() });
+        return Err(crate::TaError::LengthMismatch {
+            expected: input.len(),
+            got: periods.len(),
+        });
     }
     let mut state = VariablePeriodMovingAverage::new(minperiod, maxperiod, matype)?;
-    Ok(input.iter().zip(periods).map(|(&value, &period)| state.append(value, period).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .zip(periods)
+        .map(|(&value, &period)| state.append(value, period).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental MAVP with TA-Lib-compatible truncation and clamping.
+/// Persistent Rust state or aligned output type for `VariablePeriodMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct VariablePeriodMovingAverage {
     minperiod: usize,
     maxperiod: usize,
@@ -118,7 +129,6 @@ impl VariablePeriodMovingAverage {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_for_every_moving_average_type() {
         let input: Vec<f64> = (0..700)
@@ -130,7 +140,8 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = moving_average_variable_period(&input, &periods, 2, 12, ma_type).unwrap();
+            let expected =
+                variable_period_moving_average(&input, &periods, 2, 12, ma_type).unwrap();
             let mut state = VariablePeriodMovingAverage::new(2, 12, ma_type).unwrap();
             for index in 0..input.len() {
                 match state.append(input[index], periods[index]) {

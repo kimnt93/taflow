@@ -1,4 +1,6 @@
 //! Incremental Modified Hikkake recognition (CDLHIKKAKEMOD).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -12,6 +14,10 @@ impl Candle {
     }
 }
 /// Incremental CDLHIKKAKEMOD state.
+/// Persistent Rust state or aligned output type for `CandleHikkakeModified`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleHikkakeModified {
     candles: VecDeque<Candle>,
     index: usize,
@@ -99,6 +105,102 @@ impl CandleHikkakeModified {
     pub fn reset(&mut self) {
         *self = Self::new()
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle hikkake modified result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_hikkake_modified(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    // C TA-Lib: lookback = max(1, TA_CandleAvgPeriod(Near)) + 5
+    let lookback = 1_usize.max(NEAR.avg_period) + 5;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    // Initialize Near sum for bar (start - 3), i.e. the "2nd candle" at start
+    let mut near_sum = 0.0;
+    let near_bar = lookback - 3; // the 2nd bar of the pattern at first evaluation
+    if NEAR.avg_period > 0 && near_bar >= NEAR.avg_period {
+        for j in (near_bar - NEAR.avg_period)..near_bar {
+            near_sum += cr(NEAR, open, high, low, close, j);
+        }
+    }
+
+    let mut pattern_idx: i32 = -10; // no active pattern
+    let mut pattern_result: i32 = 0;
+
+    for i in lookback..len {
+        // C TA-Lib indices: i is current bar
+        // Pattern: bar[i-3] contains bar[i-2], bar[i-2] contains bar[i-1]
+        // Then bar[i] breaks out
+        if high[i-1] < high[i-2] && low[i-1] > low[i-2]   // bar[i-1] inside bar[i-2]
+            && high[i-2] < high[i-3] && low[i-2] > low[i-3]
+        // bar[i-2] inside bar[i-3]
+        {
+            let near_avg = ca(NEAR, near_sum, open, high, low, close, i - 2);
+            // Bullish: bar[i] breaks down (lower high AND lower low)
+            if high[i] < high[i-1] && low[i] < low[i-1]
+                // 2nd bar close near the low
+                && close[i-2] <= low[i-2] + near_avg
+            {
+                pattern_result = 100;
+                pattern_idx = i as i32;
+                output[i] = pattern_result;
+            }
+            // Bearish: bar[i] breaks up (higher high AND higher low)
+            else if high[i] > high[i-1] && low[i] > low[i-1]
+                // 2nd bar close near the high
+                && close[i-2] >= high[i-2] - near_avg
+            {
+                pattern_result = -100;
+                pattern_idx = i as i32;
+                output[i] = pattern_result;
+            }
+        }
+
+        // Confirmation: within 3 bars of pattern
+        if pattern_idx >= 0 && (i as i32) <= pattern_idx + 3 {
+            if pattern_result > 0 && close[i] > high[(pattern_idx - 1) as usize] {
+                output[i] = pattern_result + 100;
+                pattern_idx = -10;
+            } else if pattern_result < 0 && close[i] < low[(pattern_idx - 1) as usize] {
+                output[i] = pattern_result - 100;
+                pattern_idx = -10;
+            }
+        }
+
+        // Update Near sum (for the "2nd bar" position, which is i-2)
+        if NEAR.avg_period > 0 && (i - 2) >= NEAR.avg_period {
+            near_sum += cr(NEAR, open, high, low, close, i - 2)
+                - cr(NEAR, open, high, low, close, i - 2 - NEAR.avg_period);
+        }
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

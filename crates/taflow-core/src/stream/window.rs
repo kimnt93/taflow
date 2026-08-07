@@ -8,6 +8,10 @@ use super::invalid_period;
 
 /// A fixed-capacity FIFO that allocates only during construction.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `Window`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct Window {
     values: VecDeque<f64>,
     capacity: usize,

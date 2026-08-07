@@ -1,4 +1,6 @@
 //! Incremental Three Black Crows candlestick recognition (CDL3BLACKCROWS).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -19,6 +21,10 @@ impl Candle {
     }
 }
 /// Incremental CDL3BLACKCROWS state.
+/// Persistent Rust state or aligned output type for `CandleThreeBlackCrows`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleThreeBlackCrows {
     candles: VecDeque<Candle>,
     value: Option<i32>,
@@ -96,6 +102,104 @@ impl CandleThreeBlackCrows {
     pub fn reset(&mut self) {
         *self = Self::new()
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle three black crows result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_three_black_crows(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = SHADOW_VERY_SHORT.avg_period + 3;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut shadow_sum = [0.0f64; 3];
+    let start = lookback;
+    for k in 0..3 {
+        let bar_offset = start - 3 + k;
+        if bar_offset >= SHADOW_VERY_SHORT.avg_period {
+            for j in (bar_offset - SHADOW_VERY_SHORT.avg_period)..bar_offset {
+                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, j);
+            }
+        }
+    }
+
+    for i in start..len {
+        output[i] = (candle_color(open[i - 2], close[i - 2]) == -1
+            && candle_color(open[i - 1], close[i - 1]) == -1
+            && candle_color(open[i], close[i]) == -1
+            && close[i - 1] < close[i - 2]
+            && close[i] < close[i - 1]
+            && open[i - 2] <= open[i - 3].max(close[i - 3])
+            && open[i - 1] <= open[i - 2]
+            && open[i - 1] >= close[i - 2]
+            && open[i] <= open[i - 1]
+            && open[i] >= close[i - 1]
+            && lower_shadow(open[i - 2], low[i - 2], close[i - 2])
+                < ca(
+                    SHADOW_VERY_SHORT,
+                    shadow_sum[0],
+                    open,
+                    high,
+                    low,
+                    close,
+                    i - 2,
+                )
+            && lower_shadow(open[i - 1], low[i - 1], close[i - 1])
+                < ca(
+                    SHADOW_VERY_SHORT,
+                    shadow_sum[1],
+                    open,
+                    high,
+                    low,
+                    close,
+                    i - 1,
+                )
+            && lower_shadow(open[i], low[i], close[i])
+                < ca(SHADOW_VERY_SHORT, shadow_sum[2], open, high, low, close, i))
+            as i32
+            * -100;
+        for k in 0..3 {
+            let bar = i - 2 + k;
+            if bar >= SHADOW_VERY_SHORT.avg_period {
+                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, bar)
+                    - cr(
+                        SHADOW_VERY_SHORT,
+                        open,
+                        high,
+                        low,
+                        close,
+                        bar - SHADOW_VERY_SHORT.avg_period,
+                    );
+            }
+        }
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

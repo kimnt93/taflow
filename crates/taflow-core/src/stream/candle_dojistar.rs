@@ -1,4 +1,6 @@
 //! Incremental Doji Star candlestick recognition (CDLDOJISTAR).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -71,6 +73,77 @@ impl CandleDojiStar {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle doji star result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_doji_star(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = BODY_DOJI.avg_period.max(BODY_LONG.avg_period) + 1;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut body_long_sum = 0.0;
+    let mut body_doji_sum = 0.0;
+    let start = lookback;
+    for i in (start - 1 - BODY_LONG.avg_period)..(start - 1) {
+        body_long_sum += cr(BODY_LONG, open, high, low, close, i);
+    }
+    for i in (start - BODY_DOJI.avg_period)..start {
+        body_doji_sum += cr(BODY_DOJI, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        let base = real_body(open[i - 1], close[i - 1])
+            > ca(BODY_LONG, body_long_sum, open, high, low, close, i - 1)
+            && real_body(open[i], close[i])
+                <= ca(BODY_DOJI, body_doji_sum, open, high, low, close, i);
+        let bear = base
+            && candle_color(open[i - 1], close[i - 1]) == 1
+            && real_body_gap_up(open, close, i, i - 1);
+        let bull = base
+            && candle_color(open[i - 1], close[i - 1]) == -1
+            && real_body_gap_down(open, close, i, i - 1);
+        output[i] = (bull as i32) * 100 - (bear as i32) * 100;
+        body_long_sum += cr(BODY_LONG, open, high, low, close, i - 1)
+            - cr(
+                BODY_LONG,
+                open,
+                high,
+                low,
+                close,
+                i - 1 - BODY_LONG.avg_period,
+            );
+        body_doji_sum += cr(BODY_DOJI, open, high, low, close, i)
+            - cr(BODY_DOJI, open, high, low, close, i - BODY_DOJI.avg_period);
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

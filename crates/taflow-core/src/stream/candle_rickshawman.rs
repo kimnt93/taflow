@@ -2,7 +2,13 @@
 
 use std::collections::VecDeque;
 
+use super::pattern::*;
+use crate::error::TaResult;
 /// Incremental CDLRICKSHAWMAN state using TA-Lib's doji and near range averages.
+/// Persistent Rust state or aligned output type for `CandleRickshawman`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct CandleRickshawman {
     body_ranges: VecDeque<f64>,
     body_sum: f64,
@@ -72,6 +78,81 @@ impl CandleRickshawman {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle rickshawman result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_rickshawman(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = *[
+        BODY_DOJI.avg_period,
+        SHADOW_LONG.avg_period,
+        NEAR.avg_period,
+    ]
+    .iter()
+    .max()
+    .unwrap();
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut body_sum = 0.0;
+    let mut shadow_sum = 0.0;
+    let mut near_sum = 0.0;
+    let start = lookback;
+    for i in (start - BODY_DOJI.avg_period)..start {
+        body_sum += cr(BODY_DOJI, open, high, low, close, i);
+    }
+    // SHADOW_LONG avg_period=0
+    for i in (start - NEAR.avg_period)..start {
+        near_sum += cr(NEAR, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        let mid = low[i] + (high[i] - low[i]) / 2.0;
+        let near_avg = ca(NEAR, near_sum, open, high, low, close, i);
+        output[i] = (real_body(open[i], close[i])
+            <= ca(BODY_DOJI, body_sum, open, high, low, close, i)
+            && lower_shadow(open[i], low[i], close[i])
+                > ca(SHADOW_LONG, shadow_sum, open, high, low, close, i)
+            && upper_shadow(open[i], high[i], close[i])
+                > ca(SHADOW_LONG, shadow_sum, open, high, low, close, i)
+            && open[i].min(close[i]) <= mid + near_avg
+            && open[i].max(close[i]) >= mid - near_avg) as i32
+            * 100;
+        body_sum += cr(BODY_DOJI, open, high, low, close, i)
+            - cr(BODY_DOJI, open, high, low, close, i - BODY_DOJI.avg_period);
+        if NEAR.avg_period > 0 {
+            near_sum += cr(NEAR, open, high, low, close, i)
+                - cr(NEAR, open, high, low, close, i - NEAR.avg_period);
+        }
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {

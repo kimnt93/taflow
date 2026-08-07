@@ -20,12 +20,24 @@ use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn percentage_price_oscillator(input: &[f64], fastperiod: usize, slowperiod: usize, matype: MaType) -> TaResult<Vec<f64>> {
+pub fn percentage_price_oscillator(
+    input: &[f64],
+    fastperiod: usize,
+    slowperiod: usize,
+    matype: MaType,
+) -> TaResult<Vec<f64>> {
     let mut state = PercentagePriceOscillator::new(fastperiod, slowperiod, matype)?;
-    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
 }
 
 /// Incremental PPO driven by two selected moving-average states.
+/// Persistent Rust state or aligned output type for `PercentagePriceOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct PercentagePriceOscillator {
     fast: MovingAverageDispatcher,
     slow: MovingAverageDispatcher,
@@ -74,7 +86,6 @@ impl StreamingIndicator for PercentagePriceOscillator {
 #[cfg(test)]
 mod tests {
     use super::*;
-
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {

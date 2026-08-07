@@ -49,6 +49,10 @@ impl FlowWindow {
 
 /// Persistent Ultimate Oscillator with constant work per appended HLC bar.
 #[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `UltimateOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct UltimateOscillator {
     previous_close: Option<f64>,
     first: FlowWindow,

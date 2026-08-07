@@ -6,16 +6,24 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{RelativeStrengthIndex, FastStochasticOscillator, StreamingIndicator};
+use super::{FastStochasticOscillator, RelativeStrengthIndex, StreamingIndicator};
 
 /// One aligned stochastic-RSI fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `StochasticRelativeStrengthIndexValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct StochasticRelativeStrengthIndexValue {
     pub fastk: f64,
     pub fastd: f64,
 }
 
 /// Incremental STOCHRSI state.
+/// Persistent Rust state or aligned output type for `StochasticRelativeStrengthIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
 pub struct StochasticRelativeStrengthIndex {
     rsi: RelativeStrengthIndex,
     stochastic: FastStochasticOscillator,
@@ -40,12 +48,12 @@ impl StochasticRelativeStrengthIndex {
     /// Appends one close value.
     pub fn append(&mut self, input: f64) -> Option<StochasticRelativeStrengthIndexValue> {
         self.value = self.rsi.append(input).and_then(|rsi| {
-            self.stochastic
-                .append(rsi, rsi, rsi)
-                .map(|value| StochasticRelativeStrengthIndexValue {
+            self.stochastic.append(rsi, rsi, rsi).map(|value| {
+                StochasticRelativeStrengthIndexValue {
                     fastk: value.fastk,
                     fastd: value.fastd,
-                })
+                }
+            })
         });
         self.value
     }
@@ -67,7 +75,6 @@ impl StochasticRelativeStrengthIndex {
 mod tests {
     use super::*;
 
-
     #[test]
     fn matches_batch_for_all_moving_average_types() {
         let input: Vec<f64> = (0..500)
@@ -75,7 +82,9 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = crate::stream::stochastic_relative_strength_index(&input, 14, 5, 13, ma_type).unwrap();
+            let expected =
+                crate::stream::stochastic_relative_strength_index(&input, 14, 5, 13, ma_type)
+                    .unwrap();
             let mut state = StochasticRelativeStrengthIndex::new(14, 5, 13, ma_type).unwrap();
             for (index, input) in input.iter().copied().enumerate() {
                 match state.append(input) {

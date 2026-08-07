@@ -4,23 +4,21 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, AverageDirectionalIndex, AverageDirectionalIndexRating, AverageTrueRange, CommodityChannelIndex, DoubleExponentialMovingAverage, DirectionalMovementIndex, ExponentialMovingAverage, HilbertTransformTrendline, IntradayMomentumIndex, MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended, MovingAverageConvergenceDivergenceFixed, MesaAdaptiveMovingAverage,
-    VariablePeriodMovingAverage,
-    RollingMidpoint, RollingMidprice, Momentum, NormalizedAverageTrueRange, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent, RelativeStrengthIndex, SimpleMovingAverage, StochasticOscillator, FastStochasticOscillator, StochasticRelativeStrengthIndex,
-    StreamingIndicator, TripleExponentialMovingAverage, TrueRange, TriangularMovingAverage, WeightedMovingAverage, RelativeMomentumIndex,
-    VariableIndexDynamicAverage,
-    LaguerreRelativeStrengthIndex,
-    EvenBetterSinewave,
-    JurikMovingAverage,
-    SmoothedTrendChannel, PremiumDiscount, HeikinAshi,
-    FibonacciRetracement,
-    OpeningRange,
-    SessionVolumeLevels,
-    KlingerVolumeOscillator,
-    ParabolicMovingAverageStop,
-    TomDeMarkSequential,
-    AnchoredVolumeWeightedAveragePrice,
-    PivotPoints,
+    self, AnchoredVolumeWeightedAveragePrice, AverageDirectionalIndex,
+    AverageDirectionalIndexRating, AverageTrueRange, CommodityChannelIndex,
+    DirectionalMovementIndex, DoubleExponentialMovingAverage, EvenBetterSinewave,
+    ExponentialMovingAverage, FastStochasticOscillator, FibonacciRetracement, HeikinAshi,
+    HilbertTransformTrendline, IntradayMomentumIndex, JurikMovingAverage, KlingerVolumeOscillator,
+    LaguerreRelativeStrengthIndex, MesaAdaptiveMovingAverage, Momentum,
+    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended,
+    MovingAverageConvergenceDivergenceFixed, NormalizedAverageTrueRange, OpeningRange,
+    ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange, RateOfChangePercent,
+    RateOfChangeRatio, RateOfChangeRatioPercent, RelativeMomentumIndex, RelativeStrengthIndex,
+    RollingMidpoint, RollingMidprice, SessionVolumeLevels, SimpleMovingAverage,
+    SmoothedTrendChannel, StochasticOscillator, StochasticRelativeStrengthIndex,
+    StreamingIndicator, TomDeMarkSequential, TriangularMovingAverage,
+    TripleExponentialMovingAverage, TrueRange, VariableIndexDynamicAverage,
+    VariablePeriodMovingAverage, WeightedMovingAverage,
 };
 use taflow::MaType;
 
@@ -157,21 +155,42 @@ impl StatefulPremiumDiscount {
     #[new]
     #[pyo3(signature = (window=20))]
     fn new(window: usize) -> PyResult<Self> {
-        Ok(Self { inner: PremiumDiscount::new(window).map_err(py_value_error)?, zones: Vec::new(), equilibrium: Vec::new() })
+        Ok(Self {
+            inner: PremiumDiscount::new(window).map_err(py_value_error)?,
+            zones: Vec::new(),
+            equilibrium: Vec::new(),
+        })
     }
     fn append(&mut self, close: f64) -> (i32, f64) {
         let value = self.inner.append(close);
-        self.zones.push(value.0); self.equilibrium.push(value.1); value
+        self.zones.push(value.0);
+        self.equilibrium.push(value.1);
+        value
     }
     fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in close.as_slice()? { self.append(value); } Ok(())
+        for &value in close.as_slice()? {
+            self.append(value);
+        }
+        Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.zones.clone()), PyArray1::from_vec(py, self.equilibrium.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<f64>>) {
+        (
+            PyArray1::from_vec(py, self.zones.clone()),
+            PyArray1::from_vec(py, self.equilibrium.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(i32, f64)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.zones.clear(); self.equilibrium.clear(); }
+    fn value(&self) -> Option<(i32, f64)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.zones.clear();
+        self.equilibrium.clear();
+    }
 }
 
 /// Native state adapter for Heikin-Ashi OHLC transformation.
@@ -252,65 +271,198 @@ pub struct StatefulPivotPoints {
 #[pymethods]
 impl StatefulPivotPoints {
     #[new]
-    fn new() -> Self { Self { inner: PivotPoints::new(), levels: std::array::from_fn(|_| Vec::new()) } }
-    fn append(&mut self, high: f64, low: f64, close: f64, anchor: bool) -> (f64, f64, f64, f64, f64) {
+    fn new() -> Self {
+        Self {
+            inner: PivotPoints::new(),
+            levels: std::array::from_fn(|_| Vec::new()),
+        }
+    }
+    fn append(
+        &mut self,
+        high: f64,
+        low: f64,
+        close: f64,
+        anchor: bool,
+    ) -> (f64, f64, f64, f64, f64) {
         let value = self.inner.append(high, low, close, anchor);
         let values = [value.0, value.1, value.2, value.3, value.4];
-        for (index, level) in values.iter().enumerate() { self.levels[index].push(*level); }
+        for (index, level) in values.iter().enumerate() {
+            self.levels[index].push(*level);
+        }
         value
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
-        let (high, low, close, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, anchor.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for (((&high, &low), &close), &anchor) in high.iter().zip(low).zip(close).zip(anchor) { self.append(high, low, close, anchor); }
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+        anchor: PyReadonlyArray1<bool>,
+    ) -> PyResult<()> {
+        let (high, low, close, anchor) = (
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+            anchor.as_slice()?,
+        );
+        if high.len() != low.len() || high.len() != close.len() || high.len() != anchor.len() {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for (((&high, &low), &close), &anchor) in high.iter().zip(low).zip(close).zip(anchor) {
+            self.append(high, low, close, anchor);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.levels[0].clone()), PyArray1::from_vec(py, self.levels[1].clone()), PyArray1::from_vec(py, self.levels[2].clone()), PyArray1::from_vec(py, self.levels[3].clone()), PyArray1::from_vec(py, self.levels[4].clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.levels[0].clone()),
+            PyArray1::from_vec(py, self.levels[1].clone()),
+            PyArray1::from_vec(py, self.levels[2].clone()),
+            PyArray1::from_vec(py, self.levels[3].clone()),
+            PyArray1::from_vec(py, self.levels[4].clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> (f64, f64, f64, f64, f64) { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); for level in &mut self.levels { level.clear(); } }
+    fn value(&self) -> (f64, f64, f64, f64, f64) {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        for level in &mut self.levels {
+            level.clear();
+        }
+    }
 }
 
 #[pymethods]
 impl StatefulAnchoredVolumeWeightedAveragePrice {
     #[new]
     #[pyo3(signature = (stdev=1.0))]
-    fn new(stdev: f64) -> Self { Self { inner: AnchoredVolumeWeightedAveragePrice::new(stdev), means: Vec::new(), uppers: Vec::new(), lowers: Vec::new() } }
-    fn append(&mut self, high: f64, low: f64, close: f64, volume: f64, anchor: bool) -> (f64, f64, f64) {
-        let value = self.inner.append(high, low, close, volume, anchor); self.means.push(value.0); self.uppers.push(value.1); self.lowers.push(value.2); value
+    fn new(stdev: f64) -> Self {
+        Self {
+            inner: AnchoredVolumeWeightedAveragePrice::new(stdev),
+            means: Vec::new(),
+            uppers: Vec::new(),
+            lowers: Vec::new(),
+        }
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, volume: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
-        let (high, low, close, volume, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, volume.as_slice()?, anchor.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for ((((&high, &low), &close), &volume), &anchor) in high.iter().zip(low).zip(close).zip(volume).zip(anchor) { self.append(high, low, close, volume, anchor); }
+    fn append(
+        &mut self,
+        high: f64,
+        low: f64,
+        close: f64,
+        volume: f64,
+        anchor: bool,
+    ) -> (f64, f64, f64) {
+        let value = self.inner.append(high, low, close, volume, anchor);
+        self.means.push(value.0);
+        self.uppers.push(value.1);
+        self.lowers.push(value.2);
+        value
+    }
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+        volume: PyReadonlyArray1<f64>,
+        anchor: PyReadonlyArray1<bool>,
+    ) -> PyResult<()> {
+        let (high, low, close, volume, anchor) = (
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+            volume.as_slice()?,
+            anchor.as_slice()?,
+        );
+        if high.len() != low.len()
+            || high.len() != close.len()
+            || high.len() != volume.len()
+            || high.len() != anchor.len()
+        {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for ((((&high, &low), &close), &volume), &anchor) in
+            high.iter().zip(low).zip(close).zip(volume).zip(anchor)
+        {
+            self.append(high, low, close, volume, anchor);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.means.clone()), PyArray1::from_vec(py, self.uppers.clone()), PyArray1::from_vec(py, self.lowers.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.means.clone()),
+            PyArray1::from_vec(py, self.uppers.clone()),
+            PyArray1::from_vec(py, self.lowers.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, f64, f64)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.means.clear(); self.uppers.clear(); self.lowers.clear(); }
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.means.clear();
+        self.uppers.clear();
+        self.lowers.clear();
+    }
 }
 
 #[pymethods]
 impl StatefulTomDeMarkSequential {
     #[new]
-    fn new() -> Self { Self { inner: TomDeMarkSequential::new(), buys: Vec::new(), sells: Vec::new() } }
+    fn new() -> Self {
+        Self {
+            inner: TomDeMarkSequential::new(),
+            buys: Vec::new(),
+            sells: Vec::new(),
+        }
+    }
     fn append(&mut self, close: f64) -> (i32, i32) {
-        let value = self.inner.append(close); self.buys.push(value.0); self.sells.push(value.1); value
+        let value = self.inner.append(close);
+        self.buys.push(value.0);
+        self.sells.push(value.1);
+        value
     }
     fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in close.as_slice()? { self.append(value); } Ok(())
+        for &value in close.as_slice()? {
+            self.append(value);
+        }
+        Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<i32>>) {
-        (PyArray1::from_vec(py, self.buys.clone()), PyArray1::from_vec(py, self.sells.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<i32>>) {
+        (
+            PyArray1::from_vec(py, self.buys.clone()),
+            PyArray1::from_vec(py, self.sells.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(i32, i32)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.buys.clear(); self.sells.clear(); }
+    fn value(&self) -> Option<(i32, i32)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.buys.clear();
+        self.sells.clear();
+    }
 }
 
 #[pymethods]
@@ -318,23 +470,51 @@ impl StatefulParabolicMovingAverageStop {
     #[new]
     #[pyo3(signature = (length=10, multiplier=3.0))]
     fn new(length: usize, multiplier: f64) -> PyResult<Self> {
-        Ok(Self { inner: ParabolicMovingAverageStop::new(length, multiplier).map_err(py_value_error)?, stops: Vec::new(), trends: Vec::new() })
+        Ok(Self {
+            inner: ParabolicMovingAverageStop::new(length, multiplier).map_err(py_value_error)?,
+            stops: Vec::new(),
+            trends: Vec::new(),
+        })
     }
     fn append(&mut self, high: f64, low: f64, close: f64) -> (f64, i32) {
-        let value = self.inner.append(high, low, close); self.stops.push(value.0); self.trends.push(value.1); value
+        let value = self.inner.append(high, low, close);
+        self.stops.push(value.0);
+        self.trends.push(value.1);
+        value
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for ((&high, &low), &close) in high.iter().zip(low).zip(close) { self.append(high, low, close); }
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+            self.append(high, low, close);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<i32>>) {
-        (PyArray1::from_vec(py, self.stops.clone()), PyArray1::from_vec(py, self.trends.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<i32>>) {
+        (
+            PyArray1::from_vec(py, self.stops.clone()),
+            PyArray1::from_vec(py, self.trends.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, i32)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.stops.clear(); self.trends.clear(); }
+    fn value(&self) -> Option<(f64, i32)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.stops.clear();
+        self.trends.clear();
+    }
 }
 
 #[pymethods]
@@ -342,23 +522,57 @@ impl StatefulKlingerVolumeOscillator {
     #[new]
     #[pyo3(signature = (fast=34, slow=55, signal=13))]
     fn new(fast: usize, slow: usize, signal: usize) -> PyResult<Self> {
-        Ok(Self { inner: KlingerVolumeOscillator::new(fast, slow, signal).map_err(py_value_error)?, oscillator: Vec::new(), signal: Vec::new() })
+        Ok(Self {
+            inner: KlingerVolumeOscillator::new(fast, slow, signal).map_err(py_value_error)?,
+            oscillator: Vec::new(),
+            signal: Vec::new(),
+        })
     }
     fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> (f64, f64) {
-        let value = self.inner.append(high, low, close, volume); self.oscillator.push(value.0); self.signal.push(value.1); value
+        let value = self.inner.append(high, low, close, volume);
+        self.oscillator.push(value.0);
+        self.signal.push(value.1);
+        value
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, volume: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let (high, low, close, volume) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, volume.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for (((&high, &low), &close), &volume) in high.iter().zip(low).zip(close).zip(volume) { self.append(high, low, close, volume); }
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+        volume: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
+        let (high, low, close, volume) = (
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+            volume.as_slice()?,
+        );
+        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for (((&high, &low), &close), &volume) in high.iter().zip(low).zip(close).zip(volume) {
+            self.append(high, low, close, volume);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.oscillator.clone()), PyArray1::from_vec(py, self.signal.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (
+            PyArray1::from_vec(py, self.oscillator.clone()),
+            PyArray1::from_vec(py, self.signal.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, f64)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.oscillator.clear(); self.signal.clear(); }
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.oscillator.clear();
+        self.signal.clear();
+    }
 }
 
 #[pymethods]
@@ -366,47 +580,146 @@ impl StatefulSessionVolumeLevels {
     #[new]
     #[pyo3(signature = (bins=24, value_area=0.7))]
     fn new(bins: usize, value_area: f64) -> PyResult<Self> {
-        Ok(Self { inner: SessionVolumeLevels::new(bins, value_area).map_err(py_value_error)?, poc: Vec::new(), value_area_high: Vec::new(), value_area_low: Vec::new() })
+        Ok(Self {
+            inner: SessionVolumeLevels::new(bins, value_area).map_err(py_value_error)?,
+            poc: Vec::new(),
+            value_area_high: Vec::new(),
+            value_area_low: Vec::new(),
+        })
     }
-    fn append(&mut self, high: f64, low: f64, close: f64, volume: f64, anchor: bool) -> (f64, f64, f64) {
+    fn append(
+        &mut self,
+        high: f64,
+        low: f64,
+        close: f64,
+        volume: f64,
+        anchor: bool,
+    ) -> (f64, f64, f64) {
         let value = self.inner.append(high, low, close, volume, anchor);
-        self.poc.push(value.0); self.value_area_high.push(value.1); self.value_area_low.push(value.2); value
+        self.poc.push(value.0);
+        self.value_area_high.push(value.1);
+        self.value_area_low.push(value.2);
+        value
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, volume: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
-        let (high, low, close, volume, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, volume.as_slice()?, anchor.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for ((((&high, &low), &close), &volume), &anchor) in high.iter().zip(low).zip(close).zip(volume).zip(anchor) { self.append(high, low, close, volume, anchor); }
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+        volume: PyReadonlyArray1<f64>,
+        anchor: PyReadonlyArray1<bool>,
+    ) -> PyResult<()> {
+        let (high, low, close, volume, anchor) = (
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+            volume.as_slice()?,
+            anchor.as_slice()?,
+        );
+        if high.len() != low.len()
+            || high.len() != close.len()
+            || high.len() != volume.len()
+            || high.len() != anchor.len()
+        {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for ((((&high, &low), &close), &volume), &anchor) in
+            high.iter().zip(low).zip(close).zip(volume).zip(anchor)
+        {
+            self.append(high, low, close, volume, anchor);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.poc.clone()), PyArray1::from_vec(py, self.value_area_high.clone()), PyArray1::from_vec(py, self.value_area_low.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.poc.clone()),
+            PyArray1::from_vec(py, self.value_area_high.clone()),
+            PyArray1::from_vec(py, self.value_area_low.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, f64, f64)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.poc.clear(); self.value_area_high.clear(); self.value_area_low.clear(); }
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.poc.clear();
+        self.value_area_high.clear();
+        self.value_area_low.clear();
+    }
 }
 
 #[pymethods]
 impl StatefulOpeningRange {
     #[new]
     #[pyo3(signature = (bars=30))]
-    fn new(bars: usize) -> Self { Self { inner: OpeningRange::new(bars), highs: Vec::new(), lows: Vec::new(), breakouts: Vec::new() } }
+    fn new(bars: usize) -> Self {
+        Self {
+            inner: OpeningRange::new(bars),
+            highs: Vec::new(),
+            lows: Vec::new(),
+            breakouts: Vec::new(),
+        }
+    }
     fn append(&mut self, high: f64, low: f64, close: f64, anchor: bool) -> (f64, f64, i32) {
         let value = self.inner.append(high, low, close, anchor);
-        self.highs.push(value.0); self.lows.push(value.1); self.breakouts.push(value.2); value
+        self.highs.push(value.0);
+        self.lows.push(value.1);
+        self.breakouts.push(value.2);
+        value
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
-        let (high, low, close, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, anchor.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for (((&high, &low), &close), &anchor) in high.iter().zip(low).zip(close).zip(anchor) { self.append(high, low, close, anchor); }
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+        anchor: PyReadonlyArray1<bool>,
+    ) -> PyResult<()> {
+        let (high, low, close, anchor) = (
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+            anchor.as_slice()?,
+        );
+        if high.len() != low.len() || high.len() != close.len() || high.len() != anchor.len() {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for (((&high, &low), &close), &anchor) in high.iter().zip(low).zip(close).zip(anchor) {
+            self.append(high, low, close, anchor);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<i32>>) {
-        (PyArray1::from_vec(py, self.highs.clone()), PyArray1::from_vec(py, self.lows.clone()), PyArray1::from_vec(py, self.breakouts.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<i32>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.highs.clone()),
+            PyArray1::from_vec(py, self.lows.clone()),
+            PyArray1::from_vec(py, self.breakouts.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, f64, i32)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.highs.clear(); self.lows.clear(); self.breakouts.clear(); }
+    fn value(&self) -> Option<(f64, f64, i32)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.highs.clear();
+        self.lows.clear();
+        self.breakouts.clear();
+    }
 }
 
 #[pymethods]
@@ -414,46 +727,130 @@ impl StatefulFibonacciRetracement {
     #[new]
     #[pyo3(signature = (window=120))]
     fn new(window: usize) -> PyResult<Self> {
-        Ok(Self { inner: FibonacciRetracement::new(window).map_err(py_value_error)?, levels: std::array::from_fn(|_| Vec::new()) })
+        Ok(Self {
+            inner: FibonacciRetracement::new(window).map_err(py_value_error)?,
+            levels: std::array::from_fn(|_| Vec::new()),
+        })
     }
     fn append(&mut self, close: f64) -> (f64, f64, f64, f64, f64, f64, f64) {
         let value = self.inner.append(close);
-        for (index, level) in value.iter().enumerate() { self.levels[index].push(*level); }
-        (value[0], value[1], value[2], value[3], value[4], value[5], value[6])
+        for (index, level) in value.iter().enumerate() {
+            self.levels[index].push(*level);
+        }
+        (
+            value[0], value[1], value[2], value[3], value[4], value[5], value[6],
+        )
     }
     fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in close.as_slice()? { self.append(value); } Ok(())
+        for &value in close.as_slice()? {
+            self.append(value);
+        }
+        Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.levels[0].clone()), PyArray1::from_vec(py, self.levels[1].clone()), PyArray1::from_vec(py, self.levels[2].clone()), PyArray1::from_vec(py, self.levels[3].clone()), PyArray1::from_vec(py, self.levels[4].clone()), PyArray1::from_vec(py, self.levels[5].clone()), PyArray1::from_vec(py, self.levels[6].clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.levels[0].clone()),
+            PyArray1::from_vec(py, self.levels[1].clone()),
+            PyArray1::from_vec(py, self.levels[2].clone()),
+            PyArray1::from_vec(py, self.levels[3].clone()),
+            PyArray1::from_vec(py, self.levels[4].clone()),
+            PyArray1::from_vec(py, self.levels[5].clone()),
+            PyArray1::from_vec(py, self.levels[6].clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, f64, f64, f64, f64, f64, f64)> { self.inner.value().map(|v| (v[0], v[1], v[2], v[3], v[4], v[5], v[6])) }
-    fn reset(&mut self) { self.inner.reset(); for level in &mut self.levels { level.clear(); } }
+    fn value(&self) -> Option<(f64, f64, f64, f64, f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|v| (v[0], v[1], v[2], v[3], v[4], v[5], v[6]))
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        for level in &mut self.levels {
+            level.clear();
+        }
+    }
 }
 
 #[pymethods]
 impl StatefulHeikinAshi {
     #[new]
     fn new() -> PyResult<Self> {
-        Ok(Self { inner: HeikinAshi::new().map_err(py_value_error)?, open: Vec::new(), high: Vec::new(), low: Vec::new(), close: Vec::new() })
+        Ok(Self {
+            inner: HeikinAshi::new().map_err(py_value_error)?,
+            open: Vec::new(),
+            high: Vec::new(),
+            low: Vec::new(),
+            close: Vec::new(),
+        })
     }
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> (f64, f64, f64, f64) {
         let value = self.inner.append(open, high, low, close);
-        self.open.push(value.0); self.high.push(value.1); self.low.push(value.2); self.close.push(value.3); value
+        self.open.push(value.0);
+        self.high.push(value.1);
+        self.low.push(value.2);
+        self.close.push(value.3);
+        value
     }
-    fn extend(&mut self, open: PyReadonlyArray1<f64>, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let (open, high, low, close) = (open.as_slice()?, high.as_slice()?, low.as_slice()?, close.as_slice()?);
-        if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for (((&open, &high), &low), &close) in open.iter().zip(high).zip(low).zip(close) { self.append(open, high, low, close); }
+    fn extend(
+        &mut self,
+        open: PyReadonlyArray1<f64>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
+        let (open, high, low, close) = (
+            open.as_slice()?,
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+        );
+        if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for (((&open, &high), &low), &close) in open.iter().zip(high).zip(low).zip(close) {
+            self.append(open, high, low, close);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.open.clone()), PyArray1::from_vec(py, self.high.clone()), PyArray1::from_vec(py, self.low.clone()), PyArray1::from_vec(py, self.close.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.open.clone()),
+            PyArray1::from_vec(py, self.high.clone()),
+            PyArray1::from_vec(py, self.low.clone()),
+            PyArray1::from_vec(py, self.close.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, f64, f64, f64)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.open.clear(); self.high.clear(); self.low.clear(); self.close.clear(); }
+    fn value(&self) -> Option<(f64, f64, f64, f64)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.open.clear();
+        self.high.clear();
+        self.low.clear();
+        self.close.clear();
+    }
 }
 
 #[pymethods]
@@ -461,24 +858,54 @@ impl StatefulSmoothedTrendChannel {
     #[new]
     #[pyo3(signature = (length=10))]
     fn new(length: usize) -> PyResult<Self> {
-        Ok(Self { inner: SmoothedTrendChannel::new(length).map_err(py_value_error)?, lower: Vec::new(), upper: Vec::new() })
+        Ok(Self {
+            inner: SmoothedTrendChannel::new(length).map_err(py_value_error)?,
+            lower: Vec::new(),
+            upper: Vec::new(),
+        })
     }
     fn append(&mut self, high: f64, low: f64, close: f64) -> (f64, f64) {
-        let value = self.inner.append(high, low, close).unwrap_or((f64::NAN, f64::NAN));
-        self.lower.push(value.0); self.upper.push(value.1); value
+        let value = self
+            .inner
+            .append(high, low, close)
+            .unwrap_or((f64::NAN, f64::NAN));
+        self.lower.push(value.0);
+        self.upper.push(value.1);
+        value
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
-        for ((&high, &low), &close) in high.iter().zip(low).zip(close) { self.append(high, low, close); }
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+            self.append(high, low, close);
+        }
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (PyArray1::from_vec(py, self.lower.clone()), PyArray1::from_vec(py, self.upper.clone()))
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (
+            PyArray1::from_vec(py, self.lower.clone()),
+            PyArray1::from_vec(py, self.upper.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<(f64, f64)> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.lower.clear(); self.upper.clear(); }
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.lower.clear();
+        self.upper.clear();
+    }
 }
 
 #[pymethods]
@@ -486,18 +913,33 @@ impl StatefulJurikMovingAverage {
     #[new]
     #[pyo3(signature = (length=7, phase=0.0))]
     fn new(length: usize, phase: f64) -> PyResult<Self> {
-        Ok(Self { inner: JurikMovingAverage::new(length, phase).map_err(py_value_error)?, output: Vec::new() })
+        Ok(Self {
+            inner: JurikMovingAverage::new(length, phase).map_err(py_value_error)?,
+            output: Vec::new(),
+        })
     }
     fn append(&mut self, input: f64) -> Option<f64> {
-        let value = self.inner.append(input); self.output.push(value.unwrap_or(f64::NAN)); value
+        let value = self.inner.append(input);
+        self.output.push(value.unwrap_or(f64::NAN));
+        value
     }
     fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? { self.append(value); } Ok(())
+        for &value in input.as_slice()? {
+            self.append(value);
+        }
+        Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> { PyArray1::from_vec(py, self.output.clone()) }
+    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
+        PyArray1::from_vec(py, self.output.clone())
+    }
     #[getter]
-    fn value(&self) -> Option<f64> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.output.clear(); }
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.output.clear();
+    }
 }
 
 #[pymethods]
@@ -505,18 +947,33 @@ impl StatefulEvenBetterSinewave {
     #[new]
     #[pyo3(signature = (length=40))]
     fn new(length: usize) -> PyResult<Self> {
-        Ok(Self { inner: EvenBetterSinewave::new(length).map_err(py_value_error)?, output: Vec::new() })
+        Ok(Self {
+            inner: EvenBetterSinewave::new(length).map_err(py_value_error)?,
+            output: Vec::new(),
+        })
     }
     fn append(&mut self, input: f64) -> Option<f64> {
-        let value = self.inner.append(input); self.output.push(value.unwrap_or(f64::NAN)); value
+        let value = self.inner.append(input);
+        self.output.push(value.unwrap_or(f64::NAN));
+        value
     }
     fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? { self.append(value); } Ok(())
+        for &value in input.as_slice()? {
+            self.append(value);
+        }
+        Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> { PyArray1::from_vec(py, self.output.clone()) }
+    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
+        PyArray1::from_vec(py, self.output.clone())
+    }
     #[getter]
-    fn value(&self) -> Option<f64> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.output.clear(); }
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.output.clear();
+    }
 }
 
 #[pymethods]
@@ -524,18 +981,33 @@ impl StatefulLaguerreRelativeStrengthIndex {
     #[new]
     #[pyo3(signature = (gamma=0.5))]
     fn new(gamma: f64) -> PyResult<Self> {
-        Ok(Self { inner: LaguerreRelativeStrengthIndex::new(gamma).map_err(py_value_error)?, output: Vec::new() })
+        Ok(Self {
+            inner: LaguerreRelativeStrengthIndex::new(gamma).map_err(py_value_error)?,
+            output: Vec::new(),
+        })
     }
     fn append(&mut self, input: f64) -> Option<f64> {
-        let value = self.inner.append(input); self.output.push(value.unwrap_or(f64::NAN)); value
+        let value = self.inner.append(input);
+        self.output.push(value.unwrap_or(f64::NAN));
+        value
     }
     fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? { self.append(value); } Ok(())
+        for &value in input.as_slice()? {
+            self.append(value);
+        }
+        Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> { PyArray1::from_vec(py, self.output.clone()) }
+    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
+        PyArray1::from_vec(py, self.output.clone())
+    }
     #[getter]
-    fn value(&self) -> Option<f64> { self.inner.value() }
-    fn reset(&mut self) { self.inner.reset(); self.output.clear(); }
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.output.clear();
+    }
 }
 
 #[pymethods]
@@ -557,7 +1029,9 @@ impl StatefulVariableIndexDynamicAverage {
     }
 
     fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? { self.append(value); }
+        for &value in input.as_slice()? {
+            self.append(value);
+        }
         Ok(())
     }
 
@@ -566,9 +1040,14 @@ impl StatefulVariableIndexDynamicAverage {
     }
 
     #[getter]
-    fn value(&self) -> Option<f64> { self.inner.value() }
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
 
-    fn reset(&mut self) { self.inner.reset(); self.output.clear(); }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.output.clear();
+    }
 }
 
 #[pymethods]
@@ -576,7 +1055,10 @@ impl StatefulRelativeMomentumIndex {
     #[new]
     #[pyo3(signature = (timeperiod=14, momentum=5))]
     fn new(timeperiod: usize, momentum: usize) -> PyResult<Self> {
-        Ok(Self { inner: RelativeMomentumIndex::new(timeperiod, momentum).map_err(py_value_error)?, output: Vec::new() })
+        Ok(Self {
+            inner: RelativeMomentumIndex::new(timeperiod, momentum).map_err(py_value_error)?,
+            output: Vec::new(),
+        })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -585,8 +1067,14 @@ impl StatefulRelativeMomentumIndex {
         value
     }
 
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-        for &value in input.as_slice()? { self.append(value); }
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        input: PyReadonlyArray1<f64>,
+    ) -> PyResult<Py<PyArray1<f64>>> {
+        for &value in input.as_slice()? {
+            self.append(value);
+        }
         Ok(to_py_array(py, self.output.clone()))
     }
 
@@ -595,9 +1083,14 @@ impl StatefulRelativeMomentumIndex {
     }
 
     #[getter]
-    fn value(&self) -> Option<f64> { self.inner.value() }
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
 
-    fn reset(&mut self) { self.inner.reset(); self.output.clear(); }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.output.clear();
+    }
 }
 
 #[pyclass]
@@ -706,7 +1199,8 @@ impl StatefulT3 {
     #[pyo3(signature = (timeperiod=5, vfactor=0.7))]
     fn new(timeperiod: usize, vfactor: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::TripleExponentialAverage::new(timeperiod, vfactor).map_err(py_value_error)?,
+            inner: stream::TripleExponentialAverage::new(timeperiod, vfactor)
+                .map_err(py_value_error)?,
         })
     }
 
@@ -1239,7 +1733,8 @@ impl StatefulAdosc {
     #[pyo3(signature = (fastperiod=3, slowperiod=10))]
     fn new(fastperiod: usize, slowperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::AccumulationDistributionOscillator::new(fastperiod, slowperiod).map_err(py_value_error)?,
+            inner: stream::AccumulationDistributionOscillator::new(fastperiod, slowperiod)
+                .map_err(py_value_error)?,
         })
     }
 
@@ -2442,7 +2937,8 @@ impl StatefulMacd {
     #[pyo3(signature = (fastperiod=12, slowperiod=26, signalperiod=9))]
     fn new(fastperiod: usize, slowperiod: usize, signalperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: MovingAverageConvergenceDivergence::new(fastperiod, slowperiod, signalperiod).map_err(py_value_error)?,
+            inner: MovingAverageConvergenceDivergence::new(fastperiod, slowperiod, signalperiod)
+                .map_err(py_value_error)?,
         })
     }
 
@@ -2499,7 +2995,8 @@ impl StatefulMacdFix {
     #[pyo3(signature = (signalperiod=9))]
     fn new(signalperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: MovingAverageConvergenceDivergenceFixed::new(signalperiod).map_err(py_value_error)?,
+            inner: MovingAverageConvergenceDivergenceFixed::new(signalperiod)
+                .map_err(py_value_error)?,
         })
     }
 
@@ -2557,7 +3054,8 @@ impl StatefulStochf {
     fn new(fastk_period: usize, fastd_period: usize, fastd_matype: i32) -> PyResult<Self> {
         let ma_type = MaType::try_from(fastd_matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: FastStochasticOscillator::new(fastk_period, fastd_period, ma_type).map_err(py_value_error)?,
+            inner: FastStochasticOscillator::new(fastk_period, fastd_period, ma_type)
+                .map_err(py_value_error)?,
         })
     }
 
@@ -2694,8 +3192,13 @@ impl StatefulStochrsi {
     ) -> PyResult<Self> {
         let ma_type = MaType::try_from(fastd_matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: StochasticRelativeStrengthIndex::new(timeperiod, fastk_period, fastd_period, ma_type)
-                .map_err(py_value_error)?,
+            inner: StochasticRelativeStrengthIndex::new(
+                timeperiod,
+                fastk_period,
+                fastd_period,
+                ma_type,
+            )
+            .map_err(py_value_error)?,
         })
     }
 
@@ -2819,7 +3322,8 @@ impl StatefulMavp {
     fn new(minperiod: usize, maxperiod: usize, matype: i32) -> PyResult<Self> {
         let ma_type = MaType::try_from(matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: VariablePeriodMovingAverage::new(minperiod, maxperiod, ma_type).map_err(py_value_error)?,
+            inner: VariablePeriodMovingAverage::new(minperiod, maxperiod, ma_type)
+                .map_err(py_value_error)?,
         })
     }
 

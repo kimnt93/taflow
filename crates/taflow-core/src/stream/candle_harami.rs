@@ -1,4 +1,6 @@
 //! Incremental Harami candlestick recognition (CDLHARAMI).
+use super::pattern::*;
+use crate::error::TaResult;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -86,6 +88,76 @@ impl CandleHarami {
     pub fn reset(&mut self) {
         *self = Self::new();
     }
+}
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle harami result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn candle_harami(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+    let len = validate_ohlc(open, high, low, close)?;
+    let mut output = vec![0i32; len];
+    let lookback = BODY_SHORT.avg_period.max(BODY_LONG.avg_period) + 1;
+    if len <= lookback {
+        return Ok(output);
+    }
+
+    let mut body_long_sum = 0.0;
+    let mut body_short_sum = 0.0;
+    let start = lookback;
+    for i in (start - 1 - BODY_LONG.avg_period)..(start - 1) {
+        body_long_sum += cr(BODY_LONG, open, high, low, close, i);
+    }
+    for i in (start - BODY_SHORT.avg_period)..start {
+        body_short_sum += cr(BODY_SHORT, open, high, low, close, i);
+    }
+
+    for i in start..len {
+        output[i] = (real_body(open[i - 1], close[i - 1])
+            > ca(BODY_LONG, body_long_sum, open, high, low, close, i - 1)
+            && real_body(open[i], close[i])
+                <= ca(BODY_SHORT, body_short_sum, open, high, low, close, i)
+            && open[i].max(close[i]) < open[i - 1].max(close[i - 1])
+            && open[i].min(close[i]) > open[i - 1].min(close[i - 1])) as i32
+            * -candle_color(open[i - 1], close[i - 1])
+            * 100;
+        body_long_sum += cr(BODY_LONG, open, high, low, close, i - 1)
+            - cr(
+                BODY_LONG,
+                open,
+                high,
+                low,
+                close,
+                i - 1 - BODY_LONG.avg_period,
+            );
+        body_short_sum += cr(BODY_SHORT, open, high, low, close, i)
+            - cr(
+                BODY_SHORT,
+                open,
+                high,
+                low,
+                close,
+                i - BODY_SHORT.avg_period,
+            );
+    }
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {
