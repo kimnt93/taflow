@@ -1,0 +1,51 @@
+use numpy::{PyArray1, PyReadonlyArray1};
+use pyo3::exceptions::PyValueError;
+use pyo3::prelude::*;
+use taflow::stream::CdlShootingStar;
+#[pyclass]
+pub struct ShootingStar {
+    inner: CdlShootingStar,
+    outputs: Vec<i32>,
+}
+#[pymethods]
+impl ShootingStar {
+    #[new]
+    fn new() -> Self {
+        Self {
+            inner: CdlShootingStar::new(),
+            outputs: vec![],
+        }
+    }
+    fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
+        let v = self.inner.append(o, h, l, c);
+        self.outputs.push(v.unwrap_or(0));
+        v
+    }
+    fn extend(
+        &mut self,
+        o: PyReadonlyArray1<f64>,
+        h: PyReadonlyArray1<f64>,
+        l: PyReadonlyArray1<f64>,
+        c: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
+        let (o, h, l, c) = (o.as_slice()?, h.as_slice()?, l.as_slice()?, c.as_slice()?);
+        if o.len() != h.len() || o.len() != l.len() || o.len() != c.len() {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        for (((&o, &h), &l), &c) in o.iter().zip(h).zip(l).zip(c) {
+            self.append(o, h, l, c);
+        }
+        Ok(())
+    }
+    fn compute<'a>(&self, py: Python<'a>) -> Bound<'a, PyArray1<i32>> {
+        PyArray1::from_vec(py, self.outputs.clone())
+    }
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.outputs.clear();
+    }
+}

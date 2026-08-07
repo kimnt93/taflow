@@ -40,6 +40,41 @@ from ..three_outside import CDL3OUTSIDE, ThreeOutside
 from ..two_crows import CDL2CROWS, TwoCrows
 from ..ultimate_oscillator import ULTOSC, UltimateOscillator
 from ..up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
+from ..three_white_soldiers import CDL3WHITESOLDIERS, ThreeWhiteSoldiers
+from ..abandoned_baby import CDLABANDONEDBABY, AbandonedBaby
+from ..advance_block import CDLADVANCEBLOCK, AdvanceBlock
+from ..breakaway import CDLBREAKAWAY, Breakaway
+from ..conceal_baby_swall import CDLCONCEALBABYSWALL, ConcealBabySwall
+from ..counter_attack import CDLCOUNTERATTACK, CounterAttack
+from ..dark_cloud_cover import CDLDARKCLOUDCOVER, DarkCloudCover
+from ..evening_doji_star import CDLEVENINGDOJISTAR, EveningDojiStar
+from ..evening_star import CDLEVENINGSTAR, EveningStar
+from ..gap_side_side_white import CDLGAPSIDESIDEWHITE, GapSideSideWhite
+from ..hanging_man import CDLHANGINGMAN, HangingMan
+from ..harami import CDLHARAMI, Harami
+from ..harami_cross import CDLHARAMICROSS, HaramiCross
+from ..homing_pigeon import CDLHOMINGPIGEON, HomingPigeon
+from ..identical_three_crows import CDLIDENTICAL3CROWS, IdenticalThreeCrows
+from ..in_neck import CDLINNECK, InNeck
+from ..inverted_hammer import CDLINVERTEDHAMMER, InvertedHammer
+from ..kicking import CDLKICKING, Kicking
+from ..kicking_by_length import CDLKICKINGBYLENGTH, KickingByLength
+from ..ladder_bottom import CDLLADDERBOTTOM, LadderBottom
+from ..matching_low import CDLMATCHINGLOW, MatchingLow
+from ..mat_hold import CDLMATHOLD, MatHold
+from ..morning_doji_star import CDLMORNINGDOJISTAR, MorningDojiStar
+from ..morning_star import CDLMORNINGSTAR, MorningStar
+from ..on_neck import CDLONNECK, OnNeck
+from ..piercing import CDLPIERCING, Piercing
+from ..rise_fall_three_methods import CDLRISEFALL3METHODS, RiseFallThreeMethods
+from ..separating_lines import CDLSEPARATINGLINES, SeparatingLines
+from ..shooting_star import CDLSHOOTINGSTAR, ShootingStar
+from ..stalled_pattern import CDLSTALLEDPATTERN, StalledPattern
+from ..tasuki_gap import CDLTASUKIGAP, TasukiGap
+from ..thrusting import CDLTHRUSTING, Thrusting
+from ..tri_star import CDLTRISTAR, TriStar
+from ..unique_three_river import CDLUNIQUE3RIVER, UniqueThreeRiver
+from ..upside_gap_two_crows import CDLUPSIDEGAP2CROWS, UpsideGapTwoCrows
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -78,4 +113,39 @@ __all__ = [
     "ThreeOutside", "CDL3OUTSIDE",
     "StickSandwich", "CDLSTICKSANDWICH",
     "TwoCrows", "CDL2CROWS",
+    "ThreeWhiteSoldiers", "CDL3WHITESOLDIERS",
+    "AbandonedBaby", "CDLABANDONEDBABY",
+    "AdvanceBlock", "CDLADVANCEBLOCK",
+    "Breakaway", "CDLBREAKAWAY",
+    "ConcealBabySwall", "CDLCONCEALBABYSWALL",
+    "CounterAttack", "CDLCOUNTERATTACK",
+    "DarkCloudCover", "CDLDARKCLOUDCOVER",
+    "EveningDojiStar", "CDLEVENINGDOJISTAR",
+    "EveningStar", "CDLEVENINGSTAR",
+    "GapSideSideWhite", "CDLGAPSIDESIDEWHITE",
+    "HangingMan", "CDLHANGINGMAN",
+    "Harami", "CDLHARAMI",
+    "HaramiCross", "CDLHARAMICROSS",
+    "HomingPigeon", "CDLHOMINGPIGEON",
+    "IdenticalThreeCrows", "CDLIDENTICAL3CROWS",
+    "InNeck", "CDLINNECK",
+    "InvertedHammer", "CDLINVERTEDHAMMER",
+    "Kicking", "CDLKICKING",
+    "KickingByLength", "CDLKICKINGBYLENGTH",
+    "LadderBottom", "CDLLADDERBOTTOM",
+    "MatchingLow", "CDLMATCHINGLOW",
+    "MatHold", "CDLMATHOLD",
+    "MorningDojiStar", "CDLMORNINGDOJISTAR",
+    "MorningStar", "CDLMORNINGSTAR",
+    "OnNeck", "CDLONNECK",
+    "Piercing", "CDLPIERCING",
+    "RiseFallThreeMethods", "CDLRISEFALL3METHODS",
+    "SeparatingLines", "CDLSEPARATINGLINES",
+    "ShootingStar", "CDLSHOOTINGSTAR",
+    "StalledPattern", "CDLSTALLEDPATTERN",
+    "TasukiGap", "CDLTASUKIGAP",
+    "Thrusting", "CDLTHRUSTING",
+    "TriStar", "CDLTRISTAR",
+    "UniqueThreeRiver", "CDLUNIQUE3RIVER",
+    "UpsideGapTwoCrows", "CDLUPSIDEGAP2CROWS",
 ]

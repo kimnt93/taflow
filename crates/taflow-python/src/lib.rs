@@ -57,6 +57,41 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::MinusDirectionalMovement>()?;
     m.add_class::<indicators::TripleExponentialRateOfChange>()?;
     m.add_class::<indicators::UltimateOscillator>()?;
+    m.add_class::<indicators::ThreeWhiteSoldiers>()?;
+    m.add_class::<indicators::AbandonedBaby>()?;
+    m.add_class::<indicators::AdvanceBlock>()?;
+    m.add_class::<indicators::Breakaway>()?;
+    m.add_class::<indicators::ConcealBabySwall>()?;
+    m.add_class::<indicators::CounterAttack>()?;
+    m.add_class::<indicators::DarkCloudCover>()?;
+    m.add_class::<indicators::EveningDojiStar>()?;
+    m.add_class::<indicators::EveningStar>()?;
+    m.add_class::<indicators::GapSideSideWhite>()?;
+    m.add_class::<indicators::HangingMan>()?;
+    m.add_class::<indicators::Harami>()?;
+    m.add_class::<indicators::HaramiCross>()?;
+    m.add_class::<indicators::HomingPigeon>()?;
+    m.add_class::<indicators::IdenticalThreeCrows>()?;
+    m.add_class::<indicators::InNeck>()?;
+    m.add_class::<indicators::InvertedHammer>()?;
+    m.add_class::<indicators::Kicking>()?;
+    m.add_class::<indicators::KickingByLength>()?;
+    m.add_class::<indicators::LadderBottom>()?;
+    m.add_class::<indicators::MatchingLow>()?;
+    m.add_class::<indicators::MatHold>()?;
+    m.add_class::<indicators::MorningDojiStar>()?;
+    m.add_class::<indicators::MorningStar>()?;
+    m.add_class::<indicators::OnNeck>()?;
+    m.add_class::<indicators::Piercing>()?;
+    m.add_class::<indicators::RiseFallThreeMethods>()?;
+    m.add_class::<indicators::SeparatingLines>()?;
+    m.add_class::<indicators::ShootingStar>()?;
+    m.add_class::<indicators::StalledPattern>()?;
+    m.add_class::<indicators::TasukiGap>()?;
+    m.add_class::<indicators::Thrusting>()?;
+    m.add_class::<indicators::TriStar>()?;
+    m.add_class::<indicators::UniqueThreeRiver>()?;
+    m.add_class::<indicators::UpsideGapTwoCrows>()?;
 
     // Transitional state classes remain available while their indicators move
     // to the unified object surface above.
