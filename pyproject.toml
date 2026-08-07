@@ -16,6 +16,11 @@ classifiers = [
 ]
 dependencies = ["numpy>=1.20"]
 
+[project.optional-dependencies]
+arrow = ["pyarrow>=12"]
+polars = ["polars>=0.20"]
+adapters = ["pyarrow>=12", "polars>=0.20"]
+
 [tool.maturin]
 manifest-path = "crates/taflow-python/Cargo.toml"
 python-source = "python"

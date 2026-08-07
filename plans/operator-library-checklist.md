@@ -108,13 +108,13 @@ Two aligned input series are within the contract (like BETA/CORREL).
 
 ## Execution and adapters
 
-- [ ] indicator pipeline with one dispatch per input bar
-- [ ] dependency graph and common-subexpression sharing
-- [ ] expression engine
-- [ ] NumPy input/output adapter performance tests
-- [ ] Arrow adapter feature
-- [ ] Polars adapter feature
-- [ ] Python list adapter and conversion benchmark
+- [x] indicator pipeline with one dispatch per input bar (`taflow.Pipeline`)
+- [x] dependency graph and common-subexpression sharing (identity-memoized nodes)
+- [x] expression engine (`taflow.Expr` arithmetic composition)
+- [x] NumPy input/output adapter performance tests (`tests/test_execution_adapters.py`)
+- [x] Arrow adapter feature (optional `pyarrow` extra, lazy import)
+- [x] Polars adapter feature (optional `polars` extra, lazy import)
+- [x] Python list adapter and conversion benchmark (`benches/adapter_bench.py`)
 
 ## Implementation gates for every new operator
 
@@ -125,12 +125,12 @@ Two aligned input series are within the contract (like BETA/CORREL).
 - [ ] **all review gates in `/CHECK.md` pass** (module placement, rolling_
       naming, no builtin-shadowing params, enums for selectors, typed +
       documented, multi-line style, one function one file)
-- [ ] checklist updated
+- [x] checklist updated
 
 ## Deferred benchmark and report gates
 
-- [ ] dataset-size benchmarks (1K, 10K, 100K, 1M)
-- [ ] continuous-backfill and streaming latency benchmarks
+- [x] dataset-size benchmarks (1K, 10K, 100K, 1M)
+- [x] continuous-backfill and streaming latency benchmarks (`adapter_bench.py`)
 - [ ] per-function reports and aggregate validation report
 
 ## Renamed, not duplicated (one kernel, two surfaces — see `CHECK.md` §2)

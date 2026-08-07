@@ -76,6 +76,16 @@ from .ebsw import EvenBetterSinewave
 from .premium_discount import PremiumDiscount
 from .opening_range import OpeningRange
 from .pivot_points import PivotPoints
+from .execution import (
+    ArrowAdapter,
+    AdapterGateway,
+    Expr,
+    NumpyAdapter,
+    Pipeline,
+    PolarsAdapter,
+    PythonListAdapter,
+    adapt_input,
+)
 from .klinger_volume_oscillator import KlingerVolumeOscillator
 from .session_volume_levels import SessionVolumeLevels
 from .up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
@@ -277,6 +287,14 @@ __all__ = [
     "PremiumDiscount",
     "OpeningRange",
     "PivotPoints",
+    "Pipeline",
+    "Expr",
+    "NumpyAdapter",
+    "PythonListAdapter",
+    "ArrowAdapter",
+    "AdapterGateway",
+    "PolarsAdapter",
+    "adapt_input",
     "KlingerVolumeOscillator",
     "SessionVolumeLevels",
     "UpDownSideGapThreeMethods",
