@@ -840,6 +840,151 @@ pub fn ob(
     Ok((ob_out, top, bottom, ob_volume, mitigated))
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct LiquidityValue {
+    pub liquidity: f64,
+    pub level: f64,
+    pub swept: f64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct LiquidityPool {
+    level: f64,
+    count: usize,
+}
+
+/// Causal liquidity-pool clustering with sweep detection. Swing highs and
+/// lows are clustered into pools when they fall within a `range_percent`
+/// price tolerance; a pool emits a signal once a second swing confirms it.
+/// A pool is swept and removed when price trades beyond its level.
+#[derive(Debug, Clone)]
+pub struct Liquidity {
+    swing: Swing,
+    high_pools: Vec<LiquidityPool>,
+    low_pools: Vec<LiquidityPool>,
+    range_percent: f64,
+    value: Option<LiquidityValue>,
+}
+
+impl Liquidity {
+    pub fn new(swing_length: usize, range_percent: f64) -> TaResult<Self> {
+        validate_period(swing_length)?;
+        if !(0.0..=1.0).contains(&range_percent) {
+            return Err(TaError::InvalidParameter {
+                name: "range_percent",
+                value: range_percent.to_string(),
+                reason: "must be between 0 and 1",
+            });
+        }
+        Ok(Self {
+            swing: Swing::new(swing_length)?,
+            high_pools: Vec::new(),
+            low_pools: Vec::new(),
+            range_percent,
+            value: None,
+        })
+    }
+
+    fn nearest_pool(pools: &mut Vec<LiquidityPool>, level: f64, range_percent: f64) -> Option<usize> {
+        let mut best: Option<(usize, f64)> = None;
+        for (index, pool) in pools.iter().enumerate() {
+            let distance = (pool.level - level).abs();
+            if distance <= range_percent * pool.level
+                && best.map_or(true, |(_, best_distance)| distance < best_distance)
+            {
+                best = Some((index, distance));
+            }
+        }
+        best.map(|(index, _)| index)
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, _close: f64) -> LiquidityValue {
+        let mut liquidity = f64::NAN;
+        let mut level = f64::NAN;
+        let mut swept = f64::NAN;
+
+        if let Some(swing) = self.swing.append(high, low) {
+            if swing.signal > 0.0 {
+                if let Some(index) = Self::nearest_pool(&mut self.high_pools, swing.level, self.range_percent) {
+                    let pool = &mut self.high_pools[index];
+                    pool.level = pool.level.max(swing.level);
+                    pool.count += 1;
+                    if pool.count >= 2 {
+                        liquidity = 1.0;
+                        level = pool.level;
+                    }
+                } else {
+                    self.high_pools.push(LiquidityPool { level: swing.level, count: 1 });
+                }
+            } else if swing.signal < 0.0 {
+                if let Some(index) = Self::nearest_pool(&mut self.low_pools, swing.level, self.range_percent) {
+                    let pool = &mut self.low_pools[index];
+                    pool.level = pool.level.min(swing.level);
+                    pool.count += 1;
+                    if pool.count >= 2 {
+                        liquidity = -1.0;
+                        level = pool.level;
+                    }
+                } else {
+                    self.low_pools.push(LiquidityPool { level: swing.level, count: 1 });
+                }
+            }
+        }
+
+        self.high_pools.retain(|pool| {
+            let swept_pool = pool.count >= 2 && high >= pool.level;
+            if swept_pool {
+                swept = 1.0;
+                level = pool.level;
+            }
+            !swept_pool
+        });
+        self.low_pools.retain(|pool| {
+            let swept_pool = pool.count >= 2 && low <= pool.level;
+            if swept_pool {
+                swept = -1.0;
+                level = pool.level;
+            }
+            !swept_pool
+        });
+
+        let value = LiquidityValue { liquidity, level, swept };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<LiquidityValue> { self.value }
+
+    pub fn reset(&mut self) {
+        self.swing.reset();
+        self.high_pools.clear();
+        self.low_pools.clear();
+        self.value = None;
+    }
+}
+
+pub fn liquidity(
+    high: &[f64],
+    low: &[f64],
+    swing_length: usize,
+    range_percent: f64,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() {
+        return Err(TaError::LengthMismatch { expected: high.len(), got: low.len() });
+    }
+    let mut state = Liquidity::new(swing_length, range_percent)?;
+    let mut liquidity_out = Vec::with_capacity(high.len());
+    let mut level = Vec::with_capacity(high.len());
+    let mut swept = Vec::with_capacity(high.len());
+    for (&high, &low) in high.iter().zip(low) {
+        let value = state.append(high, low, f64::NAN);
+        liquidity_out.push(value.liquidity);
+        level.push(value.level);
+        swept.push(value.swept);
+    }
+    Ok((liquidity_out, level, swept))
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
