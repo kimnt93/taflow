@@ -85,7 +85,7 @@ they are not re-proposed later.
 - [x] highest_since
 - [x] lowest_since
 - [x] signal_delay
-- [ ] position_hold
+- [x] position_hold
 - [ ] entry_exit
 
 ## Extended pattern recognition

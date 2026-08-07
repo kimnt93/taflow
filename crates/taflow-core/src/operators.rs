@@ -734,6 +734,11 @@ impl SignalDelay {
 }
 
 #[derive(Debug, Clone)]
+pub struct PositionHold { position: f64, value: Option<f64> }
+impl PositionHold { pub fn new()->Self{Self{position:0.0,value:None}}pub fn append(&mut self,input:f64)->f64{if input!=0.0{self.position=input;}self.value=Some(self.position);self.position}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.position=0.0;self.value=None;}}
+impl Default for PositionHold{fn default()->Self{Self::new()}}
+
+#[derive(Debug, Clone)]
 pub struct Crossover { previous_left: Option<f64>, previous_right: Option<f64>, value: Option<f64> }
 impl Crossover { pub fn new()->Self{Self{previous_left:None,previous_right:None,value:None}}pub fn append(&mut self,left:f64,right:f64)->f64{let value=match(self.previous_left,self.previous_right){(Some(pl),Some(pr)) if pl<=pr&&left>right=>1.0,_=>0.0};self.previous_left=Some(left);self.previous_right=Some(right);self.value=Some(value);value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.previous_left=None;self.previous_right=None;self.value=None;}}
 impl Default for Crossover{fn default()->Self{Self::new()}}

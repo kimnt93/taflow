@@ -112,6 +112,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::HighestSinceOperator>()?;
     m.add_class::<indicators::LowestSinceOperator>()?;
     m.add_class::<indicators::SignalDelayOperator>()?;
+    m.add_class::<indicators::PositionHoldOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;
