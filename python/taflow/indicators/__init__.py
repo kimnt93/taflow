@@ -123,6 +123,7 @@ from ..ease_of_movement import EaseOfMovement
 from ..bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
 from ..state_helpers import BarsSince, ValueWhen, HighestSince, LowestSince, SignalDelay, PositionHold, EntryExit
 from ..swing import SwingHighLow, SwingHigh, SwingLow
+from ..retracements import Retracements
 from ..session import SessionExtrema, session_flags
 from ..previous_high_low import PreviousHighLow
 from ..sessions import Sessions
@@ -234,6 +235,7 @@ __all__ = [
     "PositionHold",
     "EntryExit",
     "SwingHighLow", "SwingHigh", "SwingLow",
+    "Retracements",
     "SessionExtrema", "session_flags",
     "PreviousHighLow", "Sessions",
     "ActiveZoneList",

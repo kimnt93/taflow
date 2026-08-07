@@ -78,7 +78,7 @@ package, stated once here and in every docstring:
 | [x] | `equal_highs_lows` | `eqh`/`eql` flags, `level` | Impl: LuxAlgo Pine — pivots equal when `max < min + ATR(200)×eq_threshold` (default 0.1), `eq_len=3` | O(1): compare consecutive confirmed pivots; needs `Atr(200)` + last-pivot slot. |
 | [x] | `previous_high_low` | `prev_high`, `prev_low`, `broken_high`/`broken_low` flags | Impl: `smc.py::previous_high_low(time_frame)` | O(1) given session-flag input series: running HTF extrema, snapshot at boundary. Causal by nature. |
 | [x] | `sessions` | `active` (0/1), `session_high`, `session_low` | Impl: `smc.py::sessions` | O(1) given session flags. Causal running extrema — matches package exactly. |
-| [ ] | `retracements` | `direction`, `current_retracement_pct`, `deepest_retracement_pct` | Impl: `smc.py::retracements` | O(1): two floats (leg high/low) updated on swing confirmation; inherits swing lag. |
+| [x] | `retracements` | `direction`, `current_retracement_pct`, `deepest_retracement_pct` | Impl: `smc.py::retracements` | O(1): two floats (leg high/low) updated on swing confirmation; inherits swing lag. |
 | [ ] | `premium_discount` | `zone` (-1/0/+1), `equilibrium` level | Theory: zones relative to 50% of current swing range (LuxAlgo). Verify exact rule in Pine source — open question from research | O(1) once swings exist. |
 
 ## P2 — modern mainstream indicators
