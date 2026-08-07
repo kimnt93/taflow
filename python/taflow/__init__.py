@@ -159,6 +159,11 @@ from .log_return import LogReturn
 from .cumsum import Cumsum
 from .cumprod import Cumprod
 from .rolling_median import RollingMedian
+from .rolling_min import RollingMin
+from .rolling_max import RollingMax
+from .rolling_sum import RollingSum
+from .rolling_argmin import RollingArgmin
+from .rolling_argmax import RollingArgmax
 from .rolling_mode import RollingMode
 from .rolling_quantile import RollingQuantile
 from .rolling_percentile import RollingPercentile
@@ -410,6 +415,11 @@ __all__ = [
     "Cumsum",
     "Cumprod",
     "RollingMedian",
+    "RollingMin",
+    "RollingMax",
+    "RollingSum",
+    "RollingArgmin",
+    "RollingArgmax",
     "RollingMode",
     "RollingQuantile",
     "RollingPercentile",
