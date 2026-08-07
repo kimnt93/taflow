@@ -3,6 +3,8 @@
 from taflow._native import StatefulMa
 from typing import Any
 
+import numpy as np
+
 
 class MovingAverage:
     """Incrementally compute any TA-Lib moving-average type."""
@@ -12,10 +14,11 @@ class MovingAverage:
     ):
         """Create a selectable moving average with optional initial values."""
         self._state = StatefulMa(period, moving_average_type)
+        self._values: list[float] = []
         if values is not None:
             self.extend(values)
 
-    def append(self, value):
+    def append(self, value: float) -> "MovingAverage":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -28,9 +31,11 @@ class MovingAverage:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(value)
+        result = self._state.append(float(value))
+        self._values.append(np.nan if result is None else float(result))
+        return self
 
-    def extend(self, values):
+    def extend(self, values: Any) -> "MovingAverage":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -43,7 +48,13 @@ class MovingAverage:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(values)
+        result = self._state.extend(values)
+        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        return self
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned moving-average history."""
+        return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self):
@@ -56,7 +67,7 @@ class MovingAverage:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> "MovingAverage":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -65,3 +76,5 @@ class MovingAverage:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self

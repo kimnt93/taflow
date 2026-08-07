@@ -3,6 +3,8 @@
 from taflow._native import StatefulSar
 from typing import Any
 
+import numpy as np
+
 
 class ParabolicSar:
     """Incrementally compute Parabolic SAR from high/low bars."""
@@ -16,10 +18,11 @@ class ParabolicSar:
     ):
         """Create Parabolic SAR with optional aligned high/low history."""
         self._state = StatefulSar(acceleration, maximum)
+        self._values: list[float] = []
         if high is not None or low is not None:
             self.extend(high, low)
 
-    def append(self, high, low):
+    def append(self, high: float, low: float) -> "ParabolicSar":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -34,9 +37,11 @@ class ParabolicSar:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(high, low)
+        result = self._state.append(float(high), float(low))
+        self._values.append(np.nan if result is None else float(result))
+        return self
 
-    def extend(self, high, low):
+    def extend(self, high: Any, low: Any) -> "ParabolicSar":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -51,7 +56,13 @@ class ParabolicSar:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(high, low)
+        result = self._state.extend(high, low)
+        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        return self
+
+    def compute(self) -> np.ndarray:
+        """Return aligned Parabolic SAR values."""
+        return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self):
@@ -64,7 +75,7 @@ class ParabolicSar:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> "ParabolicSar":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -73,3 +84,5 @@ class ParabolicSar:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self

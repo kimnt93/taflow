@@ -3,6 +3,8 @@
 from taflow._native import StatefulMavp
 from typing import Any
 
+import numpy as np
+
 
 class VariablePeriodMovingAverage:
     """Incrementally compute MAVP from values and per-bar periods."""
@@ -17,10 +19,11 @@ class VariablePeriodMovingAverage:
     ):
         """Create MAVP with optional values and per-bar periods."""
         self._state = StatefulMavp(min_period, max_period, average_type)
+        self._values: list[float] = []
         if _input is not None or periods is not None:
             self.extend(_input, periods)
 
-    def append(self, _input, period):
+    def append(self, _input: float, period: int) -> "VariablePeriodMovingAverage":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -35,9 +38,11 @@ class VariablePeriodMovingAverage:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(_input, period)
+        result = self._state.append(float(_input), int(period))
+        self._values.append(np.nan if result is None else float(result))
+        return self
 
-    def extend(self, _input, periods):
+    def extend(self, _input: Any, periods: Any) -> "VariablePeriodMovingAverage":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -52,7 +57,16 @@ class VariablePeriodMovingAverage:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(_input, periods)
+        result = self._state.extend(
+            np.asarray(_input, dtype=np.float64),
+            np.asarray(periods, dtype=np.float64),
+        )
+        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        return self
+
+    def compute(self) -> np.ndarray:
+        """Return aligned variable-period moving-average values."""
+        return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self):
@@ -65,7 +79,7 @@ class VariablePeriodMovingAverage:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> "VariablePeriodMovingAverage":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -74,3 +88,5 @@ class VariablePeriodMovingAverage:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self

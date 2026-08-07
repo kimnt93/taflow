@@ -3,6 +3,8 @@
 from taflow._native import StatefulBbands
 from typing import Any
 
+import numpy as np
+
 
 class BollingerBands:
     """Incrementally compute upper, middle, and lower Bollinger Bands."""
@@ -38,10 +40,11 @@ class BollingerBands:
         self._state = StatefulBbands(
             period, deviations_up, deviations_down, moving_average_type
         )
+        self._values: list[tuple[float, float, float]] = []
         if values is not None:
             self.extend(values)
 
-    def append(self, value):
+    def append(self, value: float) -> "BollingerBands":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -54,9 +57,13 @@ class BollingerBands:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(value)
+        result = self._state.append(float(value))
+        self._values.append(
+            (np.nan, np.nan, np.nan) if result is None else tuple(result)
+        )
+        return self
 
-    def extend(self, values):
+    def extend(self, values: Any) -> "BollingerBands":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -69,7 +76,25 @@ class BollingerBands:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(values)
+        result = self._state.extend(values)
+        arrays = [np.asarray(item, dtype=np.float64) for item in result]
+        self._values.extend(zip(*arrays))
+        return self
+
+    def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Return aligned upper, middle, and lower band histories.
+
+        Returns
+        -------
+        tuple of numpy.ndarray
+            Three same-length arrays in upper, middle, and lower order.
+        """
+        if not self._values:
+            empty = np.empty(0, dtype=np.float64)
+            return empty.copy(), empty.copy(), empty.copy()
+        return tuple(
+            np.asarray(values, dtype=np.float64) for values in zip(*self._values)
+        )
 
     @property
     def value(self):
@@ -82,7 +107,7 @@ class BollingerBands:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> "BollingerBands":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -91,3 +116,5 @@ class BollingerBands:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self
