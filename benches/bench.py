@@ -40,9 +40,13 @@ import numpy as np
 SCHEMA_VERSION = 3
 S1_SIZES = (100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000)
 S2_CHUNKS = (1, 10, 100, 1_000)
+S5_THREADS = (1, 2, 5, 10, 20)
+S5_BASE = 100_000            # per-thread warmed history for the parallel test
+S5_UPDATES_TAFLOW = 2_000    # appends per thread
+S5_UPDATES_TALIB = 10        # full recomputes per thread (each is O(base))
 CORRECTNESS_BARS = 100_000
 CHUNK_INVARIANCE_CHUNKS = (1, 10, 1_000)
-DEFAULT_REPEATS = 5
+DEFAULT_REPEATS = 20
 MIN_TIMED_SECONDS = 0.02  # autorange target per repeat
 S2_EXTRA_BARS = 60_000    # update stream appended after the base history
 ALLCLOSE_RTOL = 1e-8
@@ -349,6 +353,94 @@ def _cell_continuation(conn, spec: FunctionSpec, base: int, chunk: int,
     conn.send(result)
 
 
+def _run_threads(n_threads: int, worker) -> float:
+    """Run `worker(i)` on n_threads Python threads; return wall seconds from
+    simultaneous start (barrier) to last join."""
+    import threading
+    barrier = threading.Barrier(n_threads + 1)
+
+    def runner(i):
+        barrier.wait()
+        worker(i)
+
+    threads = [threading.Thread(target=runner, args=(i,))
+               for i in range(n_threads)]
+    for t in threads:
+        t.start()
+    barrier.wait()
+    t0 = time.perf_counter_ns()
+    for t in threads:
+        t.join()
+    return (time.perf_counter_ns() - t0) / 1e9
+
+
+def _cell_parallel(conn, spec: FunctionSpec, threads: int, repeats: int,
+                   data: dict) -> None:
+    """S5: N independent streams (one per thread), e.g. N symbols on a live
+    feed. taflow: each thread appends to its own warmed state. talib: each
+    thread recomputes the full base+1 window per update. Aggregate
+    updates/sec across threads is the figure of merit; scaling vs the
+    1-thread row shows who releases the GIL during compute."""
+    base = S5_BASE
+    result: dict = {"threads": threads, "base": base, "chunk": 1}
+
+    if spec.has_state:
+        updates = S5_UPDATES_TAFLOW
+        arrays = input_arrays(spec, data, n=base + updates)
+        base_arrays = [a[:base] for a in arrays]
+        # one warmed state per thread; identical per-thread workload
+        states = []
+        for _ in range(threads):
+            st = new_state(spec)
+            state_extend(st, base_arrays)
+            states.append(st)
+        bars = list(zip(*[a[base:base + updates].tolist() for a in arrays]))
+
+        def taflow_worker(i):
+            st = states[i]
+            for bar in bars:
+                st.append(*bar)
+
+        walls = []
+        for _ in range(repeats):
+            gc.disable()
+            walls.append(_run_threads(threads, taflow_worker))
+            gc.enable()
+        wall = float(np.mean(walls))
+        result["taflow"] = {
+            "wall_s": wall,
+            "updates_per_thread": updates,
+            "agg_updates_per_sec": threads * updates / wall,
+            "per_update_us": wall / updates * 1e6,  # latency seen by a thread
+        }
+
+    if spec.in_talib:
+        updates = S5_UPDATES_TALIB
+        arrays = input_arrays(spec, data, n=base + 1)
+
+        def talib_worker(i):
+            for _ in range(updates):
+                talib_call(spec, arrays)
+
+        walls = []
+        for _ in range(repeats):
+            gc.disable()
+            walls.append(_run_threads(threads, talib_worker))
+            gc.enable()
+        wall = float(np.mean(walls))
+        result["talib_full_recompute"] = {
+            "wall_s": wall,
+            "updates_per_thread": updates,
+            "agg_updates_per_sec": threads * updates / wall,
+        }
+
+    if "taflow" in result and "talib_full_recompute" in result:
+        result["speedup"] = (result["taflow"]["agg_updates_per_sec"]
+                             / result["talib_full_recompute"]
+                             ["agg_updates_per_sec"])
+    conn.send(result)
+
+
 def _as_tuple(result) -> tuple[np.ndarray, ...]:
     return result if isinstance(result, tuple) else (result,)
 
@@ -590,6 +682,36 @@ def render_md(report: dict) -> str:
                       f"p99 {r['taflow']['p99_us']:.2f} µs."]
         lines.append("")
 
+    par = report.get("parallel") or []
+    if par:
+        lines += [f"## Parallel continuation ({S5_BASE:,}-bar warmed history "
+                  "per thread, one independent stream per thread)", ""]
+        lines += ["| Threads | TAFlow agg updates/s | Scaling | "
+                  "TA-Lib agg updates/s | Scaling | Speedup |",
+                  "|---:|---:|---:|---:|---:|---:|"]
+        tf1 = next((r["taflow"]["agg_updates_per_sec"] for r in par
+                    if r["threads"] == 1 and r.get("taflow")), None)
+        tl1 = next((r["talib_full_recompute"]["agg_updates_per_sec"]
+                    for r in par
+                    if r["threads"] == 1 and r.get("talib_full_recompute")),
+                   None)
+        for row in par:
+            if "error" in row:
+                lines.append(f"| {row['threads']} | ERROR: {row['error']} |")
+                continue
+            tf = row.get("taflow", {}).get("agg_updates_per_sec")
+            tl = row.get("talib_full_recompute", {}).get(
+                "agg_updates_per_sec")
+            lines.append(
+                f"| {row['threads']} | {fmt_ops(tf)} | "
+                + (f"{tf / tf1:.2f}×" if tf and tf1 else "—") + " | "
+                + f"{fmt_ops(tl)} | "
+                + (f"{tl / tl1:.2f}×" if tl and tl1 else "—") + " | "
+                + f"{fmt_x(row.get('speedup'))} |")
+        lines += ["", "Each thread owns its own state/stream (N-symbol live "
+                  "feed model). Scaling >1× with threads requires the "
+                  "underlying call to release the GIL.", ""]
+
     lines += ["---", "Python-interface measurement: numbers include "
               "conversion/boundary overhead by design. Rust-core-only "
               "numbers live in criterion benches and are not comparable.", ""]
@@ -617,6 +739,14 @@ def aggregate(reports_dir: Path) -> str:
         cont = [r for r in (rep.get("continuation") or [])
                 if r["chunk"] == 1 and r.get("taflow")]
         cbest = max(cont, key=lambda r: r["base"], default=None)
+        par = [r for r in (rep.get("parallel") or []) if r.get("taflow")]
+        par_scale = None
+        if par:
+            p1 = next((r for r in par if r["threads"] == 1), None)
+            pmax = max(par, key=lambda r: r["threads"])
+            if p1 and pmax["threads"] > 1:
+                par_scale = (pmax["taflow"]["agg_updates_per_sec"]
+                             / p1["taflow"]["agg_updates_per_sec"])
         c = rep.get("correctness") or {}
         if rep["in_talib"]:
             correct = "PASS" if c.get("passed") else (
@@ -631,6 +761,8 @@ def aggregate(reports_dir: Path) -> str:
             "p50": cbest["taflow"]["p50_us"] if cbest else None,
             "cont_speedup": cbest.get("speedup_vs_full") if cbest else None,
             "cont_base": cbest["base"] if cbest else None,
+            "par_scale": par_scale,
+            "par_threads": max((r["threads"] for r in par), default=None),
         })
     if not rows:
         return "# BENCHMARK\n\nNo schema-v3 reports found.\n"
@@ -642,15 +774,18 @@ def aggregate(reports_dir: Path) -> str:
         f"Generated {date.today().isoformat()} from "
         f"{len(rows)} schema-v{SCHEMA_VERSION} reports.", "",
         f"| Function | In TA-Lib | Correct | Bulk speedup @{biggest:,} "
-        f"| Bulk ops/s | Append p50 | Cont. speedup @{cont_base:,} |",
-        "|---|---|---|---:|---:|---:|---:|",
+        f"| Bulk ops/s | Append p50 | Cont. speedup @{cont_base:,} "
+        f"| Thread scaling |",
+        "|---|---|---|---:|---:|---:|---:|---:|",
     ]
     for r in sorted(rows, key=lambda r: r["fn"]):
+        par = ("—" if r["par_scale"] is None
+               else f"{r['par_scale']:.2f}× @{r['par_threads']}T")
         lines.append(
             f"| {r['fn']} | {'yes' if r['in_talib'] else 'no'} | "
             f"{r['correct']} | {fmt_x(r['speedup'])} | {fmt_ops(r['ops'])} | "
             + (f"{r['p50']:.2f} µs" if r["p50"] is not None else "—")
-            + f" | {fmt_x(r['cont_speedup'])} |")
+            + f" | {fmt_x(r['cont_speedup'])} | {par} |")
 
     speedups = [r["speedup"] for r in rows if r["speedup"]]
     fails = [r["fn"] for r in rows if "FAIL" in r["correct"]]
@@ -731,9 +866,29 @@ def run_function(spec: FunctionSpec, sizes: list[int], bases: list[int],
                 rows.append(cell)
         report["continuation"] = rows
 
+    if "s5" in scenarios and (spec.has_state or spec.in_talib):
+        rows = []
+        for threads in S5_THREADS:
+            cell = run_in_child(_cell_parallel, spec, threads,
+                                min(repeats, 3),
+                                data_for(S5_BASE + S5_UPDATES_TAFLOW))
+            cell.setdefault("threads", threads)
+            rows.append(cell)
+        report["parallel"] = rows
+
+    # Partial-scenario runs must not clobber sections measured earlier.
     reports_dir.mkdir(parents=True, exist_ok=True)
-    (reports_dir / f"{spec.name}.json").write_text(
-        json.dumps(report, indent=1, default=float))
+    out_json = reports_dir / f"{spec.name}.json"
+    if out_json.exists():
+        try:
+            old = json.loads(out_json.read_text())
+        except json.JSONDecodeError:
+            old = {}
+        if old.get("schema_version") == SCHEMA_VERSION:
+            for key in ("correctness", "bulk", "continuation", "parallel"):
+                if key not in report and key in old:
+                    report[key] = old[key]
+    out_json.write_text(json.dumps(report, indent=1, default=float))
     (reports_dir / f"{spec.name}.md").write_text(render_md(report))
 
 
@@ -745,8 +900,9 @@ def main() -> int:
     parser.add_argument("--max-size", type=int, default=S1_SIZES[-1])
     parser.add_argument("--quick", action="store_true",
                         help="sizes <= 100k, 3 repeats")
-    parser.add_argument("--scenarios", default="s1,s2,s3",
-                        help="comma list of s1,s2,s3")
+    parser.add_argument("--scenarios", default="s1,s2,s3,s5",
+                        help="comma list of s1,s2,s3,s5 "
+                             "(s5 = parallel-thread continuation)")
     parser.add_argument("--reports-dir", type=Path, default=Path("reports"))
     parser.add_argument("--aggregate-only", action="store_true")
     parser.add_argument("--list", action="store_true",

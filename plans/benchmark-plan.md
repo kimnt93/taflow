@@ -14,9 +14,11 @@ per-function reports plus one aggregate report.
   but they are out of scope for these reports.)
 - **TA-Lib is the baseline.** Every comparable cell reports
   `speedup = talib_time / taflow_time` (>1 means TAFlow is faster).
-- **Averages over repeated runs.** Default `repeats = 5`, each repeat in a
-  fresh subprocess (the existing isolated-process pattern stays: it kills
-  cache/JIT/allocator carryover between modes). Within a repeat: 1 untimed
+- **Averages over repeated runs.** Default `repeats = 20` for the timed
+  bulk cells (expensive one-shot baselines like the S2 full recompute and
+  S5 thread sweeps cap at 3), each cell in a forked child process (the
+  isolated-process pattern kills cache/JIT/allocator carryover between
+  modes). Within a repeat: 1 untimed
   warm-up call, `gc.disable()`, `time.perf_counter_ns()`. Report the
   **mean** as the headline (user contract) and keep min/p50 in the JSON.
 - **Deterministic data.** Seeded random-walk OHLCV
@@ -88,6 +90,23 @@ At n = 100 000 (one size is enough; warm-up bugs show at any size):
 
 A function's report is marked `correctness: PASS` only if all checks pass;
 speed tables still render on failure but the md gets a red warning line.
+
+### S5 — Parallel-thread continuation
+
+Models an N-symbol live feed: N Python threads, each owning its own warmed
+state (taflow) or its own recompute loop (talib), all updating
+concurrently. Thread counts **{1, 2, 5, 10, 20}**, base history 100k bars
+per thread, chunk = 1.
+
+Metrics per thread count: aggregate updates/sec across threads, scaling
+factor vs the 1-thread row, and taflow-vs-talib speedup at equal thread
+count. Scaling above 1× requires the underlying native call to release the
+GIL — measured result (2026-08-07): **neither taflow (PyO3 holds the GIL)
+nor TA-Lib's binding scales with threads; both are flat ~1× to 20
+threads.** TAFlow's multi-symbol advantage is therefore its ~1000×+ lower
+per-update cost, not parallelism. Releasing the GIL inside bulk `extend`
+is the corresponding taflow improvement (optimize-methods §2.3); scalar
+`append` is too short (~0.2 µs) to benefit from GIL release.
 
 ### S4 — Functions with no TA-Lib counterpart
 
@@ -244,12 +263,12 @@ correctness failures, missing reports vs the checklist inventory.
 
 ## Migration and gates
 
-1. Build the registry (`taflow.metadata.functions()` + domain-aware data
-   generator + `overrides.py`), port the isolated-process runner from
-   `benchmark_function_reports.py`, add S2's continuation grid and the 10M
-   size. Delete `bench_all_indicators.py`, `bench_vs_talib.py`,
-   `generate_report.py` once parity is reached (their measurement ideas are
-   absorbed; three overlapping scripts is how the FUNCTIONS drift happened).
+1. ✅ Done (2026-08-07): single runner `benches/bench.py` with
+   registry-driven discovery, S1/S2/S3/S4/S5, and per-function + aggregate
+   reports. The legacy scripts (`bench_all_indicators.py`,
+   `bench_vs_talib.py`, `generate_report.py`,
+   `benchmark_function_reports.py`) are deleted — their measurement ideas
+   are absorbed; overlapping scripts were how the FUNCTIONS drift happened.
 2. Existing schema-v2 JSONs are regenerated, not migrated.
 3. Checklist gate addition: a function is done only when
    `reports/<FN>.md` + `.json` exist at schema v3 — which, with the

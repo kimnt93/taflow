@@ -134,7 +134,13 @@ A PyO3 method call costs ~80–150 ns before your Rust code runs; the O(1)
 
 Do not bother releasing the GIL for scalar `append` (the call is too short);
 do release it (`py.allow_threads`) around bulk `extend`/`compute` of large
-arrays so other Python threads can run.
+arrays so other Python threads can run. Measured (bench S5, 2026-08-07):
+with 1→20 Python threads each appending to its own state, aggregate
+throughput is flat ~1× — every taflow call currently holds the GIL, so
+multi-symbol feeds serialize. (TA-Lib's binding is equally flat, so taflow
+keeps its ~1000×+ per-update advantage at every thread count, but GIL
+release in `extend` plus a free-threaded/subinterpreter story is the only
+route to real parallel scaling.)
 
 ---
 
