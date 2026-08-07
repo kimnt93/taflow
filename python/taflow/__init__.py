@@ -10,6 +10,10 @@ from .double_exponential_moving_average import DoubleExponentialMovingAverage
 from .kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
 from .aroon import Aroon
 from .aroon_oscillator import AroonOscillator
+from .accumulation_distribution import AccumulationDistribution
+from .accumulation_distribution_oscillator import AccumulationDistributionOscillator
+from .balance_of_power import BalanceOfPower
+from .on_balance_volume import OnBalanceVolume
 from .average_directional_index import AverageDirectionalIndex
 from .average_directional_index_rating import AverageDirectionalIndexRating
 from .bollinger_bands import BollingerBands
@@ -313,6 +317,10 @@ __all__ = [
     "WeightedMovingAverage",
     "Aroon",
     "AroonOscillator",
+    "AccumulationDistribution",
+    "AccumulationDistributionOscillator",
+    "BalanceOfPower",
+    "OnBalanceVolume",
     "AverageDirectionalIndex",
     "AverageDirectionalIndexRating",
     "DirectionalMovementIndex",
