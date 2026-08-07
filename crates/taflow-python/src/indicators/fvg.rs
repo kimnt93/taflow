@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 use taflow::stream::FairValueGap;
 
 #[pyclass]
-pub struct FvgOperator {
+pub struct FairValueGapOperator {
     inner: FairValueGap,
     signal: Vec<f64>,
     top: Vec<f64>,
@@ -13,7 +13,7 @@ pub struct FvgOperator {
 }
 
 #[pymethods]
-impl FvgOperator {
+impl FairValueGapOperator {
     #[new]
     fn new() -> Self {
         Self { inner: FairValueGap::new(), signal: Vec::new(), top: Vec::new(), bottom: Vec::new(), mitigated: Vec::new() }

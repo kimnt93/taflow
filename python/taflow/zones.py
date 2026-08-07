@@ -16,12 +16,12 @@ class ActiveZoneList:
         Parameters
         ----------
         capacity : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Maximum number of stored zones.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(capacity)
 
@@ -31,11 +31,11 @@ class ActiveZoneList:
         Parameters
         ----------
         top : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         bottom : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         flags : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -50,9 +50,9 @@ class ActiveZoneList:
         Parameters
         ----------
         price : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Price series or the current price observation.
         max_age : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------

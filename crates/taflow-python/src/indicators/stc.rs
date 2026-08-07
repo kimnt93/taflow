@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 use taflow::stream::SchaffTrendCycle;
 
 #[pyclass]
-pub struct StcOperator {
+pub struct SchaffTrendCycleOperator {
     inner: SchaffTrendCycle,
     stc: Vec<f64>,
     macd: Vec<f64>,
@@ -12,7 +12,7 @@ pub struct StcOperator {
 }
 
 #[pymethods]
-impl StcOperator {
+impl SchaffTrendCycleOperator {
     #[new]
     #[pyo3(signature = (tclength=10, fast=12, slow=26, factor=0.5))]
     fn new(tclength: usize, fast: usize, slow: usize, factor: f64) -> PyResult<Self> {

@@ -29,9 +29,9 @@ class VariablePeriodMovingAverage:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
         period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
 
         Returns
         -------
@@ -48,9 +48,9 @@ class VariablePeriodMovingAverage:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
         periods : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------

@@ -4,10 +4,10 @@ use pyo3::prelude::*;
 use taflow::stream::VolumePriceTrend;
 
 #[pyclass]
-pub struct VptOperator { inner: VolumePriceTrend, values: Vec<f64> }
+pub struct VolumePriceTrendOperator { inner: VolumePriceTrend, values: Vec<f64> }
 
 #[pymethods]
-impl VptOperator {
+impl VolumePriceTrendOperator {
     #[new]
     fn new() -> Self { Self { inner: VolumePriceTrend::new(), values: Vec::new() } }
     fn append(&mut self, close: f64, volume: f64) -> Option<f64> { let value = self.inner.append(close, volume); self.values.push(value.unwrap_or(f64::NAN)); value }

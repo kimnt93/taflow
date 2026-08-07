@@ -19,14 +19,14 @@ class ForceIndex:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
         self.extend(close, volume) if close is not None or volume is not None else None
@@ -37,9 +37,9 @@ class ForceIndex:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------
@@ -55,9 +55,9 @@ class ForceIndex:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------

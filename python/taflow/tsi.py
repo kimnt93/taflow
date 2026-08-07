@@ -2,7 +2,7 @@
 
 from typing import Any
 import numpy as np
-from ._native import TsiOperator as _Native
+from ._native import TrueStrengthIndexOperator as _Native
 from ._series import as_float64_series
 
 
@@ -21,16 +21,16 @@ class TrueStrengthIndex:
         Parameters
         ----------
         fast : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         slow : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(fast, slow)
         self.extend(_input) if _input is not None else None
@@ -41,7 +41,7 @@ class TrueStrengthIndex:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -57,7 +57,7 @@ class TrueStrengthIndex:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------

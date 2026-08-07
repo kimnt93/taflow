@@ -22,20 +22,20 @@ class BollingerBands:
         Parameters
         ----------
         period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
         deviations_up : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         deviations_down : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         moving_average_type : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         values : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input values processed in chronological order.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = StatefulBbands(
             period, deviations_up, deviations_down, moving_average_type
@@ -50,7 +50,7 @@ class BollingerBands:
         Parameters
         ----------
         value : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input value processed at each bar.
 
         Returns
         -------
@@ -69,7 +69,7 @@ class BollingerBands:
         Parameters
         ----------
         values : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input values processed in chronological order.
 
         Returns
         -------

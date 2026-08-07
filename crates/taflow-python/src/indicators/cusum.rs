@@ -1,21 +1,21 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Cusum;
+use taflow::stream::CumulativeSumControlChart;
 
 #[pyclass]
-pub struct CusumOperator {
-    inner: Cusum,
+pub struct CumulativeSumControlChartOperator {
+    inner: CumulativeSumControlChart,
     output: Vec<f64>,
 }
 
 #[pymethods]
-impl CusumOperator {
+impl CumulativeSumControlChartOperator {
     #[new]
     #[pyo3(signature = (threshold=1.0))]
     fn new(threshold: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: Cusum::new(threshold).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: CumulativeSumControlChart::new(threshold).map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

@@ -3,9 +3,9 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::McGinleyDynamic;
 #[pyclass]
-pub struct McgdOperator { inner: McGinleyDynamic, values: Vec<f64> }
+pub struct McGinleyDynamicOperator { inner: McGinleyDynamic, values: Vec<f64> }
 #[pymethods]
-impl McgdOperator {
+impl McGinleyDynamicOperator {
     #[new]
     #[pyo3(signature = (length=10, c=1.0))]
     fn new(length: usize, c: f64) -> PyResult<Self> { Ok(Self { inner: McGinleyDynamic::new(length,c).map_err(|e|PyValueError::new_err(e.to_string()))?, values:Vec::new() }) }

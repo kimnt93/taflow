@@ -20,12 +20,12 @@ class HilbertTransformPhasor:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
         if _input is not None:
@@ -37,7 +37,7 @@ class HilbertTransformPhasor:
         Parameters
         ----------
         value : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input value processed at each bar.
 
         Returns
         -------
@@ -53,7 +53,7 @@ class HilbertTransformPhasor:
         Parameters
         ----------
         values : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input values processed in chronological order.
 
         Returns
         -------

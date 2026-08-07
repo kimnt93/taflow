@@ -2,12 +2,12 @@
 
 from typing import Any
 import numpy as np
-from ._native import CusumOperator as _Native
+from ._native import CumulativeSumControlChartOperator as _Native
 from ._series import as_float64_series
 
 
-class Cusum:
-    """Stateful Cusum indicator.
+class CumulativeSumControlChart:
+    """Stateful CumulativeSumControlChart indicator.
     Parameters are documented by the constructor signature; scalar
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
@@ -19,14 +19,14 @@ class Cusum:
         Parameters
         ----------
         change : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         threshold : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Detection threshold applied to the input changes.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(threshold)
         self.extend(change) if change is not None else None
@@ -37,7 +37,7 @@ class Cusum:
         Parameters
         ----------
         change : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -53,7 +53,7 @@ class Cusum:
         Parameters
         ----------
         change : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------

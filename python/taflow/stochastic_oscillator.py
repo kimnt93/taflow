@@ -25,26 +25,26 @@ class StochasticOscillator:
         Parameters
         ----------
         fast_k_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         slow_k_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         slow_k_average_type : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         slow_d_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         slow_d_average_type : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = StatefulStoch(
             fast_k_period,
@@ -63,11 +63,11 @@ class StochasticOscillator:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
@@ -84,11 +84,11 @@ class StochasticOscillator:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------

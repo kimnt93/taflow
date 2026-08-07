@@ -17,14 +17,14 @@ class Falling:
         Parameters
         ----------
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
         self.extend(_input) if _input is not None else None
@@ -35,7 +35,7 @@ class Falling:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -51,7 +51,7 @@ class Falling:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------

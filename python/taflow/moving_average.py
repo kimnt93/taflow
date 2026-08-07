@@ -24,7 +24,7 @@ class MovingAverage:
         Parameters
         ----------
         value : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input value processed at each bar.
 
         Returns
         -------
@@ -41,7 +41,7 @@ class MovingAverage:
         Parameters
         ----------
         values : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input values processed in chronological order.
 
         Returns
         -------

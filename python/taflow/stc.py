@@ -2,7 +2,7 @@
 
 from typing import Any
 import numpy as np
-from ._native import StcOperator as _Native
+from ._native import SchaffTrendCycleOperator as _Native
 from ._series import as_float64_series
 
 
@@ -26,20 +26,20 @@ class SchaffTrendCycle:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         tclength : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         fast : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         slow : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         factor : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(tclength, fast, slow, factor)
         self.extend(close) if close is not None else None
@@ -50,7 +50,7 @@ class SchaffTrendCycle:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
@@ -66,7 +66,7 @@ class SchaffTrendCycle:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------

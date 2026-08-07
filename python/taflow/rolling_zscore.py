@@ -2,12 +2,12 @@
 
 from typing import Any
 import numpy as np
-from ._native import RollingZscoreOperator as _Native
+from ._native import RollingZScoreOperator as _Native
 from ._series import as_float64_series
 
 
-class RollingZscore:
-    """Stateful RollingZscore indicator.
+class RollingZScore:
+    """Stateful RollingZScore indicator.
     Parameters are documented by the constructor signature; scalar
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
@@ -19,14 +19,14 @@ class RollingZscore:
         Parameters
         ----------
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
         if _input is not None:
@@ -38,7 +38,7 @@ class RollingZscore:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -54,7 +54,7 @@ class RollingZscore:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------

@@ -30,28 +30,28 @@ class Squeeze:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         bb_length : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         bb_std : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         kc_length : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         kc_scalar : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         mom_length : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         mom_smooth : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(
             bb_length, bb_std, kc_length, kc_scalar, mom_length, mom_smooth
@@ -68,11 +68,11 @@ class Squeeze:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
@@ -88,11 +88,11 @@ class Squeeze:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------

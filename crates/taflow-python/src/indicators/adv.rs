@@ -4,13 +4,13 @@ use pyo3::prelude::*;
 use taflow::stream::AverageDailyDollarValue;
 
 #[pyclass]
-pub struct AdvOperator {
+pub struct AverageDailyDollarValueOperator {
     inner: AverageDailyDollarValue,
     output: Vec<f64>,
 }
 
 #[pymethods]
-impl AdvOperator {
+impl AverageDailyDollarValueOperator {
     #[new]
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {

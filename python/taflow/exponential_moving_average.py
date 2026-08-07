@@ -25,16 +25,16 @@ class ExponentialMovingAverage:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
         column : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _NativeExponentialMovingAverage(timeperiod)
         if _input is not None:
@@ -46,7 +46,7 @@ class ExponentialMovingAverage:
         Parameters
         ----------
         value : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input value processed at each bar.
 
         Returns
         -------
@@ -64,9 +64,9 @@ class ExponentialMovingAverage:
         Parameters
         ----------
         values : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input values processed in chronological order.
         column : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------

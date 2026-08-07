@@ -4,10 +4,10 @@ use pyo3::prelude::*;
 use taflow::stream::ChaikinMoneyFlow;
 
 #[pyclass]
-pub struct CmfOperator { inner: ChaikinMoneyFlow, values: Vec<f64> }
+pub struct ChaikinMoneyFlowOperator { inner: ChaikinMoneyFlow, values: Vec<f64> }
 
 #[pymethods]
-impl CmfOperator {
+impl ChaikinMoneyFlowOperator {
     #[new]
     #[pyo3(signature = (period=20))]
     fn new(period: usize) -> PyResult<Self> {

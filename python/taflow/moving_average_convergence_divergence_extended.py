@@ -24,24 +24,24 @@ class MovingAverageConvergenceDivergenceExtended:
         Parameters
         ----------
         fast_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Fast smoothing length in bars.
         fast_average_type : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         slow_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Slow smoothing length in bars.
         slow_average_type : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         signal_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Signal smoothing length in bars.
         signal_average_type : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = StatefulMacdExt(
             fast_period,
@@ -61,7 +61,7 @@ class MovingAverageConvergenceDivergenceExtended:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -80,7 +80,7 @@ class MovingAverageConvergenceDivergenceExtended:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------

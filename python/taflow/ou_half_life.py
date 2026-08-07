@@ -2,7 +2,7 @@
 
 from typing import Any
 import numpy as np
-from ._native import OuHalfLifeOperator as _Native
+from ._native import OrnsteinUhlenbeckHalfLifeOperator as _Native
 from ._series import as_float64_series
 
 
@@ -19,14 +19,14 @@ class OrnsteinUhlenbeckHalfLife:
         Parameters
         ----------
         price : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Price series or the current price observation.
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
         self.extend(price) if price is not None else None
@@ -37,7 +37,7 @@ class OrnsteinUhlenbeckHalfLife:
         Parameters
         ----------
         price : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Price series or the current price observation.
 
         Returns
         -------
@@ -53,7 +53,7 @@ class OrnsteinUhlenbeckHalfLife:
         Parameters
         ----------
         price : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Price series or the current price observation.
 
         Returns
         -------

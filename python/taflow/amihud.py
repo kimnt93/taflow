@@ -21,16 +21,16 @@ class Amihud:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
         (
@@ -45,9 +45,9 @@ class Amihud:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------
@@ -63,9 +63,9 @@ class Amihud:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------

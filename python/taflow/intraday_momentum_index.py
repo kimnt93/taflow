@@ -24,9 +24,9 @@ class IntradayMomentumIndex:
         Parameters
         ----------
         _open : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Open-price series or the current bar open.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
@@ -43,9 +43,9 @@ class IntradayMomentumIndex:
         Parameters
         ----------
         _open : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Open-price series or the current bar open.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------

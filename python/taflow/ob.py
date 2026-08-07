@@ -2,7 +2,7 @@
 
 from typing import Any
 import numpy as np
-from ._native import ObOperator as _Native
+from ._native import OrderBlockOperator as _Native
 from ._series import as_float64_series
 
 
@@ -29,26 +29,26 @@ class OrderBlock:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
         swing_length : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         internal_length : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         atr_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         threshold : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Detection threshold applied to the input changes.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(swing_length, internal_length, atr_period, threshold)
         (
@@ -63,13 +63,13 @@ class OrderBlock:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------
@@ -85,13 +85,13 @@ class OrderBlock:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------

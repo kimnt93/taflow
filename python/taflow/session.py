@@ -34,16 +34,16 @@ class SessionExtrema:
         Parameters
         ----------
         new_session : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Boolean series marking the start of each session.
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
         (
@@ -58,11 +58,11 @@ class SessionExtrema:
         Parameters
         ----------
         new_session : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Boolean series marking the start of each session.
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
 
         Returns
         -------
@@ -78,11 +78,11 @@ class SessionExtrema:
         Parameters
         ----------
         new_session : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Boolean series marking the start of each session.
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
 
         Returns
         -------

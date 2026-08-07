@@ -2,12 +2,12 @@
 
 from typing import Any
 import numpy as np
-from ._native import CumminOperator as _Native
+from ._native import CumulativeMinimumOperator as _Native
 from ._series import as_float64_series
 
 
-class Cummin:
-    """Stateful Cummin indicator.
+class CumulativeMinimum:
+    """Stateful CumulativeMinimum indicator.
     Parameters are documented by the constructor signature; scalar
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
@@ -19,12 +19,12 @@ class Cummin:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
         self.extend(_input) if _input is not None else None
@@ -35,7 +35,7 @@ class Cummin:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -51,7 +51,7 @@ class Cummin:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------

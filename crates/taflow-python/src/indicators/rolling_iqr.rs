@@ -1,12 +1,12 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingIqr;
+use taflow::stream::RollingInterquartileRange;
 #[pyclass]
-pub struct RollingIqrOperator { inner: RollingIqr, outputs: Vec<f64> }
+pub struct RollingInterquartileRangeOperator { inner: RollingInterquartileRange, outputs: Vec<f64> }
 #[pymethods]
-impl RollingIqrOperator {
-    #[new] fn new(timeperiod: usize) -> PyResult<Self> { Ok(Self { inner: RollingIqr::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?, outputs: Vec::new() }) }
+impl RollingInterquartileRangeOperator {
+    #[new] fn new(timeperiod: usize) -> PyResult<Self> { Ok(Self { inner: RollingInterquartileRange::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?, outputs: Vec::new() }) }
     fn append(&mut self, input: f64) -> Option<f64> { let value = self.inner.append(input); self.outputs.push(value.unwrap_or(f64::NAN)); value }
     fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> { for &value in input.as_slice()? { self.append(value); } Ok(()) }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> { PyArray1::from_vec(py, self.outputs.clone()) }

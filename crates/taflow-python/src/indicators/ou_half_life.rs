@@ -4,13 +4,13 @@ use pyo3::prelude::*;
 use taflow::stream::OrnsteinUhlenbeckHalfLife;
 
 #[pyclass]
-pub struct OuHalfLifeOperator {
+pub struct OrnsteinUhlenbeckHalfLifeOperator {
     inner: OrnsteinUhlenbeckHalfLife,
     output: Vec<f64>,
 }
 
 #[pymethods]
-impl OuHalfLifeOperator {
+impl OrnsteinUhlenbeckHalfLifeOperator {
     #[new]
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {

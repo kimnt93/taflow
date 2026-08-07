@@ -4,14 +4,14 @@ use pyo3::prelude::*;
 use taflow::stream::KnowSureThing;
 
 #[pyclass]
-pub struct KstOperator {
+pub struct KnowSureThingOperator {
     inner: KnowSureThing,
     kst: Vec<f64>,
     signal: Vec<f64>,
 }
 
 #[pymethods]
-impl KstOperator {
+impl KnowSureThingOperator {
     #[new]
     #[pyo3(signature = (roc1=10, roc2=15, roc3=20, roc4=30, sma1=10, sma2=10, sma3=10, sma4=15, signal=9))]
     fn new(

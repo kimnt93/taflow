@@ -40,16 +40,16 @@ class Expr:
         Parameters
         ----------
         fn : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         deps : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         name : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._fn, self.deps, self.name = fn, tuple(deps), name
 
@@ -74,11 +74,11 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         op : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         symbol : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -102,7 +102,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -117,7 +117,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -132,7 +132,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -147,7 +147,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -162,7 +162,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -177,7 +177,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -192,7 +192,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -207,7 +207,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -237,12 +237,12 @@ class _Source(Expr):
         Parameters
         ----------
         field : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         object.__setattr__(self, "field", field)
         object.__setattr__(self, "name", field)
@@ -257,16 +257,16 @@ class _Indicator(Expr):
         Parameters
         ----------
         name : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         state : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         inputs : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self.state, self.inputs = state, tuple(inputs)
         super().__init__(lambda row: self._value, self.inputs, name)
@@ -278,9 +278,9 @@ class _Indicator(Expr):
         Parameters
         ----------
         row : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         cache : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -312,12 +312,12 @@ class _Expression(Expr):
         Parameters
         ----------
         expression : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self.expression = expression
         super().__init__(expression._fn, expression.deps, expression.name)
@@ -328,9 +328,9 @@ class _Expression(Expr):
         Parameters
         ----------
         row : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         cache : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -346,11 +346,11 @@ def _evaluate(expr: Expr, row: object, cache: object) -> object:
     Parameters
     ----------
     expr : object
-        Input series, scalar parameter, or configuration value for this operation.
+        Values or parameters consumed by this operation.
     row : object
-        Input series, scalar parameter, or configuration value for this operation.
+        Values or parameters consumed by this operation.
     cache : object
-        Input series, scalar parameter, or configuration value for this operation.
+        Values or parameters consumed by this operation.
 
     Returns
     -------
@@ -388,8 +388,8 @@ class Pipeline:
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._sources: dict[str, _Source] = {}
         self._nodes: list[Expr] = []
@@ -541,9 +541,9 @@ class ArrowAdapter:
         Parameters
         ----------
         values : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input values processed in chronological order.
         column : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -596,9 +596,9 @@ class PolarsAdapter:
         Parameters
         ----------
         values : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input values processed in chronological order.
         column : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------

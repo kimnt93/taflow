@@ -27,18 +27,18 @@ class MassIndex:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         ema_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         sum_period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(ema_period, sum_period)
         self.extend(high, low) if high is not None or low is not None else None
@@ -49,9 +49,9 @@ class MassIndex:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
 
         Returns
         -------
@@ -67,9 +67,9 @@ class MassIndex:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
 
         Returns
         -------

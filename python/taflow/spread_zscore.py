@@ -2,12 +2,12 @@
 
 from typing import Any
 import numpy as np
-from ._native import SpreadZscoreOperator as _Native
+from ._native import SpreadZScoreOperator as _Native
 from ._series import as_float64_series
 
 
-class SpreadZscore:
-    """Stateful SpreadZscore indicator.
+class SpreadZScore:
+    """Stateful SpreadZScore indicator.
     Parameters are documented by the constructor signature; scalar
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
@@ -21,16 +21,16 @@ class SpreadZscore:
         Parameters
         ----------
         x : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         y : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
         if x is not None or y is not None:
@@ -42,9 +42,9 @@ class SpreadZscore:
         Parameters
         ----------
         x : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         y : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -60,9 +60,9 @@ class SpreadZscore:
         Parameters
         ----------
         x : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         y : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------

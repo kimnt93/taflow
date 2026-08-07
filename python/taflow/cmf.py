@@ -4,7 +4,7 @@ from typing import Any
 
 import numpy as np
 
-from ._native import CmfOperator as _Native
+from ._native import ChaikinMoneyFlowOperator as _Native
 from ._series import as_float64_series
 
 
@@ -28,20 +28,20 @@ class ChaikinMoneyFlow:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
         period : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(period)
         if any(value is not None for value in (high, low, close, volume)):
@@ -53,13 +53,13 @@ class ChaikinMoneyFlow:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------
@@ -75,13 +75,13 @@ class ChaikinMoneyFlow:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------

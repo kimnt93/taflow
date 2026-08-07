@@ -2,7 +2,7 @@
 
 from typing import Any
 import numpy as np
-from ._native import KstOperator as _Native
+from ._native import KnowSureThingOperator as _Native
 from ._series import as_float64_series
 
 
@@ -31,30 +31,30 @@ class KnowSureThing:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         roc1 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         roc2 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         roc3 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         roc4 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         sma1 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         sma2 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         sma3 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         sma4 : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         signal : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, signal)
         self.extend(close) if close is not None else None
@@ -65,7 +65,7 @@ class KnowSureThing:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
@@ -81,7 +81,7 @@ class KnowSureThing:
         Parameters
         ----------
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------

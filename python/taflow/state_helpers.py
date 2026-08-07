@@ -27,12 +27,12 @@ class BarsSince:
         Parameters
         ----------
         condition : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Boolean condition series or the current condition.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = BarsSinceOperator()
         self.extend(condition) if condition is not None else None
@@ -43,7 +43,7 @@ class BarsSince:
         Parameters
         ----------
         condition : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Boolean condition series or the current condition.
 
         Returns
         -------
@@ -59,7 +59,7 @@ class BarsSince:
         Parameters
         ----------
         condition : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Boolean condition series or the current condition.
 
         Returns
         -------
@@ -108,9 +108,9 @@ def _make(native: object, name: object) -> object:
     Parameters
     ----------
     native : object
-        Input series, scalar parameter, or configuration value for this operation.
+        Values or parameters consumed by this operation.
     name : object
-        Input series, scalar parameter, or configuration value for this operation.
+        Values or parameters consumed by this operation.
 
     Returns
     -------
@@ -129,14 +129,14 @@ def _make(native: object, name: object) -> object:
             Parameters
             ----------
             condition : object
-                Input series, scalar parameter, or configuration value for this operation.
+                Boolean condition series or the current condition.
             _input : object
-                Input series, scalar parameter, or configuration value for this operation.
+                Input series or the current scalar observation.
 
             Returns
             -------
-            object
-                The updated adapter, native value, aligned output array, or execution node.
+            None
+                The constructor initializes the adapter and returns no value.
             """
             self._state = native()
             (
@@ -151,9 +151,9 @@ def _make(native: object, name: object) -> object:
             Parameters
             ----------
             condition : object
-                Input series, scalar parameter, or configuration value for this operation.
+                Boolean condition series or the current condition.
             _input : object
-                Input series, scalar parameter, or configuration value for this operation.
+                Input series or the current scalar observation.
 
             Returns
             -------
@@ -169,9 +169,9 @@ def _make(native: object, name: object) -> object:
             Parameters
             ----------
             condition : object
-                Input series, scalar parameter, or configuration value for this operation.
+                Boolean condition series or the current condition.
             _input : object
-                Input series, scalar parameter, or configuration value for this operation.
+                Input series or the current scalar observation.
 
             Returns
             -------
@@ -241,14 +241,14 @@ class SignalDelay:
         Parameters
         ----------
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = SignalDelayOperator(timeperiod)
         self.extend(_input) if _input is not None else None
@@ -259,7 +259,7 @@ class SignalDelay:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -275,7 +275,7 @@ class SignalDelay:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -333,12 +333,12 @@ class PositionHold:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = PositionHoldOperator()
         self.extend(_input) if _input is not None else None
@@ -349,7 +349,7 @@ class PositionHold:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -365,7 +365,7 @@ class PositionHold:
         Parameters
         ----------
         _input : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Input series or the current scalar observation.
 
         Returns
         -------
@@ -425,14 +425,14 @@ class EntryExit:
         Parameters
         ----------
         entry : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         _exit : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = EntryExitOperator()
         self.extend(entry, _exit) if entry is not None or _exit is not None else None
@@ -443,9 +443,9 @@ class EntryExit:
         Parameters
         ----------
         entry : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         _exit : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
@@ -461,9 +461,9 @@ class EntryExit:
         Parameters
         ----------
         entry : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
         _exit : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------

@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::BosChoch;
+use taflow::stream::BreakOfStructureChangeOfCharacter;
 
 #[pyclass]
-pub struct BosChochOperator {
-    inner: BosChoch,
+pub struct BreakOfStructureChangeOfCharacterOperator {
+    inner: BreakOfStructureChangeOfCharacter,
     bos: Vec<f64>,
     choch: Vec<f64>,
     level: Vec<f64>,
@@ -13,11 +13,11 @@ pub struct BosChochOperator {
 }
 
 #[pymethods]
-impl BosChochOperator {
+impl BreakOfStructureChangeOfCharacterOperator {
     #[new]
     fn new(swing_length: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: BosChoch::new(swing_length)
+            inner: BreakOfStructureChangeOfCharacter::new(swing_length)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             bos: Vec::new(),
             choch: Vec::new(),

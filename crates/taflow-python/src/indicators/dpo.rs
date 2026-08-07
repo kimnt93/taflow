@@ -4,10 +4,10 @@ use pyo3::prelude::*;
 use taflow::stream::DetrendedPriceOscillator;
 
 #[pyclass]
-pub struct DpoOperator { inner: DetrendedPriceOscillator, values: Vec<f64> }
+pub struct DetrendedPriceOscillatorOperator { inner: DetrendedPriceOscillator, values: Vec<f64> }
 
 #[pymethods]
-impl DpoOperator {
+impl DetrendedPriceOscillatorOperator {
     #[new]
     #[pyo3(signature = (period=20))]
     fn new(period: usize) -> PyResult<Self> {

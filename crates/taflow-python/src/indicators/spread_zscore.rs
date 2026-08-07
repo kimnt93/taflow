@@ -1,21 +1,21 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::SpreadZscore;
+use taflow::stream::SpreadZScore;
 
 #[pyclass]
-pub struct SpreadZscoreOperator {
-    inner: SpreadZscore,
+pub struct SpreadZScoreOperator {
+    inner: SpreadZScore,
     output: Vec<f64>,
 }
 
 #[pymethods]
-impl SpreadZscoreOperator {
+impl SpreadZScoreOperator {
     #[new]
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: SpreadZscore::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: SpreadZScore::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

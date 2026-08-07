@@ -4,13 +4,13 @@ use pyo3::prelude::*;
 use taflow::stream::GarmanKlassYangZhang;
 
 #[pyclass]
-pub struct GkYangZhangOperator {
+pub struct GarmanKlassYangZhangOperator {
     inner: GarmanKlassYangZhang,
     output: Vec<f64>,
 }
 
 #[pymethods]
-impl GkYangZhangOperator {
+impl GarmanKlassYangZhangOperator {
     #[new]
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {

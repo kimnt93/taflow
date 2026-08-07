@@ -21,16 +21,16 @@ class ExponentiallyWeightedCorrelation:
         Parameters
         ----------
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
         left : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Left-hand aligned input series or scalar value.
         right : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Right-hand aligned input series or scalar value.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
         self.extend(left, right) if left is not None or right is not None else None
@@ -41,9 +41,9 @@ class ExponentiallyWeightedCorrelation:
         Parameters
         ----------
         left : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Left-hand aligned input series or scalar value.
         right : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Right-hand aligned input series or scalar value.
 
         Returns
         -------
@@ -59,9 +59,9 @@ class ExponentiallyWeightedCorrelation:
         Parameters
         ----------
         left : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Left-hand aligned input series or scalar value.
         right : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Right-hand aligned input series or scalar value.
 
         Returns
         -------

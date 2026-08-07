@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 use taflow::stream::OrderBlock;
 
 #[pyclass]
-pub struct ObOperator {
+pub struct OrderBlockOperator {
     inner: OrderBlock,
     ob: Vec<f64>,
     top: Vec<f64>,
@@ -14,7 +14,7 @@ pub struct ObOperator {
 }
 
 #[pymethods]
-impl ObOperator {
+impl OrderBlockOperator {
     #[new]
     #[pyo3(signature = (swing_length=50, internal_length=5, atr_period=200, threshold=2.0))]
     fn new(

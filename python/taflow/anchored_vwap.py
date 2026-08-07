@@ -34,22 +34,22 @@ class AnchoredVolumeWeightedAveragePrice:
         Parameters
         ----------
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
         anchor : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Boolean series marking reset or anchor bars.
         stdev : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Values or parameters consumed by this operation.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = StatefulAnchoredVolumeWeightedAveragePrice(stdev)
         if close is not None:

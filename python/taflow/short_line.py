@@ -23,18 +23,18 @@ class CandleShortLine:
         Parameters
         ----------
         _open : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Open-price series or the current bar open.
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
         (
@@ -49,13 +49,13 @@ class CandleShortLine:
         Parameters
         ----------
         _open : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Open-price series or the current bar open.
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------
@@ -71,13 +71,13 @@ class CandleShortLine:
         Parameters
         ----------
         _open : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Open-price series or the current bar open.
         high : object
-            Input series, scalar parameter, or configuration value for this operation.
+            High-price series or the current bar high.
         low : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Low-price series or the current bar low.
         close : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Close-price series or the current bar close.
 
         Returns
         -------

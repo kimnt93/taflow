@@ -157,8 +157,8 @@ from .unique_three_river import CandleUniqueThreeRiver
 from .upside_gap_two_crows import CandleUpsideGapTwoCrows
 from .lag import Lag
 from .log_return import LogReturn
-from .cumsum import Cumsum
-from .cumprod import Cumprod
+from .cumsum import CumulativeSum
+from .cumprod import CumulativeProduct
 from .rolling_median import RollingMedian
 from .rolling_min import RollingMin
 from .rolling_max import RollingMax
@@ -169,10 +169,10 @@ from .rolling_mode import RollingMode
 from .rolling_quantile import RollingQuantile
 from .rolling_percentile import RollingPercentile
 from .rolling_rank import RollingRank
-from .rolling_zscore import RollingZscore
+from .rolling_zscore import RollingZScore
 from .rolling_skew import RollingSkew
 from .rolling_kurtosis import RollingKurtosis
-from .rolling_iqr import RollingIqr
+from .rolling_iqr import RollingInterquartileRange
 from .rolling_cov import RollingCov
 from .rolling_winsorize import RollingWinsorize
 from .rolling_apply import rolling_apply
@@ -180,8 +180,8 @@ from .ewm_var import ExponentiallyWeightedVariance
 from .ewm_std import ExponentiallyWeightedStandardDeviation
 from .ewm_cov import ExponentiallyWeightedCovariance
 from .ewm_corr import ExponentiallyWeightedCorrelation
-from .cummax import Cummax
-from .cummin import Cummin
+from .cummax import CumulativeMaximum
+from .cummin import CumulativeMinimum
 from .drawdown import Drawdown
 from .rolling_sharpe import RollingSharpe
 from .rolling_sortino import RollingSortino
@@ -225,7 +225,7 @@ from .fvg import FairValueGap
 from .donchian_channels import DonchianChannels
 from .rolling_vwap import RollingVolumeWeightedAveragePrice
 from .swing_highs_lows import SwingHighsLows
-from .bos_choch import BosChoch
+from .bos_choch import BreakOfStructureChangeOfCharacter
 from .ob import OrderBlock
 from .liquidity import Liquidity
 from .equal_highs_lows import EqualHighsLows
@@ -245,8 +245,8 @@ from .adv import AverageDailyDollarValue
 from .amihud import Amihud
 from .roll_spread import RollSpread
 from .ou_half_life import OrnsteinUhlenbeckHalfLife
-from .cusum import Cusum
-from .spread_zscore import SpreadZscore
+from .cusum import CumulativeSumControlChart
+from .spread_zscore import SpreadZScore
 from .frac_diff import FracDiff
 from .kalman_hedge_ratio import KalmanHedgeRatio
 from .supertrend import Supertrend
@@ -414,8 +414,8 @@ __all__ = [
     "CandleUpsideGapTwoCrows",
     "Lag",
     "LogReturn",
-    "Cumsum",
-    "Cumprod",
+    "CumulativeSum",
+    "CumulativeProduct",
     "RollingMedian",
     "RollingMin",
     "RollingMax",
@@ -426,10 +426,10 @@ __all__ = [
     "RollingQuantile",
     "RollingPercentile",
     "RollingRank",
-    "RollingZscore",
+    "RollingZScore",
     "RollingSkew",
     "RollingKurtosis",
-    "RollingIqr",
+    "RollingInterquartileRange",
     "RollingCov",
     "RollingWinsorize",
     "rolling_apply",
@@ -437,8 +437,8 @@ __all__ = [
     "ExponentiallyWeightedStandardDeviation",
     "ExponentiallyWeightedCovariance",
     "ExponentiallyWeightedCorrelation",
-    "Cummax",
-    "Cummin",
+    "CumulativeMaximum",
+    "CumulativeMinimum",
     "Drawdown",
     "RollingSharpe",
     "RollingSortino",
@@ -488,7 +488,7 @@ __all__ = [
     "DonchianChannels",
     "RollingVolumeWeightedAveragePrice",
     "SwingHighsLows",
-    "BosChoch",
+    "BreakOfStructureChangeOfCharacter",
     "OrderBlock",
     "Liquidity",
     "EqualHighsLows",
@@ -509,8 +509,8 @@ __all__ = [
     "Amihud",
     "RollSpread",
     "OrnsteinUhlenbeckHalfLife",
-    "Cusum",
-    "SpreadZscore",
+    "CumulativeSumControlChart",
+    "SpreadZScore",
     "FracDiff",
     "KalmanHedgeRatio",
     "Supertrend",

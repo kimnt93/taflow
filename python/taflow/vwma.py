@@ -21,16 +21,16 @@ class VolumeWeightedMovingAverage:
         Parameters
         ----------
         timeperiod : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Trailing window length in bars.
         price : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Price series or the current price observation.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
+        None
+            The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
         self.extend(price, volume) if price is not None or volume is not None else None
@@ -41,9 +41,9 @@ class VolumeWeightedMovingAverage:
         Parameters
         ----------
         price : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Price series or the current price observation.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------
@@ -59,9 +59,9 @@ class VolumeWeightedMovingAverage:
         Parameters
         ----------
         price : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Price series or the current price observation.
         volume : object
-            Input series, scalar parameter, or configuration value for this operation.
+            Volume series or the current bar volume.
 
         Returns
         -------

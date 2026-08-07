@@ -1,14 +1,14 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::Cumsum;
+use taflow::stream::CumulativeSum;
 
 #[pyclass]
-pub struct CumsumOperator { inner: Cumsum, outputs: Vec<f64> }
+pub struct CumulativeSumOperator { inner: CumulativeSum, outputs: Vec<f64> }
 
 #[pymethods]
-impl CumsumOperator {
+impl CumulativeSumOperator {
     #[new]
-    fn new() -> Self { Self { inner: Cumsum::new(), outputs: Vec::new() } }
+    fn new() -> Self { Self { inner: CumulativeSum::new(), outputs: Vec::new() } }
     fn append(&mut self, input: f64) -> f64 { let value = self.inner.append(input); self.outputs.push(value); value }
     fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> { for &value in input.as_slice()? { self.append(value); } Ok(()) }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> { PyArray1::from_vec(py, self.outputs.clone()) }

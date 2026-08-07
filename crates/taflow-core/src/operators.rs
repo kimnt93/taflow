@@ -695,7 +695,7 @@ pub fn fair_value_gap(
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct BosChochValue {
+pub struct BreakOfStructureChangeOfCharacterValue {
     pub bos: f64,
     pub choch: f64,
     pub level: f64,
@@ -704,15 +704,15 @@ pub struct BosChochValue {
 
 /// Causal break-of-structure and change-of-character events.
 #[derive(Debug, Clone)]
-pub struct BosChoch {
+pub struct BreakOfStructureChangeOfCharacter {
     swing: SwingHighLow,
     swings: VecDeque<(f64, f64)>,
     pending: Option<(f64, f64)>,
     trend: Option<f64>,
-    value: Option<BosChochValue>,
+    value: Option<BreakOfStructureChangeOfCharacterValue>,
 }
 
-impl BosChoch {
+impl BreakOfStructureChangeOfCharacter {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -733,7 +733,7 @@ impl BosChoch {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, high: f64, low: f64, close: f64) -> BosChochValue {
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> BreakOfStructureChangeOfCharacterValue {
         let mut bos = f64::NAN;
         let mut choch = f64::NAN;
         let mut level = f64::NAN;
@@ -789,7 +789,7 @@ impl BosChoch {
             }
         }
 
-        let value = BosChochValue { bos, choch, level, broken };
+        let value = BreakOfStructureChangeOfCharacterValue { bos, choch, level, broken };
         self.value = Some(value);
         value
     }
@@ -799,7 +799,7 @@ impl BosChoch {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<BosChochValue> { self.value }
+    pub fn value(&self) -> Option<BreakOfStructureChangeOfCharacterValue> { self.value }
 
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
@@ -828,7 +828,7 @@ pub fn bos_choch(
             got: low.len().max(close.len()),
         });
     }
-    let mut state = BosChoch::new(swing_length)?;
+    let mut state = BreakOfStructureChangeOfCharacter::new(swing_length)?;
     let mut bos = Vec::with_capacity(high.len());
     let mut choch = Vec::with_capacity(high.len());
     let mut level = Vec::with_capacity(high.len());
@@ -2581,14 +2581,14 @@ pub fn ou_half_life(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
 /// CUSUM event flags (AFML §2.5.2): `+1` when the cumulative deviation from
 /// `threshold` (daily volatility) exceeds it, `-1` on the downside, else `0`.
 #[derive(Debug, Clone)]
-pub struct Cusum {
+pub struct CumulativeSumControlChart {
     threshold: f64,
     s_positive: f64,
     s_negative: f64,
     value: Option<f64>,
 }
 
-impl Cusum {
+impl CumulativeSumControlChart {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -2647,21 +2647,21 @@ impl Cusum {
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn cusum(input: &[f64], threshold: f64) -> TaResult<Vec<f64>> {
-    let mut state = Cusum::new(threshold)?;
+    let mut state = CumulativeSumControlChart::new(threshold)?;
     Ok(input.iter().map(|&change| state.append(change)).collect())
 }
 
 /// Pairs-trading z-score: rolling OLS hedge ratio `β` of `y` on `x`, spread
 /// `s = y − β·x`, then `(s − mean(s)) / std(s)` over the same window —
-/// composition of the `HedgeRatio` and `RollingZscore` definitions.
+/// composition of the `HedgeRatio` and `RollingZScore` definitions.
 #[derive(Debug, Clone)]
-pub struct SpreadZscore {
+pub struct SpreadZScore {
     values: VecDeque<(f64, f64)>,
     timeperiod: usize,
     value: Option<f64>,
 }
 
-impl SpreadZscore {
+impl SpreadZScore {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -2728,7 +2728,7 @@ pub fn spread_zscore(x: &[f64], y: &[f64], timeperiod: usize) -> TaResult<Vec<f6
     if x.len() != y.len() {
         return Err(TaError::LengthMismatch { expected: x.len(), got: y.len() });
     }
-    let mut state = SpreadZscore::new(timeperiod)?;
+    let mut state = SpreadZScore::new(timeperiod)?;
     Ok(x.iter().zip(y).map(|(&x, &y)| state.append(x, y).unwrap_or(f64::NAN)).collect())
 }
 
@@ -4721,7 +4721,7 @@ pub fn rolling_rank(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn rolling_zscore(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = RollingZscore::new(timeperiod)?;
+    let mut state = RollingZScore::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
@@ -4751,7 +4751,7 @@ pub fn rolling_kurtosis(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> 
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn rolling_iqr(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = RollingIqr::new(timeperiod)?;
+    let mut state = RollingInterquartileRange::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
@@ -5125,13 +5125,13 @@ impl RollingRank {
 }
 
 #[derive(Debug, Clone)]
-pub struct RollingZscore {
+pub struct RollingZScore {
     values: VecDeque<f64>,
     timeperiod: usize,
     value: Option<f64>,
 }
 
-impl RollingZscore {
+impl RollingZScore {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -5220,9 +5220,9 @@ rolling_moment_operator!(RollingKurtosis, |values: &VecDeque<f64>, mean: f64| {
 });
 
 #[derive(Debug, Clone)]
-pub struct RollingIqr { quantile: RollingQuantile, value: Option<f64> }
+pub struct RollingInterquartileRange { quantile: RollingQuantile, value: Option<f64> }
 
-impl RollingIqr {
+impl RollingInterquartileRange {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -5490,8 +5490,8 @@ macro_rules! cumulative_operator {
     };
 }
 
-cumulative_operator!(Cumsum, 0.0, |total: f64, input: f64| total + input);
-cumulative_operator!(Cumprod, 1.0, |total: f64, input: f64| total * input);
+cumulative_operator!(CumulativeSum, 0.0, |total: f64, input: f64| total + input);
+cumulative_operator!(CumulativeProduct, 1.0, |total: f64, input: f64| total * input);
 
 macro_rules! cumulative_extrema_operator {
     ($name:ident, $initial:expr, $operation:expr) => {
@@ -5513,18 +5513,18 @@ macro_rules! cumulative_extrema_operator {
     };
 }
 
-cumulative_extrema_operator!(Cummax, f64::NEG_INFINITY, f64::max);
-cumulative_extrema_operator!(Cummin, f64::INFINITY, f64::min);
+cumulative_extrema_operator!(CumulativeMaximum, f64::NEG_INFINITY, f64::max);
+cumulative_extrema_operator!(CumulativeMinimum, f64::INFINITY, f64::min);
 
 #[derive(Debug, Clone)]
-pub struct Drawdown { maximum: Cummax, value: Option<f64> }
+pub struct Drawdown { maximum: CumulativeMaximum, value: Option<f64> }
 impl Drawdown {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn new() -> Self { Self { maximum: Cummax::new(), value: None } }
+    pub fn new() -> Self { Self { maximum: CumulativeMaximum::new(), value: None } }
     pub fn append(&mut self, input: f64) -> f64 { let maximum = self.maximum.append(input); let value = if maximum != 0.0 { input / maximum - 1.0 } else { 0.0 }; self.value = Some(value); value }
     pub fn value(&self) -> Option<f64> { self.value }
     /// Reset the persistent state and clear the latest value.
@@ -6057,8 +6057,8 @@ mod tests {
 
     #[test]
     fn cumulative_states_reset() {
-        let mut sum = Cumsum::new();
-        let mut product = Cumprod::new();
+        let mut sum = CumulativeSum::new();
+        let mut product = CumulativeProduct::new();
         assert_eq!(sum.append(2.0), 2.0);
         assert_eq!(product.append(2.0), 2.0);
         sum.reset(); product.reset();
@@ -6161,7 +6161,7 @@ mod tests {
             assert!((z[i] - expected).abs() < 1e-9, "index {i}");
         }
 
-        let mut state = SpreadZscore::new(period).unwrap();
+        let mut state = SpreadZScore::new(period).unwrap();
         let mut replayed = Vec::new();
         for (&x, &y) in x.iter().zip(&y) {
             replayed.push(state.append(x, y).unwrap_or(f64::NAN));
@@ -6259,7 +6259,7 @@ mod tests {
         assert!(Amihud::new(0).is_err());
         assert!(RollSpread::new(0).is_err());
         assert!(OrnsteinUhlenbeckHalfLife::new(0).is_err());
-        assert!(Cusum::new(-1.0).is_err());
+        assert!(CumulativeSumControlChart::new(-1.0).is_err());
     }
 
     #[test]
