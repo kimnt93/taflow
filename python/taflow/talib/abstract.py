@@ -1002,7 +1002,19 @@ class Function:
         return self._info["input_names"]
 
     @input_names.setter
-    def input_names(self, new_names: object) -> object:
+    def input_names(self, new_names: object) -> None:
+        """Set the ordered input-group mapping used by this function.
+
+        Parameters
+        ----------
+        new_names : mapping
+            Replacement input-group names accepted by the compatibility API.
+
+        Returns
+        -------
+        object
+            The assigned mapping value.
+        """
         self._info["input_names"] = OrderedDict(new_names)
 
     @property
@@ -1011,7 +1023,7 @@ class Function:
         return self._info["parameters"]
 
     @parameters.setter
-    def parameters(self, new_params: object) -> object:
+    def parameters(self, new_params: object) -> None:
         """Set one or more parameters by dict."""
         self.set_parameters(new_params)
 
