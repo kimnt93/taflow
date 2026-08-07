@@ -19,7 +19,7 @@ extra-oracles = [
 
 [tool.uv.sources]
 # Build the local Rust/Python package from the repository root (maturin backend).
-taflow = { path = "..", editable = false }
+taflow = { path = "..", editable = true }
 
 [tool.uv]
 package = false

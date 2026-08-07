@@ -537,6 +537,9 @@ source .venv/bin/activate && maturin develop --release -m crates/taflow-python/C
 python benches/bench.py <FN...> --quick
 # oracle verification (standalone uv project; writes verify/REPORT.md)
 cd verify && uv sync && uv run python verify.py
+
+# correctness + Python-visible native vector/warm-up/continuation/thread benchmark
+cd verify && uv run python benchmark.py --quick
 # style
 cargo fmt --check && black --check python/
 ```

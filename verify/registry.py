@@ -47,6 +47,8 @@ WHOLE_NAME = {
     "td_sequential": "tom_de_mark_sequential",
     "fib_retracement": "fibonacci_retracement",
     "anchored_vwap": "anchored_volume_weighted_average_price",
+    "ssl_channel": "smoothed_trend_channel",
+    "pmax": "parabolic_moving_average_stop",
 }
 
 # Token-level synonym expansion applied inside snake names.
@@ -96,12 +98,38 @@ INPUT_DOMAIN_OVERRIDES = {"ACOS": "unit", "ASIN": "unit"}
 # Series-typed constructor/extend parameter names (never mapped as params).
 SERIES_PARAM_NAMES = {
     "_input", "input", "values", "close", "high", "low", "open", "_open",
-    "volume", "left", "right", "periods", "real", "price", "column",
+    "volume", "left", "right", "periods", "period", "real", "price", "column",
+    "x", "y", "benchmark", "condition", "new_session", "anchor", "entry",
+    "_exit", "input0", "input1", "_input0", "_input1", "h", "l", "change",
+    "value",
 }
 
 
 def _norm(name: str) -> str:
     return name.replace("_", "").lower()
+
+
+def scalar_default(name: str, default=inspect.Parameter.empty):
+    """Deterministic constructor value for required non-series parameters."""
+    if default is not inspect.Parameter.empty:
+        return default
+    if name in {"quantile", "alpha"}:
+        return 0.5
+    if name == "percentile":
+        return 50.0
+    if name in {"gamma", "phase"}:
+        return 0.5
+    if name in {"stdev", "value_area"}:
+        return 1.0
+    if "average_type" in name or name == "matype":
+        return 0
+    if name == "fastlimit":
+        return 0.5
+    if name == "slowlimit":
+        return 0.05
+    if name in {"factor", "scalar", "multiplier"} or "factor" in name:
+        return 0.7
+    return 5
 
 
 def parse_master_table() -> list[tuple[str, str]]:
@@ -119,7 +147,7 @@ def resolve_class(snake: str):
     """Resolve a snake-case table name to a live taflow class (or None)."""
     import taflow
 
-    by_norm = {c.lower(): c for c in dir(taflow) if c[:1].isupper()}
+    by_norm = {_norm(c): c for c in dir(taflow) if c[:1].isupper()}
     candidates = [snake]
     if snake in WHOLE_NAME:
         candidates.append(WHOLE_NAME[snake])
@@ -161,7 +189,9 @@ class Spec:
         except (TypeError, ValueError):
             spec.error = "constructor signature unavailable"
             return spec
-        ctor_params = {p for p in sig.parameters if p != "self"}
+        ctor_params = {p: value for p, value in sig.parameters.items()
+                       if p != "self" and value.kind not in
+                       (value.VAR_POSITIONAL, value.VAR_KEYWORD)}
 
         try:
             ext_sig = inspect.signature(spec.cls.extend)
@@ -174,11 +204,16 @@ class Spec:
             return spec
 
         if talib_name:
-            spec._bind_talib(talib_name, ctor_params)
+            spec._bind_talib(talib_name, set(ctor_params))
         else:
             spec.input_roles = tuple(
                 "close" if a in ("_input", "input", "values") else a
                 for a in spec.series_args)
+        for name, parameter in ctor_params.items():
+            if (name not in SERIES_PARAM_NAMES
+                    and name not in spec.ctor_kwargs
+                    and parameter.default is inspect.Parameter.empty):
+                spec.ctor_kwargs[name] = scalar_default(name)
         return spec
 
     def _bind_talib(self, name: str, ctor_params: set[str]) -> None:
@@ -225,12 +260,20 @@ class Spec:
     def arrays(self, data: dict, n: int) -> list[np.ndarray]:
         out = []
         for role in self.input_roles:
-            if role in ("price", "real", "close"):
+            if role in ("_input", "input", "values", "price", "real",
+                        "close", "change", "value"):
                 key = "unit" if self.domain == "unit" else "close"
-            elif role == "price0":
+            elif role in ("price0", "left", "x", "input0", "_input0"):
                 key = "close"
-            elif role == "price1":
+            elif role in ("price1", "right", "y", "benchmark", "input1",
+                          "_input1"):
                 key = "close2"
+            elif role in ("period", "periods"):
+                key = "periods"
+            elif role == "h":
+                key = "high"
+            elif role == "l":
+                key = "low"
             elif role in data:
                 key = role
             else:
@@ -268,6 +311,25 @@ def build_registry() -> dict[str, Spec]:
     return specs
 
 
+def resolve_specs(names: list[str], registry: dict[str, Spec]) -> tuple[list[Spec], list[str]]:
+    """Resolve TA-Lib, snake-case, or canonical class names without aliases."""
+    indexes: dict[str, Spec] = {}
+    for key, spec in registry.items():
+        for candidate in (key, spec.snake,
+                          spec.talib_name or "",
+                          spec.cls.__name__ if spec.cls else ""):
+            if candidate:
+                indexes[_norm(candidate)] = spec
+    resolved, unknown = [], []
+    for name in names:
+        spec = indexes.get(_norm(name))
+        if spec is None:
+            unknown.append(name)
+        elif spec not in resolved:
+            resolved.append(spec)
+    return resolved, unknown
+
+
 # ---------------------------------------------------------------------------
 # Shared deterministic data generator (mean-reverting log-price OHLCV)
 # ---------------------------------------------------------------------------
@@ -301,6 +363,14 @@ def make_data(n: int, seed: int = 42) -> dict[str, np.ndarray]:
         "open": open_, "high": high, "low": low, "close": close,
         "volume": rng.uniform(1e5, 1e6, n),
         "close2": ar1(3000),
-        "periods": np.random.default_rng(seed + 4000).uniform(2.0, 30.0, n),
+        # TA-Lib's MAVP Python binding requires a float64 periods array even
+        # though the values represent integral periods.
+        "periods": np.random.default_rng(seed + 4000).integers(
+            2, 31, n).astype(np.float64),
         "unit": np.clip(np.cumsum(unit_noise) % 1.8 - 0.9, -0.99, 0.99),
+        "condition": np.arange(n) % 11 == 0,
+        "new_session": np.arange(n) % 32 == 0,
+        "anchor": np.arange(n) % 64 == 0,
+        "entry": np.arange(n) % 17 == 0,
+        "_exit": np.arange(n) % 19 == 0,
     }

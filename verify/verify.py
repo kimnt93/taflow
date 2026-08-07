@@ -30,10 +30,11 @@ from pathlib import Path
 
 import numpy as np
 
-from registry import Spec, build_registry, make_data
+from registry import Spec, build_registry, make_data, resolve_specs
 
 RTOL = 1e-8
 ATOL = 1e-10
+CHUNK_SIZES = (1, 10, 1_000)
 
 
 # ---------------------------------------------------------------------------
@@ -90,6 +91,25 @@ def continue_series(spec: Spec, arrays, split: int) -> tuple:
     return tuple(
         np.concatenate([np.asarray(h, dtype=np.float64), np.asarray(c)])
         for h, c in zip(head, columns))
+
+
+def chunked_series(spec: Spec, arrays, chunk: int) -> tuple:
+    """Feed a complete history through repeated native ``extend`` calls."""
+    state = spec.new_state()
+    pieces: list[tuple[np.ndarray, ...]] = []
+    for start in range(0, len(arrays[0]), chunk):
+        stop = min(start + chunk, len(arrays[0]))
+        result = state.extend(*[array[start:stop] for array in arrays])
+        if result is state:
+            result = state.compute()
+            values = result if isinstance(result, tuple) else (result,)
+            pieces.append(tuple(np.asarray(value)[-(stop - start):]
+                                for value in values))
+        else:
+            pieces.append(result if isinstance(result, tuple) else (result,))
+    arity = len(pieces[0])
+    return tuple(np.concatenate([np.asarray(piece[i]) for piece in pieces])
+                 for i in range(arity))
 
 
 # ---------------------------------------------------------------------------
@@ -189,6 +209,10 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
         row["error"] = f"continue path failed: {exc}"
         return row
     row["continue_vs_batch_bitwise"] = bitwise_equal(stitched, batch)
+    row["chunk_invariance"] = {
+        str(chunk): bitwise_equal(chunked_series(spec, arrays, chunk), batch)
+        for chunk in CHUNK_SIZES
+    }
     if expected is not None:
         row["continue_vs_oracle"] = compare(stitched, expected)
     return row
@@ -201,6 +225,8 @@ def verdict(row: dict) -> str:
               for k in ("batch_vs_oracle", "continue_vs_oracle") if k in row]
     if "continue_vs_batch_bitwise" in row:
         checks.append(row["continue_vs_batch_bitwise"])
+    if "chunk_invariance" in row:
+        checks.extend(row["chunk_invariance"].values())
     if not checks:
         return "SKIP"
     return "MATCH" if all(checks) else "MISMATCH"
@@ -249,11 +275,12 @@ def write_report(rows: list[dict], path: Path, bars: int,
         "cold `extend` over the full series against the reference;",
         "*continue vs batch*: 9k `extend` + 1k `append` stitched output",
         "bitwise-identical to one-shot batch (chunk invariance); *continue",
-        "vs oracle*: the stitched output against the reference.",
+        "vs oracle*: the stitched output against the reference. Repeated",
+        f"native `extend` chunks {list(CHUNK_SIZES)} are also checked bitwise.",
         "",
         "| Function | taflow class | Oracle | Verdict | Batch vs oracle | "
-        "Continue vs batch | Continue vs oracle |",
-        "|---|---|---|---|---|---|---|",
+        "Continue vs batch | Extend chunks | Continue vs oracle |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for row in sorted(rows, key=lambda r: (verdict(r) == "MATCH",
                                            r["function"])):
@@ -262,6 +289,7 @@ def write_report(rows: list[dict], path: Path, bars: int,
             f"{row.get('oracle', '—')} | {verdict(row)} | "
             f"{fmt_check(row.get('batch_vs_oracle'))} | "
             f"{fmt_check(row.get('continue_vs_batch_bitwise'))} | "
+            f"{fmt_check(all(row.get('chunk_invariance', {}).values()))} | "
             f"{fmt_check(row.get('continue_vs_oracle'))} |")
 
     mismatches = [r["function"] for r in rows if verdict(r) == "MISMATCH"]
@@ -287,49 +315,39 @@ def main() -> int:
 
     data = make_data(args.bars)
     registry = build_registry()
-    talib_names = sorted(k for k, s in registry.items() if s.talib_name)
-    names = args.functions or talib_names
-    unknown = [n for n in names if n not in registry]
+    if args.functions:
+        specs, unknown = resolve_specs(args.functions, registry)
+    else:
+        specs, unknown = list(registry.values()), []
     if unknown:
         print(f"unknown: {', '.join(unknown)}", file=sys.stderr)
         return 1
 
     rows: list[dict] = []
-    for i, name in enumerate(names, 1):
+    oracles = pandas_oracles()
+    for i, spec in enumerate(specs, 1):
+        name = spec.talib_name or spec.snake
         try:
-            row = verify_function(registry[name], data, args.bars,
-                                  args.warmup_split)
+            oracle = oracles.get(spec.snake)
+            if oracle and not spec.talib_name:
+                spec = Spec.build(spec.snake, None)
+                spec.ctor_kwargs.update(oracle["kwargs"])
+                spec.input_roles = oracle["inputs"]
+            row = verify_function(spec, data, args.bars,
+                                  args.warmup_split,
+                                  oracle_fn=oracle["oracle"] if oracle else None)
         except Exception:
             row = {"function": name,
                    "error": traceback.format_exc(limit=1)}
         rows.append(row)
-        print(f"[{i}/{len(names)}] {name}: {verdict(row)}")
-
-    if not args.functions:
-        oracles = pandas_oracles()
-        for name, ospec in oracles.items():
-            spec = registry.get(name)
-            if spec is None or spec.error:
-                continue
-            spec = Spec.build(spec.snake, None)
-            spec.ctor_kwargs = dict(ospec["kwargs"])
-            spec.input_roles = ospec["inputs"]
-            try:
-                row = verify_function(spec, data, args.bars,
-                                      args.warmup_split,
-                                      oracle_fn=ospec["oracle"])
-            except Exception:
-                row = {"function": name,
-                       "error": traceback.format_exc(limit=1)}
-            rows.append(row)
-            print(f"[extra] {name}: {verdict(row)}")
+        print(f"[{i}/{len(specs)}] {name}: {verdict(row)}")
 
     write_report(rows, args.report, args.bars, args.warmup_split)
     (args.report.parent / "report.json").write_text(
         json.dumps(rows, indent=1, default=str))
     bad = sum(1 for r in rows if verdict(r) in ("MISMATCH", "ERROR"))
     print(f"\nwrote {args.report}\n{len(rows)} checked, {bad} need attention")
-    return 0
+    return 1 if bad else 0
 
 
 if __name__ == "__main__":

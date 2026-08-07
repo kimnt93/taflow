@@ -65,6 +65,9 @@ from .weighted_close import WeightedClose
 from .moving_average_convergence_divergence_fixed import (
     MovingAverageConvergenceDivergenceFixed,
 )
+from .moving_average_convergence_divergence import (
+    MovingAverageConvergenceDivergence,
+)
 from .moving_average_convergence_divergence_extended import (
     MovingAverageConvergenceDivergenceExtended,
 )
@@ -94,6 +97,7 @@ from .normalized_average_true_range import NormalizedAverageTrueRange
 from .true_range import TrueRange
 from .triangular_moving_average import TriangularMovingAverage
 from .triple_exponential_moving_average import TripleExponentialMovingAverage
+from .triple_exponential_average import TripleExponentialAverage
 from .weighted_moving_average import WeightedMovingAverage
 from .relative_strength_index import RelativeStrengthIndex
 from .rmi import RelativeMomentumIndex
@@ -281,6 +285,7 @@ __all__ = [
     "TypicalPrice",
     "WeightedClose",
     "MovingAverageConvergenceDivergenceFixed",
+    "MovingAverageConvergenceDivergence",
     "MovingAverageConvergenceDivergenceExtended",
     "BollingerBands",
     "CommodityChannelIndex",
@@ -334,6 +339,7 @@ __all__ = [
     "TrueRange",
     "TriangularMovingAverage",
     "TripleExponentialMovingAverage",
+    "TripleExponentialAverage",
     "WeightedMovingAverage",
     "Aroon",
     "AroonOscillator",

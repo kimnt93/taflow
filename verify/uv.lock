@@ -171,7 +171,7 @@ wheels = [
 [[package]]
 name = "taflow"
 version = "0.1.2"
-source = { directory = "../" }
+source = { editable = "../" }
 dependencies = [
     { name = "numpy" },
 ]
@@ -210,7 +210,7 @@ requires-dist = [
     { name = "pandas-ta-classic", marker = "extra == 'extra-oracles'" },
     { name = "smartmoneyconcepts", marker = "extra == 'extra-oracles'" },
     { name = "ta-lib", specifier = ">=0.6" },
-    { name = "taflow", directory = "../" },
+    { name = "taflow", editable = "../" },
 ]
 provides-extras = ["extra-oracles"]
 
