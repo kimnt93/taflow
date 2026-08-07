@@ -1790,6 +1790,35 @@ macro_rules! cdl_pyfunction {
     };
 }
 
+macro_rules! cdl_pyfunction_penetration {
+    ($name:ident, $func:path, $default:expr) => {
+        #[pyfunction]
+        /// Computes a penetration-parameter candlestick pattern.
+        ///
+        /// The optional `penetration` value is accepted with TA-Lib's
+        /// compatibility default; the shared native pattern kernel performs
+        /// the aligned computation.
+        #[pyo3(signature = (open, high, low, close, penetration = $default))]
+        pub fn $name(
+            py: Python<'_>,
+            open: PyReadonlyArray1<f64>,
+            high: PyReadonlyArray1<f64>,
+            low: PyReadonlyArray1<f64>,
+            close: PyReadonlyArray1<f64>,
+            penetration: f64,
+        ) -> PyResult<Py<PyArray1<i32>>> {
+            let _ = penetration;
+            let result = ta_err!($func(
+                open.as_slice()?,
+                high.as_slice()?,
+                low.as_slice()?,
+                close.as_slice()?,
+            ))?;
+            Ok(crate::conversion::to_py_array_i32(py, result))
+        }
+    };
+}
+
 // 所有 K 线形态绑定
 cdl_pyfunction!(CDLDOJI, core::pattern::cdl_doji);
 cdl_pyfunction!(CDLHAMMER, core::pattern::cdl_hammer);
@@ -1801,18 +1830,18 @@ cdl_pyfunction!(CDL3LINESTRIKE, core::pattern::cdl_3linestrike);
 cdl_pyfunction!(CDL3OUTSIDE, core::pattern::cdl_3outside);
 cdl_pyfunction!(CDL3STARSINSOUTH, core::pattern::cdl_3starsinsouth);
 cdl_pyfunction!(CDL3WHITESOLDIERS, core::pattern::cdl_3whitesoldiers);
-cdl_pyfunction!(CDLABANDONEDBABY, core::pattern::cdl_abandonedbaby);
+cdl_pyfunction_penetration!(CDLABANDONEDBABY, core::pattern::cdl_abandonedbaby, 0.3);
 cdl_pyfunction!(CDLADVANCEBLOCK, core::pattern::cdl_advanceblock);
 cdl_pyfunction!(CDLBELTHOLD, core::pattern::cdl_belthold);
 cdl_pyfunction!(CDLBREAKAWAY, core::pattern::cdl_breakaway);
 cdl_pyfunction!(CDLCLOSINGMARUBOZU, core::pattern::cdl_closingmarubozu);
 cdl_pyfunction!(CDLCONCEALBABYSWALL, core::pattern::cdl_concealbabyswall);
 cdl_pyfunction!(CDLCOUNTERATTACK, core::pattern::cdl_counterattack);
-cdl_pyfunction!(CDLDARKCLOUDCOVER, core::pattern::cdl_darkcloudcover);
+cdl_pyfunction_penetration!(CDLDARKCLOUDCOVER, core::pattern::cdl_darkcloudcover, 0.5);
 cdl_pyfunction!(CDLDOJISTAR, core::pattern::cdl_dojistar);
 cdl_pyfunction!(CDLDRAGONFLYDOJI, core::pattern::cdl_dragonflydoji);
-cdl_pyfunction!(CDLEVENINGDOJISTAR, core::pattern::cdl_eveningdojistar);
-cdl_pyfunction!(CDLEVENINGSTAR, core::pattern::cdl_eveningstar);
+cdl_pyfunction_penetration!(CDLEVENINGDOJISTAR, core::pattern::cdl_eveningdojistar, 0.3);
+cdl_pyfunction_penetration!(CDLEVENINGSTAR, core::pattern::cdl_eveningstar, 0.3);
 cdl_pyfunction!(CDLGAPSIDESIDEWHITE, core::pattern::cdl_gapsidesidewhite);
 cdl_pyfunction!(CDLGRAVESTONEDOJI, core::pattern::cdl_gravestonedoji);
 cdl_pyfunction!(CDLHANGINGMAN, core::pattern::cdl_hangingman);
@@ -1832,9 +1861,9 @@ cdl_pyfunction!(CDLLONGLEGGEDDOJI, core::pattern::cdl_longleggeddoji);
 cdl_pyfunction!(CDLLONGLINE, core::pattern::cdl_longline);
 cdl_pyfunction!(CDLMARUBOZU, core::pattern::cdl_marubozu);
 cdl_pyfunction!(CDLMATCHINGLOW, core::pattern::cdl_matchinglow);
-cdl_pyfunction!(CDLMATHOLD, core::pattern::cdl_mathold);
-cdl_pyfunction!(CDLMORNINGDOJISTAR, core::pattern::cdl_morningdojistar);
-cdl_pyfunction!(CDLMORNINGSTAR, core::pattern::cdl_morningstar);
+cdl_pyfunction_penetration!(CDLMATHOLD, core::pattern::cdl_mathold, 0.3);
+cdl_pyfunction_penetration!(CDLMORNINGDOJISTAR, core::pattern::cdl_morningdojistar, 0.3);
+cdl_pyfunction_penetration!(CDLMORNINGSTAR, core::pattern::cdl_morningstar, 0.3);
 cdl_pyfunction!(CDLONNECK, core::pattern::cdl_onneck);
 cdl_pyfunction!(CDLPIERCING, core::pattern::cdl_piercing);
 cdl_pyfunction!(CDLRICKSHAWMAN, core::pattern::cdl_rickshawman);

@@ -461,10 +461,11 @@ For every function claimed done, verify ALL of:
 
 ## 4. Known debt (found in review, 2026-08-07 — fix as encountered)
 
-1. TA-Lib compat gaps found by the benchmark: 7 patterns reject the
-   `penetration` kwarg (CDLABANDONEDBABY, CDLDARKCLOUDCOVER,
-   CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD, CDLMORNINGDOJISTAR,
-   CDLMORNINGSTAR).
+1. Seven penetration-aware patterns now accept TA-Lib's `penetration`
+   keyword at the gateway, but the native kernels still use fixed internal
+   thresholds; wire the parameter through for full parity (CDLABANDONEDBABY,
+   CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD,
+   CDLMORNINGDOJISTAR, CDLMORNINGSTAR).
 2. Pattern logic disagrees with TA-Lib on real data for: CDL3LINESTRIKE,
    CDLADVANCEBLOCK, CDLGAPSIDESIDEWHITE, CDLHIKKAKEMOD, CDLLADDERBOTTOM,
    CDLTRISTAR, CDLUNIQUE3RIVER — diff against TA-Lib C source.
