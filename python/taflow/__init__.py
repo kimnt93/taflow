@@ -153,6 +153,7 @@ from .donchian_channels import DonchianChannels
 from .rolling_vwap import RollingVwap
 from .swing_highs_lows import SwingHighsLows
 from .bos_choch import BosChoch
+from .ob import Ob
 from .hedge_ratio import HedgeRatio
 from .rolling_entropy import RollingEntropy
 from .rolling_autocorr import RollingAutocorr
@@ -313,6 +314,7 @@ __all__ = [
     "Fvg",
     "DonchianChannels", "RollingVwap", "SwingHighsLows",
     "BosChoch",
+    "Ob",
     "HedgeRatio",
     "RollingEntropy", "RollingAutocorr",
     "Hurst", "FractalDimension",

@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::error::{TaError, TaResult};
+use crate::stream::Atr;
 
 fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
@@ -631,6 +632,212 @@ pub fn bos_choch(
         broken.push(value.broken);
     }
     Ok((bos, choch, level, broken))
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ObValue {
+    pub ob: f64,
+    pub top: f64,
+    pub bottom: f64,
+    pub ob_volume: f64,
+    pub mitigated: f64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct ObZone {
+    direction: f64,
+    top: f64,
+    bottom: f64,
+}
+
+/// Causal order-block detection with volatile-bar exclusion and directional
+/// mitigation. Dual pivot scales: `swing_length` locates the structure
+/// interval, `internal_length` locates the extreme block within it. Bars
+/// whose range is at least `threshold * ATR(atr_period)` are excluded from
+/// being order blocks.
+#[derive(Debug, Clone)]
+pub struct Ob {
+    atr: Atr,
+    internal: Swing,
+    structure: Swing,
+    internal_low: Option<(f64, f64, bool)>,
+    internal_high: Option<(f64, f64, bool)>,
+    structure_low: Option<f64>,
+    structure_high: Option<f64>,
+    threshold: f64,
+    zones: Vec<ObZone>,
+    value: Option<ObValue>,
+}
+
+impl Ob {
+    pub fn new(
+        swing_length: usize,
+        internal_length: usize,
+        atr_period: usize,
+        threshold: f64,
+    ) -> TaResult<Self> {
+        validate_period(swing_length)?;
+        validate_period(internal_length)?;
+        if atr_period == 0 {
+            return Err(TaError::InvalidParameter {
+                name: "atr_period",
+                value: atr_period.to_string(),
+                reason: "must be >= 1",
+            });
+        }
+        if threshold < 0.0 {
+            return Err(TaError::InvalidParameter {
+                name: "threshold",
+                value: threshold.to_string(),
+                reason: "must be >= 0",
+            });
+        }
+        Ok(Self {
+            atr: Atr::new(atr_period)?,
+            internal: Swing::new(internal_length)?,
+            structure: Swing::new(swing_length)?,
+            internal_low: None,
+            internal_high: None,
+            structure_low: None,
+            structure_high: None,
+            threshold,
+            zones: Vec::new(),
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> ObValue {
+        let atr = self.atr.append(high, low, close);
+        let volatile = atr.is_some_and(|atr| high - low >= self.threshold * atr);
+
+        let mut ob = f64::NAN;
+        let mut top = f64::NAN;
+        let mut bottom = f64::NAN;
+        let mut ob_volume = f64::NAN;
+
+        if let Some(internal_swing) = self.internal.append(high, low) {
+            match internal_swing.signal {
+                signal if signal > 0.0 => {
+                    self.internal_high = Some((internal_swing.level, volume, volatile));
+                    if let Some(structure_high) = self.structure_high {
+                        if internal_swing.level > structure_high
+                            && self.internal_low.is_some_and(|(_, _, volatile)| !volatile)
+                        {
+                            let (low_level, low_volume, _) =
+                                self.internal_low.expect("internal low is set");
+                            ob = 1.0;
+                            top = internal_swing.level;
+                            bottom = low_level;
+                            ob_volume = low_volume;
+                            self.zones.push(ObZone {
+                                direction: ob,
+                                top,
+                                bottom,
+                            });
+                            self.structure_high = Some(internal_swing.level);
+                        }
+                    }
+                }
+                signal if signal < 0.0 => {
+                    self.internal_low = Some((internal_swing.level, volume, volatile));
+                    if let Some(structure_low) = self.structure_low {
+                        if internal_swing.level < structure_low
+                            && self.internal_high.is_some_and(|(_, _, volatile)| !volatile)
+                        {
+                            let (high_level, high_volume, _) =
+                                self.internal_high.expect("internal high is set");
+                            ob = -1.0;
+                            top = high_level;
+                            bottom = internal_swing.level;
+                            ob_volume = high_volume;
+                            self.zones.push(ObZone {
+                                direction: ob,
+                                top,
+                                bottom,
+                            });
+                            self.structure_low = Some(internal_swing.level);
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        if let Some(structure_swing) = self.structure.append(high, low) {
+            match structure_swing.signal {
+                signal if signal > 0.0 => self.structure_high = Some(structure_swing.level),
+                signal if signal < 0.0 => self.structure_low = Some(structure_swing.level),
+                _ => {}
+            }
+        }
+
+        let mut mitigated = f64::NAN;
+        self.zones.retain(|zone| {
+            let filled = (zone.direction > 0.0 && low <= zone.bottom)
+                || (zone.direction < 0.0 && high >= zone.top);
+            if filled {
+                mitigated = zone.direction;
+            }
+            !filled
+        });
+
+        let value = ObValue { ob, top, bottom, ob_volume, mitigated };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<ObValue> { self.value }
+
+    pub fn reset(&mut self) {
+        self.atr.reset();
+        self.internal.reset();
+        self.structure.reset();
+        self.internal_low = None;
+        self.internal_high = None;
+        self.structure_low = None;
+        self.structure_high = None;
+        self.zones.clear();
+        self.value = None;
+    }
+}
+
+pub fn ob(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    volume: &[f64],
+    swing_length: usize,
+    internal_length: usize,
+    atr_period: usize,
+    threshold: f64,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || low.len() != close.len() || close.len() != volume.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().max(close.len()).max(volume.len()),
+        });
+    }
+    let mut state = Ob::new(swing_length, internal_length, atr_period, threshold)?;
+    let mut ob_out = Vec::with_capacity(high.len());
+    let mut top = Vec::with_capacity(high.len());
+    let mut bottom = Vec::with_capacity(high.len());
+    let mut ob_volume = Vec::with_capacity(high.len());
+    let mut mitigated = Vec::with_capacity(high.len());
+    for ((((&high, &low), &close), &volume), _) in high
+        .iter()
+        .zip(low)
+        .zip(close)
+        .zip(volume)
+        .zip(std::iter::repeat(()))
+    {
+        let value = state.append(high, low, close, volume);
+        ob_out.push(value.ob);
+        top.push(value.top);
+        bottom.push(value.bottom);
+        ob_volume.push(value.ob_volume);
+        mitigated.push(value.mitigated);
+    }
+    Ok((ob_out, top, bottom, ob_volume, mitigated))
 }
 
 impl ActiveZoneList {
