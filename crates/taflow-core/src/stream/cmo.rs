@@ -7,6 +7,12 @@ use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator};
 
+/// Computes an aligned Chande Momentum Oscillator vector.
+pub fn chande_momentum_oscillator(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = ChandeMomentumOscillator::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental Chande Momentum Oscillator with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
 pub struct ChandeMomentumOscillator {

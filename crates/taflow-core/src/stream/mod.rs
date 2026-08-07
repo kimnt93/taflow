@@ -226,7 +226,7 @@ pub use cdl_tristar::CandleTriStar;
 pub use cdl_unique3river::CandleUniqueThreeRiver;
 pub use cdl_upsidegap2crows::CandleUpsideGapTwoCrows;
 pub use cdl_xsidegap3methods::CandleUpDownSideGapThreeMethods;
-pub use cmo::ChandeMomentumOscillator;
+pub use cmo::{ChandeMomentumOscillator, chande_momentum_oscillator};
 pub use dema::{DoubleExponentialMovingAverage, double_exponential_moving_average};
 pub use dx::{DirectionalMovementIndex, directional_movement_index};
 pub use ema::{ExponentialMovingAverage, exponential_moving_average};
