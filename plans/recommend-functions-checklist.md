@@ -98,7 +98,7 @@ fork/successor version) unless noted.
 | [x] | Mass Index | Impl: ta `trend.MassIndex`; Theory: Donald Dorsey | O(1): EMA(9) of range, EMA of that, `Sum(25)` of ratio. |
 | [x] | DPO | Impl: pandas-ta `trend/dpo.py` | **Causality trap**: pandas-ta default `centered=True` is non-causal. taflow implements `centered=False` only; docstring explains the difference. O(1): SMA + delay ring. |
 | [x] | CMF | Impl: ta `volume.ChaikinMoneyFlowIndicator` | O(1): two `Sum` states. |
-| [ ] | Klinger VO | Impl: pandas-ta `volume/kvo.py` (definitions vary — pin pandas-ta's) | O(1): trend-flip state + two EMAs. |
+| [x] | Klinger VO | Impl: pandas-ta `volume/kvo.py` (definitions vary — pin pandas-ta's) | O(1): trend-flip state + two EMAs. |
 | [x] | VPT | Impl: ta `volume.VolumePriceTrendIndicator` | O(1) cumulative recurrence. |
 | [x] | NVI / PVI | Impl: ta `volume.NegativeVolumeIndexIndicator`; pandas-ta `pvi` | O(1): recurrence gated on volume direction. |
 | [x] | McGinley Dynamic | Impl: pandas-ta `overlap/mcgd.py`; Theory: McGinley, JoTA 1997 | O(1): `md += (x−md)/(k·n·(x/md)^4)`; guard `md→0`. |
@@ -128,7 +128,7 @@ contract; the session boundary arrives as an input series.
 | [x] | Anchored/session VWAP (+ σ-bands) | `vwap`, `upper`, `lower` | Impl: pandas-ta `overlap/vwap.py`; TradingView VWAP docs for band convention | O(1): cumulative Σpv, Σv, Σpv² reset on anchor flag; bands from running moments. |
 | [x] | Pivot points (classic, Fibonacci, Camarilla, Woodie) | one series per level (PP, R1-3, S1-3) | Impl: freqtrade technical `pivots_points.py` | O(1): snapshot prior-session OHLC at boundary; four variants share state, differ only in level formulas. Levels constant within a session — still emitted per bar (same-size). |
 | [x] | Opening range | `or_high`, `or_low`, `breakout` (+1/-1/0) | Theory: standard ORB (first N bars of session) | O(1): extrema until bar-count cutoff, then frozen + crossover flags. |
-| [ ] | Session volume levels (POC, VAH, VAL) | `poc`, `vah`, `val` per bar | Impl: TradingView Volume Profile docs; Theory: CBOT Market Profile (value area 70%) | Histogram is **internal state** (fixed price bins, O(1) update/bar); outputs are the running POC/VAH/VAL as same-size series (O(bins) refresh per bar, bins bounded). Document bin-width sensitivity. |
+| [x] | Session volume levels (POC, VAH, VAL) | `poc`, `vah`, `val` per bar | Impl: TradingView Volume Profile docs; Theory: CBOT Market Profile (value area 70%) | Histogram is **internal state** (fixed price bins, O(1) update/bar); outputs are the running POC/VAH/VAL as same-size series (O(bins) refresh per bar, bins bounded). Document bin-width sensitivity. |
 
 ## P5 — realized-volatility estimators (`rv`)
 

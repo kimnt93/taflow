@@ -350,7 +350,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | mass_index | mass_index | _ |
 | [x] | dpo | dpo | _ |
 | [x] | cmf | cmf | _ |
-| [ ] | kvo | kvo | _ |
+| [x] | kvo | kvo | _ |
 | [x] | vpt | vpt | _ |
 | [x] | nvi | nvi | _ |
 | [x] | pvi | pvi | _ |
@@ -368,7 +368,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | anchored_vwap | anchored_vwap | _ |
 | [x] | pivot_points | pivot_points | _ |
 | [x] | opening_range | opening_range | _ |
-| [ ] | session_volume_levels | session_volume_levels | _ |
+| [x] | session_volume_levels | session_volume_levels | _ |
 | [x] | parkinson | parkinson | _ |
 | [x] | garman_klass | garman_klass | _ |
 | [x] | rogers_satchell | rogers_satchell | _ |

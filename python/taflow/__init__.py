@@ -76,6 +76,8 @@ from .ebsw import EvenBetterSinewave
 from .premium_discount import PremiumDiscount
 from .opening_range import OpeningRange
 from .pivot_points import PivotPoints
+from .klinger_volume_oscillator import KlingerVolumeOscillator
+from .session_volume_levels import SessionVolumeLevels
 from .up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
 from .three_white_soldiers import CDL3WHITESOLDIERS, ThreeWhiteSoldiers
 from .abandoned_baby import CDLABANDONEDBABY, AbandonedBaby
@@ -275,6 +277,8 @@ __all__ = [
     "PremiumDiscount",
     "OpeningRange",
     "PivotPoints",
+    "KlingerVolumeOscillator",
+    "SessionVolumeLevels",
     "UpDownSideGapThreeMethods",
     "CDLXSIDEGAP3METHODS",
     "IntradayMomentumIndex",
