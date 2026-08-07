@@ -92,7 +92,7 @@ scalar_state_class!(StatefulMax, stream::Max, 30);
 scalar_state_class!(StatefulMaxindex, stream::Maxindex, 30);
 scalar_state_class!(StatefulMin, stream::Min, 30);
 scalar_state_class!(StatefulMinindex, stream::Minindex, 30);
-scalar_state_class!(StatefulSum, stream::Sum, 30);
+scalar_state_class!(StatefulSum, stream::RollingSum, 30);
 scalar_state_class!(StatefulAvgdev, stream::Avgdev, 14);
 scalar_state_class!(StatefulCmo, stream::Cmo, 14);
 scalar_state_class!(StatefulKama, stream::Kama, 30);

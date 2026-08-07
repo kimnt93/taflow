@@ -102,6 +102,7 @@ mod ppo;
 mod plus_di;
 mod plus_dm;
 mod rsi;
+mod rolling_sum;
 mod rmi;
 mod laguerre_rsi;
 mod even_better_sinewave;
@@ -225,6 +226,7 @@ pub use ppo::Ppo;
 pub use plus_di::PlusDi;
 pub use plus_dm::PlusDm;
 pub use rsi::Rsi;
+pub use rolling_sum::RollingSum;
 pub use rmi::RelativeMomentumIndex;
 pub use laguerre_rsi::LaguerreRelativeStrengthIndex;
 pub use even_better_sinewave::EvenBetterSinewave;
@@ -468,47 +470,6 @@ macro_rules! rolling_extrema_indicator {
 
 rolling_extrema_indicator!(Max, |(maximum, _)| maximum);
 rolling_extrema_indicator!(Min, |(_, minimum)| minimum);
-
-/// Stateful rolling sum with O(1) updates.
-#[derive(Debug, Clone)]
-pub struct Sum {
-    window: Window,
-    sum: f64,
-    value: Option<f64>,
-}
-
-impl Sum {
-    pub fn new(period: usize) -> TaResult<Self> {
-        Ok(Self {
-            window: Window::new(period)?,
-            sum: 0.0,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for Sum {
-    type Output = f64;
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        if let Some(old) = self.window.push(input) {
-            self.sum -= old;
-        }
-        self.sum += input;
-        self.value = self.window.is_full().then_some(self.sum);
-        self.value
-    }
-
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.window.clear();
-        self.sum = 0.0;
-        self.value = None;
-    }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct MinmaxValue {
@@ -2012,7 +1973,7 @@ mod tests {
         let (minidx, maxidx) = math_operator::minmaxindex(&input, period).unwrap();
         let mut max = Max::new(period).unwrap();
         let mut min = Min::new(period).unwrap();
-        let mut sum = Sum::new(period).unwrap();
+        let mut sum = RollingSum::new(period).unwrap();
         let mut maxindex = Maxindex::new(period).unwrap();
         let mut minindex = Minindex::new(period).unwrap();
         let mut minmax = Minmax::new(period).unwrap();

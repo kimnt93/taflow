@@ -4544,7 +4544,7 @@ rolling_risk_operator!(RollingCalmar, |values: &VecDeque<f64>| {
 pub struct MassIndex {
     ema_range: MassEma,
     ema_signal: MassEma,
-    ratio_sum: crate::stream::Sum,
+    ratio_sum: crate::stream::RollingSum,
     value: Option<f64>,
 }
 
@@ -4581,7 +4581,7 @@ impl MassIndex {
         Ok(Self {
             ema_range: MassEma::new(ema_period),
             ema_signal: MassEma::new(ema_period),
-            ratio_sum: crate::stream::Sum::new(sum_period)?,
+            ratio_sum: crate::stream::RollingSum::new(sum_period)?,
             value: None,
         })
     }
@@ -4660,15 +4660,15 @@ pub fn detrended_price_oscillator(input: &[f64], period: usize) -> TaResult<Vec<
 /// Stateful Chaikin Money Flow, aligned to `ta.volume.ChaikinMoneyFlowIndicator`.
 #[derive(Debug, Clone)]
 pub struct ChaikinMoneyFlow {
-    mfv: crate::stream::Sum,
-    volume: crate::stream::Sum,
+    mfv: crate::stream::RollingSum,
+    volume: crate::stream::RollingSum,
     value: Option<f64>,
 }
 
 impl ChaikinMoneyFlow {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
-        Ok(Self { mfv: crate::stream::Sum::new(period)?, volume: crate::stream::Sum::new(period)?, value: None })
+        Ok(Self { mfv: crate::stream::RollingSum::new(period)?, volume: crate::stream::RollingSum::new(period)?, value: None })
     }
 
     pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {

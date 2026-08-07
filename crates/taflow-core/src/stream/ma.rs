@@ -55,7 +55,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = overlap::ma(&input, 13, ma_type).unwrap();
+            let expected = overlap::moving_average(&input, 13, ma_type).unwrap();
             let mut state = Ma::new(13, ma_type).unwrap();
             for (&input, expected) in input.iter().zip(expected) {
                 let actual = state.append(input);
