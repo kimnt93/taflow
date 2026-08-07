@@ -121,6 +121,9 @@ from .ewm_corr import EwmCorr
 from .cummax import Cummax
 from .cummin import Cummin
 from .drawdown import Drawdown
+from .rolling_sharpe import RollingSharpe
+from .rolling_sortino import RollingSortino
+from .rolling_calmar import RollingCalmar
 
 __all__ = [
     "talib",
@@ -257,5 +260,6 @@ __all__ = [
     "rolling_apply",
     "EwmVar", "EwmStd", "EwmCov", "EwmCorr",
     "Cummax", "Cummin", "Drawdown",
+    "RollingSharpe", "RollingSortino", "RollingCalmar",
     "__version__",
 ]

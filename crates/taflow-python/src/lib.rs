@@ -79,6 +79,9 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::CummaxOperator>()?;
     m.add_class::<indicators::CumminOperator>()?;
     m.add_class::<indicators::DrawdownOperator>()?;
+    m.add_class::<indicators::RollingSharpeOperator>()?;
+    m.add_class::<indicators::RollingSortinoOperator>()?;
+    m.add_class::<indicators::RollingCalmarOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

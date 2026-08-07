@@ -40,7 +40,7 @@ they are not re-proposed later.
 
 - [x] drawdown (needs a running-max state; also expose cummax / cummin as
       the underlying primitives)
-- [ ] rolling_sharpe / rolling_sortino / rolling_calmar
+- [x] rolling_sharpe / rolling_sortino / rolling_calmar
 
 ## Extended trend indicators
 

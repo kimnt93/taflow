@@ -74,6 +74,21 @@ pub fn drawdown(input: &[f64]) -> Vec<f64> {
     }).collect()
 }
 
+pub fn rolling_sharpe(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingSharpe::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_sortino(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingSortino::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_calmar(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingCalmar::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 /// Rolling median. Warm-up values are `NaN`; even windows average the two
 /// central values.
 pub fn rolling_median(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
@@ -592,6 +607,49 @@ impl Drawdown {
     pub fn reset(&mut self) { self.maximum.reset(); self.value = None; }
 }
 impl Default for Drawdown { fn default() -> Self { Self::new() } }
+
+macro_rules! rolling_risk_operator {
+    ($name:ident, $formula:expr) => {
+        #[derive(Debug, Clone)]
+        pub struct $name { values: VecDeque<f64>, timeperiod: usize, value: Option<f64> }
+        impl $name {
+            pub fn new(timeperiod: usize) -> TaResult<Self> { validate_period(timeperiod)?; Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None }) }
+            pub fn append(&mut self, input: f64) -> Option<f64> {
+                if self.values.len() == self.timeperiod { self.values.pop_front(); }
+                self.values.push_back(input);
+                self.value = if self.values.len() == self.timeperiod { Some($formula(&self.values)) } else { None };
+                self.value
+            }
+            pub fn value(&self) -> Option<f64> { self.value }
+            pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+        }
+    };
+}
+
+fn mean(values: &VecDeque<f64>) -> f64 { values.iter().sum::<f64>() / values.len() as f64 }
+
+rolling_risk_operator!(RollingSharpe, |values: &VecDeque<f64>| {
+    let average = mean(values);
+    let variance = values.iter().map(|&value| (value - average).powi(2)).sum::<f64>() / values.len() as f64;
+    if variance > 0.0 { average / variance.sqrt() } else { 0.0 }
+});
+
+rolling_risk_operator!(RollingSortino, |values: &VecDeque<f64>| {
+    let average = mean(values);
+    let downside = values.iter().map(|&value| value.min(0.0).powi(2)).sum::<f64>() / values.len() as f64;
+    if downside > 0.0 { average / downside.sqrt() } else { 0.0 }
+});
+
+rolling_risk_operator!(RollingCalmar, |values: &VecDeque<f64>| {
+    let average = mean(values);
+    let mut peak = values[0];
+    let mut drawdown: f64 = 0.0;
+    for &value in values {
+        peak = peak.max(value);
+        drawdown = drawdown.min(if peak != 0.0 { value / peak - 1.0 } else { 0.0 });
+    }
+    if drawdown < 0.0 { average / -drawdown } else { 0.0 }
+});
 
 #[cfg(test)]
 mod tests {
