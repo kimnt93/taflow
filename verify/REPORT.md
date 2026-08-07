@@ -3,7 +3,7 @@
 Date: 2026-08-07 | bars: 10,000 | warm-up split: 9,000 + 1,000 continue | tolerance rtol=1e-08, atol=1e-10
 Environment: python 3.12.3, numpy 2.5.1, TA-Lib 0.7.1, taflow 0.1.2
 
-Summary: MATCH: 168
+Summary: MATCH: 169
 
 Columns — *batch vs oracle*: full-series batch against the
 reference; *continue vs batch*: 9k `extend` + 1k `append` stitched
@@ -160,6 +160,7 @@ reference.
 | STOCHRSI | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
 | SUB | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
 | SUM | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
+| T3 | TA-Lib | MATCH | pass (err 5.7e-13, nan 0) | yes | pass (err 5.7e-13, nan 0) |
 | TAN | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
 | TANH | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
 | TEMA | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |

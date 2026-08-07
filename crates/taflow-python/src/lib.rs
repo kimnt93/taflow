@@ -314,6 +314,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(func_api::TRIMA, m)?)?;
     m.add_function(wrap_pyfunction!(func_api::KAMA, m)?)?;
     m.add_function(wrap_pyfunction!(func_api::TripleExponentialAverage, m)?)?;
+    m.add_function(wrap_pyfunction!(func_api::T3, m)?)?;
     m.add_function(wrap_pyfunction!(func_api::MAMA, m)?)?;
     m.add_function(wrap_pyfunction!(func_api::BBANDS, m)?)?;
     m.add_function(wrap_pyfunction!(func_api::SAR, m)?)?;

@@ -196,6 +196,18 @@ pub fn TripleExponentialAverage(
     Ok(to_py_array(py, result))
 }
 
+/// TA-Lib spelling for the same triple-exponential average kernel.
+#[pyfunction]
+#[pyo3(signature = (_input, timeperiod=5, vfactor=0.7))]
+pub fn T3(
+    py: Python<'_>,
+    _input: PyReadonlyArray1<f64>,
+    timeperiod: usize,
+    vfactor: f64,
+) -> PyResult<Py<PyArray1<f64>>> {
+    TripleExponentialAverage(py, _input, timeperiod, vfactor)
+}
+
 #[pyfunction]
 #[pyo3(signature = (_input, fastlimit=0.5, slowlimit=0.05))]
 /// Computes or updates `MAMA` through the native Rust kernel.

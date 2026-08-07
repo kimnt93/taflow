@@ -9,6 +9,21 @@ gate here passes.
 
 ---
 
+## 0. Generated public-interface inventory
+
+The complete, machine-generated checklist for every public Python export,
+Rust/native binding, TA-Lib registry entry, and pandas-ta reference is kept in
+[`verify/FUNCTION_CHECKLIST.md`](verify/FUNCTION_CHECKLIST.md). Regenerate it
+from the isolated verification project with:
+
+```bash
+cd verify && uv run python generate_checklist.py
+```
+
+The source-of-truth JSON inventory is [`verify/function_inventory.json`](verify/function_inventory.json).
+The installed TA-Lib registry is compared exactly by `verify/verify.py`.
+
+
 ## 1. Module contract
 
 Two public surfaces, ONE implementation:
