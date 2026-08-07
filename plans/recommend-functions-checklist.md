@@ -164,7 +164,7 @@ tier does not (see non-goals).
 
 | Done | Function | Reference | Implementation & speed note |
 |---|---|---|---|
-| [ ] | Kalman hedge ratio (online regression) | Theory: state (α,β), random-walk transition, obs `y=α+βx+v`; Impl: QuantStart "Dynamic Hedge Ratio Between ETF Pairs Using the Kalman Filter"; letianzj.github.io/kalman-filter-pairs-trading.html (pykalman `filter_update`) | Two input series → same-size outputs α, β, innovation, `√S` (fits contract like BETA/CORREL). O(1)/bar: hand-rolled 2-state filter (~a dozen FLOPs), no linalg dep. Oracle: pykalman. |
+| [x] | Kalman hedge ratio (online regression) | Theory: state (α,β), random-walk transition, obs `y=α+βx+v`; Impl: QuantStart "Dynamic Hedge Ratio Between ETF Pairs Using the Kalman Filter"; letianzj.github.io/kalman-filter-pairs-trading.html (pykalman `filter_update`) | Two input series → same-size outputs α, β, innovation, `√S` (fits contract like BETA/CORREL). O(1)/bar: hand-rolled 2-state filter (~a dozen FLOPs), no linalg dep. Oracle: pykalman. |
 | [x] | OU half-life | Theory: `−ln(2)/λ`, λ from regressing Δp on lagged p; Impl: robotwealth "Mean Reversion and Cointegration pt 2" | O(1): `RollingPairMoments(Δp, p_lag)` slope → closed form; λ≥0 → NaN. |
 | [x] | Rolling spread z-score | composition | `(spread − mean)/std` over rolling window given hedge ratio — pure composition. |
 | [x] | CUSUM event flags | Theory: *AFML* §2.5.2; Impl: mlfinlab `filters.cusum_filter` | Same-size 0/±1 flag series, O(1): two accumulators + reset. (Reclassified here from the ML family — as a flag series it fits the contract.) |

@@ -178,6 +178,7 @@ from .ou_half_life import OuHalfLife
 from .cusum import Cusum
 from .spread_zscore import SpreadZscore
 from .frac_diff import FracDiff
+from .kalman_hedge_ratio import KalmanHedgeRatio
 
 __all__ = [
     "talib",
@@ -345,5 +346,6 @@ __all__ = [
     "Adv", "Amihud", "RollSpread", "OuHalfLife", "Cusum",
     "SpreadZscore",
     "FracDiff",
+    "KalmanHedgeRatio",
     "__version__",
 ]

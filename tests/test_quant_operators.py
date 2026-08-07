@@ -1,7 +1,16 @@
 import numpy as np
 import pytest
 
-from taflow import Adv, Amihud, Cusum, FracDiff, OuHalfLife, RollSpread, SpreadZscore
+from taflow import (
+    Adv,
+    Amihud,
+    Cusum,
+    FracDiff,
+    KalmanHedgeRatio,
+    OuHalfLife,
+    RollSpread,
+    SpreadZscore,
+)
 
 
 def make_close_volume(n=500):
@@ -239,3 +248,65 @@ def test_frac_diff_append_matches_extend():
     for p in price:
         fd_append.append(p)
     assert np.allclose(fd_append.compute(), FracDiff().extend(price).compute(), equal_nan=True)
+
+
+def _reference_kalman(x, y, delta, obs_var):
+    alpha, beta = 0.0, 1.0
+    p = np.eye(2)
+    out = np.full(len(x), np.nan)
+    for i, (xi, yi) in enumerate(zip(x, y)):
+        p_pred = p + delta * np.eye(2)
+        h = np.array([1.0, xi])
+        pred = np.array([alpha, beta])
+        innovation = yi - h @ pred
+        s = h @ p_pred @ h + obs_var
+        gain = p_pred @ h / s
+        pred = pred + gain * innovation
+        alpha, beta = pred
+        p = (np.eye(2) - np.outer(gain, h)) @ p_pred
+        out[i] = beta
+    return out
+
+
+def test_kalman_hedge_ratio_matches_reference():
+    rng = np.random.default_rng(23)
+    x = 100.0 + np.cumsum(rng.normal(0.0, 0.3, 300))
+    y = 2.0 * x + 5.0 + rng.normal(0.0, 0.5, len(x))
+    delta, obs_var = 1e-4, 1e-3
+
+    result = KalmanHedgeRatio(delta=delta, observation_variance=obs_var).extend(x, y)
+    assert np.allclose(result.compute(), _reference_kalman(x, y, delta, obs_var), atol=1e-6)
+    assert np.isfinite(result.alpha)
+    assert np.isfinite(result.innovation)
+    assert result.std > 0
+    assert abs(result.value - result.compute()[-1]) < 1e-12
+
+
+def test_kalman_hedge_ratio_tracks_synthetic_beta():
+    x = np.arange(1, 201, dtype=float) / 10.0
+    y = 1.0 + 2.0 * x
+    beta = KalmanHedgeRatio(delta=1e-4, observation_variance=1e-3).extend(x, y).compute()
+    assert abs(beta[-1] - 2.0) < 0.1
+
+    append_beta = KalmanHedgeRatio()
+    for xi, yi in zip(x, y):
+        append_beta.append(xi, yi)
+    assert np.allclose(append_beta.compute(), KalmanHedgeRatio().extend(x, y).compute())
+
+
+def test_kalman_hedge_ratio_reset_and_bad_params():
+    rng = np.random.default_rng(29)
+    x = 100.0 + np.cumsum(rng.normal(0.0, 0.2, 100))
+    y = 1.5 * x + rng.normal(0.0, 0.2, len(x))
+
+    with pytest.raises(ValueError):
+        KalmanHedgeRatio(delta=-0.1)
+    with pytest.raises(ValueError):
+        KalmanHedgeRatio(observation_variance=0.0)
+    state = KalmanHedgeRatio()
+    with pytest.raises(ValueError):
+        state.extend(x[:-1], y)
+    state.reset()
+    assert len(state.compute()) == 0
+    state.extend(x, y)
+    assert len(state.compute()) == 100

@@ -2221,6 +2221,118 @@ pub fn frac_diff(input: &[f64], d: f64, threshold: f64) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+/// Online Kalman estimate of the hedge ratio `β` in `y = α + β·x + v`.
+///
+/// Two-state filter with random-walk transition (`Q = δ·I`) and observation
+/// noise `R` (QuantStart "Dynamic Hedge Ratio"; pykalman `filter_update`).
+/// The primary output is `β`; `α`, the innovation, and `√S` are also exposed.
+/// O(1) per bar — no linear-algebra dependency.
+#[derive(Debug, Clone)]
+pub struct KalmanHedgeRatio {
+    alpha: f64,
+    beta: f64,
+    p_aa: f64,
+    p_ab: f64,
+    p_bb: f64,
+    delta: f64,
+    observation_variance: f64,
+    value: Option<f64>,
+    alpha_value: Option<f64>,
+    innovation: Option<f64>,
+    std_value: Option<f64>,
+}
+
+impl KalmanHedgeRatio {
+    pub fn new(delta: f64, observation_variance: f64) -> TaResult<Self> {
+        if !(delta >= 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "delta",
+                value: delta.to_string(),
+                reason: "must be >= 0",
+            });
+        }
+        if !(observation_variance > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "observation_variance",
+                value: observation_variance.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        Ok(Self {
+            alpha: 0.0,
+            beta: 1.0,
+            p_aa: 1.0,
+            p_ab: 0.0,
+            p_bb: 1.0,
+            delta,
+            observation_variance,
+            value: None,
+            alpha_value: None,
+            innovation: None,
+            std_value: None,
+        })
+    }
+
+    pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
+        // Predict: θ stays, P += Q (Q = delta·I adds to the diagonal).
+        let p_aa = self.p_aa + self.delta;
+        let p_ab = self.p_ab;
+        let p_bb = self.p_bb + self.delta;
+
+        // Innovation and Kalman gain.
+        let innovation = y - (self.alpha + self.beta * x);
+        let s = p_aa + 2.0 * p_ab * x + p_bb * x * x + self.observation_variance;
+        let k1 = (p_aa + p_ab * x) / s;
+        let k2 = (p_ab + p_bb * x) / s;
+
+        // Update state.
+        self.alpha += k1 * innovation;
+        self.beta += k2 * innovation;
+
+        // Update covariance: P = (I - K·H)·P.
+        let p_aa_new = (1.0 - k1) * p_aa - k1 * x * p_ab;
+        let p_ab_new = (1.0 - k1) * p_ab - k1 * x * p_bb;
+        let p_bb_new = -k2 * p_ab + (1.0 - k2 * x) * p_bb;
+        self.p_aa = p_aa_new;
+        self.p_ab = p_ab_new;
+        self.p_bb = p_bb_new;
+
+        self.value = Some(self.beta);
+        self.alpha_value = Some(self.alpha);
+        self.innovation = Some(innovation);
+        self.std_value = Some(s.sqrt());
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn alpha(&self) -> Option<f64> { self.alpha_value }
+
+    pub fn innovation(&self) -> Option<f64> { self.innovation }
+
+    pub fn std(&self) -> Option<f64> { self.std_value }
+
+    pub fn reset(&mut self) {
+        self.alpha = 0.0;
+        self.beta = 1.0;
+        self.p_aa = 1.0;
+        self.p_ab = 0.0;
+        self.p_bb = 1.0;
+        self.value = None;
+        self.alpha_value = None;
+        self.innovation = None;
+        self.std_value = None;
+    }
+}
+
+pub fn kalman_hedge_ratio(x: &[f64], y: &[f64], delta: f64, observation_variance: f64) -> TaResult<Vec<f64>> {
+    if x.len() != y.len() {
+        return Err(TaError::LengthMismatch { expected: x.len(), got: y.len() });
+    }
+    let mut state = KalmanHedgeRatio::new(delta, observation_variance)?;
+    Ok(x.iter().zip(y).map(|(&x, &y)| state.append(x, y).unwrap_or(f64::NAN)).collect())
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
@@ -3276,6 +3388,44 @@ mod tests {
         assert!(FracDiff::new(0.0, 1e-5).is_err());
         assert!(FracDiff::new(0.5, 0.0).is_err());
         assert!(FracDiff::new(-1.0, 1e-5).is_err());
+    }
+
+    #[test]
+    fn kalman_hedge_ratio_tracks_synthetic_beta() {
+        let true_beta = 2.0;
+        let x: Vec<f64> = (0..200).map(|i| i as f64 / 10.0).collect();
+        let y: Vec<f64> = x.iter().map(|&x| 1.0 + true_beta * x).collect();
+
+        let delta = 1e-4;
+        let observation_variance = 1e-3;
+        let beta = kalman_hedge_ratio(&x, &y, delta, observation_variance).unwrap();
+        assert_eq!(beta.len(), x.len());
+        assert!((beta[0] - 1.0).abs() < 1e-9);
+        assert!((beta[beta.len() - 1] - true_beta).abs() < 0.1, "final beta {}", beta[beta.len() - 1]);
+
+        let mut state = KalmanHedgeRatio::new(delta, observation_variance).unwrap();
+        let replayed: Vec<f64> = x.iter().zip(&y).map(|(&x, &y)| state.append(x, y).unwrap_or(f64::NAN)).collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            beta.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+        assert!(state.alpha().unwrap().abs() < 2.0);
+        assert!(state.innovation().is_some());
+        assert!(state.std().unwrap() > 0.0);
+
+        state.reset();
+        assert!(state.append(1.0, 3.0).is_some());
+        assert!(state.value().unwrap() > 1.0);
+    }
+
+    #[test]
+    fn kalman_hedge_ratio_rejects_bad_params() {
+        assert!(KalmanHedgeRatio::new(-0.1, 1.0).is_err());
+        assert!(KalmanHedgeRatio::new(0.0, 0.0).is_err());
+        assert_eq!(
+            kalman_hedge_ratio(&[1.0, 2.0], &[1.0], 1e-4, 1e-3),
+            Err(TaError::LengthMismatch { expected: 2, got: 1 })
+        );
     }
 
     #[test]

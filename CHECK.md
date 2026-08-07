@@ -377,7 +377,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | ts_rank | ts_rank | _ |
 | [x] | signedpower | signedpower | _ |
 | [x] | adv | adv | _ |
-| [ ] | kalman_hedge_ratio | kalman_hedge_ratio | _ |
+| [x] | kalman_hedge_ratio | kalman_hedge_ratio | _ |
 | [x] | ou_half_life | ou_half_life | _ |
 | [x] | spread_zscore | spread_zscore | _ |
 | [x] | cusum | cusum | _ |
