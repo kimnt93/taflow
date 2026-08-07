@@ -129,11 +129,11 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | kaufman_adaptive_moving_average | kaufman_adaptive_moving_average | KAMA |
 | [x] | moving_average | moving_average | MA |
 | [x] | mesa_adaptive_moving_average | mesa_adaptive_moving_average | MAMA |
-| [x] | moving_average_variable_period | moving_average_variable_period | MAVP |
+| [x] | variable_period_moving_average | variable_period_moving_average | MAVP |
 | [x] | rolling_midpoint | rolling_midpoint | MIDPOINT |
 | [x] | rolling_midprice | rolling_midprice | MIDPRICE |
 | [x] | parabolic_sar | parabolic_sar | SAR |
-| [x] | extended_parabolic_sar | extended_parabolic_sar | SAREXT |
+| [x] | parabolic_sar_extended | parabolic_sar_extended | SAREXT |
 | [x] | simple_moving_average | simple_moving_average | SMA |
 | [x] | triple_exponential_average | triple_exponential_average | T3 |
 | [x] | triple_exponential_moving_average | triple_exponential_moving_average | TEMA |
@@ -232,7 +232,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | candle_haramicross | candle_haramicross | CDLHARAMICROSS |
 | [x] | candle_highwave | candle_highwave | CDLHIGHWAVE |
 | [x] | candle_hikkake | candle_hikkake | CDLHIKKAKE |
-| [x] | candle_hikkakemod | candle_hikkakemod | CDLHIKKAKEMOD |
+| [x] | candle_hikkake_modified | candle_hikkake_modified | CDLHIKKAKEMOD |
 | [x] | candle_homingpigeon | candle_homingpigeon | CDLHOMINGPIGEON |
 | [x] | candle_identical_three_crows | candle_identical_three_crows | CDLIDENTICAL3CROWS |
 | [x] | candle_inneck | candle_inneck | CDLINNECK |
