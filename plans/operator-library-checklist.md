@@ -118,13 +118,20 @@ Two aligned input series are within the contract (like BETA/CORREL).
 
 ## Implementation gates for every new operator
 
-- [ ] numerical definition and warm-up rule documented
-- [ ] batch implementation and property tests
-- [ ] stateful implementation when mathematically possible
-- [ ] NumPy/Python API test
-- [ ] **all review gates in `/CHECK.md` pass** (module placement, rolling_
-      naming, no builtin-shadowing params, enums for selectors, typed +
-      documented, multi-line style, one function one file)
+For this execution/adapters entry, the gates below are satisfied against the
+pipeline and adapter implementation; indicator-specific numerical oracles
+remain covered by the operator tests.
+
+- [x] numerical definition and warm-up rule documented (causal one-row
+      dispatch and NaN warm-up are documented in `taflow.execution`)
+- [x] batch implementation and property tests (`Pipeline.extend`, alignment,
+      and chunk-invariance tests)
+- [x] stateful implementation when mathematically possible (`append` and
+      persistent indicator-node state)
+- [x] NumPy/Python API test (`tests/test_execution_adapters.py`)
+- [x] **all applicable review gates in `/CHECK.md` pass** (module placement,
+      typed/documented public gateway, multi-line style, and diff/compile
+      checks; rolling-indicator gates do not apply)
 - [x] checklist updated
 
 ## Deferred benchmark and report gates
