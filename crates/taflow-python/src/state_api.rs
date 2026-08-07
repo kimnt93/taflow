@@ -17,6 +17,7 @@ use taflow::stream::{
     OpeningRange,
     SessionVolumeLevels,
     KlingerVolumeOscillator,
+    ParabolicMovingAverageStop,
 };
 use taflow::MaType;
 
@@ -211,6 +212,38 @@ pub struct StatefulKlingerVolumeOscillator {
     inner: KlingerVolumeOscillator,
     oscillator: Vec<f64>,
     signal: Vec<f64>,
+}
+
+/// Native state adapter for Parabolic Moving Average Stop.
+#[pyclass]
+pub struct StatefulParabolicMovingAverageStop {
+    inner: ParabolicMovingAverageStop,
+    stops: Vec<f64>,
+    trends: Vec<i32>,
+}
+
+#[pymethods]
+impl StatefulParabolicMovingAverageStop {
+    #[new]
+    #[pyo3(signature = (length=10, multiplier=3.0))]
+    fn new(length: usize, multiplier: f64) -> PyResult<Self> {
+        Ok(Self { inner: ParabolicMovingAverageStop::new(length, multiplier).map_err(py_value_error)?, stops: Vec::new(), trends: Vec::new() })
+    }
+    fn append(&mut self, high: f64, low: f64, close: f64) -> (f64, i32) {
+        let value = self.inner.append(high, low, close); self.stops.push(value.0); self.trends.push(value.1); value
+    }
+    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
+        if high.len() != low.len() || high.len() != close.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
+        for ((&high, &low), &close) in high.iter().zip(low).zip(close) { self.append(high, low, close); }
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<i32>>) {
+        (PyArray1::from_vec(py, self.stops.clone()), PyArray1::from_vec(py, self.trends.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(f64, i32)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.stops.clear(); self.trends.clear(); }
 }
 
 #[pymethods]

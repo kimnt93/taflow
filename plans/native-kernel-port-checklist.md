@@ -30,7 +30,9 @@ For each item:
 - [x] `SmoothedTrendChannel` (`ssl_channel`, previously `SSLChannel`) —
   acronym-free native Rust/Python interface verified with multi-output
   warm-up behavior.
-- [ ] `ParabolicMovingAverageStop` (`pmax`)
+- [x] `ParabolicMovingAverageStop` (`pmax`) — Rust EMA/rolling-range stop
+  kernel, native two-output adapter, and constructor-history runtime check
+  verified.
 - [ ] `TDSequential` (`td_sequential`)
 - [x] `HeikinAshi` (`heikin_ashi`) — Rust causal OHLC transform, native
   four-output adapter, and constructor-history runtime check verified.
