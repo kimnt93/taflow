@@ -116,7 +116,7 @@ pub fn KAMA(
 
 #[pyfunction]
 #[pyo3(signature = (input, timeperiod=5, vfactor=0.7))]
-pub fn T3(
+pub fn TripleExponentialAverage(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,

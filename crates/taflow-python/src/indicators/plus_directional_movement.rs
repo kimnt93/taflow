@@ -1,10 +1,10 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::PlusDm;
+use taflow::stream::PlusDirectionalMovement as NativePlusDirectionalMovement;
 #[pyclass]
 pub struct PlusDirectionalMovement {
-    inner: PlusDm,
+    inner: NativePlusDirectionalMovement,
     outputs: Vec<f64>,
 }
 #[pymethods]
@@ -13,7 +13,7 @@ impl PlusDirectionalMovement {
     #[pyo3(signature=(timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: PlusDm::new(timeperiod)
+            inner: NativePlusDirectionalMovement::new(timeperiod)
                 .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

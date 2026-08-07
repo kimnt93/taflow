@@ -9,20 +9,20 @@ use std::collections::HashMap;
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
-use super::moving_average::MovingAverage;
+use super::moving_average::MovingAverageDispatcher;
 
 /// Incremental MAVP with TA-Lib-compatible truncation and clamping.
-pub struct Mavp {
+pub struct MovingAverageVariablePeriod {
     minperiod: usize,
     maxperiod: usize,
     matype: MaType,
     lookback: usize,
     history: Vec<f64>,
-    states: HashMap<usize, MovingAverage>,
+    states: HashMap<usize, MovingAverageDispatcher>,
     value: Option<f64>,
 }
 
-impl Mavp {
+impl MovingAverageVariablePeriod {
     /// Creates a variable-period moving-average state.
     pub fn new(minperiod: usize, maxperiod: usize, matype: MaType) -> TaResult<Self> {
         if minperiod == 0 || maxperiod < minperiod {
@@ -59,7 +59,7 @@ impl Mavp {
         if !self.states.contains_key(&selected) {
             let source_start = self.lookback - self.matype.lookback(selected);
             if self.history.len() > source_start {
-                let mut state = MovingAverage::new(selected, self.matype)
+                let mut state = MovingAverageDispatcher::new(selected, self.matype)
                     .expect("MAVP constructor validates the complete period range");
                 selected_value = self.history[source_start..]
                     .iter()
@@ -107,7 +107,7 @@ mod tests {
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
             let expected = overlap::moving_average_variable_period(&input, &periods, 2, 12, ma_type).unwrap();
-            let mut state = Mavp::new(2, 12, ma_type).unwrap();
+            let mut state = MovingAverageVariablePeriod::new(2, 12, ma_type).unwrap();
             for index in 0..input.len() {
                 match state.append(input[index], periods[index]) {
                     Some(actual) => assert!((actual - expected[index]).abs() < 1e-8),

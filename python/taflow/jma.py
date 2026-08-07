@@ -20,8 +20,23 @@ class JurikMovingAverage:
         Phase parameter retained by the public reconstruction interface.
     """
 
-    def __init__(self, close: Any | None = None, length: int = 7,
-                 phase: float = 0):
+    def __init__(self, close: Any | None = None, length: int = 7, phase: float = 0):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        length : object
+            Input series, scalar parameter, or configuration value for this operation.
+        phase : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulJurikMovingAverage(length, phase)
         if close is not None:
             self.extend(close)

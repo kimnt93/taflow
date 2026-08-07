@@ -9,7 +9,7 @@ use super::MacdValue;
 
 /// Incremental MACDFIX with fixed 12/26 smoothing and configurable signal EMA.
 #[derive(Debug, Clone)]
-pub struct MacdFix {
+pub struct MovingAverageConvergenceDivergenceFixed {
     signal_period: usize,
     warmup: Vec<f64>,
     fast_ema: Option<f64>,
@@ -21,7 +21,7 @@ pub struct MacdFix {
     value: Option<MacdValue>,
 }
 
-impl MacdFix {
+impl MovingAverageConvergenceDivergenceFixed {
     const FAST_PERIOD: usize = 12;
     const SLOW_PERIOD: usize = 26;
     const FAST_K: f64 = 0.15;
@@ -125,7 +125,7 @@ mod tests {
             .map(|index| 100.0 + (index as f64 * 0.21).sin() * 12.0 + index as f64 * 0.01)
             .collect();
         let expected = momentum::moving_average_convergence_divergence_fixed(&input, 9).unwrap();
-        let mut state = MacdFix::new(9).unwrap();
+        let mut state = MovingAverageConvergenceDivergenceFixed::new(9).unwrap();
         for (index, input) in input.iter().copied().enumerate() {
             match state.append(input) {
                 Some(actual) => {

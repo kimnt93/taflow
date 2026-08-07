@@ -1,10 +1,10 @@
 //! Incremental Hilbert Transform sine wave (HT_SINE).
 
-use crate::stream::HtDcphase;
+use crate::stream::HilbertTransformDominantCyclePhase;
 
 const DEG2RAD: f64 = std::f64::consts::PI / 180.0;
 
-/// Sine and lead-sine values returned by [`HtSine`].
+/// Sine and lead-sine values returned by [`HilbertTransformSineWave`].
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HtSineValue {
     pub sine: f64,
@@ -12,20 +12,20 @@ pub struct HtSineValue {
 }
 
 /// Incremental HT_SINE state.
-pub struct HtSine {
-    phase: HtDcphase,
+pub struct HilbertTransformSineWave {
+    phase: HilbertTransformDominantCyclePhase,
     value: Option<HtSineValue>,
 }
 
-impl Default for HtSine {
+impl Default for HilbertTransformSineWave {
     fn default() -> Self {
         Self::new()
     }
 }
-impl HtSine {
+impl HilbertTransformSineWave {
     pub fn new() -> Self {
         Self {
-            phase: HtDcphase::new(),
+            phase: HilbertTransformDominantCyclePhase::new(),
             value: None,
         }
     }
@@ -55,7 +55,7 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
         let (sine, leadsine) = crate::cycle::hilbert_transform_sine_wave(&input).unwrap();
-        let mut state = HtSine::new();
+        let mut state = HilbertTransformSineWave::new();
         for ((&input, &sine), &leadsine) in input.iter().zip(&sine).zip(&leadsine) {
             match state.append(input) {
                 Some(value) => {

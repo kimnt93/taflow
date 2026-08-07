@@ -7,7 +7,7 @@ use crate::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 32;
 
-/// In-phase and quadrature components returned by [`HtPhasor`].
+/// In-phase and quadrature components returned by [`HilbertTransformPhasor`].
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HtPhasorValue {
     pub inphase: f64,
@@ -15,7 +15,7 @@ pub struct HtPhasorValue {
 }
 
 /// Incremental HT_PHASOR state.
-pub struct HtPhasor {
+pub struct HilbertTransformPhasor {
     index: usize,
     prices: VecDeque<f64>,
     wma_sub: f64,
@@ -38,13 +38,13 @@ pub struct HtPhasor {
     value: Option<HtPhasorValue>,
 }
 
-impl Default for HtPhasor {
+impl Default for HilbertTransformPhasor {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl HtPhasor {
+impl HilbertTransformPhasor {
     pub fn new() -> Self {
         Self {
             index: 0,
@@ -174,7 +174,7 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
         let (expected_i, expected_q) = crate::cycle::hilbert_transform_phasor(&input).unwrap();
-        let mut state = HtPhasor::new();
+        let mut state = HilbertTransformPhasor::new();
         for ((&input, &inphase), &quadrature) in input.iter().zip(&expected_i).zip(&expected_q) {
             match state.append(input) {
                 Some(value) => {

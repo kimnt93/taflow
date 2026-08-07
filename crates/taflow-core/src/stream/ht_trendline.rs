@@ -12,7 +12,7 @@ const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 63;
 
 /// Incremental HT_TRENDLINE state.
-pub struct HtTrendline {
+pub struct HilbertTransformTrendline {
     index: usize,
     prices: VecDeque<f64>,
     wma_prices: VecDeque<f64>,
@@ -40,13 +40,13 @@ pub struct HtTrendline {
     value: Option<f64>,
 }
 
-impl Default for HtTrendline {
+impl Default for HilbertTransformTrendline {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl HtTrendline {
+impl HilbertTransformTrendline {
     /// Creates an empty HT_TRENDLINE state.
     pub fn new() -> Self {
         Self {
@@ -243,7 +243,7 @@ mod tests {
             .map(|index| 100.0 + (index as f64 * 0.17).sin() * 8.0 + index as f64 * 0.01)
             .collect();
         let expected = overlap::hilbert_transform_trendline(&input).unwrap();
-        let mut state = HtTrendline::new();
+        let mut state = HilbertTransformTrendline::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {
                 Some(actual) => assert!((actual - expected).abs() < 1e-12),

@@ -9,7 +9,7 @@ use super::{invalid_period, StreamingIndicator};
 
 /// Incremental Chande Momentum Oscillator with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
-pub struct Cmo {
+pub struct ChandeMomentumOscillator {
     period: usize,
     previous_input: Option<f64>,
     changes: usize,
@@ -18,7 +18,7 @@ pub struct Cmo {
     value: Option<f64>,
 }
 
-impl Cmo {
+impl ChandeMomentumOscillator {
     /// Creates a CMO state with a period of at least two changes.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
@@ -44,7 +44,7 @@ impl Cmo {
     }
 }
 
-impl StreamingIndicator for Cmo {
+impl StreamingIndicator for ChandeMomentumOscillator {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

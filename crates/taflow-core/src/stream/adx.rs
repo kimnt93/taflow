@@ -8,7 +8,7 @@ use crate::error::TaResult;
 use super::directional::DirectionalMovement;
 
 /// Incremental ADX with TA-Lib-compatible seeding and lookback.
-pub struct Adx {
+pub struct AverageDirectionalIndex {
     period: usize,
     period_f: f64,
     directional: DirectionalMovement,
@@ -17,7 +17,7 @@ pub struct Adx {
     value: Option<f64>,
 }
 
-impl Adx {
+impl AverageDirectionalIndex {
     /// Creates an ADX state with a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
@@ -74,7 +74,7 @@ mod tests {
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
             let expected = momentum::average_directional_index(&high, &low, &close, period).unwrap();
-            let mut state = Adx::new(period).unwrap();
+            let mut state = AverageDirectionalIndex::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
                     Some(actual) => assert!((actual - expected[index]).abs() < 1e-12),
@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn flat_prices_return_zero_after_warmup() {
-        let mut state = Adx::new(14).unwrap();
+        let mut state = AverageDirectionalIndex::new(14).unwrap();
         let values: Vec<_> = (0..50).map(|_| state.append(10.0, 10.0, 10.0)).collect();
         assert_eq!(values[27], Some(0.0));
     }

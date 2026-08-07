@@ -7,7 +7,7 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, RollingMax, RollingMin, StreamingIndicator};
+use super::{moving_average::MovingAverageDispatcher, RollingMax, RollingMin, StreamingIndicator};
 
 /// One aligned slow %K and slow %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -17,15 +17,15 @@ pub struct StochValue {
 }
 
 /// Incremental STOCH with amortized constant work per bar.
-pub struct Stoch {
+pub struct StochasticOscillator {
     highest: RollingMax,
     lowest: RollingMin,
-    slowk: MovingAverage,
-    slowd: MovingAverage,
+    slowk: MovingAverageDispatcher,
+    slowd: MovingAverageDispatcher,
     value: Option<StochValue>,
 }
 
-impl Stoch {
+impl StochasticOscillator {
     /// Creates a STOCH state for the selected smoothing types.
     pub fn new(
         fastk_period: usize,
@@ -37,8 +37,8 @@ impl Stoch {
         Ok(Self {
             highest: RollingMax::new(fastk_period)?,
             lowest: RollingMin::new(fastk_period)?,
-            slowk: MovingAverage::new(slowk_period, slowk_matype)?,
-            slowd: MovingAverage::new(slowd_period, slowd_matype)?,
+            slowk: MovingAverageDispatcher::new(slowk_period, slowk_matype)?,
+            slowd: MovingAverageDispatcher::new(slowd_period, slowd_matype)?,
             value: None,
         })
     }
@@ -109,7 +109,7 @@ mod tests {
                 let expected =
                     momentum::stochastic_oscillator(&high, &low, &close, 5, 13, slowk_type, 11, slowd_type)
                         .unwrap();
-                let mut state = Stoch::new(5, 13, slowk_type, 11, slowd_type).unwrap();
+                let mut state = StochasticOscillator::new(5, 13, slowk_type, 11, slowd_type).unwrap();
                 for index in 0..close.len() {
                     match state.append(high[index], low[index], close[index]) {
                         Some(actual) => {

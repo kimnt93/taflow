@@ -6,14 +6,14 @@ use super::{StreamingIndicator, Window};
 
 /// Stateful simple moving average with O(1) updates.
 #[derive(Debug, Clone)]
-pub struct Sma {
+pub struct SimpleMovingAverage {
     period: usize,
     window: Window,
     sum: f64,
     value: Option<f64>,
 }
 
-impl Sma {
+impl SimpleMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period,
@@ -24,7 +24,7 @@ impl Sma {
     }
 }
 
-impl StreamingIndicator for Sma {
+impl StreamingIndicator for SimpleMovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

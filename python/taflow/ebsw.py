@@ -19,6 +19,20 @@ class EvenBetterSinewave:
     """
 
     def __init__(self, close: Any | None = None, length: int = 40):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        length : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulEvenBetterSinewave(length)
         if close is not None:
             self.extend(close)

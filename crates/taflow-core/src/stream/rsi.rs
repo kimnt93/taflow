@@ -9,7 +9,7 @@ use super::{invalid_period, StreamingIndicator};
 
 /// Incremental Wilder RSI with TA-Lib-compatible warm-up and rounding.
 #[derive(Debug, Clone)]
-pub struct Rsi {
+pub struct RelativeStrengthIndex {
     period: usize,
     previous_input: Option<f64>,
     changes: usize,
@@ -20,7 +20,7 @@ pub struct Rsi {
     value: Option<f64>,
 }
 
-impl Rsi {
+impl RelativeStrengthIndex {
     /// Creates an RSI state with a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
@@ -48,7 +48,7 @@ impl Rsi {
     }
 }
 
-impl StreamingIndicator for Rsi {
+impl StreamingIndicator for RelativeStrengthIndex {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

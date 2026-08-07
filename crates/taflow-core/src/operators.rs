@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::error::{TaError, TaResult};
-use crate::stream::{AverageTrueRange, Ema, RollingMidprice, Sma, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
+use crate::stream::{AverageTrueRange, ExponentialMovingAverage, RollingMidprice, SimpleMovingAverage, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
 
 fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
@@ -2702,13 +2702,13 @@ pub struct Squeeze {
     kc_scalar: f64,
     mom_length: usize,
     mom_smooth: usize,
-    bb_mid: Sma,
+    bb_mid: SimpleMovingAverage,
     bb_dev: RollingStandardDeviation,
-    kc_basis: Sma,
+    kc_basis: SimpleMovingAverage,
     tr_band: SqueezeTrBand,
     trange: TrueRange,
     close_window: Window,
-    mom_smooth_sma: Sma,
+    mom_smooth_sma: SimpleMovingAverage,
     value: Option<SqueezeValue>,
 }
 
@@ -2746,13 +2746,13 @@ impl Squeeze {
             kc_scalar,
             mom_length,
             mom_smooth,
-            bb_mid: Sma::new(bb_length)?,
+            bb_mid: SimpleMovingAverage::new(bb_length)?,
             bb_dev: RollingStandardDeviation::new(bb_length, 1.0)?,
-            kc_basis: Sma::new(kc_length)?,
+            kc_basis: SimpleMovingAverage::new(kc_length)?,
             tr_band: SqueezeTrBand::new(kc_length)?,
             trange: TrueRange::new(),
             close_window: Window::new(mom_length)?,
-            mom_smooth_sma: Sma::new(mom_smooth)?,
+            mom_smooth_sma: SimpleMovingAverage::new(mom_smooth)?,
             value: None,
         })
     }
@@ -2875,13 +2875,13 @@ pub struct SqueezePro {
     kc_scalar_narrow: f64,
     mom_length: usize,
     mom_smooth: usize,
-    bb_mid: Sma,
+    bb_mid: SimpleMovingAverage,
     bb_dev: RollingStandardDeviation,
-    kc_basis: Sma,
+    kc_basis: SimpleMovingAverage,
     tr_band: SqueezeTrBand,
     trange: TrueRange,
     close_window: Window,
-    mom_smooth_sma: Sma,
+    mom_smooth_sma: SimpleMovingAverage,
     value: Option<SqueezeProValue>,
 }
 
@@ -2934,13 +2934,13 @@ impl SqueezePro {
             kc_scalar_narrow,
             mom_length,
             mom_smooth,
-            bb_mid: Sma::new(bb_length)?,
+            bb_mid: SimpleMovingAverage::new(bb_length)?,
             bb_dev: RollingStandardDeviation::new(bb_length, 1.0)?,
-            kc_basis: Sma::new(kc_length)?,
+            kc_basis: SimpleMovingAverage::new(kc_length)?,
             tr_band: SqueezeTrBand::new(kc_length)?,
             trange: TrueRange::new(),
             close_window: Window::new(mom_length)?,
-            mom_smooth_sma: Sma::new(mom_smooth)?,
+            mom_smooth_sma: SimpleMovingAverage::new(mom_smooth)?,
             value: None,
         })
     }
@@ -3169,8 +3169,8 @@ pub struct SchaffTrendCycle {
     fast: usize,
     slow: usize,
     factor: f64,
-    fast_ema: Ema,
-    slow_ema: Ema,
+    fast_ema: ExponentialMovingAverage,
+    slow_ema: ExponentialMovingAverage,
     xmacd_low: RollingExtremum,
     xmacd_high: RollingExtremum,
     pf_low: RollingExtremum,
@@ -3200,8 +3200,8 @@ impl SchaffTrendCycle {
             fast,
             slow,
             factor,
-            fast_ema: Ema::new(fast)?,
-            slow_ema: Ema::new(slow)?,
+            fast_ema: ExponentialMovingAverage::new(fast)?,
+            slow_ema: ExponentialMovingAverage::new(slow)?,
             xmacd_low: RollingExtremum::new(tclength, true)?,
             xmacd_high: RollingExtremum::new(tclength, false)?,
             pf_low: RollingExtremum::new(tclength, true)?,
@@ -3478,14 +3478,14 @@ pub fn vortex(
 #[derive(Debug, Clone)]
 struct KstRocSma {
     close_window: Window,
-    sma: Sma,
+    sma: SimpleMovingAverage,
 }
 
 impl KstRocSma {
     fn new(roc_period: usize, sma_period: usize) -> TaResult<Self> {
         Ok(Self {
             close_window: Window::new(roc_period)?,
-            sma: Sma::new(sma_period)?,
+            sma: SimpleMovingAverage::new(sma_period)?,
         })
     }
 
@@ -4624,7 +4624,7 @@ pub fn mass_index(
 /// intentionally excluded because it shifts future values backward.
 #[derive(Debug, Clone)]
 pub struct DetrendedPriceOscillator {
-    sma: Sma,
+    sma: SimpleMovingAverage,
     delay: Window,
     value: Option<f64>,
 }
@@ -4632,7 +4632,7 @@ pub struct DetrendedPriceOscillator {
 impl DetrendedPriceOscillator {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
-        Ok(Self { sma: Sma::new(period)?, delay: Window::new(period / 2 + 1)?, value: None })
+        Ok(Self { sma: SimpleMovingAverage::new(period)?, delay: Window::new(period / 2 + 1)?, value: None })
     }
 
     pub fn append(&mut self, close: f64) -> Option<f64> {

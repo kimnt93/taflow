@@ -1,21 +1,21 @@
-//! Stateful Tillson T3 moving average.
+//! Stateful Tillson TripleExponentialAverage moving average.
 //!
-//! T3 cascades six TA-Lib-seeded exponential moving averages and combines the
+//! TripleExponentialAverage cascades six TA-Lib-seeded exponential moving averages and combines the
 //! final four layers with coefficients derived from the volume factor.
 
 use crate::error::{TaError, TaResult};
 
-use super::{Ema, StreamingIndicator};
+use super::{ExponentialMovingAverage, StreamingIndicator};
 
-/// Incremental T3 with constant work and storage per appended bar.
+/// Incremental TripleExponentialAverage with constant work and storage per appended bar.
 #[derive(Debug, Clone)]
-pub struct T3 {
-    ema1: Ema,
-    ema2: Ema,
-    ema3: Ema,
-    ema4: Ema,
-    ema5: Ema,
-    ema6: Ema,
+pub struct TripleExponentialAverage {
+    ema1: ExponentialMovingAverage,
+    ema2: ExponentialMovingAverage,
+    ema3: ExponentialMovingAverage,
+    ema4: ExponentialMovingAverage,
+    ema5: ExponentialMovingAverage,
+    ema6: ExponentialMovingAverage,
     c1: f64,
     c2: f64,
     c3: f64,
@@ -23,25 +23,25 @@ pub struct T3 {
     value: Option<f64>,
 }
 
-impl T3 {
-    /// Creates a T3 state with a period of at least two bars.
+impl TripleExponentialAverage {
+    /// Creates a TripleExponentialAverage state with a period of at least two bars.
     pub fn new(period: usize, v_factor: f64) -> TaResult<Self> {
         if period < 2 {
             return Err(TaError::InvalidParameter {
                 name: "timeperiod",
                 value: period.to_string(),
-                reason: "must be >= 2 for T3",
+                reason: "must be >= 2 for TripleExponentialAverage",
             });
         }
         let v2 = v_factor * v_factor;
         let v3 = v2 * v_factor;
         Ok(Self {
-            ema1: Ema::new(period)?,
-            ema2: Ema::new(period)?,
-            ema3: Ema::new(period)?,
-            ema4: Ema::new(period)?,
-            ema5: Ema::new(period)?,
-            ema6: Ema::new(period)?,
+            ema1: ExponentialMovingAverage::new(period)?,
+            ema2: ExponentialMovingAverage::new(period)?,
+            ema3: ExponentialMovingAverage::new(period)?,
+            ema4: ExponentialMovingAverage::new(period)?,
+            ema5: ExponentialMovingAverage::new(period)?,
+            ema6: ExponentialMovingAverage::new(period)?,
             c1: -v3,
             c2: 3.0 * v2 + 3.0 * v3,
             c3: -6.0 * v2 - 3.0 * v_factor - 3.0 * v3,
@@ -51,7 +51,7 @@ impl T3 {
     }
 }
 
-impl StreamingIndicator for T3 {
+impl StreamingIndicator for TripleExponentialAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -103,7 +103,7 @@ mod tests {
             .map(|index| 100.0 + (index as f64 * 0.23).sin() * 9.0 + index as f64 * 0.04)
             .collect();
         let expected = overlap::triple_exponential_average(&input, 7, 0.7).unwrap();
-        let mut state = T3::new(7, 0.7).unwrap();
+        let mut state = TripleExponentialAverage::new(7, 0.7).unwrap();
         for (&input, expected) in input.iter().zip(expected) {
             let actual = state.append(input);
             if expected.is_nan() {

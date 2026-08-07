@@ -19,6 +19,20 @@ class FibonacciRetracement:
     """
 
     def __init__(self, close: Any | None = None, window: int = 120):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        window : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulFibonacciRetracement(window)
         if close is not None:
             self.extend(close)

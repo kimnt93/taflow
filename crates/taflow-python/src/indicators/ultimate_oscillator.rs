@@ -4,11 +4,11 @@ use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Ultosc;
+use taflow::stream::UltimateOscillator as NativeUltimateOscillator;
 
 #[pyclass]
 pub struct UltimateOscillator {
-    inner: Ultosc,
+    inner: NativeUltimateOscillator,
     outputs: Vec<f64>,
 }
 #[pymethods]
@@ -17,7 +17,7 @@ impl UltimateOscillator {
     #[pyo3(signature = (timeperiod1=7, timeperiod2=14, timeperiod3=28))]
     fn new(timeperiod1: usize, timeperiod2: usize, timeperiod3: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Ultosc::new(timeperiod1, timeperiod2, timeperiod3)
+            inner: NativeUltimateOscillator::new(timeperiod1, timeperiod2, timeperiod3)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

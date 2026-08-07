@@ -22,7 +22,7 @@ pub struct MamaValue {
 }
 
 /// Incremental MAMA with the same warm-up and recurrence as TA-Lib.
-pub struct Mama {
+pub struct MesaAdaptiveMovingAverage {
     fast_limit: f64,
     slow_limit: f64,
     index: usize,
@@ -50,7 +50,7 @@ pub struct Mama {
     value: Option<MamaValue>,
 }
 
-impl Mama {
+impl MesaAdaptiveMovingAverage {
     /// Creates a MAMA state using limits in TA-Lib's accepted ranges.
     pub fn new(fast_limit: f64, slow_limit: f64) -> TaResult<Self> {
         if fast_limit <= 0.0 || fast_limit > 1.0 {
@@ -129,7 +129,7 @@ impl Mama {
     }
 }
 
-impl StreamingIndicator for Mama {
+impl StreamingIndicator for MesaAdaptiveMovingAverage {
     type Output = MamaValue;
 
     fn append(&mut self, input: f64) -> Option<MamaValue> {
@@ -266,7 +266,7 @@ mod tests {
             .map(|index| 100.0 + (index as f64 * 0.23).sin() * 9.0 + index as f64 * 0.04)
             .collect();
         let (expected_mama, expected_fama) = overlap::mesa_adaptive_moving_average(&input, 0.5, 0.05).unwrap();
-        let mut state = Mama::new(0.5, 0.05).unwrap();
+        let mut state = MesaAdaptiveMovingAverage::new(0.5, 0.05).unwrap();
         for ((&input, expected_mama), expected_fama) in input
             .iter()
             .zip(expected_mama.iter())

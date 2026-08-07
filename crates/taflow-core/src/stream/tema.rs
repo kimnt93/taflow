@@ -2,32 +2,32 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, Ema, StreamingIndicator};
+use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
 /// Stateful triple EMA composed from the shared EMA primitive.
 #[derive(Debug, Clone)]
-pub struct Tema {
-    ema1: Ema,
-    ema2: Ema,
-    ema3: Ema,
+pub struct TripleExponentialMovingAverage {
+    ema1: ExponentialMovingAverage,
+    ema2: ExponentialMovingAverage,
+    ema3: ExponentialMovingAverage,
     value: Option<f64>,
 }
 
-impl Tema {
+impl TripleExponentialMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
         }
         Ok(Self {
-            ema1: Ema::new(period)?,
-            ema2: Ema::new(period)?,
-            ema3: Ema::new(period)?,
+            ema1: ExponentialMovingAverage::new(period)?,
+            ema2: ExponentialMovingAverage::new(period)?,
+            ema3: ExponentialMovingAverage::new(period)?,
             value: None,
         })
     }
 }
 
-impl StreamingIndicator for Tema {
+impl StreamingIndicator for TripleExponentialMovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

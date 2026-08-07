@@ -4,15 +4,15 @@ use crate::error::{TaError, TaResult};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(i32)]
 pub enum MaType {
-    Sma = 0,
-    Ema = 1,
-    Wma = 2,
-    Dema = 3,
-    Tema = 4,
-    Trima = 5,
-    Kama = 6,
-    Mama = 7,
-    T3 = 8,
+    SimpleMovingAverage = 0,
+    ExponentialMovingAverage = 1,
+    WeightedMovingAverage = 2,
+    DoubleExponentialMovingAverage = 3,
+    TripleExponentialMovingAverage = 4,
+    TriangularMovingAverage = 5,
+    KaufmanAdaptiveMovingAverage = 6,
+    MesaAdaptiveMovingAverage = 7,
+    TripleExponentialAverage = 8,
 }
 
 impl TryFrom<i32> for MaType {
@@ -20,15 +20,15 @@ impl TryFrom<i32> for MaType {
 
     fn try_from(value: i32) -> TaResult<Self> {
         match value {
-            0 => Ok(MaType::Sma),
-            1 => Ok(MaType::Ema),
-            2 => Ok(MaType::Wma),
-            3 => Ok(MaType::Dema),
-            4 => Ok(MaType::Tema),
-            5 => Ok(MaType::Trima),
-            6 => Ok(MaType::Kama),
-            7 => Ok(MaType::Mama),
-            8 => Ok(MaType::T3),
+            0 => Ok(MaType::SimpleMovingAverage),
+            1 => Ok(MaType::ExponentialMovingAverage),
+            2 => Ok(MaType::WeightedMovingAverage),
+            3 => Ok(MaType::DoubleExponentialMovingAverage),
+            4 => Ok(MaType::TripleExponentialMovingAverage),
+            5 => Ok(MaType::TriangularMovingAverage),
+            6 => Ok(MaType::KaufmanAdaptiveMovingAverage),
+            7 => Ok(MaType::MesaAdaptiveMovingAverage),
+            8 => Ok(MaType::TripleExponentialAverage),
             _ => Err(TaError::InvalidParameter {
                 name: "matype",
                 value: value.to_string(),
@@ -45,18 +45,18 @@ impl MaType {
             return 0;
         }
         match self {
-            Self::Sma | Self::Ema | Self::Wma | Self::Trima => period.saturating_sub(1),
-            Self::Dema => 2 * period.saturating_sub(1),
-            Self::Tema => 3 * period.saturating_sub(1),
-            Self::Kama => {
+            Self::SimpleMovingAverage | Self::ExponentialMovingAverage | Self::WeightedMovingAverage | Self::TriangularMovingAverage => period.saturating_sub(1),
+            Self::DoubleExponentialMovingAverage => 2 * period.saturating_sub(1),
+            Self::TripleExponentialMovingAverage => 3 * period.saturating_sub(1),
+            Self::KaufmanAdaptiveMovingAverage => {
                 if period == 1 {
                     0
                 } else {
                     period
                 }
             }
-            Self::Mama => 32,
-            Self::T3 => 6 * period.saturating_sub(1),
+            Self::MesaAdaptiveMovingAverage => 32,
+            Self::TripleExponentialAverage => 6 * period.saturating_sub(1),
         }
     }
 }
@@ -68,21 +68,21 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
     }
     use crate::overlap;
     match ma_type {
-        MaType::Sma => overlap::simple_moving_average(input, period),
-        MaType::Ema => overlap::exponential_moving_average(input, period),
-        MaType::Wma => overlap::weighted_moving_average(input, period),
-        MaType::Dema => overlap::double_exponential_moving_average(input, period),
-        MaType::Tema => overlap::triple_exponential_moving_average(input, period),
-        MaType::Trima => overlap::triangular_moving_average(input, period),
-        MaType::Kama => overlap::kaufman_adaptive_moving_average(input, period),
-        // MAMA/T3 通过 MA 调度器调用时使用固定默认值，与 C TA-Lib ta_MA.c 完全一致:
+        MaType::SimpleMovingAverage => overlap::simple_moving_average(input, period),
+        MaType::ExponentialMovingAverage => overlap::exponential_moving_average(input, period),
+        MaType::WeightedMovingAverage => overlap::weighted_moving_average(input, period),
+        MaType::DoubleExponentialMovingAverage => overlap::double_exponential_moving_average(input, period),
+        MaType::TripleExponentialMovingAverage => overlap::triple_exponential_moving_average(input, period),
+        MaType::TriangularMovingAverage => overlap::triangular_moving_average(input, period),
+        MaType::KaufmanAdaptiveMovingAverage => overlap::kaufman_adaptive_moving_average(input, period),
+        // MAMA/TripleExponentialAverage 通过 MA 调度器调用时使用固定默认值，与 C TA-Lib ta_MA.c 完全一致:
         //   MAMA: fastlimit=0.5, slowlimit=0.05 (忽略 period)
-        //   T3:   vfactor=0.7 (period 正常传递)
-        MaType::Mama => {
+        //   TripleExponentialAverage:   vfactor=0.7 (period 正常传递)
+        MaType::MesaAdaptiveMovingAverage => {
             let (mama, _fama) = overlap::mesa_adaptive_moving_average(input, 0.5, 0.05)?;
             Ok(mama)
         }
-        MaType::T3 => overlap::triple_exponential_average(input, period, 0.7),
+        MaType::TripleExponentialAverage => overlap::triple_exponential_average(input, period, 0.7),
     }
 }
 

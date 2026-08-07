@@ -3,13 +3,13 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Mfi;
+use taflow::stream::MoneyFlowIndex as NativeMoneyFlowIndex;
 
 use crate::conversion::to_py_array;
 
 #[pyclass]
 pub struct MoneyFlowIndex {
-    inner: Mfi,
+    inner: NativeMoneyFlowIndex,
     outputs: Vec<f64>,
     timeperiod: usize,
 }
@@ -20,7 +20,7 @@ impl MoneyFlowIndex {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Mfi::new(timeperiod)
+            inner: NativeMoneyFlowIndex::new(timeperiod)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
             timeperiod,

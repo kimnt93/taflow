@@ -6,7 +6,7 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, RollingMax, RollingMin, StreamingIndicator};
+use super::{moving_average::MovingAverageDispatcher, RollingMax, RollingMin, StreamingIndicator};
 
 /// One aligned fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -16,20 +16,20 @@ pub struct StochfValue {
 }
 
 /// Incremental STOCHF with amortized constant work per bar.
-pub struct Stochf {
+pub struct FastStochasticOscillator {
     highest: RollingMax,
     lowest: RollingMin,
-    fastd: MovingAverage,
+    fastd: MovingAverageDispatcher,
     value: Option<StochfValue>,
 }
 
-impl Stochf {
+impl FastStochasticOscillator {
     /// Creates a STOCHF state for the selected fast %D moving-average type.
     pub fn new(fastk_period: usize, fastd_period: usize, fastd_matype: MaType) -> TaResult<Self> {
         Ok(Self {
             highest: RollingMax::new(fastk_period)?,
             lowest: RollingMin::new(fastk_period)?,
-            fastd: MovingAverage::new(fastd_period, fastd_matype)?,
+            fastd: MovingAverageDispatcher::new(fastd_period, fastd_matype)?,
             value: None,
         })
     }
@@ -91,7 +91,7 @@ mod tests {
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
             let expected = momentum::fast_stochastic_oscillator(&high, &low, &close, 5, 13, ma_type).unwrap();
-            let mut state = Stochf::new(5, 13, ma_type).unwrap();
+            let mut state = FastStochasticOscillator::new(5, 13, ma_type).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
                     Some(actual) => {

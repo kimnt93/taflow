@@ -15,22 +15,64 @@ class ExponentialMovingAverage:
 
     def __init__(
         self,
-        input: Any | None = None,
+        _input: Any | None = None,
         timeperiod: int = 30,
         *,
         column: str | None = None,
     ) -> None:
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        _input : object
+            Input series, scalar parameter, or configuration value for this operation.
+        timeperiod : object
+            Input series, scalar parameter, or configuration value for this operation.
+        column : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = _NativeExponentialMovingAverage(timeperiod)
-        if input is not None:
-            self.extend(input, column=column)
+        if _input is not None:
+            self.extend(_input, column=column)
 
     def append(self, value: float) -> "ExponentialMovingAverage":
+        """Append one observation or aligned bar to the native Rust state.
+
+        Parameters
+        ----------
+        value : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.append(float(value))
         return self
 
     def extend(
         self, values: Any, *, column: str | None = None
     ) -> "ExponentialMovingAverage":
+        """Append aligned input series to the native Rust state.
+
+        Parameters
+        ----------
+        values : object
+            Input series, scalar parameter, or configuration value for this operation.
+        column : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.extend(as_float64_series(values, column=column))
         return self
 
@@ -47,15 +89,35 @@ class ExponentialMovingAverage:
 
     @property
     def timeperiod(self) -> int:
+        """Execute the timeperiod operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.timeperiod
 
     def reset(self) -> "ExponentialMovingAverage":
+        """Execute the reset operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.reset()
         return self
 
     def __len__(self) -> int:
-        return len(self._state)
+        """Execute the __len__ operation through the native Rust implementation.
 
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
+        return len(self._state)
 
 
 __all__ = ["ExponentialMovingAverage"]

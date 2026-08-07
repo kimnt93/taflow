@@ -5,7 +5,7 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, Sma, StreamingIndicator};
+use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
 /// One aligned upper, middle, and lower Acceleration Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -17,23 +17,23 @@ pub struct AccbandsValue {
 
 /// Incremental Acceleration Bands with constant per-bar work.
 #[derive(Debug, Clone)]
-pub struct Accbands {
-    upper: Sma,
-    middle: Sma,
-    lower: Sma,
+pub struct AccelerationBands {
+    upper: SimpleMovingAverage,
+    middle: SimpleMovingAverage,
+    lower: SimpleMovingAverage,
     value: Option<AccbandsValue>,
 }
 
-impl Accbands {
+impl AccelerationBands {
     /// Creates an ACCBANDS state for a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
         }
         Ok(Self {
-            upper: Sma::new(period)?,
-            middle: Sma::new(period)?,
-            lower: Sma::new(period)?,
+            upper: SimpleMovingAverage::new(period)?,
+            middle: SimpleMovingAverage::new(period)?,
+            lower: SimpleMovingAverage::new(period)?,
             value: None,
         })
     }
@@ -94,7 +94,7 @@ mod tests {
             .map(|(index, close)| close - 1.0 - (index as f64 * 0.13).cos().abs())
             .collect();
         let (upper, middle, lower) = overlap::acceleration_bands(&high, &low, &close, 13).unwrap();
-        let mut state = Accbands::new(13).unwrap();
+        let mut state = AccelerationBands::new(13).unwrap();
         for index in 0..close.len() {
             match state.append(high[index], low[index], close[index]) {
                 Some(actual) => {

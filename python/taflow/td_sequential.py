@@ -17,6 +17,18 @@ class TomDeMarkSequential:
     """
 
     def __init__(self, close: Any | None = None):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulTomDeMarkSequential()
         if close is not None:
             self.extend(close)

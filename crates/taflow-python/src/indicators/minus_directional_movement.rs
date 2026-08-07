@@ -2,11 +2,11 @@ use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::MinusDm;
+use taflow::stream::MinusDirectionalMovement as NativeMinusDirectionalMovement;
 
 #[pyclass]
 pub struct MinusDirectionalMovement {
-    inner: MinusDm,
+    inner: NativeMinusDirectionalMovement,
     outputs: Vec<f64>,
 }
 
@@ -16,7 +16,7 @@ impl MinusDirectionalMovement {
     #[pyo3(signature=(timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: MinusDm::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: NativeMinusDirectionalMovement::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

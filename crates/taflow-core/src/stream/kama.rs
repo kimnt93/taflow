@@ -11,7 +11,7 @@ use super::{invalid_period, StreamingIndicator};
 
 /// Incremental KAMA with the same seed and recurrence as TA-Lib.
 #[derive(Debug, Clone)]
-pub struct Kama {
+pub struct KaufmanAdaptiveMovingAverage {
     period: usize,
     prices: VecDeque<f64>,
     changes: VecDeque<f64>,
@@ -20,7 +20,7 @@ pub struct Kama {
     value: Option<f64>,
 }
 
-impl Kama {
+impl KaufmanAdaptiveMovingAverage {
     /// Creates a KAMA state with a positive period.
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
@@ -37,7 +37,7 @@ impl Kama {
     }
 }
 
-impl StreamingIndicator for Kama {
+impl StreamingIndicator for KaufmanAdaptiveMovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

@@ -6,7 +6,7 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{Rsi, Stochf, StreamingIndicator};
+use super::{RelativeStrengthIndex, FastStochasticOscillator, StreamingIndicator};
 
 /// One aligned stochastic-RSI fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -16,13 +16,13 @@ pub struct StochrsiValue {
 }
 
 /// Incremental STOCHRSI state.
-pub struct Stochrsi {
-    rsi: Rsi,
-    stochastic: Stochf,
+pub struct StochasticRelativeStrengthIndex {
+    rsi: RelativeStrengthIndex,
+    stochastic: FastStochasticOscillator,
     value: Option<StochrsiValue>,
 }
 
-impl Stochrsi {
+impl StochasticRelativeStrengthIndex {
     /// Creates STOCHRSI with a selectable fast-%D moving-average type.
     pub fn new(
         timeperiod: usize,
@@ -31,8 +31,8 @@ impl Stochrsi {
         fastd_matype: MaType,
     ) -> TaResult<Self> {
         Ok(Self {
-            rsi: Rsi::new(timeperiod)?,
-            stochastic: Stochf::new(fastk_period, fastd_period, fastd_matype)?,
+            rsi: RelativeStrengthIndex::new(timeperiod)?,
+            stochastic: FastStochasticOscillator::new(fastk_period, fastd_period, fastd_matype)?,
             value: None,
         })
     }
@@ -76,7 +76,7 @@ mod tests {
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
             let expected = momentum::stochastic_relative_strength_index(&input, 14, 5, 13, ma_type).unwrap();
-            let mut state = Stochrsi::new(14, 5, 13, ma_type).unwrap();
+            let mut state = StochasticRelativeStrengthIndex::new(14, 5, 13, ma_type).unwrap();
             for (index, input) in input.iter().copied().enumerate() {
                 match state.append(input) {
                     Some(actual) => {

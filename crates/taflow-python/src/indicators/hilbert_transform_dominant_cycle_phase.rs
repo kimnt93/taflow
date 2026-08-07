@@ -1,11 +1,11 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::HtDcphase;
+use taflow::stream::HilbertTransformDominantCyclePhase as NativeHilbertTransformDominantCyclePhase;
 
 #[pyclass]
 pub struct HilbertTransformDominantCyclePhase {
-    inner: HtDcphase,
+    inner: NativeHilbertTransformDominantCyclePhase,
     outputs: Vec<f64>,
 }
 
@@ -14,7 +14,7 @@ impl HilbertTransformDominantCyclePhase {
     #[new]
     fn new() -> Self {
         Self {
-            inner: HtDcphase::new(),
+            inner: NativeHilbertTransformDominantCyclePhase::new(),
             outputs: Vec::new(),
         }
     }

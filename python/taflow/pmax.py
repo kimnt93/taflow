@@ -20,9 +20,34 @@ class ParabolicMovingAverageStop:
         Stop distance multiplier.
     """
 
-    def __init__(self, high: Any | None = None, low: Any | None = None,
-                 close: Any | None = None, length: int = 10,
-                 multiplier: float = 3.0):
+    def __init__(
+        self,
+        high: Any | None = None,
+        low: Any | None = None,
+        close: Any | None = None,
+        length: int = 10,
+        multiplier: float = 3.0,
+    ):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        length : object
+            Input series, scalar parameter, or configuration value for this operation.
+        multiplier : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulParabolicMovingAverageStop(length, multiplier)
         if close is not None:
             self.extend(high, low, close)
@@ -33,9 +58,11 @@ class ParabolicMovingAverageStop:
 
     def extend(self, high: Any, low: Any, close: Any):
         """Process aligned OHLC history and return this indicator."""
-        self._state.extend(np.asarray(high, dtype=np.float64),
-                           np.asarray(low, dtype=np.float64),
-                           np.asarray(close, dtype=np.float64))
+        self._state.extend(
+            np.asarray(high, dtype=np.float64),
+            np.asarray(low, dtype=np.float64),
+            np.asarray(close, dtype=np.float64),
+        )
         return self
 
     def compute(self):

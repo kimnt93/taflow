@@ -20,6 +20,36 @@ class ParabolicSarExtended:
         high: Any | None = None,
         low: Any | None = None,
     ):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        start_value : object
+            Input series, scalar parameter, or configuration value for this operation.
+        offset_on_reverse : object
+            Input series, scalar parameter, or configuration value for this operation.
+        acceleration_init_long : object
+            Input series, scalar parameter, or configuration value for this operation.
+        acceleration_long : object
+            Input series, scalar parameter, or configuration value for this operation.
+        acceleration_max_long : object
+            Input series, scalar parameter, or configuration value for this operation.
+        acceleration_init_short : object
+            Input series, scalar parameter, or configuration value for this operation.
+        acceleration_short : object
+            Input series, scalar parameter, or configuration value for this operation.
+        acceleration_max_short : object
+            Input series, scalar parameter, or configuration value for this operation.
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulSarext(
             start_value,
             offset_on_reverse,
@@ -34,14 +64,56 @@ class ParabolicSarExtended:
             self.extend(high, low)
 
     def append(self, high, low):
+        """Append one observation or aligned bar to the native Rust state.
+
+        Parameters
+        ----------
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.append(high, low)
 
     def extend(self, high, low):
+        """Append aligned input series to the native Rust state.
+
+        Parameters
+        ----------
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.extend(high, low)
 
     @property
     def value(self):
+        """Return the latest computed value, or None during warm-up.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.value
 
     def reset(self):
+        """Execute the reset operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.reset()

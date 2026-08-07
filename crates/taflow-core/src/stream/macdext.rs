@@ -7,20 +7,20 @@
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, MacdValue};
+use super::{moving_average::MovingAverageDispatcher, MacdValue};
 
 /// Incremental MACDEXT with aligned fast/slow seeds.
-pub struct MacdExt {
-    fast: MovingAverage,
-    slow: MovingAverage,
-    signal: MovingAverage,
+pub struct MovingAverageConvergenceDivergenceExtended {
+    fast: MovingAverageDispatcher,
+    slow: MovingAverageDispatcher,
+    signal: MovingAverageDispatcher,
     fast_start: usize,
     slow_start: usize,
     index: usize,
     value: Option<MacdValue>,
 }
 
-impl MacdExt {
+impl MovingAverageConvergenceDivergenceExtended {
     /// Creates a MACDEXT state with independently selected MA types.
     pub fn new(
         fastperiod: usize,
@@ -46,9 +46,9 @@ impl MacdExt {
         let slow_lookback = slowmatype.lookback(slowperiod);
         let largest_lookback = fast_lookback.max(slow_lookback);
         Ok(Self {
-            fast: MovingAverage::new(fastperiod, fastmatype)?,
-            slow: MovingAverage::new(slowperiod, slowmatype)?,
-            signal: MovingAverage::new(signalperiod, signalmatype)?,
+            fast: MovingAverageDispatcher::new(fastperiod, fastmatype)?,
+            slow: MovingAverageDispatcher::new(slowperiod, slowmatype)?,
+            signal: MovingAverageDispatcher::new(signalperiod, signalmatype)?,
             fast_start: largest_lookback - fast_lookback,
             slow_start: largest_lookback - slow_lookback,
             index: 0,
@@ -116,7 +116,7 @@ mod tests {
                         momentum::moving_average_convergence_divergence_extended(&input, 7, fast_type, 13, slow_type, 5, signal_type)
                             .unwrap();
                     let mut state =
-                        MacdExt::new(7, fast_type, 13, slow_type, 5, signal_type).unwrap();
+                        MovingAverageConvergenceDivergenceExtended::new(7, fast_type, 13, slow_type, 5, signal_type).unwrap();
                     for (index, input) in input.iter().copied().enumerate() {
                         match state.append(input) {
                             Some(actual) => {

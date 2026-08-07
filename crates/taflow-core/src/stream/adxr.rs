@@ -4,22 +4,22 @@ use std::collections::VecDeque;
 
 use crate::error::TaResult;
 
-use super::Adx;
+use super::AverageDirectionalIndex;
 
 /// Incremental ADXR using the current and `period - 1` lagged ADX values.
-pub struct Adxr {
+pub struct AverageDirectionalIndexRating {
     period: usize,
-    adx: Adx,
+    adx: AverageDirectionalIndex,
     values: VecDeque<f64>,
     value: Option<f64>,
 }
 
-impl Adxr {
+impl AverageDirectionalIndexRating {
     /// Creates an ADXR state with a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period,
-            adx: Adx::new(period)?,
+            adx: AverageDirectionalIndex::new(period)?,
             values: VecDeque::with_capacity(period),
             value: None,
         })
@@ -65,7 +65,7 @@ mod tests {
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
             let expected = momentum::average_directional_index_rating(&high, &low, &close, period).unwrap();
-            let mut state = Adxr::new(period).unwrap();
+            let mut state = AverageDirectionalIndexRating::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
                     Some(actual) => assert!((actual - expected[index]).abs() < 1e-12),

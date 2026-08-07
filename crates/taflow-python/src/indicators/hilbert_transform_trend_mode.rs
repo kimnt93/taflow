@@ -1,10 +1,10 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::HtTrendmode;
+use taflow::stream::HilbertTransformTrendMode as NativeHilbertTransformTrendMode;
 
 #[pyclass]
 pub struct HilbertTransformTrendMode {
-    inner: HtTrendmode,
+    inner: NativeHilbertTransformTrendMode,
     outputs: Vec<i32>,
 }
 #[pymethods]
@@ -12,7 +12,7 @@ impl HilbertTransformTrendMode {
     #[new]
     fn new() -> Self {
         Self {
-            inner: HtTrendmode::new(),
+            inner: NativeHilbertTransformTrendMode::new(),
             outputs: Vec::new(),
         }
     }

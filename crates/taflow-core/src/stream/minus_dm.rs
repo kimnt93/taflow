@@ -1,13 +1,13 @@
 //! Incremental Minus Directional Movement (-DM).
 use crate::error::{TaError, TaResult};
-pub struct MinusDm {
+pub struct MinusDirectionalMovement {
     p: f64,
     n: usize,
     prev: Option<(f64, f64)>,
     sum: f64,
     v: Option<f64>,
 }
-impl MinusDm {
+impl MinusDirectionalMovement {
     pub fn new(p: usize) -> TaResult<Self> {
         if p == 0 {
             return Err(TaError::InvalidParameter {
@@ -70,7 +70,7 @@ mod tests {
         let high: Vec<f64> = (0..40).map(|i| 100.0 + i as f64 * 0.1).collect();
         let low: Vec<f64> = (0..40).map(|i| 98.0 - i as f64 * 0.3).collect();
         let expected = crate::momentum::minus_directional_movement(&high, &low, 14).unwrap();
-        let mut state = MinusDm::new(14).unwrap();
+        let mut state = MinusDirectionalMovement::new(14).unwrap();
 
         for ((&high, &low), expected) in high.iter().zip(&low).zip(&expected) {
             match state.append(high, low) {

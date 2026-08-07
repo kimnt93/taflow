@@ -2,10 +2,10 @@ use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::MinusDi;
+use taflow::stream::MinusDirectionalIndicator as NativeMinusDirectionalIndicator;
 #[pyclass]
 pub struct MinusDirectionalIndicator {
-    inner: MinusDi,
+    inner: NativeMinusDirectionalIndicator,
     outputs: Vec<f64>,
 }
 #[pymethods]
@@ -14,7 +14,7 @@ impl MinusDirectionalIndicator {
     #[pyo3(signature=(timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: MinusDi::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: NativeMinusDirectionalIndicator::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

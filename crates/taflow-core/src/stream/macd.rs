@@ -15,7 +15,7 @@ pub struct MacdValue {
 
 /// Stateful MACD matching the batch function's aligned EMA seeds.
 #[derive(Debug, Clone)]
-pub struct Macd {
+pub struct MovingAverageConvergenceDivergence {
     fast_period: usize,
     slow_period: usize,
     signal_period: usize,
@@ -31,7 +31,7 @@ pub struct Macd {
     value: Option<MacdValue>,
 }
 
-impl Macd {
+impl MovingAverageConvergenceDivergence {
     /// Creates a MACD state with TA-Lib-compatible periods.
     pub fn new(fast_period: usize, slow_period: usize, signal_period: usize) -> TaResult<Self> {
         if fast_period < 2 || slow_period < 2 || signal_period == 0 {
@@ -139,7 +139,7 @@ mod tests {
             .map(|index| 100.0 + (index as f64 * 0.21).sin() * 12.0 + index as f64 * 0.01)
             .collect();
         let expected = momentum::moving_average_convergence_divergence(&input, 12, 26, 9).unwrap();
-        let mut state = Macd::new(12, 26, 9).unwrap();
+        let mut state = MovingAverageConvergenceDivergence::new(12, 26, 9).unwrap();
         for (index, input) in input.iter().copied().enumerate() {
             match state.append(input) {
                 Some(actual) => {

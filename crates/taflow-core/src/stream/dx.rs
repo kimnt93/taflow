@@ -5,12 +5,12 @@ use crate::error::TaResult;
 use super::directional::DirectionalMovement;
 
 /// Incremental DX with TA-Lib-compatible Wilder smoothing and lookback.
-pub struct Dx {
+pub struct DirectionalMovementIndex {
     directional: DirectionalMovement,
     value: Option<f64>,
 }
 
-impl Dx {
+impl DirectionalMovementIndex {
     /// Creates a DX state with a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
@@ -54,7 +54,7 @@ mod tests {
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
             let expected = momentum::directional_movement_index(&high, &low, &close, period).unwrap();
-            let mut state = Dx::new(period).unwrap();
+            let mut state = DirectionalMovementIndex::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
                     Some(actual) => assert!((actual - expected[index]).abs() < 1e-12),

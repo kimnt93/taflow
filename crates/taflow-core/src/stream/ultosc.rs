@@ -49,14 +49,14 @@ impl FlowWindow {
 
 /// Persistent Ultimate Oscillator with constant work per appended HLC bar.
 #[derive(Debug, Clone)]
-pub struct Ultosc {
+pub struct UltimateOscillator {
     previous_close: Option<f64>,
     first: FlowWindow,
     second: FlowWindow,
     third: FlowWindow,
     value: Option<f64>,
 }
-impl Ultosc {
+impl UltimateOscillator {
     pub fn new(timeperiod1: usize, timeperiod2: usize, timeperiod3: usize) -> TaResult<Self> {
         if timeperiod1 == 0 || timeperiod2 == 0 || timeperiod3 == 0 {
             return Err(TaError::InvalidParameter {

@@ -42,7 +42,7 @@ pub fn moving_average_convergence_divergence_extended(
         (slowperiod, slowmatype, fastperiod, fastmatype)
     };
 
-    if fastmatype == MaType::Ema && slowmatype == MaType::Ema && signalmatype == MaType::Ema {
+    if fastmatype == MaType::ExponentialMovingAverage && slowmatype == MaType::ExponentialMovingAverage && signalmatype == MaType::ExponentialMovingAverage {
         return super::macd::moving_average_convergence_divergence(input, fastperiod, slowperiod, signalperiod);
     }
 

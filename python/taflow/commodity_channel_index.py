@@ -24,6 +24,30 @@ class CommodityChannelIndex:
         low_column: str = "low",
         close_column: str = "close",
     ) -> None:
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        timeperiod : object
+            Input series, scalar parameter, or configuration value for this operation.
+        high_column : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low_column : object
+            Input series, scalar parameter, or configuration value for this operation.
+        close_column : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = _NativeCommodityChannelIndex(timeperiod)
         if high is not None or low is not None or close is not None:
             self.extend(
@@ -36,6 +60,22 @@ class CommodityChannelIndex:
             )
 
     def append(self, high: float, low: float, close: float) -> "CommodityChannelIndex":
+        """Append one observation or aligned bar to the native Rust state.
+
+        Parameters
+        ----------
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.append(float(high), float(low), float(close))
         return self
 
@@ -49,6 +89,28 @@ class CommodityChannelIndex:
         low_column: str = "low",
         close_column: str = "close",
     ) -> "CommodityChannelIndex":
+        """Append aligned input series to the native Rust state.
+
+        Parameters
+        ----------
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        high_column : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low_column : object
+            Input series, scalar parameter, or configuration value for this operation.
+        close_column : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         if low is None and close is None and hasattr(high, "columns"):
             frame = high
             high = as_float64_series(frame, column=high_column)
@@ -71,19 +133,46 @@ class CommodityChannelIndex:
 
     @property
     def value(self) -> float | None:
+        """Return the latest computed value, or None during warm-up.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.value
 
     @property
     def timeperiod(self) -> int:
+        """Execute the timeperiod operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.timeperiod
 
     def reset(self) -> "CommodityChannelIndex":
+        """Execute the reset operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.reset()
         return self
 
     def __len__(self) -> int:
-        return len(self._state)
+        """Execute the __len__ operation through the native Rust implementation.
 
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
+        return len(self._state)
 
 
 __all__ = ["CommodityChannelIndex"]

@@ -4,11 +4,11 @@ use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{StreamingIndicator, Trix};
+use taflow::stream::{StreamingIndicator, TripleExponentialRateOfChange as NativeTripleExponentialRateOfChange};
 
 #[pyclass]
 pub struct TripleExponentialRateOfChange {
-    inner: Trix,
+    inner: NativeTripleExponentialRateOfChange,
     outputs: Vec<f64>,
     timeperiod: usize,
 }
@@ -19,7 +19,7 @@ impl TripleExponentialRateOfChange {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Trix::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: NativeTripleExponentialRateOfChange::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
             timeperiod,
         })

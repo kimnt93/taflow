@@ -8,7 +8,7 @@ const FULL_CIRCLE: f64 = 2.0 * std::f64::consts::PI;
 const LOOKBACK: usize = 63;
 
 /// Incremental HT_DCPHASE state.
-pub struct HtDcphase {
+pub struct HilbertTransformDominantCyclePhase {
     index: usize,
     prices: VecDeque<f64>,
     wma_sub: f64,
@@ -35,12 +35,12 @@ pub struct HtDcphase {
     value: Option<f64>,
 }
 
-impl Default for HtDcphase {
+impl Default for HilbertTransformDominantCyclePhase {
     fn default() -> Self {
         Self::new()
     }
 }
-impl HtDcphase {
+impl HilbertTransformDominantCyclePhase {
     pub fn new() -> Self {
         Self {
             index: 0,
@@ -205,7 +205,7 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
         let expected = crate::cycle::hilbert_transform_dominant_cycle_phase(&input).unwrap();
-        let mut state = HtDcphase::new();
+        let mut state = HilbertTransformDominantCyclePhase::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {
                 Some(value) => assert!((value - expected).abs() < 1e-12),

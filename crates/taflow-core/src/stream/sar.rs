@@ -5,7 +5,7 @@
 
 /// Incremental Parabolic SAR with a one-bar lookback.
 #[derive(Debug, Clone)]
-pub struct Sar {
+pub struct ParabolicSar {
     acceleration: f64,
     maximum: f64,
     first_bar: Option<(f64, f64)>,
@@ -19,7 +19,7 @@ pub struct Sar {
     value: Option<f64>,
 }
 
-impl Sar {
+impl ParabolicSar {
     /// Creates a SAR state with the supplied acceleration step and maximum.
     pub fn new(acceleration: f64, maximum: f64) -> Self {
         Self {
@@ -118,7 +118,7 @@ impl Sar {
     }
 }
 
-impl Default for Sar {
+impl Default for ParabolicSar {
     fn default() -> Self {
         Self::new(0.02, 0.2)
     }
@@ -137,7 +137,7 @@ mod tests {
         let high: Vec<f64> = center.iter().map(|value| value + 1.5).collect();
         let low: Vec<f64> = center.iter().map(|value| value - 1.2).collect();
         let expected = overlap::parabolic_sar(&high, &low, 0.02, 0.2).unwrap();
-        let mut state = Sar::new(0.02, 0.2);
+        let mut state = ParabolicSar::new(0.02, 0.2);
         for index in 0..center.len() {
             let actual = state.append(high[index], low[index]);
             if expected[index].is_nan() {

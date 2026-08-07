@@ -18,9 +18,40 @@ class KlingerVolumeOscillator:
         EMA periods for force, baseline, and signal smoothing.
     """
 
-    def __init__(self, high: Any | None = None, low: Any | None = None,
-                 close: Any | None = None, volume: Any | None = None,
-                 fast: int = 34, slow: int = 55, signal: int = 13):
+    def __init__(
+        self,
+        high: Any | None = None,
+        low: Any | None = None,
+        close: Any | None = None,
+        volume: Any | None = None,
+        fast: int = 34,
+        slow: int = 55,
+        signal: int = 13,
+    ):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        high : object
+            Input series, scalar parameter, or configuration value for this operation.
+        low : object
+            Input series, scalar parameter, or configuration value for this operation.
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        volume : object
+            Input series, scalar parameter, or configuration value for this operation.
+        fast : object
+            Input series, scalar parameter, or configuration value for this operation.
+        slow : object
+            Input series, scalar parameter, or configuration value for this operation.
+        signal : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulKlingerVolumeOscillator(fast, slow, signal)
         if close is not None:
             self.extend(high, low, close, volume)
@@ -31,10 +62,12 @@ class KlingerVolumeOscillator:
 
     def extend(self, high: Any, low: Any, close: Any, volume: Any):
         """Process aligned OHLCV history and return this indicator."""
-        self._state.extend(np.asarray(high, dtype=np.float64),
-                           np.asarray(low, dtype=np.float64),
-                           np.asarray(close, dtype=np.float64),
-                           np.asarray(volume, dtype=np.float64))
+        self._state.extend(
+            np.asarray(high, dtype=np.float64),
+            np.asarray(low, dtype=np.float64),
+            np.asarray(close, dtype=np.float64),
+            np.asarray(volume, dtype=np.float64),
+        )
         return self
 
     def compute(self):

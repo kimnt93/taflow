@@ -6,7 +6,7 @@ use super::{StreamingIndicator, Window};
 
 /// Stateful weighted moving average with O(1) updates.
 #[derive(Debug, Clone)]
-pub struct Wma {
+pub struct WeightedMovingAverage {
     period: usize,
     divider: f64,
     window: Window,
@@ -15,7 +15,7 @@ pub struct Wma {
     value: Option<f64>,
 }
 
-impl Wma {
+impl WeightedMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         let window = Window::new(period)?;
         let period_f = period as f64;
@@ -30,7 +30,7 @@ impl Wma {
     }
 }
 
-impl StreamingIndicator for Wma {
+impl StreamingIndicator for WeightedMovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

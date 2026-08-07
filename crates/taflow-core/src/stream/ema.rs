@@ -2,25 +2,25 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, Sma, StreamingIndicator};
+use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
 /// Stateful EMA with the same SMA seed as TA-Lib's batch EMA.
 #[derive(Debug, Clone)]
-pub struct Ema {
-    seed: Sma,
+pub struct ExponentialMovingAverage {
+    seed: SimpleMovingAverage,
     k: f64,
     period: usize,
     samples: usize,
     value: Option<f64>,
 }
 
-impl Ema {
+impl ExponentialMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(invalid_period("timeperiod", period, 1));
         }
         Ok(Self {
-            seed: Sma::new(period)?,
+            seed: SimpleMovingAverage::new(period)?,
             k: 2.0 / (period as f64 + 1.0),
             period,
             samples: 0,
@@ -55,7 +55,7 @@ impl Ema {
     }
 }
 
-impl StreamingIndicator for Ema {
+impl StreamingIndicator for ExponentialMovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

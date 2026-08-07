@@ -6,7 +6,7 @@ use super::{invalid_period, Window};
 
 /// Persistent Money Flow Index with O(1) updates after each HLCV bar.
 #[derive(Debug, Clone)]
-pub struct Mfi {
+pub struct MoneyFlowIndex {
     previous_typical_price: Option<f64>,
     positive_flow: Window,
     negative_flow: Window,
@@ -15,7 +15,7 @@ pub struct Mfi {
     value: Option<f64>,
 }
 
-impl Mfi {
+impl MoneyFlowIndex {
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -114,7 +114,7 @@ mod tests {
         let volume: Vec<f64> = (0..96).map(|index| 1_000.0 + index as f64 * 17.0).collect();
         let expected = crate::momentum::money_flow_index(&high, &low, &close, &volume, 14).unwrap();
 
-        let mut state = Mfi::new(14).unwrap();
+        let mut state = MoneyFlowIndex::new(14).unwrap();
         let mut actual = state
             .extend_slice(&high[..41], &low[..41], &close[..41], &volume[..41])
             .unwrap();

@@ -3,14 +3,14 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Cci;
+use taflow::stream::CommodityChannelIndex as NativeCommodityChannelIndex;
 
 use crate::conversion::to_py_array;
 
 /// Persistent CCI with aligned HLC bulk input and scalar continuation.
 #[pyclass]
 pub struct CommodityChannelIndex {
-    inner: Cci,
+    inner: NativeCommodityChannelIndex,
     outputs: Vec<f64>,
     timeperiod: usize,
 }
@@ -21,7 +21,7 @@ impl CommodityChannelIndex {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Cci::new(timeperiod)
+            inner: NativeCommodityChannelIndex::new(timeperiod)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
             timeperiod,

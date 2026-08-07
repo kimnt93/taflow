@@ -1,11 +1,11 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::HtDcperiod;
+use taflow::stream::HilbertTransformDominantCyclePeriod as NativeHilbertTransformDominantCyclePeriod;
 
 #[pyclass]
 pub struct HilbertTransformDominantCyclePeriod {
-    inner: HtDcperiod,
+    inner: NativeHilbertTransformDominantCyclePeriod,
     outputs: Vec<f64>,
 }
 
@@ -14,7 +14,7 @@ impl HilbertTransformDominantCyclePeriod {
     #[new]
     fn new() -> Self {
         Self {
-            inner: HtDcperiod::new(),
+            inner: NativeHilbertTransformDominantCyclePeriod::new(),
             outputs: Vec::new(),
         }
     }

@@ -2,17 +2,17 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, Sma, StreamingIndicator};
+use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
 /// Stateful triangular moving average as two cascaded SMA windows.
 #[derive(Debug, Clone)]
-pub struct Trima {
-    sma1: Sma,
-    sma2: Sma,
+pub struct TriangularMovingAverage {
+    sma1: SimpleMovingAverage,
+    sma2: SimpleMovingAverage,
     value: Option<f64>,
 }
 
-impl Trima {
+impl TriangularMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(invalid_period("timeperiod", period, 1));
@@ -24,14 +24,14 @@ impl Trima {
             (period / 2 + 1, period / 2)
         };
         Ok(Self {
-            sma1: Sma::new(p1)?,
-            sma2: Sma::new(p2)?,
+            sma1: SimpleMovingAverage::new(p1)?,
+            sma2: SimpleMovingAverage::new(p2)?,
             value: None,
         })
     }
 }
 
-impl StreamingIndicator for Trima {
+impl StreamingIndicator for TriangularMovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

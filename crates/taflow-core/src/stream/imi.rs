@@ -9,7 +9,7 @@ use super::{invalid_period, Window};
 
 /// Incremental Intraday Momentum Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
-pub struct Imi {
+pub struct IntradayMomentumIndex {
     gains: Window,
     losses: Window,
     gain_sum: f64,
@@ -17,7 +17,7 @@ pub struct Imi {
     value: Option<f64>,
 }
 
-impl Imi {
+impl IntradayMomentumIndex {
     /// Creates an IMI state with a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
@@ -90,7 +90,7 @@ mod tests {
             .map(|(index, open)| open + (index as f64 * 0.31).cos() * 1.7)
             .collect();
         let expected = momentum::intraday_momentum_index(&open, &close, 14).unwrap();
-        let mut state = Imi::new(14).unwrap();
+        let mut state = IntradayMomentumIndex::new(14).unwrap();
         for index in 0..open.len() {
             match state.append(open[index], close[index]) {
                 Some(actual) => assert!((actual - expected[index]).abs() < 1e-10),
@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     fn flat_candles_return_neutral_value() {
-        let mut state = Imi::new(2).unwrap();
+        let mut state = IntradayMomentumIndex::new(2).unwrap();
         assert_eq!(state.append(10.0, 10.0), None);
         assert_eq!(state.append(10.0, 10.0), Some(50.0));
     }

@@ -1,11 +1,11 @@
 //! Incremental Minus Directional Indicator (-DI).
 use super::directional::DirectionalMovement;
 use crate::error::TaResult;
-pub struct MinusDi {
+pub struct MinusDirectionalIndicator {
     directional: DirectionalMovement,
     value: Option<f64>,
 }
-impl MinusDi {
+impl MinusDirectionalIndicator {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             directional: DirectionalMovement::new(period)?,

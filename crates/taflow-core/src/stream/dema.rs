@@ -2,30 +2,30 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, Ema, StreamingIndicator};
+use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
 /// Stateful double EMA composed from the shared EMA primitive.
 #[derive(Debug, Clone)]
-pub struct Dema {
-    ema1: Ema,
-    ema2: Ema,
+pub struct DoubleExponentialMovingAverage {
+    ema1: ExponentialMovingAverage,
+    ema2: ExponentialMovingAverage,
     value: Option<f64>,
 }
 
-impl Dema {
+impl DoubleExponentialMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
         }
         Ok(Self {
-            ema1: Ema::new(period)?,
-            ema2: Ema::new(period)?,
+            ema1: ExponentialMovingAverage::new(period)?,
+            ema2: ExponentialMovingAverage::new(period)?,
             value: None,
         })
     }
 }
 
-impl StreamingIndicator for Dema {
+impl StreamingIndicator for DoubleExponentialMovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {

@@ -2,34 +2,34 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, Ema, StreamingIndicator};
+use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
 /// Persistent TRIX with a triple TA-Lib-seeded EMA cascade and O(1) updates.
 #[derive(Debug, Clone)]
-pub struct Trix {
-    ema1: Ema,
-    ema2: Ema,
-    ema3: Ema,
+pub struct TripleExponentialRateOfChange {
+    ema1: ExponentialMovingAverage,
+    ema2: ExponentialMovingAverage,
+    ema3: ExponentialMovingAverage,
     previous_ema3: Option<f64>,
     value: Option<f64>,
 }
 
-impl Trix {
+impl TripleExponentialRateOfChange {
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
         }
         Ok(Self {
-            ema1: Ema::new(period)?,
-            ema2: Ema::new(period)?,
-            ema3: Ema::new(period)?,
+            ema1: ExponentialMovingAverage::new(period)?,
+            ema2: ExponentialMovingAverage::new(period)?,
+            ema3: ExponentialMovingAverage::new(period)?,
             previous_ema3: None,
             value: None,
         })
     }
 }
 
-impl StreamingIndicator for Trix {
+impl StreamingIndicator for TripleExponentialRateOfChange {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -68,7 +68,7 @@ mod tests {
             .map(|i| 100.0 + i as f64 * 0.2 + (i as f64 * 0.3).sin())
             .collect();
         let expected = crate::momentum::triple_exponential_rate_of_change(&input, 7).unwrap();
-        let mut state = Trix::new(7).unwrap();
+        let mut state = TripleExponentialRateOfChange::new(7).unwrap();
         let mut actual = state.extend(input[..43].iter().copied());
         actual.extend(state.extend(input[43..].iter().copied()));
         for (actual, expected) in actual.iter().zip(&expected) {

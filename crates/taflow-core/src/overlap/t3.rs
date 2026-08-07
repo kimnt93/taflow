@@ -1,9 +1,9 @@
 use crate::error::{TaError, TaResult};
 use crate::simd::sum_f64;
 
-/// T3 Triple Exponential Moving Average (Tillson)
+/// TripleExponentialAverage Triple Exponential Moving Average (Tillson)
 ///
-/// T3 = c1*EMA6 + c2*EMA5 + c3*EMA4 + c4*EMA3
+/// TripleExponentialAverage = c1*EMA6 + c2*EMA5 + c3*EMA4 + c4*EMA3
 /// 其中 EMA_n 是 n 次 EMA 嵌套, v_factor 默认 0.7
 /// c1 = -v^3, c2 = 3v^2 + 3v^3, c3 = -6v^2 - 3v - 3v^3, c4 = 1 + 3v + v^3 + 3v^2
 /// lookback = 6 * (timeperiod - 1)
@@ -14,7 +14,7 @@ pub fn triple_exponential_average(input: &[f64], timeperiod: usize, v_factor: f6
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
             value: timeperiod.to_string(),
-            reason: "must be >= 2 for T3",
+            reason: "must be >= 2 for TripleExponentialAverage",
         });
     }
     let len = input.len();
@@ -30,7 +30,7 @@ pub fn triple_exponential_average(input: &[f64], timeperiod: usize, v_factor: f6
     let p = timeperiod - 1;
     let tp = timeperiod as f64;
 
-    // T3 coefficients
+    // TripleExponentialAverage coefficients
     let v = v_factor;
     let v2 = v * v;
     let v3 = v2 * v;

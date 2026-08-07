@@ -6,26 +6,26 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, StreamingIndicator};
+use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
 
 /// Incremental moving average selected by [`MaType`].
-pub struct Ma {
-    inner: MovingAverage,
+pub struct MovingAverage {
+    inner: MovingAverageDispatcher,
     value: Option<f64>,
 }
 
-impl Ma {
+impl MovingAverage {
     /// Creates a selectable moving average with TA-Lib-compatible defaults at
     /// the binding layer.
     pub fn new(period: usize, ma_type: MaType) -> TaResult<Self> {
         Ok(Self {
-            inner: MovingAverage::new(period, ma_type)?,
+            inner: MovingAverageDispatcher::new(period, ma_type)?,
             value: None,
         })
     }
 }
 
-impl StreamingIndicator for Ma {
+impl StreamingIndicator for MovingAverage {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -56,7 +56,7 @@ mod tests {
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
             let expected = overlap::moving_average(&input, 13, ma_type).unwrap();
-            let mut state = Ma::new(13, ma_type).unwrap();
+            let mut state = MovingAverage::new(13, ma_type).unwrap();
             for (&input, expected) in input.iter().zip(expected) {
                 let actual = state.append(input);
                 if expected.is_nan() {

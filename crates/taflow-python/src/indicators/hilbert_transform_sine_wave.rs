@@ -1,11 +1,11 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{HtSine, HtSineValue};
+use taflow::stream::{HilbertTransformSineWave as NativeHilbertTransformSineWave, HtSineValue};
 
 #[pyclass]
 pub struct HilbertTransformSineWave {
-    inner: HtSine,
+    inner: NativeHilbertTransformSineWave,
     sine: Vec<f64>,
     leadsine: Vec<f64>,
 }
@@ -15,7 +15,7 @@ impl HilbertTransformSineWave {
     #[new]
     fn new() -> Self {
         Self {
-            inner: HtSine::new(),
+            inner: NativeHilbertTransformSineWave::new(),
             sine: Vec::new(),
             leadsine: Vec::new(),
         }

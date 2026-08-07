@@ -29,7 +29,25 @@ class Expr:
         Human-readable expression name used in graph diagnostics.
     """
 
-    def __init__(self, fn: Callable[[Mapping[str, float]], float], deps=(), name="expr"):
+    def __init__(
+        self, fn: Callable[[Mapping[str, float]], float], deps=(), name="expr"
+    ):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        fn : object
+            Input series, scalar parameter, or configuration value for this operation.
+        deps : object
+            Input series, scalar parameter, or configuration value for this operation.
+        name : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._fn, self.deps, self.name = fn, tuple(deps), name
 
     def eval(self, row: Mapping[str, float]) -> float:
@@ -48,34 +66,161 @@ class Expr:
         return self._fn(row)
 
     def _binary(self, other, op, symbol):
-        rhs = other if isinstance(other, Expr) else Expr(lambda _row, value=other: value, name=repr(other))
-        return Expr(lambda row: op(self.eval(row), rhs.eval(row)), (self, rhs), f"({self.name}{symbol}{rhs.name})")
+        """Execute the _binary operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+        op : object
+            Input series, scalar parameter, or configuration value for this operation.
+        symbol : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
+        rhs = (
+            other
+            if isinstance(other, Expr)
+            else Expr(lambda _row, value=other: value, name=repr(other))
+        )
+        return Expr(
+            lambda row: op(self.eval(row), rhs.eval(row)),
+            (self, rhs),
+            f"({self.name}{symbol}{rhs.name})",
+        )
 
     def __add__(self, other):
+        """Execute the __add__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: a + b, "+")
 
     def __radd__(self, other):
+        """Execute the __radd__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: b + a, "+")
 
     def __sub__(self, other):
+        """Execute the __sub__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: a - b, "-")
 
     def __rsub__(self, other):
+        """Execute the __rsub__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: b - a, "-")
 
     def __mul__(self, other):
+        """Execute the __mul__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: a * b, "*")
 
     def __rmul__(self, other):
+        """Execute the __rmul__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: b * a, "*")
 
     def __truediv__(self, other):
+        """Execute the __truediv__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: a / b if b else np.nan, "/")
 
     def __rtruediv__(self, other):
+        """Execute the __rtruediv__ operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        other : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._binary(other, lambda a, b: b / a if a else np.nan, "/")
 
     def __neg__(self):
+        """Execute the __neg__ operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return Expr(lambda row: -self.eval(row), (self,), f"(-{self.name})")
 
 
@@ -84,6 +229,18 @@ class _Source(Expr):
     field: str = ""
 
     def __init__(self, field: str):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        field : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         object.__setattr__(self, "field", field)
         object.__setattr__(self, "name", field)
         object.__setattr__(self, "deps", ())
@@ -92,17 +249,54 @@ class _Source(Expr):
 
 class _Indicator(Expr):
     def __init__(self, name: str, state: Any, inputs: Sequence[Expr]):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        name : object
+            Input series, scalar parameter, or configuration value for this operation.
+        state : object
+            Input series, scalar parameter, or configuration value for this operation.
+        inputs : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self.state, self.inputs = state, tuple(inputs)
         super().__init__(lambda row: self._value, self.inputs, name)
         self._value = np.nan
 
     def step(self, row, cache):
+        """Execute the step operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        row : object
+            Input series, scalar parameter, or configuration value for this operation.
+        cache : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         args = [_evaluate(dep, row, cache) for dep in self.inputs]
         value = self.state.append(*args)
         self._value = np.nan if value is None else value
         return self._value
 
     def reset(self):
+        """Execute the reset operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         if hasattr(self.state, "reset"):
             self.state.reset()
         self._value = np.nan
@@ -110,14 +304,56 @@ class _Indicator(Expr):
 
 class _Expression(Expr):
     def __init__(self, expression: Expr):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        expression : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self.expression = expression
         super().__init__(expression._fn, expression.deps, expression.name)
 
     def step(self, row, cache):
+        """Execute the step operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        row : object
+            Input series, scalar parameter, or configuration value for this operation.
+        cache : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return _evaluate(self.expression, row, cache)
 
 
 def _evaluate(expr: Expr, row, cache):
+    """Evaluate this execution expression for one input row.
+
+    Parameters
+    ----------
+    expr : object
+        Input series, scalar parameter, or configuration value for this operation.
+    row : object
+        Input series, scalar parameter, or configuration value for this operation.
+    cache : object
+        Input series, scalar parameter, or configuration value for this operation.
+
+    Returns
+    -------
+    object
+        The updated adapter, native value, aligned output array, or execution node.
+    """
     key = id(expr)
     if key in cache:
         return cache[key]
@@ -145,6 +381,13 @@ class Pipeline:
     """
 
     def __init__(self):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._sources: dict[str, _Source] = {}
         self._nodes: list[Expr] = []
         self._outputs: dict[str, Expr] = {}
@@ -200,6 +443,13 @@ class Pipeline:
 
     @property
     def outputs(self) -> tuple[str, ...]:
+        """Execute the outputs operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return tuple(self._outputs)
 
     def reset(self):
@@ -212,7 +462,9 @@ class Pipeline:
     def append(self, row: Mapping[str, float]) -> dict[str, float]:
         """Dispatch one aligned bar through the graph exactly once."""
         cache: dict[int, float] = {}
-        return {name: _evaluate(node, row, cache) for name, node in self._outputs.items()}
+        return {
+            name: _evaluate(node, row, cache) for name, node in self._outputs.items()
+        }
 
     def extend(self, rows: Mapping[str, Sequence[float]]) -> dict[str, np.ndarray]:
         """Run aligned columns and return same-length output arrays."""
@@ -264,14 +516,37 @@ class ArrowAdapter:
 
     @staticmethod
     def _module():
+        """Execute the _module operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         try:
             import pyarrow as pa
         except ImportError as error:
-            raise ImportError("ArrowAdapter requires the 'arrow' extra (pyarrow)") from error
+            raise ImportError(
+                "ArrowAdapter requires the 'arrow' extra (pyarrow)"
+            ) from error
         return pa
 
     @classmethod
     def input(cls, values, *, column=None):
+        """Execute the input operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        values : object
+            Input series, scalar parameter, or configuration value for this operation.
+        column : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         pa = cls._module()
         if isinstance(values, pa.Table):
             if column is None:
@@ -281,7 +556,9 @@ class ArrowAdapter:
             values = values[column]
         if isinstance(values, pa.ChunkedArray):
             values = values.combine_chunks()
-        return np.ascontiguousarray(values.to_numpy(zero_copy_only=False), dtype=np.float64)
+        return np.ascontiguousarray(
+            values.to_numpy(zero_copy_only=False), dtype=np.float64
+        )
 
     @classmethod
     def output(cls, values):
@@ -294,19 +571,44 @@ class PolarsAdapter:
 
     @staticmethod
     def _module():
+        """Execute the _module operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         try:
             import polars as pl
         except ImportError as error:
-            raise ImportError("PolarsAdapter requires the 'polars' extra (polars)") from error
+            raise ImportError(
+                "PolarsAdapter requires the 'polars' extra (polars)"
+            ) from error
         return pl
 
     @classmethod
     def input(cls, values, *, column=None):
+        """Execute the input operation through the native Rust implementation.
+
+        Parameters
+        ----------
+        values : object
+            Input series, scalar parameter, or configuration value for this operation.
+        column : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         pl = cls._module()
         if isinstance(values, pl.DataFrame):
             if column is None:
                 if values.width != 1:
-                    raise ValueError("column is required for multi-column Polars frames")
+                    raise ValueError(
+                        "column is required for multi-column Polars frames"
+                    )
                 column = values.columns[0]
             values = values.get_column(column)
         return np.ascontiguousarray(values.to_numpy(), dtype=np.float64)

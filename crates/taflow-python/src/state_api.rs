@@ -4,10 +4,10 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Adx, Adxr, AverageTrueRange, Cci, Dema, Dx, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama,
-    Mavp,
-    RollingMidpoint, RollingMidprice, Mom, NormalizedAverageTrueRange, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi,
-    StreamingIndicator, Tema, TrueRange, Trima, Wma, RelativeMomentumIndex,
+    self, AverageDirectionalIndex, AverageDirectionalIndexRating, AverageTrueRange, CommodityChannelIndex, DoubleExponentialMovingAverage, DirectionalMovementIndex, ExponentialMovingAverage, HilbertTransformTrendline, IntradayMomentumIndex, MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended, MovingAverageConvergenceDivergenceFixed, MesaAdaptiveMovingAverage,
+    MovingAverageVariablePeriod,
+    RollingMidpoint, RollingMidprice, Mom, NormalizedAverageTrueRange, Roc, Rocp, Rocr, Rocr100, RelativeStrengthIndex, SimpleMovingAverage, StochasticOscillator, FastStochasticOscillator, StochasticRelativeStrengthIndex,
+    StreamingIndicator, TripleExponentialMovingAverage, TrueRange, TriangularMovingAverage, WeightedMovingAverage, RelativeMomentumIndex,
     VariableIndexDynamicAverage,
     LaguerreRelativeStrengthIndex,
     EvenBetterSinewave,
@@ -94,8 +94,8 @@ scalar_state_class!(StatefulMin, stream::RollingMin, 30);
 scalar_state_class!(StatefulMinindex, stream::RollingArgmin, 30);
 scalar_state_class!(StatefulSum, stream::RollingSum, 30);
 scalar_state_class!(StatefulAvgdev, stream::RollingAverageDeviation, 14);
-scalar_state_class!(StatefulCmo, stream::Cmo, 14);
-scalar_state_class!(StatefulKama, stream::Kama, 30);
+scalar_state_class!(StatefulCmo, stream::ChandeMomentumOscillator, 14);
+scalar_state_class!(StatefulKama, stream::KaufmanAdaptiveMovingAverage, 30);
 scalar_state_class!(StatefulLinearreg, stream::Linearreg, 14);
 scalar_state_class!(StatefulLinearregSlope, stream::LinearregSlope, 14);
 scalar_state_class!(StatefulLinearregIntercept, stream::LinearregIntercept, 14);
@@ -602,7 +602,7 @@ impl StatefulRelativeMomentumIndex {
 
 #[pyclass]
 pub struct StatefulCci {
-    inner: Cci,
+    inner: CommodityChannelIndex,
 }
 
 #[pymethods]
@@ -611,7 +611,7 @@ impl StatefulCci {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Cci::new(timeperiod).map_err(py_value_error)?,
+            inner: CommodityChannelIndex::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -645,7 +645,7 @@ impl StatefulCci {
 
 #[pyclass]
 pub struct StatefulImi {
-    inner: Imi,
+    inner: IntradayMomentumIndex,
 }
 
 #[pymethods]
@@ -654,7 +654,7 @@ impl StatefulImi {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Imi::new(timeperiod).map_err(py_value_error)?,
+            inner: IntradayMomentumIndex::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -697,7 +697,7 @@ impl StatefulImi {
 
 #[pyclass]
 pub struct StatefulT3 {
-    inner: stream::T3,
+    inner: stream::TripleExponentialAverage,
 }
 
 #[pymethods]
@@ -706,7 +706,7 @@ impl StatefulT3 {
     #[pyo3(signature = (timeperiod=5, vfactor=0.7))]
     fn new(timeperiod: usize, vfactor: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::T3::new(timeperiod, vfactor).map_err(py_value_error)?,
+            inner: stream::TripleExponentialAverage::new(timeperiod, vfactor).map_err(py_value_error)?,
         })
     }
 
@@ -780,12 +780,12 @@ macro_rules! oscillator_state_class {
     };
 }
 
-oscillator_state_class!(StatefulApo, stream::Apo);
-oscillator_state_class!(StatefulPpo, stream::Ppo);
+oscillator_state_class!(StatefulApo, stream::AbsolutePriceOscillator);
+oscillator_state_class!(StatefulPpo, stream::PercentagePriceOscillator);
 
 #[pyclass]
 pub struct StatefulMa {
-    inner: stream::Ma,
+    inner: stream::MovingAverage,
 }
 
 #[pymethods]
@@ -794,7 +794,7 @@ impl StatefulMa {
     #[pyo3(signature = (timeperiod=30, matype=0))]
     fn new(timeperiod: usize, matype: i32) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Ma::new(
+            inner: stream::MovingAverage::new(
                 timeperiod,
                 MaType::try_from(matype).map_err(py_value_error)?,
             )
@@ -892,7 +892,7 @@ impl StatefulBbands {
 
 #[pyclass]
 pub struct StatefulAccbands {
-    inner: stream::Accbands,
+    inner: stream::AccelerationBands,
 }
 
 #[pymethods]
@@ -901,7 +901,7 @@ impl StatefulAccbands {
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Accbands::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::AccelerationBands::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -959,7 +959,7 @@ impl StatefulAccbands {
 
 #[pyclass]
 pub struct StatefulSar {
-    inner: stream::Sar,
+    inner: stream::ParabolicSar,
 }
 
 #[pymethods]
@@ -968,7 +968,7 @@ impl StatefulSar {
     #[pyo3(signature = (acceleration=0.02, maximum=0.2))]
     fn new(acceleration: f64, maximum: f64) -> Self {
         Self {
-            inner: stream::Sar::new(acceleration, maximum),
+            inner: stream::ParabolicSar::new(acceleration, maximum),
         }
     }
 
@@ -1009,7 +1009,7 @@ impl StatefulSar {
 
 #[pyclass]
 pub struct StatefulSarext {
-    inner: stream::Sarext,
+    inner: stream::ExtendedParabolicSar,
 }
 
 #[pymethods]
@@ -1028,7 +1028,7 @@ impl StatefulSarext {
         accelerationmaxshort: f64,
     ) -> Self {
         Self {
-            inner: stream::Sarext::new(
+            inner: stream::ExtendedParabolicSar::new(
                 startvalue,
                 offsetonreverse,
                 accelerationinitlong,
@@ -1908,7 +1908,7 @@ impl StatefulMidprice {
 
 #[pyclass]
 pub struct StatefulSma {
-    inner: Sma,
+    inner: SimpleMovingAverage,
 }
 
 #[pymethods]
@@ -1917,7 +1917,7 @@ impl StatefulSma {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Sma::new(timeperiod).map_err(py_value_error)?,
+            inner: SimpleMovingAverage::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -1946,7 +1946,7 @@ impl StatefulSma {
 
 #[pyclass]
 pub struct StatefulEma {
-    inner: Ema,
+    inner: ExponentialMovingAverage,
 }
 
 #[pymethods]
@@ -1955,7 +1955,7 @@ impl StatefulEma {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Ema::new(timeperiod).map_err(py_value_error)?,
+            inner: ExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -1984,7 +1984,7 @@ impl StatefulEma {
 
 #[pyclass]
 pub struct StatefulWma {
-    inner: Wma,
+    inner: WeightedMovingAverage,
 }
 
 #[pymethods]
@@ -1993,7 +1993,7 @@ impl StatefulWma {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Wma::new(timeperiod).map_err(py_value_error)?,
+            inner: WeightedMovingAverage::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2022,7 +2022,7 @@ impl StatefulWma {
 
 #[pyclass]
 pub struct StatefulDema {
-    inner: Dema,
+    inner: DoubleExponentialMovingAverage,
 }
 
 #[pymethods]
@@ -2031,7 +2031,7 @@ impl StatefulDema {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Dema::new(timeperiod).map_err(py_value_error)?,
+            inner: DoubleExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2060,7 +2060,7 @@ impl StatefulDema {
 
 #[pyclass]
 pub struct StatefulTema {
-    inner: Tema,
+    inner: TripleExponentialMovingAverage,
 }
 
 #[pymethods]
@@ -2069,7 +2069,7 @@ impl StatefulTema {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Tema::new(timeperiod).map_err(py_value_error)?,
+            inner: TripleExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2098,7 +2098,7 @@ impl StatefulTema {
 
 #[pyclass]
 pub struct StatefulTrima {
-    inner: Trima,
+    inner: TriangularMovingAverage,
 }
 
 #[pymethods]
@@ -2107,7 +2107,7 @@ impl StatefulTrima {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Trima::new(timeperiod).map_err(py_value_error)?,
+            inner: TriangularMovingAverage::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2136,7 +2136,7 @@ impl StatefulTrima {
 
 #[pyclass]
 pub struct StatefulRsi {
-    inner: Rsi,
+    inner: RelativeStrengthIndex,
 }
 
 #[pymethods]
@@ -2145,7 +2145,7 @@ impl StatefulRsi {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Rsi::new(timeperiod).map_err(py_value_error)?,
+            inner: RelativeStrengthIndex::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2333,62 +2333,62 @@ impl StatefulNatr {
 
 #[pyclass]
 pub struct StatefulMacd {
-    inner: Macd,
+    inner: MovingAverageConvergenceDivergence,
 }
 
 #[pyclass]
 pub struct StatefulMacdFix {
-    inner: MacdFix,
+    inner: MovingAverageConvergenceDivergenceFixed,
 }
 
 #[pyclass]
 pub struct StatefulMacdExt {
-    inner: MacdExt,
+    inner: MovingAverageConvergenceDivergenceExtended,
 }
 
 #[pyclass]
 pub struct StatefulMavp {
-    inner: Mavp,
+    inner: MovingAverageVariablePeriod,
 }
 
 #[pyclass]
 pub struct StatefulHtTrendline {
-    inner: HtTrendline,
+    inner: HilbertTransformTrendline,
 }
 
 #[pyclass]
 pub struct StatefulAdx {
-    inner: Adx,
+    inner: AverageDirectionalIndex,
 }
 
 #[pyclass]
 pub struct StatefulAdxr {
-    inner: Adxr,
+    inner: AverageDirectionalIndexRating,
 }
 
 #[pyclass]
 pub struct StatefulDx {
-    inner: Dx,
+    inner: DirectionalMovementIndex,
 }
 
 #[pyclass]
 pub struct StatefulStochf {
-    inner: Stochf,
+    inner: FastStochasticOscillator,
 }
 
 #[pyclass]
 pub struct StatefulStoch {
-    inner: Stoch,
+    inner: StochasticOscillator,
 }
 
 #[pyclass]
 pub struct StatefulStochrsi {
-    inner: Stochrsi,
+    inner: StochasticRelativeStrengthIndex,
 }
 
 #[pyclass]
 pub struct StatefulMama {
-    inner: Mama,
+    inner: MesaAdaptiveMovingAverage,
 }
 
 #[pymethods]
@@ -2397,7 +2397,7 @@ impl StatefulMama {
     #[pyo3(signature = (fastlimit=0.5, slowlimit=0.05))]
     fn new(fastlimit: f64, slowlimit: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: Mama::new(fastlimit, slowlimit).map_err(py_value_error)?,
+            inner: MesaAdaptiveMovingAverage::new(fastlimit, slowlimit).map_err(py_value_error)?,
         })
     }
 
@@ -2442,7 +2442,7 @@ impl StatefulMacd {
     #[pyo3(signature = (fastperiod=12, slowperiod=26, signalperiod=9))]
     fn new(fastperiod: usize, slowperiod: usize, signalperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Macd::new(fastperiod, slowperiod, signalperiod).map_err(py_value_error)?,
+            inner: MovingAverageConvergenceDivergence::new(fastperiod, slowperiod, signalperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2499,7 +2499,7 @@ impl StatefulMacdFix {
     #[pyo3(signature = (signalperiod=9))]
     fn new(signalperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: MacdFix::new(signalperiod).map_err(py_value_error)?,
+            inner: MovingAverageConvergenceDivergenceFixed::new(signalperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2557,7 +2557,7 @@ impl StatefulStochf {
     fn new(fastk_period: usize, fastd_period: usize, fastd_matype: i32) -> PyResult<Self> {
         let ma_type = MaType::try_from(fastd_matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: Stochf::new(fastk_period, fastd_period, ma_type).map_err(py_value_error)?,
+            inner: FastStochasticOscillator::new(fastk_period, fastd_period, ma_type).map_err(py_value_error)?,
         })
     }
 
@@ -2623,7 +2623,7 @@ impl StatefulStoch {
         let slowk_type = MaType::try_from(slowk_matype).map_err(py_value_error)?;
         let slowd_type = MaType::try_from(slowd_matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: Stoch::new(
+            inner: StochasticOscillator::new(
                 fastk_period,
                 slowk_period,
                 slowk_type,
@@ -2694,7 +2694,7 @@ impl StatefulStochrsi {
     ) -> PyResult<Self> {
         let ma_type = MaType::try_from(fastd_matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: Stochrsi::new(timeperiod, fastk_period, fastd_period, ma_type)
+            inner: StochasticRelativeStrengthIndex::new(timeperiod, fastk_period, fastd_period, ma_type)
                 .map_err(py_value_error)?,
         })
     }
@@ -2753,7 +2753,7 @@ impl StatefulMacdExt {
         let slow_type = MaType::try_from(slowmatype).map_err(py_value_error)?;
         let signal_type = MaType::try_from(signalmatype).map_err(py_value_error)?;
         Ok(Self {
-            inner: MacdExt::new(
+            inner: MovingAverageConvergenceDivergenceExtended::new(
                 fastperiod,
                 fast_type,
                 slowperiod,
@@ -2819,7 +2819,7 @@ impl StatefulMavp {
     fn new(minperiod: usize, maxperiod: usize, matype: i32) -> PyResult<Self> {
         let ma_type = MaType::try_from(matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: Mavp::new(minperiod, maxperiod, ma_type).map_err(py_value_error)?,
+            inner: MovingAverageVariablePeriod::new(minperiod, maxperiod, ma_type).map_err(py_value_error)?,
         })
     }
 
@@ -2865,7 +2865,7 @@ impl StatefulHtTrendline {
     #[new]
     fn new() -> Self {
         Self {
-            inner: HtTrendline::new(),
+            inner: HilbertTransformTrendline::new(),
         }
     }
 
@@ -2904,7 +2904,7 @@ impl StatefulAdx {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Adx::new(timeperiod).map_err(py_value_error)?,
+            inner: AverageDirectionalIndex::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2955,7 +2955,7 @@ impl StatefulAdxr {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Adxr::new(timeperiod).map_err(py_value_error)?,
+            inner: AverageDirectionalIndexRating::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -3006,7 +3006,7 @@ impl StatefulDx {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Dx::new(timeperiod).map_err(py_value_error)?,
+            inner: DirectionalMovementIndex::new(timeperiod).map_err(py_value_error)?,
         })
     }
 

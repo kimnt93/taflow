@@ -25,7 +25,7 @@ pub fn bollinger_bands(
 
     let len = input.len();
 
-    if matype == MaType::Sma {
+    if matype == MaType::SimpleMovingAverage {
         // SMA 优化路径: 单遍滑动窗口同时计算 SMA 和 stddev
         return bbands_sma(input, timeperiod, nbdevup, nbdevdn);
     }
@@ -126,7 +126,7 @@ mod tests {
     #[test]
     fn test_bbands_basic() {
         let input = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
-        let (upper, middle, lower) = bollinger_bands(&input, 5, 2.0, 2.0, MaType::Sma).unwrap();
+        let (upper, middle, lower) = bollinger_bands(&input, 5, 2.0, 2.0, MaType::SimpleMovingAverage).unwrap();
 
         assert!(upper[3].is_nan());
         assert!(!upper[4].is_nan());

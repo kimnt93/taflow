@@ -3,14 +3,14 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{Ema, StreamingIndicator};
+use taflow::stream::{ExponentialMovingAverage as NativeExponentialMovingAverage, StreamingIndicator};
 
 use crate::conversion::to_py_array;
 
 /// Persistent EMA with bulk initialization and O(1) scalar continuation.
 #[pyclass]
 pub struct ExponentialMovingAverage {
-    inner: Ema,
+    inner: NativeExponentialMovingAverage,
     outputs: Vec<f64>,
     timeperiod: usize,
 }
@@ -21,7 +21,7 @@ impl ExponentialMovingAverage {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Ema::new(timeperiod)
+            inner: NativeExponentialMovingAverage::new(timeperiod)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
             timeperiod,

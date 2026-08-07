@@ -1,4 +1,5 @@
 """Fractionally-differentiated series (AFML ch. 5, fixed-width window)."""
+
 from typing import Any
 import numpy as np
 from ._native import FracDiffOperator as _Native
@@ -11,7 +12,10 @@ class FracDiff:
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
     """
-    def __init__(self, _input: Any | None = None, d: float = 0.5, threshold: float = 1e-5):
+
+    def __init__(
+        self, _input: Any | None = None, d: float = 0.5, threshold: float = 1e-5
+    ):
         """Create fractional differencing with optional _input history.
 
         Parameters are ``_input`` (the aligned source series), ``d`` (the
@@ -21,20 +25,65 @@ class FracDiff:
         self.extend(_input) if _input is not None else None
 
     def append(self, _input: float):
+        """Append one observation or aligned bar to the native Rust state.
+
+        Parameters
+        ----------
+        _input : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.append(_input)
         return self
 
     def extend(self, _input: Any):
+        """Append aligned input series to the native Rust state.
+
+        Parameters
+        ----------
+        _input : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
+        """Return the aligned output history as a NumPy array.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.compute()
 
     @property
     def value(self):
+        """Return the latest computed value, or None during warm-up.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         return self._state.value
 
     def reset(self):
+        """Execute the reset operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state.reset()
         return self

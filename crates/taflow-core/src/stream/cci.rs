@@ -10,14 +10,14 @@ use super::{invalid_period, Window};
 
 /// Persistent Commodity Channel Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
-pub struct Cci {
+pub struct CommodityChannelIndex {
     period: usize,
     window: Window,
     sum: f64,
     value: Option<f64>,
 }
 
-impl Cci {
+impl CommodityChannelIndex {
     /// Creates an empty CCI state. TA-Lib requires a period of at least two.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
@@ -104,7 +104,7 @@ mod tests {
         let low: Vec<f64> = close.iter().map(|value| value - 0.9).collect();
         let expected = crate::momentum::commodity_channel_index(&high, &low, &close, 14).unwrap();
 
-        let mut state = Cci::new(14).unwrap();
+        let mut state = CommodityChannelIndex::new(14).unwrap();
         let mut actual = state
             .extend_slice(&high[..37], &low[..37], &close[..37])
             .unwrap();

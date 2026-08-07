@@ -6,7 +6,7 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, RollingStandardDeviation, StreamingIndicator};
+use super::{moving_average::MovingAverageDispatcher, RollingStandardDeviation, StreamingIndicator};
 
 /// One aligned upper, middle, and lower Bollinger Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -18,7 +18,7 @@ pub struct BbandsValue {
 
 /// Incremental Bollinger Bands with constant per-bar work.
 pub struct Bbands {
-    middle: MovingAverage,
+    middle: MovingAverageDispatcher,
     deviation: RollingStandardDeviation,
     deviations_up: f64,
     deviations_down: f64,
@@ -34,7 +34,7 @@ impl Bbands {
         ma_type: MaType,
     ) -> TaResult<Self> {
         Ok(Self {
-            middle: MovingAverage::new(period, ma_type)?,
+            middle: MovingAverageDispatcher::new(period, ma_type)?,
             deviation: RollingStandardDeviation::new(period, 1.0)?,
             deviations_up,
             deviations_down,

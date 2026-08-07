@@ -6,16 +6,16 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, StreamingIndicator};
+use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
 
 /// Incremental APO driven by two selected moving-average states.
-pub struct Apo {
-    fast: MovingAverage,
-    slow: MovingAverage,
+pub struct AbsolutePriceOscillator {
+    fast: MovingAverageDispatcher,
+    slow: MovingAverageDispatcher,
     value: Option<f64>,
 }
 
-impl Apo {
+impl AbsolutePriceOscillator {
     /// Creates an APO state; period order is normalized to fast then slow.
     pub fn new(fast_period: usize, slow_period: usize, ma_type: MaType) -> TaResult<Self> {
         let (fast_period, slow_period) = if fast_period < slow_period {
@@ -24,14 +24,14 @@ impl Apo {
             (slow_period, fast_period)
         };
         Ok(Self {
-            fast: MovingAverage::new(fast_period, ma_type)?,
-            slow: MovingAverage::new(slow_period, ma_type)?,
+            fast: MovingAverageDispatcher::new(fast_period, ma_type)?,
+            slow: MovingAverageDispatcher::new(slow_period, ma_type)?,
             value: None,
         })
     }
 }
 
-impl StreamingIndicator for Apo {
+impl StreamingIndicator for AbsolutePriceOscillator {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -65,7 +65,7 @@ mod tests {
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
             let expected = momentum::absolute_price_oscillator(&input, 7, 13, ma_type).unwrap();
-            let mut state = Apo::new(7, 13, ma_type).unwrap();
+            let mut state = AbsolutePriceOscillator::new(7, 13, ma_type).unwrap();
             for (&input, expected) in input.iter().zip(expected) {
                 let actual = state.append(input);
                 if expected.is_nan() {

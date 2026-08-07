@@ -20,8 +20,23 @@ class RelativeMomentumIndex:
         Lag, in bars, used to measure each momentum change.
     """
 
-    def __init__(self, close: Any | None = None, length: int = 14,
-                 mom: int = 5):
+    def __init__(self, close: Any | None = None, length: int = 14, mom: int = 5):
+        """Initialize this adapter and optionally process the supplied input series.
+
+        Parameters
+        ----------
+        close : object
+            Input series, scalar parameter, or configuration value for this operation.
+        length : object
+            Input series, scalar parameter, or configuration value for this operation.
+        mom : object
+            Input series, scalar parameter, or configuration value for this operation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
         self._state = StatefulRelativeMomentumIndex(length, mom)
         if close is not None:
             self.extend(close)

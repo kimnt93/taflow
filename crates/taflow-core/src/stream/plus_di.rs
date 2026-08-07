@@ -2,11 +2,11 @@
 use super::directional::DirectionalMovement;
 use crate::error::TaResult;
 
-pub struct PlusDi {
+pub struct PlusDirectionalIndicator {
     directional: DirectionalMovement,
     value: Option<f64>,
 }
-impl PlusDi {
+impl PlusDirectionalIndicator {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             directional: DirectionalMovement::new(period)?,

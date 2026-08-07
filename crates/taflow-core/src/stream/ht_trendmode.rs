@@ -1,14 +1,14 @@
 //! Incremental Hilbert Transform trend/cycle mode (HT_TRENDMODE).
 
-use crate::stream::HtDcphase;
+use crate::stream::HilbertTransformDominantCyclePhase;
 use std::collections::VecDeque;
 
 const DEG2RAD: f64 = std::f64::consts::PI / 180.0;
 
 /// Incremental HT_TRENDMODE state.
-pub struct HtTrendmode {
+pub struct HilbertTransformTrendMode {
     index: usize,
-    phase: HtDcphase,
+    phase: HilbertTransformDominantCyclePhase,
     prices: VecDeque<f64>,
     prev_phase: f64,
     trend1: f64,
@@ -21,16 +21,16 @@ pub struct HtTrendmode {
     leadsine: f64,
     value: Option<i32>,
 }
-impl Default for HtTrendmode {
+impl Default for HilbertTransformTrendMode {
     fn default() -> Self {
         Self::new()
     }
 }
-impl HtTrendmode {
+impl HilbertTransformTrendMode {
     pub fn new() -> Self {
         Self {
             index: 0,
-            phase: HtDcphase::new(),
+            phase: HilbertTransformDominantCyclePhase::new(),
             prices: VecDeque::with_capacity(50),
             prev_phase: 0.0,
             trend1: 0.0,
@@ -118,7 +118,7 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
         let expected = crate::cycle::hilbert_transform_trend_mode(&input).unwrap();
-        let mut state = HtTrendmode::new();
+        let mut state = HilbertTransformTrendMode::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {
                 Some(value) => assert_eq!(value, expected),
