@@ -260,7 +260,7 @@ pub use rolling_median::RollingMedian;
 pub use rolling_mode::RollingMode;
 use rolling_extrema::RollingExtrema;
 pub use rolling_price::{RollingMidpoint, RollingMidprice};
-pub use volume_states::{AccumulationDistribution, AccumulationDistributionOscillator, BalanceOfPower, OnBalanceVolume, WilliamsR, on_balance_volume};
+pub use volume_states::{AccumulationDistribution, AccumulationDistributionOscillator, BalanceOfPower, OnBalanceVolume, WilliamsR, accumulation_distribution, accumulation_distribution_oscillator, on_balance_volume};
 pub use aroon_true_range::{Aroon, AroonOscillator, AroonValue, AverageTrueRange, NormalizedAverageTrueRange, TrueRange, average_true_range, normalized_average_true_range, true_range};
 pub use rolling_statistics::{RollingAverageDeviation, RollingBeta, RollingCorrelation, RollingStandardDeviation, RollingVariance};
 pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlope, Tsf};

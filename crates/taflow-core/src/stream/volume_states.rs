@@ -22,6 +22,24 @@ fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {
     }
 }
 
+/// Computes an aligned Chaikin accumulation/distribution line.
+pub fn accumulation_distribution(high: &[f64], low: &[f64], close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
+    }
+    let mut state = AccumulationDistribution::new();
+    Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume)).collect())
+}
+
+/// Computes an aligned Chaikin accumulation/distribution oscillator.
+pub fn accumulation_distribution_oscillator(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], fastperiod: usize, slowperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
+    }
+    let mut state = AccumulationDistributionOscillator::new(fastperiod, slowperiod)?;
+    Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume).unwrap_or(f64::NAN)).collect())
+}
+
 /// Stateful Chaikin accumulation/distribution line.
 #[derive(Debug, Clone, Default)]
 pub struct AccumulationDistribution {
