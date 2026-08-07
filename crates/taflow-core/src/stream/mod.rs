@@ -283,7 +283,7 @@ pub use anchored_volume_weighted_average_price::AnchoredVolumeWeightedAveragePri
 pub use pivot_points::PivotPoints;
 pub use sar::ParabolicSar;
 pub use sarext::ParabolicSarExtended;
-pub use sma::SimpleMovingAverage;
+pub use sma::{SimpleMovingAverage, simple_moving_average};
 pub use stoch::{StochasticOscillator, StochasticOscillatorValue};
 pub use stochf::{FastStochasticOscillator, FastStochasticOscillatorValue};
 pub use stochrsi::{StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue};
