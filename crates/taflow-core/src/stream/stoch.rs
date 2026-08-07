@@ -107,7 +107,7 @@ mod tests {
                 let slowk_type = MaType::try_from(slowk_code).unwrap();
                 let slowd_type = MaType::try_from(slowd_code).unwrap();
                 let expected =
-                    momentum::stoch(&high, &low, &close, 5, 13, slowk_type, 11, slowd_type)
+                    momentum::stochastic_oscillator(&high, &low, &close, 5, 13, slowk_type, 11, slowd_type)
                         .unwrap();
                 let mut state = Stoch::new(5, 13, slowk_type, 11, slowd_type).unwrap();
                 for index in 0..close.len() {

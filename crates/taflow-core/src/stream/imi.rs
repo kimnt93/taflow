@@ -89,7 +89,7 @@ mod tests {
             .enumerate()
             .map(|(index, open)| open + (index as f64 * 0.31).cos() * 1.7)
             .collect();
-        let expected = momentum::imi(&open, &close, 14).unwrap();
+        let expected = momentum::intraday_momentum_index(&open, &close, 14).unwrap();
         let mut state = Imi::new(14).unwrap();
         for index in 0..open.len() {
             match state.append(open[index], close[index]) {

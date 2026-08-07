@@ -1859,13 +1859,13 @@ mod tests {
         let trima_batch = overlap::trima(&input, 7).unwrap();
         let kama_batch = overlap::kama(&input, 7).unwrap();
         let midpoint_batch = overlap::midpoint(&input, 7).unwrap();
-        let rsi_batch = momentum::rsi(&input, 14).unwrap();
-        let cmo_batch = momentum::cmo(&input, 14).unwrap();
-        let mom_batch = momentum::mom(&input, 7).unwrap();
-        let roc_batch = momentum::roc(&input, 7).unwrap();
-        let rocp_batch = momentum::rocp(&input, 7).unwrap();
-        let rocr_batch = momentum::rocr(&input, 7).unwrap();
-        let rocr100_batch = momentum::rocr100(&input, 7).unwrap();
+        let rsi_batch = momentum::relative_strength_index(&input, 14).unwrap();
+        let cmo_batch = momentum::chande_momentum_oscillator(&input, 14).unwrap();
+        let mom_batch = momentum::momentum(&input, 7).unwrap();
+        let roc_batch = momentum::rate_of_change(&input, 7).unwrap();
+        let rocp_batch = momentum::rate_of_change_percent(&input, 7).unwrap();
+        let rocr_batch = momentum::rate_of_change_ratio(&input, 7).unwrap();
+        let rocr100_batch = momentum::rate_of_change_ratio_percent(&input, 7).unwrap();
         let mut sma = Sma::new(7).unwrap();
         let mut ema = Ema::new(7).unwrap();
         let mut wma = Wma::new(7).unwrap();
@@ -2195,10 +2195,10 @@ mod tests {
             low[index] = close[index];
         }
         let period = 14;
-        let bop_expected = momentum::bop(&open, &high, &low, &close).unwrap();
-        let willr_expected = momentum::willr(&high, &low, &close, period).unwrap();
+        let bop_expected = momentum::balance_of_power(&open, &high, &low, &close).unwrap();
+        let willr_expected = momentum::williams_r(&high, &low, &close, period).unwrap();
         let (down_expected, up_expected) = momentum::aroon(&high, &low, period).unwrap();
-        let osc_expected = momentum::aroon_osc(&high, &low, period).unwrap();
+        let osc_expected = momentum::aroon_oscillator(&high, &low, period).unwrap();
         let mut bop = Bop::new();
         let mut willr = Willr::new(period).unwrap();
         let mut aroon = Aroon::new(period).unwrap();
@@ -2240,7 +2240,7 @@ mod tests {
         let trange_batch = volatility::trange(&high, &low, &close).unwrap();
         let natr_batch = volatility::natr(&high, &low, &close, 14).unwrap();
         let (macd_batch, signal_batch, histogram_batch) =
-            momentum::macd(&close, 12, 26, 9).unwrap();
+            momentum::moving_average_convergence_divergence(&close, 12, 26, 9).unwrap();
         let mut atr = Atr::new(14).unwrap();
         let mut trange = Trange::new();
         let mut natr = Natr::new(14).unwrap();

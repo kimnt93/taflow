@@ -64,7 +64,7 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.3).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
-            let expected = momentum::adxr(&high, &low, &close, period).unwrap();
+            let expected = momentum::average_directional_index_rating(&high, &low, &close, period).unwrap();
             let mut state = Adxr::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {

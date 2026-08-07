@@ -75,7 +75,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = momentum::stochrsi(&input, 14, 5, 13, ma_type).unwrap();
+            let expected = momentum::stochastic_relative_strength_index(&input, 14, 5, 13, ma_type).unwrap();
             let mut state = Stochrsi::new(14, 5, 13, ma_type).unwrap();
             for (index, input) in input.iter().copied().enumerate() {
                 match state.append(input) {

@@ -113,7 +113,7 @@ mod tests {
                     let slow_type = MaType::try_from(slow_code).unwrap();
                     let signal_type = MaType::try_from(signal_code).unwrap();
                     let expected =
-                        momentum::macd_ext(&input, 7, fast_type, 13, slow_type, 5, signal_type)
+                        momentum::moving_average_convergence_divergence_extended(&input, 7, fast_type, 13, slow_type, 5, signal_type)
                             .unwrap();
                     let mut state =
                         MacdExt::new(7, fast_type, 13, slow_type, 5, signal_type).unwrap();

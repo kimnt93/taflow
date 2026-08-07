@@ -124,7 +124,7 @@ mod tests {
         let input: Vec<f64> = (0..300)
             .map(|index| 100.0 + (index as f64 * 0.21).sin() * 12.0 + index as f64 * 0.01)
             .collect();
-        let expected = momentum::macd_fix(&input, 9).unwrap();
+        let expected = momentum::moving_average_convergence_divergence_fixed(&input, 9).unwrap();
         let mut state = MacdFix::new(9).unwrap();
         for (index, input) in input.iter().copied().enumerate() {
             match state.append(input) {

@@ -90,7 +90,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = momentum::stochf(&high, &low, &close, 5, 13, ma_type).unwrap();
+            let expected = momentum::fast_stochastic_oscillator(&high, &low, &close, 5, 13, ma_type).unwrap();
             let mut state = Stochf::new(5, 13, ma_type).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {

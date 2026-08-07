@@ -64,7 +64,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = momentum::apo(&input, 7, 13, ma_type).unwrap();
+            let expected = momentum::absolute_price_oscillator(&input, 7, 13, ma_type).unwrap();
             let mut state = Apo::new(7, 13, ma_type).unwrap();
             for (&input, expected) in input.iter().zip(expected) {
                 let actual = state.append(input);

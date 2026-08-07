@@ -102,7 +102,7 @@ mod tests {
             .collect();
         let high: Vec<f64> = close.iter().map(|value| value + 1.2).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 0.9).collect();
-        let expected = crate::momentum::cci(&high, &low, &close, 14).unwrap();
+        let expected = crate::momentum::commodity_channel_index(&high, &low, &close, 14).unwrap();
 
         let mut state = Cci::new(14).unwrap();
         let mut actual = state
