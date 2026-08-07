@@ -5,6 +5,7 @@ __version__ = "0.1.2"
 from . import talib
 from .talib import MaType
 from .acceleration_bands import AccelerationBands
+from .average_true_range import AverageTrueRange
 from .double_exponential_moving_average import DoubleExponentialMovingAverage
 from .kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
 from .aroon import Aroon
@@ -73,6 +74,8 @@ from .anchored_vwap import AnchoredVolumeWeightedAveragePrice
 from .vidya import VariableIndexDynamicAverage
 from .laguerre_rsi import LaguerreRelativeStrengthIndex
 from .simple_moving_average import SimpleMovingAverage
+from .normalized_average_true_range import NormalizedAverageTrueRange
+from .true_range import TrueRange
 from .triangular_moving_average import TriangularMovingAverage
 from .triple_exponential_moving_average import TripleExponentialMovingAverage
 from .weighted_moving_average import WeightedMovingAverage
@@ -299,9 +302,12 @@ __all__ = [
     "CandleUpDownSideGapThreeMethods",
     "IntradayMomentumIndex",
     "AccelerationBands",
+    "AverageTrueRange",
     "DoubleExponentialMovingAverage",
     "KaufmanAdaptiveMovingAverage",
     "SimpleMovingAverage",
+    "NormalizedAverageTrueRange",
+    "TrueRange",
     "TriangularMovingAverage",
     "TripleExponentialMovingAverage",
     "WeightedMovingAverage",
