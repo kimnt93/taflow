@@ -79,7 +79,7 @@ package, stated once here and in every docstring:
 | [x] | `previous_high_low` | `prev_high`, `prev_low`, `broken_high`/`broken_low` flags | Impl: `smc.py::previous_high_low(time_frame)` | O(1) given session-flag input series: running HTF extrema, snapshot at boundary. Causal by nature. |
 | [x] | `sessions` | `active` (0/1), `session_high`, `session_low` | Impl: `smc.py::sessions` | O(1) given session flags. Causal running extrema — matches package exactly. |
 | [x] | `retracements` | `direction`, `current_retracement_pct`, `deepest_retracement_pct` | Impl: `smc.py::retracements` | O(1): two floats (leg high/low) updated on swing confirmation; inherits swing lag. |
-| [ ] | `premium_discount` | `zone` (-1/0/+1), `equilibrium` level | Theory: zones relative to 50% of current swing range (LuxAlgo). Verify exact rule in Pine source — open question from research | O(1) once swings exist. |
+| [x] | `premium_discount` | `zone` (-1/0/+1), `equilibrium` level | Theory: zones relative to 50% of current swing range (LuxAlgo). Verify exact rule in Pine source — open question from research | O(1) once swings exist. |
 
 ## P2 — modern mainstream indicators
 
@@ -109,7 +109,7 @@ fork/successor version) unless noted.
 | [x] | SSL Channel | Impl: freqtrade technical `indicators.py::SSLChannels` | O(1): SMA(high), SMA(low) + side flip-flop. |
 | [x] | PMAX | Impl: freqtrade technical `indicators.py::PMAX` | O(1): Supertrend generalized over (MA, ATR multiple) — share ratchet code. |
 | [x] | TD Sequential | Impl: pandas-ta `momentum/td_seq.py`; Theory: Tom DeMark | O(1): setup/countdown counters + 4-bar delay ring; integer outputs like CDL patterns. |
-| [ ] | Even Better Sinewave | Impl: pandas-ta `cycles/ebsw.py`; Theory: Ehlers, *Cycle Analytics for Traders* | O(1) recurrence; lives with Hilbert family. |
+| [x] | Even Better Sinewave | Impl: pandas-ta `cycles/ebsw.py`; Theory: Ehlers, *Cycle Analytics for Traders* | O(1) recurrence; lives with Hilbert family. |
 | [x] | Fibonacci retracement levels | Impl: freqtrade technical `indicators.py::fibonacci_retracements(window=120)` | O(1) on rolling extrema; emit each level as its own same-size series. |
 
 ## P3 — per-bar transforms
@@ -126,8 +126,8 @@ contract; the session boundary arrives as an input series.
 | Done | Function | Outputs | Reference | Implementation & speed note |
 |---|---|---|---|---|
 | [x] | Anchored/session VWAP (+ σ-bands) | `vwap`, `upper`, `lower` | Impl: pandas-ta `overlap/vwap.py`; TradingView VWAP docs for band convention | O(1): cumulative Σpv, Σv, Σpv² reset on anchor flag; bands from running moments. |
-| [ ] | Pivot points (classic, Fibonacci, Camarilla, Woodie) | one series per level (PP, R1-3, S1-3) | Impl: freqtrade technical `pivots_points.py` | O(1): snapshot prior-session OHLC at boundary; four variants share state, differ only in level formulas. Levels constant within a session — still emitted per bar (same-size). |
-| [ ] | Opening range | `or_high`, `or_low`, `breakout` (+1/-1/0) | Theory: standard ORB (first N bars of session) | O(1): extrema until bar-count cutoff, then frozen + crossover flags. |
+| [x] | Pivot points (classic, Fibonacci, Camarilla, Woodie) | one series per level (PP, R1-3, S1-3) | Impl: freqtrade technical `pivots_points.py` | O(1): snapshot prior-session OHLC at boundary; four variants share state, differ only in level formulas. Levels constant within a session — still emitted per bar (same-size). |
+| [x] | Opening range | `or_high`, `or_low`, `breakout` (+1/-1/0) | Theory: standard ORB (first N bars of session) | O(1): extrema until bar-count cutoff, then frozen + crossover flags. |
 | [ ] | Session volume levels (POC, VAH, VAL) | `poc`, `vah`, `val` per bar | Impl: TradingView Volume Profile docs; Theory: CBOT Market Profile (value area 70%) | Histogram is **internal state** (fixed price bins, O(1) update/bar); outputs are the running POC/VAH/VAL as same-size series (O(bins) refresh per bar, bins bounded). Document bin-width sensitivity. |
 
 ## P5 — realized-volatility estimators (`rv`)

@@ -339,7 +339,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | previous_high_low | previous_high_low | _ |
 | [x] | sessions | sessions | _ |
 | [x] | retracements | retracements | _ |
-| [ ] | premium_discount | premium_discount | _ |
+| [x] | premium_discount | premium_discount | _ |
 | [x] | supertrend | supertrend | _ |
 | [x] | ichimoku | ichimoku | _ |
 | [x] | squeeze | squeeze | _ |
@@ -362,12 +362,12 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | ssl_channel | ssl_channel | _ |
 | [x] | pmax | pmax | _ |
 | [x] | td_sequential | td_sequential | _ |
-| [ ] | even_better_sinewave | even_better_sinewave | _ |
+| [x] | even_better_sinewave | even_better_sinewave | _ |
 | [ ] | fib_retracement | fib_retracement | _ |
 | [x] | heikin_ashi | heikin_ashi | _ |
 | [x] | anchored_vwap | anchored_vwap | _ |
-| [ ] | pivot_points | pivot_points | _ |
-| [ ] | opening_range | opening_range | _ |
+| [x] | pivot_points | pivot_points | _ |
+| [x] | opening_range | opening_range | _ |
 | [ ] | session_volume_levels | session_volume_levels | _ |
 | [x] | parkinson | parkinson | _ |
 | [x] | garman_klass | garman_klass | _ |

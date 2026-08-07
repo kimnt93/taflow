@@ -72,6 +72,10 @@ from .ssl_channel import SSLChannel
 from .jma import JMA
 from .pmax import PMAX
 from .td_sequential import TDSequential
+from .ebsw import EvenBetterSinewave
+from .premium_discount import PremiumDiscount
+from .opening_range import OpeningRange
+from .pivot_points import PivotPoints
 from .up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
 from .three_white_soldiers import CDL3WHITESOLDIERS, ThreeWhiteSoldiers
 from .abandoned_baby import CDLABANDONEDBABY, AbandonedBaby
@@ -267,6 +271,10 @@ __all__ = [
     "JMA",
     "PMAX",
     "TDSequential",
+    "EvenBetterSinewave",
+    "PremiumDiscount",
+    "OpeningRange",
+    "PivotPoints",
     "UpDownSideGapThreeMethods",
     "CDLXSIDEGAP3METHODS",
     "IntradayMomentumIndex",
