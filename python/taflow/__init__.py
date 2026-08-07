@@ -5,6 +5,8 @@ __version__ = "0.1.2"
 from . import talib
 from .talib import MaType
 from .acceleration_bands import AccelerationBands
+from .double_exponential_moving_average import DoubleExponentialMovingAverage
+from .kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
 from .aroon import Aroon
 from .aroon_oscillator import AroonOscillator
 from .average_directional_index import AverageDirectionalIndex
@@ -70,6 +72,10 @@ from .fibonacci_retracement import FibonacciRetracement
 from .anchored_vwap import AnchoredVolumeWeightedAveragePrice
 from .vidya import VariableIndexDynamicAverage
 from .laguerre_rsi import LaguerreRelativeStrengthIndex
+from .simple_moving_average import SimpleMovingAverage
+from .triangular_moving_average import TriangularMovingAverage
+from .triple_exponential_moving_average import TripleExponentialMovingAverage
+from .weighted_moving_average import WeightedMovingAverage
 from .relative_strength_index import RelativeStrengthIndex
 from .rmi import RelativeMomentumIndex
 from .ssl_channel import SmoothedTrendChannel
@@ -293,6 +299,12 @@ __all__ = [
     "CandleUpDownSideGapThreeMethods",
     "IntradayMomentumIndex",
     "AccelerationBands",
+    "DoubleExponentialMovingAverage",
+    "KaufmanAdaptiveMovingAverage",
+    "SimpleMovingAverage",
+    "TriangularMovingAverage",
+    "TripleExponentialMovingAverage",
+    "WeightedMovingAverage",
     "Aroon",
     "AroonOscillator",
     "AverageDirectionalIndex",
