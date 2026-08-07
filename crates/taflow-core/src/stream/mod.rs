@@ -159,7 +159,7 @@ mod window;
 mod wma;
 mod vidya;
 
-pub use accbands::{AccelerationBands, AccelerationBandsValue};
+pub use accbands::{AccelerationBands, AccelerationBandsValue, acceleration_bands};
 pub use adx::AverageDirectionalIndex;
 pub use adxr::AverageDirectionalIndexRating;
 pub use apo::AbsolutePriceOscillator;

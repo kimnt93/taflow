@@ -7,6 +7,29 @@ use crate::error::TaResult;
 
 use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
+/// Computes aligned upper, middle, and lower Acceleration Band vectors.
+pub fn acceleration_bands(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+    }
+    let mut state = AccelerationBands::new(timeperiod)?;
+    let mut upper = Vec::with_capacity(high.len());
+    let mut middle = Vec::with_capacity(high.len());
+    let mut lower = Vec::with_capacity(high.len());
+    for ((high, low), close) in high.iter().zip(low).zip(close) {
+        if let Some(output) = state.append(*high, *low, *close) {
+            upper.push(output.upper);
+            middle.push(output.middle);
+            lower.push(output.lower);
+        } else {
+            upper.push(f64::NAN);
+            middle.push(f64::NAN);
+            lower.push(f64::NAN);
+        }
+    }
+    Ok((upper, middle, lower))
+}
+
 /// One aligned upper, middle, and lower Acceleration Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct AccelerationBandsValue {
