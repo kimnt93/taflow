@@ -45,34 +45,58 @@ pub fn log_return(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     Ok(output)
 }
 
-/// Cumulative sum of a series.
-pub fn cumsum(input: &[f64]) -> Vec<f64> {
+/// Computes the prefix sum of an aligned numeric series.
+///
+/// `input` is consumed in chronological order and every output element is
+/// the sum through the corresponding bar. The output has the same length as
+/// `input`; no warm-up values are required.
+///
+/// # Parameters
+/// `input`: numeric observations in chronological order.
+///
+/// # Returns
+/// A same-length vector containing cumulative sums.
+pub fn cumulative_sum(input: &[f64]) -> Vec<f64> {
     let mut total = 0.0;
     input.iter().map(|&value| { total += value; total }).collect()
 }
 
-/// Cumulative product of a series.
-pub fn cumprod(input: &[f64]) -> Vec<f64> {
+/// Computes the prefix product of an aligned numeric series.
+///
+/// `input` is consumed in chronological order and every output element is
+/// the product through the corresponding bar. The output has the same length
+/// as `input`; no warm-up values are required.
+///
+/// # Parameters
+/// `input`: numeric observations in chronological order.
+///
+/// # Returns
+/// A same-length vector containing cumulative products.
+pub fn cumulative_product(input: &[f64]) -> Vec<f64> {
     let mut total = 1.0;
     input.iter().map(|&value| { total *= value; total }).collect()
 }
 
-/// Computes or updates `cummax` through the native Rust kernel.
+/// Computes the running maximum of an aligned numeric series.
 ///
-/// Parameters are the typed series and configuration values in the signature.
+/// # Parameters
+/// `input`: numeric observations in chronological order.
 ///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn cummax(input: &[f64]) -> Vec<f64> {
+/// # Returns
+/// A same-length vector containing the maximum observed through each bar.
+pub fn cumulative_maximum(input: &[f64]) -> Vec<f64> {
     let mut maximum = f64::NEG_INFINITY;
     input.iter().map(|&value| { maximum = maximum.max(value); maximum }).collect()
 }
 
-/// Computes or updates `cummin` through the native Rust kernel.
+/// Computes the running minimum of an aligned numeric series.
 ///
-/// Parameters are the typed series and configuration values in the signature.
+/// # Parameters
+/// `input`: numeric observations in chronological order.
 ///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn cummin(input: &[f64]) -> Vec<f64> {
+/// # Returns
+/// A same-length vector containing the minimum observed through each bar.
+pub fn cumulative_minimum(input: &[f64]) -> Vec<f64> {
     let mut minimum = f64::INFINITY;
     input.iter().map(|&value| { minimum = minimum.min(value); minimum }).collect()
 }
@@ -889,12 +913,12 @@ impl BreakOfStructureChangeOfCharacter {
     }
 }
 
-/// Computes or updates `bos_choch` through the native Rust kernel.
+/// Computes break-of-structure and change-of-character events.
 ///
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn bos_choch(
+pub fn break_of_structure_change_of_character(
     high: &[f64],
     low: &[f64],
     close: &[f64],
@@ -2151,12 +2175,12 @@ impl GarmanKlassYangZhang {
     }
 }
 
-/// Computes or updates `gk_yang_zhang` through the native Rust kernel.
+/// Computes the Garman-Klass/Yang-Zhang volatility estimate.
 ///
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn gk_yang_zhang(
+pub fn garman_klass_yang_zhang(
     open: &[f64],
     high: &[f64],
     low: &[f64],
@@ -2292,16 +2316,16 @@ pub fn yang_zhang(
         .collect())
 }
 
-/// WorldQuant Alpha101 `ts_rank(x, d)`: the rank of the current value within
+/// WorldQuant Alpha101 time-series rank: the rank of the current value within
 /// the trailing `d`-bar window as a fraction in `(0, 1]`. Shares the rolling
 /// rank kernel. Warm-up values are `NaN`.
-pub fn ts_rank(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn time_series_rank(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     rolling_rank(input, timeperiod)
 }
 
-/// WorldQuant Alpha101 `signedpower(x, a)`: pointwise `sign(x)·|x|^a`.
+/// Computes pointwise signed power `sign(x)·|x|^a`.
 /// `a == 2` is special-cased to `x·|x|` to avoid `powf`.
-pub fn signedpower(input: &[f64], exponent: f64) -> Vec<f64> {
+pub fn signed_power(input: &[f64], exponent: f64) -> Vec<f64> {
     input
         .iter()
         .map(|&value| {
@@ -2646,12 +2670,12 @@ impl OrnsteinUhlenbeckHalfLife {
     }
 }
 
-/// Computes or updates `ou_half_life` through the native Rust kernel.
+/// Computes the Ornstein-Uhlenbeck mean-reversion half-life.
 ///
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn ou_half_life(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn ornstein_uhlenbeck_half_life(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = OrnsteinUhlenbeckHalfLife::new(timeperiod)?;
     Ok(input.iter().map(|&price| state.append(price).unwrap_or(f64::NAN)).collect())
 }
@@ -2719,12 +2743,12 @@ impl CumulativeSumControlChart {
     }
 }
 
-/// Computes or updates `cusum` through the native Rust kernel.
+/// Computes the cumulative-sum control-chart signal.
 ///
 /// Parameters are the typed series and configuration values in the signature.
 ///
 /// Returns the computed value, aligned history, or a validation error.
-pub fn cusum(input: &[f64], threshold: f64) -> TaResult<Vec<f64>> {
+pub fn cumulative_sum_control_chart(input: &[f64], threshold: f64) -> TaResult<Vec<f64>> {
     let mut state = CumulativeSumControlChart::new(threshold)?;
     Ok(input.iter().map(|&change| state.append(change)).collect())
 }
@@ -6092,10 +6116,10 @@ mod tests {
     fn batch_and_stream_match() {
         let input = vec![2.0, 4.0, 1.0, 8.0, 2.0];
         assert_eq!(lag(&input, 2).unwrap()[2..], [2.0, 4.0, 1.0]);
-        assert_eq!(cumsum(&input), vec![2.0, 6.0, 7.0, 15.0, 17.0]);
-        assert_eq!(cumprod(&input), vec![2.0, 8.0, 8.0, 64.0, 128.0]);
-        assert_eq!(cummax(&input), vec![2.0, 4.0, 4.0, 8.0, 8.0]);
-        assert_eq!(cummin(&input), vec![2.0, 2.0, 1.0, 1.0, 1.0]);
+        assert_eq!(cumulative_sum(&input), vec![2.0, 6.0, 7.0, 15.0, 17.0]);
+        assert_eq!(cumulative_product(&input), vec![2.0, 8.0, 8.0, 64.0, 128.0]);
+        assert_eq!(cumulative_maximum(&input), vec![2.0, 4.0, 4.0, 8.0, 8.0]);
+        assert_eq!(cumulative_minimum(&input), vec![2.0, 2.0, 1.0, 1.0, 1.0]);
         assert_eq!(drawdown(&input), vec![0.0, 0.0, -0.75, 0.0, -0.75]);
         let expected = log_return(&input, 2).unwrap();
         let mut state = LogReturn::new(2).unwrap();
@@ -6151,14 +6175,14 @@ mod tests {
         let volume = vec![1000.0, 1100.0, 900.0, 1200.0, 1300.0, 950.0];
 
         assert_eq!(
-            ts_rank(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>(),
+            time_series_rank(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>(),
             rolling_rank(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>()
         );
         assert_eq!(
             decay_linear(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>(),
             crate::overlap::weighted_moving_average(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>()
         );
-        assert_eq!(signedpower(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
+        assert_eq!(signed_power(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
 
         let adv_batch = average_daily_dollar_value(&close, &volume, 3).unwrap();
         let mut adv_state = AverageDailyDollarValue::new(3).unwrap();
@@ -6178,13 +6202,13 @@ mod tests {
             assert_eq!(spread_state.append(*price).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
         }
 
-        let hl_batch = ou_half_life(&close, 3).unwrap();
+        let hl_batch = ornstein_uhlenbeck_half_life(&close, 3).unwrap();
         let mut hl_state = OrnsteinUhlenbeckHalfLife::new(3).unwrap();
         for (price, expected) in close.iter().zip(&hl_batch) {
             assert_eq!(hl_state.append(*price).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
         }
 
-        let cusum_batch = cusum(&[0.5, -0.5, 2.0, -1.0], 1.0).unwrap();
+        let cusum_batch = cumulative_sum_control_chart(&[0.5, -0.5, 2.0, -1.0], 1.0).unwrap();
         assert_eq!(cusum_batch, vec![0.0, 0.0, 1.0, 0.0]);
 
         assert_eq!(average_daily_dollar_value(&close, &volume[..5], 3), Err(TaError::LengthMismatch { expected: 6, got: 5 }));

@@ -240,13 +240,13 @@ The complete operator basis for all 101 alphas:
   `delay(x,d)`, `delta(x,d)` — you have these (MOM/lag);
   `ts_min/ts_max/ts_argmin/ts_argmax` — you have (MIN/MAX/MININDEX/MAXINDEX);
   `sum/product/stddev/correlation/covariance` over a window — planned;
-  **`ts_rank(x,d)`** — rank of today's value within the trailing window:
+  **`time_series_rank(x,d)`** — rank of today's value within the trailing window:
   O(log w) per bar with an order-statistics structure (Fenwick over value
   ranks or a skiplist), or O(w) rescan for small windows — same machinery
   as your planned `rolling_rank`;
   **`decay_linear(x,d)`** — extracted claim, confirmed by inspection: it is
   exactly WMA, already O(1) in taflow;
-  **`signedpower(x,a)`** = `sign(x)·|x|^a` — pointwise, trivial.
+  **`signed_power(x,a)`** = `sign(x)·|x|^a` — pointwise, trivial.
 - **Cross-sectional (require the full universe snapshot per timestamp —
   do NOT fit a single-series stream):** `rank(x)` (cross-sectional),
   `scale(x,a)` (normalize so `Σ|x| = a`), `indneutralize(x, group)` (group

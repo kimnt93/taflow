@@ -59,10 +59,10 @@ Rules:
 | `math` | pointwise transforms (acos … tanh) — NOT rolling, no prefix | lowercase |
 | `pattern` | 61 candle patterns | `candle_` prefix: `candle_doji`, `candle_engulfing`, … |
 | `cycle` | Hilbert family | `ht_` prefix |
-| `smc` | fair_value_gap, swing_highs_lows, bos_choch, order_block, liquidity, … | per recommend checklist P1 |
+| `smc` | fair_value_gap, swing_highs_lows, break_of_structure_change_of_character, order_block, liquidity, … | per recommend checklist P1 |
 | `session` | anchored_vwap, pivot_points, opening_range, session volume levels | lowercase |
-| `quant` | kalman_hedge_ratio, ornstein_uhlenbeck_half_life, spread_zscore, cusum, frac_diff, amihud, roll_spread | lowercase |
-| `ops` | ts_rank, signedpower, lag, crossover helpers | lowercase |
+| `quant` | kalman_hedge_ratio, ornstein_uhlenbeck_half_life, spread_zscore, cumulative_sum_control_chart, frac_diff, amihud, roll_spread | lowercase |
+| `ops` | time_series_rank, signed_power, lag, crossover helpers | lowercase |
 
 ### Rolling rename rule (the important one)
 
@@ -297,8 +297,8 @@ as functions land; regenerate statuses any time by running the checks in
 |---|---|---|---|
 | [x] | lag | lag | _ |
 | [x] | log_return | log_return | _ |
-| [x] | cumsum | cumsum | _ |
-| [x] | cumprod | cumprod | _ |
+| [x] | cumulative_sum | cumulative_sum | _ |
+| [x] | cumulative_product | cumulative_product | _ |
 | [x] | rolling_median | rolling_median | _ |
 | [x] | rolling_mode | rolling_mode | _ |
 | [x] | rolling_quantile | rolling_quantile | _ |
@@ -313,8 +313,8 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | ewm_cov | ewm_cov | _ |
 | [x] | ewm_corr | ewm_corr | _ |
 | [x] | drawdown | drawdown | _ |
-| [x] | cummax | cummax | _ |
-| [x] | cummin | cummin | _ |
+| [x] | cumulative_maximum | cumulative_maximum | _ |
+| [x] | cumulative_minimum | cumulative_minimum | _ |
 | [x] | rolling_sharpe | rolling_sharpe | _ |
 | [x] | rolling_sortino | rolling_sortino | _ |
 | [x] | rolling_calmar | rolling_calmar | _ |
@@ -356,7 +356,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_alpha | rolling_alpha | _ |
 | [x] | rolling_information_ratio | rolling_information_ratio | _ |
 | [x] | fair_value_gap | fair_value_gap | _ |
-| [x] | bos_choch | bos_choch | _ |
+| [x] | break_of_structure_change_of_character | break_of_structure_change_of_character | _ |
 | [x] | order_block | order_block | _ |
 | [x] | liquidity | liquidity | _ |
 | [x] | equal_highs_lows | equal_highs_lows | _ |
@@ -396,16 +396,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | parkinson | parkinson | _ |
 | [x] | garman_klass | garman_klass | _ |
 | [x] | rogers_satchell | rogers_satchell | _ |
-| [x] | gk_yang_zhang | gk_yang_zhang | _ |
+| [x] | garman_klass_yang_zhang | garman_klass_yang_zhang | _ |
 | [x] | yang_zhang | yang_zhang | _ |
 | [x] | close_to_close_sigma | close_to_close_sigma | _ |
-| [x] | ts_rank | ts_rank | _ |
-| [x] | signedpower | signedpower | _ |
+| [x] | time_series_rank | time_series_rank | _ |
+| [x] | signed_power | signed_power | _ |
 | [x] | average_daily_dollar_value | average_daily_dollar_value | _ |
 | [x] | kalman_hedge_ratio | kalman_hedge_ratio | _ |
 | [x] | ornstein_uhlenbeck_half_life | ornstein_uhlenbeck_half_life | _ |
 | [x] | spread_zscore | spread_zscore | _ |
-| [x] | cusum | cusum | _ |
+| [x] | cumulative_sum_control_chart | cumulative_sum_control_chart | _ |
 | [x] | frac_diff | frac_diff | _ |
 | [x] | amihud | amihud | _ |
 | [x] | roll_spread | roll_spread | _ |

@@ -20,7 +20,7 @@ they are not re-proposed later.
 - [x] log_return (`ln(x_t / x_{t-n})`; kept because it is the standard
       return definition and warm-up/NaN handling should match the library,
       not ad-hoc numpy)
-- [x] cumsum / cumprod
+- [x] cumulative_sum / cumulative_product
 
 ## Rolling operators
 
@@ -38,7 +38,7 @@ they are not re-proposed later.
 
 ## Return and risk features
 
-- [x] drawdown (needs a running-max state; also expose cummax / cummin as
+- [x] drawdown (needs a running-max state; also expose cumulative_maximum / cumulative_minimum as
       the underlying primitives)
 - [x] rolling_sharpe / rolling_sortino / rolling_calmar
 
