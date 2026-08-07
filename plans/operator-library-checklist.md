@@ -44,7 +44,7 @@ they are not re-proposed later.
 
 ## Extended trend indicators
 
-- [ ] HMA / VWMA / ZLEMA / ALMA
+- [x] HMA / VWMA / ZLEMA / ALMA
 
 ## Extended momentum and oscillators
 

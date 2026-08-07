@@ -124,6 +124,10 @@ from .drawdown import Drawdown
 from .rolling_sharpe import RollingSharpe
 from .rolling_sortino import RollingSortino
 from .rolling_calmar import RollingCalmar
+from .hma import Hma
+from .vwma import Vwma
+from .zlema import Zlema
+from .alma import Alma
 
 __all__ = [
     "talib",
@@ -261,5 +265,6 @@ __all__ = [
     "EwmVar", "EwmStd", "EwmCov", "EwmCorr",
     "Cummax", "Cummin", "Drawdown",
     "RollingSharpe", "RollingSortino", "RollingCalmar",
+    "Hma", "Vwma", "Zlema", "Alma",
     "__version__",
 ]

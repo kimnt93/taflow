@@ -89,6 +89,11 @@ pub fn rolling_calmar(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+pub fn hma(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state = Hma::new(timeperiod)?; Ok(input.iter().map(|&v| state.append(v).unwrap_or(f64::NAN)).collect()) }
+pub fn vwma(price: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if price.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:price.len(),got:volume.len()});} let mut state=Vwma::new(timeperiod)?;Ok(price.iter().zip(volume).map(|(&p,&v)|state.append(p,v).unwrap_or(f64::NAN)).collect()) }
+pub fn zlema(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Zlema::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+pub fn alma(input: &[f64], timeperiod: usize, offset: f64, sigma: f64) -> TaResult<Vec<f64>> { let mut state=Alma::new(timeperiod,offset,sigma)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+
 /// Rolling median. Warm-up values are `NaN`; even windows average the two
 /// central values.
 pub fn rolling_median(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
@@ -627,6 +632,24 @@ macro_rules! rolling_risk_operator {
 }
 
 fn mean(values: &VecDeque<f64>) -> f64 { values.iter().sum::<f64>() / values.len() as f64 }
+
+fn weighted_mean(values: &VecDeque<f64>) -> f64 { let denominator = (values.len() * (values.len() + 1) / 2) as f64; values.iter().enumerate().map(|(i,&v)| v * (i + 1) as f64).sum::<f64>() / denominator }
+
+#[derive(Debug, Clone)]
+pub struct Hma { raw: VecDeque<f64>, intermediate: VecDeque<f64>, period: usize, half: usize, smooth: usize, value: Option<f64> }
+impl Hma { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;let half=(period/2).max(1);let smooth=(period as f64).sqrt().floor() as usize;Ok(Self{raw:VecDeque::with_capacity(period),intermediate:VecDeque::with_capacity(smooth.max(1)),period,half,smooth:smooth.max(1),value:None})} pub fn append(&mut self,input:f64)->Option<f64>{if self.raw.len()==self.period{self.raw.pop_front();}self.raw.push_back(input);if self.raw.len()>=self.half&&self.raw.len()>=self.period{let half=weighted_mean(&self.raw.iter().skip(self.period-self.half).copied().collect());let full=weighted_mean(&self.raw);if self.intermediate.len()==self.smooth{self.intermediate.pop_front();}self.intermediate.push_back(2.0*half-full);self.value=(self.intermediate.len()==self.smooth).then(||weighted_mean(&self.intermediate));}else{self.value=None}self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.raw.clear();self.intermediate.clear();self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct Vwma { prices: VecDeque<f64>, volumes: VecDeque<f64>, period: usize, value: Option<f64> }
+impl Vwma { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{prices:VecDeque::with_capacity(period),volumes:VecDeque::with_capacity(period),period,value:None})} pub fn append(&mut self,price:f64,volume:f64)->Option<f64>{if self.prices.len()==self.period{self.prices.pop_front();self.volumes.pop_front();}self.prices.push_back(price);self.volumes.push_back(volume);self.value=(self.prices.len()==self.period).then(||{let volume=self.volumes.iter().sum::<f64>();if volume!=0.0{self.prices.iter().zip(&self.volumes).map(|(&p,&v)|p*v).sum::<f64>()/volume}else{0.0}});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.prices.clear();self.volumes.clear();self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct Zlema { values: VecDeque<f64>, period: usize, lag: usize, alpha: f64, ema: Option<f64>, value: Option<f64> }
+impl Zlema { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{values:VecDeque::with_capacity((period/2).max(1)),period,lag:(period-1)/2,alpha:2.0/(period as f64+1.0),ema:None,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.lag.max(1){self.values.pop_front();}self.values.push_back(input);if self.values.len()<=self.lag{self.value=None}else{let lagged=self.values.front().copied().unwrap_or(input);let adjusted=2.0*input-lagged;self.ema=Some(match self.ema{Some(previous)=>previous+self.alpha*(adjusted-previous),None=>adjusted});self.value=self.ema;}self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.ema=None;self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct Alma { values: VecDeque<f64>, period: usize, weights: Vec<f64>, value: Option<f64> }
+impl Alma { pub fn new(period:usize,offset:f64,sigma:f64)->TaResult<Self>{validate_period(period)?;if !(0.0..=1.0).contains(&offset)||sigma<=0.0{return Err(TaError::InvalidParameter{name:"offset/sigma",value:format!("{offset}/{sigma}"),reason:"offset must be 0..1 and sigma must be positive"});}let m=offset*(period-1)as f64;let weights=(0..period).map(|i|((-(i as f64-m).powi(2)/(2.0*sigma.powi(2)*(period as f64).powi(2))).exp())).collect();Ok(Self{values:VecDeque::with_capacity(period),period,weights,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back(input);self.value=(self.values.len()==self.period).then(||{let total=self.weights.iter().sum::<f64>();self.values.iter().zip(&self.weights).map(|(&v,&w)|v*w).sum::<f64>()/total});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}
 
 rolling_risk_operator!(RollingSharpe, |values: &VecDeque<f64>| {
     let average = mean(values);
