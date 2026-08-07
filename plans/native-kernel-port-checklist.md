@@ -36,7 +36,8 @@ For each item:
 - [ ] `AnchoredVolumeWeightedAveragePrice` (`anchored_vwap`)
 - [ ] `PivotPoints` (`pivot_points`)
 - [ ] `OpeningRange` (`opening_range`)
-- [ ] `PremiumDiscount` (`premium_discount`)
+- [x] `PremiumDiscount` (`premium_discount`) — Rust rolling range/midpoint
+  kernel, native two-output adapter, and constructor-history check verified.
 - [x] `EvenBetterSinewave` (`ebsw`) — Rust streaming kernel, native adapter,
   and finite-output smoke check verified.
 - [ ] `FibonacciRetracement` (`fibonacci_retracement`)

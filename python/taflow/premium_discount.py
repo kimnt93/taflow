@@ -1,18 +1,47 @@
-"""Premium/discount zones relative to a rolling swing midpoint."""
+"""Native premium/discount zone interface."""
+
+from typing import Any
+
 import numpy as np
+
+from ._native import StatefulPremiumDiscount
+
+
 class PremiumDiscount:
-    """Stateful PremiumDiscount indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Classify closes against the midpoint of a rolling swing range.
+
+    Parameters
+    ----------
+    close : array-like, optional
+        Initial aligned close history.
+    window : int, default 20
+        Number of closes used to calculate the rolling high and low.
     """
-    def __init__(self, close=None, window=20): self.window=int(window); self.reset(); self.extend(close) if close is not None else None
-    def append(self, close):
-        x=float(close); self._c.append(x); lo=min(self._c[-self.window:]); hi=max(self._c[-self.window:]); eq=(hi+lo)/2; z=1 if x>eq else -1 if x<eq else 0; self._v.append((z,eq)); return self._v[-1]
-    def extend(self, close):
-        for x in close: self.append(x)
+
+    def __init__(self, close: Any | None = None, window: int = 20):
+        self._state = StatefulPremiumDiscount(window)
+        if close is not None:
+            self.extend(close)
+
+    def append(self, close: float):
+        """Process one close and return `(zone, equilibrium)`."""
+        return self._state.append(float(close))
+
+    def extend(self, close: Any):
+        """Process an aligned close history and return this indicator."""
+        self._state.extend(np.asarray(close, dtype=np.float64))
         return self
-    def compute(self): return tuple(np.asarray(v) for v in zip(*self._v)) if self._v else (np.array([]),)*2
+
+    def compute(self):
+        """Return zone and equilibrium histories."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._v[-1] if self._v else None
-    def reset(self): self._c=[]; self._v=[]; return self
+    def value(self):
+        """Return the latest zone and equilibrium pair."""
+        return self._state.value
+
+    def reset(self):
+        """Clear rolling history and output."""
+        self._state.reset()
+        return self

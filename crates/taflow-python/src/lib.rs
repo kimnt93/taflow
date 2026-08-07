@@ -237,6 +237,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulEvenBetterSinewave>()?;
     m.add_class::<state_api::StatefulJurikMovingAverage>()?;
     m.add_class::<state_api::StatefulSmoothedTrendChannel>()?;
+    m.add_class::<state_api::StatefulPremiumDiscount>()?;
     m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::StatefulAd>()?;

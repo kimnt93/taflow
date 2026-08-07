@@ -12,7 +12,7 @@ use taflow::stream::{
     LaguerreRelativeStrengthIndex,
     EvenBetterSinewave,
     JurikMovingAverage,
-    SmoothedTrendChannel,
+    SmoothedTrendChannel, PremiumDiscount,
 };
 use taflow::MaType;
 
@@ -134,6 +134,36 @@ pub struct StatefulSmoothedTrendChannel {
     inner: SmoothedTrendChannel,
     lower: Vec<f64>,
     upper: Vec<f64>,
+}
+
+/// Native state adapter for premium/discount zones.
+#[pyclass]
+pub struct StatefulPremiumDiscount {
+    inner: PremiumDiscount,
+    zones: Vec<i32>,
+    equilibrium: Vec<f64>,
+}
+
+#[pymethods]
+impl StatefulPremiumDiscount {
+    #[new]
+    #[pyo3(signature = (window=20))]
+    fn new(window: usize) -> PyResult<Self> {
+        Ok(Self { inner: PremiumDiscount::new(window).map_err(py_value_error)?, zones: Vec::new(), equilibrium: Vec::new() })
+    }
+    fn append(&mut self, close: f64) -> (i32, f64) {
+        let value = self.inner.append(close);
+        self.zones.push(value.0); self.equilibrium.push(value.1); value
+    }
+    fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        for &value in close.as_slice()? { self.append(value); } Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<f64>>) {
+        (PyArray1::from_vec(py, self.zones.clone()), PyArray1::from_vec(py, self.equilibrium.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(i32, f64)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.zones.clear(); self.equilibrium.clear(); }
 }
 
 #[pymethods]
