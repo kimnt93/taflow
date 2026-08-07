@@ -110,6 +110,15 @@ bar_relation_operator!(InsideBar, |h:f64,l:f64,ph:f64,pl:f64| h<ph&&l>pl);
 bar_relation_operator!(OutsideBar, |h:f64,l:f64,ph:f64,pl:f64| h>ph&&l<pl);
 bar_relation_operator!(GapUp, |_h:f64,l:f64,ph:f64,_pl:f64| l>ph);
 bar_relation_operator!(GapDown, |h:f64,_l:f64,_ph:f64,pl:f64| h<pl);
+
+#[derive(Debug, Clone)] pub struct BarsSince { count: Option<usize>, value: Option<f64> }
+impl BarsSince { pub fn new()->Self{Self{count:None,value:None}}pub fn append(&mut self,condition:bool)->Option<f64>{self.count=Some(if condition{0}else{self.count.map_or(0,|v|v+1)});self.value=self.count.map(|v|v as f64);self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.count=None;self.value=None;}}
+impl Default for BarsSince{fn default()->Self{Self::new()}}
+#[derive(Debug, Clone)] pub struct ValueWhen { latest: Option<f64>, value: Option<f64> }
+impl ValueWhen { pub fn new()->Self{Self{latest:None,value:None}}pub fn append(&mut self,condition:bool,input:f64)->Option<f64>{if condition{self.latest=Some(input);}self.value=self.latest;self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.latest=None;self.value=None;}}
+impl Default for ValueWhen{fn default()->Self{Self::new()}}
+macro_rules! since_extreme {($name:ident,$operation:expr)=>{#[derive(Debug,Clone)]pub struct $name{extreme:Option<f64>,value:Option<f64>}impl $name{pub fn new()->Self{Self{extreme:None,value:None}}pub fn append(&mut self,condition:bool,input:f64)->Option<f64>{self.extreme=Some(if condition{input}else{self.extreme.map_or(input,|v|$operation(v,input))});self.value=self.extreme;self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.extreme=None;self.value=None;}}impl Default for $name{fn default()->Self{Self::new()}}};}
+since_extreme!(HighestSince,f64::max); since_extreme!(LowestSince,f64::min);
 pub fn rising(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Rising::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn falling(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Falling::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
