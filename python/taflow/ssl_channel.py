@@ -1,27 +1,50 @@
-"""SSL Channel using rolling SMA(high/low) and a causal side state."""
+"""Native SSL Channel interface."""
+
+from typing import Any
+
 import numpy as np
-class SSLChannel:
-    """Stateful SSLChannel indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+
+from ._native import StatefulSmoothedTrendChannel
+
+
+class SmoothedTrendChannel:
+    """Compute rolling high/low averages with causal trend-side ordering.
+
+    Parameters
+    ----------
+    high, low, close : array-like, optional
+        Initial aligned OHLC history.
+    length : int, default 10
+        Rolling average period.
     """
-    def __init__(self, high=None, low=None, close=None, length=10):
-        self.length=int(length)
-        if self.length<1: raise ValueError("length must be positive")
-        self.reset()
-        if close is not None: self.extend(high,low,close)
-    def append(self, high, low, close):
-        self._h.append(float(high)); self._l.append(float(low)); c=float(close); self._c.append(c); out=(np.nan,np.nan)
-        if len(self._c)>=self.length:
-            hh=sum(self._h[-self.length:])/self.length; ll=sum(self._l[-self.length:])/self.length
-            self._hlv=1 if c>hh else -1 if c<ll else self._hlv
-            out=(ll,hh) if self._hlv>0 else (hh,ll)
-        self._values.append(out); return out
-    def extend(self, high, low, close):
-        for row in zip(high,low,close): self.append(*row)
+
+    def __init__(self, high: Any | None = None, low: Any | None = None,
+                 close: Any | None = None, length: int = 10):
+        self._state = StatefulSmoothedTrendChannel(length)
+        if high is not None or low is not None or close is not None:
+            self.extend(high, low, close)
+
+    def append(self, high: float, low: float, close: float):
+        """Process one OHLC bar and return lower/upper channel values."""
+        return self._state.append(float(high), float(low), float(close))
+
+    def extend(self, high: Any, low: Any, close: Any):
+        """Process aligned OHLC history and return this indicator."""
+        self._state.extend(np.asarray(high, dtype=np.float64),
+                           np.asarray(low, dtype=np.float64),
+                           np.asarray(close, dtype=np.float64))
         return self
-    def compute(self): return tuple(np.asarray(v,dtype=float) for v in zip(*self._values)) if self._values else (np.array([]),)*2
+
+    def compute(self):
+        """Return lower and upper channel histories."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._values[-1] if self._values else None
-    def reset(self): self._h=[]; self._l=[]; self._c=[]; self._hlv=1; self._values=[]; return self
+    def value(self):
+        """Return the latest channel pair, or ``None`` if not warm."""
+        return self._state.value
+
+    def reset(self):
+        """Clear state and accumulated channel history."""
+        self._state.reset()
+        return self

@@ -27,7 +27,9 @@ For each item:
   Python adapter verified with warm-up and monotonic-input checks.
 - [x] `JurikMovingAverage` (`jma`) — Rust streaming kernel, native adapter,
   constructor-history and finite-output checks verified.
-- [ ] `SSLChannel` (`ssl_channel`)
+- [x] `SmoothedTrendChannel` (`ssl_channel`, previously `SSLChannel`) —
+  acronym-free native Rust/Python interface verified with multi-output
+  warm-up behavior.
 - [ ] `ParabolicMovingAverageStop` (`pmax`)
 - [ ] `TDSequential` (`td_sequential`)
 - [ ] `HeikinAshi` (`heikin_ashi`)

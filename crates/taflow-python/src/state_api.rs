@@ -12,6 +12,7 @@ use taflow::stream::{
     LaguerreRelativeStrengthIndex,
     EvenBetterSinewave,
     JurikMovingAverage,
+    SmoothedTrendChannel,
 };
 use taflow::MaType;
 
@@ -125,6 +126,39 @@ pub struct StatefulEvenBetterSinewave {
 pub struct StatefulJurikMovingAverage {
     inner: JurikMovingAverage,
     output: Vec<f64>,
+}
+
+/// Native state adapter for SSL Channel.
+#[pyclass]
+pub struct StatefulSmoothedTrendChannel {
+    inner: SmoothedTrendChannel,
+    lower: Vec<f64>,
+    upper: Vec<f64>,
+}
+
+#[pymethods]
+impl StatefulSmoothedTrendChannel {
+    #[new]
+    #[pyo3(signature = (length=10))]
+    fn new(length: usize) -> PyResult<Self> {
+        Ok(Self { inner: SmoothedTrendChannel::new(length).map_err(py_value_error)?, lower: Vec::new(), upper: Vec::new() })
+    }
+    fn append(&mut self, high: f64, low: f64, close: f64) -> (f64, f64) {
+        let value = self.inner.append(high, low, close).unwrap_or((f64::NAN, f64::NAN));
+        self.lower.push(value.0); self.upper.push(value.1); value
+    }
+    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
+        if high.len() != low.len() || high.len() != close.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
+        for ((&high, &low), &close) in high.iter().zip(low).zip(close) { self.append(high, low, close); }
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (PyArray1::from_vec(py, self.lower.clone()), PyArray1::from_vec(py, self.upper.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.lower.clear(); self.upper.clear(); }
 }
 
 #[pymethods]

@@ -68,7 +68,7 @@ from .anchored_vwap import AnchoredVolumeWeightedAveragePrice
 from .vidya import VariableIndexDynamicAverage
 from .laguerre_rsi import LaguerreRelativeStrengthIndex
 from .rmi import RelativeMomentumIndex
-from .ssl_channel import SSLChannel
+from .ssl_channel import SmoothedTrendChannel
 from .jma import JurikMovingAverage
 from .pmax import ParabolicMovingAverageStop
 from .td_sequential import TDSequential
@@ -258,7 +258,7 @@ __all__ = [
     "VariableIndexDynamicAverage",
     "LaguerreRelativeStrengthIndex",
     "RelativeMomentumIndex",
-    "SSLChannel",
+    "SmoothedTrendChannel",
     "JurikMovingAverage",
     "ParabolicMovingAverageStop",
     "TDSequential",
