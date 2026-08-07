@@ -636,17 +636,27 @@ def adapt_input(values, *, adapter="numpy", column=None):
     numpy.ndarray
         Contiguous float64 input values.
     """
-    adapters = {
-        "numpy": NumpyAdapter,
-        "list": PythonListAdapter,
-        "arrow": ArrowAdapter,
-        "polars": PolarsAdapter,
-    }
-    try:
-        adapter_cls = adapters[adapter]
-    except KeyError as error:
-        raise ValueError(f"unknown adapter: {adapter}") from error
-    return adapter_cls.input(values, column=column)
+    return AdapterGateway.input(values, adapter=adapter, column=column)
+
+
+def adapt_output(values, *, adapter="numpy", **kwargs):
+    """Convert computed values through a named output adapter.
+
+    Parameters
+    ----------
+    values : array-like
+        Aligned values produced by a pipeline or indicator.
+    adapter : str, optional
+        ``numpy``, ``list``, ``arrow``, or ``polars``.
+    **kwargs : object
+        Adapter-specific output options, such as a Polars series name.
+
+    Returns
+    -------
+    object
+        Values represented by the requested container adapter.
+    """
+    return AdapterGateway.output(values, adapter=adapter, **kwargs)
 
 
 class AdapterGateway:
@@ -661,14 +671,42 @@ class AdapterGateway:
 
     @classmethod
     def register(cls, name: str, adapter: type) -> None:
-        """Register an adapter implementing ``input`` and ``output``."""
+        """Register an adapter implementing ``input`` and ``output``.
+
+        Parameters
+        ----------
+        name : str
+            Name used by :meth:`input` and :meth:`output`.
+        adapter : type
+            Adapter class exposing callable ``input`` and ``output`` methods.
+
+        Returns
+        -------
+        None
+            The adapter is installed in the process-local registry.
+        """
         if not name or not hasattr(adapter, "input") or not hasattr(adapter, "output"):
             raise TypeError("adapter must provide input() and output()")
         cls._adapters[name] = adapter
 
     @classmethod
     def input(cls, values, *, adapter="numpy", column=None):
-        """Convert an input container through a registered adapter."""
+        """Convert an input container through a registered adapter.
+
+        Parameters
+        ----------
+        values : object
+            Array-like data or a supported table/series container.
+        adapter : str, optional
+            Registered adapter name.
+        column : str, optional
+            Column selected from a multi-column container.
+
+        Returns
+        -------
+        object
+            Normalized input accepted by the execution pipeline.
+        """
         try:
             adapter_cls = cls._adapters[adapter]
         except KeyError as error:
@@ -677,7 +715,22 @@ class AdapterGateway:
 
     @classmethod
     def output(cls, values, *, adapter="numpy", **kwargs):
-        """Convert values to a registered output container."""
+        """Convert values to a registered output container.
+
+        Parameters
+        ----------
+        values : object
+            Aligned values produced by an indicator or pipeline.
+        adapter : str, optional
+            Registered adapter name.
+        **kwargs : object
+            Adapter-specific output options.
+
+        Returns
+        -------
+        object
+            Values represented by the requested output container.
+        """
         try:
             adapter_cls = cls._adapters[adapter]
         except KeyError as error:

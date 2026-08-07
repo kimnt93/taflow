@@ -115,6 +115,7 @@ from .execution import (
     PolarsAdapter,
     PythonListAdapter,
     adapt_input,
+    adapt_output,
 )
 from .klinger_volume_oscillator import KlingerVolumeOscillator
 from .session_volume_levels import SessionVolumeLevels
@@ -321,6 +322,7 @@ __all__ = [
     "PythonListAdapter",
     "ArrowAdapter",
     "AdapterGateway",
+    "adapt_output",
     "PolarsAdapter",
     "adapt_input",
     "KlingerVolumeOscillator",

@@ -3,8 +3,6 @@
 //! Each TA implementation lives in its own module and retains only the bounded
 //! recurrence state required to process newly appended bars.
 
-use std::collections::VecDeque;
-
 use crate::error::{TaError, TaResult};
 
 mod accbands;
