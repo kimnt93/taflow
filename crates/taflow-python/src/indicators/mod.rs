@@ -142,7 +142,7 @@ pub use volatility_more::{ChaikinVolatilityOperator, KeltnerChannelsOperator};
 pub use signal_helpers::{CrossOperator, CrossoverOperator, CrossunderOperator, FallingOperator, RisingOperator};
 pub use volume_operators::{EaseOfMovementOperator, ForceIndexOperator, VwapOperator};
 pub use bar_helpers::{GapDownOperator, GapUpOperator, HigherHighOperator, InsideBarOperator, LowerLowOperator, OutsideBarOperator};
-pub use state_helpers::{BarsSinceOperator, HighestSinceOperator, LowestSinceOperator, ValueWhenOperator};
+pub use state_helpers::{BarsSinceOperator, HighestSinceOperator, LowestSinceOperator, SignalDelayOperator, ValueWhenOperator};
 pub use belt_hold::BeltHold;
 pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;

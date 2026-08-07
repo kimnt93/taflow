@@ -121,7 +121,7 @@ from ..vwap import Vwap
 from ..force_index import ForceIndex
 from ..ease_of_movement import EaseOfMovement
 from ..bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
-from ..state_helpers import BarsSince, ValueWhen, HighestSince, LowestSince
+from ..state_helpers import BarsSince, ValueWhen, HighestSince, LowestSince, SignalDelay
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -211,4 +211,5 @@ __all__ = [
     "Vwap", "ForceIndex", "EaseOfMovement",
     "HigherHigh", "LowerLow", "InsideBar", "OutsideBar", "GapUp", "GapDown",
     "BarsSince", "ValueWhen", "HighestSince", "LowestSince",
+    "SignalDelay",
 ]

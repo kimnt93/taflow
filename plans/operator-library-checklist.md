@@ -69,14 +69,24 @@ they are not re-proposed later.
 
 ## Signal and strategy helpers
 
-- [ ] crossover / crossunder (aliases: cross_up / cross_down; plus plain
-      `cross` = either direction)
-- [ ] rising / falling
-- [ ] higher_high / lower_low / inside_bar / outside_bar
-- [ ] gap_up / gap_down
-- [ ] bars_since / value_when
-- [ ] highest_since / lowest_since
-- [ ] signal_delay / position_hold / entry_exit
+- [x] crossover
+- [x] crossunder (aliases: `cross_up` / `cross_down`)
+- [x] cross (either direction)
+- [x] rising
+- [x] falling
+- [x] higher_high
+- [x] lower_low
+- [x] inside_bar
+- [x] outside_bar
+- [x] gap_up
+- [x] gap_down
+- [x] bars_since
+- [x] value_when
+- [x] highest_since
+- [x] lowest_since
+- [x] signal_delay
+- [ ] position_hold
+- [ ] entry_exit
 
 ## Extended pattern recognition
 
