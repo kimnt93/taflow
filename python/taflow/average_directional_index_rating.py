@@ -7,7 +7,17 @@ import numpy as np
 
 
 class AverageDirectionalIndexRating:
-    """Incrementally compute the lag-averaged Average Directional Index."""
+    """Incrementally compute the lag-averaged Average Directional Index
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    AverageDirectionalIndexRating
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -65,7 +75,13 @@ class AverageDirectionalIndexRating:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history."""
+        """Return the aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

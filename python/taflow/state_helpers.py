@@ -20,7 +20,18 @@ def _make(native: object, name: str) -> type:
     """Create a native-backed two-input state adapter class."""
 
     class State:
-        """Track a condition and associated value series."""
+        """Track a condition and associated value series.
+
+        Parameters
+        ----------
+        condition, input_values : array-like, optional
+            Initial aligned condition and value histories.
+
+        Returns
+        -------
+        State
+            A persistent native-backed signal helper.
+        """
 
         def __init__(
             self, condition: Any | None = None, _input: Any | None = None
@@ -31,28 +42,68 @@ def _make(native: object, name: str) -> type:
                 self.extend(condition, _input)
 
         def append(self, condition: bool, _input: float) -> "State":
-            """Append one condition/value pair to the native state."""
+            """Append one condition/value pair to the native state..
+
+            Parameters
+            ----------
+            values : object
+                Input values or the aligned result container.
+
+            Returns
+            -------
+            object
+                Updated state, converted values, or aligned output.
+            """
             self._state.append(condition, _input)
             return self
 
         def extend(self, condition: Any, _input: Any) -> "State":
-            """Process aligned condition and value histories in native Rust."""
+            """Process aligned condition and value histories in native Rust..
+
+            Parameters
+            ----------
+            values : object
+                Input values or the aligned result container.
+
+            Returns
+            -------
+            object
+                Updated state, converted values, or aligned output.
+            """
             self._state.extend(
                 np.asarray(condition, dtype=bool), as_float64_series(_input)
             )
             return self
 
         def compute(self) -> np.ndarray:
-            """Return the aligned native output history."""
+            """Return the aligned native output history..
+
+            Returns
+            -------
+            object
+                Updated state, converted values, or aligned output.
+            """
             return self._state.compute()
 
         @property
         def value(self) -> object:
-            """Return the latest native output."""
+            """Return the latest native output..
+
+            Returns
+            -------
+            object
+                Updated state, converted values, or aligned output.
+            """
             return self._state.value
 
         def reset(self) -> "State":
-            """Reset the native state and accumulated history."""
+            """Reset the native state and accumulated history..
+
+            Returns
+            -------
+            object
+                Updated state, converted values, or aligned output.
+            """
             self._state.reset()
             return self
 

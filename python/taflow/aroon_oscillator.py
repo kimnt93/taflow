@@ -32,28 +32,68 @@ class AroonOscillator:
             self.extend(high, low)
 
     def append(self, high: float, low: float) -> "AroonOscillator":
-        """Append one high/low bar and update the native state."""
+        """Append one high/low bar and update the native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         value = self._state.append(float(high), float(low))
         self._values.append(np.nan if value is None else value)
         return self
 
     def extend(self, high: Any, low: Any) -> "AroonOscillator":
-        """Append aligned high and low histories to the native state."""
+        """Append aligned high and low histories to the native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         values = self._state.extend(as_float64_series(high), as_float64_series(low))
         self._values.extend(np.asarray(values, dtype=np.float64).tolist())
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned oscillator history."""
+        """Return the aligned oscillator history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self) -> float | None:
-        """Return the latest oscillator value, or ``None`` during warm-up."""
+        """Return the latest oscillator value, or ``None`` during warm-up..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> "AroonOscillator":
-        """Reset native state and accumulated output history."""
+        """Reset native state and accumulated output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         self._values.clear()
         return self

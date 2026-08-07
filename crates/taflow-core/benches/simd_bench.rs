@@ -89,17 +89,17 @@ fn bench_indicators(c: &mut Criterion) {
 
     let mut group = c.benchmark_group("indicators_10k");
     group.bench_function("SMA_20", |b| {
-        b.iter(|| taflow::overlap::sma(black_box(&close), 20));
+        b.iter(|| taflow::stream::simple_moving_average(black_box(&close), 20));
     });
     group.bench_function("EMA_20", |b| {
-        b.iter(|| taflow::overlap::ema(black_box(&close), 20));
+        b.iter(|| taflow::stream::exponential_moving_average(black_box(&close), 20));
     });
     group.bench_function("RSI_14", |b| {
-        b.iter(|| taflow::momentum::rsi(black_box(&close), 14));
+        b.iter(|| taflow::stream::relative_strength_index(black_box(&close), 14));
     });
     group.bench_function("BBANDS_20", |b| {
         b.iter(|| {
-            taflow::overlap::bbands(
+            taflow::stream::bollinger_bands(
                 black_box(&close),
                 20,
                 2.0,
@@ -109,7 +109,7 @@ fn bench_indicators(c: &mut Criterion) {
         });
     });
     group.bench_function("STDDEV_20", |b| {
-        b.iter(|| taflow::statistic::stddev(black_box(&close), 20, 1.0));
+        b.iter(|| taflow::stream::rolling_std(black_box(&close), 20, 1.0));
     });
     group.finish();
 }

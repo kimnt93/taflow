@@ -190,7 +190,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | stochastic_relative_strength_index | stochastic_relative_strength_index | STOCHRSI |
 | [x] | triple_exponential_rate_of_change | triple_exponential_rate_of_change | TRIX |
 | [x] | ultimate_oscillator | ultimate_oscillator | ULTOSC |
-| [x] | williams_r | williams_r | WILLR |
+| [x] | williams_percent_r | williams_percent_r | WILLR |
 | [x] | add | add | ADD |
 | [x] | div | div | DIV |
 | [x] | rolling_max | rolling_max | MAX |
@@ -218,57 +218,57 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | candle_three_outside | candle_three_outside | CDL3OUTSIDE |
 | [x] | candle_three_stars_in_south | candle_three_stars_in_south | CDL3STARSINSOUTH |
 | [x] | candle_three_white_soldiers | candle_three_white_soldiers | CDL3WHITESOLDIERS |
-| [x] | candle_abandonedbaby | candle_abandonedbaby | CDLABANDONEDBABY |
-| [x] | candle_advanceblock | candle_advanceblock | CDLADVANCEBLOCK |
-| [x] | candle_belthold | candle_belthold | CDLBELTHOLD |
+| [x] | candle_abandoned_baby | candle_abandoned_baby | CDLABANDONEDBABY |
+| [x] | candle_advance_block | candle_advance_block | CDLADVANCEBLOCK |
+| [x] | candle_belt_hold | candle_belt_hold | CDLBELTHOLD |
 | [x] | candle_breakaway | candle_breakaway | CDLBREAKAWAY |
-| [x] | candle_closingmarubozu | candle_closingmarubozu | CDLCLOSINGMARUBOZU |
-| [x] | candle_concealbabyswall | candle_concealbabyswall | CDLCONCEALBABYSWALL |
+| [x] | candle_closing_marubozu | candle_closing_marubozu | CDLCLOSINGMARUBOZU |
+| [x] | candle_conceal_baby_swall | candle_conceal_baby_swall | CDLCONCEALBABYSWALL |
 | [x] | candle_counterattack | candle_counterattack | CDLCOUNTERATTACK |
-| [x] | candle_darkcloudcover | candle_darkcloudcover | CDLDARKCLOUDCOVER |
+| [x] | candle_dark_cloud_cover | candle_dark_cloud_cover | CDLDARKCLOUDCOVER |
 | [x] | candle_doji | candle_doji | CDLDOJI |
-| [x] | candle_dojistar | candle_dojistar | CDLDOJISTAR |
-| [x] | candle_dragonflydoji | candle_dragonflydoji | CDLDRAGONFLYDOJI |
+| [x] | candle_doji_star | candle_doji_star | CDLDOJISTAR |
+| [x] | candle_dragonfly_doji | candle_dragonfly_doji | CDLDRAGONFLYDOJI |
 | [x] | candle_engulfing | candle_engulfing | CDLENGULFING |
-| [x] | candle_eveningdojistar | candle_eveningdojistar | CDLEVENINGDOJISTAR |
-| [x] | candle_eveningstar | candle_eveningstar | CDLEVENINGSTAR |
-| [x] | candle_gapsidesidewhite | candle_gapsidesidewhite | CDLGAPSIDESIDEWHITE |
-| [x] | candle_gravestonedoji | candle_gravestonedoji | CDLGRAVESTONEDOJI |
+| [x] | candle_evening_doji_star | candle_evening_doji_star | CDLEVENINGDOJISTAR |
+| [x] | candle_evening_star | candle_evening_star | CDLEVENINGSTAR |
+| [x] | candle_gap_side_side_white | candle_gap_side_side_white | CDLGAPSIDESIDEWHITE |
+| [x] | candle_gravestone_doji | candle_gravestone_doji | CDLGRAVESTONEDOJI |
 | [x] | candle_hammer | candle_hammer | CDLHAMMER |
-| [x] | candle_hangingman | candle_hangingman | CDLHANGINGMAN |
+| [x] | candle_hanging_man | candle_hanging_man | CDLHANGINGMAN |
 | [x] | candle_harami | candle_harami | CDLHARAMI |
-| [x] | candle_haramicross | candle_haramicross | CDLHARAMICROSS |
-| [x] | candle_highwave | candle_highwave | CDLHIGHWAVE |
+| [x] | candle_harami_cross | candle_harami_cross | CDLHARAMICROSS |
+| [x] | candle_high_wave | candle_high_wave | CDLHIGHWAVE |
 | [x] | candle_hikkake | candle_hikkake | CDLHIKKAKE |
 | [x] | candle_hikkake_modified | candle_hikkake_modified | CDLHIKKAKEMOD |
-| [x] | candle_homingpigeon | candle_homingpigeon | CDLHOMINGPIGEON |
+| [x] | candle_homing_pigeon | candle_homing_pigeon | CDLHOMINGPIGEON |
 | [x] | candle_identical_three_crows | candle_identical_three_crows | CDLIDENTICAL3CROWS |
-| [x] | candle_inneck | candle_inneck | CDLINNECK |
-| [x] | candle_invertedhammer | candle_invertedhammer | CDLINVERTEDHAMMER |
+| [x] | candle_in_neck | candle_in_neck | CDLINNECK |
+| [x] | candle_inverted_hammer | candle_inverted_hammer | CDLINVERTEDHAMMER |
 | [x] | candle_kicking | candle_kicking | CDLKICKING |
-| [x] | candle_kickingbylength | candle_kickingbylength | CDLKICKINGBYLENGTH |
-| [x] | candle_ladderbottom | candle_ladderbottom | CDLLADDERBOTTOM |
-| [x] | candle_longleggeddoji | candle_longleggeddoji | CDLLONGLEGGEDDOJI |
-| [x] | candle_longline | candle_longline | CDLLONGLINE |
+| [x] | candle_kicking_by_length | candle_kicking_by_length | CDLKICKINGBYLENGTH |
+| [x] | candle_ladder_bottom | candle_ladder_bottom | CDLLADDERBOTTOM |
+| [x] | candle_long_legged_doji | candle_long_legged_doji | CDLLONGLEGGEDDOJI |
+| [x] | candle_long_line | candle_long_line | CDLLONGLINE |
 | [x] | candle_marubozu | candle_marubozu | CDLMARUBOZU |
-| [x] | candle_matchinglow | candle_matchinglow | CDLMATCHINGLOW |
-| [x] | candle_mathold | candle_mathold | CDLMATHOLD |
-| [x] | candle_morningdojistar | candle_morningdojistar | CDLMORNINGDOJISTAR |
-| [x] | candle_morningstar | candle_morningstar | CDLMORNINGSTAR |
-| [x] | candle_onneck | candle_onneck | CDLONNECK |
+| [x] | candle_matching_low | candle_matching_low | CDLMATCHINGLOW |
+| [x] | candle_mat_hold | candle_mat_hold | CDLMATHOLD |
+| [x] | candle_morning_doji_star | candle_morning_doji_star | CDLMORNINGDOJISTAR |
+| [x] | candle_morning_star | candle_morning_star | CDLMORNINGSTAR |
+| [x] | candle_on_neck | candle_on_neck | CDLONNECK |
 | [x] | candle_piercing | candle_piercing | CDLPIERCING |
 | [x] | candle_rickshawman | candle_rickshawman | CDLRICKSHAWMAN |
 | [x] | candle_rise_fall_three_methods | candle_rise_fall_three_methods | CDLRISEFALL3METHODS |
-| [x] | candle_separatinglines | candle_separatinglines | CDLSEPARATINGLINES |
-| [x] | candle_shootingstar | candle_shootingstar | CDLSHOOTINGSTAR |
-| [x] | candle_shortline | candle_shortline | CDLSHORTLINE |
+| [x] | candle_separating_lines | candle_separating_lines | CDLSEPARATINGLINES |
+| [x] | candle_shooting_star | candle_shooting_star | CDLSHOOTINGSTAR |
+| [x] | candle_short_line | candle_short_line | CDLSHORTLINE |
 | [x] | candle_spinningtop | candle_spinningtop | CDLSPINNINGTOP |
-| [x] | candle_stalledpattern | candle_stalledpattern | CDLSTALLEDPATTERN |
-| [x] | candle_sticksandwich | candle_sticksandwich | CDLSTICKSANDWICH |
+| [x] | candle_stalled_pattern | candle_stalled_pattern | CDLSTALLEDPATTERN |
+| [x] | candle_stick_sandwich | candle_stick_sandwich | CDLSTICKSANDWICH |
 | [x] | candle_takuri | candle_takuri | CDLTAKURI |
-| [x] | candle_tasukigap | candle_tasukigap | CDLTASUKIGAP |
+| [x] | candle_tasuki_gap | candle_tasuki_gap | CDLTASUKIGAP |
 | [x] | candle_thrusting | candle_thrusting | CDLTHRUSTING |
-| [x] | candle_tristar | candle_tristar | CDLTRISTAR |
+| [x] | candle_tri_star | candle_tri_star | CDLTRISTAR |
 | [x] | candle_unique_three_river | candle_unique_three_river | CDLUNIQUE3RIVER |
 | [x] | candle_upside_gap_two_crows | candle_upside_gap_two_crows | CDLUPSIDEGAP2CROWS |
 | [x] | candle_up_down_side_gap_three_methods | candle_up_down_side_gap_three_methods | CDLXSIDEGAP3METHODS |
@@ -474,12 +474,24 @@ For every function claimed done, verify ALL of:
    thresholds; wire the parameter through for full parity (CDLABANDONEDBABY,
    CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD,
    CDLMORNINGDOJISTAR, CDLMORNINGSTAR).
-2. Pattern logic disagrees with TA-Lib on real data for: CDL3LINESTRIKE,
-   CDLADVANCEBLOCK, CDLGAPSIDESIDEWHITE, CDLHIKKAKEMOD, CDLLADDERBOTTOM,
-   CDLTRISTAR, CDLUNIQUE3RIVER — diff against TA-Lib C source.
-3. Statistics drift at 100k bars (STDDEV/VAR/CORREL/LINEARREG_SLOPE/
-   LINEARREG_ANGLE ~1e-9..3e-7; CCI state-path only) — needs the parity
-   contract decision + accumulator reseeding (optimize-methods §6.1/§6.2).
+2. Pattern logic still disagrees with TA-Lib (verify/REPORT.md run of
+   2026-08-07, 10k bars): CDLHIKKAKEMOD, CDLLADDERBOTTOM, CDLTRISTAR,
+   CDLUNIQUE3RIVER — diff against TA-Lib C source.
+   (CDL3LINESTRIKE, CDLADVANCEBLOCK, CDLGAPSIDESIDEWHITE now pass.)
+3. Remaining numeric drift vs TA-Lib (verify run @10k):
+   LINEARREG_SLOPE 1.7e-10, LINEARREG_ANGLE 9.5e-9 — parity-contract
+   decision + accumulator reseeding (optimize-methods §6.1/§6.2).
+   STDDEV/VAR/CORREL/CCI now pass at this size.
+4. SUM batch/state arithmetic order is now aligned: the rolling batch path
+   uses the same left-to-right subtract-then-add recurrence as `RollingSum`,
+   so a 9k-`extend` + 1k-`append` split is bitwise-identical to one-shot
+   output.
+5. **rolling_skew / rolling_kurtosis numerical instability**: raw
+   power-sum moments cancel catastrophically at price~100 scale (errors
+   3.8e-7 / 1.7e-4 vs pandas after exact population-form conversion —
+   taflow's population convention itself is correct). Maintain central
+   moments incrementally or anchor-subtract a running mean
+   (optimize-methods §6.2).
 
 ## 5. How to run the review
 
@@ -488,6 +500,8 @@ For every function claimed done, verify ALL of:
 source .venv/bin/activate && maturin develop --release -m crates/taflow-python/Cargo.toml
 # correctness + performance evidence for changed functions
 python benches/bench.py <FN...> --quick
+# oracle verification (standalone uv project; writes verify/REPORT.md)
+cd verify && uv sync && uv run python verify.py
 # style
 cargo fmt --check && black --check python/
 ```

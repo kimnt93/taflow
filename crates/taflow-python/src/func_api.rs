@@ -184,7 +184,7 @@ pub fn MAMA(
     fastlimit: f64,
     slowlimit: f64,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (mama, fama) = ta_err!(core::overlap::mesa_adaptive_moving_average(_input.as_slice()?, fastlimit, slowlimit))?;
+    let (mama, fama) = ta_err!(core::stream::mesa_adaptive_moving_average(_input.as_slice()?, fastlimit, slowlimit))?;
     Ok((to_py_array(py, mama), to_py_array(py, fama)))
 }
 
@@ -289,7 +289,7 @@ pub fn MIDPOINT(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::midpoint(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::midpoint(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -306,7 +306,7 @@ pub fn MIDPRICE(
     low: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::midprice(
+    let result = ta_err!(core::stream::midprice(
         high.as_slice()?,
         low.as_slice()?,
         timeperiod
@@ -348,7 +348,7 @@ pub fn MAVP(
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_TRENDLINE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::hilbert_transform_trendline(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_trendline(_input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -367,7 +367,7 @@ pub fn MA(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::overlap::moving_average(_input.as_slice()?, timeperiod, ma))?;
+    let result = ta_err!(core::stream::moving_average(_input.as_slice()?, timeperiod, ma))?;
     Ok(to_py_array(py, result))
 }
 
@@ -388,7 +388,7 @@ pub fn IMI(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::intraday_momentum_index(
+    let result = ta_err!(core::stream::intraday_momentum_index(
         _open.as_slice()?,
         close.as_slice()?,
         timeperiod
@@ -426,7 +426,7 @@ pub fn MACD(
     slowperiod: usize,
     signalperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (m, s, h) = ta_err!(core::momentum::moving_average_convergence_divergence(
+    let (m, s, h) = ta_err!(core::stream::moving_average_convergence_divergence(
         _input.as_slice()?,
         fastperiod,
         slowperiod,
@@ -458,7 +458,7 @@ pub fn MACDEXT(
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let sigmt = core::MaType::try_from(signalmatype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let (m, s, h) = ta_err!(core::momentum::moving_average_convergence_divergence_extended(
+    let (m, s, h) = ta_err!(core::stream::moving_average_convergence_divergence_extended(
         _input.as_slice()?,
         fastperiod,
         fmt,
@@ -482,7 +482,7 @@ pub fn MACDFIX(
     _input: PyReadonlyArray1<f64>,
     signalperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (m, s, h) = ta_err!(core::momentum::moving_average_convergence_divergence_fixed(_input.as_slice()?, signalperiod))?;
+    let (m, s, h) = ta_err!(core::stream::moving_average_convergence_divergence_fixed(_input.as_slice()?, signalperiod))?;
     Ok((to_py_array(py, m), to_py_array(py, s), to_py_array(py, h)))
 }
 
@@ -508,7 +508,7 @@ pub fn STOCH(
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
     let sdm = core::MaType::try_from(slowd_matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let (k, d) = ta_err!(core::momentum::stochastic_oscillator(
+    let (k, d) = ta_err!(core::stream::stochastic_oscillator(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -539,7 +539,7 @@ pub fn STOCHF(
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
     let fdm = core::MaType::try_from(fastd_matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let (k, d) = ta_err!(core::momentum::fast_stochastic_oscillator(
+    let (k, d) = ta_err!(core::stream::fast_stochastic_oscillator(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -567,7 +567,7 @@ pub fn STOCHRSI(
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
     let fdm = core::MaType::try_from(fastd_matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let (k, d) = ta_err!(core::momentum::stochastic_relative_strength_index(
+    let (k, d) = ta_err!(core::stream::stochastic_relative_strength_index(
         _input.as_slice()?,
         timeperiod,
         fastk_period,
@@ -591,7 +591,7 @@ pub fn ADX(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::average_directional_index(
+    let result = ta_err!(core::stream::average_directional_index(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -614,7 +614,7 @@ pub fn ADXR(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::average_directional_index_rating(
+    let result = ta_err!(core::stream::average_directional_index_rating(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -740,7 +740,7 @@ pub fn WILLR(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::stream::williams_r(
+    let result = ta_err!(core::stream::williams_percent_r(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -850,7 +850,7 @@ pub fn AROON(
     low: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (down, up) = ta_err!(core::momentum::aroon(
+    let (down, up) = ta_err!(core::stream::aroon(
         high.as_slice()?,
         low.as_slice()?,
         timeperiod
@@ -871,7 +871,7 @@ pub fn AROONOSC(
     low: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::aroon_oscillator(
+    let result = ta_err!(core::stream::aroon_oscillator(
         high.as_slice()?,
         low.as_slice()?,
         timeperiod
@@ -916,7 +916,7 @@ pub fn TRIX(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::triple_exponential_rate_of_change(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::triple_exponential_rate_of_change(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -936,7 +936,7 @@ pub fn ULTOSC(
     timeperiod2: usize,
     timeperiod3: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::ultimate_oscillator(
+    let result = ta_err!(core::stream::ultimate_oscillator(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -1213,7 +1213,7 @@ pub fn AVGPRICE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::average_price(
+    let result = ta_err!(core::stream::average_price(
         _open.as_slice()?,
         high.as_slice()?,
         low.as_slice()?,
@@ -1233,7 +1233,7 @@ pub fn MEDPRICE(
     high: PyReadonlyArray1<f64>,
     low: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::median_price(
+    let result = ta_err!(core::stream::median_price(
         high.as_slice()?,
         low.as_slice()?
     ))?;
@@ -1252,7 +1252,7 @@ pub fn TYPPRICE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::typical_price(
+    let result = ta_err!(core::stream::typical_price(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -1272,7 +1272,7 @@ pub fn WCLPRICE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::weighted_close(
+    let result = ta_err!(core::stream::weighted_close(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -1296,7 +1296,7 @@ pub fn AVGDEV(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::avgdev(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_avgdev(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1313,7 +1313,7 @@ pub fn STDDEV(
     timeperiod: usize,
     nbdev: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::stddev(
+    let result = ta_err!(core::stream::rolling_std(
         _input.as_slice()?,
         timeperiod,
         nbdev
@@ -1334,7 +1334,7 @@ pub fn VAR(
     timeperiod: usize,
     nbdev: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::var(_input.as_slice()?, timeperiod, nbdev))?;
+    let result = ta_err!(core::stream::rolling_var(_input.as_slice()?, timeperiod, nbdev))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1351,7 +1351,7 @@ pub fn BETA(
     input1: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::beta(
+    let result = ta_err!(core::stream::rolling_beta(
         input0.as_slice()?,
         input1.as_slice()?,
         timeperiod
@@ -1372,7 +1372,7 @@ pub fn CORREL(
     input1: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::correl(
+    let result = ta_err!(core::stream::rolling_corr(
         input0.as_slice()?,
         input1.as_slice()?,
         timeperiod
@@ -1392,7 +1392,7 @@ pub fn LINEARREG(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::linearreg(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_linreg(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1408,7 +1408,7 @@ pub fn LINEARREG_SLOPE(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::linearreg_slope(
+    let result = ta_err!(core::stream::rolling_linreg_slope(
         _input.as_slice()?,
         timeperiod
     ))?;
@@ -1427,7 +1427,7 @@ pub fn LINEARREG_INTERCEPT(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::linearreg_intercept(
+    let result = ta_err!(core::stream::rolling_linreg_intercept(
         _input.as_slice()?,
         timeperiod
     ))?;
@@ -1446,7 +1446,7 @@ pub fn LINEARREG_ANGLE(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::linearreg_angle(
+    let result = ta_err!(core::stream::rolling_linreg_angle(
         _input.as_slice()?,
         timeperiod
     ))?;
@@ -1465,7 +1465,7 @@ pub fn TSF(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::statistic::tsf(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_tsf(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1488,21 +1488,21 @@ macro_rules! math_transform_py {
     };
 }
 
-math_transform_py!(ACOS, core::math_transform::acos);
-math_transform_py!(ASIN, core::math_transform::asin);
-math_transform_py!(ATAN, core::math_transform::atan);
-math_transform_py!(CEIL, core::math_transform::ceil);
-math_transform_py!(COS, core::math_transform::cos);
-math_transform_py!(COSH, core::math_transform::cosh);
-math_transform_py!(EXP, core::math_transform::exp);
-math_transform_py!(FLOOR, core::math_transform::floor);
-math_transform_py!(LN, core::math_transform::ln);
-math_transform_py!(LOG10, core::math_transform::log10);
-math_transform_py!(SIN, core::math_transform::sin);
-math_transform_py!(SINH, core::math_transform::sinh);
-math_transform_py!(SQRT, core::math_transform::sqrt);
-math_transform_py!(TAN, core::math_transform::tan);
-math_transform_py!(TANH, core::math_transform::tanh);
+math_transform_py!(ACOS, core::stream::acos);
+math_transform_py!(ASIN, core::stream::asin);
+math_transform_py!(ATAN, core::stream::atan);
+math_transform_py!(CEIL, core::stream::ceil);
+math_transform_py!(COS, core::stream::cos);
+math_transform_py!(COSH, core::stream::cosh);
+math_transform_py!(EXP, core::stream::exp);
+math_transform_py!(FLOOR, core::stream::floor);
+math_transform_py!(LN, core::stream::ln);
+math_transform_py!(LOG10, core::stream::log10);
+math_transform_py!(SIN, core::stream::sin);
+math_transform_py!(SINH, core::stream::sinh);
+math_transform_py!(SQRT, core::stream::sqrt);
+math_transform_py!(TAN, core::stream::tan);
+math_transform_py!(TANH, core::stream::tanh);
 
 // ============================================================
 // Math Operators
@@ -1519,7 +1519,7 @@ pub fn ADD(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::add(
+    let result = ta_err!(core::stream::add(
         input0.as_slice()?,
         input1.as_slice()?
     ))?;
@@ -1537,7 +1537,7 @@ pub fn SUB(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::sub(
+    let result = ta_err!(core::stream::sub(
         input0.as_slice()?,
         input1.as_slice()?
     ))?;
@@ -1555,7 +1555,7 @@ pub fn MULT(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::mult(
+    let result = ta_err!(core::stream::mult(
         input0.as_slice()?,
         input1.as_slice()?
     ))?;
@@ -1573,7 +1573,7 @@ pub fn DIV(
     input0: PyReadonlyArray1<f64>,
     input1: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::div(
+    let result = ta_err!(core::stream::div(
         input0.as_slice()?,
         input1.as_slice()?
     ))?;
@@ -1592,7 +1592,7 @@ pub fn MAX(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::max(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_max(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1608,7 +1608,7 @@ pub fn MAXINDEX(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::maxindex(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_argmax(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1624,7 +1624,7 @@ pub fn MIN(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::min(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_min(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1640,7 +1640,7 @@ pub fn MININDEX(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::minindex(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_argmin(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1656,7 +1656,7 @@ pub fn SUM(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::math_operator::sum(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rolling_sum(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1672,7 +1672,7 @@ pub fn MINMAX(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (min_arr, max_arr) = ta_err!(core::math_operator::minmax(_input.as_slice()?, timeperiod))?;
+    let (min_arr, max_arr) = ta_err!(core::stream::rolling_minmax(_input.as_slice()?, timeperiod))?;
     Ok((to_py_array(py, min_arr), to_py_array(py, max_arr)))
 }
 
@@ -1688,7 +1688,7 @@ pub fn MINMAXINDEX(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (minidx, maxidx) = ta_err!(core::math_operator::minmaxindex(
+    let (minidx, maxidx) = ta_err!(core::stream::rolling_minmax_index(
         _input.as_slice()?,
         timeperiod
     ))?;
@@ -1706,7 +1706,7 @@ pub fn MINMAXINDEX(
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_DCPERIOD(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_period(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_dominant_cycle_period(_input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1717,7 +1717,7 @@ pub fn HT_DCPERIOD(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_DCPHASE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_phase(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_dominant_cycle_phase(_input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1731,7 +1731,7 @@ pub fn HT_PHASOR(
     py: Python<'_>,
     _input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (inphase, quadrature) = ta_err!(core::cycle::hilbert_transform_phasor(_input.as_slice()?))?;
+    let (inphase, quadrature) = ta_err!(core::stream::hilbert_transform_phasor(_input.as_slice()?))?;
     Ok((to_py_array(py, inphase), to_py_array(py, quadrature)))
 }
 
@@ -1745,7 +1745,7 @@ pub fn HT_SINE(
     py: Python<'_>,
     _input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (sine, leadsine) = ta_err!(core::cycle::hilbert_transform_sine_wave(_input.as_slice()?))?;
+    let (sine, leadsine) = ta_err!(core::stream::hilbert_transform_sine_wave(_input.as_slice()?))?;
     Ok((to_py_array(py, sine), to_py_array(py, leadsine)))
 }
 
@@ -1756,7 +1756,7 @@ pub fn HT_SINE(
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn HT_TRENDMODE(py: Python<'_>, _input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<i32>>> {
-    let result = ta_err!(core::cycle::hilbert_transform_trend_mode(_input.as_slice()?))?;
+    let result = ta_err!(core::stream::hilbert_transform_trend_mode(_input.as_slice()?))?;
     Ok(crate::conversion::to_py_array_i32(py, result))
 }
 
@@ -1820,64 +1820,64 @@ macro_rules! cdl_pyfunction_penetration {
 }
 
 // 所有 K 线形态绑定
-cdl_pyfunction!(CDLDOJI, core::pattern::cdl_doji);
-cdl_pyfunction!(CDLHAMMER, core::pattern::cdl_hammer);
-cdl_pyfunction!(CDLENGULFING, core::pattern::cdl_engulfing);
-cdl_pyfunction!(CDL2CROWS, core::pattern::cdl_2crows);
-cdl_pyfunction!(CDL3BLACKCROWS, core::pattern::cdl_3blackcrows);
-cdl_pyfunction!(CDL3INSIDE, core::pattern::cdl_3inside);
-cdl_pyfunction!(CDL3LINESTRIKE, core::pattern::cdl_3linestrike);
-cdl_pyfunction!(CDL3OUTSIDE, core::pattern::cdl_3outside);
-cdl_pyfunction!(CDL3STARSINSOUTH, core::pattern::cdl_3starsinsouth);
-cdl_pyfunction!(CDL3WHITESOLDIERS, core::pattern::cdl_3whitesoldiers);
-cdl_pyfunction_penetration!(CDLABANDONEDBABY, core::pattern::cdl_abandonedbaby, 0.3);
-cdl_pyfunction!(CDLADVANCEBLOCK, core::pattern::cdl_advanceblock);
-cdl_pyfunction!(CDLBELTHOLD, core::pattern::cdl_belthold);
-cdl_pyfunction!(CDLBREAKAWAY, core::pattern::cdl_breakaway);
-cdl_pyfunction!(CDLCLOSINGMARUBOZU, core::pattern::cdl_closingmarubozu);
-cdl_pyfunction!(CDLCONCEALBABYSWALL, core::pattern::cdl_concealbabyswall);
-cdl_pyfunction!(CDLCOUNTERATTACK, core::pattern::cdl_counterattack);
-cdl_pyfunction_penetration!(CDLDARKCLOUDCOVER, core::pattern::cdl_darkcloudcover, 0.5);
-cdl_pyfunction!(CDLDOJISTAR, core::pattern::cdl_dojistar);
-cdl_pyfunction!(CDLDRAGONFLYDOJI, core::pattern::cdl_dragonflydoji);
-cdl_pyfunction_penetration!(CDLEVENINGDOJISTAR, core::pattern::cdl_eveningdojistar, 0.3);
-cdl_pyfunction_penetration!(CDLEVENINGSTAR, core::pattern::cdl_eveningstar, 0.3);
-cdl_pyfunction!(CDLGAPSIDESIDEWHITE, core::pattern::cdl_gapsidesidewhite);
-cdl_pyfunction!(CDLGRAVESTONEDOJI, core::pattern::cdl_gravestonedoji);
-cdl_pyfunction!(CDLHANGINGMAN, core::pattern::cdl_hangingman);
-cdl_pyfunction!(CDLHARAMI, core::pattern::cdl_harami);
-cdl_pyfunction!(CDLHARAMICROSS, core::pattern::cdl_haramicross);
-cdl_pyfunction!(CDLHIGHWAVE, core::pattern::cdl_highwave);
-cdl_pyfunction!(CDLHIKKAKE, core::pattern::cdl_hikkake);
-cdl_pyfunction!(CDLHIKKAKEMOD, core::pattern::cdl_hikkakemod);
-cdl_pyfunction!(CDLHOMINGPIGEON, core::pattern::cdl_homingpigeon);
-cdl_pyfunction!(CDLIDENTICAL3CROWS, core::pattern::cdl_identical3crows);
-cdl_pyfunction!(CDLINNECK, core::pattern::cdl_inneck);
-cdl_pyfunction!(CDLINVERTEDHAMMER, core::pattern::cdl_invertedhammer);
-cdl_pyfunction!(CDLKICKING, core::pattern::cdl_kicking);
-cdl_pyfunction!(CDLKICKINGBYLENGTH, core::pattern::cdl_kickingbylength);
-cdl_pyfunction!(CDLLADDERBOTTOM, core::pattern::cdl_ladderbottom);
-cdl_pyfunction!(CDLLONGLEGGEDDOJI, core::pattern::cdl_longleggeddoji);
-cdl_pyfunction!(CDLLONGLINE, core::pattern::cdl_longline);
-cdl_pyfunction!(CDLMARUBOZU, core::pattern::cdl_marubozu);
-cdl_pyfunction!(CDLMATCHINGLOW, core::pattern::cdl_matchinglow);
-cdl_pyfunction_penetration!(CDLMATHOLD, core::pattern::cdl_mathold, 0.3);
-cdl_pyfunction_penetration!(CDLMORNINGDOJISTAR, core::pattern::cdl_morningdojistar, 0.3);
-cdl_pyfunction_penetration!(CDLMORNINGSTAR, core::pattern::cdl_morningstar, 0.3);
-cdl_pyfunction!(CDLONNECK, core::pattern::cdl_onneck);
-cdl_pyfunction!(CDLPIERCING, core::pattern::cdl_piercing);
-cdl_pyfunction!(CDLRICKSHAWMAN, core::pattern::cdl_rickshawman);
-cdl_pyfunction!(CDLRISEFALL3METHODS, core::pattern::cdl_risefall3methods);
-cdl_pyfunction!(CDLSEPARATINGLINES, core::pattern::cdl_separatinglines);
-cdl_pyfunction!(CDLSHOOTINGSTAR, core::pattern::cdl_shootingstar);
-cdl_pyfunction!(CDLSHORTLINE, core::pattern::cdl_shortline);
-cdl_pyfunction!(CDLSPINNINGTOP, core::pattern::cdl_spinningtop);
-cdl_pyfunction!(CDLSTALLEDPATTERN, core::pattern::cdl_stalledpattern);
-cdl_pyfunction!(CDLSTICKSANDWICH, core::pattern::cdl_sticksandwich);
-cdl_pyfunction!(CDLTAKURI, core::pattern::cdl_takuri);
-cdl_pyfunction!(CDLTASUKIGAP, core::pattern::cdl_tasukigap);
-cdl_pyfunction!(CDLTHRUSTING, core::pattern::cdl_thrusting);
-cdl_pyfunction!(CDLTRISTAR, core::pattern::cdl_tristar);
-cdl_pyfunction!(CDLUNIQUE3RIVER, core::pattern::cdl_unique3river);
-cdl_pyfunction!(CDLUPSIDEGAP2CROWS, core::pattern::cdl_upsidegap2crows);
-cdl_pyfunction!(CDLXSIDEGAP3METHODS, core::pattern::cdl_xsidegap3methods);
+cdl_pyfunction!(CDLDOJI, core::stream::candle_doji);
+cdl_pyfunction!(CDLHAMMER, core::stream::candle_hammer);
+cdl_pyfunction!(CDLENGULFING, core::stream::candle_engulfing);
+cdl_pyfunction!(CDL2CROWS, core::stream::candle_two_crows);
+cdl_pyfunction!(CDL3BLACKCROWS, core::stream::candle_three_black_crows);
+cdl_pyfunction!(CDL3INSIDE, core::stream::candle_three_inside);
+cdl_pyfunction!(CDL3LINESTRIKE, core::stream::candle_three_line_strike);
+cdl_pyfunction!(CDL3OUTSIDE, core::stream::candle_three_outside);
+cdl_pyfunction!(CDL3STARSINSOUTH, core::stream::candle_three_stars_in_south);
+cdl_pyfunction!(CDL3WHITESOLDIERS, core::stream::candle_three_white_soldiers);
+cdl_pyfunction_penetration!(CDLABANDONEDBABY, core::stream::candle_abandoned_baby, 0.3);
+cdl_pyfunction!(CDLADVANCEBLOCK, core::stream::candle_advance_block);
+cdl_pyfunction!(CDLBELTHOLD, core::stream::candle_belt_hold);
+cdl_pyfunction!(CDLBREAKAWAY, core::stream::candle_breakaway);
+cdl_pyfunction!(CDLCLOSINGMARUBOZU, core::stream::candle_closing_marubozu);
+cdl_pyfunction!(CDLCONCEALBABYSWALL, core::stream::candle_conceal_baby_swall);
+cdl_pyfunction!(CDLCOUNTERATTACK, core::stream::candle_counterattack);
+cdl_pyfunction_penetration!(CDLDARKCLOUDCOVER, core::stream::candle_dark_cloud_cover, 0.5);
+cdl_pyfunction!(CDLDOJISTAR, core::stream::candle_doji_star);
+cdl_pyfunction!(CDLDRAGONFLYDOJI, core::stream::candle_dragonfly_doji);
+cdl_pyfunction_penetration!(CDLEVENINGDOJISTAR, core::stream::candle_evening_doji_star, 0.3);
+cdl_pyfunction_penetration!(CDLEVENINGSTAR, core::stream::candle_evening_star, 0.3);
+cdl_pyfunction!(CDLGAPSIDESIDEWHITE, core::stream::candle_gap_side_side_white);
+cdl_pyfunction!(CDLGRAVESTONEDOJI, core::stream::candle_gravestone_doji);
+cdl_pyfunction!(CDLHANGINGMAN, core::stream::candle_hanging_man);
+cdl_pyfunction!(CDLHARAMI, core::stream::candle_harami);
+cdl_pyfunction!(CDLHARAMICROSS, core::stream::candle_harami_cross);
+cdl_pyfunction!(CDLHIGHWAVE, core::stream::candle_high_wave);
+cdl_pyfunction!(CDLHIKKAKE, core::stream::candle_hikkake);
+cdl_pyfunction!(CDLHIKKAKEMOD, core::stream::candle_hikkake_modified);
+cdl_pyfunction!(CDLHOMINGPIGEON, core::stream::candle_homing_pigeon);
+cdl_pyfunction!(CDLIDENTICAL3CROWS, core::stream::candle_identical_three_crows);
+cdl_pyfunction!(CDLINNECK, core::stream::candle_in_neck);
+cdl_pyfunction!(CDLINVERTEDHAMMER, core::stream::candle_inverted_hammer);
+cdl_pyfunction!(CDLKICKING, core::stream::candle_kicking);
+cdl_pyfunction!(CDLKICKINGBYLENGTH, core::stream::candle_kicking_by_length);
+cdl_pyfunction!(CDLLADDERBOTTOM, core::stream::candle_ladder_bottom);
+cdl_pyfunction!(CDLLONGLEGGEDDOJI, core::stream::candle_long_legged_doji);
+cdl_pyfunction!(CDLLONGLINE, core::stream::candle_long_line);
+cdl_pyfunction!(CDLMARUBOZU, core::stream::candle_marubozu);
+cdl_pyfunction!(CDLMATCHINGLOW, core::stream::candle_matching_low);
+cdl_pyfunction_penetration!(CDLMATHOLD, core::stream::candle_mat_hold, 0.3);
+cdl_pyfunction_penetration!(CDLMORNINGDOJISTAR, core::stream::candle_morning_doji_star, 0.3);
+cdl_pyfunction_penetration!(CDLMORNINGSTAR, core::stream::candle_morning_star, 0.3);
+cdl_pyfunction!(CDLONNECK, core::stream::candle_on_neck);
+cdl_pyfunction!(CDLPIERCING, core::stream::candle_piercing);
+cdl_pyfunction!(CDLRICKSHAWMAN, core::stream::candle_rickshawman);
+cdl_pyfunction!(CDLRISEFALL3METHODS, core::stream::candle_rise_fall_three_methods);
+cdl_pyfunction!(CDLSEPARATINGLINES, core::stream::candle_separating_lines);
+cdl_pyfunction!(CDLSHOOTINGSTAR, core::stream::candle_shooting_star);
+cdl_pyfunction!(CDLSHORTLINE, core::stream::candle_short_line);
+cdl_pyfunction!(CDLSPINNINGTOP, core::stream::candle_spinningtop);
+cdl_pyfunction!(CDLSTALLEDPATTERN, core::stream::candle_stalled_pattern);
+cdl_pyfunction!(CDLSTICKSANDWICH, core::stream::candle_stick_sandwich);
+cdl_pyfunction!(CDLTAKURI, core::stream::candle_takuri);
+cdl_pyfunction!(CDLTASUKIGAP, core::stream::candle_tasuki_gap);
+cdl_pyfunction!(CDLTHRUSTING, core::stream::candle_thrusting);
+cdl_pyfunction!(CDLTRISTAR, core::stream::candle_tri_star);
+cdl_pyfunction!(CDLUNIQUE3RIVER, core::stream::candle_unique_three_river);
+cdl_pyfunction!(CDLUPSIDEGAP2CROWS, core::stream::candle_upside_gap_two_crows);
+cdl_pyfunction!(CDLXSIDEGAP3METHODS, core::stream::candle_xside_gap_three_methods);

@@ -5,7 +5,17 @@ from ._volume_state import OhlcvStateAdapter
 
 
 class AccumulationDistributionOscillator(OhlcvStateAdapter):
-    """Compute the Accumulation/Distribution Oscillator through Rust."""
+    """Compute the Accumulation/Distribution Oscillator through Rust
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    AccumulationDistributionOscillator
+        A persistent native-backed indicator adapter.
+    """
 
     _native_cls = StatefulAdosc
 

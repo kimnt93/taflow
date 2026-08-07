@@ -7,7 +7,18 @@ use crate::error::TaResult;
 
 use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
-/// Computes aligned upper, middle, and lower Acceleration Band vectors.
+/// Compute the acceleration bands result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn acceleration_bands(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
@@ -109,7 +120,7 @@ impl AccelerationBands {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::overlap;
+
 
     #[test]
     fn matches_batch_and_reset_replay() {

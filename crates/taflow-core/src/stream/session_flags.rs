@@ -4,7 +4,15 @@
 ///
 /// The first input is always a new session. Each later flag is true when the
 /// current identifier differs from the previous identifier. The result has
-/// exactly the same length as `session_id`.
+/// Compute the session flags result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `session_id` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn session_flags(session_id: &[f64]) -> Vec<bool> {
     let mut flags = vec![false; session_id.len()];
     if let Some((first, rest)) = flags.split_first_mut() {

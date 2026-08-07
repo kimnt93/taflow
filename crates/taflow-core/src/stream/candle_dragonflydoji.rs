@@ -1,0 +1,92 @@
+//! Incremental Dragonfly Doji candlestick recognition (CDLDRAGONFLYDOJI).
+
+use std::collections::VecDeque;
+
+/// Incremental CDLDRAGONFLYDOJI state using TA-Lib's two ten-bar range averages.
+pub struct CandleDragonflyDoji {
+    ranges: VecDeque<f64>,
+    sum: f64,
+    value: Option<i32>,
+}
+impl Default for CandleDragonflyDoji {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl CandleDragonflyDoji {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new() -> Self {
+        Self {
+            ranges: VecDeque::with_capacity(10),
+            sum: 0.0,
+            value: None,
+        }
+    }
+    /// Appends OHLC data and returns +100 for a dragonfly doji after warmup.
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
+        let range = high - low;
+        let body = (close - open).abs();
+        let output = if self.ranges.len() == 10 {
+            let shadow_limit = self.sum * 0.01;
+            Some(
+                (body <= shadow_limit
+                    && high - open.max(close) < shadow_limit
+                    && open.min(close) - low > shadow_limit) as i32
+                    * 100,
+            )
+        } else {
+            None
+        };
+        if self.ranges.len() == 10 {
+            self.sum -= self.ranges.pop_front().expect("window is full");
+        }
+        self.ranges.push_back(range);
+        self.sum += range;
+        self.value = output;
+        output
+    }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<i32> {
+        self.value
+    }
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        *self = Self::new();
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn matches_batch() {
+        let open: Vec<f64> = (0..45).map(|i| 100.0 + i as f64 * 0.2).collect();
+        let high: Vec<f64> = open.iter().map(|x| x + 2.0).collect();
+        let low: Vec<f64> = open.iter().map(|x| x - 2.0).collect();
+        let close: Vec<f64> = open
+            .iter()
+            .enumerate()
+            .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
+            .collect();
+        let expected = crate::stream::candle_dragonfly_doji(&open, &high, &low, &close).unwrap();
+        let mut state = CandleDragonflyDoji::new();
+        for (((&o, &h), &l), (&c, &expected)) in open
+            .iter()
+            .zip(&high)
+            .zip(&low)
+            .zip(close.iter().zip(&expected))
+        {
+            match state.append(o, h, l, c) {
+                Some(value) => assert_eq!(value, expected),
+                None => assert_eq!(expected, 0),
+            }
+        }
+    }
+}

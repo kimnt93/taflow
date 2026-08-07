@@ -44,24 +44,64 @@ class VariableIndexDynamicAverage:
             self.extend(close)
 
     def append(self, close: float) -> object:
-        """Process one close and return the current average."""
+        """Process one close and return the current average..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.append(float(close))
 
     def extend(self, close: Any) -> object:
-        """Process an aligned close history and return this indicator."""
+        """Process an aligned close history and return this indicator..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.extend(np.asarray(close, dtype=np.float64))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned average history."""
+        """Return the aligned average history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest average value."""
+        """Return the latest average value..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Clear state and accumulated output."""
+        """Clear state and accumulated output..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

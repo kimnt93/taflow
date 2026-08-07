@@ -1,6 +1,6 @@
 //! Incremental Hilbert Transform dominant cycle phase (HT_DCPHASE).
 
-use crate::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
+use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 use std::collections::VecDeque;
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
@@ -219,7 +219,7 @@ mod tests {
         let input: Vec<f64> = (0..400)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let expected = crate::cycle::hilbert_transform_dominant_cycle_phase(&input).unwrap();
+        let expected = crate::stream::cycle::hilbert_transform_dominant_cycle_phase(&input).unwrap();
         let mut state = HilbertTransformDominantCyclePhase::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {

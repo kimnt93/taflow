@@ -9,6 +9,15 @@ use crate::ma_type::MaType;
 use super::{moving_average::MovingAverageDispatcher, RollingStandardDeviation, StreamingIndicator};
 
 /// Computes aligned upper, middle, and lower Bollinger Band vectors.
+///
+/// # Parameters
+///
+/// * `input` - Chronological price series.
+/// * Period, deviation, and moving-average parameters configure the bands.
+///
+/// # Returns
+///
+/// Three same-length arrays containing upper, middle, and lower bands.
 pub fn bollinger_bands(
     input: &[f64],
     timeperiod: usize,
@@ -99,7 +108,7 @@ impl StreamingIndicator for BollingerBands {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::overlap;
+
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {

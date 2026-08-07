@@ -66,7 +66,6 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
     if period == 1 {
         return Ok(input.to_vec());
     }
-    use crate::overlap;
     match ma_type {
         MaType::SimpleMovingAverage => crate::stream::simple_moving_average(input, period),
         MaType::ExponentialMovingAverage => crate::stream::exponential_moving_average(input, period),
@@ -79,7 +78,7 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
         //   MAMA: fastlimit=0.5, slowlimit=0.05 (忽略 period)
         //   TripleExponentialAverage:   vfactor=0.7 (period 正常传递)
         MaType::MesaAdaptiveMovingAverage => {
-            let (mama, _fama) = overlap::mesa_adaptive_moving_average(input, 0.5, 0.05)?;
+            let (mama, _fama) = crate::stream::mesa_adaptive_moving_average(input, 0.5, 0.05)?;
             Ok(mama)
         }
         MaType::TripleExponentialAverage => crate::stream::triple_exponential_average(input, period, 0.7),

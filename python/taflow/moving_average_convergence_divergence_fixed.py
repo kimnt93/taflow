@@ -7,14 +7,24 @@ import numpy as np
 
 
 class MovingAverageConvergenceDivergenceFixed:
-    """Incrementally compute TA-Lib's fixed 12/26 MACD variant."""
+    """Incrementally compute TA-Lib's fixed 12/26 MACD variant
 
-    def __init__(self, signal_period: int = 9, value: Any | None = None) -> None:
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    MovingAverageConvergenceDivergenceFixed
+        A persistent native-backed indicator adapter.
+    """
+
+    def __init__(self, signal_period: int = 9, values: Any | None = None) -> None:
         """Create fixed MACD with an optional initial price series."""
         self._state = StatefulMacdFix(signal_period)
         self._values: list[tuple[float, float, float]] = []
-        if value is not None:
-            self.extend(value)
+        if values is not None:
+            self.extend(values)
 
     def append(self, value: float) -> "MovingAverageConvergenceDivergenceFixed":
         """Append one observation or aligned bar to the native Rust state.
@@ -54,7 +64,13 @@ class MovingAverageConvergenceDivergenceFixed:
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return aligned MACD, signal, and histogram histories."""
+        """Return aligned MACD, signal, and histogram histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         if not self._values:
             empty = np.empty(0, dtype=np.float64)
             return empty.copy(), empty.copy(), empty.copy()

@@ -7,7 +7,17 @@ import numpy as np
 
 
 class VariablePeriodMovingAverage:
-    """Incrementally compute MAVP from values and per-bar periods."""
+    """Incrementally compute MAVP from values and per-bar periods
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    VariablePeriodMovingAverage
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -65,7 +75,13 @@ class VariablePeriodMovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned variable-period moving-average values."""
+        """Return aligned variable-period moving-average values..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

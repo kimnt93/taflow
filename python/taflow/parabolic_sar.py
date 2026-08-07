@@ -7,7 +7,17 @@ import numpy as np
 
 
 class ParabolicSar:
-    """Incrementally compute Parabolic SAR from high/low bars."""
+    """Incrementally compute Parabolic SAR from high/low bars
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    ParabolicSar
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -61,7 +71,13 @@ class ParabolicSar:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned Parabolic SAR values."""
+        """Return aligned Parabolic SAR values..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

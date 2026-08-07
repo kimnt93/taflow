@@ -5,7 +5,18 @@
 
 use crate::TaResult;
 
-/// Computes an aligned Parabolic SAR vector from high and low slices.
+/// Compute the parabolic sar result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `acceleration` - Input series or configuration value.
+/// * `maximum` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn parabolic_sar(high: &[f64], low: &[f64], acceleration: f64, maximum: f64) -> TaResult<Vec<f64>> {
     if high.len() != low.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len() });
@@ -148,7 +159,7 @@ impl Default for ParabolicSar {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::overlap;
+
 
     #[test]
     fn matches_batch_through_multiple_reversals() {

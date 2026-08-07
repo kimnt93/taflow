@@ -77,7 +77,7 @@ impl IntradayMomentumIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::momentum;
+
 
     #[test]
     fn matches_batch_and_reset_replay() {
@@ -89,7 +89,7 @@ mod tests {
             .enumerate()
             .map(|(index, open)| open + (index as f64 * 0.31).cos() * 1.7)
             .collect();
-        let expected = momentum::intraday_momentum_index(&open, &close, 14).unwrap();
+        let expected = crate::stream::intraday_momentum_index(&open, &close, 14).unwrap();
         let mut state = IntradayMomentumIndex::new(14).unwrap();
         for index in 0..open.len() {
             match state.append(open[index], close[index]) {
@@ -111,4 +111,60 @@ mod tests {
         assert_eq!(state.append(10.0, 10.0), None);
         assert_eq!(state.append(10.0, 10.0), Some(50.0));
     }
+}
+use crate::error::TaError;
+
+/// Compute the intraday momentum index result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn intraday_momentum_index(open: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let len = open.len();
+    if len != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: len,
+            got: close.len(),
+        });
+    }
+    if timeperiod < 2 {
+        return Err(TaError::InvalidParameter {
+            name: "timeperiod",
+            value: timeperiod.to_string(),
+            reason: "must be >= 2",
+        });
+    }
+    if len < timeperiod {
+        return Err(TaError::InsufficientData {
+            need: timeperiod,
+            got: len,
+        });
+    }
+
+    let lookback = timeperiod - 1;
+    let mut output = vec![f64::NAN; len];
+    for today in lookback..len {
+        let mut gains = 0.0;
+        let mut losses = 0.0;
+        for index in (today + 1 - timeperiod)..=today {
+            let movement = close[index] - open[index];
+            if movement > 0.0 {
+                gains += movement;
+            } else {
+                losses -= movement;
+            }
+        }
+        output[today] = if gains + losses == 0.0 {
+            50.0
+        } else {
+            100.0 * gains / (gains + losses)
+        };
+    }
+    Ok(output)
 }

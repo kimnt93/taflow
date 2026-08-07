@@ -4,7 +4,18 @@ use crate::error::TaResult;
 
 use super::directional::DirectionalMovement;
 
-/// Computes an aligned Directional Movement Index vector from HLC slices.
+/// Compute the directional movement index result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn directional_movement_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
@@ -52,7 +63,7 @@ impl DirectionalMovementIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::momentum;
+
 
     #[test]
     fn matches_batch_and_reset_replay() {

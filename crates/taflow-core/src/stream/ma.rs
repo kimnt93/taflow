@@ -4,7 +4,7 @@
 //! implementations while retaining the selected type's native warm-up.
 
 use crate::error::TaResult;
-use crate::ma_type::MaType;
+use crate::ma_type::{compute_ma, MaType};
 
 use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
 
@@ -46,7 +46,7 @@ impl StreamingIndicator for MovingAverage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::overlap;
+
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {
@@ -55,7 +55,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = overlap::moving_average(&input, 13, ma_type).unwrap();
+            let expected = crate::stream::moving_average(&input, 13, ma_type).unwrap();
             let mut state = MovingAverage::new(13, ma_type).unwrap();
             for (&input, expected) in input.iter().zip(expected) {
                 let actual = state.append(input);
@@ -71,4 +71,25 @@ mod tests {
             }
         }
     }
+}
+
+/// MA - Moving Average (selectable type)
+///
+/// Wrapper that dispatches to SMA, EMA, WMA, DEMA, TEMA, TRIMA, KAMA, MAMA, or TripleExponentialAverage
+/// based on the `matype` parameter.
+///
+/// C TA-Lib signature: MA(input, timeperiod=30, matype=0)
+/// Compute the moving average result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+/// * `matype` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn moving_average(input: &[f64], timeperiod: usize, matype: MaType) -> TaResult<Vec<f64>> {
+    compute_ma(input, timeperiod, matype)
 }

@@ -11,7 +11,17 @@ from ._series import as_float64_series
 
 
 class MoneyFlowIndex:
-    """Compute MFI history once, then append HLCV bars in O(1)."""
+    """Compute MFI history once, then append HLCV bars in O(1)
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    MoneyFlowIndex
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,

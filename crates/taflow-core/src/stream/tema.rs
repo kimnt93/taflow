@@ -4,7 +4,16 @@ use crate::error::TaResult;
 
 use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
-/// Computes an aligned Triple Exponential Moving Average vector.
+/// Compute the triple exponential moving average result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn triple_exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = TripleExponentialMovingAverage::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())

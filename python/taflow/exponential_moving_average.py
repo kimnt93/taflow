@@ -11,7 +11,17 @@ from ._series import as_float64_series
 
 
 class ExponentialMovingAverage:
-    """Compute EMA history once, then continue it with new observations."""
+    """Compute EMA history once, then continue it with new observations
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    ExponentialMovingAverage
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -57,13 +67,13 @@ class ExponentialMovingAverage:
         return self
 
     def extend(
-        self, values: Any, *, column: str | None = None
+        self, _input: Any, *, column: str | None = None
     ) -> "ExponentialMovingAverage":
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        values : object
+        _input : object
             Input values processed in chronological order.
         column : object
             Input parameter or configuration value for this operation.
@@ -73,17 +83,29 @@ class ExponentialMovingAverage:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(values, column=column))
+        self._state.extend(as_float64_series(_input, column=column))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return every aligned result accumulated by this object."""
+        """Return every aligned result accumulated by this object..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
 
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest warm value without materializing history."""
+        """Return the latest warm value without materializing history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
 
         return self._state.value
 

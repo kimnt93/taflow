@@ -4,7 +4,16 @@ use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, RollingExtrema};
 
-/// Computes an aligned On-Balance Volume vector from close and volume slices.
+/// Compute the on balance volume result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `close` - Input series or configuration value.
+/// * `volume` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn on_balance_volume(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     if close.len() != volume.len() {
         return Err(crate::TaError::LengthMismatch { expected: close.len(), got: volume.len() });
@@ -22,7 +31,18 @@ fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {
     }
 }
 
-/// Computes an aligned Chaikin accumulation/distribution line.
+/// Compute the accumulation distribution result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `volume` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn accumulation_distribution(high: &[f64], low: &[f64], close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
@@ -31,7 +51,20 @@ pub fn accumulation_distribution(high: &[f64], low: &[f64], close: &[f64], volum
     Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume)).collect())
 }
 
-/// Computes an aligned Chaikin accumulation/distribution oscillator.
+/// Compute the accumulation distribution oscillator result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `volume` - Input series or configuration value.
+/// * `fastperiod` - Input series or configuration value.
+/// * `slowperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn accumulation_distribution_oscillator(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], fastperiod: usize, slowperiod: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
@@ -40,7 +73,18 @@ pub fn accumulation_distribution_oscillator(high: &[f64], low: &[f64], close: &[
     Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume).unwrap_or(f64::NAN)).collect())
 }
 
-/// Computes an aligned Balance of Power vector from OHLC slices.
+/// Compute the balance of power result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn balance_of_power(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
     if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: open.len(), got: high.len().min(low.len()).min(close.len()) });
@@ -49,12 +93,23 @@ pub fn balance_of_power(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) 
     Ok(open.iter().zip(high).zip(low).zip(close).map(|(((&open, &high), &low), &close)| state.append(open, high, low, close)).collect())
 }
 
-/// Computes an aligned Williams %R vector from HLC slices.
-pub fn williams_r(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+/// Compute the williams r result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn williams_percent_r(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
     }
-    let mut state = WilliamsR::new(timeperiod)?;
+    let mut state = WilliamsPercentR::new(timeperiod)?;
     Ok(high.iter().zip(low).zip(close).map(|((&high, &low), &close)| state.append(high, low, close).unwrap_or(f64::NAN)).collect())
 }
 
@@ -303,13 +358,13 @@ impl BalanceOfPower {
 
 /// Stateful Williams %R.
 #[derive(Debug, Clone)]
-pub struct WilliamsR {
+pub struct WilliamsPercentR {
     highs: RollingExtrema,
     lows: RollingExtrema,
     value: Option<f64>,
 }
 
-impl WilliamsR {
+impl WilliamsPercentR {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.

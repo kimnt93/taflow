@@ -7,7 +7,17 @@ import numpy as np
 
 
 class IntradayMomentumIndex:
-    """Incrementally compare rolling intraday candle gains and losses."""
+    """Incrementally compare rolling intraday candle gains and losses
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    IntradayMomentumIndex
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self, period: int = 14, _open: Any | None = None, close: Any | None = None
@@ -57,7 +67,13 @@ class IntradayMomentumIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history."""
+        """Return the aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

@@ -2,7 +2,18 @@
 use super::directional::DirectionalMovement;
 use crate::error::TaResult;
 
-/// Computes an aligned Plus Directional Indicator vector from HLC slices.
+/// Compute the plus directional indicator result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn plus_directional_indicator(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });

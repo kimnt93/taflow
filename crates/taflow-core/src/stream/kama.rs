@@ -9,7 +9,16 @@ use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator};
 
-/// Computes an aligned Kaufman Adaptive Moving Average vector.
+/// Compute the kaufman adaptive moving average result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn kaufman_adaptive_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = KaufmanAdaptiveMovingAverage::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())

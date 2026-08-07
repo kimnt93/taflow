@@ -7,7 +7,17 @@ import numpy as np
 
 
 class HilbertTransformTrendline:
-    """Incrementally compute the instantaneous Hilbert Transform trendline."""
+    """Incrementally compute the instantaneous Hilbert Transform trendline
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    HilbertTransformTrendline
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(self, _input: Any | None = None) -> None:
         """Create the trendline with an optional initial price series."""
@@ -51,7 +61,13 @@ class HilbertTransformTrendline:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history."""
+        """Return the aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

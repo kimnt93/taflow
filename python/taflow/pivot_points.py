@@ -50,13 +50,35 @@ class PivotPoints:
     def append(
         self, high: float, low: float, close: float, anchor: bool = False
     ) -> object:
-        """Process one OHLC bar and return five pivot levels."""
+        """Process one OHLC bar and return five pivot levels..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.append(float(high), float(low), float(close), bool(anchor))
 
     def extend(
         self, high: Any, low: Any, close: Any, anchor: Any | None = None
     ) -> object:
-        """Process aligned OHLC history and return this indicator."""
+        """Process aligned OHLC history and return this indicator..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         close_array = np.asarray(close, dtype=np.float64)
         if anchor is None:
             anchor = np.zeros(close_array.shape, dtype=np.bool_)
@@ -69,15 +91,33 @@ class PivotPoints:
         return self
 
     def compute(self) -> object:
-        """Return pivot, resistance, and support level histories."""
+        """Return pivot, resistance, and support level histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest five pivot levels."""
+        """Return the latest five pivot levels..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Clear session extrema and pivot output."""
+        """Clear session extrema and pivot output..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

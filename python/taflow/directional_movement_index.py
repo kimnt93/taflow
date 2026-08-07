@@ -7,7 +7,17 @@ import numpy as np
 
 
 class DirectionalMovementIndex:
-    """Incrementally compute Wilder's Directional Movement Index."""
+    """Incrementally compute Wilder's Directional Movement Index
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    DirectionalMovementIndex
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -65,7 +75,13 @@ class DirectionalMovementIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history."""
+        """Return the aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

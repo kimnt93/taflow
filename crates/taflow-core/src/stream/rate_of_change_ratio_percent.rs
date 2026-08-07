@@ -3,7 +3,16 @@
 use crate::TaResult;
 use super::{StreamingIndicator, lagged_common::{LaggedValue, validate_rate_of_change}};
 
-/// Computes the lagged value ratio scaled by one hundred.
+/// Compute the rate of change ratio percent result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn rate_of_change_ratio_percent(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     validate_rate_of_change(input, timeperiod)?;
     let mut output = vec![f64::NAN; timeperiod];

@@ -7,7 +7,17 @@ import numpy as np
 
 
 class MovingAverageConvergenceDivergenceExtended:
-    """Incrementally compute MACDEXT with independently selected MA types."""
+    """Incrementally compute MACDEXT with independently selected MA types
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    MovingAverageConvergenceDivergenceExtended
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -93,7 +103,13 @@ class MovingAverageConvergenceDivergenceExtended:
         return self
 
     def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the aligned native output histories."""
+        """Return the aligned native output histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         if not self._values:
             empty = np.empty(0, dtype=np.float64)
             return tuple(empty.copy() for _ in range(3))

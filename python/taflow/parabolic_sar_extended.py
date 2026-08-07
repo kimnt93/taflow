@@ -7,7 +7,17 @@ import numpy as np
 
 
 class ParabolicSarExtended:
-    """Incrementally compute signed SAREXT with independent trend settings."""
+    """Incrementally compute signed SAREXT with independent trend settings
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    ParabolicSarExtended
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -105,7 +115,13 @@ class ParabolicSarExtended:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned extended Parabolic SAR values."""
+        """Return aligned extended Parabolic SAR values..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

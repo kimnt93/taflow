@@ -2,7 +2,8 @@
 
 use std::collections::VecDeque;
 
-use crate::{TaResult, operators::validate_period};
+use crate::TaResult;
+use super::operators::validate_period;
 
 /// Computes the causal most-frequent value over a fixed trailing window.
 #[derive(Debug, Clone)]

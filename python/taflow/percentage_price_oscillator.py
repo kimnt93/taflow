@@ -5,7 +5,17 @@ from ._native import StatefulPpo
 
 
 class PercentagePriceOscillator(AbsolutePriceOscillator):
-    """Compute the percentage price oscillator through Rust."""
+    """Compute the percentage price oscillator through Rust
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    PercentagePriceOscillator
+        A persistent native-backed indicator adapter.
+    """
 
     _native_cls = StatefulPpo
 

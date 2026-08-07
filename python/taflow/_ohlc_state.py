@@ -8,7 +8,17 @@ from ._series import as_float64_series
 
 
 class OhlcStateAdapter:
-    """Adapt a native three-input state without Python-side calculations."""
+    """Adapt a native three-input state without Python-side calculations
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    OhlcStateAdapter
+        A persistent native-backed indicator adapter.
+    """
 
     _native_cls = None
     _period_required = True
@@ -30,13 +40,35 @@ class OhlcStateAdapter:
             self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> object:
-        """Append one OHLC bar and update the native state."""
+        """Append one OHLC bar and update the native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         value = self._state.append(float(high), float(low), float(close))
         self._values.append(np.nan if value is None else value)
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> object:
-        """Append aligned high, low, and close histories to native state."""
+        """Append aligned high, low, and close histories to native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         values = self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
         )
@@ -44,16 +76,34 @@ class OhlcStateAdapter:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history."""
+        """Return the aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self) -> object:
-        """Return the latest native output, or ``None`` during warm-up."""
+        """Return the latest native output, or ``None`` during warm-up..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history."""
+        """Reset native state and accumulated output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         self._values.clear()
         return self

@@ -57,11 +57,33 @@ class KlingerVolumeOscillator:
             self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> object:
-        """Process one OHLCV bar and return oscillator and signal values."""
+        """Process one OHLCV bar and return oscillator and signal values..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.append(float(high), float(low), float(close), float(volume))
 
     def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
-        """Process aligned OHLCV history and return this indicator."""
+        """Process aligned OHLCV history and return this indicator..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.extend(
             np.asarray(high, dtype=np.float64),
             np.asarray(low, dtype=np.float64),
@@ -71,15 +93,33 @@ class KlingerVolumeOscillator:
         return self
 
     def compute(self) -> object:
-        """Return oscillator and signal histories."""
+        """Return oscillator and signal histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest oscillator and signal pair."""
+        """Return the latest oscillator and signal pair..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Clear EMA state and accumulated output."""
+        """Clear EMA state and accumulated output..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

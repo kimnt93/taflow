@@ -22,7 +22,7 @@ from .rate_of_change import RateOfChange
 from .rate_of_change_percent import RateOfChangePercent
 from .rate_of_change_ratio import RateOfChangeRatio
 from .rate_of_change_ratio_percent import RateOfChangeRatioPercent
-from .williams_r import WilliamsR
+from .williams_percent_r import WilliamsPercentR
 from .average_directional_index import AverageDirectionalIndex
 from .average_directional_index_rating import AverageDirectionalIndexRating
 from .bollinger_bands import BollingerBands
@@ -350,7 +350,7 @@ __all__ = [
     "RateOfChangePercent",
     "RateOfChangeRatio",
     "RateOfChangeRatioPercent",
-    "WilliamsR",
+    "WilliamsPercentR",
     "AverageDirectionalIndex",
     "AverageDirectionalIndexRating",
     "DirectionalMovementIndex",

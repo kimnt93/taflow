@@ -9,7 +9,17 @@ from ._series import as_float64_series
 
 
 class DetrendedPriceOscillator:
-    """Causal DPO; pandas-ta centered/lookahead output is not exposed."""
+    """Causal DPO; pandas-ta centered/lookahead output is not exposed
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    DetrendedPriceOscillator
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(self, close: Any | None = None, period: object = 20) -> None:
         """Initialize this adapter and optionally process the supplied input series.

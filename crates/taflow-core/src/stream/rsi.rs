@@ -8,7 +8,16 @@ use crate::error::{TaError, TaResult};
 use super::{invalid_period, StreamingIndicator};
 
 /// Computes an aligned Wilder RSI vector using the same recurrence as the
-/// streaming state. The first `timeperiod` values are `NaN` warm-up entries.
+/// Compute the relative strength index result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn relative_strength_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {

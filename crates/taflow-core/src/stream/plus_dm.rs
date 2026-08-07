@@ -1,7 +1,17 @@
 //! Incremental Plus Directional Movement (+DM).
 use crate::error::{TaError, TaResult};
 
-/// Computes an aligned Plus Directional Movement vector.
+/// Compute the plus directional movement result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn plus_directional_movement(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() {

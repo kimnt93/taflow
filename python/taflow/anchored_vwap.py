@@ -58,7 +58,18 @@ class AnchoredVolumeWeightedAveragePrice:
     def append(
         self, high: float, low: float, close: float, volume: float, anchor: bool = False
     ) -> object:
-        """Process one OHLCV bar and return mean, upper, and lower bands."""
+        """Process one OHLCV bar and return mean, upper, and lower bands..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.append(
             float(high), float(low), float(close), float(volume), bool(anchor)
         )
@@ -66,7 +77,18 @@ class AnchoredVolumeWeightedAveragePrice:
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any, anchor: Any | None = None
     ) -> object:
-        """Process aligned OHLCV history and return this indicator."""
+        """Process aligned OHLCV history and return this indicator..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         close_array = np.asarray(close, dtype=np.float64)
         if anchor is None:
             anchor = np.zeros(close_array.shape, dtype=np.bool_)
@@ -80,15 +102,33 @@ class AnchoredVolumeWeightedAveragePrice:
         return self
 
     def compute(self) -> object:
-        """Return mean, upper-band, and lower-band histories."""
+        """Return mean, upper-band, and lower-band histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest weighted mean and bands."""
+        """Return the latest weighted mean and bands..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Clear weighted moments and output history."""
+        """Clear weighted moments and output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

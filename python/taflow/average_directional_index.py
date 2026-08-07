@@ -7,7 +7,17 @@ import numpy as np
 
 
 class AverageDirectionalIndex:
-    """Incrementally compute Wilder's Average Directional Index."""
+    """Incrementally compute Wilder's Average Directional Index
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    AverageDirectionalIndex
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -70,7 +80,13 @@ class AverageDirectionalIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history."""
+        """Return the aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

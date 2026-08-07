@@ -6,6 +6,15 @@
 use crate::TaResult;
 
 /// Computes an aligned extended Parabolic SAR vector from high and low slices.
+///
+/// # Parameters
+///
+/// * `high`, `low` - Equal-length chronological price series.
+/// * Remaining arguments configure starting value, reversal offset, and acceleration schedules.
+///
+/// # Returns
+///
+/// An aligned vector of signed extended Parabolic SAR values.
 #[allow(clippy::too_many_arguments)]
 pub fn extended_parabolic_sar(
     high: &[f64],
@@ -223,7 +232,7 @@ impl Default for ParabolicSarExtended {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::overlap;
+
 
     #[test]
     fn matches_batch_with_asymmetric_parameters_and_reversals() {

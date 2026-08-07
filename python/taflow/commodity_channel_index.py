@@ -11,7 +11,17 @@ from ._series import as_float64_series
 
 
 class CommodityChannelIndex:
-    """Compute CCI history once, then continue it with new HLC bars."""
+    """Compute CCI history once, then continue it with new HLC bars
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    CommodityChannelIndex
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -127,7 +137,13 @@ class CommodityChannelIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return every aligned CCI result accumulated by this object."""
+        """Return every aligned CCI result accumulated by this object..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
 
         return self._state.compute()
 

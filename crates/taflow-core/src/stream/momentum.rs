@@ -4,7 +4,16 @@ use crate::error::{TaError, TaResult};
 
 use super::{StreamingIndicator, lagged_common::LaggedValue};
 
-/// Computes a same-length momentum vector from the lagged stream state.
+/// Compute the momentum result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn momentum(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod == 0 {
         return Err(TaError::InvalidParameter { name: "timeperiod", value: "0".to_string(), reason: "must be >= 1" });

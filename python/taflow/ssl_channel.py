@@ -48,11 +48,33 @@ class SmoothedTrendChannel:
             self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> object:
-        """Process one OHLC bar and return lower/upper channel values."""
+        """Process one OHLC bar and return lower/upper channel values..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.append(float(high), float(low), float(close))
 
     def extend(self, high: Any, low: Any, close: Any) -> object:
-        """Process aligned OHLC history and return this indicator."""
+        """Process aligned OHLC history and return this indicator..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.extend(
             np.asarray(high, dtype=np.float64),
             np.asarray(low, dtype=np.float64),
@@ -61,15 +83,33 @@ class SmoothedTrendChannel:
         return self
 
     def compute(self) -> object:
-        """Return lower and upper channel histories."""
+        """Return lower and upper channel histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest channel pair, or ``None`` if not warm."""
+        """Return the latest channel pair, or ``None`` if not warm..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Clear state and accumulated channel history."""
+        """Clear state and accumulated channel history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

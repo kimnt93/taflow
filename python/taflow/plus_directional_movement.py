@@ -52,14 +52,14 @@ class PlusDirectionalMovement:
         self._state.append(h, l)
         return self
 
-    def extend(self, h: Any, l: Any | None = None) -> object:
+    def extend(self, high: Any, low: Any | None = None) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        h : object
+        high : object
             Input parameter or configuration value for this operation.
-        l : object
+        low : object
             Input parameter or configuration value for this operation.
 
         Returns
@@ -67,9 +67,9 @@ class PlusDirectionalMovement:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        if l is None:
+        if low is None:
             raise ValueError("high and low must be provided together")
-        self._state.extend(as_float64_series(h), as_float64_series(l))
+        self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
 
     def compute(self) -> np.ndarray:

@@ -7,7 +7,17 @@ import numpy as np
 
 
 class BollingerBands:
-    """Incrementally compute upper, middle, and lower Bollinger Bands."""
+    """Incrementally compute upper, middle, and lower Bollinger Bands
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    BollingerBands
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,

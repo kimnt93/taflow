@@ -66,7 +66,7 @@ impl StochasticRelativeStrengthIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::momentum;
+
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {
@@ -75,7 +75,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = momentum::stochastic_relative_strength_index(&input, 14, 5, 13, ma_type).unwrap();
+            let expected = crate::stream::stochastic_relative_strength_index(&input, 14, 5, 13, ma_type).unwrap();
             let mut state = StochasticRelativeStrengthIndex::new(14, 5, 13, ma_type).unwrap();
             for (index, input) in input.iter().copied().enumerate() {
                 match state.append(input) {
@@ -94,4 +94,43 @@ mod tests {
             assert_eq!(state.value(), final_value);
         }
     }
+}
+// Batch Stochastic Relative Strength Index.
+//
+// STOCHRSI applies a rolling stochastic range to RSI values, then smooths
+// fast %K with a selectable TA-Lib moving average to produce fast %D.
+
+/// Computes aligned stochastic-RSI fast %K and fast %D arrays.
+///
+/// # Parameters
+///
+/// * `input` - Chronological close-price series.
+/// * Period and moving-average parameters configure RSI and stochastic windows.
+///
+/// # Returns
+///
+/// A pair of same-length fast %K and fast %D arrays with warm-up NaNs.
+pub fn stochastic_relative_strength_index(
+    input: &[f64],
+    timeperiod: usize,
+    fastk_period: usize,
+    fastd_period: usize,
+    fastd_matype: MaType,
+) -> TaResult<(Vec<f64>, Vec<f64>)> {
+    let rsi_values = crate::stream::relative_strength_index(input, timeperiod)?;
+    let rsi_valid = &rsi_values[timeperiod..];
+    let (stochastic_k, stochastic_d) = crate::stream::fast_stochastic_oscillator(
+        rsi_valid,
+        rsi_valid,
+        rsi_valid,
+        fastk_period,
+        fastd_period,
+        fastd_matype,
+    )?;
+    let len = input.len();
+    let mut fastk_out = vec![f64::NAN; len];
+    let mut fastd_out = vec![f64::NAN; len];
+    fastk_out[timeperiod..].copy_from_slice(&stochastic_k);
+    fastd_out[timeperiod..].copy_from_slice(&stochastic_d);
+    Ok((fastk_out, fastd_out))
 }

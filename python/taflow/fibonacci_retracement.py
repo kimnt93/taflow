@@ -38,24 +38,64 @@ class FibonacciRetracement:
             self.extend(close)
 
     def append(self, close: float) -> object:
-        """Process one close and return seven retracement levels."""
+        """Process one close and return seven retracement levels..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.append(float(close))
 
     def extend(self, close: Any) -> object:
-        """Process an aligned close history and return this indicator."""
+        """Process an aligned close history and return this indicator..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.extend(np.asarray(close, dtype=np.float64))
         return self
 
     def compute(self) -> object:
-        """Return seven aligned retracement level histories."""
+        """Return seven aligned retracement level histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest seven retracement levels."""
+        """Return the latest seven retracement levels..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Clear rolling history and level output."""
+        """Clear rolling history and level output..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

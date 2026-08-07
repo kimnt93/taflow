@@ -8,7 +8,17 @@ from ._series import as_float64_series
 
 
 class OhlcvStateAdapter:
-    """Adapt a native high/low/close/volume state."""
+    """Adapt a native high/low/close/volume state
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    OhlcvStateAdapter
+        A persistent native-backed indicator adapter.
+    """
 
     _native_cls = None
     _constructor_args = ()
@@ -28,13 +38,35 @@ class OhlcvStateAdapter:
             self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> object:
-        """Append one OHLCV bar and update native state."""
+        """Append one OHLCV bar and update native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         value = self._state.append(float(high), float(low), float(close), float(volume))
         self._values.append(np.nan if value is None else value)
         return self
 
     def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
-        """Append aligned OHLCV histories to native state."""
+        """Append aligned OHLCV histories to native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         values = self._state.extend(
             as_float64_series(high),
             as_float64_series(low),
@@ -45,23 +77,51 @@ class OhlcvStateAdapter:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history."""
+        """Return aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self) -> object:
-        """Return latest native output, or ``None`` during warm-up."""
+        """Return latest native output, or ``None`` during warm-up..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history."""
+        """Reset native state and accumulated output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         self._values.clear()
         return self
 
 
 class CloseVolumeStateAdapter:
-    """Adapt a native close/volume state."""
+    """Adapt a native close/volume state
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    CloseVolumeStateAdapter
+        A persistent native-backed indicator adapter.
+    """
 
     _native_cls = None
 
@@ -73,28 +133,68 @@ class CloseVolumeStateAdapter:
             self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> object:
-        """Append one close/volume observation and update native state."""
+        """Append one close/volume observation and update native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         value = self._state.append(float(close), float(volume))
         self._values.append(np.nan if value is None else value)
         return self
 
     def extend(self, close: Any, volume: Any) -> object:
-        """Append aligned close and volume histories to native state."""
+        """Append aligned close and volume histories to native state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         values = self._state.extend(as_float64_series(close), as_float64_series(volume))
         self._values.extend(np.asarray(values, dtype=np.float64).tolist())
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history."""
+        """Return aligned native output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self) -> object:
-        """Return latest native output, or ``None`` during warm-up."""
+        """Return latest native output, or ``None`` during warm-up..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history."""
+        """Reset native state and accumulated output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         self._values.clear()
         return self

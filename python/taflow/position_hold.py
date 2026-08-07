@@ -24,25 +24,65 @@ class PositionHold:
             self.extend(_input)
 
     def append(self, _input: float) -> "PositionHold":
-        """Append one position value and update the native result."""
+        """Append one position value and update the native result..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.append(_input)
         return self
 
     def extend(self, _input: Any) -> "PositionHold":
-        """Process an aligned position series in native Rust."""
+        """Process an aligned position series in native Rust..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned held-position series."""
+        """Return the aligned held-position series..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest held position."""
+        """Return the latest held position..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> "PositionHold":
-        """Reset the native state and accumulated history."""
+        """Reset the native state and accumulated history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

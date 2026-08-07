@@ -35,28 +35,68 @@ class AbsolutePriceOscillator:
             self.extend(_input)
 
     def append(self, _input: float) -> object:
-        """Append one input value to native APO state."""
+        """Append one input value to native APO state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         value = self._state.append(float(_input))
         self._values.append(np.nan if value is None else value)
         return self
 
     def extend(self, _input: Any) -> object:
-        """Append an aligned input history to native APO state."""
+        """Append an aligned input history to native APO state..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         values = self._state.extend(as_float64_series(_input))
         self._values.extend(np.asarray(values, dtype=np.float64).tolist())
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned APO history."""
+        """Return aligned APO history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self) -> object:
-        """Return the latest APO value."""
+        """Return the latest APO value..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history."""
+        """Reset native state and accumulated output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         self._values.clear()
         return self

@@ -54,7 +54,7 @@ impl AverageDirectionalIndexRating {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::momentum;
+
 
     #[test]
     fn matches_batch_and_reset_replay() {
@@ -64,7 +64,7 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.3).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
-            let expected = momentum::average_directional_index_rating(&high, &low, &close, period).unwrap();
+            let expected = crate::stream::average_directional_index_rating(&high, &low, &close, period).unwrap();
             let mut state = AverageDirectionalIndexRating::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
@@ -80,4 +80,29 @@ mod tests {
             assert_eq!(state.value(), final_value);
         }
     }
+}
+// Batch Average Directional Movement Index Rating.
+
+
+/// Compute the average directional index rating result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn average_directional_index_rating(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let adx_values = crate::stream::average_directional_index(high, low, close, timeperiod)?;
+    let len = adx_values.len();
+    let lookback = 3 * timeperiod - 2;
+    let mut output = vec![f64::NAN; len];
+    for index in lookback..len {
+        output[index] = (adx_values[index] + adx_values[index - timeperiod + 1]) / 2.0;
+    }
+    Ok(output)
 }

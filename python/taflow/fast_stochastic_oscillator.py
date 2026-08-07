@@ -7,7 +7,17 @@ import numpy as np
 
 
 class FastStochasticOscillator:
-    """Incrementally compute aligned fast %K and fast %D."""
+    """Incrementally compute aligned fast %K and fast %D
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    FastStochasticOscillator
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
@@ -72,7 +82,13 @@ class FastStochasticOscillator:
         return self
 
     def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the aligned native output histories."""
+        """Return the aligned native output histories..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         if not self._values:
             empty = np.empty(0, dtype=np.float64)
             return tuple(empty.copy() for _ in range(2))

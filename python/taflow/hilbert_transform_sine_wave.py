@@ -46,12 +46,12 @@ class HilbertTransformSineWave:
         self._state.append(float(value))
         return self
 
-    def extend(self, values: Any) -> object:
+    def extend(self, _input: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        values : object
+        _input : object
             Input values processed in chronological order.
 
         Returns
@@ -59,7 +59,7 @@ class HilbertTransformSineWave:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(values))
+        self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray]:

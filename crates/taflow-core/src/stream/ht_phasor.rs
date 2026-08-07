@@ -2,7 +2,7 @@
 
 use std::collections::VecDeque;
 
-use crate::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
+use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 32;
@@ -184,7 +184,7 @@ mod tests {
         let input: Vec<f64> = (0..300)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let (expected_i, expected_q) = crate::cycle::hilbert_transform_phasor(&input).unwrap();
+        let (expected_i, expected_q) = crate::stream::cycle::hilbert_transform_phasor(&input).unwrap();
         let mut state = HilbertTransformPhasor::new();
         for ((&input, &inphase), &quadrature) in input.iter().zip(&expected_i).zip(&expected_q) {
             match state.append(input) {

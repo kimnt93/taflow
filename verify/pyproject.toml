@@ -1,0 +1,25 @@
+[project]
+name = "taflow-verify"
+version = "0.1.0"
+description = "Correctness verification of taflow against reference implementations (TA-Lib, pandas, pandas-ta)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.0",
+    "ta-lib>=0.6",
+    "taflow",
+]
+
+[project.optional-dependencies]
+# Extra oracles for functions that are not in TA-Lib.
+extra-oracles = [
+    "pandas-ta-classic",
+    "smartmoneyconcepts",
+]
+
+[tool.uv.sources]
+# Build the local Rust/Python package from the repository root (maturin backend).
+taflow = { path = "..", editable = false }
+
+[tool.uv]
+package = false

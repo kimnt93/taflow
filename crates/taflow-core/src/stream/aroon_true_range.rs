@@ -4,7 +4,17 @@ use crate::error::TaResult;
 
 use super::{invalid_period, RollingExtrema};
 
-/// Computes aligned true-range values from HLC slices.
+/// Compute the true range result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn true_range(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
@@ -13,7 +23,18 @@ pub fn true_range(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>
     Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
 }
 
-/// Computes an aligned Average True Range vector from HLC slices.
+/// Compute the average true range result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
@@ -22,7 +43,18 @@ pub fn average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: 
     Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
 }
 
-/// Computes an aligned Normalized Average True Range vector from HLC slices.
+/// Compute the normalized average true range result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn normalized_average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });

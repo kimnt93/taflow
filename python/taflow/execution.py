@@ -90,11 +90,15 @@ class Expr:
             if isinstance(other, Expr)
             else Expr(lambda _row, value=other: value, name=repr(other))
         )
-        return Expr(
+        result = Expr(
             lambda row: op(self.eval(row), rhs.eval(row)),
             (self, rhs),
             f"({self.name}{symbol}{rhs.name})",
         )
+        # Keep the operation explicit so the evaluator can use its identity
+        # cache instead of recursively stepping stateful dependencies twice.
+        result._operation = (op, self, rhs)
+        return result
 
     def __add__(self, other: object) -> object:
         """Execute the __add__ operation through the native Rust implementation.
@@ -224,7 +228,9 @@ class Expr:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return Expr(lambda row: -self.eval(row), (self,), f"(-{self.name})")
+        result = Expr(lambda row: -self.eval(row), (self,), f"(-{self.name})")
+        result._operation = (lambda value: -value, self)
+        return result
 
 
 @dataclass(frozen=True)
@@ -366,6 +372,14 @@ def _evaluate(expr: Expr, row: object, cache: object) -> object:
         value = expr.step(row, cache)
     elif isinstance(expr, _Expression):
         value = expr.step(row, cache)
+    elif hasattr(expr, "_operation"):
+        operation = expr._operation
+        if len(operation) == 3:
+            op, lhs, rhs = operation
+            value = op(_evaluate(lhs, row, cache), _evaluate(rhs, row, cache))
+        else:
+            op, operand = operation
+            value = op(_evaluate(operand, row, cache))
     else:
         # Binary Expr closures call their operands directly; evaluating their
         # dependency graph here ensures shared indicator nodes are cached.
@@ -434,13 +448,39 @@ class Pipeline:
         return node
 
     def expression(self, name: str, expression: Expr) -> Expr:
-        """Add a derived expression node and return it."""
+        """Add a derived expression node and return it.
+
+        Parameters
+        ----------
+        name : str
+            Stable output-node name.
+        expression : Expr
+            Expression evaluated from graph dependencies.
+
+        Returns
+        -------
+        Expr
+            The registered expression node.
+        """
         node = _Expression(expression)
         self._nodes.append(node)
         return node
 
     def output(self, name: str, node: Expr) -> Expr:
-        """Expose a graph node under an output name."""
+        """Expose a graph node under an output name.
+
+        Parameters
+        ----------
+        name : str
+            Name used in pipeline result mappings.
+        node : Expr
+            Node emitted for each input bar.
+
+        Returns
+        -------
+        Expr
+            The same node for fluent graph construction.
+        """
         self._outputs[name] = node
         return node
 
@@ -456,21 +496,49 @@ class Pipeline:
         return tuple(self._outputs)
 
     def reset(self) -> object:
-        """Reset all stateful nodes and return this pipeline."""
+        """Reset all stateful nodes and return this pipeline.
+
+        Returns
+        -------
+        Pipeline
+            This pipeline after every indicator node has been reset.
+        """
         for node in self._nodes:
             if isinstance(node, _Indicator):
                 node.reset()
         return self
 
     def append(self, row: Mapping[str, float]) -> dict[str, float]:
-        """Dispatch one aligned bar through the graph exactly once."""
+        """Dispatch one aligned bar through the graph exactly once.
+
+        Parameters
+        ----------
+        row : mapping[str, float]
+            Current values for every source field in the graph.
+
+        Returns
+        -------
+        dict[str, float]
+            Current values for all named pipeline outputs.
+        """
         cache: dict[int, float] = {}
         return {
             name: _evaluate(node, row, cache) for name, node in self._outputs.items()
         }
 
     def extend(self, rows: Mapping[str, Sequence[float]]) -> dict[str, np.ndarray]:
-        """Run aligned columns and return same-length output arrays."""
+        """Run aligned columns and return same-length output arrays.
+
+        Parameters
+        ----------
+        rows : mapping[str, sequence[float]]
+            Equal-length chronological source columns.
+
+        Returns
+        -------
+        dict[str, numpy.ndarray]
+            Same-length output columns with causal warm-up values preserved.
+        """
         columns = {name: as_float64_series(values) for name, values in rows.items()}
         if not columns:
             return {name: np.empty(0) for name in self._outputs}
@@ -487,35 +555,109 @@ class Pipeline:
 
 
 class NumpyAdapter:
-    """Zero-copy where possible NumPy input/output adapter."""
+    """Zero-copy where possible NumPy input/output adapter
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    NumpyAdapter
+        A persistent native-backed indicator adapter.
+    """
 
     @staticmethod
     def input(values: object, *, column: object = None) -> object:
-        """Convert an array-like input to contiguous float64 values."""
+        """Convert an array-like input to contiguous float64 values..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return as_float64_series(values, column=column)
 
     @staticmethod
     def output(values: object) -> object:
-        """Return contiguous float64 NumPy output."""
+        """Return contiguous float64 NumPy output..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.ascontiguousarray(values, dtype=np.float64)
 
 
 class PythonListAdapter:
-    """Adapter for Python sequences, with explicit list conversion."""
+    """Adapter for Python sequences, with explicit list conversion
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    PythonListAdapter
+        A persistent native-backed indicator adapter.
+    """
 
     @staticmethod
     def input(values: object, *, column: object = None) -> object:
-        """Convert a Python sequence to contiguous float64 values."""
+        """Convert a Python sequence to contiguous float64 values..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return as_float64_series(values, column=column)
 
     @staticmethod
     def output(values: object) -> object:
-        """Return output as a Python list of floats."""
+        """Return output as a Python list of floats..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(values, dtype=np.float64).tolist()
 
 
 class ArrowAdapter:
-    """Optional Apache Arrow adapter; import is deferred until use."""
+    """Optional Apache Arrow adapter; import is deferred until use
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    ArrowAdapter
+        A persistent native-backed indicator adapter.
+    """
 
     @staticmethod
     def _module() -> object:
@@ -565,12 +707,33 @@ class ArrowAdapter:
 
     @classmethod
     def output(cls, values: object) -> object:
-        """Convert values to an Arrow array."""
+        """Convert values to an Arrow array..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return cls._module().array(np.asarray(values, dtype=np.float64))
 
 
 class PolarsAdapter:
-    """Optional Polars adapter; import is deferred until use."""
+    """Optional Polars adapter; import is deferred until use
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    PolarsAdapter
+        A persistent native-backed indicator adapter.
+    """
 
     @staticmethod
     def _module() -> object:
@@ -618,7 +781,18 @@ class PolarsAdapter:
 
     @classmethod
     def output(cls, values: object, name: object = "value") -> object:
-        """Convert values to a Polars Series."""
+        """Convert values to a Polars Series..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return cls._module().Series(name, values)
 
 
@@ -667,7 +841,17 @@ def adapt_output(
 
 
 class AdapterGateway:
-    """Single dispatch gateway for supported input and output containers."""
+    """Single dispatch gateway for supported input and output containers
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    AdapterGateway
+        A persistent native-backed indicator adapter.
+    """
 
     _adapters = {
         "numpy": NumpyAdapter,

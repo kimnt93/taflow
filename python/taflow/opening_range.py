@@ -55,13 +55,35 @@ class OpeningRange:
     def append(
         self, high: float, low: float, close: float, anchor: bool = False
     ) -> object:
-        """Process one bar and return opening high, low, and breakout flag."""
+        """Process one bar and return opening high, low, and breakout flag..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.append(float(high), float(low), float(close), bool(anchor))
 
     def extend(
         self, high: Any, low: Any, close: Any, anchor: Any | None = None
     ) -> object:
-        """Process aligned OHLC history and return this indicator."""
+        """Process aligned OHLC history and return this indicator..
+
+        Parameters
+        ----------
+        values : object
+            Input values or the aligned result container.
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         close_array = np.asarray(close, dtype=np.float64)
         if anchor is None:
             anchor = np.zeros(close_array.shape, dtype=np.bool_)
@@ -74,15 +96,33 @@ class OpeningRange:
         return self
 
     def compute(self) -> object:
-        """Return opening highs, lows, and breakout flags."""
+        """Return opening highs, lows, and breakout flags..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest opening range tuple."""
+        """Return the latest opening range tuple..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return self._state.value
 
     def reset(self) -> object:
-        """Clear current session and output history."""
+        """Clear current session and output history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         self._state.reset()
         return self

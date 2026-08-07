@@ -12,6 +12,15 @@ use crate::ma_type::MaType;
 use super::moving_average::MovingAverageDispatcher;
 
 /// Computes an aligned variable-period moving-average vector.
+///
+/// # Parameters
+///
+/// * `input`, `periods` - Equal-length chronological series.
+/// * `minperiod`, `maxperiod`, `matype` - Per-bar period bounds and moving-average type.
+///
+/// # Returns
+///
+/// An aligned vector with NaN warm-up values and validated parameters.
 pub fn moving_average_variable_period(
     input: &[f64],
     periods: &[f64],
@@ -108,7 +117,7 @@ impl VariablePeriodMovingAverage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::overlap;
+
 
     #[test]
     fn matches_batch_for_every_moving_average_type() {

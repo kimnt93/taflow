@@ -8,7 +8,18 @@ use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, Window};
 
-/// Computes an aligned Commodity Channel Index vector from HLC slices.
+/// Compute the commodity channel index result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn commodity_channel_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() {
         return Err(TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });

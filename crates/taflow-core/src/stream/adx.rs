@@ -63,7 +63,7 @@ impl AverageDirectionalIndex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::momentum;
+
 
     #[test]
     fn matches_batch_and_reset_replay() {
@@ -73,7 +73,7 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.3).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 1.1).collect();
         for period in [2, 3, 14, 30] {
-            let expected = momentum::average_directional_index(&high, &low, &close, period).unwrap();
+            let expected = crate::stream::average_directional_index(&high, &low, &close, period).unwrap();
             let mut state = AverageDirectionalIndex::new(period).unwrap();
             for index in 0..close.len() {
                 match state.append(high[index], low[index], close[index]) {
@@ -96,4 +96,139 @@ mod tests {
         let values: Vec<_> = (0..50).map(|_| state.append(10.0, 10.0, 10.0)).collect();
         assert_eq!(values[27], Some(0.0));
     }
+}
+use crate::error::TaError;
+
+/// Average Directional Index (ADX)
+///
+/// lookback = 2 * timeperiod - 1
+///
+/// Computes TR, +DM, -DM inline (no intermediate Vec allocations),
+/// Compute the average directional index result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub fn average_directional_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let len = high.len();
+    if len != low.len() || len != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: len,
+            got: low.len().min(close.len()),
+        });
+    }
+    if timeperiod < 2 {
+        return Err(TaError::InvalidParameter {
+            name: "timeperiod",
+            value: timeperiod.to_string(),
+            reason: "must be >= 2",
+        });
+    }
+    let lookback = 2 * timeperiod - 1;
+    if len <= lookback {
+        return Err(TaError::InsufficientData {
+            need: lookback + 1,
+            got: len,
+        });
+    }
+
+    let pf = timeperiod as f64;
+    let mut output = vec![0.0_f64; len];
+    output[..lookback].fill(f64::NAN);
+
+    // Phase 1: Compute raw TR, +DM, -DM and seed Wilder sums.
+    // Seed range: bars 1..timeperiod-1 (i.e. period-2 bars for the seed sum).
+    let mut sum_tr: f64 = 0.0;
+    let mut sum_pdm: f64 = 0.0;
+    let mut sum_mdm: f64 = 0.0;
+
+    for i in 1..timeperiod {
+        let hl = high[i] - low[i];
+        let hc = (high[i] - close[i - 1]).abs();
+        let lc = (low[i] - close[i - 1]).abs();
+        sum_tr += hl.max(hc).max(lc);
+
+        let up = high[i] - high[i - 1];
+        let down = low[i - 1] - low[i];
+        if up > down && up > 0.0 {
+            sum_pdm += up;
+        } else if down > up && down > 0.0 {
+            sum_mdm += down;
+        }
+    }
+
+    // Phase 2: Wilder smooth TR/+DM/-DM from timeperiod..len, compute DX values.
+    // We need DX values starting at index `timeperiod` to seed ADX.
+    // ADX seed = SMA of first `timeperiod` DX values (indices timeperiod..2*timeperiod-1).
+    let dx_start = timeperiod;
+    let adx_start = dx_start + timeperiod - 1; // = 2*timeperiod - 1
+
+    let mut dx_sum_for_adx_seed: f64 = 0.0;
+    let mut dx_count_for_adx_seed: usize = 0;
+    let mut prev_adx: f64 = 0.0;
+
+    for i in timeperiod..len {
+        // Compute TR, +DM, -DM for bar i
+        let hl = high[i] - low[i];
+        let hc = (high[i] - close[i - 1]).abs();
+        let lc = (low[i] - close[i - 1]).abs();
+        let tr_i = hl.max(hc).max(lc);
+
+        let up = high[i] - high[i - 1];
+        let down = low[i - 1] - low[i];
+        let pdm_i = if up > down && up > 0.0 { up } else { 0.0 };
+        let mdm_i = if down > up && down > 0.0 { down } else { 0.0 };
+
+        // Wilder smoothing
+        sum_tr = sum_tr - sum_tr / pf + tr_i;
+        sum_pdm = sum_pdm - sum_pdm / pf + pdm_i;
+        sum_mdm = sum_mdm - sum_mdm / pf + mdm_i;
+
+        // Compute DX
+        let dx_val = if sum_tr > 0.0 {
+            let pdi = 100.0 * sum_pdm / sum_tr;
+            let mdi = 100.0 * sum_mdm / sum_tr;
+            let sum_di = pdi + mdi;
+            if sum_di > 0.0 {
+                100.0 * (pdi - mdi).abs() / sum_di
+            } else {
+                0.0
+            }
+        } else {
+            f64::NAN
+        };
+
+        if i < adx_start {
+            // Accumulate DX for ADX seed
+            if !dx_val.is_nan() {
+                dx_sum_for_adx_seed += dx_val;
+                dx_count_for_adx_seed += 1;
+            }
+        } else if i == adx_start {
+            // Include this DX in seed, then compute initial ADX = SMA(DX)
+            if !dx_val.is_nan() {
+                dx_sum_for_adx_seed += dx_val;
+                dx_count_for_adx_seed += 1;
+            }
+            if dx_count_for_adx_seed > 0 {
+                prev_adx = dx_sum_for_adx_seed / dx_count_for_adx_seed as f64;
+                output[i] = prev_adx;
+            }
+        } else {
+            // Wilder smooth ADX
+            if !dx_val.is_nan() {
+                prev_adx = (prev_adx * (pf - 1.0) + dx_val) / pf;
+                output[i] = prev_adx;
+            }
+        }
+    }
+
+    Ok(output)
 }

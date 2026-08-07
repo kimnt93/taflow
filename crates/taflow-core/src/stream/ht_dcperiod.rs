@@ -2,7 +2,7 @@
 
 use std::collections::VecDeque;
 
-use crate::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
+use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 32;
@@ -193,7 +193,7 @@ mod tests {
         let input: Vec<f64> = (0..300)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let expected = crate::cycle::hilbert_transform_dominant_cycle_period(&input).unwrap();
+        let expected = crate::stream::cycle::hilbert_transform_dominant_cycle_period(&input).unwrap();
         let mut state = HilbertTransformDominantCyclePeriod::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {

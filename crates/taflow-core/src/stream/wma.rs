@@ -4,7 +4,16 @@ use crate::error::TaResult;
 
 use super::{StreamingIndicator, Window};
 
-/// Computes an aligned Weighted Moving Average vector.
+/// Compute the weighted moving average result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `timeperiod` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn weighted_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = WeightedMovingAverage::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())

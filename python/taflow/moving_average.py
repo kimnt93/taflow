@@ -7,7 +7,17 @@ import numpy as np
 
 
 class MovingAverage:
-    """Incrementally compute any TA-Lib moving-average type."""
+    """Incrementally compute any TA-Lib moving-average type
+
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    MovingAverage
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self, period: int = 30, moving_average_type: int = 0, values: Any | None = None
@@ -53,7 +63,13 @@ class MovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned moving-average history."""
+        """Return the aligned moving-average history..
+
+        Returns
+        -------
+        object
+            Updated state, converted values, or aligned output.
+        """
         return np.asarray(self._values, dtype=np.float64)
 
     @property

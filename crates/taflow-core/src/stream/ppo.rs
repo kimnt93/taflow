@@ -8,7 +8,18 @@ use crate::ma_type::MaType;
 
 use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
 
-/// Computes an aligned Percentage Price Oscillator vector.
+/// Compute the percentage price oscillator result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `input` - Input series or configuration value.
+/// * `fastperiod` - Input series or configuration value.
+/// * `slowperiod` - Input series or configuration value.
+/// * `matype` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub fn percentage_price_oscillator(input: &[f64], fastperiod: usize, slowperiod: usize, matype: MaType) -> TaResult<Vec<f64>> {
     let mut state = PercentagePriceOscillator::new(fastperiod, slowperiod, matype)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
@@ -63,7 +74,7 @@ impl StreamingIndicator for PercentagePriceOscillator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::momentum;
+
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {
