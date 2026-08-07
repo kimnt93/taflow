@@ -355,11 +355,11 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | nvi | nvi | _ |
 | [x] | pvi | pvi | _ |
 | [x] | mcginley | mcginley_dynamic | _ |
-| [ ] | vidya | vidya | _ |
-| [ ] | laguerre_rsi | laguerre_rsi | _ |
-| [ ] | rmi | rmi | _ |
+| [x] | vidya | vidya | _ |
+| [x] | laguerre_rsi | laguerre_rsi | _ |
+| [x] | rmi | rmi | _ |
 | [ ] | jma | jma | _ |
-| [ ] | ssl_channel | ssl_channel | _ |
+| [x] | ssl_channel | ssl_channel | _ |
 | [ ] | pmax | pmax | _ |
 | [ ] | td_sequential | td_sequential | _ |
 | [ ] | even_better_sinewave | even_better_sinewave | _ |

@@ -102,11 +102,11 @@ fork/successor version) unless noted.
 | [x] | VPT | Impl: ta `volume.VolumePriceTrendIndicator` | O(1) cumulative recurrence. |
 | [x] | NVI / PVI | Impl: ta `volume.NegativeVolumeIndexIndicator`; pandas-ta `pvi` | O(1): recurrence gated on volume direction. |
 | [x] | McGinley Dynamic | Impl: pandas-ta `overlap/mcgd.py`; Theory: McGinley, JoTA 1997 | O(1): `md += (x−md)/(k·n·(x/md)^4)`; guard `md→0`. |
-| [ ] | VIDYA | Impl: pandas-ta / freqtrade technical; Theory: Chande, TASC 1992 | O(1): CMO-modulated EMA — reuse `Cmo`. |
-| [ ] | Laguerre RSI | Impl: freqtrade technical; Theory: Ehlers, *Cybernetic Analysis*, ch. 14 | O(1): 4-float Laguerre filter recurrence. |
-| [ ] | RMI | Impl: freqtrade technical `indicators.py::RMI` | O(1): Wilder smoothing + lag-k delay ring. |
+| [x] | VIDYA | Impl: pandas-ta / freqtrade technical; Theory: Chande, TASC 1992 | O(1): CMO-modulated EMA — reuse `Cmo`. |
+| [x] | Laguerre RSI | Impl: freqtrade technical; Theory: Ehlers, *Cybernetic Analysis*, ch. 14 | O(1): 4-float Laguerre filter recurrence. |
+| [x] | RMI | Impl: freqtrade technical `indicators.py::RMI` | O(1): Wilder smoothing + lag-k delay ring. |
 | [ ] | JMA | Impl: pandas-ta `overlap/jma.py` (public reconstruction; true JMA proprietary — document we match pandas-ta) | O(1) multi-stage adaptive recurrence. |
-| [ ] | SSL Channel | Impl: freqtrade technical `indicators.py::SSLChannels` | O(1): SMA(high), SMA(low) + side flip-flop. |
+| [x] | SSL Channel | Impl: freqtrade technical `indicators.py::SSLChannels` | O(1): SMA(high), SMA(low) + side flip-flop. |
 | [ ] | PMAX | Impl: freqtrade technical `indicators.py::PMAX` | O(1): Supertrend generalized over (MA, ATR multiple) — share ratchet code. |
 | [ ] | TD Sequential | Impl: pandas-ta `momentum/td_seq.py`; Theory: Tom DeMark | O(1): setup/countdown counters + 4-bar delay ring; integer outputs like CDL patterns. |
 | [ ] | Even Better Sinewave | Impl: pandas-ta `cycles/ebsw.py`; Theory: Ehlers, *Cycle Analytics for Traders* | O(1) recurrence; lives with Hilbert family. |
