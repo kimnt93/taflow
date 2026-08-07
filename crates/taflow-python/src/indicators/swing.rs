@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Swing;
+use taflow::stream::SwingHighLow;
 
 #[pyclass]
 pub struct SwingHighLowOperator {
-    inner: Swing,
+    inner: SwingHighLow,
     signal: Vec<f64>,
     level: Vec<f64>,
     bars_since: Vec<f64>,
@@ -16,7 +16,7 @@ impl SwingHighLowOperator {
     #[new]
     fn new(swing_length: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Swing::new(swing_length).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: SwingHighLow::new(swing_length).map_err(|error| PyValueError::new_err(error.to_string()))?,
             signal: Vec::new(),
             level: Vec::new(),
             bars_since: Vec::new(),

@@ -705,7 +705,7 @@ pub struct BosChochValue {
 /// Causal break-of-structure and change-of-character events.
 #[derive(Debug, Clone)]
 pub struct BosChoch {
-    swing: Swing,
+    swing: SwingHighLow,
     swings: VecDeque<(f64, f64)>,
     pending: Option<(f64, f64)>,
     trend: Option<f64>,
@@ -720,7 +720,7 @@ impl BosChoch {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new(swing_length: usize) -> TaResult<Self> {
         Ok(Self {
-            swing: Swing::new(swing_length)?,
+            swing: SwingHighLow::new(swing_length)?,
             swings: VecDeque::with_capacity(4),
             pending: None,
             trend: None,
@@ -867,8 +867,8 @@ struct ObZone {
 #[derive(Debug, Clone)]
 pub struct OrderBlock {
     atr: AverageTrueRange,
-    internal: Swing,
-    structure: Swing,
+    internal: SwingHighLow,
+    structure: SwingHighLow,
     internal_low: Option<(f64, f64, bool)>,
     internal_high: Option<(f64, f64, bool)>,
     structure_low: Option<f64>,
@@ -908,8 +908,8 @@ impl OrderBlock {
         }
         Ok(Self {
             atr: AverageTrueRange::new(atr_period)?,
-            internal: Swing::new(internal_length)?,
-            structure: Swing::new(swing_length)?,
+            internal: SwingHighLow::new(internal_length)?,
+            structure: SwingHighLow::new(swing_length)?,
             internal_low: None,
             internal_high: None,
             structure_low: None,
@@ -1081,13 +1081,13 @@ struct LiquidityPool {
     count: usize,
 }
 
-/// Causal liquidity-pool clustering with sweep detection. Swing highs and
+/// Causal liquidity-pool clustering with sweep detection. SwingHighLow highs and
 /// lows are clustered into pools when they fall within a `range_percent`
 /// price tolerance; a pool emits a signal once a second swing confirms it.
 /// A pool is swept and removed when price trades beyond its level.
 #[derive(Debug, Clone)]
 pub struct Liquidity {
-    swing: Swing,
+    swing: SwingHighLow,
     high_pools: Vec<LiquidityPool>,
     low_pools: Vec<LiquidityPool>,
     range_percent: f64,
@@ -1110,7 +1110,7 @@ impl Liquidity {
             });
         }
         Ok(Self {
-            swing: Swing::new(swing_length)?,
+            swing: SwingHighLow::new(swing_length)?,
             high_pools: Vec::new(),
             low_pools: Vec::new(),
             range_percent,
@@ -1247,7 +1247,7 @@ pub struct EqualHighsLowsValue {
 #[derive(Debug, Clone)]
 pub struct EqualHighsLows {
     atr: AverageTrueRange,
-    swing: Swing,
+    swing: SwingHighLow,
     previous_high: Option<f64>,
     previous_low: Option<f64>,
     eq_threshold: f64,
@@ -1278,7 +1278,7 @@ impl EqualHighsLows {
         }
         Ok(Self {
             atr: AverageTrueRange::new(atr_period)?,
-            swing: Swing::new(eq_len)?,
+            swing: SwingHighLow::new(eq_len)?,
             previous_high: None,
             previous_low: None,
             eq_threshold,
@@ -1612,7 +1612,7 @@ pub struct RetracementsValue {
 /// the deepest value tracked since the leg began.
 #[derive(Debug, Clone)]
 pub struct Retracements {
-    swing: Swing,
+    swing: SwingHighLow,
     last_high: Option<f64>,
     last_low: Option<f64>,
     leg_high: Option<f64>,
@@ -1630,7 +1630,7 @@ impl Retracements {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new(swing_length: usize) -> TaResult<Self> {
         Ok(Self {
-            swing: Swing::new(swing_length)?,
+            swing: SwingHighLow::new(swing_length)?,
             last_high: None,
             last_low: None,
             leg_high: None,
@@ -4556,7 +4556,7 @@ pub fn swing_highs_lows(
             got: low.len(),
         });
     }
-    let mut state = Swing::new(swing_length)?;
+    let mut state = SwingHighLow::new(swing_length)?;
     let mut signal = Vec::with_capacity(high.len());
     let mut level = Vec::with_capacity(high.len());
     let mut bars_since = Vec::with_capacity(high.len());
@@ -4577,7 +4577,7 @@ pub struct SwingValue {
 }
 
 #[derive(Debug, Clone)]
-pub struct Swing {
+pub struct SwingHighLow {
     highs: VecDeque<f64>,
     lows: VecDeque<f64>,
     length: usize,
@@ -4585,7 +4585,7 @@ pub struct Swing {
     value: Option<SwingValue>,
 }
 
-impl Swing {
+impl SwingHighLow {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.

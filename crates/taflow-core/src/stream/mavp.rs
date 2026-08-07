@@ -12,7 +12,7 @@ use crate::ma_type::MaType;
 use super::moving_average::MovingAverageDispatcher;
 
 /// Incremental MAVP with TA-Lib-compatible truncation and clamping.
-pub struct MovingAverageVariablePeriod {
+pub struct VariablePeriodMovingAverage {
     minperiod: usize,
     maxperiod: usize,
     matype: MaType,
@@ -22,7 +22,7 @@ pub struct MovingAverageVariablePeriod {
     value: Option<f64>,
 }
 
-impl MovingAverageVariablePeriod {
+impl VariablePeriodMovingAverage {
     /// Creates a variable-period moving-average state.
     pub fn new(minperiod: usize, maxperiod: usize, matype: MaType) -> TaResult<Self> {
         if minperiod == 0 || maxperiod < minperiod {
@@ -107,7 +107,7 @@ mod tests {
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
             let expected = overlap::moving_average_variable_period(&input, &periods, 2, 12, ma_type).unwrap();
-            let mut state = MovingAverageVariablePeriod::new(2, 12, ma_type).unwrap();
+            let mut state = VariablePeriodMovingAverage::new(2, 12, ma_type).unwrap();
             for index in 0..input.len() {
                 match state.append(input[index], periods[index]) {
                     Some(actual) => assert!((actual - expected[index]).abs() < 1e-8),

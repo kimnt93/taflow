@@ -12,18 +12,18 @@ impl Candle {
     }
 }
 /// Incremental CDLHIKKAKEMOD state.
-pub struct CandleHikkakeMod {
+pub struct CandleHikkakeModified {
     candles: VecDeque<Candle>,
     index: usize,
     pending: Option<(usize, i32, f64)>,
     value: Option<i32>,
 }
-impl Default for CandleHikkakeMod {
+impl Default for CandleHikkakeModified {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleHikkakeMod {
+impl CandleHikkakeModified {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -110,7 +110,7 @@ mod tests {
         let low: Vec<f64> = (0..20).map(|i| i as f64 * 0.1).collect();
         let close = high.clone();
         let e = crate::pattern::cdl_hikkakemod(&open, &high, &low, &close).unwrap();
-        let mut s = CandleHikkakeMod::new();
+        let mut s = CandleHikkakeModified::new();
         for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
         {
             match s.append(o, h, l, c) {

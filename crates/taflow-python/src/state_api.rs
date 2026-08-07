@@ -5,7 +5,7 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
     self, AverageDirectionalIndex, AverageDirectionalIndexRating, AverageTrueRange, CommodityChannelIndex, DoubleExponentialMovingAverage, DirectionalMovementIndex, ExponentialMovingAverage, HilbertTransformTrendline, IntradayMomentumIndex, MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended, MovingAverageConvergenceDivergenceFixed, MesaAdaptiveMovingAverage,
-    MovingAverageVariablePeriod,
+    VariablePeriodMovingAverage,
     RollingMidpoint, RollingMidprice, Momentum, NormalizedAverageTrueRange, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent, RelativeStrengthIndex, SimpleMovingAverage, StochasticOscillator, FastStochasticOscillator, StochasticRelativeStrengthIndex,
     StreamingIndicator, TripleExponentialMovingAverage, TrueRange, TriangularMovingAverage, WeightedMovingAverage, RelativeMomentumIndex,
     VariableIndexDynamicAverage,
@@ -1009,7 +1009,7 @@ impl StatefulSar {
 
 #[pyclass]
 pub struct StatefulSarext {
-    inner: stream::ExtendedParabolicSar,
+    inner: stream::ParabolicSarExtended,
 }
 
 #[pymethods]
@@ -1028,7 +1028,7 @@ impl StatefulSarext {
         accelerationmaxshort: f64,
     ) -> Self {
         Self {
-            inner: stream::ExtendedParabolicSar::new(
+            inner: stream::ParabolicSarExtended::new(
                 startvalue,
                 offsetonreverse,
                 accelerationinitlong,
@@ -2348,7 +2348,7 @@ pub struct StatefulMacdExt {
 
 #[pyclass]
 pub struct StatefulMavp {
-    inner: MovingAverageVariablePeriod,
+    inner: VariablePeriodMovingAverage,
 }
 
 #[pyclass]
@@ -2819,7 +2819,7 @@ impl StatefulMavp {
     fn new(minperiod: usize, maxperiod: usize, matype: i32) -> PyResult<Self> {
         let ma_type = MaType::try_from(matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: MovingAverageVariablePeriod::new(minperiod, maxperiod, ma_type).map_err(py_value_error)?,
+            inner: VariablePeriodMovingAverage::new(minperiod, maxperiod, ma_type).map_err(py_value_error)?,
         })
     }
 
