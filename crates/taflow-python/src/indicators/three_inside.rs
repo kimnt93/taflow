@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Cdl3Inside;
+use taflow::stream::Candle3Inside;
 #[pyclass]
-pub struct ThreeInside {
-    inner: Cdl3Inside,
+/// Stateful CandleThreeInside candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleThreeInside {
+    inner: Candle3Inside,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl ThreeInside {
+impl CandleThreeInside {
     #[new]
     fn new() -> Self {
         Self {
-            inner: Cdl3Inside::new(),
+            inner: Candle3Inside::new(),
             outputs: Vec::new(),
         }
     }

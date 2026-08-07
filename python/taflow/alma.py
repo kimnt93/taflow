@@ -3,7 +3,12 @@ from typing import Any
 import numpy as np
 from ._native import AlmaOperator as _Native
 from ._series import as_float64_series
-class Alma:
+class ArnaudLegouxMovingAverage:
+    """Stateful ArnaudLegouxMovingAverage indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self,timeperiod:int,offset:float=.85,sigma:float=6.,input:Any|None=None):self._state=_Native(timeperiod,offset,sigma);self.extend(input) if input is not None else None
     def append(self,input:float):self._state.append(input);return self
     def extend(self,input:Any):self._state.extend(as_float64_series(input));return self

@@ -8,7 +8,12 @@ from ._native import CmfOperator as _Native
 from ._series import as_float64_series
 
 
-class Cmf:
+class ChaikinMoneyFlow:
+    """Stateful ChaikinMoneyFlow indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high: Any | None = None, low: Any | None = None, close: Any | None = None, volume: Any | None = None, period=20):
         self._state = _Native(period)
         if any(value is not None for value in (high, low, close, volume)):

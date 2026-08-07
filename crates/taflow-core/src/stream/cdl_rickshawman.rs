@@ -3,19 +3,19 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLRICKSHAWMAN state using TA-Lib's doji and near range averages.
-pub struct CdlRickshawman {
+pub struct CandleRickshawman {
     body_ranges: VecDeque<f64>,
     body_sum: f64,
     near_ranges: VecDeque<f64>,
     near_sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlRickshawman {
+impl Default for CandleRickshawman {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlRickshawman {
+impl CandleRickshawman {
     pub fn new() -> Self {
         Self {
             body_ranges: VecDeque::with_capacity(10),
@@ -76,7 +76,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_rickshawman(&open, &high, &low, &close).unwrap();
-        let mut state = CdlRickshawman::new();
+        let mut state = CandleRickshawman::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

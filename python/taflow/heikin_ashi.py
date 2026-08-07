@@ -2,6 +2,11 @@
 import numpy as np
 
 class HeikinAshi:
+    """Stateful HeikinAshi indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, open=None, high=None, low=None, close=None):
         self.reset()
         if open is not None: self.extend(open, high, low, close)

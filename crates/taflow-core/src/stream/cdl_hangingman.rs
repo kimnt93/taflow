@@ -21,16 +21,18 @@ impl Candle {
         self.o.min(self.c) - self.l
     }
 }
-pub struct CdlHangingMan {
+/// Stateful CandleHangingMan candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleHangingMan {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlHangingMan {
+impl Default for CandleHangingMan {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlHangingMan {
+impl CandleHangingMan {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -82,7 +84,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_hangingman(&o, &h, &l, &c).unwrap();
-        let mut s = CdlHangingMan::new();
+        let mut s = CandleHangingMan::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

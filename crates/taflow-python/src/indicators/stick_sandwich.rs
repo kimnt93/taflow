@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlStickSandwich;
+use taflow::stream::CandleStickSandwich as CandleStickSandwichState;
 #[pyclass]
-pub struct StickSandwich {
-    inner: CdlStickSandwich,
+/// Stateful CandleStickSandwich candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleStickSandwich {
+    inner: CandleStickSandwichState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl StickSandwich {
+impl CandleStickSandwich {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlStickSandwich::new(),
+            inner: CandleStickSandwichState::new(),
             outputs: Vec::new(),
         }
     }

@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlSpinningTop;
+use taflow::stream::CandleSpinningTop as CandleSpinningTopState;
 #[pyclass]
-pub struct SpinningTop {
-    inner: CdlSpinningTop,
+/// Stateful CandleSpinningTop candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleSpinningTop {
+    inner: CandleSpinningTopState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl SpinningTop {
+impl CandleSpinningTop {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlSpinningTop::new(),
+            inner: CandleSpinningTopState::new(),
             outputs: vec![],
         }
     }

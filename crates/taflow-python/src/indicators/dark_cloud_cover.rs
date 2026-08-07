@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlDarkCloudCover;
+use taflow::stream::CandleDarkCloudCover as CandleDarkCloudCoverState;
 #[pyclass]
-pub struct DarkCloudCover {
-    inner: CdlDarkCloudCover,
+/// Stateful CandleDarkCloudCover candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleDarkCloudCover {
+    inner: CandleDarkCloudCoverState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl DarkCloudCover {
+impl CandleDarkCloudCover {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlDarkCloudCover::new(),
+            inner: CandleDarkCloudCoverState::new(),
             outputs: vec![],
         }
     }

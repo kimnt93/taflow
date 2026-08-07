@@ -3,17 +3,17 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLDOJI state using TA-Lib's ten-bar High-Low average.
-pub struct CdlDoji {
+pub struct CandleDoji {
     ranges: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlDoji {
+impl Default for CandleDoji {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlDoji {
+impl CandleDoji {
     pub fn new() -> Self {
         Self {
             ranges: VecDeque::with_capacity(10),
@@ -59,7 +59,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_doji(&open, &high, &low, &close).unwrap();
-        let mut state = CdlDoji::new();
+        let mut state = CandleDoji::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

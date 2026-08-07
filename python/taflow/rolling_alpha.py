@@ -6,6 +6,11 @@ from ._series import as_float64_series
 
 
 class RollingAlpha:
+    """Stateful RollingAlpha indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, input: Any | None = None, benchmark: Any | None = None, timeperiod: int = 20):
         self._state = RollingAlphaOperator(timeperiod)
         self.extend(input, benchmark) if input is not None or benchmark is not None else None
@@ -18,6 +23,11 @@ class RollingAlpha:
 
 
 class RollingInformationRatio:
+    """Stateful RollingInformationRatio indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, input: Any | None = None, benchmark: Any | None = None, timeperiod: int = 20):
         self._state = RollingInformationRatioOperator(timeperiod)
         self.extend(input, benchmark) if input is not None or benchmark is not None else None

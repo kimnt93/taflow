@@ -19,16 +19,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlPiercing {
+/// Stateful CandlePiercing candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandlePiercing {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlPiercing {
+impl Default for CandlePiercing {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlPiercing {
+impl CandlePiercing {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -82,7 +84,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_piercing(&o, &h, &l, &c).unwrap();
-        let mut s = CdlPiercing::new();
+        let mut s = CandlePiercing::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

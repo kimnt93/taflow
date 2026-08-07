@@ -19,16 +19,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlDarkCloudCover {
+/// Stateful CandleDarkCloudCover candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleDarkCloudCover {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlDarkCloudCover {
+impl Default for CandleDarkCloudCover {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlDarkCloudCover {
+impl CandleDarkCloudCover {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -80,7 +82,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_darkcloudcover(&o, &h, &l, &c).unwrap();
-        let mut s = CdlDarkCloudCover::new();
+        let mut s = CandleDarkCloudCover::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

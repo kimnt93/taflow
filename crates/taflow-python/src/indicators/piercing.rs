@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlPiercing;
+use taflow::stream::CandlePiercing as CandlePiercingState;
 #[pyclass]
-pub struct Piercing {
-    inner: CdlPiercing,
+/// Stateful CandlePiercing candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandlePiercing {
+    inner: CandlePiercingState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl Piercing {
+impl CandlePiercing {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlPiercing::new(),
+            inner: CandlePiercingState::new(),
             outputs: vec![],
         }
     }

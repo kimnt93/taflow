@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlHikkakeMod;
+use taflow::stream::CandleHikkakeMod as CandleHikkakeModifiedState;
 #[pyclass]
-pub struct HikkakeModified {
-    inner: CdlHikkakeMod,
+/// Stateful CandleHikkakeModified candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleHikkakeModified {
+    inner: CandleHikkakeModifiedState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl HikkakeModified {
+impl CandleHikkakeModified {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlHikkakeMod::new(),
+            inner: CandleHikkakeModifiedState::new(),
             outputs: Vec::new(),
         }
     }

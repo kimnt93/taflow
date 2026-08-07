@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlRiseFall3Methods;
+use taflow::stream::CandleRiseFall3Methods;
 #[pyclass]
-pub struct RiseFallThreeMethods {
-    inner: CdlRiseFall3Methods,
+/// Stateful CandleRiseFallThreeMethods candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleRiseFallThreeMethods {
+    inner: CandleRiseFall3Methods,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl RiseFallThreeMethods {
+impl CandleRiseFallThreeMethods {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlRiseFall3Methods::new(),
+            inner: CandleRiseFall3Methods::new(),
             outputs: vec![],
         }
     }

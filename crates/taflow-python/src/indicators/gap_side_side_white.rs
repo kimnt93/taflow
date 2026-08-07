@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlGapSideSideWhite;
+use taflow::stream::CandleGapSideSideWhite as CandleGapSideSideWhiteState;
 #[pyclass]
-pub struct GapSideSideWhite {
-    inner: CdlGapSideSideWhite,
+/// Stateful CandleGapSideSideWhite candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleGapSideSideWhite {
+    inner: CandleGapSideSideWhiteState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl GapSideSideWhite {
+impl CandleGapSideSideWhite {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlGapSideSideWhite::new(),
+            inner: CandleGapSideSideWhiteState::new(),
             outputs: vec![],
         }
     }

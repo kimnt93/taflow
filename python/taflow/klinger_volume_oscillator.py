@@ -1,6 +1,11 @@
 """Klinger volume oscillator (causal fast/slow EMA of signed volume force)."""
 import numpy as np
 class KlingerVolumeOscillator:
+    """Stateful KlingerVolumeOscillator indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high=None, low=None, close=None, volume=None, fast=34, slow=55, signal=13):
         self.fast=int(fast); self.slow=int(slow); self.signal=int(signal); self.reset()
         if close is not None: self.extend(high,low,close,volume)

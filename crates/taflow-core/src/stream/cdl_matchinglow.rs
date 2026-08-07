@@ -22,16 +22,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlMatchingLow {
+/// Stateful CandleMatchingLow candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleMatchingLow {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlMatchingLow {
+impl Default for CandleMatchingLow {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlMatchingLow {
+impl CandleMatchingLow {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(6),
@@ -80,7 +82,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_matchinglow(&o, &h, &l, &c).unwrap();
-        let mut s = CdlMatchingLow::new();
+        let mut s = CandleMatchingLow::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

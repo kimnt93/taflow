@@ -1,9 +1,14 @@
 """Persistent High-Wave candlestick recognition (CDLHIGHWAVE)."""
 from typing import Any
 import numpy as np
-from ._native import HighWave as _Native
+from ._native import CandleHighWave as _Native
 from ._series import as_float64_series
-class HighWave:
+class CandleHighWave:
+    """Stateful CandleHighWave indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self,open:Any|None=None,high:Any|None=None,low:Any|None=None,close:Any|None=None):self._state=_Native();self.extend(open,high,low,close) if any(value is not None for value in (open,high,low,close)) else None
     def append(self,open:float,high:float,low:float,close:float):self._state.append(open,high,low,close);return self
     def extend(self,open:Any,high:Any,low:Any,close:Any):self._state.extend(as_float64_series(open),as_float64_series(high),as_float64_series(low),as_float64_series(close));return self
@@ -11,4 +16,3 @@ class HighWave:
     @property
     def value(self):return self._state.value
     def reset(self):self._state.reset();return self
-CDLHIGHWAVE=HighWave

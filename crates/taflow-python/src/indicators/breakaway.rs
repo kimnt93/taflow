@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlBreakaway;
+use taflow::stream::CandleBreakaway as CandleBreakawayState;
 #[pyclass]
-pub struct Breakaway {
-    inner: CdlBreakaway,
+/// Stateful CandleBreakaway candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleBreakaway {
+    inner: CandleBreakawayState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl Breakaway {
+impl CandleBreakaway {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlBreakaway::new(),
+            inner: CandleBreakawayState::new(),
             outputs: vec![],
         }
     }

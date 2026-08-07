@@ -1,19 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlEngulfing;
-
+use taflow::stream::CandleEngulfing as CandleEngulfingState;
 #[pyclass]
-pub struct Engulfing {
-    inner: CdlEngulfing,
+/// Stateful CandleEngulfing candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleEngulfing {
+    inner: CandleEngulfingState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl Engulfing {
+impl CandleEngulfing {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlEngulfing::new(),
+            inner: CandleEngulfingState::new(),
             outputs: Vec::new(),
         }
     }

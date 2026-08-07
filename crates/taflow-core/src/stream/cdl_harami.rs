@@ -22,16 +22,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlHarami {
+/// Stateful CandleHarami candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleHarami {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlHarami {
+impl Default for CandleHarami {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlHarami {
+impl CandleHarami {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -83,7 +85,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_harami(&o, &h, &l, &c).unwrap();
-        let mut s = CdlHarami::new();
+        let mut s = CandleHarami::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

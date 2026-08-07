@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlRickshawman;
+use taflow::stream::CandleRickshawman as CandleRickshawmanState;
 #[pyclass]
-pub struct Rickshawman {
-    inner: CdlRickshawman,
+/// Stateful CandleRickshawman candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleRickshawman {
+    inner: CandleRickshawmanState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl Rickshawman {
+impl CandleRickshawman {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlRickshawman::new(),
+            inner: CandleRickshawmanState::new(),
             outputs: Vec::new(),
         }
     }

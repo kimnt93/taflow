@@ -1,6 +1,7 @@
 """Descriptive stateful interface for extended Parabolic SAR."""
 
 from taflow._native import StatefulSarext
+from typing import Any
 
 
 class ParabolicSarExtended:
@@ -16,6 +17,8 @@ class ParabolicSarExtended:
         acceleration_init_short=0.02,
         acceleration_short=0.02,
         acceleration_max_short=0.2,
+        high: Any | None = None,
+        low: Any | None = None,
     ):
         self._state = StatefulSarext(
             start_value,
@@ -27,6 +30,8 @@ class ParabolicSarExtended:
             acceleration_short,
             acceleration_max_short,
         )
+        if high is not None or low is not None:
+            self.extend(high, low)
 
     def append(self, high, low):
         return self._state.append(high, low)

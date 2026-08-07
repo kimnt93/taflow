@@ -3,17 +3,17 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLGRAVESTONEDOJI state using TA-Lib's ten-bar range average.
-pub struct CdlGravestoneDoji {
+pub struct CandleGravestoneDoji {
     ranges: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlGravestoneDoji {
+impl Default for CandleGravestoneDoji {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlGravestoneDoji {
+impl CandleGravestoneDoji {
     pub fn new() -> Self {
         Self {
             ranges: VecDeque::with_capacity(10),
@@ -64,7 +64,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_gravestonedoji(&open, &high, &low, &close).unwrap();
-        let mut state = CdlGravestoneDoji::new();
+        let mut state = CandleGravestoneDoji::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

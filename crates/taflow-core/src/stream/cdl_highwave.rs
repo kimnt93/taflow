@@ -3,17 +3,17 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLHIGHWAVE state using TA-Lib's rolling short-body average.
-pub struct CdlHighWave {
+pub struct CandleHighWave {
     bodies: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlHighWave {
+impl Default for CandleHighWave {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlHighWave {
+impl CandleHighWave {
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -63,7 +63,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -0.1 } else { 0.1 })
             .collect();
         let expected = crate::pattern::cdl_highwave(&open, &high, &low, &close).unwrap();
-        let mut state = CdlHighWave::new();
+        let mut state = CandleHighWave::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

@@ -6,6 +6,11 @@ from ._series import as_float64_series
 
 
 class Cusum:
+    """Stateful Cusum indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, change: Any | None = None, threshold: float = 1.0):
         self._state = _Native(threshold)
         self.extend(change) if change is not None else None

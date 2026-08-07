@@ -3,17 +3,17 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLSPINNINGTOP state using TA-Lib's ten-bar short-body average.
-pub struct CdlSpinningTop {
+pub struct CandleSpinningTop {
     bodies: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlSpinningTop {
+impl Default for CandleSpinningTop {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlSpinningTop {
+impl CandleSpinningTop {
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -62,7 +62,7 @@ mod tests {
             .map(|(i, x)| x + if i % 2 == 0 { 0.1 } else { -0.1 })
             .collect();
         let expected = crate::pattern::cdl_spinningtop(&o, &h, &l, &c).unwrap();
-        let mut state = CdlSpinningTop::new();
+        let mut state = CandleSpinningTop::new();
         for (((&o, &h), &l), (&c, &e)) in o.iter().zip(&h).zip(&l).zip(c.iter().zip(&expected)) {
             assert_eq!(state.append(o, h, l, c).unwrap_or(0), e);
         }

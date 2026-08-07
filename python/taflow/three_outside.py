@@ -1,9 +1,14 @@
 """Persistent Three Outside pattern recognition (CDL3OUTSIDE)."""
 from typing import Any
 import numpy as np
-from ._native import ThreeOutside as _Native
+from ._native import CandleThreeOutside as _Native
 from ._series import as_float64_series
-class ThreeOutside:
+class CandleThreeOutside:
+    """Stateful CandleThreeOutside indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self,open:Any|None=None,high:Any|None=None,low:Any|None=None,close:Any|None=None):
         self._state=_Native()
         if any(value is not None for value in(open,high,low,close)):self.extend(open,high,low,close)
@@ -13,4 +18,3 @@ class ThreeOutside:
     @property
     def value(self):return self._state.value
     def reset(self):self._state.reset();return self
-CDL3OUTSIDE=ThreeOutside

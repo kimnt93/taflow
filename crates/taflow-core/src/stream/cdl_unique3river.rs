@@ -19,16 +19,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlUnique3River {
+/// Stateful CandleUnique3River candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleUnique3River {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlUnique3River {
+impl Default for CandleUnique3River {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlUnique3River {
+impl CandleUnique3River {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
@@ -85,7 +87,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_unique3river(&o, &h, &l, &c).unwrap();
-        let mut s = CdlUnique3River::new();
+        let mut s = CandleUnique3River::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

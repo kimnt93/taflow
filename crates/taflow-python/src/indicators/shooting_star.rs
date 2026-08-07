@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlShootingStar;
+use taflow::stream::CandleShootingStar as CandleShootingStarState;
 #[pyclass]
-pub struct ShootingStar {
-    inner: CdlShootingStar,
+/// Stateful CandleShootingStar candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleShootingStar {
+    inner: CandleShootingStarState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl ShootingStar {
+impl CandleShootingStar {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlShootingStar::new(),
+            inner: CandleShootingStarState::new(),
             outputs: vec![],
         }
     }

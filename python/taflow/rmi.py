@@ -1,6 +1,11 @@
 """Relative Momentum Index with Wilder smoothing."""
 import numpy as np
-class RMI:
+class RelativeMomentumIndex:
+    """Stateful RelativeMomentumIndex indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None, length=14, mom=5):
         self.length=int(length); self.mom=int(mom)
         if self.length<1 or self.mom<1: raise ValueError("length and mom must be positive")

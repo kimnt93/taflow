@@ -5,7 +5,12 @@ from ._native import ObOperator as _Native
 from ._series import as_float64_series
 
 
-class Ob:
+class OrderBlock:
+    """Stateful OrderBlock indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(
         self,
         high: Any | None = None,

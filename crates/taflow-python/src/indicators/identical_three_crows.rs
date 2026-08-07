@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlIdentical3Crows;
+use taflow::stream::CandleIdentical3Crows;
 #[pyclass]
-pub struct IdenticalThreeCrows {
-    inner: CdlIdentical3Crows,
+/// Stateful CandleIdenticalThreeCrows candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleIdenticalThreeCrows {
+    inner: CandleIdentical3Crows,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl IdenticalThreeCrows {
+impl CandleIdenticalThreeCrows {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlIdentical3Crows::new(),
+            inner: CandleIdentical3Crows::new(),
             outputs: vec![],
         }
     }

@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Ob;
+use taflow::stream::OrderBlock;
 
 #[pyclass]
 pub struct ObOperator {
-    inner: Ob,
+    inner: OrderBlock,
     ob: Vec<f64>,
     top: Vec<f64>,
     bottom: Vec<f64>,
@@ -24,7 +24,7 @@ impl ObOperator {
         threshold: f64,
     ) -> PyResult<Self> {
         Ok(Self {
-            inner: Ob::new(swing_length, internal_length, atr_period, threshold)
+            inner: OrderBlock::new(swing_length, internal_length, atr_period, threshold)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             ob: Vec::new(),
             top: Vec::new(),

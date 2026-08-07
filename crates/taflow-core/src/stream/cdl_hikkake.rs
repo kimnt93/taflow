@@ -6,18 +6,18 @@ struct Candle {
     low: f64,
 }
 /// Incremental CDLHIKKAKE state.
-pub struct CdlHikkake {
+pub struct CandleHikkake {
     candles: VecDeque<Candle>,
     index: usize,
     pending: Option<(usize, i32, f64)>,
     value: Option<i32>,
 }
-impl Default for CdlHikkake {
+impl Default for CandleHikkake {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlHikkake {
+impl CandleHikkake {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(2),
@@ -91,7 +91,7 @@ mod tests {
         ];
         let close = high.clone();
         let e = crate::pattern::cdl_hikkake(&open, &high, &low, &close).unwrap();
-        let mut s = CdlHikkake::new();
+        let mut s = CandleHikkake::new();
         for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
         {
             match s.append(o, h, l, c) {

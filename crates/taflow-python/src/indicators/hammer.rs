@@ -1,19 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlHammer;
-
+use taflow::stream::CandleHammer as CandleHammerState;
 #[pyclass]
-pub struct Hammer {
-    inner: CdlHammer,
+/// Stateful CandleHammer candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleHammer {
+    inner: CandleHammerState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl Hammer {
+impl CandleHammer {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlHammer::new(),
+            inner: CandleHammerState::new(),
             outputs: Vec::new(),
         }
     }

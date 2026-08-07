@@ -3,17 +3,17 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLLONGLEGGEDDOJI state using TA-Lib's ten-bar doji range average.
-pub struct CdlLongLeggedDoji {
+pub struct CandleLongLeggedDoji {
     ranges: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlLongLeggedDoji {
+impl Default for CandleLongLeggedDoji {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlLongLeggedDoji {
+impl CandleLongLeggedDoji {
     pub fn new() -> Self {
         Self {
             ranges: VecDeque::with_capacity(10),
@@ -64,7 +64,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_longleggeddoji(&open, &high, &low, &close).unwrap();
-        let mut state = CdlLongLeggedDoji::new();
+        let mut state = CandleLongLeggedDoji::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

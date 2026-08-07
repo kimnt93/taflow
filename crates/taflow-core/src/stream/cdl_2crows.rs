@@ -8,18 +8,18 @@ struct Candle {
     body: f64,
 }
 /// Incremental CDL2CROWS state.
-pub struct Cdl2Crows {
+pub struct Candle2Crows {
     candles: VecDeque<Candle>,
     bodies: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for Cdl2Crows {
+impl Default for Candle2Crows {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Cdl2Crows {
+impl Candle2Crows {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(3),
@@ -83,7 +83,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let expected = crate::pattern::cdl_2crows(&open, &high, &low, &close).unwrap();
-        let mut state = Cdl2Crows::new();
+        let mut state = Candle2Crows::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

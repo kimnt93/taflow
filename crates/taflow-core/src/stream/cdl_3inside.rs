@@ -18,16 +18,16 @@ impl Candle {
     }
 }
 /// Incremental CDL3INSIDE state.
-pub struct Cdl3Inside {
+pub struct Candle3Inside {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Cdl3Inside {
+impl Default for Candle3Inside {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Cdl3Inside {
+impl Candle3Inside {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
@@ -84,7 +84,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let expected = crate::pattern::cdl_3inside(&open, &high, &low, &close).unwrap();
-        let mut s = Cdl3Inside::new();
+        let mut s = Candle3Inside::new();
         for (((&o, &h), &l), (&c, &e)) in open
             .iter()
             .zip(&high)

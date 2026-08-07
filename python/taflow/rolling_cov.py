@@ -4,6 +4,11 @@ import numpy as np
 from ._native import RollingCovOperator as _Native
 from ._series import as_float64_series
 class RollingCov:
+    """Stateful RollingCov indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, timeperiod: int, left: Any | None = None, right: Any | None = None):
         self._state = _Native(timeperiod)
         if left is not None or right is not None: self.extend(left, right)

@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlThrusting;
+use taflow::stream::CandleThrusting as CandleThrustingState;
 #[pyclass]
-pub struct Thrusting {
-    inner: CdlThrusting,
+/// Stateful CandleThrusting candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleThrusting {
+    inner: CandleThrustingState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl Thrusting {
+impl CandleThrusting {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlThrusting::new(),
+            inner: CandleThrustingState::new(),
             outputs: vec![],
         }
     }

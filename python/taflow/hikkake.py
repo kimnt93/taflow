@@ -1,9 +1,14 @@
-"""Persistent Hikkake pattern recognition (CDLHIKKAKE)."""
+"""Persistent CandleHikkake pattern recognition (CDLHIKKAKE)."""
 from typing import Any
 import numpy as np
-from ._native import Hikkake as _Native
+from ._native import CandleHikkake as _Native
 from ._series import as_float64_series
-class Hikkake:
+class CandleHikkake:
+    """Stateful CandleHikkake indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self,open:Any|None=None,high:Any|None=None,low:Any|None=None,close:Any|None=None):
         self._state=_Native()
         if any(value is not None for value in(open,high,low,close)):self.extend(open,high,low,close)
@@ -13,4 +18,3 @@ class Hikkake:
     @property
     def value(self):return self._state.value
     def reset(self):self._state.reset();return self
-CDLHIKKAKE=Hikkake

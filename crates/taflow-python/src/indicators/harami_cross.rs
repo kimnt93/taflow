@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlHaramiCross;
+use taflow::stream::CandleHaramiCross as CandleHaramiCrossState;
 #[pyclass]
-pub struct HaramiCross {
-    inner: CdlHaramiCross,
+/// Stateful CandleHaramiCross candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleHaramiCross {
+    inner: CandleHaramiCrossState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl HaramiCross {
+impl CandleHaramiCross {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlHaramiCross::new(),
+            inner: CandleHaramiCrossState::new(),
             outputs: vec![],
         }
     }

@@ -1,18 +1,20 @@
 //! Incremental Belt Hold candlestick recognition (CDLBELTHOLD).
 use std::collections::VecDeque;
-pub struct CdlBeltHold {
+/// Stateful CandleBeltHold candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleBeltHold {
     b: VecDeque<f64>,
     r: VecDeque<f64>,
     bs: f64,
     rs: f64,
     value: Option<i32>,
 }
-impl Default for CdlBeltHold {
+impl Default for CandleBeltHold {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlBeltHold {
+impl CandleBeltHold {
     pub fn new() -> Self {
         Self {
             b: VecDeque::with_capacity(10),
@@ -73,7 +75,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_belthold(&o, &h, &l, &c).unwrap();
-        let mut s = CdlBeltHold::new();
+        let mut s = CandleBeltHold::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             assert_eq!(s.append(o, h, l, c).unwrap_or(0), e)
         }

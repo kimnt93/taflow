@@ -1,6 +1,7 @@
 """Descriptive stateful interface for extended MACD."""
 
 from taflow._native import StatefulMacdExt
+from typing import Any
 
 
 class MovingAverageConvergenceDivergenceExtended:
@@ -14,6 +15,7 @@ class MovingAverageConvergenceDivergenceExtended:
         slow_average_type=1,
         signal_period=9,
         signal_average_type=1,
+        input: Any | None = None,
     ):
         self._state = StatefulMacdExt(
             fast_period,
@@ -23,6 +25,8 @@ class MovingAverageConvergenceDivergenceExtended:
             signal_period,
             signal_average_type,
         )
+        if input is not None:
+            self.extend(input)
 
     def append(self, input):
         return self._state.append(input)

@@ -15,16 +15,18 @@ impl Candle {
         self.h - self.l
     }
 }
-pub struct CdlDojiStar {
+/// Stateful CandleDojiStar candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleDojiStar {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlDojiStar {
+impl Default for CandleDojiStar {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlDojiStar {
+impl CandleDojiStar {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -73,7 +75,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -0.1 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_dojistar(&o, &h, &l, &c).unwrap();
-        let mut s = CdlDojiStar::new();
+        let mut s = CandleDojiStar::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             assert_eq!(s.append(o, h, l, c).unwrap_or(0), e)
         }

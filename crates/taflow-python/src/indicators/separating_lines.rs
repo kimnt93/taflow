@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlSeparatingLines;
+use taflow::stream::CandleSeparatingLines as CandleSeparatingLinesState;
 #[pyclass]
-pub struct SeparatingLines {
-    inner: CdlSeparatingLines,
+/// Stateful CandleSeparatingLines candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleSeparatingLines {
+    inner: CandleSeparatingLinesState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl SeparatingLines {
+impl CandleSeparatingLines {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlSeparatingLines::new(),
+            inner: CandleSeparatingLinesState::new(),
             outputs: vec![],
         }
     }

@@ -1,6 +1,11 @@
 """Ehlers Laguerre RSI."""
 import numpy as np
-class LaguerreRSI:
+class LaguerreRelativeStrengthIndex:
+    """Stateful LaguerreRelativeStrengthIndex indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None, gamma=.5):
         if not 0<=gamma<1: raise ValueError("gamma must be in [0,1)")
         self.gamma=float(gamma); self.reset()

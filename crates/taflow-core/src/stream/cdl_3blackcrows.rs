@@ -19,16 +19,16 @@ impl Candle {
     }
 }
 /// Incremental CDL3BLACKCROWS state.
-pub struct Cdl3BlackCrows {
+pub struct Candle3BlackCrows {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Cdl3BlackCrows {
+impl Default for Candle3BlackCrows {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Cdl3BlackCrows {
+impl Candle3BlackCrows {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(13),
@@ -96,7 +96,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let expected = crate::pattern::cdl_3blackcrows(&open, &high, &low, &close).unwrap();
-        let mut state = Cdl3BlackCrows::new();
+        let mut state = Candle3BlackCrows::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

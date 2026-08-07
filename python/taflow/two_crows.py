@@ -1,9 +1,14 @@
 """Persistent Two Crows candlestick recognition (CDL2CROWS)."""
 from typing import Any
 import numpy as np
-from ._native import TwoCrows as _Native
+from ._native import CandleTwoCrows as _Native
 from ._series import as_float64_series
-class TwoCrows:
+class CandleTwoCrows:
+    """Stateful CandleTwoCrows indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, open: Any|None=None, high: Any|None=None, low: Any|None=None, close: Any|None=None):
         self._state=_Native()
         if any(value is not None for value in (open,high,low,close)): self.extend(open,high,low,close)
@@ -13,4 +18,3 @@ class TwoCrows:
     @property
     def value(self):return self._state.value
     def reset(self):self._state.reset();return self
-CDL2CROWS=TwoCrows

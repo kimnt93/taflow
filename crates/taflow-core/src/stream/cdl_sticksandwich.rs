@@ -20,16 +20,16 @@ impl Candle {
     }
 }
 /// Incremental CDLSTICKSANDWICH state.
-pub struct CdlStickSandwich {
+pub struct CandleStickSandwich {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlStickSandwich {
+impl Default for CandleStickSandwich {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlStickSandwich {
+impl CandleStickSandwich {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(7),
@@ -84,7 +84,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let e = crate::pattern::cdl_sticksandwich(&open, &high, &low, &close).unwrap();
-        let mut s = CdlStickSandwich::new();
+        let mut s = CandleStickSandwich::new();
         for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
         {
             match s.append(o, h, l, c) {

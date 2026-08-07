@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Cdl3WhiteSoldiers;
+use taflow::stream::Candle3WhiteSoldiers;
 #[pyclass]
-pub struct ThreeWhiteSoldiers {
-    inner: Cdl3WhiteSoldiers,
+/// Stateful CandleThreeWhiteSoldiers candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleThreeWhiteSoldiers {
+    inner: Candle3WhiteSoldiers,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl ThreeWhiteSoldiers {
+impl CandleThreeWhiteSoldiers {
     #[new]
     fn new() -> Self {
         Self {
-            inner: Cdl3WhiteSoldiers::new(),
+            inner: Candle3WhiteSoldiers::new(),
             outputs: vec![],
         }
     }

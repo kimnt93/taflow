@@ -1,12 +1,14 @@
 use std::collections::VecDeque;
-pub struct CdlShortLine {
+/// Stateful CandleShortLine candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleShortLine {
     b: VecDeque<f64>,
     s: VecDeque<f64>,
     bs: f64,
     ss: f64,
     value: Option<i32>,
 }
-impl CdlShortLine {
+impl CandleShortLine {
     pub fn new() -> Self {
         Self {
             b: VecDeque::with_capacity(10),

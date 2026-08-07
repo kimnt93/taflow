@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Fvg;
+use taflow::stream::FairValueGap;
 
 #[pyclass]
 pub struct FvgOperator {
-    inner: Fvg,
+    inner: FairValueGap,
     signal: Vec<f64>,
     top: Vec<f64>,
     bottom: Vec<f64>,
@@ -16,7 +16,7 @@ pub struct FvgOperator {
 impl FvgOperator {
     #[new]
     fn new() -> Self {
-        Self { inner: Fvg::new(), signal: Vec::new(), top: Vec::new(), bottom: Vec::new(), mitigated: Vec::new() }
+        Self { inner: FairValueGap::new(), signal: Vec::new(), top: Vec::new(), bottom: Vec::new(), mitigated: Vec::new() }
     }
 
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> (f64, f64, f64, f64) {

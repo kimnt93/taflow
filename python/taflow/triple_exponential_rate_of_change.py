@@ -5,6 +5,11 @@ from ._native import TripleExponentialRateOfChange as _Native
 from ._series import as_float64_series
 
 class TripleExponentialRateOfChange:
+    """Stateful TripleExponentialRateOfChange indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, input: Any | None = None, timeperiod: int = 30) -> None:
         self._state = _Native(timeperiod)
         if input is not None: self.extend(input)
@@ -15,4 +20,3 @@ class TripleExponentialRateOfChange:
     def value(self) -> float | None: return self._state.value
     def reset(self) -> "TripleExponentialRateOfChange": self._state.reset(); return self
     def __len__(self) -> int: return len(self._state)
-TRIX = TripleExponentialRateOfChange

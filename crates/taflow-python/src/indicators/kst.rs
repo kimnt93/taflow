@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Kst;
+use taflow::stream::KnowSureThing;
 
 #[pyclass]
 pub struct KstOperator {
-    inner: Kst,
+    inner: KnowSureThing,
     kst: Vec<f64>,
     signal: Vec<f64>,
 }
@@ -26,7 +26,7 @@ impl KstOperator {
         signal: usize,
     ) -> PyResult<Self> {
         Ok(Self {
-            inner: Kst::new(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, signal)
+            inner: KnowSureThing::new(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, signal)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             kst: Vec::new(),
             signal: Vec::new(),

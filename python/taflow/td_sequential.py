@@ -1,6 +1,11 @@
 """Tom DeMark TD Sequential setup counts (causal 4-bar comparison)."""
 import numpy as np
 class TDSequential:
+    """Stateful TDSequential indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None): self.reset(); self.extend(close) if close is not None else None
     def append(self, close):
         x=float(close); self._c.append(x); buy=sell=0

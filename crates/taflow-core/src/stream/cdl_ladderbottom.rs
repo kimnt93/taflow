@@ -25,16 +25,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlLadderBottom {
+/// Stateful CandleLadderBottom candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleLadderBottom {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlLadderBottom {
+impl Default for CandleLadderBottom {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlLadderBottom {
+impl CandleLadderBottom {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(14),
@@ -93,7 +95,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_ladderbottom(&o, &h, &l, &c).unwrap();
-        let mut s = CdlLadderBottom::new();
+        let mut s = CandleLadderBottom::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

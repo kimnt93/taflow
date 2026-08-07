@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlMorningDojiStar;
+use taflow::stream::CandleMorningDojiStar as CandleMorningDojiStarState;
 #[pyclass]
-pub struct MorningDojiStar {
-    inner: CdlMorningDojiStar,
+/// Stateful CandleMorningDojiStar candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleMorningDojiStar {
+    inner: CandleMorningDojiStarState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl MorningDojiStar {
+impl CandleMorningDojiStar {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlMorningDojiStar::new(),
+            inner: CandleMorningDojiStarState::new(),
             outputs: vec![],
         }
     }

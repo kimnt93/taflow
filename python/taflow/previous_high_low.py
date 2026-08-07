@@ -6,6 +6,11 @@ from ._series import as_float64_series
 
 
 class PreviousHighLow:
+    """Stateful PreviousHighLow indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, new_session: Any | None = None, high: Any | None = None, low: Any | None = None):
         self._state = _Native()
         self.extend(new_session, high, low) if new_session is not None or high is not None or low is not None else None

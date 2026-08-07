@@ -44,11 +44,12 @@ they are not re-proposed later.
 
 ## Extended trend indicators
 
-- [x] HMA / VWMA / ZLEMA / ALMA
+- [x] hull_moving_average / volume_weighted_moving_average /
+      zero_lag_exponential_moving_average / arnaud_legoux_moving_average
 
 ## Extended momentum and oscillators
 
-- [x] TSI
+- [x] true_strength_index
 - [x] Awesome Oscillator
 - [x] Fisher Transform
 
@@ -62,7 +63,7 @@ they are not re-proposed later.
 
 ## Extended volume indicators
 
-- [x] VWAP (rolling; session/anchored variant is in
+- [x] rolling_volume_weighted_average_price (session/anchored variant is in
       `recommend-functions-checklist.md` P4)
 - [x] Force Index
 - [x] Ease of Movement
@@ -111,7 +112,8 @@ Two aligned input series are within the contract (like BETA/CORREL).
 - [x] indicator pipeline with one dispatch per input bar (`taflow.Pipeline`)
 - [x] dependency graph and common-subexpression sharing (identity-memoized nodes)
 - [x] expression engine (`taflow.Expr` arithmetic composition)
-- [x] NumPy input/output adapter performance tests (`tests/test_execution_adapters.py`)
+- [x] NumPy input/output adapter performance checks (`benches/adapter_bench.py`;
+      the historical test file was removed with the tests directory)
 - [x] Arrow adapter feature (optional `pyarrow` extra, lazy import)
 - [x] Polars adapter feature (optional `polars` extra, lazy import)
 - [x] Python list adapter and conversion benchmark (`benches/adapter_bench.py`)

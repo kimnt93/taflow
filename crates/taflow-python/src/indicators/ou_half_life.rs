@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::OuHalfLife;
+use taflow::stream::OrnsteinUhlenbeckHalfLife;
 
 #[pyclass]
 pub struct OuHalfLifeOperator {
-    inner: OuHalfLife,
+    inner: OrnsteinUhlenbeckHalfLife,
     output: Vec<f64>,
 }
 
@@ -15,7 +15,7 @@ impl OuHalfLifeOperator {
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: OuHalfLife::new(timeperiod)
+            inner: OrnsteinUhlenbeckHalfLife::new(timeperiod)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })

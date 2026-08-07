@@ -90,17 +90,35 @@ pub fn rolling_calmar(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
-pub fn hma(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state = Hma::new(timeperiod)?; Ok(input.iter().map(|&v| state.append(v).unwrap_or(f64::NAN)).collect()) }
-pub fn vwma(price: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if price.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:price.len(),got:volume.len()});} let mut state=Vwma::new(timeperiod)?;Ok(price.iter().zip(volume).map(|(&p,&v)|state.append(p,v).unwrap_or(f64::NAN)).collect()) }
-pub fn zlema(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Zlema::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
-pub fn alma(input: &[f64], timeperiod: usize, offset: f64, sigma: f64) -> TaResult<Vec<f64>> { let mut state=Alma::new(timeperiod,offset,sigma)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+/// Computes the causal hull moving average series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn hull_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state = HullMovingAverage::new(timeperiod)?; Ok(input.iter().map(|&v| state.append(v).unwrap_or(f64::NAN)).collect()) }
+/// Computes the causal volume weighted moving average series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn volume_weighted_moving_average(price: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if price.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:price.len(),got:volume.len()});} let mut state=VolumeWeightedMovingAverage::new(timeperiod)?;Ok(price.iter().zip(volume).map(|(&p,&v)|state.append(p,v).unwrap_or(f64::NAN)).collect()) }
+/// Computes the causal zero lag exponential moving average series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn zero_lag_exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=ZeroLagExponentialMovingAverage::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+/// Computes the causal arnaud legoux moving average series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn arnaud_legoux_moving_average(input: &[f64], timeperiod: usize, offset: f64, sigma: f64) -> TaResult<Vec<f64>> { let mut state=ArnaudLegouxMovingAverage::new(timeperiod,offset,sigma)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
-pub fn tsi(input: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { let mut state=Tsi::new(fast,slow)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+/// Computes the causal true strength index series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn true_strength_index(input: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { let mut state=TrueStrengthIndex::new(fast,slow)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn awesome_oscillator(high: &[f64], low: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=AwesomeOscillator::new(fast,slow)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 pub fn fisher_transform(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=FisherTransform::new(timeperiod)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 pub fn ulcer_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=UlcerIndex::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn chaikin_volatility(high: &[f64], low: &[f64], timeperiod: usize, roc_period: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=ChaikinVolatility::new(timeperiod,roc_period)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
-pub fn vwap(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len()||high.len()!=close.len()||high.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=Vwap::new(timeperiod)?;Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&h,&l),&c),&v)|state.append(h,l,c,v).unwrap_or(f64::NAN)).collect()) }
+/// Computes the causal rolling volume weighted average price series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn rolling_volume_weighted_average_price(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len()||high.len()!=close.len()||high.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=RollingVolumeWeightedAveragePrice::new(timeperiod)?;Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&h,&l),&c),&v)|state.append(h,l,c,v).unwrap_or(f64::NAN)).collect()) }
 pub fn force_index(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> { if close.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:close.len(),got:volume.len()});}let mut state=ForceIndex::new();Ok(close.iter().zip(volume).map(|(&c,&v)|state.append(c,v).unwrap_or(f64::NAN)).collect()) }
 pub fn ease_of_movement(high: &[f64], low: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> { if high.len()!=low.len()||high.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=EaseOfMovement::new();Ok(high.iter().zip(low).zip(volume).map(|((&h,&l),&v)|state.append(h,l,v).unwrap_or(f64::NAN)).collect()) }
 
@@ -406,7 +424,7 @@ pub struct ActiveZoneList {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct FvgValue {
+pub struct FairValueGapValue {
     pub signal: f64,
     pub top: f64,
     pub bottom: f64,
@@ -422,16 +440,16 @@ struct FvgZone {
 
 /// Causal fair-value-gap detection with directional mitigation events.
 #[derive(Debug, Clone, Default)]
-pub struct Fvg {
+pub struct FairValueGap {
     bars: VecDeque<(f64, f64, f64, f64)>,
     zones: Vec<FvgZone>,
-    value: Option<FvgValue>,
+    value: Option<FairValueGapValue>,
 }
 
-impl Fvg {
+impl FairValueGap {
     pub fn new() -> Self { Self::default() }
 
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<FvgValue> {
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<FairValueGapValue> {
         let previous = self.bars.back().copied();
         let two_back = self.bars.front().copied();
         let mut signal = f64::NAN;
@@ -468,12 +486,12 @@ impl Fvg {
             self.bars.pop_front();
         }
         self.bars.push_back((open, high, low, close));
-        let value = FvgValue { signal, top, bottom, mitigated };
+        let value = FairValueGapValue { signal, top, bottom, mitigated };
         self.value = Some(value);
         Some(value)
     }
 
-    pub fn value(&self) -> Option<FvgValue> { self.value }
+    pub fn value(&self) -> Option<FairValueGapValue> { self.value }
 
     pub fn reset(&mut self) {
         self.bars.clear();
@@ -482,7 +500,10 @@ impl Fvg {
     }
 }
 
-pub fn fvg(
+/// Computes the causal fair value gap series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn fair_value_gap(
     open: &[f64],
     high: &[f64],
     low: &[f64],
@@ -491,7 +512,7 @@ pub fn fvg(
     if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
         return Err(TaError::LengthMismatch { expected: open.len(), got: high.len().max(low.len()).max(close.len()) });
     }
-    let mut state = Fvg::new();
+    let mut state = FairValueGap::new();
     let mut signal = Vec::with_capacity(open.len());
     let mut top = Vec::with_capacity(open.len());
     let mut bottom = Vec::with_capacity(open.len());
@@ -635,7 +656,7 @@ pub fn bos_choch(
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct ObValue {
+pub struct OrderBlockValue {
     pub ob: f64,
     pub top: f64,
     pub bottom: f64,
@@ -656,7 +677,7 @@ struct ObZone {
 /// whose range is at least `threshold * ATR(atr_period)` are excluded from
 /// being order blocks.
 #[derive(Debug, Clone)]
-pub struct Ob {
+pub struct OrderBlock {
     atr: Atr,
     internal: Swing,
     structure: Swing,
@@ -666,10 +687,10 @@ pub struct Ob {
     structure_high: Option<f64>,
     threshold: f64,
     zones: Vec<ObZone>,
-    value: Option<ObValue>,
+    value: Option<OrderBlockValue>,
 }
 
-impl Ob {
+impl OrderBlock {
     pub fn new(
         swing_length: usize,
         internal_length: usize,
@@ -706,7 +727,7 @@ impl Ob {
         })
     }
 
-    pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> ObValue {
+    pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> OrderBlockValue {
         let atr = self.atr.append(high, low, close);
         let volatile = atr.is_some_and(|atr| high - low >= self.threshold * atr);
 
@@ -781,12 +802,12 @@ impl Ob {
             !filled
         });
 
-        let value = ObValue { ob, top, bottom, ob_volume, mitigated };
+        let value = OrderBlockValue { ob, top, bottom, ob_volume, mitigated };
         self.value = Some(value);
         value
     }
 
-    pub fn value(&self) -> Option<ObValue> { self.value }
+    pub fn value(&self) -> Option<OrderBlockValue> { self.value }
 
     pub fn reset(&mut self) {
         self.atr.reset();
@@ -801,7 +822,10 @@ impl Ob {
     }
 }
 
-pub fn ob(
+/// Computes the causal order block series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn order_block(
     high: &[f64],
     low: &[f64],
     close: &[f64],
@@ -817,7 +841,7 @@ pub fn ob(
             got: low.len().max(close.len()).max(volume.len()),
         });
     }
-    let mut state = Ob::new(swing_length, internal_length, atr_period, threshold)?;
+    let mut state = OrderBlock::new(swing_length, internal_length, atr_period, threshold)?;
     let mut ob_out = Vec::with_capacity(high.len());
     let mut top = Vec::with_capacity(high.len());
     let mut bottom = Vec::with_capacity(high.len());
@@ -1605,13 +1629,13 @@ pub fn rogers_satchell(
 
 /// Garman-Klass with the overnight term `ln(O/C_prev)²` added (GK-Yang-Zhang).
 #[derive(Debug, Clone)]
-pub struct GkYangZhang {
+pub struct GarmanKlassYangZhang {
     mean: RollingMean,
     previous_close: Option<f64>,
     value: Option<f64>,
 }
 
-impl GkYangZhang {
+impl GarmanKlassYangZhang {
     pub fn new(timeperiod: usize) -> TaResult<Self> {
         Ok(Self { mean: RollingMean::new(timeperiod)?, previous_close: None, value: None })
     }
@@ -1653,7 +1677,7 @@ pub fn gk_yang_zhang(
             got: high.len().max(low.len()).max(close.len()),
         });
     }
-    let mut state = GkYangZhang::new(timeperiod)?;
+    let mut state = GarmanKlassYangZhang::new(timeperiod)?;
     Ok(open
         .iter()
         .zip(high)
@@ -1785,14 +1809,14 @@ pub fn decay_linear(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
 
 /// Average daily dollar value traded: SMA of `close × volume`.
 #[derive(Debug, Clone)]
-pub struct Adv {
+pub struct AverageDailyDollarValue {
     sum: f64,
     window: VecDeque<f64>,
     timeperiod: usize,
     value: Option<f64>,
 }
 
-impl Adv {
+impl AverageDailyDollarValue {
     pub fn new(timeperiod: usize) -> TaResult<Self> {
         validate_period(timeperiod)?;
         Ok(Self { sum: 0.0, window: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
@@ -1822,11 +1846,14 @@ impl Adv {
     }
 }
 
-pub fn adv(close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+/// Computes the causal average daily dollar value series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn average_daily_dollar_value(close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if close.len() != volume.len() {
         return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() });
     }
-    let mut state = Adv::new(timeperiod)?;
+    let mut state = AverageDailyDollarValue::new(timeperiod)?;
     Ok(close
         .iter()
         .zip(volume)
@@ -1981,13 +2008,13 @@ pub fn roll_spread(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
 /// OU half-life: `−ln(2)/λ` where `λ` is the slope of `Δp` on lagged `p`.
 /// `λ ≥ 0` yields `NaN`.
 #[derive(Debug, Clone)]
-pub struct OuHalfLife {
+pub struct OrnsteinUhlenbeckHalfLife {
     moments: RollingPairMoments,
     previous_price: Option<f64>,
     value: Option<f64>,
 }
 
-impl OuHalfLife {
+impl OrnsteinUhlenbeckHalfLife {
     pub fn new(timeperiod: usize) -> TaResult<Self> {
         Ok(Self {
             moments: RollingPairMoments::new(timeperiod)?,
@@ -2033,7 +2060,7 @@ impl OuHalfLife {
 }
 
 pub fn ou_half_life(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = OuHalfLife::new(timeperiod)?;
+    let mut state = OrnsteinUhlenbeckHalfLife::new(timeperiod)?;
     Ok(input.iter().map(|&price| state.append(price).unwrap_or(f64::NAN)).collect())
 }
 
@@ -3123,7 +3150,7 @@ impl RollingExtremum {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct StcValue {
+pub struct SchaffTrendCycleValue {
     pub stc: f64,
     pub macd: f64,
     pub stoch: f64,
@@ -3137,7 +3164,7 @@ pub struct StcValue {
 /// carried forward while the rolling windows are cold or non-positive); the
 /// `macd` line is NaN until both EMAs are warm.
 #[derive(Debug, Clone)]
-pub struct Stc {
+pub struct SchaffTrendCycle {
     tclength: usize,
     fast: usize,
     slow: usize,
@@ -3152,10 +3179,10 @@ pub struct Stc {
     pf: f64,
     stoch2: f64,
     pff: f64,
-    value: Option<StcValue>,
+    value: Option<SchaffTrendCycleValue>,
 }
 
-impl Stc {
+impl SchaffTrendCycle {
     pub fn new(tclength: usize, fast: usize, slow: usize, factor: f64) -> TaResult<Self> {
         validate_period(tclength)?;
         validate_period(fast)?;
@@ -3187,7 +3214,7 @@ impl Stc {
         })
     }
 
-    pub fn append(&mut self, close: f64) -> StcValue {
+    pub fn append(&mut self, close: f64) -> SchaffTrendCycleValue {
         let fast = self.fast_ema.append(close);
         let slow = self.slow_ema.append(close);
         let macd = match (fast, slow) {
@@ -3211,7 +3238,7 @@ impl Stc {
         }
         self.pff = round8(self.pff + self.factor * (self.stoch2 - self.pff));
 
-        let value = StcValue {
+        let value = SchaffTrendCycleValue {
             stc: self.pff,
             macd,
             stoch: self.pf,
@@ -3220,7 +3247,7 @@ impl Stc {
         value
     }
 
-    pub fn value(&self) -> Option<StcValue> {
+    pub fn value(&self) -> Option<SchaffTrendCycleValue> {
         self.value
     }
 
@@ -3252,14 +3279,17 @@ fn non_zero(difference: f64) -> f64 {
     }
 }
 
-pub fn stc(
+/// Computes the causal schaff trend cycle series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn schaff_trend_cycle(
     close: &[f64],
     tclength: usize,
     fast: usize,
     slow: usize,
     factor: f64,
 ) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
-    let mut state = Stc::new(tclength, fast, slow, factor)?;
+    let mut state = SchaffTrendCycle::new(tclength, fast, slow, factor)?;
     let mut stc_out = Vec::with_capacity(close.len());
     let mut macd = Vec::with_capacity(close.len());
     let mut stoch = Vec::with_capacity(close.len());
@@ -3525,7 +3555,7 @@ impl RollingMeanMin0 {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct KstValue {
+pub struct KnowSureThingValue {
     pub kst: f64,
     pub signal: f64,
 }
@@ -3539,14 +3569,14 @@ pub struct KstValue {
 /// instead leaves those bars NaN, so outputs match the reference exactly from
 /// bar `roc4 + sma4 − 1` (KST) and `roc4 + sma4 + nsig − 2` (signal).
 #[derive(Debug, Clone)]
-pub struct Kst {
+pub struct KnowSureThing {
     rocs: [KstRocSma; 4],
     nsig: usize,
     signal_state: RollingMeanMin0,
-    value: Option<KstValue>,
+    value: Option<KnowSureThingValue>,
 }
 
-impl Kst {
+impl KnowSureThing {
     pub fn new(
         roc1: usize,
         roc2: usize,
@@ -3580,19 +3610,19 @@ impl Kst {
         })
     }
 
-    pub fn append(&mut self, close: f64) -> KstValue {
+    pub fn append(&mut self, close: f64) -> KnowSureThingValue {
         let rocma1 = self.rocs[0].append(close).unwrap_or(f64::NAN);
         let rocma2 = self.rocs[1].append(close).unwrap_or(f64::NAN);
         let rocma3 = self.rocs[2].append(close).unwrap_or(f64::NAN);
         let rocma4 = self.rocs[3].append(close).unwrap_or(f64::NAN);
         let kst = 100.0 * (rocma1 + 2.0 * rocma2 + 3.0 * rocma3 + 4.0 * rocma4);
         let signal = self.signal_state.append(kst).unwrap_or(f64::NAN);
-        let value = KstValue { kst, signal };
+        let value = KnowSureThingValue { kst, signal };
         self.value = Some(value);
         value
     }
 
-    pub fn value(&self) -> Option<KstValue> {
+    pub fn value(&self) -> Option<KnowSureThingValue> {
         self.value
     }
 
@@ -3605,7 +3635,10 @@ impl Kst {
     }
 }
 
-pub fn kst(
+/// Computes the causal know sure thing series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn know_sure_thing(
     close: &[f64],
     roc1: usize,
     roc2: usize,
@@ -3617,7 +3650,7 @@ pub fn kst(
     sma4: usize,
     nsig: usize,
 ) -> TaResult<(Vec<f64>, Vec<f64>)> {
-    let mut state = Kst::new(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, nsig)?;
+    let mut state = KnowSureThing::new(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, nsig)?;
     let mut kst_out = Vec::with_capacity(close.len());
     let mut signal = Vec::with_capacity(close.len());
     for &close in close {
@@ -3875,24 +3908,24 @@ pub fn rolling_winsorize(input: &[f64], timeperiod: usize, lower: f64, upper: f6
 }
 
 pub fn ewm_var(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = EwmVar::new(timeperiod)?;
+    let mut state = ExponentiallyWeightedVariance::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value)).collect())
 }
 
 pub fn ewm_std(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = EwmStd::new(timeperiod)?;
+    let mut state = ExponentiallyWeightedStandardDeviation::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value)).collect())
 }
 
 pub fn ewm_cov(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if input0.len() != input1.len() { return Err(TaError::LengthMismatch { expected: input0.len(), got: input1.len() }); }
-    let mut state = EwmCov::new(timeperiod)?;
+    let mut state = ExponentiallyWeightedCovariance::new(timeperiod)?;
     Ok(input0.iter().zip(input1).map(|(&left, &right)| state.append(left, right)).collect())
 }
 
 pub fn ewm_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if input0.len() != input1.len() { return Err(TaError::LengthMismatch { expected: input0.len(), got: input1.len() }); }
-    let mut state = EwmCorr::new(timeperiod)?;
+    let mut state = ExponentiallyWeightedCorrelation::new(timeperiod)?;
     Ok(input0.iter().zip(input1).map(|(&left, &right)| state.append(left, right)).collect())
 }
 
@@ -4244,9 +4277,9 @@ fn ewm_alpha(timeperiod: usize) -> TaResult<f64> {
 }
 
 #[derive(Debug, Clone)]
-pub struct EwmVar { alpha: f64, mean: Option<f64>, variance: f64, value: Option<f64> }
+pub struct ExponentiallyWeightedVariance { alpha: f64, mean: Option<f64>, variance: f64, value: Option<f64> }
 
-impl EwmVar {
+impl ExponentiallyWeightedVariance {
     pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { alpha: ewm_alpha(timeperiod)?, mean: None, variance: 0.0, value: None }) }
     pub fn append(&mut self, input: f64) -> f64 {
         let variance = match self.mean {
@@ -4266,19 +4299,19 @@ impl EwmVar {
 }
 
 #[derive(Debug, Clone)]
-pub struct EwmStd { variance: EwmVar, value: Option<f64> }
+pub struct ExponentiallyWeightedStandardDeviation { variance: ExponentiallyWeightedVariance, value: Option<f64> }
 
-impl EwmStd {
-    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { variance: EwmVar::new(timeperiod)?, value: None }) }
+impl ExponentiallyWeightedStandardDeviation {
+    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { variance: ExponentiallyWeightedVariance::new(timeperiod)?, value: None }) }
     pub fn append(&mut self, input: f64) -> f64 { let value = self.variance.append(input).sqrt(); self.value = Some(value); value }
     pub fn value(&self) -> Option<f64> { self.value }
     pub fn reset(&mut self) { self.variance.reset(); self.value = None; }
 }
 
 #[derive(Debug, Clone)]
-pub struct EwmCov { alpha: f64, mean0: Option<f64>, mean1: Option<f64>, var0: f64, var1: f64, covariance: f64, value: Option<f64> }
+pub struct ExponentiallyWeightedCovariance { alpha: f64, mean0: Option<f64>, mean1: Option<f64>, var0: f64, var1: f64, covariance: f64, value: Option<f64> }
 
-impl EwmCov {
+impl ExponentiallyWeightedCovariance {
     pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { alpha: ewm_alpha(timeperiod)?, mean0: None, mean1: None, var0: 0.0, var1: 0.0, covariance: 0.0, value: None }) }
     pub fn append(&mut self, left: f64, right: f64) -> f64 {
         let covariance = match (self.mean0, self.mean1) {
@@ -4302,10 +4335,10 @@ impl EwmCov {
 }
 
 #[derive(Debug, Clone)]
-pub struct EwmCorr { covariance: EwmCov, value: Option<f64> }
+pub struct ExponentiallyWeightedCorrelation { covariance: ExponentiallyWeightedCovariance, value: Option<f64> }
 
-impl EwmCorr {
-    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { covariance: EwmCov::new(timeperiod)?, value: None }) }
+impl ExponentiallyWeightedCorrelation {
+    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { covariance: ExponentiallyWeightedCovariance::new(timeperiod)?, value: None }) }
     pub fn append(&mut self, left: f64, right: f64) -> f64 {
         self.covariance.append(left, right);
         let denominator = (self.covariance.var0 * self.covariance.var1).sqrt();
@@ -4388,24 +4421,24 @@ fn mean(values: &VecDeque<f64>) -> f64 { values.iter().sum::<f64>() / values.len
 fn weighted_mean(values: &VecDeque<f64>) -> f64 { let denominator = (values.len() * (values.len() + 1) / 2) as f64; values.iter().enumerate().map(|(i,&v)| v * (i + 1) as f64).sum::<f64>() / denominator }
 
 #[derive(Debug, Clone)]
-pub struct Hma { raw: VecDeque<f64>, intermediate: VecDeque<f64>, period: usize, half: usize, smooth: usize, value: Option<f64> }
-impl Hma { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;let half=(period/2).max(1);let smooth=(period as f64).sqrt().floor() as usize;Ok(Self{raw:VecDeque::with_capacity(period),intermediate:VecDeque::with_capacity(smooth.max(1)),period,half,smooth:smooth.max(1),value:None})} pub fn append(&mut self,input:f64)->Option<f64>{if self.raw.len()==self.period{self.raw.pop_front();}self.raw.push_back(input);if self.raw.len()>=self.half&&self.raw.len()>=self.period{let half=weighted_mean(&self.raw.iter().skip(self.period-self.half).copied().collect());let full=weighted_mean(&self.raw);if self.intermediate.len()==self.smooth{self.intermediate.pop_front();}self.intermediate.push_back(2.0*half-full);self.value=(self.intermediate.len()==self.smooth).then(||weighted_mean(&self.intermediate));}else{self.value=None}self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.raw.clear();self.intermediate.clear();self.value=None;}}
+pub struct HullMovingAverage { raw: VecDeque<f64>, intermediate: VecDeque<f64>, period: usize, half: usize, smooth: usize, value: Option<f64> }
+impl HullMovingAverage { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;let half=(period/2).max(1);let smooth=(period as f64).sqrt().floor() as usize;Ok(Self{raw:VecDeque::with_capacity(period),intermediate:VecDeque::with_capacity(smooth.max(1)),period,half,smooth:smooth.max(1),value:None})} pub fn append(&mut self,input:f64)->Option<f64>{if self.raw.len()==self.period{self.raw.pop_front();}self.raw.push_back(input);if self.raw.len()>=self.half&&self.raw.len()>=self.period{let half=weighted_mean(&self.raw.iter().skip(self.period-self.half).copied().collect());let full=weighted_mean(&self.raw);if self.intermediate.len()==self.smooth{self.intermediate.pop_front();}self.intermediate.push_back(2.0*half-full);self.value=(self.intermediate.len()==self.smooth).then(||weighted_mean(&self.intermediate));}else{self.value=None}self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.raw.clear();self.intermediate.clear();self.value=None;}}
 
 #[derive(Debug, Clone)]
-pub struct Vwma { prices: VecDeque<f64>, volumes: VecDeque<f64>, period: usize, value: Option<f64> }
-impl Vwma { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{prices:VecDeque::with_capacity(period),volumes:VecDeque::with_capacity(period),period,value:None})} pub fn append(&mut self,price:f64,volume:f64)->Option<f64>{if self.prices.len()==self.period{self.prices.pop_front();self.volumes.pop_front();}self.prices.push_back(price);self.volumes.push_back(volume);self.value=(self.prices.len()==self.period).then(||{let volume=self.volumes.iter().sum::<f64>();if volume!=0.0{self.prices.iter().zip(&self.volumes).map(|(&p,&v)|p*v).sum::<f64>()/volume}else{0.0}});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.prices.clear();self.volumes.clear();self.value=None;}}
+pub struct VolumeWeightedMovingAverage { prices: VecDeque<f64>, volumes: VecDeque<f64>, period: usize, value: Option<f64> }
+impl VolumeWeightedMovingAverage { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{prices:VecDeque::with_capacity(period),volumes:VecDeque::with_capacity(period),period,value:None})} pub fn append(&mut self,price:f64,volume:f64)->Option<f64>{if self.prices.len()==self.period{self.prices.pop_front();self.volumes.pop_front();}self.prices.push_back(price);self.volumes.push_back(volume);self.value=(self.prices.len()==self.period).then(||{let volume=self.volumes.iter().sum::<f64>();if volume!=0.0{self.prices.iter().zip(&self.volumes).map(|(&p,&v)|p*v).sum::<f64>()/volume}else{0.0}});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.prices.clear();self.volumes.clear();self.value=None;}}
 
 #[derive(Debug, Clone)]
-pub struct Zlema { values: VecDeque<f64>, period: usize, lag: usize, alpha: f64, ema: Option<f64>, value: Option<f64> }
-impl Zlema { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{values:VecDeque::with_capacity((period/2).max(1)),period,lag:(period-1)/2,alpha:2.0/(period as f64+1.0),ema:None,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.lag.max(1){self.values.pop_front();}self.values.push_back(input);if self.values.len()<=self.lag{self.value=None}else{let lagged=self.values.front().copied().unwrap_or(input);let adjusted=2.0*input-lagged;self.ema=Some(match self.ema{Some(previous)=>previous+self.alpha*(adjusted-previous),None=>adjusted});self.value=self.ema;}self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.ema=None;self.value=None;}}
+pub struct ZeroLagExponentialMovingAverage { values: VecDeque<f64>, period: usize, lag: usize, alpha: f64, ema: Option<f64>, value: Option<f64> }
+impl ZeroLagExponentialMovingAverage { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{values:VecDeque::with_capacity((period/2).max(1)),period,lag:(period-1)/2,alpha:2.0/(period as f64+1.0),ema:None,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.lag.max(1){self.values.pop_front();}self.values.push_back(input);if self.values.len()<=self.lag{self.value=None}else{let lagged=self.values.front().copied().unwrap_or(input);let adjusted=2.0*input-lagged;self.ema=Some(match self.ema{Some(previous)=>previous+self.alpha*(adjusted-previous),None=>adjusted});self.value=self.ema;}self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.ema=None;self.value=None;}}
 
 #[derive(Debug, Clone)]
-pub struct Alma { values: VecDeque<f64>, period: usize, weights: Vec<f64>, value: Option<f64> }
-impl Alma { pub fn new(period:usize,offset:f64,sigma:f64)->TaResult<Self>{validate_period(period)?;if !(0.0..=1.0).contains(&offset)||sigma<=0.0{return Err(TaError::InvalidParameter{name:"offset/sigma",value:format!("{offset}/{sigma}"),reason:"offset must be 0..1 and sigma must be positive"});}let m=offset*(period-1)as f64;let weights=(0..period).map(|i|((-(i as f64-m).powi(2)/(2.0*sigma.powi(2)*(period as f64).powi(2))).exp())).collect();Ok(Self{values:VecDeque::with_capacity(period),period,weights,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back(input);self.value=(self.values.len()==self.period).then(||{let total=self.weights.iter().sum::<f64>();self.values.iter().zip(&self.weights).map(|(&v,&w)|v*w).sum::<f64>()/total});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}
+pub struct ArnaudLegouxMovingAverage { values: VecDeque<f64>, period: usize, weights: Vec<f64>, value: Option<f64> }
+impl ArnaudLegouxMovingAverage { pub fn new(period:usize,offset:f64,sigma:f64)->TaResult<Self>{validate_period(period)?;if !(0.0..=1.0).contains(&offset)||sigma<=0.0{return Err(TaError::InvalidParameter{name:"offset/sigma",value:format!("{offset}/{sigma}"),reason:"offset must be 0..1 and sigma must be positive"});}let m=offset*(period-1)as f64;let weights=(0..period).map(|i|((-(i as f64-m).powi(2)/(2.0*sigma.powi(2)*(period as f64).powi(2))).exp())).collect();Ok(Self{values:VecDeque::with_capacity(period),period,weights,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back(input);self.value=(self.values.len()==self.period).then(||{let total=self.weights.iter().sum::<f64>();self.values.iter().zip(&self.weights).map(|(&v,&w)|v*w).sum::<f64>()/total});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}
 
 #[derive(Debug, Clone)]
-pub struct Tsi { previous: Option<f64>, fast: usize, slow: usize, alpha_fast: f64, alpha_slow: f64, momentum: Option<f64>, absolute: Option<f64>, value: Option<f64> }
-impl Tsi { pub fn new(fast:usize,slow:usize)->TaResult<Self>{validate_period(fast)?;validate_period(slow)?;Ok(Self{previous:None,fast,slow,alpha_fast:2.0/(fast as f64+1.0),alpha_slow:2.0/(slow as f64+1.0),momentum:None,absolute:None,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{let previous=self.previous.replace(input)?;let change=input-previous;let abs=change.abs();let m1=self.momentum.map_or(change,|v|v+self.alpha_fast*(change-v));let a1=self.absolute.map_or(abs,|v|v+self.alpha_fast*(abs-v));self.momentum=Some(m1);self.absolute=Some(a1);let m2=self.momentum.map_or(m1,|v|v+self.alpha_slow*(m1-v));let a2=self.absolute.map_or(a1,|v|v+self.alpha_slow*(a1-v));let value=if a2!=0.0{Some(100.0*m2/a2)}else{Some(0.0)};self.value=value;value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.previous=None;self.momentum=None;self.absolute=None;self.value=None;}}
+pub struct TrueStrengthIndex { previous: Option<f64>, fast: usize, slow: usize, alpha_fast: f64, alpha_slow: f64, momentum: Option<f64>, absolute: Option<f64>, value: Option<f64> }
+impl TrueStrengthIndex { pub fn new(fast:usize,slow:usize)->TaResult<Self>{validate_period(fast)?;validate_period(slow)?;Ok(Self{previous:None,fast,slow,alpha_fast:2.0/(fast as f64+1.0),alpha_slow:2.0/(slow as f64+1.0),momentum:None,absolute:None,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{let previous=self.previous.replace(input)?;let change=input-previous;let abs=change.abs();let m1=self.momentum.map_or(change,|v|v+self.alpha_fast*(change-v));let a1=self.absolute.map_or(abs,|v|v+self.alpha_fast*(abs-v));self.momentum=Some(m1);self.absolute=Some(a1);let m2=self.momentum.map_or(m1,|v|v+self.alpha_slow*(m1-v));let a2=self.absolute.map_or(a1,|v|v+self.alpha_slow*(a1-v));let value=if a2!=0.0{Some(100.0*m2/a2)}else{Some(0.0)};self.value=value;value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.previous=None;self.momentum=None;self.absolute=None;self.value=None;}}
 
 #[derive(Debug, Clone)]
 pub struct AwesomeOscillator { fast: usize, slow: usize, values: VecDeque<f64>, value: Option<f64> }
@@ -4436,8 +4469,8 @@ pub struct ChaikinVolatility { period: usize, roc_period: usize, alpha: f64, ema
 impl ChaikinVolatility { pub fn new(period:usize,roc_period:usize)->TaResult<Self>{validate_period(period)?;validate_period(roc_period)?;Ok(Self{period,roc_period,alpha:2.0/(period as f64+1.0),ema:None,history:VecDeque::with_capacity(roc_period+1),value:None})}pub fn append(&mut self,high:f64,low:f64)->Option<f64>{let range=high-low;let ema=self.ema.map_or(range,|v|v+self.alpha*(range-v));self.ema=Some(ema);if self.history.len()==self.roc_period+1{self.history.pop_front();}self.history.push_back(ema);self.value=(self.history.len()==self.roc_period+1).then(||{let old=self.history.front().copied().unwrap();if old!=0.0{(ema-old)/old*100.0}else{0.0}});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.ema=None;self.history.clear();self.value=None;}}
 
 #[derive(Debug, Clone)]
-pub struct Vwap { prices: VecDeque<f64>, volumes: VecDeque<f64>, period: usize, value: Option<f64> }
-impl Vwap { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{prices:VecDeque::with_capacity(period),volumes:VecDeque::with_capacity(period),period,value:None})}pub fn append(&mut self,high:f64,low:f64,close:f64,volume:f64)->Option<f64>{if self.prices.len()==self.period{self.prices.pop_front();self.volumes.pop_front();}self.prices.push_back((high+low+close)/3.0);self.volumes.push_back(volume);self.value=(self.prices.len()==self.period).then(||{let total=self.volumes.iter().sum::<f64>();if total!=0.0{self.prices.iter().zip(&self.volumes).map(|(&p,&v)|p*v).sum::<f64>()/total}else{0.0}});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.prices.clear();self.volumes.clear();self.value=None;}}
+pub struct RollingVolumeWeightedAveragePrice { prices: VecDeque<f64>, volumes: VecDeque<f64>, period: usize, value: Option<f64> }
+impl RollingVolumeWeightedAveragePrice { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{prices:VecDeque::with_capacity(period),volumes:VecDeque::with_capacity(period),period,value:None})}pub fn append(&mut self,high:f64,low:f64,close:f64,volume:f64)->Option<f64>{if self.prices.len()==self.period{self.prices.pop_front();self.volumes.pop_front();}self.prices.push_back((high+low+close)/3.0);self.volumes.push_back(volume);self.value=(self.prices.len()==self.period).then(||{let total=self.volumes.iter().sum::<f64>();if total!=0.0{self.prices.iter().zip(&self.volumes).map(|(&p,&v)|p*v).sum::<f64>()/total}else{0.0}});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.prices.clear();self.volumes.clear();self.value=None;}}
 #[derive(Debug, Clone)] pub struct ForceIndex { previous: Option<f64>, value: Option<f64> }
 impl ForceIndex { pub fn new()->Self{Self{previous:None,value:None}}pub fn append(&mut self,close:f64,volume:f64)->Option<f64>{let previous=self.previous.replace(close)?;self.value=Some((close-previous)*volume);self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.previous=None;self.value=None;}}
 impl Default for ForceIndex{fn default()->Self{Self::new()}}
@@ -4590,13 +4623,13 @@ pub fn mass_index(
 /// Stateful causal Detrended Price Oscillator. The centered pandas-ta form is
 /// intentionally excluded because it shifts future values backward.
 #[derive(Debug, Clone)]
-pub struct Dpo {
+pub struct DetrendedPriceOscillator {
     sma: Sma,
     delay: Window,
     value: Option<f64>,
 }
 
-impl Dpo {
+impl DetrendedPriceOscillator {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self { sma: Sma::new(period)?, delay: Window::new(period / 2 + 1)?, value: None })
@@ -4616,20 +4649,23 @@ impl Dpo {
     }
 }
 
-pub fn dpo(input: &[f64], period: usize) -> TaResult<Vec<f64>> {
-    let mut state = Dpo::new(period)?;
+/// Computes the causal detrended price oscillator series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn detrended_price_oscillator(input: &[f64], period: usize) -> TaResult<Vec<f64>> {
+    let mut state = DetrendedPriceOscillator::new(period)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
 /// Stateful Chaikin Money Flow, aligned to `ta.volume.ChaikinMoneyFlowIndicator`.
 #[derive(Debug, Clone)]
-pub struct Cmf {
+pub struct ChaikinMoneyFlow {
     mfv: crate::stream::Sum,
     volume: crate::stream::Sum,
     value: Option<f64>,
 }
 
-impl Cmf {
+impl ChaikinMoneyFlow {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self { mfv: crate::stream::Sum::new(period)?, volume: crate::stream::Sum::new(period)?, value: None })
@@ -4656,19 +4692,22 @@ impl Cmf {
     }
 }
 
-pub fn cmf(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], period: usize) -> TaResult<Vec<f64>> {
+/// Computes the causal chaikin money flow series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn chaikin_money_flow(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], period: usize) -> TaResult<Vec<f64>> {
     if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
         return Err(TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
     }
-    let mut state = Cmf::new(period)?;
+    let mut state = ChaikinMoneyFlow::new(period)?;
     Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&h, &l), &c), &v)| state.append(h, l, c, v).unwrap_or(f64::NAN)).collect())
 }
 
 /// Stateful Volume-price Trend, aligned to `ta.volume.VolumePriceTrendIndicator`.
 #[derive(Debug, Clone)]
-pub struct Vpt { previous_close: Option<f64>, total: f64, value: Option<f64> }
+pub struct VolumePriceTrend { previous_close: Option<f64>, total: f64, value: Option<f64> }
 
-impl Vpt {
+impl VolumePriceTrend {
     pub fn new() -> Self { Self { previous_close: None, total: 0.0, value: None } }
     pub fn append(&mut self, close: f64, volume: f64) -> Option<f64> {
         let previous = self.previous_close.replace(close);
@@ -4682,9 +4721,12 @@ impl Vpt {
     pub fn reset(&mut self) { self.previous_close = None; self.total = 0.0; self.value = None; }
 }
 
-pub fn vpt(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+/// Computes the causal volume price trend series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn volume_price_trend(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     if close.len() != volume.len() { return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() }); }
-    let mut state = Vpt::new();
+    let mut state = VolumePriceTrend::new();
     Ok(close.iter().zip(volume).map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN)).collect())
 }
 
@@ -4706,26 +4748,32 @@ impl VolumeIndex {
     fn reset(&mut self) { self.previous_close = None; self.previous_volume = None; self.value = 1000.0; }
 }
 
-pub struct Nvi(VolumeIndex);
-pub struct Pvi(VolumeIndex);
-impl Nvi { pub fn new() -> Self { Self(VolumeIndex::new(VolumeIndexMode::Negative)) } pub fn append(&mut self, close: f64, volume: f64) -> f64 { self.0.append(close, volume) } pub fn value(&self) -> f64 { self.0.value } pub fn reset(&mut self) { self.0.reset(); } }
-impl Pvi { pub fn new() -> Self { Self(VolumeIndex::new(VolumeIndexMode::Positive)) } pub fn append(&mut self, close: f64, volume: f64) -> f64 { self.0.append(close, volume) } pub fn value(&self) -> f64 { self.0.value } pub fn reset(&mut self) { self.0.reset(); } }
+pub struct NegativeVolumeIndex(VolumeIndex);
+pub struct PositiveVolumeIndex(VolumeIndex);
+impl NegativeVolumeIndex { pub fn new() -> Self { Self(VolumeIndex::new(VolumeIndexMode::Negative)) } pub fn append(&mut self, close: f64, volume: f64) -> f64 { self.0.append(close, volume) } pub fn value(&self) -> f64 { self.0.value } pub fn reset(&mut self) { self.0.reset(); } }
+impl PositiveVolumeIndex { pub fn new() -> Self { Self(VolumeIndex::new(VolumeIndexMode::Positive)) } pub fn append(&mut self, close: f64, volume: f64) -> f64 { self.0.append(close, volume) } pub fn value(&self) -> f64 { self.0.value } pub fn reset(&mut self) { self.0.reset(); } }
 
-pub fn nvi(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+/// Computes the causal negative volume index series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn negative_volume_index(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     if close.len() != volume.len() { return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() }); }
     let mut state = VolumeIndex::new(VolumeIndexMode::Negative);
     Ok(close.iter().zip(volume).map(|(&c, &v)| { state.append(c, v) }).collect())
 }
 
-pub fn pvi(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+/// Computes the causal positive volume index series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn positive_volume_index(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     if close.len() != volume.len() { return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() }); }
     let mut state = VolumeIndex::new(VolumeIndexMode::Positive);
     Ok(close.iter().zip(volume).map(|(&c, &v)| { state.append(c, v) }).collect())
 }
 
 #[derive(Debug, Clone)]
-pub struct Mcgd { length: usize, c: f64, value: Option<f64> }
-impl Mcgd {
+pub struct McGinleyDynamic { length: usize, c: f64, value: Option<f64> }
+impl McGinleyDynamic {
     pub fn new(length: usize, c: f64) -> TaResult<Self> {
         validate_period(length)?;
         if !(0.0 < c && c <= 1.0) { return Err(TaError::InvalidParameter { name: "c", value: c.to_string(), reason: "must be in (0, 1]" }); }
@@ -4746,7 +4794,10 @@ impl Mcgd {
     pub fn value(&self) -> Option<f64> { self.value }
     pub fn reset(&mut self) { self.value = None; }
 }
-pub fn mcgd(input: &[f64], length: usize, c: f64) -> TaResult<Vec<f64>> { let mut state = Mcgd::new(length, c)?; Ok(input.iter().map(|&v| state.append(v).unwrap()).collect()) }
+/// Computes the causal mcginley dynamic series.
+/// Parameters: aligned input slices followed by indicator parameters.
+/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
+pub fn mcginley_dynamic(input: &[f64], length: usize, c: f64) -> TaResult<Vec<f64>> { let mut state = McGinleyDynamic::new(length, c)?; Ok(input.iter().map(|&v| state.append(v).unwrap()).collect()) }
 
 #[cfg(test)]
 mod tests {
@@ -4825,7 +4876,7 @@ mod tests {
         assert_eq!(signedpower(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
 
         let adv_batch = adv(&close, &volume, 3).unwrap();
-        let mut adv_state = Adv::new(3).unwrap();
+        let mut adv_state = AverageDailyDollarValue::new(3).unwrap();
         for ((close, volume), expected) in close.iter().zip(&volume).zip(&adv_batch) {
             assert_eq!(adv_state.append(*close, *volume).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
         }
@@ -4843,7 +4894,7 @@ mod tests {
         }
 
         let hl_batch = ou_half_life(&close, 3).unwrap();
-        let mut hl_state = OuHalfLife::new(3).unwrap();
+        let mut hl_state = OrnsteinUhlenbeckHalfLife::new(3).unwrap();
         for (price, expected) in close.iter().zip(&hl_batch) {
             assert_eq!(hl_state.append(*price).map(f64::to_bits), (!expected.is_nan()).then_some(expected.to_bits()));
         }
@@ -4968,10 +5019,10 @@ mod tests {
 
     #[test]
     fn quant_family_rejects_bad_periods() {
-        assert!(Adv::new(0).is_err());
+        assert!(AverageDailyDollarValue::new(0).is_err());
         assert!(Amihud::new(0).is_err());
         assert!(RollSpread::new(0).is_err());
-        assert!(OuHalfLife::new(0).is_err());
+        assert!(OrnsteinUhlenbeckHalfLife::new(0).is_err());
         assert!(Cusum::new(-1.0).is_err());
     }
 
@@ -5191,7 +5242,7 @@ mod tests {
         assert!(stc.iter().all(|&v| v.is_finite() && (0.0..=100.0).contains(&v)));
         assert!(stoch.iter().all(|&v| v.is_finite() && (0.0..=100.0).contains(&v)));
 
-        let mut state = Stc::new(10, 12, 26, 0.5).unwrap();
+        let mut state = SchaffTrendCycle::new(10, 12, 26, 0.5).unwrap();
         let replayed: Vec<f64> = close.iter().map(|&c| state.append(c).stc).collect();
         assert_eq!(
             replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
@@ -5206,9 +5257,9 @@ mod tests {
         let (b, _, _) = stc(&close, 10, 26, 12, 0.5).unwrap();
         assert_eq!(a, b);
 
-        assert!(Stc::new(0, 12, 26, 0.5).is_err());
-        assert!(Stc::new(10, 0, 26, 0.5).is_err());
-        assert!(Stc::new(10, 12, 26, 0.0).is_err());
+        assert!(SchaffTrendCycle::new(0, 12, 26, 0.5).is_err());
+        assert!(SchaffTrendCycle::new(10, 0, 26, 0.5).is_err());
+        assert!(SchaffTrendCycle::new(10, 12, 26, 0.0).is_err());
     }
 
     #[test]
@@ -5263,7 +5314,7 @@ mod tests {
         assert!(kst[44..].iter().all(|&v| v.is_finite()));
         assert!(signal[52..].iter().all(|&v| v.is_finite()));
 
-        let mut state = Kst::new(10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
+        let mut state = KnowSureThing::new(10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
         let replayed: Vec<f64> = close.iter().map(|&c| state.append(c).kst).collect();
         assert_eq!(
             replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
@@ -5273,8 +5324,8 @@ mod tests {
 
     #[test]
     fn kst_rejects_bad_params() {
-        assert!(Kst::new(0, 15, 20, 30, 10, 10, 10, 15, 9).is_err());
-        assert!(Kst::new(10, 15, 20, 30, 10, 10, 10, 15, 0).is_err());
+        assert!(KnowSureThing::new(0, 15, 20, 30, 10, 10, 10, 15, 9).is_err());
+        assert!(KnowSureThing::new(10, 15, 20, 30, 10, 10, 10, 15, 0).is_err());
     }
 
     #[test]
@@ -5302,7 +5353,7 @@ mod tests {
     fn dpo_batch_and_stream_match() {
         let input: Vec<f64> = (0..100).map(|i| i as f64 + (i as f64 * 0.2).sin()).collect();
         let batch = dpo(&input, 20).unwrap();
-        let mut state = Dpo::new(20).unwrap();
+        let mut state = DetrendedPriceOscillator::new(20).unwrap();
         let replayed: Vec<f64> = input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect();
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
         assert!(batch[..30].iter().all(|value| value.is_nan()));
@@ -5316,7 +5367,7 @@ mod tests {
         let low: Vec<f64> = close.iter().map(|value| value - 1.0).collect();
         let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
         let batch = cmf(&high, &low, &close, &volume, 20).unwrap();
-        let mut state = Cmf::new(20).unwrap();
+        let mut state = ChaikinMoneyFlow::new(20).unwrap();
         let replayed: Vec<f64> = high.iter().zip(&low).zip(&close).zip(&volume).map(|(((&h, &l), &c), &v)| state.append(h, l, c, v).unwrap_or(f64::NAN)).collect();
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
         assert!(batch[..19].iter().all(|value| value.is_nan()));
@@ -5328,7 +5379,7 @@ mod tests {
         let close: Vec<f64> = (1..=100).map(|value| value as f64).collect();
         let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
         let batch = vpt(&close, &volume).unwrap();
-        let mut state = Vpt::new();
+        let mut state = VolumePriceTrend::new();
         let replayed: Vec<f64> = close.iter().zip(&volume).map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN)).collect();
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
         assert!(batch[0].is_nan());

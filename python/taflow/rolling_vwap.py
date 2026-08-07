@@ -1,6 +1,4 @@
 """Canonical name for the rolling volume-weighted average price."""
-from .vwap import Vwap
+from .vwap import RollingVolumeWeightedAveragePrice
 
-RollingVwap = Vwap
-
-__all__ = ["RollingVwap"]
+__all__ = ["RollingVolumeWeightedAveragePrice"]

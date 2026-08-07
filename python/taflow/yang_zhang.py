@@ -6,6 +6,11 @@ from ._series import as_float64_series
 
 
 class YangZhang:
+    """Stateful YangZhang indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(
         self,
         open: Any | None = None,

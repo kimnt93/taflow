@@ -3,7 +3,7 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLHAMMER state using TA-Lib's body, range, and near windows.
-pub struct CdlHammer {
+pub struct CandleHammer {
     bodies: VecDeque<f64>,
     body_sum: f64,
     ranges: VecDeque<f64>,
@@ -13,12 +13,12 @@ pub struct CdlHammer {
     previous: Option<(f64, f64)>,
     value: Option<i32>,
 }
-impl Default for CdlHammer {
+impl Default for CandleHammer {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlHammer {
+impl CandleHammer {
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -83,7 +83,7 @@ mod tests {
             .map(|(i, x)| x + if i % 5 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_hammer(&open, &high, &low, &close).unwrap();
-        let mut state = CdlHammer::new();
+        let mut state = CandleHammer::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

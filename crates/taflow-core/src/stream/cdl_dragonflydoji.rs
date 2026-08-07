@@ -3,17 +3,17 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLDRAGONFLYDOJI state using TA-Lib's two ten-bar range averages.
-pub struct CdlDragonflyDoji {
+pub struct CandleDragonflyDoji {
     ranges: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlDragonflyDoji {
+impl Default for CandleDragonflyDoji {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlDragonflyDoji {
+impl CandleDragonflyDoji {
     pub fn new() -> Self {
         Self {
             ranges: VecDeque::with_capacity(10),
@@ -65,7 +65,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_dragonflydoji(&open, &high, &low, &close).unwrap();
-        let mut state = CdlDragonflyDoji::new();
+        let mut state = CandleDragonflyDoji::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

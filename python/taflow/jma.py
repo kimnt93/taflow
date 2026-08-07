@@ -1,6 +1,11 @@
-"""Public Jurik-like adaptive moving average reconstruction (not proprietary JMA)."""
+"""Public Jurik-like adaptive moving average reconstruction (not proprietary JurikMovingAverage)."""
 import numpy as np
-class JMA:
+class JurikMovingAverage:
+    """Stateful JurikMovingAverage indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None, length=7, phase=0):
         self.length=int(length); self.phase=float(phase)
         if self.length<1: raise ValueError("length must be positive")

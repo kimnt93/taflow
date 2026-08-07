@@ -8,7 +8,7 @@ from ._native import DpoOperator as _Native
 from ._series import as_float64_series
 
 
-class Dpo:
+class DetrendedPriceOscillator:
     """Causal DPO; pandas-ta centered/lookahead output is not exposed."""
 
     def __init__(self, close: Any | None = None, period=20):

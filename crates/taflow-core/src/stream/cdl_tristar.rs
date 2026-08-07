@@ -15,16 +15,18 @@ impl Candle {
         self.h - self.l
     }
 }
-pub struct CdlTriStar {
+/// Stateful CandleTriStar candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleTriStar {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlTriStar {
+impl Default for CandleTriStar {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlTriStar {
+impl CandleTriStar {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
@@ -72,7 +74,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_tristar(&o, &h, &l, &c).unwrap();
-        let mut s = CdlTriStar::new();
+        let mut s = CandleTriStar::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

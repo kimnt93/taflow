@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Cdl3LineStrike;
+use taflow::stream::Candle3LineStrike;
 #[pyclass]
-pub struct ThreeLineStrike {
-    inner: Cdl3LineStrike,
+/// Stateful CandleThreeLineStrike candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleThreeLineStrike {
+    inner: Candle3LineStrike,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl ThreeLineStrike {
+impl CandleThreeLineStrike {
     #[new]
     fn new() -> Self {
         Self {
-            inner: Cdl3LineStrike::new(),
+            inner: Candle3LineStrike::new(),
             outputs: Vec::new(),
         }
     }

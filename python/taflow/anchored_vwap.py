@@ -1,7 +1,12 @@
 """Anchored VWAP with running standard-deviation bands."""
 import numpy as np
 
-class AnchoredVWAP:
+class AnchoredVolumeWeightedAveragePrice:
+    """Stateful AnchoredVolumeWeightedAveragePrice indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high=None, low=None, close=None, volume=None, anchor=None, stdev=1.0):
         self.stdev=float(stdev); self.reset()
         if close is not None: self.extend(high,low,close,volume,anchor)

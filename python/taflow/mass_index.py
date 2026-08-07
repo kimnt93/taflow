@@ -9,6 +9,11 @@ from ._series import as_float64_series
 
 
 class MassIndex:
+    """Stateful MassIndex indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high: Any | None = None, low: Any | None = None, ema_period=9, sum_period=25):
         self._state = _Native(ema_period, sum_period)
         self.extend(high, low) if high is not None or low is not None else None

@@ -3,6 +3,11 @@ from ._native import ActiveZoneListOperator as _Native
 
 
 class ActiveZoneList:
+    """Stateful ActiveZoneList indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, capacity: int = 64):
         self._state = _Native(capacity)
 

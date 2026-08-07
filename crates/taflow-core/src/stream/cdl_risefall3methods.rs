@@ -19,16 +19,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlRiseFall3Methods {
+/// Stateful CandleRiseFall3Methods candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleRiseFall3Methods {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlRiseFall3Methods {
+impl Default for CandleRiseFall3Methods {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlRiseFall3Methods {
+impl CandleRiseFall3Methods {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(14),
@@ -120,7 +122,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_risefall3methods(&o, &h, &l, &c).unwrap();
-        let mut s = CdlRiseFall3Methods::new();
+        let mut s = CandleRiseFall3Methods::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

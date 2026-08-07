@@ -25,16 +25,18 @@ impl Candle {
         }
     }
 }
-pub struct Cdl3WhiteSoldiers {
+/// Stateful Candle3WhiteSoldiers candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct Candle3WhiteSoldiers {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Cdl3WhiteSoldiers {
+impl Default for Candle3WhiteSoldiers {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Cdl3WhiteSoldiers {
+impl Candle3WhiteSoldiers {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
@@ -103,7 +105,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_3whitesoldiers(&o, &h, &l, &c).unwrap();
-        let mut s = Cdl3WhiteSoldiers::new();
+        let mut s = Candle3WhiteSoldiers::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

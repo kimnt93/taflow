@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::GkYangZhang;
+use taflow::stream::GarmanKlassYangZhang;
 
 #[pyclass]
 pub struct GkYangZhangOperator {
-    inner: GkYangZhang,
+    inner: GarmanKlassYangZhang,
     output: Vec<f64>,
 }
 
@@ -15,7 +15,7 @@ impl GkYangZhangOperator {
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: GkYangZhang::new(timeperiod)
+            inner: GarmanKlassYangZhang::new(timeperiod)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })

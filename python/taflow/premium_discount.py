@@ -1,6 +1,11 @@
 """Premium/discount zones relative to a rolling swing midpoint."""
 import numpy as np
 class PremiumDiscount:
+    """Stateful PremiumDiscount indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None, window=20): self.window=int(window); self.reset(); self.extend(close) if close is not None else None
     def append(self, close):
         x=float(close); self._c.append(x); lo=min(self._c[-self.window:]); hi=max(self._c[-self.window:]); eq=(hi+lo)/2; z=1 if x>eq else -1 if x<eq else 0; self._v.append((z,eq)); return self._v[-1]

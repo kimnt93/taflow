@@ -8,6 +8,11 @@ from ._series import as_float64_series
 
 
 class HilbertTransformDominantCyclePeriod:
+    """Stateful HilbertTransformDominantCyclePeriod indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, input: Any | None = None):
         self._state = _Native()
         if input is not None:
@@ -31,6 +36,3 @@ class HilbertTransformDominantCyclePeriod:
     def reset(self):
         self._state.reset()
         return self
-
-
-HT_DCPERIOD = HilbertTransformDominantCyclePeriod

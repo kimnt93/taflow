@@ -1,19 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlLongLine;
-
+use taflow::stream::CandleLongLine as CandleLongLineState;
 #[pyclass]
-pub struct LongLine {
-    inner: CdlLongLine,
+/// Stateful CandleLongLine candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleLongLine {
+    inner: CandleLongLineState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl LongLine {
+impl CandleLongLine {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlLongLine::new(),
+            inner: CandleLongLineState::new(),
             outputs: Vec::new(),
         }
     }

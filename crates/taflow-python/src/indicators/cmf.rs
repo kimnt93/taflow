@@ -1,17 +1,17 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Cmf;
+use taflow::stream::ChaikinMoneyFlow;
 
 #[pyclass]
-pub struct CmfOperator { inner: Cmf, values: Vec<f64> }
+pub struct CmfOperator { inner: ChaikinMoneyFlow, values: Vec<f64> }
 
 #[pymethods]
 impl CmfOperator {
     #[new]
     #[pyo3(signature = (period=20))]
     fn new(period: usize) -> PyResult<Self> {
-        Ok(Self { inner: Cmf::new(period).map_err(|error| PyValueError::new_err(error.to_string()))?, values: Vec::new() })
+        Ok(Self { inner: ChaikinMoneyFlow::new(period).map_err(|error| PyValueError::new_err(error.to_string()))?, values: Vec::new() })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {

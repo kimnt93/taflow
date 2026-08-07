@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlGravestoneDoji;
+use taflow::stream::CandleGravestoneDoji as CandleGravestoneDojiState;
 #[pyclass]
-pub struct GravestoneDoji {
-    inner: CdlGravestoneDoji,
+/// Stateful CandleGravestoneDoji candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleGravestoneDoji {
+    inner: CandleGravestoneDojiState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl GravestoneDoji {
+impl CandleGravestoneDoji {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlGravestoneDoji::new(),
+            inner: CandleGravestoneDojiState::new(),
             outputs: Vec::new(),
         }
     }

@@ -9,6 +9,11 @@ from ._series import as_float64_series
 
 
 class MinusDirectionalMovement:
+    """Stateful MinusDirectionalMovement indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(
         self,
         high: Any | None = None,
@@ -39,6 +44,3 @@ class MinusDirectionalMovement:
     def reset(self):
         self._state.reset()
         return self
-
-
-MINUS_DM = MinusDirectionalMovement

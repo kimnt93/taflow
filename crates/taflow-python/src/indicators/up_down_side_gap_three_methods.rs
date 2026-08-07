@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlXSideGap3Methods;
+use taflow::stream::CandleXSideGap3Methods;
 #[pyclass]
-pub struct UpDownSideGapThreeMethods {
-    inner: CdlXSideGap3Methods,
+/// Stateful CandleUpDownSideGapThreeMethods candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleUpDownSideGapThreeMethods {
+    inner: CandleXSideGap3Methods,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl UpDownSideGapThreeMethods {
+impl CandleUpDownSideGapThreeMethods {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlXSideGap3Methods::new(),
+            inner: CandleXSideGap3Methods::new(),
             outputs: Vec::new(),
         }
     }

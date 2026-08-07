@@ -1,4 +1,4 @@
-"""Descriptive, stateful Python interface for TAFlow."""
+"Descriptive, stateful Python interface for TAFlow."
 
 __version__ = "0.1.2"
 
@@ -7,39 +7,39 @@ from .acceleration_bands import AccelerationBands
 from .average_directional_index import AverageDirectionalIndex
 from .average_directional_index_rating import AverageDirectionalIndexRating
 from .bollinger_bands import BollingerBands
-from .commodity_channel_index import CCI, CommodityChannelIndex
+from .commodity_channel_index import CommodityChannelIndex
 from .directional_movement_index import DirectionalMovementIndex
-from .doji import CDLDOJI, Doji
-from .takuri import CDLTAKURI, Takuri
-from .marubozu import CDLMARUBOZU, Marubozu
-from .closing_marubozu import CDLCLOSINGMARUBOZU, ClosingMarubozu
-from .long_legged_doji import CDLLONGLEGGEDDOJI, LongLeggedDoji
-from .rickshawman import CDLRICKSHAWMAN, Rickshawman
-from .high_wave import CDLHIGHWAVE, HighWave
-from .dragonfly_doji import CDLDRAGONFLYDOJI, DragonflyDoji
-from .gravestone_doji import CDLGRAVESTONEDOJI, GravestoneDoji
-from .short_line import CDLSHORTLINE, ShortLine
-from .spinning_top import CDLSPINNINGTOP, SpinningTop
-from .long_line import CDLLONGLINE, LongLine
-from .doji_star import CDLDOJISTAR, DojiStar
-from .belt_hold import CDLBELTHOLD, BeltHold
-from .engulfing import CDLENGULFING, Engulfing
-from .exponential_moving_average import EMA, ExponentialMovingAverage
+from .doji import CandleDoji
+from .takuri import CandleTakuri
+from .marubozu import CandleMarubozu
+from .closing_marubozu import CandleClosingMarubozu
+from .long_legged_doji import CandleLongLeggedDoji
+from .rickshawman import CandleRickshawman
+from .high_wave import CandleHighWave
+from .dragonfly_doji import CandleDragonflyDoji
+from .gravestone_doji import CandleGravestoneDoji
+from .short_line import CandleShortLine
+from .spinning_top import CandleSpinningTop
+from .long_line import CandleLongLine
+from .doji_star import CandleDojiStar
+from .belt_hold import CandleBeltHold
+from .engulfing import CandleEngulfing
+from .exponential_moving_average import ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
 from .hilbert_transform_trendline import HilbertTransformTrendline
-from .hikkake import CDLHIKKAKE, Hikkake
-from .hikkake_modified import CDLHIKKAKEMOD, HikkakeModified
-from .hammer import CDLHAMMER, Hammer
-from .hilbert_transform_dominant_cycle_period import HT_DCPERIOD, HilbertTransformDominantCyclePeriod
-from .hilbert_transform_dominant_cycle_phase import HT_DCPHASE, HilbertTransformDominantCyclePhase
-from .hilbert_transform_phasor import HT_PHASOR, HilbertTransformPhasor
-from .hilbert_transform_sine_wave import HT_SINE, HilbertTransformSineWave
-from .hilbert_transform_trend_mode import HT_TRENDMODE, HilbertTransformTrendMode
+from .hikkake import CandleHikkake
+from .hikkake_modified import CandleHikkakeModified
+from .hammer import CandleHammer
+from .hilbert_transform_dominant_cycle_period import HilbertTransformDominantCyclePeriod
+from .hilbert_transform_dominant_cycle_phase import HilbertTransformDominantCyclePhase
+from .hilbert_transform_phasor import HilbertTransformPhasor
+from .hilbert_transform_sine_wave import HilbertTransformSineWave
+from .hilbert_transform_trend_mode import HilbertTransformTrendMode
 from .intraday_momentum_index import IntradayMomentumIndex
 from .moving_average import MovingAverage
-from .minus_directional_indicator import MINUS_DI, MinusDirectionalIndicator
-from .minus_directional_movement import MINUS_DM, MinusDirectionalMovement
-from .money_flow_index import MFI, MoneyFlowIndex
+from .minus_directional_indicator import MinusDirectionalIndicator
+from .minus_directional_movement import MinusDirectionalMovement
+from .money_flow_index import MoneyFlowIndex
 from .moving_average_convergence_divergence_fixed import (
     MovingAverageConvergenceDivergenceFixed,
 )
@@ -48,29 +48,29 @@ from .moving_average_convergence_divergence_extended import (
 )
 from .parabolic_sar import ParabolicSar
 from .parabolic_sar_extended import ParabolicSarExtended
-from .plus_directional_indicator import PLUS_DI, PlusDirectionalIndicator
-from .plus_directional_movement import PLUS_DM, PlusDirectionalMovement
+from .plus_directional_indicator import PlusDirectionalIndicator
+from .plus_directional_movement import PlusDirectionalMovement
 from .stochastic_oscillator import StochasticOscillator
 from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
-from .stick_sandwich import CDLSTICKSANDWICH, StickSandwich
-from .triple_exponential_rate_of_change import TRIX, TripleExponentialRateOfChange
-from .three_black_crows import CDL3BLACKCROWS, ThreeBlackCrows
-from .three_inside import CDL3INSIDE, ThreeInside
-from .three_line_strike import CDL3LINESTRIKE, ThreeLineStrike
-from .three_stars_in_south import CDL3STARSINSOUTH, ThreeStarsInSouth
-from .three_outside import CDL3OUTSIDE, ThreeOutside
-from .two_crows import CDL2CROWS, TwoCrows
-from .ultimate_oscillator import ULTOSC, UltimateOscillator
+from .stick_sandwich import CandleStickSandwich
+from .triple_exponential_rate_of_change import TripleExponentialRateOfChange
+from .three_black_crows import CandleThreeBlackCrows
+from .three_inside import CandleThreeInside
+from .three_line_strike import CandleThreeLineStrike
+from .three_stars_in_south import CandleThreeStarsInSouth
+from .three_outside import CandleThreeOutside
+from .two_crows import CandleTwoCrows
+from .ultimate_oscillator import UltimateOscillator
 from .variable_period_moving_average import VariablePeriodMovingAverage
 from .heikin_ashi import HeikinAshi
 from .fibonacci_retracement import FibonacciRetracement
-from .anchored_vwap import AnchoredVWAP
-from .vidya import VIDYA
-from .laguerre_rsi import LaguerreRSI
-from .rmi import RMI
+from .anchored_vwap import AnchoredVolumeWeightedAveragePrice
+from .vidya import VariableIndexDynamicAverage
+from .laguerre_rsi import LaguerreRelativeStrengthIndex
+from .rmi import RelativeMomentumIndex
 from .ssl_channel import SSLChannel
-from .jma import JMA
-from .pmax import PMAX
+from .jma import JurikMovingAverage
+from .pmax import ParabolicMovingAverageStop
 from .td_sequential import TDSequential
 from .ebsw import EvenBetterSinewave
 from .premium_discount import PremiumDiscount
@@ -88,42 +88,42 @@ from .execution import (
 )
 from .klinger_volume_oscillator import KlingerVolumeOscillator
 from .session_volume_levels import SessionVolumeLevels
-from .up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
-from .three_white_soldiers import CDL3WHITESOLDIERS, ThreeWhiteSoldiers
-from .abandoned_baby import CDLABANDONEDBABY, AbandonedBaby
-from .advance_block import CDLADVANCEBLOCK, AdvanceBlock
-from .breakaway import CDLBREAKAWAY, Breakaway
-from .conceal_baby_swall import CDLCONCEALBABYSWALL, ConcealBabySwall
-from .counter_attack import CDLCOUNTERATTACK, CounterAttack
-from .dark_cloud_cover import CDLDARKCLOUDCOVER, DarkCloudCover
-from .evening_doji_star import CDLEVENINGDOJISTAR, EveningDojiStar
-from .evening_star import CDLEVENINGSTAR, EveningStar
-from .gap_side_side_white import CDLGAPSIDESIDEWHITE, GapSideSideWhite
-from .hanging_man import CDLHANGINGMAN, HangingMan
-from .harami import CDLHARAMI, Harami
-from .harami_cross import CDLHARAMICROSS, HaramiCross
-from .homing_pigeon import CDLHOMINGPIGEON, HomingPigeon
-from .identical_three_crows import CDLIDENTICAL3CROWS, IdenticalThreeCrows
-from .in_neck import CDLINNECK, InNeck
-from .inverted_hammer import CDLINVERTEDHAMMER, InvertedHammer
-from .kicking import CDLKICKING, Kicking
-from .kicking_by_length import CDLKICKINGBYLENGTH, KickingByLength
-from .ladder_bottom import CDLLADDERBOTTOM, LadderBottom
-from .matching_low import CDLMATCHINGLOW, MatchingLow
-from .mat_hold import CDLMATHOLD, MatHold
-from .morning_doji_star import CDLMORNINGDOJISTAR, MorningDojiStar
-from .morning_star import CDLMORNINGSTAR, MorningStar
-from .on_neck import CDLONNECK, OnNeck
-from .piercing import CDLPIERCING, Piercing
-from .rise_fall_three_methods import CDLRISEFALL3METHODS, RiseFallThreeMethods
-from .separating_lines import CDLSEPARATINGLINES, SeparatingLines
-from .shooting_star import CDLSHOOTINGSTAR, ShootingStar
-from .stalled_pattern import CDLSTALLEDPATTERN, StalledPattern
-from .tasuki_gap import CDLTASUKIGAP, TasukiGap
-from .thrusting import CDLTHRUSTING, Thrusting
-from .tri_star import CDLTRISTAR, TriStar
-from .unique_three_river import CDLUNIQUE3RIVER, UniqueThreeRiver
-from .upside_gap_two_crows import CDLUPSIDEGAP2CROWS, UpsideGapTwoCrows
+from .up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
+from .three_white_soldiers import CandleThreeWhiteSoldiers
+from .abandoned_baby import CandleAbandonedBaby
+from .advance_block import CandleAdvanceBlock
+from .breakaway import CandleBreakaway
+from .conceal_baby_swall import CandleConcealBabySwall
+from .counter_attack import CandleCounterAttack
+from .dark_cloud_cover import CandleDarkCloudCover
+from .evening_doji_star import CandleEveningDojiStar
+from .evening_star import CandleEveningStar
+from .gap_side_side_white import CandleGapSideSideWhite
+from .hanging_man import CandleHangingMan
+from .harami import CandleHarami
+from .harami_cross import CandleHaramiCross
+from .homing_pigeon import CandleHomingPigeon
+from .identical_three_crows import CandleIdenticalThreeCrows
+from .in_neck import CandleInNeck
+from .inverted_hammer import CandleInvertedHammer
+from .kicking import CandleKicking
+from .kicking_by_length import CandleKickingByLength
+from .ladder_bottom import CandleLadderBottom
+from .matching_low import CandleMatchingLow
+from .mat_hold import CandleMatHold
+from .morning_doji_star import CandleMorningDojiStar
+from .morning_star import CandleMorningStar
+from .on_neck import CandleOnNeck
+from .piercing import CandlePiercing
+from .rise_fall_three_methods import CandleRiseFallThreeMethods
+from .separating_lines import CandleSeparatingLines
+from .shooting_star import CandleShootingStar
+from .stalled_pattern import CandleStalledPattern
+from .tasuki_gap import CandleTasukiGap
+from .thrusting import CandleThrusting
+from .tri_star import CandleTriStar
+from .unique_three_river import CandleUniqueThreeRiver
+from .upside_gap_two_crows import CandleUpsideGapTwoCrows
 from .lag import Lag
 from .log_return import LogReturn
 from .cumsum import Cumsum
@@ -140,21 +140,21 @@ from .rolling_iqr import RollingIqr
 from .rolling_cov import RollingCov
 from .rolling_winsorize import RollingWinsorize
 from .rolling_apply import rolling_apply
-from .ewm_var import EwmVar
-from .ewm_std import EwmStd
-from .ewm_cov import EwmCov
-from .ewm_corr import EwmCorr
+from .ewm_var import ExponentiallyWeightedVariance
+from .ewm_std import ExponentiallyWeightedStandardDeviation
+from .ewm_cov import ExponentiallyWeightedCovariance
+from .ewm_corr import ExponentiallyWeightedCorrelation
 from .cummax import Cummax
 from .cummin import Cummin
 from .drawdown import Drawdown
 from .rolling_sharpe import RollingSharpe
 from .rolling_sortino import RollingSortino
 from .rolling_calmar import RollingCalmar
-from .hma import Hma
-from .vwma import Vwma
-from .zlema import Zlema
-from .alma import Alma
-from .tsi import Tsi
+from .hma import HullMovingAverage
+from .vwma import VolumeWeightedMovingAverage
+from .zlema import ZeroLagExponentialMovingAverage
+from .alma import ArnaudLegouxMovingAverage
+from .tsi import TrueStrengthIndex
 from .awesome_oscillator import AwesomeOscillator
 from .fisher_transform import FisherTransform
 from .donchian import Donchian
@@ -166,7 +166,7 @@ from .crossunder import Crossunder
 from .cross import Cross
 from .rising import Rising
 from .falling import Falling
-from .vwap import Vwap
+from .vwap import RollingVolumeWeightedAveragePrice
 from .force_index import ForceIndex
 from .ease_of_movement import EaseOfMovement
 from .bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
@@ -177,12 +177,12 @@ from .session import SessionExtrema, session_flags
 from .previous_high_low import PreviousHighLow
 from .sessions import Sessions
 from .zones import ActiveZoneList
-from .fvg import Fvg
+from .fvg import FairValueGap
 from .donchian_channels import DonchianChannels
-from .rolling_vwap import RollingVwap
+from .rolling_vwap import RollingVolumeWeightedAveragePrice
 from .swing_highs_lows import SwingHighsLows
 from .bos_choch import BosChoch
-from .ob import Ob
+from .ob import OrderBlock
 from .liquidity import Liquidity
 from .equal_highs_lows import EqualHighsLows
 from .hedge_ratio import HedgeRatio
@@ -195,12 +195,12 @@ from .close_to_close_sigma import CloseToCloseSigma
 from .parkinson import Parkinson
 from .garman_klass import GarmanKlass
 from .rogers_satchell import RogersSatchell
-from .gk_yang_zhang import GkYangZhang
+from .gk_yang_zhang import GarmanKlassYangZhang
 from .yang_zhang import YangZhang
-from .adv import Adv
+from .adv import AverageDailyDollarValue
 from .amihud import Amihud
 from .roll_spread import RollSpread
-from .ou_half_life import OuHalfLife
+from .ou_half_life import OrnsteinUhlenbeckHalfLife
 from .cusum import Cusum
 from .spread_zscore import SpreadZscore
 from .frac_diff import FracDiff
@@ -209,79 +209,58 @@ from .supertrend import Supertrend
 from .ichimoku import Ichimoku
 from .squeeze import Squeeze
 from .squeeze_pro import SqueezePro
-from .stc import Stc
+from .stc import SchaffTrendCycle
 from .vortex import Vortex
-from .kst import Kst
+from .kst import KnowSureThing
 from .mass_index import MassIndex
-from .dpo import Dpo
-from .cmf import Cmf
-from .vpt import Vpt
-from .nvi import Nvi
-from .pvi import Pvi
+from .dpo import DetrendedPriceOscillator
+from .cmf import ChaikinMoneyFlow
+from .vpt import VolumePriceTrend
+from .nvi import NegativeVolumeIndex
+from .pvi import PositiveVolumeIndex
 from .mcginley_dynamic import McGinleyDynamic
 
 __all__ = [
     "talib",
     "MovingAverage",
     "MinusDirectionalIndicator",
-    "MINUS_DI",
     "MinusDirectionalMovement",
-    "MINUS_DM",
     "MoneyFlowIndex",
-    "MFI",
     "MovingAverageConvergenceDivergenceFixed",
     "MovingAverageConvergenceDivergenceExtended",
     "BollingerBands",
     "CommodityChannelIndex",
-    "CCI",
     "FastStochasticOscillator",
     "HilbertTransformTrendline",
-    "Hikkake",
-    "CDLHIKKAKE",
-    "HikkakeModified",
-    "CDLHIKKAKEMOD",
-    "Hammer",
-    "CDLHAMMER",
+    "CandleHikkake",
+    "CandleHikkakeModified",
+    "CandleHammer",
     "HilbertTransformDominantCyclePeriod",
-    "HT_DCPERIOD",
     "HilbertTransformDominantCyclePhase",
-    "HT_DCPHASE",
     "HilbertTransformPhasor",
-    "HT_PHASOR",
     "HilbertTransformSineWave",
-    "HT_SINE",
     "HilbertTransformTrendMode",
-    "HT_TRENDMODE",
     "StochasticOscillator",
     "StochasticRelativeStrengthIndex",
-    "StickSandwich",
-    "CDLSTICKSANDWICH",
+    "CandleStickSandwich",
     "TripleExponentialRateOfChange",
-    "TRIX",
-    "ThreeBlackCrows",
-    "CDL3BLACKCROWS",
-    "ThreeInside",
-    "CDL3INSIDE",
-    "ThreeLineStrike",
-    "CDL3LINESTRIKE",
-    "ThreeStarsInSouth",
-    "CDL3STARSINSOUTH",
-    "ThreeOutside",
-    "CDL3OUTSIDE",
-    "TwoCrows",
-    "CDL2CROWS",
+    "CandleThreeBlackCrows",
+    "CandleThreeInside",
+    "CandleThreeLineStrike",
+    "CandleThreeStarsInSouth",
+    "CandleThreeOutside",
+    "CandleTwoCrows",
     "UltimateOscillator",
-    "ULTOSC",
     "VariablePeriodMovingAverage",
     "HeikinAshi",
     "FibonacciRetracement",
-    "AnchoredVWAP",
-    "VIDYA",
-    "LaguerreRSI",
-    "RMI",
+    "AnchoredVolumeWeightedAveragePrice",
+    "VariableIndexDynamicAverage",
+    "LaguerreRelativeStrengthIndex",
+    "RelativeMomentumIndex",
     "SSLChannel",
-    "JMA",
-    "PMAX",
+    "JurikMovingAverage",
+    "ParabolicMovingAverageStop",
     "TDSequential",
     "EvenBetterSinewave",
     "PremiumDiscount",
@@ -297,95 +276,41 @@ __all__ = [
     "adapt_input",
     "KlingerVolumeOscillator",
     "SessionVolumeLevels",
-    "UpDownSideGapThreeMethods",
-    "CDLXSIDEGAP3METHODS",
+    "CandleUpDownSideGapThreeMethods",
     "IntradayMomentumIndex",
     "AccelerationBands",
     "AverageDirectionalIndex",
     "AverageDirectionalIndexRating",
     "DirectionalMovementIndex",
-    "Doji",
-    "Takuri",
-    "CDLTAKURI",
-    "Marubozu",
-    "CDLMARUBOZU",
-    "ClosingMarubozu",
-    "CDLCLOSINGMARUBOZU",
-    "LongLeggedDoji",
-    "CDLLONGLEGGEDDOJI",
-    "Rickshawman",
-    "CDLRICKSHAWMAN",
-    "HighWave",
-    "CDLHIGHWAVE",
-    "DragonflyDoji",
-    "CDLDRAGONFLYDOJI",
-    "GravestoneDoji",
-    "CDLGRAVESTONEDOJI",
-    "ShortLine", "CDLSHORTLINE",
-    "SpinningTop", "CDLSPINNINGTOP",
-    "LongLine", "CDLLONGLINE",
-    "DojiStar", "CDLDOJISTAR",
-    "BeltHold", "CDLBELTHOLD",
-    "CDLDOJI",
-    "Engulfing",
-    "CDLENGULFING",
+    "CandleDoji",
+    "CandleTakuri",
+    "CandleMarubozu",
+    "CandleClosingMarubozu",
+    "CandleLongLeggedDoji",
+    "CandleRickshawman",
+    "CandleHighWave",
+    "CandleDragonflyDoji",
+    "CandleGravestoneDoji",
+    "CandleShortLine",     "CandleSpinningTop",     "CandleLongLine",     "CandleDojiStar",     "CandleBeltHold",     "CandleEngulfing",
     "ExponentialMovingAverage",
-    "EMA",
     "ParabolicSar",
     "ParabolicSarExtended",
     "PlusDirectionalIndicator",
-    "PLUS_DI",
     "PlusDirectionalMovement",
-    "PLUS_DM",
-    "ThreeWhiteSoldiers", "CDL3WHITESOLDIERS",
-    "AbandonedBaby", "CDLABANDONEDBABY",
-    "AdvanceBlock", "CDLADVANCEBLOCK",
-    "Breakaway", "CDLBREAKAWAY",
-    "ConcealBabySwall", "CDLCONCEALBABYSWALL",
-    "CounterAttack", "CDLCOUNTERATTACK",
-    "DarkCloudCover", "CDLDARKCLOUDCOVER",
-    "EveningDojiStar", "CDLEVENINGDOJISTAR",
-    "EveningStar", "CDLEVENINGSTAR",
-    "GapSideSideWhite", "CDLGAPSIDESIDEWHITE",
-    "HangingMan", "CDLHANGINGMAN",
-    "Harami", "CDLHARAMI",
-    "HaramiCross", "CDLHARAMICROSS",
-    "HomingPigeon", "CDLHOMINGPIGEON",
-    "IdenticalThreeCrows", "CDLIDENTICAL3CROWS",
-    "InNeck", "CDLINNECK",
-    "InvertedHammer", "CDLINVERTEDHAMMER",
-    "Kicking", "CDLKICKING",
-    "KickingByLength", "CDLKICKINGBYLENGTH",
-    "LadderBottom", "CDLLADDERBOTTOM",
-    "MatchingLow", "CDLMATCHINGLOW",
-    "MatHold", "CDLMATHOLD",
-    "MorningDojiStar", "CDLMORNINGDOJISTAR",
-    "MorningStar", "CDLMORNINGSTAR",
-    "OnNeck", "CDLONNECK",
-    "Piercing", "CDLPIERCING",
-    "RiseFallThreeMethods", "CDLRISEFALL3METHODS",
-    "SeparatingLines", "CDLSEPARATINGLINES",
-    "ShootingStar", "CDLSHOOTINGSTAR",
-    "StalledPattern", "CDLSTALLEDPATTERN",
-    "TasukiGap", "CDLTASUKIGAP",
-    "Thrusting", "CDLTHRUSTING",
-    "TriStar", "CDLTRISTAR",
-    "UniqueThreeRiver", "CDLUNIQUE3RIVER",
-    "UpsideGapTwoCrows", "CDLUPSIDEGAP2CROWS",
-    "Lag", "LogReturn", "Cumsum", "Cumprod", "RollingMedian", "RollingMode",
+    "CandleThreeWhiteSoldiers",     "CandleAbandonedBaby",     "CandleAdvanceBlock",     "CandleBreakaway",     "CandleConcealBabySwall",     "CandleCounterAttack",     "CandleDarkCloudCover",     "CandleEveningDojiStar",     "CandleEveningStar",     "CandleGapSideSideWhite",     "CandleHangingMan",     "CandleHarami",     "CandleHaramiCross",     "CandleHomingPigeon",     "CandleIdenticalThreeCrows",     "CandleInNeck",     "CandleInvertedHammer",     "CandleKicking",     "CandleKickingByLength",     "CandleLadderBottom",     "CandleMatchingLow",     "CandleMatHold",     "CandleMorningDojiStar",     "CandleMorningStar",     "CandleOnNeck",     "CandlePiercing",     "CandleRiseFallThreeMethods",     "CandleSeparatingLines",     "CandleShootingStar",     "CandleStalledPattern",     "CandleTasukiGap",     "CandleThrusting",     "CandleTriStar",     "CandleUniqueThreeRiver",     "CandleUpsideGapTwoCrows",     "Lag", "LogReturn", "Cumsum", "Cumprod", "RollingMedian", "RollingMode",
     "RollingQuantile", "RollingPercentile", "RollingRank", "RollingZscore",
     "RollingSkew", "RollingKurtosis", "RollingIqr",
     "RollingCov", "RollingWinsorize",
     "rolling_apply",
-    "EwmVar", "EwmStd", "EwmCov", "EwmCorr",
+    "ExponentiallyWeightedVariance", "ExponentiallyWeightedStandardDeviation", "ExponentiallyWeightedCovariance", "ExponentiallyWeightedCorrelation",
     "Cummax", "Cummin", "Drawdown",
     "RollingSharpe", "RollingSortino", "RollingCalmar",
-    "Hma", "Vwma", "Zlema", "Alma",
-    "Tsi", "AwesomeOscillator", "FisherTransform",
+    "HullMovingAverage", "VolumeWeightedMovingAverage", "ZeroLagExponentialMovingAverage", "ArnaudLegouxMovingAverage",
+    "TrueStrengthIndex", "AwesomeOscillator", "FisherTransform",
     "Donchian", "UlcerIndex",
     "KeltnerChannels", "ChaikinVolatility",
     "Crossover", "Crossunder", "Cross", "Rising", "Falling",
-    "Vwap", "ForceIndex", "EaseOfMovement",
+    "RollingVolumeWeightedAveragePrice", "ForceIndex", "EaseOfMovement",
     "HigherHigh", "LowerLow", "InsideBar", "OutsideBar", "GapUp", "GapDown",
     "BarsSince", "ValueWhen", "HighestSince", "LowestSince",
     "SignalDelay",
@@ -396,18 +321,18 @@ __all__ = [
     "SessionExtrema", "session_flags",
     "PreviousHighLow", "Sessions",
     "ActiveZoneList",
-    "Fvg",
-    "DonchianChannels", "RollingVwap", "SwingHighsLows",
+    "FairValueGap",
+    "DonchianChannels", "RollingVolumeWeightedAveragePrice", "SwingHighsLows",
     "BosChoch",
-    "Ob",
+    "OrderBlock",
     "Liquidity",
     "EqualHighsLows",
     "HedgeRatio",
     "RollingEntropy", "RollingAutocorr",
     "Hurst", "FractalDimension",
     "RollingAlpha", "RollingInformationRatio",
-    "CloseToCloseSigma", "Parkinson", "GarmanKlass", "RogersSatchell", "GkYangZhang", "YangZhang",
-    "Adv", "Amihud", "RollSpread", "OuHalfLife", "Cusum",
+    "CloseToCloseSigma", "Parkinson", "GarmanKlass", "RogersSatchell", "GarmanKlassYangZhang", "YangZhang",
+    "AverageDailyDollarValue", "Amihud", "RollSpread", "OrnsteinUhlenbeckHalfLife", "Cusum",
     "SpreadZscore",
     "FracDiff",
     "KalmanHedgeRatio",
@@ -415,15 +340,15 @@ __all__ = [
     "Ichimoku",
     "Squeeze",
     "SqueezePro",
-    "Stc",
+    "SchaffTrendCycle",
     "Vortex",
-    "Kst",
+    "KnowSureThing",
     "MassIndex",
-    "Dpo",
-    "Cmf",
-    "Vpt",
-    "Nvi",
-    "Pvi",
+    "DetrendedPriceOscillator",
+    "ChaikinMoneyFlow",
+    "VolumePriceTrend",
+    "NegativeVolumeIndex",
+    "PositiveVolumeIndex",
     "McGinleyDynamic",
     "__version__",
 ]

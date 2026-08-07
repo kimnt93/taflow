@@ -1,6 +1,11 @@
-"""PMAX trend/risk line using EMA and Wilder ATR."""
+"""ParabolicMovingAverageStop trend/risk line using EMA and Wilder ATR."""
 import numpy as np
-class PMAX:
+class ParabolicMovingAverageStop:
+    """Stateful ParabolicMovingAverageStop indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high=None, low=None, close=None, length=10, multiplier=3.):
         self.length=int(length); self.multiplier=float(multiplier); self.reset()
         if close is not None: self.extend(high,low,close)

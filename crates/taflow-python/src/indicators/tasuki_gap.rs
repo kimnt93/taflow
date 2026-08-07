@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlTasukiGap;
+use taflow::stream::CandleTasukiGap as CandleTasukiGapState;
 #[pyclass]
-pub struct TasukiGap {
-    inner: CdlTasukiGap,
+/// Stateful CandleTasukiGap candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleTasukiGap {
+    inner: CandleTasukiGapState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl TasukiGap {
+impl CandleTasukiGap {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlTasukiGap::new(),
+            inner: CandleTasukiGapState::new(),
             outputs: vec![],
         }
     }

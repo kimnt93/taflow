@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlMatchingLow;
+use taflow::stream::CandleMatchingLow as CandleMatchingLowState;
 #[pyclass]
-pub struct MatchingLow {
-    inner: CdlMatchingLow,
+/// Stateful CandleMatchingLow candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleMatchingLow {
+    inner: CandleMatchingLowState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl MatchingLow {
+impl CandleMatchingLow {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlMatchingLow::new(),
+            inner: CandleMatchingLowState::new(),
             outputs: vec![],
         }
     }

@@ -1,6 +1,11 @@
 """Rolling Fibonacci retracement levels."""
 import numpy as np
 class FibonacciRetracement:
+    """Stateful FibonacciRetracement indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None, window=120):
         if int(window)<1: raise ValueError("window must be positive")
         self.window=int(window); self.reset()

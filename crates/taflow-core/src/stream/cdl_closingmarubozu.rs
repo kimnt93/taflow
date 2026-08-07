@@ -3,7 +3,7 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLCLOSINGMARUBOZU state using TA-Lib's rolling body and range averages.
-pub struct CdlClosingMarubozu {
+pub struct CandleClosingMarubozu {
     bodies: VecDeque<f64>,
     body_sum: f64,
     ranges: VecDeque<f64>,
@@ -11,13 +11,13 @@ pub struct CdlClosingMarubozu {
     value: Option<i32>,
 }
 
-impl Default for CdlClosingMarubozu {
+impl Default for CandleClosingMarubozu {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl CdlClosingMarubozu {
+impl CandleClosingMarubozu {
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -74,7 +74,7 @@ mod tests {
             .map(|(i, x)| x + if i % 4 == 0 { -1.0 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_closingmarubozu(&open, &high, &low, &close).unwrap();
-        let mut state = CdlClosingMarubozu::new();
+        let mut state = CandleClosingMarubozu::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

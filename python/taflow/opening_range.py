@@ -1,6 +1,11 @@
 """Opening range high/low and breakout flags."""
 import numpy as np
 class OpeningRange:
+    """Stateful OpeningRange indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high=None, low=None, close=None, anchor=None, bars= opening if False else 30):
         self.bars=int(bars); self.reset()
         if close is not None: self.extend(high,low,close,anchor)

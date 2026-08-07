@@ -4,6 +4,11 @@ import numpy as np
 from ._native import RollingWinsorizeOperator as _Native
 from ._series import as_float64_series
 class RollingWinsorize:
+    """Stateful RollingWinsorize indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, timeperiod: int, lower: float = .05, upper: float = .95, input: Any | None = None):
         self._state = _Native(timeperiod, lower, upper)
         if input is not None: self.extend(input)

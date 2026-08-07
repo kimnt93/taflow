@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlHarami;
+use taflow::stream::CandleHarami as CandleHaramiState;
 #[pyclass]
-pub struct Harami {
-    inner: CdlHarami,
+/// Stateful CandleHarami candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleHarami {
+    inner: CandleHaramiState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl Harami {
+impl CandleHarami {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlHarami::new(),
+            inner: CandleHaramiState::new(),
             outputs: vec![],
         }
     }

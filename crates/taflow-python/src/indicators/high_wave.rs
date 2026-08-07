@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlHighWave;
+use taflow::stream::CandleHighWave as CandleHighWaveState;
 #[pyclass]
-pub struct HighWave {
-    inner: CdlHighWave,
+/// Stateful CandleHighWave candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleHighWave {
+    inner: CandleHighWaveState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl HighWave {
+impl CandleHighWave {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlHighWave::new(),
+            inner: CandleHighWaveState::new(),
             outputs: Vec::new(),
         }
     }

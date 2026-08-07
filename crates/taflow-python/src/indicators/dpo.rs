@@ -1,17 +1,17 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Dpo;
+use taflow::stream::DetrendedPriceOscillator;
 
 #[pyclass]
-pub struct DpoOperator { inner: Dpo, values: Vec<f64> }
+pub struct DpoOperator { inner: DetrendedPriceOscillator, values: Vec<f64> }
 
 #[pymethods]
 impl DpoOperator {
     #[new]
     #[pyo3(signature = (period=20))]
     fn new(period: usize) -> PyResult<Self> {
-        Ok(Self { inner: Dpo::new(period).map_err(|error| PyValueError::new_err(error.to_string()))?, values: Vec::new() })
+        Ok(Self { inner: DetrendedPriceOscillator::new(period).map_err(|error| PyValueError::new_err(error.to_string()))?, values: Vec::new() })
     }
 
     fn append(&mut self, close: f64) -> Option<f64> {

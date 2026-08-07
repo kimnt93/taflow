@@ -1,20 +1,21 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlTakuri;
-
+use taflow::stream::CandleTakuri as CandleTakuriState;
 #[pyclass]
-pub struct Takuri {
-    inner: CdlTakuri,
+/// Stateful CandleTakuri candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleTakuri {
+    inner: CandleTakuriState,
     outputs: Vec<i32>,
 }
 
 #[pymethods]
-impl Takuri {
+impl CandleTakuri {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlTakuri::new(),
+            inner: CandleTakuriState::new(),
             outputs: Vec::new(),
         }
     }

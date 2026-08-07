@@ -4,6 +4,11 @@ import numpy as np
 from ._native import ForceIndexOperator as _Native
 from ._series import as_float64_series
 class ForceIndex:
+    """Stateful ForceIndex indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self,close:Any|None=None,volume:Any|None=None):self._state=_Native();self.extend(close,volume) if close is not None or volume is not None else None
     def append(self,close:float,volume:float):self._state.append(close,volume);return self
     def extend(self,close:Any,volume:Any):self._state.extend(as_float64_series(close),as_float64_series(volume));return self

@@ -6,6 +6,11 @@ from ._series import as_float64_series
 
 
 class Hurst:
+    """Stateful Hurst indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, input: Any | None = None, timeperiod: int = 20):
         self._state = _Native(timeperiod)
         self.extend(input) if input is not None else None

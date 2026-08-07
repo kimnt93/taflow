@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlConcealBabySwall;
+use taflow::stream::CandleConcealBabySwall as CandleConcealBabySwallState;
 #[pyclass]
-pub struct ConcealBabySwall {
-    inner: CdlConcealBabySwall,
+/// Stateful CandleConcealBabySwall candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleConcealBabySwall {
+    inner: CandleConcealBabySwallState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl ConcealBabySwall {
+impl CandleConcealBabySwall {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlConcealBabySwall::new(),
+            inner: CandleConcealBabySwallState::new(),
             outputs: vec![],
         }
     }

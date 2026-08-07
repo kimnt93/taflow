@@ -85,6 +85,5 @@ class CommodityChannelIndex:
         return len(self._state)
 
 
-CCI = CommodityChannelIndex
 
-__all__ = ["CommodityChannelIndex", "CCI"]
+__all__ = ["CommodityChannelIndex"]

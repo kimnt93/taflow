@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlHangingMan;
+use taflow::stream::CandleHangingMan as CandleHangingManState;
 #[pyclass]
-pub struct HangingMan {
-    inner: CdlHangingMan,
+/// Stateful CandleHangingMan candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleHangingMan {
+    inner: CandleHangingManState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl HangingMan {
+impl CandleHangingMan {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlHangingMan::new(),
+            inner: CandleHangingManState::new(),
             outputs: vec![],
         }
     }

@@ -27,6 +27,22 @@ Rules:
   second implementation, never Python math.
 - Functions with no TA-Lib counterpart (SMC, rolling_median, …) exist only
   in `taflow` and never get a fake uppercase alias.
+- Canonical interface names are descriptive words, not TA-Lib acronyms. For
+  example, `ChaikinMoneyFlow`/`chaikin_money_flow` is canonical while `MFI`
+  remains only in `taflow.talib`.
+- Every Python stateful indicator constructor accepts its complete input
+  series signature (for example `high`, `low`, `close`, and `volume`) in
+  addition to configuration parameters. Passing those series at construction
+  time is equivalent to calling `extend`; later updates use `append` or
+  `extend` with the same names and order.
+- Public Python and Rust names match their canonical descriptive spelling;
+  candle-pattern interfaces use `Candle...`/`candle_...`. Each public
+  function has a multi-line docstring or Rust documentation comment that
+  describes inputs, parameters, and return values.
+- Python must remain an adapter only: every numerical operation behind a
+  public indicator must be implemented by a Rust kernel in
+  `crates/taflow-core` and exposed through the native binding. Pure-Python
+  numerical implementations are review failures until ported.
 
 ## 2. Grouping and rename map
 
@@ -35,17 +51,17 @@ Rules:
 | Group | Contents | taflow naming |
 |---|---|---|
 | `rolling` | rolling-window math/statistics (from TA-Lib Math Operators + Statistic families and the operator checklist) | **mandatory `rolling_` prefix** |
-| `ma` | moving averages: sma, ema, wma, dema, tema, trima, kama, t3, mama, hma, zlema, alma, vwma, jma, vidya, mcginley | indicator names (trader vocabulary), lowercase |
-| `momentum` | rsi, macd, stoch, adx, cci, willr, tsi, fisher, … | lowercase indicator names |
+| `ma` | moving averages: sma, ema, wma, dema, tema, trima, kama, t3, mama, hull_moving_average, zero_lag_exponential_moving_average, arnaud_legoux_moving_average, volume_weighted_moving_average, jma, vidya, mcginley | indicator names (trader vocabulary), lowercase |
+| `momentum` | rsi, macd, stoch, adx, cci, willr, true_strength_index, fisher, … | lowercase indicator names |
 | `volatility` | atr, natr, true_range, keltner, donchian, ulcer_index, chaikin_volatility + `rv` estimators (parkinson, garman_klass, rogers_satchell, yang_zhang) | lowercase |
-| `volume` | ad, adosc, obv, cmf, force_index, eom, kvo, vpt, nvi, pvi, rolling_vwap | lowercase |
+| `volume` | ad, adosc, obv, chaikin_money_flow, force_index, eom, kvo, volume_price_trend, negative_volume_index, positive_volume_index, rolling_vwap | lowercase |
 | `price` | avg_price, median_price, typical_price, weighted_close | lowercase descriptive |
 | `math` | pointwise transforms (acos … tanh) — NOT rolling, no prefix | lowercase |
-| `pattern` | 61 candle patterns | `cdl_` prefix: `cdl_doji`, `cdl_engulfing`, … |
+| `pattern` | 61 candle patterns | `candle_` prefix: `candle_doji`, `candle_engulfing`, … |
 | `cycle` | Hilbert family | `ht_` prefix |
-| `smc` | fvg, swing_highs_lows, bos_choch, ob, liquidity, … | per recommend checklist P1 |
+| `smc` | fair_value_gap, swing_highs_lows, bos_choch, order_block, liquidity, … | per recommend checklist P1 |
 | `session` | anchored_vwap, pivot_points, opening_range, session volume levels | lowercase |
-| `quant` | kalman_hedge_ratio, ou_half_life, spread_zscore, cusum, frac_diff, amihud, roll_spread | lowercase |
+| `quant` | kalman_hedge_ratio, ornstein_uhlenbeck_half_life, spread_zscore, cusum, frac_diff, amihud, roll_spread | lowercase |
 | `ops` | ts_rank, signedpower, lag, crossover helpers | lowercase |
 
 ### Rolling rename rule (the important one)
@@ -187,67 +203,67 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | ht_phasor | ht_phasor | HT_PHASOR |
 | [ ] | ht_sine | ht_sine | HT_SINE |
 | [ ] | ht_trendmode | ht_trendmode | HT_TRENDMODE |
-| [ ] | cdl_2crows | cdl_2crows | CDL2CROWS |
-| [ ] | cdl_3blackcrows | cdl_3blackcrows | CDL3BLACKCROWS |
-| [ ] | cdl_3inside | cdl_3inside | CDL3INSIDE |
-| [ ] | cdl_3linestrike | cdl_3linestrike | CDL3LINESTRIKE |
-| [ ] | cdl_3outside | cdl_3outside | CDL3OUTSIDE |
-| [ ] | cdl_3starsinsouth | cdl_3starsinsouth | CDL3STARSINSOUTH |
-| [ ] | cdl_3whitesoldiers | cdl_3whitesoldiers | CDL3WHITESOLDIERS |
-| [ ] | cdl_abandonedbaby | cdl_abandonedbaby | CDLABANDONEDBABY |
-| [ ] | cdl_advanceblock | cdl_advanceblock | CDLADVANCEBLOCK |
-| [ ] | cdl_belthold | cdl_belthold | CDLBELTHOLD |
-| [ ] | cdl_breakaway | cdl_breakaway | CDLBREAKAWAY |
-| [ ] | cdl_closingmarubozu | cdl_closingmarubozu | CDLCLOSINGMARUBOZU |
-| [ ] | cdl_concealbabyswall | cdl_concealbabyswall | CDLCONCEALBABYSWALL |
-| [ ] | cdl_counterattack | cdl_counterattack | CDLCOUNTERATTACK |
-| [ ] | cdl_darkcloudcover | cdl_darkcloudcover | CDLDARKCLOUDCOVER |
-| [ ] | cdl_doji | cdl_doji | CDLDOJI |
-| [ ] | cdl_dojistar | cdl_dojistar | CDLDOJISTAR |
-| [ ] | cdl_dragonflydoji | cdl_dragonflydoji | CDLDRAGONFLYDOJI |
-| [ ] | cdl_engulfing | cdl_engulfing | CDLENGULFING |
-| [ ] | cdl_eveningdojistar | cdl_eveningdojistar | CDLEVENINGDOJISTAR |
-| [ ] | cdl_eveningstar | cdl_eveningstar | CDLEVENINGSTAR |
-| [ ] | cdl_gapsidesidewhite | cdl_gapsidesidewhite | CDLGAPSIDESIDEWHITE |
-| [ ] | cdl_gravestonedoji | cdl_gravestonedoji | CDLGRAVESTONEDOJI |
-| [ ] | cdl_hammer | cdl_hammer | CDLHAMMER |
-| [ ] | cdl_hangingman | cdl_hangingman | CDLHANGINGMAN |
-| [ ] | cdl_harami | cdl_harami | CDLHARAMI |
-| [ ] | cdl_haramicross | cdl_haramicross | CDLHARAMICROSS |
-| [ ] | cdl_highwave | cdl_highwave | CDLHIGHWAVE |
-| [ ] | cdl_hikkake | cdl_hikkake | CDLHIKKAKE |
-| [ ] | cdl_hikkakemod | cdl_hikkakemod | CDLHIKKAKEMOD |
-| [ ] | cdl_homingpigeon | cdl_homingpigeon | CDLHOMINGPIGEON |
-| [ ] | cdl_identical3crows | cdl_identical3crows | CDLIDENTICAL3CROWS |
-| [ ] | cdl_inneck | cdl_inneck | CDLINNECK |
-| [ ] | cdl_invertedhammer | cdl_invertedhammer | CDLINVERTEDHAMMER |
-| [ ] | cdl_kicking | cdl_kicking | CDLKICKING |
-| [ ] | cdl_kickingbylength | cdl_kickingbylength | CDLKICKINGBYLENGTH |
-| [ ] | cdl_ladderbottom | cdl_ladderbottom | CDLLADDERBOTTOM |
-| [ ] | cdl_longleggeddoji | cdl_longleggeddoji | CDLLONGLEGGEDDOJI |
-| [ ] | cdl_longline | cdl_longline | CDLLONGLINE |
-| [ ] | cdl_marubozu | cdl_marubozu | CDLMARUBOZU |
-| [ ] | cdl_matchinglow | cdl_matchinglow | CDLMATCHINGLOW |
-| [ ] | cdl_mathold | cdl_mathold | CDLMATHOLD |
-| [ ] | cdl_morningdojistar | cdl_morningdojistar | CDLMORNINGDOJISTAR |
-| [ ] | cdl_morningstar | cdl_morningstar | CDLMORNINGSTAR |
-| [ ] | cdl_onneck | cdl_onneck | CDLONNECK |
-| [ ] | cdl_piercing | cdl_piercing | CDLPIERCING |
-| [ ] | cdl_rickshawman | cdl_rickshawman | CDLRICKSHAWMAN |
-| [ ] | cdl_risefall3methods | cdl_risefall3methods | CDLRISEFALL3METHODS |
-| [ ] | cdl_separatinglines | cdl_separatinglines | CDLSEPARATINGLINES |
-| [ ] | cdl_shootingstar | cdl_shootingstar | CDLSHOOTINGSTAR |
-| [ ] | cdl_shortline | cdl_shortline | CDLSHORTLINE |
-| [ ] | cdl_spinningtop | cdl_spinningtop | CDLSPINNINGTOP |
-| [ ] | cdl_stalledpattern | cdl_stalledpattern | CDLSTALLEDPATTERN |
-| [ ] | cdl_sticksandwich | cdl_sticksandwich | CDLSTICKSANDWICH |
-| [ ] | cdl_takuri | cdl_takuri | CDLTAKURI |
-| [ ] | cdl_tasukigap | cdl_tasukigap | CDLTASUKIGAP |
-| [ ] | cdl_thrusting | cdl_thrusting | CDLTHRUSTING |
-| [ ] | cdl_tristar | cdl_tristar | CDLTRISTAR |
-| [ ] | cdl_unique3river | cdl_unique3river | CDLUNIQUE3RIVER |
-| [ ] | cdl_upsidegap2crows | cdl_upsidegap2crows | CDLUPSIDEGAP2CROWS |
-| [ ] | cdl_xsidegap3methods | cdl_xsidegap3methods | CDLXSIDEGAP3METHODS |
+| [ ] | candle_2crows | candle_2crows | CDL2CROWS |
+| [ ] | candle_3blackcrows | candle_3blackcrows | CDL3BLACKCROWS |
+| [ ] | candle_3inside | candle_3inside | CDL3INSIDE |
+| [ ] | candle_3linestrike | candle_3linestrike | CDL3LINESTRIKE |
+| [ ] | candle_3outside | candle_3outside | CDL3OUTSIDE |
+| [ ] | candle_3starsinsouth | candle_3starsinsouth | CDL3STARSINSOUTH |
+| [ ] | candle_3whitesoldiers | candle_3whitesoldiers | CDL3WHITESOLDIERS |
+| [ ] | candle_abandonedbaby | candle_abandonedbaby | CDLABANDONEDBABY |
+| [ ] | candle_advanceblock | candle_advanceblock | CDLADVANCEBLOCK |
+| [ ] | candle_belthold | candle_belthold | CDLBELTHOLD |
+| [ ] | candle_breakaway | candle_breakaway | CDLBREAKAWAY |
+| [ ] | candle_closingmarubozu | candle_closingmarubozu | CDLCLOSINGMARUBOZU |
+| [ ] | candle_concealbabyswall | candle_concealbabyswall | CDLCONCEALBABYSWALL |
+| [ ] | candle_counterattack | candle_counterattack | CDLCOUNTERATTACK |
+| [ ] | candle_darkcloudcover | candle_darkcloudcover | CDLDARKCLOUDCOVER |
+| [ ] | candle_doji | candle_doji | CDLDOJI |
+| [ ] | candle_dojistar | candle_dojistar | CDLDOJISTAR |
+| [ ] | candle_dragonflydoji | candle_dragonflydoji | CDLDRAGONFLYDOJI |
+| [ ] | candle_engulfing | candle_engulfing | CDLENGULFING |
+| [ ] | candle_eveningdojistar | candle_eveningdojistar | CDLEVENINGDOJISTAR |
+| [ ] | candle_eveningstar | candle_eveningstar | CDLEVENINGSTAR |
+| [ ] | candle_gapsidesidewhite | candle_gapsidesidewhite | CDLGAPSIDESIDEWHITE |
+| [ ] | candle_gravestonedoji | candle_gravestonedoji | CDLGRAVESTONEDOJI |
+| [ ] | candle_hammer | candle_hammer | CDLHAMMER |
+| [ ] | candle_hangingman | candle_hangingman | CDLHANGINGMAN |
+| [ ] | candle_harami | candle_harami | CDLHARAMI |
+| [ ] | candle_haramicross | candle_haramicross | CDLHARAMICROSS |
+| [ ] | candle_highwave | candle_highwave | CDLHIGHWAVE |
+| [ ] | candle_hikkake | candle_hikkake | CDLHIKKAKE |
+| [ ] | candle_hikkakemod | candle_hikkakemod | CDLHIKKAKEMOD |
+| [ ] | candle_homingpigeon | candle_homingpigeon | CDLHOMINGPIGEON |
+| [ ] | candle_identical3crows | candle_identical3crows | CDLIDENTICAL3CROWS |
+| [ ] | candle_inneck | candle_inneck | CDLINNECK |
+| [ ] | candle_invertedhammer | candle_invertedhammer | CDLINVERTEDHAMMER |
+| [ ] | candle_kicking | candle_kicking | CDLKICKING |
+| [ ] | candle_kickingbylength | candle_kickingbylength | CDLKICKINGBYLENGTH |
+| [ ] | candle_ladderbottom | candle_ladderbottom | CDLLADDERBOTTOM |
+| [ ] | candle_longleggeddoji | candle_longleggeddoji | CDLLONGLEGGEDDOJI |
+| [ ] | candle_longline | candle_longline | CDLLONGLINE |
+| [ ] | candle_marubozu | candle_marubozu | CDLMARUBOZU |
+| [ ] | candle_matchinglow | candle_matchinglow | CDLMATCHINGLOW |
+| [ ] | candle_mathold | candle_mathold | CDLMATHOLD |
+| [ ] | candle_morningdojistar | candle_morningdojistar | CDLMORNINGDOJISTAR |
+| [ ] | candle_morningstar | candle_morningstar | CDLMORNINGSTAR |
+| [ ] | candle_onneck | candle_onneck | CDLONNECK |
+| [ ] | candle_piercing | candle_piercing | CDLPIERCING |
+| [ ] | candle_rickshawman | candle_rickshawman | CDLRICKSHAWMAN |
+| [ ] | candle_risefall3methods | candle_risefall3methods | CDLRISEFALL3METHODS |
+| [ ] | candle_separatinglines | candle_separatinglines | CDLSEPARATINGLINES |
+| [ ] | candle_shootingstar | candle_shootingstar | CDLSHOOTINGSTAR |
+| [ ] | candle_shortline | candle_shortline | CDLSHORTLINE |
+| [ ] | candle_spinningtop | candle_spinningtop | CDLSPINNINGTOP |
+| [ ] | candle_stalledpattern | candle_stalledpattern | CDLSTALLEDPATTERN |
+| [ ] | candle_sticksandwich | candle_sticksandwich | CDLSTICKSANDWICH |
+| [ ] | candle_takuri | candle_takuri | CDLTAKURI |
+| [ ] | candle_tasukigap | candle_tasukigap | CDLTASUKIGAP |
+| [ ] | candle_thrusting | candle_thrusting | CDLTHRUSTING |
+| [ ] | candle_tristar | candle_tristar | CDLTRISTAR |
+| [ ] | candle_unique3river | candle_unique3river | CDLUNIQUE3RIVER |
+| [ ] | candle_upsidegap2crows | candle_upsidegap2crows | CDLUPSIDEGAP2CROWS |
+| [ ] | candle_xsidegap3methods | candle_xsidegap3methods | CDLXSIDEGAP3METHODS |
 | [x] | ad | ad | AD |
 | [x] | adosc | adosc | ADOSC |
 | [x] | obv | obv | OBV |
@@ -294,11 +310,11 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_sharpe | rolling_sharpe | _ |
 | [x] | rolling_sortino | rolling_sortino | _ |
 | [x] | rolling_calmar | rolling_calmar | _ |
-| [x] | hma | hma | _ |
-| [x] | vwma | vwma | _ |
-| [x] | zlema | zlema | _ |
-| [x] | alma | alma | _ |
-| [x] | tsi | tsi | _ |
+| [x] | hull_moving_average | hull_moving_average | _ |
+| [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
+| [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |
+| [x] | arnaud_legoux_moving_average | arnaud_legoux_moving_average | _ |
+| [x] | true_strength_index | true_strength_index | _ |
 | [x] | awesome_oscillator | awesome_oscillator | _ |
 | [x] | fisher_transform | fisher_transform | _ |
 | [x] | keltner_channels | keltner_channels | _ |
@@ -331,44 +347,44 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | fractal_dimension | fractal_dimension | _ |
 | [x] | rolling_alpha | rolling_alpha | _ |
 | [x] | rolling_information_ratio | rolling_information_ratio | _ |
-| [x] | fvg | fvg | _ |
+| [x] | fair_value_gap | fair_value_gap | _ |
 | [x] | bos_choch | bos_choch | _ |
-| [x] | ob | ob | _ |
+| [x] | order_block | order_block | _ |
 | [x] | liquidity | liquidity | _ |
 | [x] | equal_highs_lows | equal_highs_lows | _ |
 | [x] | previous_high_low | previous_high_low | _ |
 | [x] | sessions | sessions | _ |
 | [x] | retracements | retracements | _ |
-| [x] | premium_discount | premium_discount | _ |
+| [ ] | premium_discount | premium_discount | _ |
 | [x] | supertrend | supertrend | _ |
 | [x] | ichimoku | ichimoku | _ |
 | [x] | squeeze | squeeze | _ |
 | [x] | squeeze_pro | squeeze_pro | _ |
-| [x] | schaff_trend_cycle | stc | _ |
+| [x] | schaff_trend_cycle | schaff_trend_cycle | _ |
 | [x] | vortex | vortex | _ |
-| [x] | kst | kst | _ |
+| [x] | know_sure_thing | know_sure_thing | _ |
 | [x] | mass_index | mass_index | _ |
-| [x] | dpo | dpo | _ |
-| [x] | cmf | cmf | _ |
+| [x] | detrended_price_oscillator | detrended_price_oscillator | _ |
+| [x] | chaikin_money_flow | chaikin_money_flow | _ |
 | [x] | kvo | kvo | _ |
-| [x] | vpt | vpt | _ |
-| [x] | nvi | nvi | _ |
-| [x] | pvi | pvi | _ |
+| [x] | volume_price_trend | volume_price_trend | _ |
+| [x] | negative_volume_index | negative_volume_index | _ |
+| [x] | positive_volume_index | positive_volume_index | _ |
 | [x] | mcginley | mcginley_dynamic | _ |
-| [x] | vidya | vidya | _ |
-| [x] | laguerre_rsi | laguerre_rsi | _ |
-| [x] | rmi | rmi | _ |
-| [x] | jma | jma | _ |
-| [x] | ssl_channel | ssl_channel | _ |
-| [x] | pmax | pmax | _ |
-| [x] | td_sequential | td_sequential | _ |
-| [x] | even_better_sinewave | even_better_sinewave | _ |
-| [x] | fib_retracement | fib_retracement | _ |
-| [x] | heikin_ashi | heikin_ashi | _ |
-| [x] | anchored_vwap | anchored_vwap | _ |
-| [x] | pivot_points | pivot_points | _ |
-| [x] | opening_range | opening_range | _ |
-| [x] | session_volume_levels | session_volume_levels | _ |
+| [ ] | vidya | vidya | _ |
+| [ ] | laguerre_rsi | laguerre_rsi | _ |
+| [ ] | rmi | rmi | _ |
+| [ ] | jma | jma | _ |
+| [ ] | ssl_channel | ssl_channel | _ |
+| [ ] | pmax | pmax | _ |
+| [ ] | td_sequential | td_sequential | _ |
+| [ ] | even_better_sinewave | even_better_sinewave | _ |
+| [ ] | fib_retracement | fib_retracement | _ |
+| [ ] | heikin_ashi | heikin_ashi | _ |
+| [ ] | anchored_vwap | anchored_vwap | _ |
+| [ ] | pivot_points | pivot_points | _ |
+| [ ] | opening_range | opening_range | _ |
+| [ ] | session_volume_levels | session_volume_levels | _ |
 | [x] | parkinson | parkinson | _ |
 | [x] | garman_klass | garman_klass | _ |
 | [x] | rogers_satchell | rogers_satchell | _ |
@@ -377,9 +393,9 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | close_to_close_sigma | close_to_close_sigma | _ |
 | [x] | ts_rank | ts_rank | _ |
 | [x] | signedpower | signedpower | _ |
-| [x] | adv | adv | _ |
+| [x] | average_daily_dollar_value | average_daily_dollar_value | _ |
 | [x] | kalman_hedge_ratio | kalman_hedge_ratio | _ |
-| [x] | ou_half_life | ou_half_life | _ |
+| [x] | ornstein_uhlenbeck_half_life | ornstein_uhlenbeck_half_life | _ |
 | [x] | spread_zscore | spread_zscore | _ |
 | [x] | cusum | cusum | _ |
 | [x] | frac_diff | frac_diff | _ |

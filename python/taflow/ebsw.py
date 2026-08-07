@@ -1,6 +1,11 @@
 """Ehlers Even Better Sinewave-style detrended cycle oscillator."""
 import numpy as np
 class EvenBetterSinewave:
+    """Stateful EvenBetterSinewave indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None, length=40): self.length=int(length); self.reset(); self.extend(close) if close is not None else None
     def append(self, close):
         x=float(close); self._c.append(x); hp=0 if len(self._c)<3 else .5*(1-.5)*(x-2*self._c[-2]+self._c[-3]) + 1.0*self._hp[-1] if self._hp else 0

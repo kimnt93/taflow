@@ -4,6 +4,11 @@ import numpy as np
 from ._native import UltimateOscillator as _Native
 from ._series import as_float64_series
 class UltimateOscillator:
+    """Stateful UltimateOscillator indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high: Any | None = None, low: Any | None = None, close: Any | None = None, timeperiod1: int = 7, timeperiod2: int = 14, timeperiod3: int = 28) -> None:
         self._state = _Native(timeperiod1, timeperiod2, timeperiod3)
         if high is not None or low is not None or close is not None: self.extend(high, low, close)
@@ -16,4 +21,3 @@ class UltimateOscillator:
     def value(self) -> float | None: return self._state.value
     def reset(self) -> "UltimateOscillator": self._state.reset(); return self
     def __len__(self) -> int: return len(self._state)
-ULTOSC = UltimateOscillator

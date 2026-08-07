@@ -1,7 +1,12 @@
-"""Chande VIDYA (CMO-modulated EMA), causal and stateful."""
+"""Chande VariableIndexDynamicAverage (CMO-modulated EMA), causal and stateful."""
 import numpy as np
 
-class VIDYA:
+class VariableIndexDynamicAverage:
+    """Stateful VariableIndexDynamicAverage indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close=None, length=14, alpha=None):
         self.length=int(length); self.alpha=2/(self.length+1) if alpha is None else float(alpha)
         if self.length<1 or not 0<self.alpha<=1: raise ValueError("invalid length/alpha")

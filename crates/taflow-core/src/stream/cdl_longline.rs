@@ -3,7 +3,7 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLLONGLINE state using TA-Lib's long-body and short-shadow averages.
-pub struct CdlLongLine {
+pub struct CandleLongLine {
     bodies: VecDeque<f64>,
     body_sum: f64,
     shadows: VecDeque<f64>,
@@ -11,13 +11,13 @@ pub struct CdlLongLine {
     value: Option<i32>,
 }
 
-impl Default for CdlLongLine {
+impl Default for CandleLongLine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl CdlLongLine {
+impl CandleLongLine {
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -76,7 +76,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_longline(&open, &high, &low, &close).unwrap();
-        let mut state = CdlLongLine::new();
+        let mut state = CandleLongLine::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

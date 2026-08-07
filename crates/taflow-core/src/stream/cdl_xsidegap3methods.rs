@@ -6,16 +6,16 @@ struct Candle {
     close: f64,
 }
 /// Incremental CDLXSIDEGAP3METHODS state.
-pub struct CdlXSideGap3Methods {
+pub struct CandleXSideGap3Methods {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlXSideGap3Methods {
+impl Default for CandleXSideGap3Methods {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlXSideGap3Methods {
+impl CandleXSideGap3Methods {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(2),
@@ -69,7 +69,7 @@ mod tests {
         let low = vec![6.; 6];
         let close = vec![12., 14., 11., 8., 6., 9.];
         let e = crate::pattern::cdl_xsidegap3methods(&open, &high, &low, &close).unwrap();
-        let mut s = CdlXSideGap3Methods::new();
+        let mut s = CandleXSideGap3Methods::new();
         for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
         {
             match s.append(o, h, l, c) {

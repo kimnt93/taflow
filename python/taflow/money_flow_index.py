@@ -46,6 +46,5 @@ class MoneyFlowIndex:
     def __len__(self) -> int: return len(self._state)
 
 
-MFI = MoneyFlowIndex
 
-__all__ = ["MoneyFlowIndex", "MFI"]
+__all__ = ["MoneyFlowIndex"]

@@ -3,6 +3,11 @@ import numpy as np
 from ._native import MinusDirectionalIndicator as _Native
 from ._series import as_float64_series
 class MinusDirectionalIndicator:
+    """Stateful MinusDirectionalIndicator indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high:Any|None=None, low:Any|None=None, close:Any|None=None, timeperiod:int=14):
         self._state=_Native(timeperiod)
         if high is not None or low is not None or close is not None:self.extend(high,low,close)
@@ -14,4 +19,3 @@ class MinusDirectionalIndicator:
     @property
     def value(self):return self._state.value
     def reset(self):self._state.reset();return self
-MINUS_DI=MinusDirectionalIndicator

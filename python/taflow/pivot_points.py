@@ -1,6 +1,11 @@
 """Classic session pivot levels."""
 import numpy as np
 class PivotPoints:
+    """Stateful PivotPoints indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high=None, low=None, close=None, anchor=None): self.reset(); self.extend(high,low,close,anchor) if close is not None else None
     def append(self, high, low, close, anchor=False):
         if anchor and self._h is not None:

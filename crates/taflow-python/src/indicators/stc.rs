@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Stc;
+use taflow::stream::SchaffTrendCycle;
 
 #[pyclass]
 pub struct StcOperator {
-    inner: Stc,
+    inner: SchaffTrendCycle,
     stc: Vec<f64>,
     macd: Vec<f64>,
     stoch: Vec<f64>,
@@ -17,7 +17,7 @@ impl StcOperator {
     #[pyo3(signature = (tclength=10, fast=12, slow=26, factor=0.5))]
     fn new(tclength: usize, fast: usize, slow: usize, factor: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: Stc::new(tclength, fast, slow, factor)
+            inner: SchaffTrendCycle::new(tclength, fast, slow, factor)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             stc: Vec::new(),
             macd: Vec::new(),

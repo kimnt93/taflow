@@ -25,16 +25,16 @@ impl Candle {
     }
 }
 /// Incremental CDL3STARSINSOUTH state.
-pub struct Cdl3StarsInSouth {
+pub struct Candle3StarsInSouth {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Cdl3StarsInSouth {
+impl Default for Candle3StarsInSouth {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Cdl3StarsInSouth {
+impl Candle3StarsInSouth {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
@@ -110,7 +110,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let e = crate::pattern::cdl_3starsinsouth(&open, &high, &low, &close).unwrap();
-        let mut s = Cdl3StarsInSouth::new();
+        let mut s = Candle3StarsInSouth::new();
         for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
         {
             match s.append(o, h, l, c) {

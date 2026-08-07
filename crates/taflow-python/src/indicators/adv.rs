@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Adv;
+use taflow::stream::AverageDailyDollarValue;
 
 #[pyclass]
 pub struct AdvOperator {
-    inner: Adv,
+    inner: AverageDailyDollarValue,
     output: Vec<f64>,
 }
 
@@ -15,7 +15,7 @@ impl AdvOperator {
     #[pyo3(signature = (timeperiod=20))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Adv::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?,
+            inner: AverageDailyDollarValue::new(timeperiod).map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

@@ -57,6 +57,5 @@ class ExponentialMovingAverage:
         return len(self._state)
 
 
-EMA = ExponentialMovingAverage
 
-__all__ = ["ExponentialMovingAverage", "EMA"]
+__all__ = ["ExponentialMovingAverage"]

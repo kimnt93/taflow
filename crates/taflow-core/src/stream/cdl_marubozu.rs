@@ -3,19 +3,19 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLMARUBOZU state using TA-Lib's long-body and very-short-shadow averages.
-pub struct CdlMarubozu {
+pub struct CandleMarubozu {
     bodies: VecDeque<f64>,
     body_sum: f64,
     ranges: VecDeque<f64>,
     range_sum: f64,
     value: Option<i32>,
 }
-impl Default for CdlMarubozu {
+impl Default for CandleMarubozu {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlMarubozu {
+impl CandleMarubozu {
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -74,7 +74,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_marubozu(&open, &high, &low, &close).unwrap();
-        let mut state = CdlMarubozu::new();
+        let mut state = CandleMarubozu::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

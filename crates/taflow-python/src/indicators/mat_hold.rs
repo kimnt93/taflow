@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CdlMatHold;
+use taflow::stream::CandleMatHold as CandleMatHoldState;
 #[pyclass]
-pub struct MatHold {
-    inner: CdlMatHold,
+/// Stateful CandleMatHold candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleMatHold {
+    inner: CandleMatHoldState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl MatHold {
+impl CandleMatHold {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CdlMatHold::new(),
+            inner: CandleMatHoldState::new(),
             outputs: vec![],
         }
     }

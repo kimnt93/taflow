@@ -5,7 +5,12 @@ from ._native import GkYangZhangOperator as _Native
 from ._series import as_float64_series
 
 
-class GkYangZhang:
+class GarmanKlassYangZhang:
+    """Stateful GarmanKlassYangZhang indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(
         self,
         open: Any | None = None,

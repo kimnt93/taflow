@@ -22,16 +22,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlOnNeck {
+/// Stateful CandleOnNeck candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleOnNeck {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlOnNeck {
+impl Default for CandleOnNeck {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlOnNeck {
+impl CandleOnNeck {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -83,7 +85,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_onneck(&o, &h, &l, &c).unwrap();
-        let mut s = CdlOnNeck::new();
+        let mut s = CandleOnNeck::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

@@ -3,7 +3,7 @@
 use std::collections::VecDeque;
 
 /// Incremental CDLTAKURI state using TA-Lib's body and shadow averages.
-pub struct CdlTakuri {
+pub struct CandleTakuri {
     bodies: VecDeque<f64>,
     body_sum: f64,
     ranges: VecDeque<f64>,
@@ -11,13 +11,13 @@ pub struct CdlTakuri {
     value: Option<i32>,
 }
 
-impl Default for CdlTakuri {
+impl Default for CandleTakuri {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl CdlTakuri {
+impl CandleTakuri {
     pub fn new() -> Self {
         Self {
             bodies: VecDeque::with_capacity(10),
@@ -81,7 +81,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { 0.1 } else { 1.0 })
             .collect();
         let expected = crate::pattern::cdl_takuri(&open, &high, &low, &close).unwrap();
-        let mut state = CdlTakuri::new();
+        let mut state = CandleTakuri::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

@@ -1,6 +1,11 @@
 """SSL Channel using rolling SMA(high/low) and a causal side state."""
 import numpy as np
 class SSLChannel:
+    """Stateful SSLChannel indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high=None, low=None, close=None, length=10):
         self.length=int(length)
         if self.length<1: raise ValueError("length must be positive")

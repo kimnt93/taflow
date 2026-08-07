@@ -4,6 +4,11 @@ import numpy as np
 from ._native import McgdOperator as _Native
 from ._series import as_float64_series
 class McGinleyDynamic:
+    """Stateful McGinleyDynamic indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close: Any|None=None, length=10, c=1.0): self._state=_Native(length,c); self.extend(close) if close is not None else None
     def append(self, close: float): self._state.append(close); return self
     def extend(self, close: Any): self._state.extend(as_float64_series(close)); return self

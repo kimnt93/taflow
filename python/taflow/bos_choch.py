@@ -6,6 +6,11 @@ from ._series import as_float64_series
 
 
 class BosChoch:
+    """Stateful BosChoch indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high: Any | None = None, low: Any | None = None, close: Any | None = None, swing_length: int = 5):
         self._state = _Native(swing_length)
         self.extend(high, low, close) if any(value is not None for value in (high, low, close)) else None

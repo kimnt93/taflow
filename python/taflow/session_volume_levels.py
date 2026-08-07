@@ -1,6 +1,11 @@
 """Session volume-profile levels using a bounded fixed-bin histogram."""
 import numpy as np
 class SessionVolumeLevels:
+    """Stateful SessionVolumeLevels indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, high=None, low=None, close=None, volume=None, anchor=None, bins=24, value_area=.7):
         self.bins=int(bins); self.value_area=float(value_area); self.reset()
         if close is not None: self.extend(high,low,close,volume,anchor)

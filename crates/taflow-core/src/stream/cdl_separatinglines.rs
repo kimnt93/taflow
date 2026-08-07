@@ -28,16 +28,18 @@ impl Candle {
         }
     }
 }
-pub struct CdlSeparatingLines {
+/// Stateful CandleSeparatingLines candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleSeparatingLines {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CdlSeparatingLines {
+impl Default for CandleSeparatingLines {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlSeparatingLines {
+impl CandleSeparatingLines {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
@@ -90,7 +92,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_separatinglines(&o, &h, &l, &c).unwrap();
-        let mut s = CdlSeparatingLines::new();
+        let mut s = CandleSeparatingLines::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

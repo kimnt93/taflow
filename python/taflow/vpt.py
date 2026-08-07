@@ -8,7 +8,12 @@ from ._native import VptOperator as _Native
 from ._series import as_float64_series
 
 
-class Vpt:
+class VolumePriceTrend:
+    """Stateful VolumePriceTrend indicator.
+    Parameters are documented by the constructor signature; scalar
+    ``append`` returns the current value and ``compute`` returns
+    the aligned history with NaN warm-up where applicable.
+    """
     def __init__(self, close: Any | None = None, volume: Any | None = None):
         self._state = _Native()
         self.extend(close, volume) if close is not None or volume is not None else None

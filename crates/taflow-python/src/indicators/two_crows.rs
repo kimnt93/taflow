@@ -1,18 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Cdl2Crows;
+use taflow::stream::Candle2Crows;
 #[pyclass]
-pub struct TwoCrows {
-    inner: Cdl2Crows,
+/// Stateful CandleTwoCrows candlestick recognizer.
+/// Inputs are OHLC bars; output is the aligned integer pattern score.
+pub struct CandleTwoCrows {
+    inner: Candle2Crows,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl TwoCrows {
+impl CandleTwoCrows {
     #[new]
     fn new() -> Self {
         Self {
-            inner: Cdl2Crows::new(),
+            inner: Candle2Crows::new(),
             outputs: Vec::new(),
         }
     }

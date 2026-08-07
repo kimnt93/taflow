@@ -1,16 +1,16 @@
 //! Incremental Engulfing candlestick recognition (CDLENGULFING).
 
 /// Incremental CDLENGULFING state.
-pub struct CdlEngulfing {
+pub struct CandleEngulfing {
     previous: Option<(f64, f64)>,
     value: Option<i32>,
 }
-impl Default for CdlEngulfing {
+impl Default for CandleEngulfing {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CdlEngulfing {
+impl CandleEngulfing {
     pub fn new() -> Self {
         Self {
             previous: None,
@@ -47,7 +47,7 @@ mod tests {
         let low = vec![7.; 5];
         let close = vec![9., 11., 10., 8., 11.];
         let expected = crate::pattern::cdl_engulfing(&open, &high, &low, &close).unwrap();
-        let mut state = CdlEngulfing::new();
+        let mut state = CandleEngulfing::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)
