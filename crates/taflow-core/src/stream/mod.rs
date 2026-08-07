@@ -116,6 +116,7 @@ mod trima;
 mod ultosc;
 mod window;
 mod wma;
+mod vidya;
 
 pub use accbands::{Accbands, AccbandsValue};
 pub use adx::Adx;
@@ -225,6 +226,7 @@ pub use ultosc::Ultosc;
 pub use crate::operators::{ActiveZoneList, AverageDailyDollarValue, ArnaudLegouxMovingAverage, Amihud, AwesomeOscillator, BarsSince, BosChoch, BosChochValue, ChaikinVolatility, ChaikinMoneyFlow, CloseToCloseSigma, Cross, Crossover, Crossunder, Cumsum, Cummax, Cummin, Cumprod, Cusum, Donchian, DonchianValue, DetrendedPriceOscillator, Drawdown, EaseOfMovement, EntryExit, EqualHighsLows, EqualHighsLowsValue, ExponentiallyWeightedCorrelation, ExponentiallyWeightedCovariance, ExponentiallyWeightedStandardDeviation, ExponentiallyWeightedVariance, Falling, FairValueGap, FairValueGapValue, FisherTransform, ForceIndex, FracDiff, GarmanKlass, GapDown, GapUp, GarmanKlassYangZhang, HedgeRatio, HighestSince, HullMovingAverage, HigherHigh, Hurst, Ichimoku, IchimokuValue, InsideBar, KalmanHedgeRatio, KeltnerChannels, KeltnerValue, KnowSureThing, KnowSureThingValue, Lag, LogReturn, LowerLow, LowestSince, Liquidity, LiquidityValue, MassIndex, McGinleyDynamic, NegativeVolumeIndex, OrderBlock, OrderBlockValue, OutsideBar, OrnsteinUhlenbeckHalfLife, Parkinson, PositionHold, PreviousHighLow, PreviousHighLowValue, PositiveVolumeIndex, Retracements, RetracementsValue, Rising, RollingAlpha, RollingAutocorr, RollingCalmar, RollingCov, RollingEntropy, RollingInformationRatio, RollingIqr, RollingKurtosis, RollingMedian, RollingMode, RollingQuantile, RollingRank, RollingSharpe, RollingSkew, RollingSortino, RollingWinsorize, RollingZscore, RogersSatchell, RollSpread, SessionExtrema, SessionExtremaValue, Sessions, SessionsValue, SignalDelay, SpreadZscore, Squeeze, SqueezePro, SqueezeProValue, SqueezeValue, SchaffTrendCycle, SchaffTrendCycleValue, Supertrend, SupertrendValue, Swing, SwingValue, TrueStrengthIndex, UlcerIndex, ValueWhen, Vortex, VortexValue, VolumePriceTrend, RollingVolumeWeightedAveragePrice, VolumeWeightedMovingAverage, YangZhang, ZeroLagExponentialMovingAverage};
 pub use window::Window;
 pub use wma::Wma;
+pub use vidya::VariableIndexDynamicAverage;
 
 pub(super) fn invalid_period(name: &'static str, period: usize, minimum: usize) -> TaError {
     TaError::InvalidParameter {

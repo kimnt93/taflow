@@ -1,27 +1,50 @@
-"""Chande VariableIndexDynamicAverage (CMO-modulated EMA), causal and stateful."""
+"""Native Variable Index Dynamic Average interface."""
+
+from typing import Any
+
 import numpy as np
 
+from ._native import StatefulVariableIndexDynamicAverage
+
+
 class VariableIndexDynamicAverage:
-    """Stateful VariableIndexDynamicAverage indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute a CMO-modulated exponential average of close prices.
+
+    Parameters
+    ----------
+    close : array-like, optional
+        Initial aligned close history.
+    length : int, default 14
+        Number of recent changes used to determine directional weighting.
+    alpha : float, optional
+        EMA coefficient. When omitted, uses ``2 / (length + 1)``.
     """
-    def __init__(self, close=None, length=14, alpha=None):
-        self.length=int(length); self.alpha=2/(self.length+1) if alpha is None else float(alpha)
-        if self.length<1 or not 0<self.alpha<=1: raise ValueError("invalid length/alpha")
-        self.reset()
-        if close is not None: self.extend(close)
-    def append(self, close):
-        x=float(close); self._close.append(x); n=min(self.length,len(self._close)-1)
-        if self._value is None: self._value=x
-        elif n:
-            d=np.diff(self._close[-(n+1):]); up=float(d[d>0].sum()); dn=float(-d[d<0].sum()); cmo=(up-dn)/(up+dn) if up+dn else 0.; self._value=self.alpha*abs(cmo)*x+(1-self.alpha*abs(cmo))*self._value
-        self._values.append(self._value); return self._value
-    def extend(self, close):
-        for x in close: self.append(x)
+
+    def __init__(self, close: Any | None = None, length: int = 14,
+                 alpha: float | None = None):
+        self._state = StatefulVariableIndexDynamicAverage(length, alpha)
+        if close is not None:
+            self.extend(close)
+
+    def append(self, close: float):
+        """Process one close and return the current average."""
+        return self._state.append(float(close))
+
+    def extend(self, close: Any):
+        """Process an aligned close history and return this indicator."""
+        self._state.extend(np.asarray(close, dtype=np.float64))
         return self
-    def compute(self): return np.asarray(self._values,dtype=float)
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned average history."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._value
-    def reset(self): self._close=[]; self._values=[]; self._value=None; return self
+    def value(self):
+        """Return the latest average value."""
+        return self._state.value
+
+    def reset(self):
+        """Clear state and accumulated output."""
+        self._state.reset()
+        return self

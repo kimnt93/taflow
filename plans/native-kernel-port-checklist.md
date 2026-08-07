@@ -19,7 +19,8 @@ For each item:
 
 ## Pending ports
 
-- [ ] `VariableIndexDynamicAverage` (`vidya`)
+- [x] `VariableIndexDynamicAverage` (`vidya`) — Rust streaming kernel,
+  native adapter, and causal history smoke check verified.
 - [ ] `LaguerreRelativeStrengthIndex` (`laguerre_rsi`)
 - [x] `RelativeMomentumIndex` (`rmi`) — Rust streaming kernel and native
   Python adapter verified with warm-up and monotonic-input checks.

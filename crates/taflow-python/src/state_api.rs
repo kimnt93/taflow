@@ -8,6 +8,7 @@ use taflow::stream::{
     Mavp,
     Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi,
     StreamingIndicator, Tema, Trange, Trima, Wma, RelativeMomentumIndex,
+    VariableIndexDynamicAverage,
 };
 use taflow::MaType;
 
@@ -93,6 +94,46 @@ scalar_state_class!(StatefulTsf, stream::Tsf, 14);
 pub struct StatefulRelativeMomentumIndex {
     inner: RelativeMomentumIndex,
     output: Vec<f64>,
+}
+
+/// Native state adapter for Variable Index Dynamic Average.
+#[pyclass]
+pub struct StatefulVariableIndexDynamicAverage {
+    inner: VariableIndexDynamicAverage,
+    output: Vec<f64>,
+}
+
+#[pymethods]
+impl StatefulVariableIndexDynamicAverage {
+    #[new]
+    #[pyo3(signature = (length=14, alpha=None))]
+    fn new(length: usize, alpha: Option<f64>) -> PyResult<Self> {
+        let alpha = alpha.unwrap_or(2.0 / (length as f64 + 1.0));
+        Ok(Self {
+            inner: VariableIndexDynamicAverage::new(length, alpha).map_err(py_value_error)?,
+            output: Vec::new(),
+        })
+    }
+
+    fn append(&mut self, input: f64) -> Option<f64> {
+        let value = self.inner.append(input);
+        self.output.push(value.unwrap_or(f64::NAN));
+        value
+    }
+
+    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        for &value in input.as_slice()? { self.append(value); }
+        Ok(())
+    }
+
+    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
+        PyArray1::from_vec(py, self.output.clone())
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> { self.inner.value() }
+
+    fn reset(&mut self) { self.inner.reset(); self.output.clear(); }
 }
 
 #[pymethods]
