@@ -358,10 +358,10 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | vidya | vidya | _ |
 | [x] | laguerre_rsi | laguerre_rsi | _ |
 | [x] | rmi | rmi | _ |
-| [ ] | jma | jma | _ |
+| [x] | jma | jma | _ |
 | [x] | ssl_channel | ssl_channel | _ |
-| [ ] | pmax | pmax | _ |
-| [ ] | td_sequential | td_sequential | _ |
+| [x] | pmax | pmax | _ |
+| [x] | td_sequential | td_sequential | _ |
 | [ ] | even_better_sinewave | even_better_sinewave | _ |
 | [ ] | fib_retracement | fib_retracement | _ |
 | [x] | heikin_ashi | heikin_ashi | _ |

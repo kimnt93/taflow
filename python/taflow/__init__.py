@@ -69,6 +69,9 @@ from .vidya import VIDYA
 from .laguerre_rsi import LaguerreRSI
 from .rmi import RMI
 from .ssl_channel import SSLChannel
+from .jma import JMA
+from .pmax import PMAX
+from .td_sequential import TDSequential
 from .up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
 from .three_white_soldiers import CDL3WHITESOLDIERS, ThreeWhiteSoldiers
 from .abandoned_baby import CDLABANDONEDBABY, AbandonedBaby
@@ -261,6 +264,9 @@ __all__ = [
     "LaguerreRSI",
     "RMI",
     "SSLChannel",
+    "JMA",
+    "PMAX",
+    "TDSequential",
     "UpDownSideGapThreeMethods",
     "CDLXSIDEGAP3METHODS",
     "IntradayMomentumIndex",
