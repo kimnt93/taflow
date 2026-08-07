@@ -3,7 +3,7 @@
 Date: 2026-08-07 | bars: 10,000 | warm-up split: 9,000 + 1,000 continue | tolerance rtol=1e-08, atol=1e-10
 Environment: python 3.12.3, numpy 2.5.1, TA-Lib 0.7.1, taflow 0.1.2
 
-Summary: MATCH: 166, MISMATCH: 2
+Summary: MATCH: 168
 
 Columns — *batch vs oracle*: full-series batch against the
 reference; *continue vs batch*: 9k `extend` + 1k `append` stitched
@@ -13,8 +13,6 @@ reference.
 
 | Function | Oracle | Verdict | Batch vs oracle | Continue vs batch (bitwise) | Continue vs oracle |
 |---|---|---|---|---|---|
-| rolling_kurtosis | pandas | MISMATCH | **FAIL** (err 1.7e-04, nan 0) | yes | **FAIL** (err 1.7e-04, nan 0) |
-| rolling_skew | pandas | MISMATCH | **FAIL** (err 3.8e-07, nan 0) | yes | **FAIL** (err 3.8e-07, nan 0) |
 | ACCBANDS | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
 | ACOS | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
 | AD | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
@@ -178,11 +176,13 @@ reference.
 | ewm_std | pandas | MATCH | pass (err 7.8e-14, nan 0) | yes | pass (err 7.8e-14, nan 0) |
 | ewm_var | pandas | MATCH | pass (err 1.9e-12, nan 0) | yes | pass (err 1.9e-12, nan 0) |
 | rolling_cov | pandas | MATCH | pass (err 1.3e-11, nan 0) | yes | pass (err 1.3e-11, nan 0) |
+| rolling_kurtosis | pandas | MATCH | pass (err 1.3e-15, nan 0) | yes | pass (err 1.3e-15, nan 0) |
 | rolling_median | pandas | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
 | rolling_quantile | pandas | MATCH | pass (err 0.0e+00, nan 0) | yes | pass (err 0.0e+00, nan 0) |
+| rolling_skew | pandas | MATCH | pass (err 8.9e-16, nan 0) | yes | pass (err 8.9e-16, nan 0) |
 | rolling_zscore | pandas | MATCH | pass (err 6.4e-10, nan 0) | yes | pass (err 6.4e-10, nan 0) |
 
 ## Follow-ups
 
-- Mismatches: rolling_skew, rolling_kurtosis
+- Mismatches: none
 - Errors: none

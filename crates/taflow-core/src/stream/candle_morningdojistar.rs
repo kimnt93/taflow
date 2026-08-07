@@ -118,6 +118,7 @@ impl CandleMorningDojiStar {
 /// * `high` - Input series or configuration value.
 /// * `low` - Input series or configuration value.
 /// * `close` - Input series or configuration value.
+/// * `penetration` - Fraction of the first candle body that the final close must penetrate.
 ///
 /// # Returns
 ///
@@ -127,10 +128,10 @@ pub fn candle_morning_doji_star(
     high: &[f64],
     low: &[f64],
     close: &[f64],
+    penetration: f64,
 ) -> TaResult<Vec<i32>> {
     let len = validate_ohlc(open, high, low, close)?;
     let mut output = vec![0i32; len];
-    let penetration = 0.3;
     let lookback = *[
         BODY_DOJI.avg_period,
         BODY_LONG.avg_period,
@@ -214,7 +215,7 @@ mod tests {
             .enumerate()
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
-        let e = crate::stream::candle_morning_doji_star(&o, &h, &l, &c).unwrap();
+        let e = crate::stream::candle_morning_doji_star(&o, &h, &l, &c, 0.3).unwrap();
         let mut s = CandleMorningDojiStar::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {

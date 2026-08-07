@@ -467,13 +467,13 @@ For every function claimed done, verify ALL of:
       state; `mod.rs` contains only `mod`/`pub use` lines. Python
       `python/taflow/<name>.py`, one indicator per file.
 
-## 4. Known debt (found in review, 2026-08-07 — fix as encountered)
+## 4. Review notes and resolved parity gates (2026-08-07)
 
-1. Seven penetration-aware patterns now accept TA-Lib's `penetration`
-   keyword at the gateway, but the native kernels still use fixed internal
-   thresholds; wire the parameter through for full parity (CDLABANDONEDBABY,
-   CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD,
-   CDLMORNINGDOJISTAR, CDLMORNINGSTAR).
+1. The seven penetration-aware patterns now carry the TA-Lib `penetration`
+   parameter through the Python gateway into their Rust kernels, including
+   the correct TA-Lib defaults (CDLABANDONEDBABY, CDLDARKCLOUDCOVER,
+   CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD, CDLMORNINGDOJISTAR,
+   CDLMORNINGSTAR).
 2. Pattern and regression parity are now aligned with TA-Lib at the 10k-bar
    verification size: CDLLADDERBOTTOM, CDLTRISTAR, LINEARREG_SLOPE, and
    LINEARREG_ANGLE use the reference candle predicates and ordered regression
@@ -482,11 +482,9 @@ For every function claimed done, verify ALL of:
    uses the same left-to-right subtract-then-add recurrence as `RollingSum`,
    so a 9k-`extend` + 1k-`append` split is bitwise-identical to one-shot
    output.
-5. **rolling_skew / rolling_kurtosis parity debt**: the kernels use
-   population central moments with compensated sums, but still differ from
-   pandas' online rolling algorithm after the population-form conversion
-   (current errors 3.8e-7 / 1.7e-4). A pandas-compatible incremental
-   central-moment update remains required for that optional oracle.
+5. Rolling skew and kurtosis now use the same online central-moment update
+   and population-form conversion as the pandas oracle; both pass the 10k-bar
+   verification run.
 
 ## 5. How to run the review
 

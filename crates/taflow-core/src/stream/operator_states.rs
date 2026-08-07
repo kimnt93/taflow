@@ -4665,6 +4665,11 @@ macro_rules! rolling_moment_operator {
         pub struct $name {
             values: VecDeque<f64>,
             timeperiod: usize,
+            nobs: usize,
+            mean: f64,
+            m2: f64,
+            m3: f64,
+            m4: f64,
             value: Option<f64>,
         }
         impl $name {
@@ -4678,6 +4683,11 @@ macro_rules! rolling_moment_operator {
                 Ok(Self {
                     values: VecDeque::with_capacity(timeperiod),
                     timeperiod,
+                    nobs: 0,
+                    mean: 0.0,
+                    m2: 0.0,
+                    m3: 0.0,
+                    m4: 0.0,
                     value: None,
                 })
             }
@@ -4688,20 +4698,37 @@ macro_rules! rolling_moment_operator {
             /// Returns the computed value, aligned history, or a validation error.
             pub fn append(&mut self, input: f64) -> Option<f64> {
                 if self.values.len() == self.timeperiod {
-                    self.values.pop_front();
+                    let old = self.values.pop_front().expect("full moment window");
+                    let n = (self.nobs - 1) as f64;
+                    let delta = old - self.mean;
+                    let delta_n = delta / n;
+                    let term1 = delta_n * delta * (n + 1.0);
+                    let old_m2 = self.m2;
+                    let old_m3 = self.m3;
+                    self.m4 += delta_n
+                        * (4.0 * old_m3
+                            + delta_n * (6.0 * old_m2 - term1 * (n * n + 3.0 * n + 3.0)));
+                    self.m3 = old_m3 - delta_n * (term1 * (n + 2.0) - 3.0 * old_m2);
+                    self.m2 = old_m2 - term1;
+                    self.mean -= delta_n;
+                    self.nobs -= 1;
                 }
                 self.values.push_back(input);
-                self.value = if self.values.len() == self.timeperiod {
-                    // Center around the first value before forming moments.
-                    // This avoids catastrophic cancellation for price series
-                    // near a large absolute level (for example, prices near
-                    // 100 with small bar-to-bar changes).
-                    let anchor = *self.values.front().expect("full moment window");
-                    let centered: VecDeque<f64> =
-                        self.values.iter().map(|&value| value - anchor).collect();
-                    let mean = compensated_sum(centered.iter().copied()) / self.timeperiod as f64;
-                    let result = $formula(&centered, mean);
-                    Some(result)
+                let n_old = self.nobs as f64;
+                let n = n_old + 1.0;
+                let delta = input - self.mean;
+                let delta_n = delta / n;
+                let term1 = delta * delta_n * n_old;
+                let old_m2 = self.m2;
+                let old_m3 = self.m3;
+                self.m4 += delta_n
+                    * (-4.0 * old_m3 + delta_n * (6.0 * old_m2 + term1 * (n * n - 3.0 * n + 3.0)));
+                self.m3 += delta_n * (term1 * (n - 2.0) - 3.0 * old_m2);
+                self.m2 = old_m2 + term1;
+                self.mean += delta_n;
+                self.nobs += 1;
+                self.value = if self.nobs == self.timeperiod {
+                    Some($formula(self.nobs as f64, self.m2, self.m3, self.m4))
                 } else {
                     None
                 };
@@ -4718,48 +4745,28 @@ macro_rules! rolling_moment_operator {
             /// Reset the persistent state and clear the latest value.
             pub fn reset(&mut self) {
                 self.values.clear();
+                self.nobs = 0;
+                self.mean = 0.0;
+                self.m2 = 0.0;
+                self.m3 = 0.0;
+                self.m4 = 0.0;
                 self.value = None;
             }
         }
     };
 }
 
-/// Sum floating-point moments with a compensated accumulator so rolling
-/// higher-order statistics remain stable on large absolute price levels.
-fn compensated_sum<I>(values: I) -> f64
-where
-    I: Iterator<Item = f64>,
-{
-    let mut sum = 0.0;
-    let mut correction = 0.0;
-    for value in values {
-        let adjusted = value - correction;
-        let next = sum + adjusted;
-        correction = (next - sum) - adjusted;
-        sum = next;
-    }
-    sum
-}
-
-rolling_moment_operator!(RollingSkew, |values: &VecDeque<f64>, mean: f64| {
-    let m2 =
-        compensated_sum(values.iter().map(|&value| (value - mean).powi(2))) / values.len() as f64;
-    let m3 =
-        compensated_sum(values.iter().map(|&value| (value - mean).powi(3))) / values.len() as f64;
+rolling_moment_operator!(RollingSkew, |n: f64, m2: f64, m3: f64, _m4: f64| {
     if m2 > 0.0 {
-        m3 / m2.powf(1.5)
+        n.sqrt() * m3 / m2.powf(1.5)
     } else {
         0.0
     }
 });
 
-rolling_moment_operator!(RollingKurtosis, |values: &VecDeque<f64>, mean: f64| {
-    let m2 =
-        compensated_sum(values.iter().map(|&value| (value - mean).powi(2))) / values.len() as f64;
-    let m4 =
-        compensated_sum(values.iter().map(|&value| (value - mean).powi(4))) / values.len() as f64;
+rolling_moment_operator!(RollingKurtosis, |n: f64, m2: f64, _m3: f64, m4: f64| {
     if m2 > 0.0 {
-        m4 / m2.powi(2) - 3.0
+        n * m4 / m2.powi(2) - 3.0
     } else {
         0.0
     }

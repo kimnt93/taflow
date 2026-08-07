@@ -1872,12 +1872,12 @@ macro_rules! cdl_pyfunction_penetration {
             close: PyReadonlyArray1<f64>,
             penetration: f64,
         ) -> PyResult<Py<PyArray1<i32>>> {
-            let _ = penetration;
             let result = ta_err!($func(
                 _open.as_slice()?,
                 high.as_slice()?,
                 low.as_slice()?,
                 close.as_slice()?,
+                penetration,
             ))?;
             Ok(crate::conversion::to_py_array_i32(py, result))
         }
@@ -1940,7 +1940,7 @@ cdl_pyfunction!(CDLLONGLEGGEDDOJI, core::stream::candle_long_legged_doji);
 cdl_pyfunction!(CDLLONGLINE, core::stream::candle_long_line);
 cdl_pyfunction!(CDLMARUBOZU, core::stream::candle_marubozu);
 cdl_pyfunction!(CDLMATCHINGLOW, core::stream::candle_matching_low);
-cdl_pyfunction_penetration!(CDLMATHOLD, core::stream::candle_mat_hold, 0.3);
+cdl_pyfunction_penetration!(CDLMATHOLD, core::stream::candle_mat_hold, 0.5);
 cdl_pyfunction_penetration!(
     CDLMORNINGDOJISTAR,
     core::stream::candle_morning_doji_star,

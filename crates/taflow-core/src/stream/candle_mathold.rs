@@ -134,6 +134,7 @@ impl CandleMatHold {
 /// * `high` - Input series or configuration value.
 /// * `low` - Input series or configuration value.
 /// * `close` - Input series or configuration value.
+/// * `penetration` - Fraction of the first candle body required for continuation.
 ///
 /// # Returns
 ///
@@ -143,10 +144,10 @@ pub fn candle_mat_hold(
     high: &[f64],
     low: &[f64],
     close: &[f64],
+    penetration: f64,
 ) -> TaResult<Vec<i32>> {
     let len = validate_ohlc(open, high, low, close)?;
     let mut output = vec![0i32; len];
-    let penetration = 0.5;
     let lookback = BODY_SHORT.avg_period.max(BODY_LONG.avg_period) + 4;
     if len <= lookback {
         return Ok(output);
@@ -226,7 +227,7 @@ mod tests {
             .enumerate()
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
-        let e = crate::stream::candle_mat_hold(&o, &h, &l, &c).unwrap();
+        let e = crate::stream::candle_mat_hold(&o, &h, &l, &c, 0.5).unwrap();
         let mut s = CandleMatHold::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
