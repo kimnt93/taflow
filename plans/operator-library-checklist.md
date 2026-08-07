@@ -104,7 +104,7 @@ Two aligned input series are within the contract (like BETA/CORREL).
       TA-Lib BETA, which regresses percent returns)
 - [x] rolling_entropy / rolling_autocorr
 - [x] hurst / fractal_dimension (rolling-window variants)
-- [ ] rolling_alpha / rolling_information_ratio
+- [x] rolling_alpha / rolling_information_ratio
 
 ## Execution and adapters
 

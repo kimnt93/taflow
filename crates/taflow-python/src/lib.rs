@@ -124,6 +124,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingAutocorrOperator>()?;
     m.add_class::<indicators::HurstOperator>()?;
     m.add_class::<indicators::FractalDimensionOperator>()?;
+    m.add_class::<indicators::RollingAlphaOperator>()?;
+    m.add_class::<indicators::RollingInformationRatioOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

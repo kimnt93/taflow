@@ -142,6 +142,59 @@ pub fn fractal_dimension(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>>
     Ok(input.iter().map(|&value| state.append(value).map(|hurst| 2.0 - hurst).unwrap_or(f64::NAN)).collect())
 }
 
+pub fn rolling_alpha(input: &[f64], benchmark: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if input.len() != benchmark.len() { return Err(TaError::LengthMismatch { expected: input.len(), got: benchmark.len() }); }
+    let mut state = RollingAlpha::new(timeperiod)?;
+    Ok(input.iter().zip(benchmark).map(|(&input, &benchmark)| state.append(input, benchmark).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_information_ratio(input: &[f64], benchmark: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if input.len() != benchmark.len() { return Err(TaError::LengthMismatch { expected: input.len(), got: benchmark.len() }); }
+    let mut state = RollingInformationRatio::new(timeperiod)?;
+    Ok(input.iter().zip(benchmark).map(|(&input, &benchmark)| state.append(input, benchmark).unwrap_or(f64::NAN)).collect())
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingAlpha { values: VecDeque<(f64, f64)>, period: usize, value: Option<f64> }
+impl RollingAlpha {
+    pub fn new(period: usize) -> TaResult<Self> { validate_period(period)?; Ok(Self { values: VecDeque::with_capacity(period), period, value: None }) }
+    pub fn append(&mut self, input: f64, benchmark: f64) -> Option<f64> {
+        if self.values.len() == self.period { self.values.pop_front(); }
+        self.values.push_back((input, benchmark));
+        self.value = (self.values.len() == self.period).then(|| {
+            let n = self.period as f64;
+            let mean_input = self.values.iter().map(|&(input, _)| input).sum::<f64>() / n;
+            let mean_benchmark = self.values.iter().map(|&(_, benchmark)| benchmark).sum::<f64>() / n;
+            let covariance = self.values.iter().map(|&(input, benchmark)| (input - mean_input) * (benchmark - mean_benchmark)).sum::<f64>();
+            let variance = self.values.iter().map(|&(_, benchmark)| (benchmark - mean_benchmark).powi(2)).sum::<f64>();
+            let beta = if variance > 0.0 { covariance / variance } else { 0.0 };
+            mean_input - beta * mean_benchmark
+        });
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingInformationRatio { values: VecDeque<f64>, period: usize, value: Option<f64> }
+impl RollingInformationRatio {
+    pub fn new(period: usize) -> TaResult<Self> { validate_period(period)?; Ok(Self { values: VecDeque::with_capacity(period), period, value: None }) }
+    pub fn append(&mut self, input: f64, benchmark: f64) -> Option<f64> {
+        if self.values.len() == self.period { self.values.pop_front(); }
+        self.values.push_back(input - benchmark);
+        self.value = (self.values.len() == self.period).then(|| {
+            let n = self.period as f64;
+            let mean = self.values.iter().sum::<f64>() / n;
+            let variance = self.values.iter().map(|&value| (value - mean).powi(2)).sum::<f64>() / n;
+            if variance > 0.0 { mean / variance.sqrt() } else { 0.0 }
+        });
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
 #[derive(Debug, Clone)]
 pub struct Hurst { values: VecDeque<f64>, period: usize, value: Option<f64> }
 

@@ -132,6 +132,7 @@ from ..rolling_entropy import RollingEntropy
 from ..rolling_autocorr import RollingAutocorr
 from ..hurst import Hurst
 from ..fractal_dimension import FractalDimension
+from ..rolling_alpha import RollingAlpha, RollingInformationRatio
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -232,4 +233,5 @@ __all__ = [
     "HedgeRatio",
     "RollingEntropy", "RollingAutocorr",
     "Hurst", "FractalDimension",
+    "RollingAlpha", "RollingInformationRatio",
 ]
