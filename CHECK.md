@@ -364,7 +364,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | td_sequential | td_sequential | _ |
 | [ ] | even_better_sinewave | even_better_sinewave | _ |
 | [ ] | fib_retracement | fib_retracement | _ |
-| [ ] | heikin_ashi | heikin_ashi | _ |
+| [x] | heikin_ashi | heikin_ashi | _ |
 | [ ] | anchored_vwap | anchored_vwap | _ |
 | [ ] | pivot_points | pivot_points | _ |
 | [ ] | opening_range | opening_range | _ |

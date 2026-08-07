@@ -110,13 +110,13 @@ fork/successor version) unless noted.
 | [ ] | PMAX | Impl: freqtrade technical `indicators.py::PMAX` | O(1): Supertrend generalized over (MA, ATR multiple) — share ratchet code. |
 | [ ] | TD Sequential | Impl: pandas-ta `momentum/td_seq.py`; Theory: Tom DeMark | O(1): setup/countdown counters + 4-bar delay ring; integer outputs like CDL patterns. |
 | [ ] | Even Better Sinewave | Impl: pandas-ta `cycles/ebsw.py`; Theory: Ehlers, *Cycle Analytics for Traders* | O(1) recurrence; lives with Hilbert family. |
-| [ ] | Fibonacci retracement levels | Impl: freqtrade technical `indicators.py::fibonacci_retracements(window=120)` | O(1) on rolling extrema; emit each level as its own same-size series. |
+| [x] | Fibonacci retracement levels | Impl: freqtrade technical `indicators.py::fibonacci_retracements(window=120)` | O(1) on rolling extrema; emit each level as its own same-size series. |
 
 ## P3 — per-bar transforms
 
 | Done | Function | Reference | Implementation & speed note |
 |---|---|---|---|
-| [ ] | Heikin-Ashi | Impl: pandas-ta `candles/ha.py` | 1:1 OHLC→OHLC transform, O(1) 4-float recurrence. The only chart transform that fits the same-size contract. |
+| [x] | Heikin-Ashi | Impl: pandas-ta `candles/ha.py` | 1:1 OHLC→OHLC transform, O(1) 4-float recurrence. The only chart transform that fits the same-size contract. |
 
 ## P4 — session/anchored (`session`) — needs P0 session-flag input
 
