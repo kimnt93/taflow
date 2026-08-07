@@ -1,0 +1,181 @@
+{
+ "schema_version": 3,
+ "function": "CDLBREAKAWAY",
+ "in_talib": true,
+ "date": "2026-08-07",
+ "environment": {
+  "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "numpy": "2.5.1",
+  "taflow": "0.1.2",
+  "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+  "talib_python": "0.7.1"
+ },
+ "protocol": {
+  "repeats": 20,
+  "seed_base": 42,
+  "isolated_processes": true,
+  "autorange_min_seconds": 0.02,
+  "params": {},
+  "inputs": [
+   "open",
+   "high",
+   "low",
+   "close"
+  ],
+  "allclose": {
+   "rtol": 1e-08,
+   "atol": 1e-10
+  }
+ },
+ "state_error": null,
+ "correctness": {
+  "bars": 100000,
+  "batch_vs_talib": {
+   "outputs": 1,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0,
+   "passed": true
+  },
+  "passed": true
+ },
+ "bulk": [
+  {
+   "size": 100,
+   "talib_batch": {
+    "mean_ms": 0.0009831197457763046,
+    "min_ms": 0.0009521210168947818,
+    "p50_ms": 0.0009740911436056458,
+    "repeats": 20,
+    "ops_per_sec": 101717008.97029245
+   },
+   "taflow_batch": {
+    "mean_ms": 0.0011826108230228046,
+    "min_ms": 0.0011633605046094129,
+    "p50_ms": 0.0011792003881610869,
+    "repeats": 20,
+    "ops_per_sec": 84558671.41854466
+   }
+  },
+  {
+   "size": 1000,
+   "talib_batch": {
+    "mean_ms": 0.0029730492926520274,
+    "min_ms": 0.002864373205236486,
+    "p50_ms": 0.002917145586993243,
+    "repeats": 20,
+    "ops_per_sec": 336355001.73896456
+   },
+   "taflow_batch": {
+    "mean_ms": 0.003170423194183865,
+    "min_ms": 0.003111395247029393,
+    "p50_ms": 0.003149476704190119,
+    "repeats": 20,
+    "ops_per_sec": 315415305.38714767
+   }
+  },
+  {
+   "size": 10000,
+   "talib_batch": {
+    "mean_ms": 0.05886201739130436,
+    "min_ms": 0.056738048136645965,
+    "p50_ms": 0.05821501397515527,
+    "repeats": 20,
+    "ops_per_sec": 169888842.46901962
+   },
+   "taflow_batch": {
+    "mean_ms": 0.09124577245508982,
+    "min_ms": 0.08578301796407185,
+    "p50_ms": 0.08819758233532934,
+    "repeats": 20,
+    "ops_per_sec": 109594118.5102235
+   }
+  },
+  {
+   "size": 100000,
+   "talib_batch": {
+    "mean_ms": 0.6505056981481482,
+    "min_ms": 0.626908037037037,
+    "p50_ms": 0.6466223796296297,
+    "repeats": 20,
+    "ops_per_sec": 153726555.02431232
+   },
+   "taflow_batch": {
+    "mean_ms": 1.1662361984374998,
+    "min_ms": 1.1330317187499999,
+    "p50_ms": 1.165868859375,
+    "repeats": 20,
+    "ops_per_sec": 85745923.62505813
+   }
+  },
+  {
+   "size": 1000000,
+   "talib_batch": {
+    "mean_ms": 7.179205450000001,
+    "min_ms": 6.8762462499999994,
+    "p50_ms": 7.188975125,
+    "repeats": 20,
+    "ops_per_sec": 139291180.1959923
+   },
+   "taflow_batch": {
+    "mean_ms": 12.181205849999998,
+    "min_ms": 11.6682785,
+    "p50_ms": 11.94415625,
+    "repeats": 20,
+    "ops_per_sec": 82093678.76333854
+   }
+  }
+ ],
+ "parallel": [
+  {
+   "threads": 1,
+   "base": 100000,
+   "chunk": 1,
+   "talib_full_recompute": {
+    "wall_s": 0.006582838666666667,
+    "updates_per_thread": 10,
+    "agg_updates_per_sec": 1519.1014859040547
+   }
+  },
+  {
+   "threads": 2,
+   "base": 100000,
+   "chunk": 1,
+   "talib_full_recompute": {
+    "wall_s": 0.013225682666666667,
+    "updates_per_thread": 10,
+    "agg_updates_per_sec": 1512.209275246485
+   }
+  },
+  {
+   "threads": 5,
+   "base": 100000,
+   "chunk": 1,
+   "talib_full_recompute": {
+    "wall_s": 0.03266504133333333,
+    "updates_per_thread": 10,
+    "agg_updates_per_sec": 1530.6884044557157
+   }
+  },
+  {
+   "threads": 10,
+   "base": 100000,
+   "chunk": 1,
+   "talib_full_recompute": {
+    "wall_s": 0.06566268866666668,
+    "updates_per_thread": 10,
+    "agg_updates_per_sec": 1522.9348969800026
+   }
+  },
+  {
+   "threads": 20,
+   "base": 100000,
+   "chunk": 1,
+   "talib_full_recompute": {
+    "wall_s": 0.13807562133333331,
+    "updates_per_thread": 10,
+    "agg_updates_per_sec": 1448.4816223797598
+   }
+  }
+ ]
+}
