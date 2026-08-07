@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::error::{TaError, TaResult};
-use crate::stream::{AverageTrueRange, ExponentialMovingAverage, RollingMidprice, SimpleMovingAverage, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
+use crate::stream::{AverageTrueRange, CumulativeMaximum, ExponentialMovingAverage, RollingMidprice, SimpleMovingAverage, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
 
 fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
@@ -5539,64 +5539,6 @@ impl ExponentiallyWeightedCorrelation {
     pub fn reset(&mut self) { self.covariance.reset(); self.value = None; }
 }
 
-macro_rules! cumulative_operator {
-    ($name:ident, $initial:expr, $operation:expr) => {
-        #[derive(Debug, Clone)]
-        pub struct $name { total: f64, value: Option<f64> }
-        impl $name {
-            /// Computes or updates `new` through the native Rust kernel.
-            ///
-            /// Parameters are the typed series and configuration values in the signature.
-            ///
-            /// Returns the computed value, aligned history, or a validation error.
-            pub fn new() -> Self { Self { total: $initial, value: None } }
-            /// Append one value and return the cumulative result.
-            pub fn append(&mut self, input: f64) -> f64 {
-                self.total = $operation(self.total, input);
-                self.value = Some(self.total);
-                self.total
-            }
-            /// Computes or updates `value` through the native Rust kernel.
-            ///
-            /// Parameters are the typed series and configuration values in the signature.
-            ///
-            /// Returns the computed value, aligned history, or a validation error.
-            pub fn value(&self) -> Option<f64> { self.value }
-            /// Reset the persistent state and clear the latest value.
-            pub fn reset(&mut self) { self.total = $initial; self.value = None; }
-        }
-        impl Default for $name { fn default() -> Self { Self::new() } }
-    };
-}
-
-cumulative_operator!(CumulativeSum, 0.0, |total: f64, input: f64| total + input);
-cumulative_operator!(CumulativeProduct, 1.0, |total: f64, input: f64| total * input);
-
-macro_rules! cumulative_extrema_operator {
-    ($name:ident, $initial:expr, $operation:expr) => {
-        #[derive(Debug, Clone)]
-        pub struct $name { extreme: f64, value: Option<f64> }
-        impl $name {
-            /// Computes or updates `new` through the native Rust kernel.
-            ///
-            /// Parameters are the typed series and configuration values in the signature.
-            ///
-            /// Returns the computed value, aligned history, or a validation error.
-            pub fn new() -> Self { Self { extreme: $initial, value: None } }
-            /// Append one value and return the cumulative extreme.
-            pub fn append(&mut self, input: f64) -> f64 { self.extreme = $operation(self.extreme, input); self.value = Some(self.extreme); self.extreme }
-            /// Return the latest cumulative extreme.
-            pub fn value(&self) -> Option<f64> { self.value }
-            /// Reset the persistent state and clear the latest value.
-            pub fn reset(&mut self) { self.extreme = $initial; self.value = None; }
-        }
-        impl Default for $name { fn default() -> Self { Self::new() } }
-    };
-}
-
-cumulative_extrema_operator!(CumulativeMaximum, f64::NEG_INFINITY, f64::max);
-cumulative_extrema_operator!(CumulativeMinimum, f64::INFINITY, f64::min);
-
 #[derive(Debug, Clone)]
 pub struct Drawdown { maximum: CumulativeMaximum, value: Option<f64> }
 impl Drawdown {
@@ -6144,6 +6086,7 @@ pub fn mcginley_dynamic(input: &[f64], length: usize, c: f64) -> TaResult<Vec<f6
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::stream::{CumulativeProduct, CumulativeSum};
 
     #[test]
     fn batch_and_stream_match() {
