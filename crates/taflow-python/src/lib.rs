@@ -121,6 +121,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::BosChochOperator>()?;
     m.add_class::<indicators::ObOperator>()?;
     m.add_class::<indicators::LiquidityOperator>()?;
+    m.add_class::<indicators::EqualHighsLowsOperator>()?;
     m.add_class::<indicators::HedgeRatioOperator>()?;
     m.add_class::<indicators::RollingEntropyOperator>()?;
     m.add_class::<indicators::RollingAutocorrOperator>()?;
