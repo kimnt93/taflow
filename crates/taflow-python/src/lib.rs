@@ -245,6 +245,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulKlingerVolumeOscillator>()?;
     m.add_class::<state_api::StatefulParabolicMovingAverageStop>()?;
     m.add_class::<state_api::StatefulTomDeMarkSequential>()?;
+    m.add_class::<state_api::StatefulAnchoredVolumeWeightedAveragePrice>()?;
     m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::StatefulAd>()?;

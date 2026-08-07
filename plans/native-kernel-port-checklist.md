@@ -38,7 +38,9 @@ For each item:
   constructor-history runtime check verified.
 - [x] `HeikinAshi` (`heikin_ashi`) — Rust causal OHLC transform, native
   four-output adapter, and constructor-history runtime check verified.
-- [ ] `AnchoredVolumeWeightedAveragePrice` (`anchored_vwap`)
+- [x] `AnchoredVolumeWeightedAveragePrice` (`anchored_vwap`) — Rust running
+  weighted-moment kernel, native three-output adapter, and anchor-history
+  runtime check verified.
 - [ ] `PivotPoints` (`pivot_points`)
 - [x] `OpeningRange` (`opening_range`) — Rust causal session-range kernel,
   native multi-output adapter, and anchor-history check verified.

@@ -1,25 +1,60 @@
-"""Anchored VWAP with running standard-deviation bands."""
+"""Native anchored volume-weighted average price interface."""
+
+from typing import Any
+
 import numpy as np
 
+from ._native import StatefulAnchoredVolumeWeightedAveragePrice
+
+
 class AnchoredVolumeWeightedAveragePrice:
-    """Stateful AnchoredVolumeWeightedAveragePrice indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute anchored weighted price and running deviation bands.
+
+    Parameters
+    ----------
+    high, low, close, volume : array-like, optional
+        Initial aligned OHLCV history.
+    anchor : array-like of bool, optional
+        Session-boundary flags for the initial history.
+    stdev : float, default 1
+        Standard-deviation band multiplier.
     """
-    def __init__(self, high=None, low=None, close=None, volume=None, anchor=None, stdev=1.0):
-        self.stdev=float(stdev); self.reset()
-        if close is not None: self.extend(high,low,close,volume,anchor)
-    def append(self, high, low, close, volume, anchor=False):
-        if anchor or self._n == 0: self._n=self._pv=self._v=self._p2v=0.0
-        p=(float(high)+float(low)+float(close))/3; v=float(volume); self._pv+=p*v; self._p2v+=p*p*v; self._v+=v; self._n+=1
-        mean=self._pv/self._v if self._v else np.nan; var=max(self._p2v/self._v-mean*mean,0) if self._v else np.nan
-        x=(mean, mean+self.stdev*np.sqrt(var), mean-self.stdev*np.sqrt(var)); self._values.append(x); return x
-    def extend(self, high, low, close, volume, anchor=None):
-        if anchor is None: anchor=[False]*len(close)
-        for row in zip(high,low,close,volume,anchor): self.append(*row)
+
+    def __init__(self, high: Any | None = None, low: Any | None = None,
+                 close: Any | None = None, volume: Any | None = None,
+                 anchor: Any | None = None, stdev: float = 1.0):
+        self._state = StatefulAnchoredVolumeWeightedAveragePrice(stdev)
+        if close is not None:
+            self.extend(high, low, close, volume, anchor)
+
+    def append(self, high: float, low: float, close: float, volume: float,
+               anchor: bool = False):
+        """Process one OHLCV bar and return mean, upper, and lower bands."""
+        return self._state.append(float(high), float(low), float(close),
+                                  float(volume), bool(anchor))
+
+    def extend(self, high: Any, low: Any, close: Any, volume: Any,
+               anchor: Any | None = None):
+        """Process aligned OHLCV history and return this indicator."""
+        close_array = np.asarray(close, dtype=np.float64)
+        if anchor is None:
+            anchor = np.zeros(close_array.shape, dtype=np.bool_)
+        self._state.extend(np.asarray(high, dtype=np.float64),
+                           np.asarray(low, dtype=np.float64), close_array,
+                           np.asarray(volume, dtype=np.float64),
+                           np.asarray(anchor, dtype=np.bool_))
         return self
-    def compute(self): return tuple(np.asarray(v) for v in zip(*self._values)) if self._values else (np.array([]),)*3
+
+    def compute(self):
+        """Return mean, upper-band, and lower-band histories."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._values[-1] if self._values else None
-    def reset(self): self._n=self._pv=self._v=self._p2v=0.; self._values=[]; return self
+    def value(self):
+        """Return the latest weighted mean and bands."""
+        return self._state.value
+
+    def reset(self):
+        """Clear weighted moments and output history."""
+        self._state.reset()
+        return self

@@ -19,6 +19,7 @@ use taflow::stream::{
     KlingerVolumeOscillator,
     ParabolicMovingAverageStop,
     TomDeMarkSequential,
+    AnchoredVolumeWeightedAveragePrice,
 };
 use taflow::MaType;
 
@@ -229,6 +230,37 @@ pub struct StatefulTomDeMarkSequential {
     inner: TomDeMarkSequential,
     buys: Vec<i32>,
     sells: Vec<i32>,
+}
+
+/// Native state adapter for anchored volume-weighted average price bands.
+#[pyclass]
+pub struct StatefulAnchoredVolumeWeightedAveragePrice {
+    inner: AnchoredVolumeWeightedAveragePrice,
+    means: Vec<f64>,
+    uppers: Vec<f64>,
+    lowers: Vec<f64>,
+}
+
+#[pymethods]
+impl StatefulAnchoredVolumeWeightedAveragePrice {
+    #[new]
+    #[pyo3(signature = (stdev=1.0))]
+    fn new(stdev: f64) -> Self { Self { inner: AnchoredVolumeWeightedAveragePrice::new(stdev), means: Vec::new(), uppers: Vec::new(), lowers: Vec::new() } }
+    fn append(&mut self, high: f64, low: f64, close: f64, volume: f64, anchor: bool) -> (f64, f64, f64) {
+        let value = self.inner.append(high, low, close, volume, anchor); self.means.push(value.0); self.uppers.push(value.1); self.lowers.push(value.2); value
+    }
+    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, volume: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
+        let (high, low, close, volume, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, volume.as_slice()?, anchor.as_slice()?);
+        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
+        for ((((&high, &low), &close), &volume), &anchor) in high.iter().zip(low).zip(close).zip(volume).zip(anchor) { self.append(high, low, close, volume, anchor); }
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (PyArray1::from_vec(py, self.means.clone()), PyArray1::from_vec(py, self.uppers.clone()), PyArray1::from_vec(py, self.lowers.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.means.clear(); self.uppers.clear(); self.lowers.clear(); }
 }
 
 #[pymethods]
