@@ -1,0 +1,1022 @@
+[
+  {
+    "name": "RollingApply",
+    "status": "PASS"
+  },
+  {
+    "name": "SessionFlags",
+    "status": "PASS"
+  },
+  {
+    "name": "AdaptInput",
+    "status": "PASS"
+  },
+  {
+    "name": "AdaptOutput",
+    "status": "PASS"
+  },
+  {
+    "name": "ToNumpy",
+    "status": "PASS"
+  },
+  {
+    "name": "ToList",
+    "status": "PASS"
+  },
+  {
+    "name": "ToPandas",
+    "status": "PASS"
+  },
+  {
+    "name": "MovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "MinusDirectionalIndicator",
+    "status": "PASS"
+  },
+  {
+    "name": "MinusDirectionalMovement",
+    "status": "PASS"
+  },
+  {
+    "name": "MoneyFlowIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "AveragePrice",
+    "status": "PASS"
+  },
+  {
+    "name": "MedianPrice",
+    "status": "PASS"
+  },
+  {
+    "name": "TypicalPrice",
+    "status": "PASS"
+  },
+  {
+    "name": "WeightedClose",
+    "status": "PASS"
+  },
+  {
+    "name": "MovingAverageConvergenceDivergenceFixed",
+    "status": "PASS"
+  },
+  {
+    "name": "MovingAverageConvergenceDivergenceExtended",
+    "status": "PASS"
+  },
+  {
+    "name": "BollingerBands",
+    "status": "PASS"
+  },
+  {
+    "name": "CommodityChannelIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "FastStochasticOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "HilbertTransformTrendline",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHikkake",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHikkakeModified",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHammer",
+    "status": "PASS"
+  },
+  {
+    "name": "HilbertTransformDominantCyclePeriod",
+    "status": "PASS"
+  },
+  {
+    "name": "HilbertTransformDominantCyclePhase",
+    "status": "PASS"
+  },
+  {
+    "name": "HilbertTransformPhasor",
+    "status": "PASS"
+  },
+  {
+    "name": "HilbertTransformSineWave",
+    "status": "PASS"
+  },
+  {
+    "name": "HilbertTransformTrendMode",
+    "status": "PASS"
+  },
+  {
+    "name": "StochasticOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "StochasticRelativeStrengthIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleStickSandwich",
+    "status": "PASS"
+  },
+  {
+    "name": "TripleExponentialRateOfChange",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleThreeBlackCrows",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleThreeInside",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleThreeLineStrike",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleThreeStarsInSouth",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleThreeOutside",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleTwoCrows",
+    "status": "PASS"
+  },
+  {
+    "name": "UltimateOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "VariablePeriodMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "HeikinAshi",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciRetracement",
+    "status": "PASS"
+  },
+  {
+    "name": "AnchoredVolumeWeightedAveragePrice",
+    "status": "PASS"
+  },
+  {
+    "name": "VariableIndexDynamicAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "LaguerreRelativeStrengthIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "RelativeStrengthIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "RelativeMomentumIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "SmoothedTrendChannel",
+    "status": "PASS"
+  },
+  {
+    "name": "JurikMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "ParabolicMovingAverageStop",
+    "status": "PASS"
+  },
+  {
+    "name": "TomDeMarkSequential",
+    "status": "PASS"
+  },
+  {
+    "name": "EvenBetterSinewave",
+    "status": "PASS"
+  },
+  {
+    "name": "PremiumDiscount",
+    "status": "PASS"
+  },
+  {
+    "name": "OpeningRange",
+    "status": "PASS"
+  },
+  {
+    "name": "PivotPoints",
+    "status": "PASS"
+  },
+  {
+    "name": "KlingerVolumeOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "SessionVolumeLevels",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleUpDownSideGapThreeMethods",
+    "status": "PASS"
+  },
+  {
+    "name": "IntradayMomentumIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "AccelerationBands",
+    "status": "PASS"
+  },
+  {
+    "name": "AverageTrueRange",
+    "status": "PASS"
+  },
+  {
+    "name": "DoubleExponentialMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "KaufmanAdaptiveMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "SimpleMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "NormalizedAverageTrueRange",
+    "status": "PASS"
+  },
+  {
+    "name": "TrueRange",
+    "status": "PASS"
+  },
+  {
+    "name": "TriangularMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "TripleExponentialMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "WeightedMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "Aroon",
+    "status": "PASS"
+  },
+  {
+    "name": "AroonOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "AccumulationDistribution",
+    "status": "PASS"
+  },
+  {
+    "name": "AccumulationDistributionOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "BalanceOfPower",
+    "status": "PASS"
+  },
+  {
+    "name": "OnBalanceVolume",
+    "status": "PASS"
+  },
+  {
+    "name": "AbsolutePriceOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "PercentagePriceOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "ChandeMomentumOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "Momentum",
+    "status": "PASS"
+  },
+  {
+    "name": "RateOfChange",
+    "status": "PASS"
+  },
+  {
+    "name": "RateOfChangePercent",
+    "status": "PASS"
+  },
+  {
+    "name": "RateOfChangeRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "RateOfChangeRatioPercent",
+    "status": "PASS"
+  },
+  {
+    "name": "WilliamsPercentR",
+    "status": "PASS"
+  },
+  {
+    "name": "AverageDirectionalIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "AverageDirectionalIndexRating",
+    "status": "PASS"
+  },
+  {
+    "name": "DirectionalMovementIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleDoji",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleTakuri",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleMarubozu",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleClosingMarubozu",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleLongLeggedDoji",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleRickshawman",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHighWave",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleDragonflyDoji",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleGravestoneDoji",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleShortLine",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleSpinningTop",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleLongLine",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleDojiStar",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleBeltHold",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleEngulfing",
+    "status": "PASS"
+  },
+  {
+    "name": "ExponentialMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "ParabolicSar",
+    "status": "PASS"
+  },
+  {
+    "name": "ParabolicSarExtended",
+    "status": "PASS"
+  },
+  {
+    "name": "PlusDirectionalIndicator",
+    "status": "PASS"
+  },
+  {
+    "name": "PlusDirectionalMovement",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleThreeWhiteSoldiers",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleAbandonedBaby",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleAdvanceBlock",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleBreakaway",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleConcealBabySwall",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleCounterAttack",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleDarkCloudCover",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleEveningDojiStar",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleEveningStar",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleGapSideSideWhite",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHangingMan",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHarami",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHaramiCross",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleHomingPigeon",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleIdenticalThreeCrows",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleInNeck",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleInvertedHammer",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleKicking",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleKickingByLength",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleLadderBottom",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleMatchingLow",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleMatHold",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleMorningDojiStar",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleMorningStar",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleOnNeck",
+    "status": "PASS"
+  },
+  {
+    "name": "CandlePiercing",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleRiseFallThreeMethods",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleSeparatingLines",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleShootingStar",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleStalledPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleTasukiGap",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleThrusting",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleTriStar",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleUniqueThreeRiver",
+    "status": "PASS"
+  },
+  {
+    "name": "CandleUpsideGapTwoCrows",
+    "status": "PASS"
+  },
+  {
+    "name": "Lag",
+    "status": "PASS"
+  },
+  {
+    "name": "LogReturn",
+    "status": "PASS"
+  },
+  {
+    "name": "CumulativeSum",
+    "status": "PASS"
+  },
+  {
+    "name": "CumulativeProduct",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMedian",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMin",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMax",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingSum",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingArgmin",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingArgmax",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMode",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingQuantile",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingPercentile",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingRank",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingZScore",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingSkew",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingKurtosis",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingInterquartileRange",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingCov",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingWinsorize",
+    "status": "PASS"
+  },
+  {
+    "name": "ExponentiallyWeightedVariance",
+    "status": "PASS"
+  },
+  {
+    "name": "ExponentiallyWeightedStandardDeviation",
+    "status": "PASS"
+  },
+  {
+    "name": "ExponentiallyWeightedCovariance",
+    "status": "PASS"
+  },
+  {
+    "name": "ExponentiallyWeightedCorrelation",
+    "status": "PASS"
+  },
+  {
+    "name": "CumulativeMaximum",
+    "status": "PASS"
+  },
+  {
+    "name": "CumulativeMinimum",
+    "status": "PASS"
+  },
+  {
+    "name": "Drawdown",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingSharpe",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingSortino",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingCalmar",
+    "status": "PASS"
+  },
+  {
+    "name": "HullMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "VolumeWeightedMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "ZeroLagExponentialMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "ArnaudLegouxMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "TrueStrengthIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "AwesomeOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "FisherTransform",
+    "status": "PASS"
+  },
+  {
+    "name": "Donchian",
+    "status": "PASS"
+  },
+  {
+    "name": "UlcerIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "KeltnerChannels",
+    "status": "PASS"
+  },
+  {
+    "name": "ChaikinVolatility",
+    "status": "PASS"
+  },
+  {
+    "name": "Crossover",
+    "status": "PASS"
+  },
+  {
+    "name": "Crossunder",
+    "status": "PASS"
+  },
+  {
+    "name": "Cross",
+    "status": "PASS"
+  },
+  {
+    "name": "Rising",
+    "status": "PASS"
+  },
+  {
+    "name": "Falling",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingVolumeWeightedAveragePrice",
+    "status": "PASS"
+  },
+  {
+    "name": "ForceIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "EaseOfMovement",
+    "status": "PASS"
+  },
+  {
+    "name": "HigherHigh",
+    "status": "PASS"
+  },
+  {
+    "name": "LowerLow",
+    "status": "PASS"
+  },
+  {
+    "name": "InsideBar",
+    "status": "PASS"
+  },
+  {
+    "name": "OutsideBar",
+    "status": "PASS"
+  },
+  {
+    "name": "GapUp",
+    "status": "PASS"
+  },
+  {
+    "name": "GapDown",
+    "status": "PASS"
+  },
+  {
+    "name": "BarsSince",
+    "status": "PASS"
+  },
+  {
+    "name": "ValueWhen",
+    "status": "PASS"
+  },
+  {
+    "name": "HighestSince",
+    "status": "PASS"
+  },
+  {
+    "name": "LowestSince",
+    "status": "PASS"
+  },
+  {
+    "name": "SignalDelay",
+    "status": "PASS"
+  },
+  {
+    "name": "PositionHold",
+    "status": "PASS"
+  },
+  {
+    "name": "EntryExit",
+    "status": "PASS"
+  },
+  {
+    "name": "SwingHighLow",
+    "status": "PASS"
+  },
+  {
+    "name": "SwingHigh",
+    "status": "PASS"
+  },
+  {
+    "name": "SwingLow",
+    "status": "PASS"
+  },
+  {
+    "name": "Retracements",
+    "status": "PASS"
+  },
+  {
+    "name": "SessionExtrema",
+    "status": "PASS"
+  },
+  {
+    "name": "PreviousHighLow",
+    "status": "PASS"
+  },
+  {
+    "name": "Sessions",
+    "status": "PASS"
+  },
+  {
+    "name": "FairValueGap",
+    "status": "PASS"
+  },
+  {
+    "name": "DonchianChannels",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingVolumeWeightedAveragePrice",
+    "status": "PASS"
+  },
+  {
+    "name": "SwingHighsLows",
+    "status": "PASS"
+  },
+  {
+    "name": "BreakOfStructureChangeOfCharacter",
+    "status": "PASS"
+  },
+  {
+    "name": "OrderBlock",
+    "status": "PASS"
+  },
+  {
+    "name": "Liquidity",
+    "status": "PASS"
+  },
+  {
+    "name": "EqualHighsLows",
+    "status": "PASS"
+  },
+  {
+    "name": "HedgeRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingEntropy",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingAutocorr",
+    "status": "PASS"
+  },
+  {
+    "name": "Hurst",
+    "status": "PASS"
+  },
+  {
+    "name": "FractalDimension",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingAlpha",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingInformationRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "CloseToCloseSigma",
+    "status": "PASS"
+  },
+  {
+    "name": "Parkinson",
+    "status": "PASS"
+  },
+  {
+    "name": "GarmanKlass",
+    "status": "PASS"
+  },
+  {
+    "name": "RogersSatchell",
+    "status": "PASS"
+  },
+  {
+    "name": "GarmanKlassYangZhang",
+    "status": "PASS"
+  },
+  {
+    "name": "YangZhang",
+    "status": "PASS"
+  },
+  {
+    "name": "AverageDailyDollarValue",
+    "status": "PASS"
+  },
+  {
+    "name": "Amihud",
+    "status": "PASS"
+  },
+  {
+    "name": "RollSpread",
+    "status": "PASS"
+  },
+  {
+    "name": "OrnsteinUhlenbeckHalfLife",
+    "status": "PASS"
+  },
+  {
+    "name": "CumulativeSumControlChart",
+    "status": "PASS"
+  },
+  {
+    "name": "SpreadZScore",
+    "status": "PASS"
+  },
+  {
+    "name": "FracDiff",
+    "status": "PASS"
+  },
+  {
+    "name": "KalmanHedgeRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "Supertrend",
+    "status": "PASS"
+  },
+  {
+    "name": "Ichimoku",
+    "status": "PASS"
+  },
+  {
+    "name": "Squeeze",
+    "status": "PASS"
+  },
+  {
+    "name": "SqueezePro",
+    "status": "PASS"
+  },
+  {
+    "name": "SchaffTrendCycle",
+    "status": "PASS"
+  },
+  {
+    "name": "Vortex",
+    "status": "PASS"
+  },
+  {
+    "name": "KnowSureThing",
+    "status": "PASS"
+  },
+  {
+    "name": "MassIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "DetrendedPriceOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "ChaikinMoneyFlow",
+    "status": "PASS"
+  },
+  {
+    "name": "VolumePriceTrend",
+    "status": "PASS"
+  },
+  {
+    "name": "NegativeVolumeIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "PositiveVolumeIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "McGinleyDynamic",
+    "status": "PASS"
+  }
+]

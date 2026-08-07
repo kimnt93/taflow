@@ -92,7 +92,6 @@ from ..rolling_kurtosis import RollingKurtosis
 from ..rolling_iqr import RollingInterquartileRange
 from ..rolling_cov import RollingCov
 from ..rolling_winsorize import RollingWinsorize
-from ..rolling_apply import rolling_apply
 from ..ewm_var import ExponentiallyWeightedVariance
 from ..ewm_std import ExponentiallyWeightedStandardDeviation
 from ..ewm_cov import ExponentiallyWeightedCovariance
@@ -134,7 +133,7 @@ from ..state_helpers import (
 )
 from ..swing import SwingHighLow, SwingHigh, SwingLow
 from ..retracements import Retracements
-from ..session import SessionExtrema, session_flags
+from ..session import SessionExtrema
 from ..previous_high_low import PreviousHighLow
 from ..sessions import Sessions
 from ..zones import ActiveZoneList
@@ -251,7 +250,6 @@ __all__ = [
     "RollingInterquartileRange",
     "RollingCov",
     "RollingWinsorize",
-    "rolling_apply",
     "ExponentiallyWeightedVariance",
     "ExponentiallyWeightedStandardDeviation",
     "ExponentiallyWeightedCovariance",
@@ -299,7 +297,6 @@ __all__ = [
     "SwingLow",
     "Retracements",
     "SessionExtrema",
-    "session_flags",
     "PreviousHighLow",
     "Sessions",
     "ActiveZoneList",

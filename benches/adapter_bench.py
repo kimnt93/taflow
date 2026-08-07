@@ -32,14 +32,14 @@ def _timed(fn, repeats=5):
 
 
 def _pipeline(values):
-    pipeline = taflow.Pipeline()
+    pipeline = taflow.executions.TAPipeline()
     ema = pipeline.indicator("ema", EMA(20), pipeline.source("close"))
     pipeline.output("ema", ema)
     return pipeline.extend({"close": values})
 
 
 def _streaming(values):
-    pipeline = taflow.Pipeline()
+    pipeline = taflow.executions.TAPipeline()
     ema = pipeline.indicator("ema", EMA(20), pipeline.source("close"))
     pipeline.output("ema", ema)
     pipeline.extend({"close": values})
@@ -52,16 +52,16 @@ def run(sizes, repeats):
         values = np.linspace(90.0, 110.0, size, dtype=np.float64)
         row = {"size": size, "conversion": {}, "pipeline": {}}
         for name, value in (("numpy", values), ("list", values.tolist())):
-            row["conversion"][name] = _timed(lambda v=value, n=name: taflow.AdapterGateway.input(v, adapter=n), repeats)
-            row["pipeline"][name] = _timed(lambda v=value, n=name: _pipeline(taflow.AdapterGateway.input(v, adapter=n)), repeats)
+            row["conversion"][name] = _timed(lambda v=value, n=name: taflow.executions.TAAdapterGateway.input(v, adapter=n), repeats)
+            row["pipeline"][name] = _timed(lambda v=value, n=name: _pipeline(taflow.executions.TAAdapterGateway.input(v, adapter=n)), repeats)
         stream = _streaming(values)
         row["streaming_append"] = _timed(lambda: stream.append({"close": 105.0}), repeats)
         for name, value in (("arrow", values), ("polars", values)):
             try:
-                converted = taflow.AdapterGateway.output(value, adapter=name)
+                converted = taflow.executions.TAAdapterGateway.output(value, adapter=name)
             except ImportError:
                 continue
-            row["conversion"][name] = _timed(lambda v=converted, n=name: taflow.AdapterGateway.input(v, adapter=n), repeats)
+            row["conversion"][name] = _timed(lambda v=converted, n=name: taflow.executions.TAAdapterGateway.input(v, adapter=n), repeats)
         rows.append(row)
     return rows
 

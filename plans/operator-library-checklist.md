@@ -108,9 +108,9 @@ Two aligned input series are within the contract (like BETA/CORREL).
 
 ## Execution and adapters
 
-- [x] indicator pipeline with one dispatch per input bar (`taflow.Pipeline`)
+- [x] indicator pipeline with one dispatch per input bar (`taflow.executions.TAPipeline`)
 - [x] dependency graph and common-subexpression sharing (identity-memoized nodes)
-- [x] expression engine (`taflow.Expr` arithmetic composition)
+- [x] expression engine (`taflow.executions.TAExpr` arithmetic composition)
 - [x] NumPy input/output adapter performance checks (`benches/adapter_bench.py`;
       the historical test file was removed with the tests directory)
 - [x] Arrow adapter feature (optional `pyarrow` extra, lazy import)
