@@ -4,6 +4,15 @@ use crate::error::TaResult;
 
 use super::directional::DirectionalMovement;
 
+/// Computes an aligned Directional Movement Index vector from HLC slices.
+pub fn directional_movement_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+    }
+    let mut state = DirectionalMovementIndex::new(timeperiod)?;
+    Ok(high.iter().zip(low).zip(close).map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental DX with TA-Lib-compatible Wilder smoothing and lookback.
 pub struct DirectionalMovementIndex {
     directional: DirectionalMovement,

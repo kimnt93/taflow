@@ -228,7 +228,7 @@ pub use cdl_upsidegap2crows::CandleUpsideGapTwoCrows;
 pub use cdl_xsidegap3methods::CandleUpDownSideGapThreeMethods;
 pub use cmo::ChandeMomentumOscillator;
 pub use dema::DoubleExponentialMovingAverage;
-pub use dx::DirectionalMovementIndex;
+pub use dx::{DirectionalMovementIndex, directional_movement_index};
 pub use ema::ExponentialMovingAverage;
 pub use ht_trendline::HilbertTransformTrendline;
 pub use ht_trendmode::HilbertTransformTrendMode;
