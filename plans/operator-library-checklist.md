@@ -122,6 +122,9 @@ Two aligned input series are within the contract (like BETA/CORREL).
 - [ ] batch implementation and property tests
 - [ ] stateful implementation when mathematically possible
 - [ ] NumPy/Python API test
+- [ ] **all review gates in `/CHECK.md` pass** (module placement, rolling_
+      naming, no builtin-shadowing params, enums for selectors, typed +
+      documented, multi-line style, one function one file)
 - [ ] checklist updated
 
 ## Deferred benchmark and report gates
@@ -130,37 +133,45 @@ Two aligned input series are within the contract (like BETA/CORREL).
 - [ ] continuous-backfill and streaming latency benchmarks
 - [ ] per-function reports and aggregate validation report
 
+## Renamed, not duplicated (one kernel, two surfaces — see `CHECK.md` §2)
+
+These are NOT separate checklist items: each is one Rust kernel already in
+`full-ta-checklist.md`, exposed under its canonical `taflow` name with the
+TA-Lib uppercase name living only in `taflow.talib`. Per the rolling
+rename rule, the un-prefixed name (`min`, `max`, `sum`, …) does not exist
+in `taflow` at all.
+
+| taflow canonical name | taflow.talib alias |
+|---|---|
+| rolling_min / rolling_max | MIN / MAX |
+| rolling_sum | SUM |
+| rolling_argmin / rolling_argmax | MININDEX / MAXINDEX |
+| rolling_minmax / rolling_minmax_index | MINMAX / MINMAXINDEX |
+| rolling_midpoint | MIDPOINT |
+| rolling_var / rolling_std | VAR / STDDEV |
+| rolling_avgdev | AVGDEV |
+| rolling_corr / rolling_beta | CORREL / BETA |
+| rolling_linreg (+ slope/intercept/angle, rolling_tsf) | LINEARREG* / TSF |
+| median_price / typical_price / avg_price / weighted_close | MEDPRICE / TYPPRICE / AVGPRICE / WCLPRICE |
+| true_range | TRANGE |
+| sma / ema / … (moving averages keep indicator names) | SMA / EMA / … |
+
 ## Removed entries (do not re-propose)
 
 ### Duplicates of TA-Lib functions (already in `full-ta-checklist.md`)
 
-| Removed name | It is exactly | 
+| Removed name | It is exactly |
 |---|---|
-| rolling_sum / rolling_mean | SUM / SMA |
-| rolling_min / rolling_max | MIN / MAX |
-| rolling_argmin / rolling_argmax | MININDEX / MAXINDEX |
-| rolling_var / rolling_std | VAR / STDDEV |
-| rolling_mad | AVGDEV |
-| rolling_corr / rolling_beta | CORREL / BETA |
 | ewm_mean | EMA |
 | Wilder smoothing | EMA with `alpha = 1/period` (stays as an internal shared primitive, not a public operator) |
 | diff / change | MOM |
 | pct_change | ROCP |
 | ratio | DIV |
 | spread | SUB (the hedged spread is `SUB(y, hedge_ratio*x)` — a composition) |
-| hl2 / median_price | MEDPRICE |
-| hlc3 / typical_price | TYPPRICE |
-| ohlc4 | AVGPRICE |
-| weighted_close | WCLPRICE |
-| true_range | TRANGE |
 | log_price | LN |
 | return / rolling_return | ROCP(1) / ROCP(n) |
 | LSMA (least-squares MA) | LINEARREG |
 | engulfing / doji / pinbar | CDLENGULFING / CDLDOJI / CDLHAMMER + CDLSHOOTINGSTAR (the 61 CDL patterns cover these) |
-
-Descriptive aliases for TA-Lib names (e.g. `typical_price` → TYPPRICE) are
-welcome as zero-cost Python-level re-exports, but they are naming, not
-checklist items.
 
 ### Trivial one-liners (self-computable with numpy on existing outputs)
 

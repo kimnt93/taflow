@@ -12,6 +12,11 @@ Implementation checklist derived from
 Functions from the research that violate this contract are listed at the
 bottom as explicit non-goals — do not implement them under this API.
 
+Every item must additionally pass all review gates in
+[`/CHECK.md`](../CHECK.md) (module placement + naming map, no
+builtin-shadowing params, typed enums, docs, multi-line style, one function
+one file) before its box is checked; the master status table lives there.
+
 Reference legend: **Impl** = concrete open-source implementation to match
 (or align to) numerically; **Theory** = defining paper/book. Read the Impl
 source before coding — secondhand descriptions of these algorithms are
