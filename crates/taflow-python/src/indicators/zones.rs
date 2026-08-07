@@ -30,7 +30,7 @@ impl ActiveZoneListOperator {
     }
 
     #[getter]
-    fn size(&self) -> usize { self.inner.zones().len() }
+    fn size(&self) -> usize { self.inner.zone_count() }
 
     fn reset(&mut self) { self.inner.reset(); }
 }

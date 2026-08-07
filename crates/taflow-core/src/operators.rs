@@ -666,7 +666,7 @@ pub struct SessionExtrema {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Zone {
+struct Zone {
     pub top: f64,
     pub bottom: f64,
     pub birth: usize,
@@ -4594,7 +4594,8 @@ impl ActiveZoneList {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn zones(&self) -> &[Zone] { &self.zones }
+    /// Returns the number of currently active zones.
+    pub fn zone_count(&self) -> usize { self.zones.len() }
 
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
@@ -4921,7 +4922,7 @@ pub fn ewm_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<V
 }
 
 #[derive(Debug, Clone)]
-pub struct RollingMean {
+struct RollingMean {
     values: VecDeque<f64>,
     timeperiod: usize,
     sum: f64,
@@ -5959,7 +5960,7 @@ pub fn volume_price_trend(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
 enum VolumeIndexMode { Negative, Positive }
 
 #[derive(Debug, Clone)]
-pub struct VolumeIndex { mode: VolumeIndexMode, previous_close: Option<f64>, previous_volume: Option<f64>, value: f64 }
+struct VolumeIndex { mode: VolumeIndexMode, previous_close: Option<f64>, previous_volume: Option<f64>, value: f64 }
 
 impl VolumeIndex {
     fn new(mode: VolumeIndexMode) -> Self { Self { mode, previous_close: None, previous_volume: None, value: 1000.0 } }
