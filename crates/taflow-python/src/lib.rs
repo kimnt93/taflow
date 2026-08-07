@@ -144,6 +144,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::DpoOperator>()?;
     m.add_class::<indicators::CmfOperator>()?;
     m.add_class::<indicators::VptOperator>()?;
+    m.add_class::<indicators::NviOperator>()?;
+    m.add_class::<indicators::PviOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;

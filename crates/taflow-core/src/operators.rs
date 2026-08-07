@@ -4688,6 +4688,41 @@ pub fn vpt(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     Ok(close.iter().zip(volume).map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN)).collect())
 }
 
+#[derive(Debug, Clone, Copy)]
+enum VolumeIndexMode { Negative, Positive }
+
+#[derive(Debug, Clone)]
+pub struct VolumeIndex { mode: VolumeIndexMode, previous_close: Option<f64>, previous_volume: Option<f64>, value: f64 }
+
+impl VolumeIndex {
+    fn new(mode: VolumeIndexMode) -> Self { Self { mode, previous_close: None, previous_volume: None, value: 1000.0 } }
+    fn append(&mut self, close: f64, volume: f64) -> f64 {
+        if let (Some(previous_close), Some(previous_volume)) = (self.previous_close, self.previous_volume) {
+            let active = match self.mode { VolumeIndexMode::Negative => volume < previous_volume, VolumeIndexMode::Positive => volume > previous_volume };
+            if active && previous_close != 0.0 { self.value *= 1.0 + (close - previous_close) / previous_close; }
+        }
+        self.previous_close = Some(close); self.previous_volume = Some(volume); self.value
+    }
+    fn reset(&mut self) { self.previous_close = None; self.previous_volume = None; self.value = 1000.0; }
+}
+
+pub struct Nvi(VolumeIndex);
+pub struct Pvi(VolumeIndex);
+impl Nvi { pub fn new() -> Self { Self(VolumeIndex::new(VolumeIndexMode::Negative)) } pub fn append(&mut self, close: f64, volume: f64) -> f64 { self.0.append(close, volume) } pub fn value(&self) -> f64 { self.0.value } pub fn reset(&mut self) { self.0.reset(); } }
+impl Pvi { pub fn new() -> Self { Self(VolumeIndex::new(VolumeIndexMode::Positive)) } pub fn append(&mut self, close: f64, volume: f64) -> f64 { self.0.append(close, volume) } pub fn value(&self) -> f64 { self.0.value } pub fn reset(&mut self) { self.0.reset(); } }
+
+pub fn nvi(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+    if close.len() != volume.len() { return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() }); }
+    let mut state = VolumeIndex::new(VolumeIndexMode::Negative);
+    Ok(close.iter().zip(volume).map(|(&c, &v)| { state.append(c, v) }).collect())
+}
+
+pub fn pvi(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+    if close.len() != volume.len() { return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() }); }
+    let mut state = VolumeIndex::new(VolumeIndexMode::Positive);
+    Ok(close.iter().zip(volume).map(|(&c, &v)| { state.append(c, v) }).collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -352,8 +352,8 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | cmf | cmf | _ |
 | [ ] | kvo | kvo | _ |
 | [x] | vpt | vpt | _ |
-| [ ] | nvi | nvi | _ |
-| [ ] | pvi | pvi | _ |
+| [x] | nvi | nvi | _ |
+| [x] | pvi | pvi | _ |
 | [ ] | mcginley | mcginley | _ |
 | [ ] | vidya | vidya | _ |
 | [ ] | laguerre_rsi | laguerre_rsi | _ |

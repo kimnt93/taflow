@@ -190,6 +190,8 @@ from .mass_index import MassIndex
 from .dpo import Dpo
 from .cmf import Cmf
 from .vpt import Vpt
+from .nvi import Nvi
+from .pvi import Pvi
 
 __all__ = [
     "talib",
@@ -369,5 +371,7 @@ __all__ = [
     "Dpo",
     "Cmf",
     "Vpt",
+    "Nvi",
+    "Pvi",
     "__version__",
 ]
