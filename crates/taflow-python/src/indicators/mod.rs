@@ -30,6 +30,7 @@ mod extended_trend;
 mod extended_momentum;
 mod volatility_extended;
 mod volatility_more;
+mod signal_helpers;
 mod belt_hold;
 mod closing_marubozu;
 mod doji;
@@ -135,6 +136,7 @@ pub use extended_trend::{AlmaOperator, HmaOperator, VwmaOperator, ZlemaOperator}
 pub use extended_momentum::{AwesomeOscillatorOperator, FisherTransformOperator, TsiOperator};
 pub use volatility_extended::{DonchianOperator, UlcerIndexOperator};
 pub use volatility_more::{ChaikinVolatilityOperator, KeltnerChannelsOperator};
+pub use signal_helpers::{CrossOperator, CrossoverOperator, CrossunderOperator, FallingOperator, RisingOperator};
 pub use belt_hold::BeltHold;
 pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;

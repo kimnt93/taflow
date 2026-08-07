@@ -93,6 +93,11 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::UlcerIndexOperator>()?;
     m.add_class::<indicators::KeltnerChannelsOperator>()?;
     m.add_class::<indicators::ChaikinVolatilityOperator>()?;
+    m.add_class::<indicators::CrossoverOperator>()?;
+    m.add_class::<indicators::CrossunderOperator>()?;
+    m.add_class::<indicators::CrossOperator>()?;
+    m.add_class::<indicators::RisingOperator>()?;
+    m.add_class::<indicators::FallingOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;
