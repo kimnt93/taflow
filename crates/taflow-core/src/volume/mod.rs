@@ -92,39 +92,8 @@ pub fn accumulation_distribution_oscillator(
     Ok(output)
 }
 
-/// On Balance Volume (OBV)
-pub fn on_balance_volume(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
-    let len = close.len();
-    if len != volume.len() {
-        return Err(TaError::LengthMismatch {
-            expected: len,
-            got: volume.len(),
-        });
-    }
-    if len == 0 {
-        return Ok(vec![]);
-    }
-
-    // push() is intentional: at 1M bars, push() avoids calloc COW page faults
-    // that vec![0.0;n]+indexed would cause (0.98x vs 1.94x at 1M).
-    // Tradeoff: 0.42x at 1K due to per-push capacity check overhead.
-    let mut output = Vec::with_capacity(len);
-    let mut acc = volume[0];
-    output.push(acc);
-    for i in 1..len {
-        let c = close[i];
-        let pc = close[i - 1];
-        let v = volume[i];
-        if c > pc {
-            acc += v;
-        } else if c < pc {
-            acc -= v;
-        }
-        output.push(acc);
-    }
-
-    Ok(output)
-}
+/// Compatibility export for the stream-owned On-Balance Volume kernel.
+pub use crate::stream::on_balance_volume;
 
 #[cfg(test)]
 mod tests {

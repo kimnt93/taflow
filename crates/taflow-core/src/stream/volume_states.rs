@@ -4,6 +4,15 @@ use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, RollingExtrema};
 
+/// Computes an aligned On-Balance Volume vector from close and volume slices.
+pub fn on_balance_volume(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+    if close.len() != volume.len() {
+        return Err(crate::TaError::LengthMismatch { expected: close.len(), got: volume.len() });
+    }
+    let mut state = OnBalanceVolume::new();
+    Ok(close.iter().zip(volume).map(|(&close, &volume)| state.append(close, volume)).collect())
+}
+
 fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {
     let range = high - low;
     if range > 0.0 {
