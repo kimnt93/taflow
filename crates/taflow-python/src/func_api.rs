@@ -1076,7 +1076,7 @@ pub fn ATR(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volatility::average_true_range(
+    let result = ta_err!(core::stream::average_true_range(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -1099,7 +1099,7 @@ pub fn NATR(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volatility::normalized_average_true_range(
+    let result = ta_err!(core::stream::normalized_average_true_range(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -1120,7 +1120,7 @@ pub fn TRANGE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volatility::true_range(
+    let result = ta_err!(core::stream::true_range(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -1145,7 +1145,7 @@ pub fn AD(
     close: PyReadonlyArray1<f64>,
     volume: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volume::accumulation_distribution(
+    let result = ta_err!(core::stream::accumulation_distribution(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -1170,7 +1170,7 @@ pub fn ADOSC(
     fastperiod: usize,
     slowperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volume::accumulation_distribution_oscillator(
+    let result = ta_err!(core::stream::accumulation_distribution_oscillator(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -1192,7 +1192,7 @@ pub fn OBV(
     close: PyReadonlyArray1<f64>,
     volume: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volume::on_balance_volume(close.as_slice()?, volume.as_slice()?))?;
+    let result = ta_err!(core::stream::on_balance_volume(close.as_slice()?, volume.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 

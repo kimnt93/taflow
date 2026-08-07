@@ -313,8 +313,7 @@ pub(super) fn invalid_period(name: &'static str, period: usize, minimum: usize) 
 mod tests {
     use super::*;
     use crate::{
-        math_operator, math_transform, momentum, overlap, price_transform, statistic, volatility,
-        volume,
+        math_operator, math_transform, momentum, overlap, price_transform, statistic,
     };
 
     fn assert_optional_eq(actual: Option<f64>, expected: f64) {
@@ -636,9 +635,9 @@ mod tests {
         let volumes: Vec<f64> = (0..close.len())
             .map(|index| 1_000.0 + (index % 13) as f64 * 37.0)
             .collect();
-        let ad_expected = volume::accumulation_distribution(&high, &low, &close, &volumes).unwrap();
-        let adosc_expected = volume::accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
-        let obv_expected = volume::on_balance_volume(&close, &volumes).unwrap();
+        let ad_expected = accumulation_distribution(&high, &low, &close, &volumes).unwrap();
+        let adosc_expected = accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
+        let obv_expected = on_balance_volume(&close, &volumes).unwrap();
         let mut ad = AccumulationDistribution::new();
         let mut adosc = AccumulationDistributionOscillator::new(3, 10).unwrap();
         let mut obv = OnBalanceVolume::new();
@@ -724,9 +723,9 @@ mod tests {
             .collect();
         let high: Vec<f64> = close.iter().map(|v| v + 1.5).collect();
         let low: Vec<f64> = close.iter().map(|v| v - 1.0).collect();
-        let atr_batch = volatility::average_true_range(&high, &low, &close, 14).unwrap();
-        let trange_batch = volatility::true_range(&high, &low, &close).unwrap();
-        let natr_batch = volatility::normalized_average_true_range(&high, &low, &close, 14).unwrap();
+        let atr_batch = average_true_range(&high, &low, &close, 14).unwrap();
+        let trange_batch = true_range(&high, &low, &close).unwrap();
+        let natr_batch = normalized_average_true_range(&high, &low, &close, 14).unwrap();
         let (macd_batch, signal_batch, histogram_batch) =
             momentum::moving_average_convergence_divergence(&close, 12, 26, 9).unwrap();
         let mut atr = AverageTrueRange::new(14).unwrap();
