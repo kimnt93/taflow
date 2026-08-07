@@ -33,3 +33,9 @@ Thumbs.db
 # Codex agent config (holds API key + runtime state; repo is public)
 .agents/codex/*
 !.agents/codex/.gitkeep
+
+node_modules/*
+package-lock.json
+package.json
+opencode.json
+.opencode/*
