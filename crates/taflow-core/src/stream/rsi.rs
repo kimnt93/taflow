@@ -3,9 +3,26 @@
 //! RSI retains Wilder's average gain and loss recurrence and uses TA-Lib's
 //! operation order and epsilon rule for deterministic composite indicators.
 
-use crate::error::TaResult;
+use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, StreamingIndicator};
+
+/// Computes an aligned Wilder RSI vector using the same recurrence as the
+/// streaming state. The first `timeperiod` values are `NaN` warm-up entries.
+pub fn relative_strength_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if timeperiod < 2 {
+        return Err(TaError::InvalidParameter {
+            name: "timeperiod",
+            value: timeperiod.to_string(),
+            reason: "must be >= 2",
+        });
+    }
+    let mut state = RelativeStrengthIndex::new(timeperiod)?;
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
+}
 
 /// Incremental Wilder RSI with TA-Lib-compatible warm-up and rounding.
 #[derive(Debug, Clone)]
