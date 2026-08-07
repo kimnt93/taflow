@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::error::{TaError, TaResult};
-use crate::stream::{AverageTrueRange, CumulativeMaximum, ExponentialMovingAverage, RollingMidprice, SimpleMovingAverage, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
+use crate::stream::{AverageTrueRange, CumulativeMaximum, ExponentialMovingAverage, RollingMedian, RollingMode, RollingMidprice, SimpleMovingAverage, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
 
 pub(crate) fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
@@ -4975,103 +4975,6 @@ impl RollingMean {
 }
 
 #[derive(Debug, Clone)]
-pub struct RollingMedian {
-    values: VecDeque<f64>,
-    timeperiod: usize,
-    value: Option<f64>,
-}
-
-impl RollingMedian {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(timeperiod: usize) -> TaResult<Self> {
-        validate_period(timeperiod)?;
-        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
-    }
-
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.values.len() == self.timeperiod { self.values.pop_front(); }
-        self.values.push_back(input);
-        self.value = if self.values.len() == self.timeperiod {
-            let mut sorted: Vec<f64> = self.values.iter().copied().collect();
-            sorted.sort_by(f64::total_cmp);
-            let middle = self.timeperiod / 2;
-            Some(if self.timeperiod % 2 == 1 {
-                sorted[middle]
-            } else {
-                (sorted[middle - 1] + sorted[middle]) * 0.5
-            })
-        } else { None };
-        self.value
-    }
-
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<f64> { self.value }
-    /// Reset the persistent state and clear the latest value.
-    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
-}
-
-#[derive(Debug, Clone)]
-pub struct RollingMode {
-    values: VecDeque<f64>,
-    timeperiod: usize,
-    value: Option<f64>,
-}
-
-impl RollingMode {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(timeperiod: usize) -> TaResult<Self> {
-        validate_period(timeperiod)?;
-        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
-    }
-
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.values.len() == self.timeperiod { self.values.pop_front(); }
-        self.values.push_back(input);
-        self.value = if self.values.len() == self.timeperiod {
-            let mut best = self.values[0];
-            let mut best_count = 0;
-            for &candidate in &self.values {
-                let count = self.values.iter().filter(|&&value| value == candidate).count();
-                if count > best_count { best = candidate; best_count = count; }
-            }
-            Some(best)
-        } else { None };
-        self.value
-    }
-
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<f64> { self.value }
-    /// Reset the persistent state and clear the latest value.
-    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
-}
-
-#[derive(Debug, Clone)]
 pub struct RollingQuantile {
     values: VecDeque<f64>,
     timeperiod: usize,
@@ -6044,7 +5947,7 @@ pub fn mcginley_dynamic(input: &[f64], length: usize, c: f64) -> TaResult<Vec<f6
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::stream::{CumulativeProduct, CumulativeSum, LogReturn};
+    use crate::stream::{CumulativeProduct, CumulativeSum, LogReturn, RollingMedian, RollingMode};
 
     #[test]
     fn batch_and_stream_match() {
