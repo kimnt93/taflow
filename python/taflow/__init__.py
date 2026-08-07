@@ -64,6 +64,7 @@ from .ultimate_oscillator import ULTOSC, UltimateOscillator
 from .variable_period_moving_average import VariablePeriodMovingAverage
 from .heikin_ashi import HeikinAshi
 from .fibonacci_retracement import FibonacciRetracement
+from .anchored_vwap import AnchoredVWAP
 from .up_down_side_gap_three_methods import CDLXSIDEGAP3METHODS, UpDownSideGapThreeMethods
 from .three_white_soldiers import CDL3WHITESOLDIERS, ThreeWhiteSoldiers
 from .abandoned_baby import CDLABANDONEDBABY, AbandonedBaby
@@ -251,6 +252,7 @@ __all__ = [
     "VariablePeriodMovingAverage",
     "HeikinAshi",
     "FibonacciRetracement",
+    "AnchoredVWAP",
     "UpDownSideGapThreeMethods",
     "CDLXSIDEGAP3METHODS",
     "IntradayMomentumIndex",

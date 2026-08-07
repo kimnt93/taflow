@@ -125,7 +125,7 @@ contract; the session boundary arrives as an input series.
 
 | Done | Function | Outputs | Reference | Implementation & speed note |
 |---|---|---|---|---|
-| [ ] | Anchored/session VWAP (+ σ-bands) | `vwap`, `upper`, `lower` | Impl: pandas-ta `overlap/vwap.py`; TradingView VWAP docs for band convention | O(1): cumulative Σpv, Σv, Σpv² reset on anchor flag; bands from running moments. |
+| [x] | Anchored/session VWAP (+ σ-bands) | `vwap`, `upper`, `lower` | Impl: pandas-ta `overlap/vwap.py`; TradingView VWAP docs for band convention | O(1): cumulative Σpv, Σv, Σpv² reset on anchor flag; bands from running moments. |
 | [ ] | Pivot points (classic, Fibonacci, Camarilla, Woodie) | one series per level (PP, R1-3, S1-3) | Impl: freqtrade technical `pivots_points.py` | O(1): snapshot prior-session OHLC at boundary; four variants share state, differ only in level formulas. Levels constant within a session — still emitted per bar (same-size). |
 | [ ] | Opening range | `or_high`, `or_low`, `breakout` (+1/-1/0) | Theory: standard ORB (first N bars of session) | O(1): extrema until bar-count cutoff, then frozen + crossover flags. |
 | [ ] | Session volume levels (POC, VAH, VAL) | `poc`, `vah`, `val` per bar | Impl: TradingView Volume Profile docs; Theory: CBOT Market Profile (value area 70%) | Histogram is **internal state** (fixed price bins, O(1) update/bar); outputs are the running POC/VAH/VAL as same-size series (O(bins) refresh per bar, bins bounded). Document bin-width sensitivity. |
