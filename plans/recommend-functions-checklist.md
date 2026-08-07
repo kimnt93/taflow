@@ -101,7 +101,7 @@ fork/successor version) unless noted.
 | [ ] | Klinger VO | Impl: pandas-ta `volume/kvo.py` (definitions vary — pin pandas-ta's) | O(1): trend-flip state + two EMAs. |
 | [x] | VPT | Impl: ta `volume.VolumePriceTrendIndicator` | O(1) cumulative recurrence. |
 | [x] | NVI / PVI | Impl: ta `volume.NegativeVolumeIndexIndicator`; pandas-ta `pvi` | O(1): recurrence gated on volume direction. |
-| [ ] | McGinley Dynamic | Impl: pandas-ta `overlap/mcgd.py`; Theory: McGinley, JoTA 1997 | O(1): `md += (x−md)/(k·n·(x/md)^4)`; guard `md→0`. |
+| [x] | McGinley Dynamic | Impl: pandas-ta `overlap/mcgd.py`; Theory: McGinley, JoTA 1997 | O(1): `md += (x−md)/(k·n·(x/md)^4)`; guard `md→0`. |
 | [ ] | VIDYA | Impl: pandas-ta / freqtrade technical; Theory: Chande, TASC 1992 | O(1): CMO-modulated EMA — reuse `Cmo`. |
 | [ ] | Laguerre RSI | Impl: freqtrade technical; Theory: Ehlers, *Cybernetic Analysis*, ch. 14 | O(1): 4-float Laguerre filter recurrence. |
 | [ ] | RMI | Impl: freqtrade technical `indicators.py::RMI` | O(1): Wilder smoothing + lag-k delay ring. |

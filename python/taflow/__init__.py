@@ -192,6 +192,7 @@ from .cmf import Cmf
 from .vpt import Vpt
 from .nvi import Nvi
 from .pvi import Pvi
+from .mcginley_dynamic import McGinleyDynamic
 
 __all__ = [
     "talib",
@@ -373,5 +374,6 @@ __all__ = [
     "Vpt",
     "Nvi",
     "Pvi",
+    "McGinleyDynamic",
     "__version__",
 ]

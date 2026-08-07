@@ -4723,6 +4723,31 @@ pub fn pvi(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     Ok(close.iter().zip(volume).map(|(&c, &v)| { state.append(c, v) }).collect())
 }
 
+#[derive(Debug, Clone)]
+pub struct Mcgd { length: usize, c: f64, value: Option<f64> }
+impl Mcgd {
+    pub fn new(length: usize, c: f64) -> TaResult<Self> {
+        validate_period(length)?;
+        if !(0.0 < c && c <= 1.0) { return Err(TaError::InvalidParameter { name: "c", value: c.to_string(), reason: "must be in (0, 1]" }); }
+        Ok(Self { length, c, value: None })
+    }
+    pub fn append(&mut self, close: f64) -> Option<f64> {
+        self.value = Some(match self.value {
+            None => close,
+            Some(previous) if previous != 0.0 => {
+                let mut denominator = self.c * self.length as f64 * (close / previous).powi(4);
+                if denominator < 1e-10 { denominator = 1e-10; }
+                previous + (close - previous) / denominator
+            }
+            Some(_) => close,
+        });
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.value = None; }
+}
+pub fn mcgd(input: &[f64], length: usize, c: f64) -> TaResult<Vec<f64>> { let mut state = Mcgd::new(length, c)?; Ok(input.iter().map(|&v| state.append(v).unwrap()).collect()) }
+
 #[cfg(test)]
 mod tests {
     use super::*;

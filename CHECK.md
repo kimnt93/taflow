@@ -354,7 +354,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | vpt | vpt | _ |
 | [x] | nvi | nvi | _ |
 | [x] | pvi | pvi | _ |
-| [ ] | mcginley | mcginley | _ |
+| [x] | mcginley | mcginley_dynamic | _ |
 | [ ] | vidya | vidya | _ |
 | [ ] | laguerre_rsi | laguerre_rsi | _ |
 | [ ] | rmi | rmi | _ |
