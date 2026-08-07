@@ -229,7 +229,7 @@ pub use cdl_xsidegap3methods::CandleUpDownSideGapThreeMethods;
 pub use cmo::ChandeMomentumOscillator;
 pub use dema::DoubleExponentialMovingAverage;
 pub use dx::{DirectionalMovementIndex, directional_movement_index};
-pub use ema::ExponentialMovingAverage;
+pub use ema::{ExponentialMovingAverage, exponential_moving_average};
 pub use ht_trendline::HilbertTransformTrendline;
 pub use ht_trendmode::HilbertTransformTrendMode;
 pub use ht_dcperiod::HilbertTransformDominantCyclePeriod;

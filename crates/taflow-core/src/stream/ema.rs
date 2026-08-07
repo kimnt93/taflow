@@ -4,6 +4,17 @@ use crate::error::TaResult;
 
 use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
+/// Computes an aligned Exponential Moving Average vector using the stream
+/// recurrence and SMA seed. Warm-up entries are `NaN`.
+pub fn exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = ExponentialMovingAverage::new(timeperiod)?;
+    Ok(state
+        .extend_slice(input)
+        .into_iter()
+        .map(|value| value.unwrap_or(f64::NAN))
+        .collect())
+}
+
 /// Stateful EMA with the same SMA seed as TA-Lib's batch EMA.
 #[derive(Debug, Clone)]
 pub struct ExponentialMovingAverage {
