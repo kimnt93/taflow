@@ -8,6 +8,12 @@ use crate::ma_type::MaType;
 
 use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
 
+/// Computes an aligned Absolute Price Oscillator vector.
+pub fn absolute_price_oscillator(input: &[f64], fastperiod: usize, slowperiod: usize, matype: MaType) -> TaResult<Vec<f64>> {
+    let mut state = AbsolutePriceOscillator::new(fastperiod, slowperiod, matype)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental APO driven by two selected moving-average states.
 pub struct AbsolutePriceOscillator {
     fast: MovingAverageDispatcher,

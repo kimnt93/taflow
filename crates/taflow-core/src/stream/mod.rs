@@ -162,7 +162,7 @@ mod vidya;
 pub use accbands::{AccelerationBands, AccelerationBandsValue, acceleration_bands};
 pub use adx::AverageDirectionalIndex;
 pub use adxr::AverageDirectionalIndexRating;
-pub use apo::AbsolutePriceOscillator;
+pub use apo::{AbsolutePriceOscillator, absolute_price_oscillator};
 pub use bbands::{BollingerBands, BollingerBandsValue, bollinger_bands};
 pub use cci::{CommodityChannelIndex, commodity_channel_index};
 pub use cdl_doji::CandleDoji;
