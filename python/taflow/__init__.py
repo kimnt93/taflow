@@ -189,6 +189,7 @@ from .kst import Kst
 from .mass_index import MassIndex
 from .dpo import Dpo
 from .cmf import Cmf
+from .vpt import Vpt
 
 __all__ = [
     "talib",
@@ -367,5 +368,6 @@ __all__ = [
     "MassIndex",
     "Dpo",
     "Cmf",
+    "Vpt",
     "__version__",
 ]

@@ -4664,6 +4664,30 @@ pub fn cmf(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], period: usi
     Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&h, &l), &c), &v)| state.append(h, l, c, v).unwrap_or(f64::NAN)).collect())
 }
 
+/// Stateful Volume-price Trend, aligned to `ta.volume.VolumePriceTrendIndicator`.
+#[derive(Debug, Clone)]
+pub struct Vpt { previous_close: Option<f64>, total: f64, value: Option<f64> }
+
+impl Vpt {
+    pub fn new() -> Self { Self { previous_close: None, total: 0.0, value: None } }
+    pub fn append(&mut self, close: f64, volume: f64) -> Option<f64> {
+        let previous = self.previous_close.replace(close);
+        self.value = previous.map(|previous| {
+            if previous != 0.0 { self.total += volume * (close - previous) / previous; }
+            self.total
+        });
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.previous_close = None; self.total = 0.0; self.value = None; }
+}
+
+pub fn vpt(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+    if close.len() != volume.len() { return Err(TaError::LengthMismatch { expected: close.len(), got: volume.len() }); }
+    let mut state = Vpt::new();
+    Ok(close.iter().zip(volume).map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN)).collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -5237,5 +5261,17 @@ mod tests {
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
         assert!(batch[..19].iter().all(|value| value.is_nan()));
         assert!(batch[19..].iter().all(|value| value.is_finite()));
+    }
+
+    #[test]
+    fn vpt_batch_and_stream_match() {
+        let close: Vec<f64> = (1..=100).map(|value| value as f64).collect();
+        let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
+        let batch = vpt(&close, &volume).unwrap();
+        let mut state = Vpt::new();
+        let replayed: Vec<f64> = close.iter().zip(&volume).map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN)).collect();
+        assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
+        assert!(batch[0].is_nan());
+        assert!(batch[1..].iter().all(|value| value.is_finite()));
     }
 }

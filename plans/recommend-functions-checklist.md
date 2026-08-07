@@ -99,7 +99,7 @@ fork/successor version) unless noted.
 | [x] | DPO | Impl: pandas-ta `trend/dpo.py` | **Causality trap**: pandas-ta default `centered=True` is non-causal. taflow implements `centered=False` only; docstring explains the difference. O(1): SMA + delay ring. |
 | [x] | CMF | Impl: ta `volume.ChaikinMoneyFlowIndicator` | O(1): two `Sum` states. |
 | [ ] | Klinger VO | Impl: pandas-ta `volume/kvo.py` (definitions vary — pin pandas-ta's) | O(1): trend-flip state + two EMAs. |
-| [ ] | VPT | Impl: ta `volume.VolumePriceTrendIndicator` | O(1) cumulative recurrence. |
+| [x] | VPT | Impl: ta `volume.VolumePriceTrendIndicator` | O(1) cumulative recurrence. |
 | [ ] | NVI / PVI | Impl: ta `volume.NegativeVolumeIndexIndicator`; pandas-ta `pvi` | O(1): recurrence gated on volume direction. |
 | [ ] | McGinley Dynamic | Impl: pandas-ta `overlap/mcgd.py`; Theory: McGinley, JoTA 1997 | O(1): `md += (x−md)/(k·n·(x/md)^4)`; guard `md→0`. |
 | [ ] | VIDYA | Impl: pandas-ta / freqtrade technical; Theory: Chande, TASC 1992 | O(1): CMO-modulated EMA — reuse `Cmo`. |

@@ -351,7 +351,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | dpo | dpo | _ |
 | [x] | cmf | cmf | _ |
 | [ ] | kvo | kvo | _ |
-| [ ] | vpt | vpt | _ |
+| [x] | vpt | vpt | _ |
 | [ ] | nvi | nvi | _ |
 | [ ] | pvi | pvi | _ |
 | [ ] | mcginley | mcginley | _ |
