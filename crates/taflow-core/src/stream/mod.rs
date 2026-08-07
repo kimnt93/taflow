@@ -220,6 +220,7 @@ pub use tema::Tema;
 pub use trix::Trix;
 pub use trima::Trima;
 pub use ultosc::Ultosc;
+pub use crate::operators::{Cumsum, Cumprod, Lag, LogReturn};
 pub use window::Window;
 pub use wma::Wma;
 

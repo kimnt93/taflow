@@ -1,6 +1,7 @@
 pub mod common;
 pub mod error;
 pub mod ma_type;
+pub mod operators;
 pub mod simd;
 pub mod sliding_window;
 pub mod stream;

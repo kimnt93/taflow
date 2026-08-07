@@ -57,6 +57,10 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::MinusDirectionalMovement>()?;
     m.add_class::<indicators::TripleExponentialRateOfChange>()?;
     m.add_class::<indicators::UltimateOscillator>()?;
+    m.add_class::<indicators::LagOperator>()?;
+    m.add_class::<indicators::LogReturnOperator>()?;
+    m.add_class::<indicators::CumsumOperator>()?;
+    m.add_class::<indicators::CumprodOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

@@ -98,6 +98,10 @@ from .thrusting import CDLTHRUSTING, Thrusting
 from .tri_star import CDLTRISTAR, TriStar
 from .unique_three_river import CDLUNIQUE3RIVER, UniqueThreeRiver
 from .upside_gap_two_crows import CDLUPSIDEGAP2CROWS, UpsideGapTwoCrows
+from .lag import Lag
+from .log_return import LogReturn
+from .cumsum import Cumsum
+from .cumprod import Cumprod
 
 __all__ = [
     "talib",
@@ -227,5 +231,6 @@ __all__ = [
     "TriStar", "CDLTRISTAR",
     "UniqueThreeRiver", "CDLUNIQUE3RIVER",
     "UpsideGapTwoCrows", "CDLUPSIDEGAP2CROWS",
+    "Lag", "LogReturn", "Cumsum", "Cumprod",
     "__version__",
 ]

@@ -16,11 +16,11 @@ they are not re-proposed later.
 
 ## Core series operations
 
-- [ ] lag (delay line; `shift` is its alias)
-- [ ] log_return (`ln(x_t / x_{t-n})`; kept because it is the standard
+- [x] lag (delay line; `shift` is its alias)
+- [x] log_return (`ln(x_t / x_{t-n})`; kept because it is the standard
       return definition and warm-up/NaN handling should match the library,
       not ad-hoc numpy)
-- [ ] cumsum / cumprod
+- [x] cumsum / cumprod
 
 ## Rolling operators
 

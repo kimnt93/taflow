@@ -1,6 +1,10 @@
 //! Unified Python indicator objects.
 
 mod commodity_channel_index;
+mod lag;
+mod log_return;
+mod cumsum;
+mod cumprod;
 mod belt_hold;
 mod closing_marubozu;
 mod doji;
@@ -77,6 +81,10 @@ mod unique_three_river;
 mod upside_gap_two_crows;
 
 pub use commodity_channel_index::CommodityChannelIndex;
+pub use lag::LagOperator;
+pub use log_return::LogReturnOperator;
+pub use cumsum::CumsumOperator;
+pub use cumprod::CumprodOperator;
 pub use belt_hold::BeltHold;
 pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;
