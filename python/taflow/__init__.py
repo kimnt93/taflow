@@ -147,6 +147,7 @@ from .bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, Gap
 from .state_helpers import BarsSince, ValueWhen, HighestSince, LowestSince, SignalDelay, PositionHold, EntryExit
 from .swing import SwingHighLow, SwingHigh, SwingLow
 from .session import SessionExtrema, session_flags
+from .zones import ActiveZoneList
 
 __all__ = [
     "talib",
@@ -297,5 +298,6 @@ __all__ = [
     "EntryExit",
     "SwingHighLow", "SwingHigh", "SwingLow",
     "SessionExtrema", "session_flags",
+    "ActiveZoneList",
     "__version__",
 ]

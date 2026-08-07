@@ -41,7 +41,7 @@ chunk invariance (benchmark plan S4).
   flags), never an internal calendar. Python layer provides helpers to
   build the flag series from datetime indexes. Keeps the Rust core
   timestamp-free and the API pure series-in/series-out.
-- [ ] **Bounded active-zone list** — internal state (not an output):
+- [x] **Bounded active-zone list** — internal state (not an output):
   fixed-capacity `Vec<Zone>` (top, bottom, birth index, flags) with
   O(active) linear scan per bar and eviction on fill/expiry/overflow
   (configurable cap, default 64). Used by FVG/OB/liquidity mitigation
