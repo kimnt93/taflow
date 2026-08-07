@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 
 import taflow
-from taflow.talib.state import EMA
+from taflow import ExponentialMovingAverage as EMA
 
 
 def _timed(fn, repeats=5):

@@ -53,6 +53,8 @@ Two public surfaces, ONE implementation:
 - **`taflow.executions`** — explicitly named execution graph and adapter
   helpers (`TAPipeline`, `TAExpr`, `AdaptInput`, `AdaptOutput`, …). These are
   not indicator exports from the root namespace.
+- **`taflow.op`** — short execution namespace, re-exporting the graph,
+  pipeline, adapter, and conversion helpers from `taflow.executions`.
 
 Rules:
 

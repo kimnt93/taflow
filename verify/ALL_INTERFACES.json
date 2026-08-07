@@ -652,6 +652,142 @@
     "status": "PASS"
   },
   {
+    "name": "RollingStandardDeviation",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingAverageDeviation",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMidpoint",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMidprice",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingVariance",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingLinearRegression",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingLinearRegressionAngle",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingLinearRegressionIntercept",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingLinearRegressionSlope",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingTimeSeriesForecast",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingBeta",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingCorrelation",
+    "status": "PASS"
+  },
+  {
+    "name": "MesaAdaptiveMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMinMax",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMinMaxIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "MathAcos",
+    "status": "PASS"
+  },
+  {
+    "name": "MathAsin",
+    "status": "PASS"
+  },
+  {
+    "name": "MathAtan",
+    "status": "PASS"
+  },
+  {
+    "name": "MathCeil",
+    "status": "PASS"
+  },
+  {
+    "name": "MathCos",
+    "status": "PASS"
+  },
+  {
+    "name": "MathCosh",
+    "status": "PASS"
+  },
+  {
+    "name": "MathExp",
+    "status": "PASS"
+  },
+  {
+    "name": "MathFloor",
+    "status": "PASS"
+  },
+  {
+    "name": "MathLn",
+    "status": "PASS"
+  },
+  {
+    "name": "MathLog10",
+    "status": "PASS"
+  },
+  {
+    "name": "MathSin",
+    "status": "PASS"
+  },
+  {
+    "name": "MathSinh",
+    "status": "PASS"
+  },
+  {
+    "name": "MathSqrt",
+    "status": "PASS"
+  },
+  {
+    "name": "MathTan",
+    "status": "PASS"
+  },
+  {
+    "name": "MathTanh",
+    "status": "PASS"
+  },
+  {
+    "name": "MathAdd",
+    "status": "PASS"
+  },
+  {
+    "name": "MathSubtract",
+    "status": "PASS"
+  },
+  {
+    "name": "MathMultiply",
+    "status": "PASS"
+  },
+  {
+    "name": "MathDivide",
+    "status": "PASS"
+  },
+  {
     "name": "ExponentiallyWeightedVariance",
     "status": "PASS"
   },

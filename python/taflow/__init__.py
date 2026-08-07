@@ -2,8 +2,7 @@
 
 __version__ = "0.1.2"
 
-from . import talib
-from .talib import MaType
+from .ma_type import MaType
 from .acceleration_bands import AccelerationBands
 from .average_true_range import AverageTrueRange
 from .double_exponential_moving_average import DoubleExponentialMovingAverage
@@ -107,6 +106,22 @@ from .premium_discount import PremiumDiscount
 from .opening_range import OpeningRange
 from .pivot_points import PivotPoints
 from . import executions
+from . import op
+from .math_transform import (
+    MathAcos, MathAsin, MathAtan, MathCeil, MathCos, MathCosh, MathExp,
+    MathFloor, MathLn, MathLog10, MathSin, MathSinh, MathSqrt, MathTan,
+    MathTanh,
+    MathAdd, MathSubtract, MathMultiply, MathDivide,
+)
+from .rolling_std import RollingStandardDeviation
+from .statistics import (
+    RollingAverageDeviation, RollingMidpoint, RollingMidprice, RollingVariance,
+    RollingLinearRegression, RollingLinearRegressionAngle,
+    RollingLinearRegressionIntercept, RollingLinearRegressionSlope,
+    RollingTimeSeriesForecast, RollingBeta, RollingCorrelation,
+    MesaAdaptiveMovingAverage,
+    RollingMinMax, RollingMinMaxIndex,
+)
 from .klinger_volume_oscillator import KlingerVolumeOscillator
 from .session_volume_levels import SessionVolumeLevels
 from .up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
@@ -251,7 +266,6 @@ from .pvi import PositiveVolumeIndex
 from .mcginley_dynamic import McGinleyDynamic
 
 __all__ = [
-    "talib",
     "MovingAverage",
     "MinusDirectionalIndicator",
     "MinusDirectionalMovement",
@@ -408,6 +422,17 @@ __all__ = [
     "RollingInterquartileRange",
     "RollingCov",
     "RollingWinsorize",
+    "RollingStandardDeviation",
+    "RollingAverageDeviation", "RollingMidpoint", "RollingMidprice",
+    "RollingVariance", "RollingLinearRegression", "RollingLinearRegressionAngle",
+    "RollingLinearRegressionIntercept", "RollingLinearRegressionSlope",
+    "RollingTimeSeriesForecast", "RollingBeta", "RollingCorrelation",
+    "MesaAdaptiveMovingAverage",
+    "RollingMinMax", "RollingMinMaxIndex",
+    "MathAcos", "MathAsin", "MathAtan", "MathCeil", "MathCos", "MathCosh",
+    "MathExp", "MathFloor", "MathLn", "MathLog10", "MathSin", "MathSinh",
+    "MathSqrt", "MathTan", "MathTanh",
+    "MathAdd", "MathSubtract", "MathMultiply", "MathDivide",
     "ExponentiallyWeightedVariance",
     "ExponentiallyWeightedStandardDeviation",
     "ExponentiallyWeightedCovariance",
@@ -501,5 +526,6 @@ __all__ = [
     "NegativeVolumeIndex",
     "PositiveVolumeIndex",
     "McGinleyDynamic",
+    "op",
     "__version__",
 ]

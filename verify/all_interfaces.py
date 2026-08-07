@@ -34,6 +34,8 @@ ARRAYS = {
     "_open": open_, "open": open_, "volume": volume, "periods": periods,
     "condition": condition, "new_session": new_session, "anchor": new_session,
     "entry": condition, "_exit": ~condition,
+    "input0": close, "input1": benchmark,
+    "_input0": close, "_input1": benchmark,
 }
 SKIP = {
     "MaType", "ActiveZoneList",

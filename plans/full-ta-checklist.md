@@ -18,8 +18,8 @@ mean merely that an old batch function exists.
 This delivery is intentionally limited to TA-Lib. The separate operator
 checklist is deferred and is not linked to this implementation gate.
 
-Naming: each item's canonical `taflow` name (e.g. `rolling_min` for MIN,
-`typical_price` for TYPPRICE) and the review gates for checking a box are
+Naming: each item's canonical `taflow` name (e.g. `RollingMin` for MIN,
+`TypicalPrice` for TYPPRICE, and `MathSin` for SIN) and the review gates for checking a box are
 defined in [`/CHECK.md`](../CHECK.md), which also holds the live master
 status table (done | rs | py | talib).
 

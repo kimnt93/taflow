@@ -118,6 +118,20 @@ from ..crossunder import Crossunder
 from ..cross import Cross
 from ..rising import Rising
 from ..falling import Falling
+from ..math_transform import (
+    MathAcos, MathAsin, MathAtan, MathCeil, MathCos, MathCosh, MathExp,
+    MathFloor, MathLn, MathLog10, MathSin, MathSinh, MathSqrt, MathTan,
+    MathTanh,
+    MathAdd, MathSubtract, MathMultiply, MathDivide,
+)
+from ..statistics import (
+    MesaAdaptiveMovingAverage, RollingAverageDeviation, RollingBeta,
+    RollingCorrelation, RollingLinearRegression, RollingLinearRegressionAngle,
+    RollingLinearRegressionIntercept, RollingLinearRegressionSlope,
+    RollingMidpoint, RollingMidprice, RollingStandardDeviation,
+    RollingTimeSeriesForecast, RollingVariance,
+    RollingMinMax, RollingMinMaxIndex,
+)
 from ..vwap import RollingVolumeWeightedAveragePrice
 from ..force_index import ForceIndex
 from ..ease_of_movement import EaseOfMovement

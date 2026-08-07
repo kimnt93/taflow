@@ -2,7 +2,7 @@
 
 Indicator oracle: constructor history == native `extend` history == one-bar `append` history; helper functions also receive smoke checks.
 
-- Passed: **255**
+- Passed: **289**
 - Failed: **0**
 
 | Interface | Status | Error |
@@ -170,6 +170,40 @@ Indicator oracle: constructor history == native `extend` history == one-bar `app
 | `RollingInterquartileRange` | PASS |  |
 | `RollingCov` | PASS |  |
 | `RollingWinsorize` | PASS |  |
+| `RollingStandardDeviation` | PASS |  |
+| `RollingAverageDeviation` | PASS |  |
+| `RollingMidpoint` | PASS |  |
+| `RollingMidprice` | PASS |  |
+| `RollingVariance` | PASS |  |
+| `RollingLinearRegression` | PASS |  |
+| `RollingLinearRegressionAngle` | PASS |  |
+| `RollingLinearRegressionIntercept` | PASS |  |
+| `RollingLinearRegressionSlope` | PASS |  |
+| `RollingTimeSeriesForecast` | PASS |  |
+| `RollingBeta` | PASS |  |
+| `RollingCorrelation` | PASS |  |
+| `MesaAdaptiveMovingAverage` | PASS |  |
+| `RollingMinMax` | PASS |  |
+| `RollingMinMaxIndex` | PASS |  |
+| `MathAcos` | PASS |  |
+| `MathAsin` | PASS |  |
+| `MathAtan` | PASS |  |
+| `MathCeil` | PASS |  |
+| `MathCos` | PASS |  |
+| `MathCosh` | PASS |  |
+| `MathExp` | PASS |  |
+| `MathFloor` | PASS |  |
+| `MathLn` | PASS |  |
+| `MathLog10` | PASS |  |
+| `MathSin` | PASS |  |
+| `MathSinh` | PASS |  |
+| `MathSqrt` | PASS |  |
+| `MathTan` | PASS |  |
+| `MathTanh` | PASS |  |
+| `MathAdd` | PASS |  |
+| `MathSubtract` | PASS |  |
+| `MathMultiply` | PASS |  |
+| `MathDivide` | PASS |  |
 | `ExponentiallyWeightedVariance` | PASS |  |
 | `ExponentiallyWeightedStandardDeviation` | PASS |  |
 | `ExponentiallyWeightedCovariance` | PASS |  |

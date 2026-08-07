@@ -1,5 +1,9 @@
 # TAFlow operator-library checklist
 
+Execution helpers are exposed from `taflow.executions` and its short alias
+`taflow.op`. TA-Lib functions are tracked separately in
+[`full-ta-functions-checklist.md`](full-ta-functions-checklist.md).
+
 This inventory is derived from the shared design discussion. The execution
 and adapter entries below are implemented as part of the unified realtime
 delivery; indicator-specific reports remain a separate follow-up pass.
