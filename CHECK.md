@@ -461,23 +461,14 @@ For every function claimed done, verify ALL of:
 
 ## 4. Known debt (found in review, 2026-08-07 — fix as encountered)
 
-1. `crates/taflow-core/src/stream/mod.rs` defines ~31 states inline
-   (Mom/Roc*/Max/Min/Sum/Minmax*/Midpoint/Midprice/Var/Stddev/Avgdev/
-   Correl/Beta/Linearreg*/Ad/Adosc/Obv/Bop/Willr/Aroon*/Atr/Natr/Trange/
-   math ops) — violates one-function-one-file; split them out.
-2. One-liner style + builtin-shadowing `open` parameter in generated
-   pattern wrappers (e.g. `python/taflow/abandoned_baby.py`) — violates
-   §3.3/§3.4; regenerate with `_open` and multi-line bodies.
-3. `MA_Type` in `taflow.talib` is a bare int class → replace with
-   `MaType(IntEnum)` per §3.3.
-4. TA-Lib compat gaps found by the benchmark: 7 patterns reject the
+1. TA-Lib compat gaps found by the benchmark: 7 patterns reject the
    `penetration` kwarg (CDLABANDONEDBABY, CDLDARKCLOUDCOVER,
    CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD, CDLMORNINGDOJISTAR,
    CDLMORNINGSTAR).
-5. Pattern logic disagrees with TA-Lib on real data for: CDL3LINESTRIKE,
+2. Pattern logic disagrees with TA-Lib on real data for: CDL3LINESTRIKE,
    CDLADVANCEBLOCK, CDLGAPSIDESIDEWHITE, CDLHIKKAKEMOD, CDLLADDERBOTTOM,
    CDLTRISTAR, CDLUNIQUE3RIVER — diff against TA-Lib C source.
-6. Statistics drift at 100k bars (STDDEV/VAR/CORREL/LINEARREG_SLOPE/
+3. Statistics drift at 100k bars (STDDEV/VAR/CORREL/LINEARREG_SLOPE/
    LINEARREG_ANGLE ~1e-9..3e-7; CCI state-path only) — needs the parity
    contract decision + accumulator reseeding (optimize-methods §6.1/§6.2).
 
