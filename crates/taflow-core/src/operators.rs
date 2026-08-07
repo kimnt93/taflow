@@ -13,6 +13,17 @@ fn validate_period(timeperiod: usize) -> TaResult<()> {
     Ok(())
 }
 
+fn validate_quantile(quantile: f64) -> TaResult<()> {
+    if !(0.0..=1.0).contains(&quantile) {
+        return Err(TaError::InvalidParameter {
+            name: "quantile",
+            value: quantile.to_string(),
+            reason: "must be between 0 and 1",
+        });
+    }
+    Ok(())
+}
+
 /// Delay a series by `timeperiod` bars. Warm-up values are `NaN`.
 pub fn lag(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     validate_period(timeperiod)?;
@@ -58,6 +69,29 @@ pub fn rolling_median(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
 pub fn rolling_mode(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     validate_period(timeperiod)?;
     let mut state = RollingMode::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_quantile(input: &[f64], timeperiod: usize, quantile: f64) -> TaResult<Vec<f64>> {
+    validate_quantile(quantile)?;
+    let mut state = RollingQuantile::new(timeperiod, quantile)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_percentile(input: &[f64], timeperiod: usize, percentile: f64) -> TaResult<Vec<f64>> {
+    if !(0.0..=100.0).contains(&percentile) {
+        return Err(TaError::InvalidParameter { name: "percentile", value: percentile.to_string(), reason: "must be between 0 and 100" });
+    }
+    rolling_quantile(input, timeperiod, percentile / 100.0)
+}
+
+pub fn rolling_rank(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingRank::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_zscore(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingZscore::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
@@ -166,6 +200,89 @@ impl RollingMode {
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
+#[derive(Debug, Clone)]
+pub struct RollingQuantile {
+    values: VecDeque<f64>,
+    timeperiod: usize,
+    quantile: f64,
+    value: Option<f64>,
+}
+
+impl RollingQuantile {
+    pub fn new(timeperiod: usize, quantile: f64) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        validate_quantile(quantile)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, quantile, value: None })
+    }
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = if self.values.len() == self.timeperiod {
+            let mut sorted: Vec<f64> = self.values.iter().copied().collect();
+            sorted.sort_by(f64::total_cmp);
+            let position = self.quantile * (self.timeperiod - 1) as f64;
+            let lower = position.floor() as usize;
+            let upper = position.ceil() as usize;
+            Some(sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower as f64))
+        } else { None };
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingRank {
+    values: VecDeque<f64>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl RollingRank {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+    }
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = if self.values.len() == self.timeperiod {
+            let less = self.values.iter().filter(|&&value| value < input).count();
+            let equal = self.values.iter().filter(|&&value| value == input).count();
+            Some((less as f64 + equal as f64) / self.timeperiod as f64)
+        } else { None };
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingZscore {
+    values: VecDeque<f64>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl RollingZscore {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+    }
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = if self.values.len() == self.timeperiod {
+            let mean = self.values.iter().sum::<f64>() / self.timeperiod as f64;
+            let variance = self.values.iter().map(|&value| (value - mean).powi(2)).sum::<f64>() / self.timeperiod as f64;
+            Some(if variance > 0.0 { (input - mean) / variance.sqrt() } else { 0.0 })
+        } else { None };
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
 macro_rules! cumulative_operator {
     ($name:ident, $initial:expr, $operation:expr) => {
         #[derive(Debug, Clone)]
@@ -229,5 +346,14 @@ mod tests {
         for &value in &input { state.append(value); }
         state.reset();
         assert!(state.append(7.0).is_none());
+    }
+
+    #[test]
+    fn rolling_distribution_operators_match_definitions() {
+        let input = vec![1.0, 4.0, 2.0, 8.0];
+        assert_eq!(rolling_quantile(&input, 3, 0.5).unwrap()[2..], [2.0, 4.0]);
+        assert_eq!(rolling_percentile(&input, 3, 50.0).unwrap()[2..], [2.0, 4.0]);
+        assert_eq!(rolling_rank(&input, 3).unwrap()[2..], [2.0 / 3.0, 1.0]);
+        assert!((rolling_zscore(&input, 3).unwrap()[2] - (-0.2672612419)).abs() < 1e-9);
     }
 }

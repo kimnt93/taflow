@@ -104,6 +104,10 @@ from .cumsum import Cumsum
 from .cumprod import Cumprod
 from .rolling_median import RollingMedian
 from .rolling_mode import RollingMode
+from .rolling_quantile import RollingQuantile
+from .rolling_percentile import RollingPercentile
+from .rolling_rank import RollingRank
+from .rolling_zscore import RollingZscore
 
 __all__ = [
     "talib",
@@ -234,5 +238,6 @@ __all__ = [
     "UniqueThreeRiver", "CDLUNIQUE3RIVER",
     "UpsideGapTwoCrows", "CDLUPSIDEGAP2CROWS",
     "Lag", "LogReturn", "Cumsum", "Cumprod", "RollingMedian", "RollingMode",
+    "RollingQuantile", "RollingPercentile", "RollingRank", "RollingZscore",
     "__version__",
 ]

@@ -25,7 +25,7 @@ they are not re-proposed later.
 ## Rolling operators
 
 - [x] rolling_median / rolling_mode
-- [ ] rolling_quantile / rolling_percentile / rolling_rank / rolling_zscore
+- [x] rolling_quantile / rolling_percentile / rolling_rank / rolling_zscore
 - [ ] rolling_skew / rolling_kurtosis / rolling_iqr
 - [ ] rolling_cov (plain covariance; TA-Lib has only CORREL/BETA)
 - [ ] rolling_winsorize

@@ -63,6 +63,10 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::CumprodOperator>()?;
     m.add_class::<indicators::RollingMedianOperator>()?;
     m.add_class::<indicators::RollingModeOperator>()?;
+    m.add_class::<indicators::RollingQuantileOperator>()?;
+    m.add_class::<indicators::RollingPercentileOperator>()?;
+    m.add_class::<indicators::RollingRankOperator>()?;
+    m.add_class::<indicators::RollingZscoreOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;
