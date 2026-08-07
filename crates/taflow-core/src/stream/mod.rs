@@ -248,7 +248,7 @@ pub use mavp::{VariablePeriodMovingAverage, moving_average_variable_period};
 pub use mfi::{MoneyFlowIndex, money_flow_index};
 pub use minus_di::{MinusDirectionalIndicator, minus_directional_indicator};
 pub use minus_dm::{MinusDirectionalMovement, minus_directional_movement};
-pub use ppo::PercentagePriceOscillator;
+pub use ppo::{PercentagePriceOscillator, percentage_price_oscillator};
 pub use plus_di::{PlusDirectionalIndicator, plus_directional_indicator};
 pub use plus_dm::{PlusDirectionalMovement, plus_directional_movement};
 pub use rsi::{RelativeStrengthIndex, relative_strength_index};
