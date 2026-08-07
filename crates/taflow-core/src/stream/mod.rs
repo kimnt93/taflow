@@ -238,7 +238,7 @@ pub use ht_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
 pub use ht_sine::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
 pub use imi::IntradayMomentumIndex;
 pub use indicator::StreamingIndicator;
-pub use kama::KaufmanAdaptiveMovingAverage;
+pub use kama::{KaufmanAdaptiveMovingAverage, kaufman_adaptive_moving_average};
 pub use ma::MovingAverage;
 pub use macd::{MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue};
 pub use macdext::MovingAverageConvergenceDivergenceExtended;

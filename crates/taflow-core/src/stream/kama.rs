@@ -9,6 +9,12 @@ use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator};
 
+/// Computes an aligned Kaufman Adaptive Moving Average vector.
+pub fn kaufman_adaptive_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = KaufmanAdaptiveMovingAverage::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental KAMA with the same seed and recurrence as TA-Lib.
 #[derive(Debug, Clone)]
 pub struct KaufmanAdaptiveMovingAverage {
