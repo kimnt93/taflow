@@ -29,3 +29,7 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Codex agent config (holds API key + runtime state; repo is public)
+.agents/codex/*
+!.agents/codex/.gitkeep
