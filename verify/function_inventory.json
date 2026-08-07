@@ -1,6 +1,6 @@
 {
   "counts": {
-    "native_functions": 86,
+    "native_functions": 0,
     "native_state_classes": 283,
     "pandas_ta_symbols": 427,
     "python_exports": 251,

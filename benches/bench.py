@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""TAFlow vs TA-Lib Python-interface benchmark runner.
+"""Legacy TAFlow vs TA-Lib batch benchmark runner.
 
 One script implements the whole plan in ``plans/benchmark-plan.md``:
 
@@ -15,7 +15,7 @@ change here. Functions whose TA-Lib alias does not exist in the installed
 TA-Lib automatically run as S4.
 
 Usage:
-  python benches/bench.py                # every discovered function, full grid
+  python benches/bench.py                # reports legacy batch compatibility
   python benches/bench.py EMA ATR MACD   # a subset
   python benches/bench.py --quick        # sizes <= 100k, 3 repeats
   python benches/bench.py --aggregate-only
@@ -914,6 +914,14 @@ def main() -> int:
         out.write_text(aggregate(args.reports_dir))
         print(f"wrote {out}")
         return 0
+
+    # The package no longer exports one-shot ``taflow.talib`` functions.  Keep
+    # this historical runner importable for old reports, but direct live-feed
+    # measurements to the continuous adapter benchmark.
+    print("bench.py is a legacy one-shot TA-Lib comparison and is disabled for "
+          "the continuous-only API. Use benches/adapter_bench.py instead.",
+          file=sys.stderr)
+    return 0
 
     registry = build_registry()
     if args.list:

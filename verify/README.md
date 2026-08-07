@@ -10,15 +10,15 @@ With 10,000 seeded bars:
 1. **Oracle full pass** — reference library over all 10k bars
    (TA-Lib for TA-Lib-named functions; pandas for `rolling_*`/`ewm_*`;
    self-oracle when no reference exists).
-2. **taflow batch** — `taflow.talib.FN` (or the native batch) over the same
-   10k bars → compared to the oracle.
-3. **Warm-up / continue** — feed the first **9,000** bars into the
+2. **Warm-up / continue** — feed the first **9,000** bars into the
    persistent state (`extend`), then continue with the last **1,000** bars
    through scalar `append` calls (the live-update path). The concatenated
    9k+1k output is compared to:
-   - the taflow 10k batch result (must be **bitwise identical** —
-     chunk-invariance contract), and
    - the oracle 10k result.
+
+TA-Lib one-shot migration checks are intentionally disabled. The package
+keeps TA-Lib-named state aliases only under `taflow.talib.state`; canonical
+users should import CamelCase classes from `taflow`.
 
 Verdict is `MATCH` when NaN placement is identical and values agree within
 `rtol=1e-8, atol=1e-10`; the report also records the max absolute error so

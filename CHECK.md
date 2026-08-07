@@ -45,12 +45,11 @@ checks; a reference inventory alone is never reported as numerical parity.
 
 Two public surfaces, ONE implementation:
 
-- **`taflow`** — our style. Descriptive snake_case names, persistent state
+- **`taflow`** — our style. Descriptive CamelCase indicator classes, persistent state
   objects with continue-update compute:
   `append(...) / extend(...) / value / compute() / reset()`.
-- **`taflow.talib`** — TA-Lib-compatible surface. Uppercase TA-Lib names
-  (`BBANDS`, `MIN`, `MAX`, …), TA-Lib parameter names, order, defaults, and
-  warm-up/NaN semantics. Thin aliases only.
+- **`taflow.talib`** — optional continuous state aliases only. It intentionally
+  exposes no one-shot uppercase TA-Lib functions or migration layer.
 - **`taflow.executions`** — explicitly named execution graph and adapter
   helpers (`TAPipeline`, `TAExpr`, `AdaptInput`, `AdaptOutput`, …). These are
   not indicator exports from the root namespace.
@@ -62,9 +61,9 @@ Rules:
   second implementation, never Python math.
 - Functions with no TA-Lib counterpart (SMC, rolling_median, …) exist only
   in `taflow` and never get a fake uppercase alias.
-- Canonical interface names are descriptive words, not TA-Lib acronyms. For
-  example, `ChaikinMoneyFlow`/`chaikin_money_flow` is canonical while `MFI`
-  remains only in `taflow.talib`.
+- Canonical interface names are descriptive CamelCase words, not TA-Lib
+  acronyms. TA-Lib-style state aliases, when useful for migration, live only
+  in `taflow.talib.state`.
 - Every Python stateful indicator constructor accepts its complete input
   series signature (for example `high`, `low`, `close`, and `volume`) in
   addition to configuration parameters. Passing those series at construction

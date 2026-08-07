@@ -1,0 +1,1752 @@
+{
+  "root_exports": 251,
+  "root_indicators": 249,
+  "root_indicators_with_lifecycle": 248,
+  "native_one_shot_functions": [],
+  "taflow_talib_one_shot_exports": [],
+  "rows": [
+    {
+      "name": "MovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MinusDirectionalIndicator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MinusDirectionalMovement",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MoneyFlowIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AveragePrice",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MedianPrice",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TypicalPrice",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "WeightedClose",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MovingAverageConvergenceDivergenceFixed",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MovingAverageConvergenceDivergenceExtended",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "BollingerBands",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CommodityChannelIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "FastStochasticOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HilbertTransformTrendline",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHikkake",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHikkakeModified",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHammer",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HilbertTransformDominantCyclePeriod",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HilbertTransformDominantCyclePhase",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HilbertTransformPhasor",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HilbertTransformSineWave",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HilbertTransformTrendMode",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "StochasticOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "StochasticRelativeStrengthIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleStickSandwich",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TripleExponentialRateOfChange",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleThreeBlackCrows",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleThreeInside",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleThreeLineStrike",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleThreeStarsInSouth",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleThreeOutside",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleTwoCrows",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "UltimateOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "VariablePeriodMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HeikinAshi",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "FibonacciRetracement",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AnchoredVolumeWeightedAveragePrice",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "VariableIndexDynamicAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "LaguerreRelativeStrengthIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RelativeStrengthIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RelativeMomentumIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SmoothedTrendChannel",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "JurikMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ParabolicMovingAverageStop",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TomDeMarkSequential",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "EvenBetterSinewave",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PremiumDiscount",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "OpeningRange",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PivotPoints",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "KlingerVolumeOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SessionVolumeLevels",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleUpDownSideGapThreeMethods",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "IntradayMomentumIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AccelerationBands",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AverageTrueRange",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "DoubleExponentialMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "KaufmanAdaptiveMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SimpleMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "NormalizedAverageTrueRange",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TrueRange",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TriangularMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TripleExponentialMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "WeightedMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Aroon",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AroonOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AccumulationDistribution",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AccumulationDistributionOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "BalanceOfPower",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "OnBalanceVolume",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AbsolutePriceOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PercentagePriceOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ChandeMomentumOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Momentum",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RateOfChange",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RateOfChangePercent",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RateOfChangeRatio",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RateOfChangeRatioPercent",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "WilliamsPercentR",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AverageDirectionalIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AverageDirectionalIndexRating",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "DirectionalMovementIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleDoji",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleTakuri",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleMarubozu",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleClosingMarubozu",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleLongLeggedDoji",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleRickshawman",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHighWave",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleDragonflyDoji",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleGravestoneDoji",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleShortLine",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleSpinningTop",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleLongLine",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleDojiStar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleBeltHold",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleEngulfing",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ExponentialMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ParabolicSar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ParabolicSarExtended",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PlusDirectionalIndicator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PlusDirectionalMovement",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleThreeWhiteSoldiers",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleAbandonedBaby",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleAdvanceBlock",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleBreakaway",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleConcealBabySwall",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleCounterAttack",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleDarkCloudCover",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleEveningDojiStar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleEveningStar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleGapSideSideWhite",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHangingMan",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHarami",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHaramiCross",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleHomingPigeon",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleIdenticalThreeCrows",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleInNeck",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleInvertedHammer",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleKicking",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleKickingByLength",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleLadderBottom",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleMatchingLow",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleMatHold",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleMorningDojiStar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleMorningStar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleOnNeck",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandlePiercing",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleRiseFallThreeMethods",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleSeparatingLines",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleShootingStar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleStalledPattern",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleTasukiGap",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleThrusting",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleTriStar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleUniqueThreeRiver",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CandleUpsideGapTwoCrows",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Lag",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "LogReturn",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CumulativeSum",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CumulativeProduct",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMedian",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMin",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMax",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingSum",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingArgmin",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingArgmax",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingMode",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingQuantile",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingPercentile",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingRank",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingZScore",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingSkew",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingKurtosis",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingInterquartileRange",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingCov",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingWinsorize",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ExponentiallyWeightedVariance",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ExponentiallyWeightedStandardDeviation",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ExponentiallyWeightedCovariance",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ExponentiallyWeightedCorrelation",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CumulativeMaximum",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CumulativeMinimum",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Drawdown",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingSharpe",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingSortino",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingCalmar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HullMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "VolumeWeightedMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ZeroLagExponentialMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ArnaudLegouxMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TrueStrengthIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AwesomeOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "FisherTransform",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Donchian",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "UlcerIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "KeltnerChannels",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ChaikinVolatility",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Crossover",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Crossunder",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Cross",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Rising",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Falling",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingVolumeWeightedAveragePrice",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ForceIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "EaseOfMovement",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HigherHigh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "LowerLow",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "InsideBar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "OutsideBar",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "GapUp",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "GapDown",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "BarsSince",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ValueWhen",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HighestSince",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "LowestSince",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SignalDelay",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PositionHold",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "EntryExit",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SwingHighLow",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SwingHigh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SwingLow",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Retracements",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SessionExtrema",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PreviousHighLow",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Sessions",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ActiveZoneList",
+      "append": false,
+      "extend": false,
+      "reset": true,
+      "compute_or_value": false
+    },
+    {
+      "name": "FairValueGap",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "DonchianChannels",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingVolumeWeightedAveragePrice",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SwingHighsLows",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "BreakOfStructureChangeOfCharacter",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "OrderBlock",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Liquidity",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "EqualHighsLows",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "HedgeRatio",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingEntropy",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingAutocorr",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Hurst",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "FractalDimension",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingAlpha",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollingInformationRatio",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CloseToCloseSigma",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Parkinson",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "GarmanKlass",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RogersSatchell",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "GarmanKlassYangZhang",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "YangZhang",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "AverageDailyDollarValue",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Amihud",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "RollSpread",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "OrnsteinUhlenbeckHalfLife",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "CumulativeSumControlChart",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SpreadZScore",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "FracDiff",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "KalmanHedgeRatio",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Supertrend",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Ichimoku",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Squeeze",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SqueezePro",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SchaffTrendCycle",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "Vortex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "KnowSureThing",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MassIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "DetrendedPriceOscillator",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ChaikinMoneyFlow",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "VolumePriceTrend",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "NegativeVolumeIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "PositiveVolumeIndex",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "McGinleyDynamic",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    }
+  ]
+}

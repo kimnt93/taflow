@@ -69,8 +69,13 @@ def export_modules() -> dict[str, str]:
 
 
 def native_functions() -> set[str]:
-    text = (ROOT / "crates" / "taflow-python" / "src" / "func_api.rs").read_text()
-    return set(re.findall(r"\bpub fn\s+([A-Za-z0-9_]+)\s*\(", text))
+    """Return public one-shot PyO3 functions.
+
+    TAFlow is continuous-only; the former ``func_api.rs`` batch bindings are
+    intentionally not registered by the extension anymore.  Keep this
+    inventory explicit so a dead source file cannot make them look public.
+    """
+    return set()
 
 
 def native_classes() -> set[str]:
@@ -126,8 +131,7 @@ def main() -> None:
     native_state = native_classes()
     rust = rust_exports()
     ta, pandas_ta, smc_functions = references()
-    # Uppercase aliases are the compatibility surface; canonical names are
-    # deliberately not forced to match by spelling.
+    # Canonical names are deliberately not forced to match by spelling.
     rows = []
     for name in exported:
         d = defs.get(name, {"name": name, "kind": "export", "module": export_module_map.get(name, "__init__")})
@@ -151,9 +155,7 @@ def main() -> None:
         refs = "yes" if r["pandas_ta_reference"] else "—"
         symbols = ", ".join(f"`{x}`" for x in r.get("native_symbols", [])) or "—"
         lines.append(f"| {status} | `{r['name']}` | {r['kind']} | `{r['module']}` | {symbols} | {'yes' if (r['native_binding'] or r['rust_export']) else '—'} | `{r['talib_alias']}` | {refs} | {'yes' if r['smc_reference'] else '—'} |")
-    lines += ["", "## TA-Lib compatibility registry", "", "Every name below is required to be callable through `taflow.talib`; the verifier compares this list to the installed upstream registry.", "", "| Function | Registry status |", "|---|---|"]
-    for name in ta:
-        lines.append(f"| `{name}` | implemented |")
+    lines += ["", "## TA-Lib compatibility", "", "TA-Lib is an external oracle only. One-shot uppercase functions are intentionally not exported by `taflow.talib`; use persistent CamelCase classes from `taflow` (or optional state aliases from `taflow.talib.state`)."]
     OUT_MD.write_text("\n".join(lines) + "\n")
     print(f"wrote {OUT_JSON} and {OUT_MD}: {len(rows)} exports")
 

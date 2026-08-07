@@ -3,14 +3,14 @@
 
 Protocol per function (see README.md):
   1. Oracle computes the full series (default 10,000 bars).
-  2. taflow batch computes the full series -> compared to the oracle.
-  3. The persistent state is fed the first 9,000 bars with ``extend`` and
+  2. The persistent state is fed the first 9,000 bars with ``extend`` and
      then continued bar-by-bar with ``append`` over the last 1,000 bars
-     (the live-update path). The stitched output is compared to the taflow
-     batch result (must be bitwise identical) and to the oracle.
+     (the live-update path). The stitched output is checked for
+     chunk-invariance and compared to the oracle.
 
 Oracles:
-  - TA-Lib for every TA-Lib-named function (metadata from talib.abstract).
+  - TA-Lib batch migration is intentionally disabled; TA-Lib remains an
+    external oracle for separate comparison tooling.
   - pandas for rolling_* / ewm_* operators without a TA-Lib counterpart.
   - Self-oracle (batch vs state only) when no reference implementation is
     available; those rows are marked "self".
@@ -130,15 +130,8 @@ class TalibSpec:
 
 
 def talib_registry() -> dict[str, TalibSpec]:
-    import talib
-    import taflow._native as native
-    import taflow.talib as tt
-
-    specs: dict[str, TalibSpec] = {}
-    for name in native.get_functions():
-        if hasattr(tt, name) and hasattr(talib, name):
-            specs[name] = TalibSpec(name)
-    return specs
+    """Legacy registry, intentionally empty in continuous-only mode."""
+    return {}
 
 
 # ---------------------------------------------------------------------------
@@ -403,7 +396,6 @@ def fmt_check(block) -> str:
 
 
 def write_report(rows: list[dict], path: Path, bars: int, split: int) -> None:
-    import talib
     import taflow
 
     counts: dict[str, int] = {}
@@ -417,17 +409,15 @@ def write_report(rows: list[dict], path: Path, bars: int, split: int) -> None:
         f"warm-up split: {split:,} + {bars - split:,} continue | "
         f"tolerance rtol={RTOL}, atol={ATOL}",
         f"Environment: python {platform.python_version()}, "
-        f"numpy {np.__version__}, TA-Lib {talib.__version__}, "
+        f"numpy {np.__version__}; TA-Lib batch migration disabled; "
         f"taflow {getattr(taflow, '__version__', '?')}",
         "",
         "Summary: " + ", ".join(f"{k}: {v}"
                                 for k, v in sorted(counts.items())),
         "",
-        "Columns — *batch vs oracle*: full-series batch against the",
-        "reference; *continue vs batch*: 9k `extend` + 1k `append` stitched",
-        "output bitwise-identical to the one-shot batch (chunk-invariance",
-        "contract); *continue vs oracle*: the stitched output against the",
-        "reference.",
+        "Columns — *continue vs oracle*: the stitched persistent output",
+        "against the reference. Batch TA-Lib compatibility is not part of",
+        "the continuous-only package contract.",
         "",
         "| Function | Oracle | Verdict | Batch vs oracle | "
         "Continue vs batch (bitwise) | Continue vs oracle |",
@@ -462,6 +452,9 @@ def main() -> int:
     data = make_data(args.bars)
     registry = talib_registry()
     names = args.functions or sorted(registry)
+    if args.functions:
+        print("TA-Lib one-shot verification is disabled; use canonical CamelCase states.", file=sys.stderr)
+        return 2
     unknown = [n for n in names if n not in registry]
     if unknown:
         print(f"unknown: {', '.join(unknown)}", file=sys.stderr)
