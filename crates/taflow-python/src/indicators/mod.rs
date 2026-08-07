@@ -35,6 +35,7 @@ mod volume_operators;
 mod bar_helpers;
 mod state_helpers;
 mod swing;
+mod session;
 mod belt_hold;
 mod closing_marubozu;
 mod doji;
@@ -145,6 +146,7 @@ pub use volume_operators::{EaseOfMovementOperator, ForceIndexOperator, VwapOpera
 pub use bar_helpers::{GapDownOperator, GapUpOperator, HigherHighOperator, InsideBarOperator, LowerLowOperator, OutsideBarOperator};
 pub use state_helpers::{BarsSinceOperator, EntryExitOperator, HighestSinceOperator, LowestSinceOperator, PositionHoldOperator, SignalDelayOperator, ValueWhenOperator};
 pub use swing::SwingHighLowOperator;
+pub use session::SessionExtremaOperator;
 pub use belt_hold::BeltHold;
 pub use closing_marubozu::ClosingMarubozu;
 pub use doji::Doji;

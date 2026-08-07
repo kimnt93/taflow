@@ -123,6 +123,7 @@ from ..ease_of_movement import EaseOfMovement
 from ..bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
 from ..state_helpers import BarsSince, ValueWhen, HighestSince, LowestSince, SignalDelay, PositionHold, EntryExit
 from ..swing import SwingHighLow, SwingHigh, SwingLow
+from ..session import SessionExtrema, session_flags
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -216,4 +217,5 @@ __all__ = [
     "PositionHold",
     "EntryExit",
     "SwingHighLow", "SwingHigh", "SwingLow",
+    "SessionExtrema", "session_flags",
 ]

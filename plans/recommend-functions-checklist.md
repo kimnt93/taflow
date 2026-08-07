@@ -35,7 +35,7 @@ chunk invariance (benchmark plan S4).
   Note: two monotonic deques (reuse `RollingExtrema`, split per §3.2 of
   `optimize-methods.md`) + candidate slot — O(1) amortized. Every SMC row
   consumes this state.
-- [ ] **Session/anchor input handling** — session-scoped functions need to
+- [x] **Session/anchor input handling** — session-scoped functions need to
   know boundaries. Contract-compatible design: accept an extra aligned
   input series (`timestamp: i64` or precomputed `session_id`/`new_session`
   flags), never an internal calendar. Python layer provides helpers to
