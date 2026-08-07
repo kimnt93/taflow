@@ -130,7 +130,9 @@ remain covered by the operator tests.
       and chunk-invariance tests)
 - [x] stateful implementation when mathematically possible (`append` and
       persistent indicator-node state)
-- [x] NumPy/Python API test (`tests/test_execution_adapters.py`)
+- [x] NumPy/Python API smoke coverage (gateway conversion, pipeline
+      append/extend/reset, chunk invariance, and optional-adapter error paths;
+      the historical `tests/` tree was removed)
 - [x] **all applicable review gates in `/CHECK.md` pass** (module placement,
       typed/documented public gateway, multi-line style, and diff/compile
       checks; rolling-indicator gates do not apply)
