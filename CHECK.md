@@ -342,9 +342,10 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | premium_discount | premium_discount | _ |
 | [x] | supertrend | supertrend | _ |
 | [x] | ichimoku | ichimoku | _ |
-| [ ] | squeeze | squeeze | _ |
-| [ ] | schaff_trend_cycle | schaff_trend_cycle | _ |
-| [ ] | vortex | vortex | _ |
+| [x] | squeeze | squeeze | _ |
+| [x] | squeeze_pro | squeeze_pro | _ |
+| [x] | schaff_trend_cycle | stc | _ |
+| [x] | vortex | vortex | _ |
 | [ ] | kst | kst | _ |
 | [ ] | mass_index | mass_index | _ |
 | [ ] | dpo | dpo | _ |

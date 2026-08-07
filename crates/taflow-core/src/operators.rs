@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::error::{TaError, TaResult};
-use crate::stream::{Atr, Midprice};
+use crate::stream::{Atr, Ema, Midprice, Sma, Stddev, StreamingIndicator, Trange, Window};
 
 fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
@@ -2609,6 +2609,1025 @@ pub fn ichimoku(
     Ok((tenkan_sen, kijun_sen, span_a, span_b, chikou_span))
 }
 
+/// SMA of the true-range series with pandas-ta's NaN-at-bar-0 convention.
+///
+/// The true range of bar 0 is NaN and is excluded from every window, so the
+/// first valid band lands at bar `period` (windows over bars `1..=period`)
+/// instead of `period - 1`.
+#[derive(Debug, Clone)]
+struct SqueezeTrBand {
+    period: usize,
+    window: Window,
+    sum: f64,
+    value: Option<f64>,
+}
+
+impl SqueezeTrBand {
+    fn new(period: usize) -> TaResult<Self> {
+        Ok(Self {
+            period,
+            window: Window::new(period)?,
+            sum: 0.0,
+            value: None,
+        })
+    }
+
+    fn append(&mut self, tr: f64) -> Option<f64> {
+        if !tr.is_nan() {
+            if let Some(old) = self.window.push(tr) {
+                self.sum -= old;
+            }
+            self.sum += tr;
+        }
+        self.value = self.window.is_full().then(|| self.sum / self.period as f64);
+        self.value
+    }
+
+    fn reset(&mut self) {
+        self.window.clear();
+        self.sum = 0.0;
+        self.value = None;
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SqueezeValue {
+    pub squeeze: f64,
+    pub on: f64,
+    pub off: f64,
+    pub no: f64,
+}
+
+/// Stateful TTM Squeeze (pandas-ta classic `momentum/squeeze.py`, theory:
+/// John Carter). A Bollinger Bands envelope (SMA basis, population std) is
+/// compared against a Keltner Channel (SMA of close, SMA of true range) to
+/// classify compression states; the momentum line is an SMA of the
+/// `close − close[mom_length]` difference.
+///
+/// All four band components are O(1) incremental states; `on`/`off`/`no` are
+/// `0/1` booleans and, like pandas-ta's `&` against NaN, report `no = 1`
+/// during warm-up (before both envelopes are defined).
+#[derive(Debug, Clone)]
+pub struct Squeeze {
+    bb_length: usize,
+    bb_std: f64,
+    kc_length: usize,
+    kc_scalar: f64,
+    mom_length: usize,
+    mom_smooth: usize,
+    bb_mid: Sma,
+    bb_dev: Stddev,
+    kc_basis: Sma,
+    tr_band: SqueezeTrBand,
+    trange: Trange,
+    close_window: Window,
+    mom_smooth_sma: Sma,
+    value: Option<SqueezeValue>,
+}
+
+impl Squeeze {
+    pub fn new(
+        bb_length: usize,
+        bb_std: f64,
+        kc_length: usize,
+        kc_scalar: f64,
+        mom_length: usize,
+        mom_smooth: usize,
+    ) -> TaResult<Self> {
+        validate_period(bb_length)?;
+        validate_period(kc_length)?;
+        validate_period(mom_length)?;
+        validate_period(mom_smooth)?;
+        if !(bb_std > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "bb_std",
+                value: bb_std.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        if !(kc_scalar > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "kc_scalar",
+                value: kc_scalar.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        Ok(Self {
+            bb_length,
+            bb_std,
+            kc_length,
+            kc_scalar,
+            mom_length,
+            mom_smooth,
+            bb_mid: Sma::new(bb_length)?,
+            bb_dev: Stddev::new(bb_length, 1.0)?,
+            kc_basis: Sma::new(kc_length)?,
+            tr_band: SqueezeTrBand::new(kc_length)?,
+            trange: Trange::new(),
+            close_window: Window::new(mom_length)?,
+            mom_smooth_sma: Sma::new(mom_smooth)?,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> SqueezeValue {
+        let (bb_lower, bb_upper) = match (self.bb_mid.append(close), self.bb_dev.append(close)) {
+            (Some(mid), Some(std)) => (mid - self.bb_std * std, mid + self.bb_std * std),
+            _ => (f64::NAN, f64::NAN),
+        };
+
+        let kc_basis = self.kc_basis.append(close);
+        let tr = self.trange.append(high, low, close).unwrap_or(f64::NAN);
+        let kc_band = self.tr_band.append(tr);
+        let (kc_lower, kc_upper) = match (kc_basis, kc_band) {
+            (Some(basis), Some(band)) => {
+                (basis - self.kc_scalar * band, basis + self.kc_scalar * band)
+            }
+            _ => (f64::NAN, f64::NAN),
+        };
+
+        let mom = self.close_window.push(close).map(|old| close - old);
+        let squeeze = mom
+            .and_then(|mom| self.mom_smooth_sma.append(mom))
+            .unwrap_or(f64::NAN);
+
+        let on = (bb_lower > kc_lower && bb_upper < kc_upper) as u8 as f64;
+        let off = (bb_lower < kc_lower && bb_upper > kc_upper) as u8 as f64;
+        let no = if on == 0.0 && off == 0.0 { 1.0 } else { 0.0 };
+
+        let value = SqueezeValue {
+            squeeze,
+            on,
+            off,
+            no,
+        };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<SqueezeValue> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.bb_mid.reset();
+        self.bb_dev.reset();
+        self.kc_basis.reset();
+        self.tr_band.reset();
+        self.trange.reset();
+        self.close_window.clear();
+        self.mom_smooth_sma.reset();
+        self.value = None;
+    }
+}
+
+pub fn squeeze(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    bb_length: usize,
+    bb_std: f64,
+    kc_length: usize,
+    kc_scalar: f64,
+    mom_length: usize,
+    mom_smooth: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
+    }
+    let mut state = Squeeze::new(
+        bb_length,
+        bb_std,
+        kc_length,
+        kc_scalar,
+        mom_length,
+        mom_smooth,
+    )?;
+    let mut out = (0..4)
+        .map(|_| Vec::with_capacity(high.len()))
+        .collect::<Vec<_>>();
+    for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+        let value = state.append(high, low, close);
+        out[0].push(value.squeeze);
+        out[1].push(value.on);
+        out[2].push(value.off);
+        out[3].push(value.no);
+    }
+    let mut out = out.into_iter();
+    Ok((
+        out.next().unwrap(),
+        out.next().unwrap(),
+        out.next().unwrap(),
+        out.next().unwrap(),
+    ))
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SqueezeProValue {
+    pub squeeze: f64,
+    pub on_wide: f64,
+    pub on_normal: f64,
+    pub on_narrow: f64,
+    pub off: f64,
+    pub no: f64,
+}
+
+/// Stateful Squeeze PRO (pandas-ta classic `momentum/squeeze_pro.py`): the
+/// TTM Squeeze with three Keltner scalar levels (`wide`/`normal`/`narrow`)
+/// sharing one SMA basis and one SMA-of-TR band.
+#[derive(Debug, Clone)]
+pub struct SqueezePro {
+    bb_length: usize,
+    bb_std: f64,
+    kc_length: usize,
+    kc_scalar_wide: f64,
+    kc_scalar_normal: f64,
+    kc_scalar_narrow: f64,
+    mom_length: usize,
+    mom_smooth: usize,
+    bb_mid: Sma,
+    bb_dev: Stddev,
+    kc_basis: Sma,
+    tr_band: SqueezeTrBand,
+    trange: Trange,
+    close_window: Window,
+    mom_smooth_sma: Sma,
+    value: Option<SqueezeProValue>,
+}
+
+impl SqueezePro {
+    pub fn new(
+        bb_length: usize,
+        bb_std: f64,
+        kc_length: usize,
+        kc_scalar_wide: f64,
+        kc_scalar_normal: f64,
+        kc_scalar_narrow: f64,
+        mom_length: usize,
+        mom_smooth: usize,
+    ) -> TaResult<Self> {
+        validate_period(bb_length)?;
+        validate_period(kc_length)?;
+        validate_period(mom_length)?;
+        validate_period(mom_smooth)?;
+        if !(bb_std > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "bb_std",
+                value: bb_std.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        if !(kc_scalar_wide > 0.0 && kc_scalar_normal > 0.0 && kc_scalar_narrow > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "kc_scalar",
+                value: format!(
+                    "{kc_scalar_wide}/{kc_scalar_normal}/{kc_scalar_narrow}"
+                ),
+                reason: "must all be > 0",
+            });
+        }
+        if !(kc_scalar_wide > kc_scalar_normal && kc_scalar_normal > kc_scalar_narrow) {
+            return Err(TaError::InvalidParameter {
+                name: "kc_scalar",
+                value: format!(
+                    "{kc_scalar_wide}/{kc_scalar_normal}/{kc_scalar_narrow}"
+                ),
+                reason: "must satisfy wide > normal > narrow",
+            });
+        }
+        Ok(Self {
+            bb_length,
+            bb_std,
+            kc_length,
+            kc_scalar_wide,
+            kc_scalar_normal,
+            kc_scalar_narrow,
+            mom_length,
+            mom_smooth,
+            bb_mid: Sma::new(bb_length)?,
+            bb_dev: Stddev::new(bb_length, 1.0)?,
+            kc_basis: Sma::new(kc_length)?,
+            tr_band: SqueezeTrBand::new(kc_length)?,
+            trange: Trange::new(),
+            close_window: Window::new(mom_length)?,
+            mom_smooth_sma: Sma::new(mom_smooth)?,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> SqueezeProValue {
+        let (bb_lower, bb_upper) = match (self.bb_mid.append(close), self.bb_dev.append(close)) {
+            (Some(mid), Some(std)) => (mid - self.bb_std * std, mid + self.bb_std * std),
+            _ => (f64::NAN, f64::NAN),
+        };
+
+        let kc_basis = self.kc_basis.append(close);
+        let tr = self.trange.append(high, low, close).unwrap_or(f64::NAN);
+        let kc_band = self.tr_band.append(tr);
+        let (kc_wide_lower, kc_wide_upper, kc_norm_lower, kc_norm_upper, kc_narr_lower, kc_narr_upper) =
+            match (kc_basis, kc_band) {
+                (Some(basis), Some(band)) => (
+                    basis - self.kc_scalar_wide * band,
+                    basis + self.kc_scalar_wide * band,
+                    basis - self.kc_scalar_normal * band,
+                    basis + self.kc_scalar_normal * band,
+                    basis - self.kc_scalar_narrow * band,
+                    basis + self.kc_scalar_narrow * band,
+                ),
+                _ => (
+                    f64::NAN,
+                    f64::NAN,
+                    f64::NAN,
+                    f64::NAN,
+                    f64::NAN,
+                    f64::NAN,
+                ),
+            };
+
+        let mom = self.close_window.push(close).map(|old| close - old);
+        let squeeze = mom
+            .and_then(|mom| self.mom_smooth_sma.append(mom))
+            .unwrap_or(f64::NAN);
+
+        let on_wide = (bb_lower > kc_wide_lower && bb_upper < kc_wide_upper) as u8 as f64;
+        let on_normal = (bb_lower > kc_norm_lower && bb_upper < kc_norm_upper) as u8 as f64;
+        let on_narrow = (bb_lower > kc_narr_lower && bb_upper < kc_narr_upper) as u8 as f64;
+        let off = (bb_lower < kc_wide_lower && bb_upper > kc_wide_upper) as u8 as f64;
+        let no = if on_wide == 0.0 && off == 0.0 { 1.0 } else { 0.0 };
+
+        let value = SqueezeProValue {
+            squeeze,
+            on_wide,
+            on_normal,
+            on_narrow,
+            off,
+            no,
+        };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<SqueezeProValue> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.bb_mid.reset();
+        self.bb_dev.reset();
+        self.kc_basis.reset();
+        self.tr_band.reset();
+        self.trange.reset();
+        self.close_window.clear();
+        self.mom_smooth_sma.reset();
+        self.value = None;
+    }
+}
+
+pub fn squeeze_pro(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    bb_length: usize,
+    bb_std: f64,
+    kc_length: usize,
+    kc_scalar_wide: f64,
+    kc_scalar_normal: f64,
+    kc_scalar_narrow: f64,
+    mom_length: usize,
+    mom_smooth: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
+    }
+    let mut state = SqueezePro::new(
+        bb_length,
+        bb_std,
+        kc_length,
+        kc_scalar_wide,
+        kc_scalar_normal,
+        kc_scalar_narrow,
+        mom_length,
+        mom_smooth,
+    )?;
+    let mut squeeze = Vec::with_capacity(high.len());
+    let mut on_wide = Vec::with_capacity(high.len());
+    let mut on_normal = Vec::with_capacity(high.len());
+    let mut on_narrow = Vec::with_capacity(high.len());
+    let mut off = Vec::with_capacity(high.len());
+    let mut no = Vec::with_capacity(high.len());
+    for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+        let value = state.append(high, low, close);
+        squeeze.push(value.squeeze);
+        on_wide.push(value.on_wide);
+        on_normal.push(value.on_normal);
+        on_narrow.push(value.on_narrow);
+        off.push(value.off);
+        no.push(value.no);
+    }
+    Ok((squeeze, on_wide, on_normal, on_narrow, off, no))
+}
+
+/// Python `round(value, 8)` semantics: round half to even at 1e-8 scale.
+fn round8(value: f64) -> f64 {
+    const SCALE: f64 = 1e8;
+    let scaled = value * SCALE;
+    let floor = scaled.floor();
+    let diff = scaled - floor;
+    let rounded = if diff < 0.5 {
+        floor
+    } else if diff > 0.5 {
+        floor + 1.0
+    } else if floor % 2.0 == 0.0 {
+        floor
+    } else {
+        floor + 1.0
+    };
+    rounded / SCALE
+}
+
+/// O(1) amortized rolling extremum (min or max) via a monotonic deque.
+///
+/// Mirrors pandas `rolling(period).min()/max()`: a NaN input voids the window
+/// and the output resumes only after `period` consecutive non-NaN values.
+#[derive(Debug, Clone)]
+struct RollingExtremum {
+    period: usize,
+    is_min: bool,
+    deque: VecDeque<(usize, f64)>,
+    index: usize,
+    warm: usize,
+    value: Option<f64>,
+}
+
+impl RollingExtremum {
+    fn new(period: usize, is_min: bool) -> TaResult<Self> {
+        if period == 0 {
+            return Err(TaError::InvalidParameter {
+                name: "timeperiod",
+                value: period.to_string(),
+                reason: "must be >= 1",
+            });
+        }
+        Ok(Self {
+            period,
+            is_min,
+            deque: VecDeque::new(),
+            index: 0,
+            warm: 0,
+            value: None,
+        })
+    }
+
+    fn append(&mut self, x: f64) -> Option<f64> {
+        let index = self.index;
+        self.index += 1;
+        if x.is_nan() {
+            self.deque.clear();
+            self.warm = 0;
+            self.value = None;
+            return None;
+        }
+        self.warm = (self.warm + 1).min(self.period);
+        while let Some(&(old, _)) = self.deque.front() {
+            if old + self.period <= index {
+                self.deque.pop_front();
+            } else {
+                break;
+            }
+        }
+        while let Some(&(_, value)) = self.deque.back() {
+            let dominated = if self.is_min { value >= x } else { value <= x };
+            if dominated {
+                self.deque.pop_back();
+            } else {
+                break;
+            }
+        }
+        self.deque.push_back((index, x));
+        self.value = (self.warm >= self.period).then(|| self.deque.front().unwrap().1);
+        self.value
+    }
+
+    fn reset(&mut self) {
+        self.deque.clear();
+        self.index = 0;
+        self.warm = 0;
+        self.value = None;
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct StcValue {
+    pub stc: f64,
+    pub macd: f64,
+    pub stoch: f64,
+}
+
+/// Stateful Schaff Trend Cycle (pandas-ta classic `momentum/stc.py`, theory:
+/// Douglas Schaff). MACD line from two SMA-seeded EMAs, then two cascaded
+/// stochastics with `round(..., 8)` smoothing at `factor`.
+///
+/// The `stc`/`stoch` series are fully defined from bar 0 (seeded `0` and
+/// carried forward while the rolling windows are cold or non-positive); the
+/// `macd` line is NaN until both EMAs are warm.
+#[derive(Debug, Clone)]
+pub struct Stc {
+    tclength: usize,
+    fast: usize,
+    slow: usize,
+    factor: f64,
+    fast_ema: Ema,
+    slow_ema: Ema,
+    xmacd_low: RollingExtremum,
+    xmacd_high: RollingExtremum,
+    pf_low: RollingExtremum,
+    pf_high: RollingExtremum,
+    stoch1: f64,
+    pf: f64,
+    stoch2: f64,
+    pff: f64,
+    value: Option<StcValue>,
+}
+
+impl Stc {
+    pub fn new(tclength: usize, fast: usize, slow: usize, factor: f64) -> TaResult<Self> {
+        validate_period(tclength)?;
+        validate_period(fast)?;
+        validate_period(slow)?;
+        if !(factor > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "factor",
+                value: factor.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        let (fast, slow) = if slow < fast { (slow, fast) } else { (fast, slow) };
+        Ok(Self {
+            tclength,
+            fast,
+            slow,
+            factor,
+            fast_ema: Ema::new(fast)?,
+            slow_ema: Ema::new(slow)?,
+            xmacd_low: RollingExtremum::new(tclength, true)?,
+            xmacd_high: RollingExtremum::new(tclength, false)?,
+            pf_low: RollingExtremum::new(tclength, true)?,
+            pf_high: RollingExtremum::new(tclength, false)?,
+            stoch1: 0.0,
+            pf: 0.0,
+            stoch2: 0.0,
+            pff: 0.0,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, close: f64) -> StcValue {
+        let fast = self.fast_ema.append(close);
+        let slow = self.slow_ema.append(close);
+        let macd = match (fast, slow) {
+            (Some(fast), Some(slow)) => fast - slow,
+            _ => f64::NAN,
+        };
+
+        let lowest = self.xmacd_low.append(macd).unwrap_or(f64::NAN);
+        let highest = self.xmacd_high.append(macd).unwrap_or(f64::NAN);
+        let range = non_zero(highest - lowest);
+        if lowest > 0.0 {
+            self.stoch1 = 100.0 * ((macd - lowest) / range);
+        }
+        self.pf = round8(self.pf + self.factor * (self.stoch1 - self.pf));
+
+        let lowest_pf = self.pf_low.append(self.pf).unwrap_or(f64::NAN);
+        let highest_pf = self.pf_high.append(self.pf).unwrap_or(f64::NAN);
+        let range_pf = non_zero(highest_pf - lowest_pf);
+        if range_pf > 0.0 {
+            self.stoch2 = 100.0 * ((self.pf - lowest_pf) / range_pf);
+        }
+        self.pff = round8(self.pff + self.factor * (self.stoch2 - self.pff));
+
+        let value = StcValue {
+            stc: self.pff,
+            macd,
+            stoch: self.pf,
+        };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<StcValue> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.fast_ema.reset();
+        self.slow_ema.reset();
+        self.xmacd_low.reset();
+        self.xmacd_high.reset();
+        self.pf_low.reset();
+        self.pf_high.reset();
+        self.stoch1 = 0.0;
+        self.pf = 0.0;
+        self.stoch2 = 0.0;
+        self.pff = 0.0;
+        self.value = None;
+    }
+}
+
+/// pandas-ta `non_zero_range(max, min)`: `max − min`, substituting
+/// `f64::EPSILON` for an exact zero so flat windows avoid 0/0 division. The
+/// package adds the epsilon to the whole series when *any* element is zero;
+/// that global perturbation is far below the 1e-8 smoothing precision, so a
+/// per-bar guard is equivalent in effect.
+fn non_zero(difference: f64) -> f64 {
+    if difference == 0.0 {
+        f64::EPSILON
+    } else {
+        difference
+    }
+}
+
+pub fn stc(
+    close: &[f64],
+    tclength: usize,
+    fast: usize,
+    slow: usize,
+    factor: f64,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+    let mut state = Stc::new(tclength, fast, slow, factor)?;
+    let mut stc_out = Vec::with_capacity(close.len());
+    let mut macd = Vec::with_capacity(close.len());
+    let mut stoch = Vec::with_capacity(close.len());
+    for &close in close {
+        let value = state.append(close);
+        stc_out.push(value.stc);
+        macd.push(value.macd);
+        stoch.push(value.stoch);
+    }
+    Ok((stc_out, macd, stoch))
+}
+
+/// Rolling window sum with pandas `rolling(period).sum()` semantics: NaN
+/// inputs are skipped and the output appears once `period` non-NaN values are
+/// in the window (used for the Vortex true-range and movement sums).
+#[derive(Debug, Clone)]
+struct RollingSum {
+    period: usize,
+    window: Window,
+    count: usize,
+    sum: f64,
+    value: Option<f64>,
+}
+
+impl RollingSum {
+    fn new(period: usize) -> TaResult<Self> {
+        if period == 0 {
+            return Err(TaError::InvalidParameter {
+                name: "timeperiod",
+                value: period.to_string(),
+                reason: "must be >= 1",
+            });
+        }
+        Ok(Self {
+            period,
+            window: Window::new(period)?,
+            count: 0,
+            sum: 0.0,
+            value: None,
+        })
+    }
+
+    fn append(&mut self, x: f64) -> Option<f64> {
+        if let Some(old) = self.window.push(x) {
+            if !old.is_nan() {
+                self.sum -= old;
+                self.count -= 1;
+            }
+        }
+        if !x.is_nan() {
+            self.sum += x;
+            self.count += 1;
+        }
+        self.value = (self.count >= self.period).then_some(self.sum);
+        self.value
+    }
+
+    fn reset(&mut self) {
+        self.window.clear();
+        self.count = 0;
+        self.sum = 0.0;
+        self.value = None;
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct VortexValue {
+    pub vp: f64,
+    pub vn: f64,
+}
+
+/// Stateful Vortex indicator (bukosabino `ta` `trend.VortexIndicator`, theory:
+/// Etienne Botes & Douglas Siepman, TASC Jan 2010). +VI/−VI are the ratio of
+/// the rolling `n`-sum of positive/negative directional movement to the
+/// rolling `n`-sum of true range.
+///
+/// The first bar's true range uses `close` as its own previous close (the
+/// package fills bar 0 with the global close mean, but that value only feeds
+/// outputs whose window is not yet complete, so the streaming choice is
+/// output-equivalent); the movement terms are NaN at bar 0, so +VI/−VI are
+/// first defined at bar `n`.
+#[derive(Debug, Clone)]
+pub struct Vortex {
+    period: usize,
+    previous_close: Option<f64>,
+    previous_low: Option<f64>,
+    previous_high: Option<f64>,
+    tr_sum: RollingSum,
+    vmp_sum: RollingSum,
+    vmm_sum: RollingSum,
+    value: Option<VortexValue>,
+}
+
+impl Vortex {
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self {
+            period,
+            previous_close: None,
+            previous_low: None,
+            previous_high: None,
+            tr_sum: RollingSum::new(period)?,
+            vmp_sum: RollingSum::new(period)?,
+            vmm_sum: RollingSum::new(period)?,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> VortexValue {
+        let (tr, vmp, vmm) = match self.previous_close {
+            Some(previous_close) => {
+                let tr = (high - low)
+                    .max((high - previous_close).abs())
+                    .max((low - previous_close).abs());
+                let vmp = (high - self.previous_low.unwrap()).abs();
+                let vmm = (low - self.previous_high.unwrap()).abs();
+                (tr, vmp, vmm)
+            }
+            None => {
+                let tr = (high - low)
+                    .max((high - close).abs())
+                    .max((low - close).abs());
+                (tr, f64::NAN, f64::NAN)
+            }
+        };
+        self.previous_close = Some(close);
+        self.previous_low = Some(low);
+        self.previous_high = Some(high);
+
+        let trn = self.tr_sum.append(tr);
+        let vmp_sum = self.vmp_sum.append(vmp);
+        let vmm_sum = self.vmm_sum.append(vmm);
+        let vp = match (vmp_sum, trn) {
+            (Some(numerator), Some(denominator)) => numerator / denominator,
+            _ => f64::NAN,
+        };
+        let vn = match (vmm_sum, trn) {
+            (Some(numerator), Some(denominator)) => numerator / denominator,
+            _ => f64::NAN,
+        };
+        let value = VortexValue { vp, vn };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<VortexValue> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.previous_close = None;
+        self.previous_low = None;
+        self.previous_high = None;
+        self.tr_sum.reset();
+        self.vmp_sum.reset();
+        self.vmm_sum.reset();
+        self.value = None;
+    }
+}
+
+pub fn vortex(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    period: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
+    }
+    let mut state = Vortex::new(period)?;
+    let mut vp = Vec::with_capacity(high.len());
+    let mut vn = Vec::with_capacity(high.len());
+    for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+        let value = state.append(high, low, close);
+        vp.push(value.vp);
+        vn.push(value.vn);
+    }
+    Ok((vp, vn))
+}
+
+/// ROC → SMA pair used by KST: `(close − close[roc]) / close[roc]` fed into an
+/// SMA once the shift window is warm.
+#[derive(Debug, Clone)]
+struct KstRocSma {
+    close_window: Window,
+    sma: Sma,
+}
+
+impl KstRocSma {
+    fn new(roc_period: usize, sma_period: usize) -> TaResult<Self> {
+        Ok(Self {
+            close_window: Window::new(roc_period)?,
+            sma: Sma::new(sma_period)?,
+        })
+    }
+
+    fn append(&mut self, close: f64) -> Option<f64> {
+        match self.close_window.push(close) {
+            Some(previous) => self.sma.append((close - previous) / previous),
+            None => None,
+        }
+    }
+
+    fn reset(&mut self) {
+        self.close_window.clear();
+        self.sma.reset();
+    }
+}
+
+/// Rolling mean with pandas `min_periods=0` semantics: defined whenever the
+/// window holds at least one non-NaN value (KST signal-line warm-up).
+#[derive(Debug, Clone)]
+struct RollingMeanMin0 {
+    period: usize,
+    window: Window,
+    count: usize,
+    sum: f64,
+    value: Option<f64>,
+}
+
+impl RollingMeanMin0 {
+    fn new(period: usize) -> TaResult<Self> {
+        if period == 0 {
+            return Err(TaError::InvalidParameter {
+                name: "timeperiod",
+                value: period.to_string(),
+                reason: "must be >= 1",
+            });
+        }
+        Ok(Self {
+            period,
+            window: Window::new(period)?,
+            count: 0,
+            sum: 0.0,
+            value: None,
+        })
+    }
+
+    fn append(&mut self, x: f64) -> Option<f64> {
+        if let Some(old) = self.window.push(x) {
+            if !old.is_nan() {
+                self.sum -= old;
+                self.count -= 1;
+            }
+        }
+        if !x.is_nan() {
+            self.sum += x;
+            self.count += 1;
+        }
+        self.value = (self.count > 0).then_some(self.sum / self.count as f64);
+        self.value
+    }
+
+    fn reset(&mut self) {
+        self.window.clear();
+        self.count = 0;
+        self.sum = 0.0;
+        self.value = None;
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct KstValue {
+    pub kst: f64,
+    pub signal: f64,
+}
+
+/// Stateful Know Sure Thing (bukosabino `ta` `trend.KSTIndicator`, theory:
+/// Martin Pring). `kst = 100·(rocma1 + 2·rocma2 + 3·rocma3 + 4·rocma4)` where
+/// each `rocma` is an SMA of the raw ROC ratio over its window; the signal is
+/// an `nsig`-period mean of KST (pandas `min_periods=0` warm-up).
+///
+/// The package fills the ROC shift warm-up with the global close mean; taflow
+/// instead leaves those bars NaN, so outputs match the reference exactly from
+/// bar `roc4 + sma4 − 1` (KST) and `roc4 + sma4 + nsig − 2` (signal).
+#[derive(Debug, Clone)]
+pub struct Kst {
+    rocs: [KstRocSma; 4],
+    nsig: usize,
+    signal_state: RollingMeanMin0,
+    value: Option<KstValue>,
+}
+
+impl Kst {
+    pub fn new(
+        roc1: usize,
+        roc2: usize,
+        roc3: usize,
+        roc4: usize,
+        sma1: usize,
+        sma2: usize,
+        sma3: usize,
+        sma4: usize,
+        nsig: usize,
+    ) -> TaResult<Self> {
+        validate_period(roc1)?;
+        validate_period(roc2)?;
+        validate_period(roc3)?;
+        validate_period(roc4)?;
+        validate_period(sma1)?;
+        validate_period(sma2)?;
+        validate_period(sma3)?;
+        validate_period(sma4)?;
+        validate_period(nsig)?;
+        Ok(Self {
+            rocs: [
+                KstRocSma::new(roc1, sma1)?,
+                KstRocSma::new(roc2, sma2)?,
+                KstRocSma::new(roc3, sma3)?,
+                KstRocSma::new(roc4, sma4)?,
+            ],
+            nsig,
+            signal_state: RollingMeanMin0::new(nsig)?,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, close: f64) -> KstValue {
+        let rocma1 = self.rocs[0].append(close).unwrap_or(f64::NAN);
+        let rocma2 = self.rocs[1].append(close).unwrap_or(f64::NAN);
+        let rocma3 = self.rocs[2].append(close).unwrap_or(f64::NAN);
+        let rocma4 = self.rocs[3].append(close).unwrap_or(f64::NAN);
+        let kst = 100.0 * (rocma1 + 2.0 * rocma2 + 3.0 * rocma3 + 4.0 * rocma4);
+        let signal = self.signal_state.append(kst).unwrap_or(f64::NAN);
+        let value = KstValue { kst, signal };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<KstValue> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        for roc in &mut self.rocs {
+            roc.reset();
+        }
+        self.signal_state.reset();
+        self.value = None;
+    }
+}
+
+pub fn kst(
+    close: &[f64],
+    roc1: usize,
+    roc2: usize,
+    roc3: usize,
+    roc4: usize,
+    sma1: usize,
+    sma2: usize,
+    sma3: usize,
+    sma4: usize,
+    nsig: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>)> {
+    let mut state = Kst::new(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, nsig)?;
+    let mut kst_out = Vec::with_capacity(close.len());
+    let mut signal = Vec::with_capacity(close.len());
+    for &close in close {
+        let value = state.append(close);
+        kst_out.push(value.kst);
+        signal.push(value.signal);
+    }
+    Ok((kst_out, signal))
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
@@ -3806,5 +4825,212 @@ mod tests {
             ichimoku(&[1.0], &[1.0], &[1.0, 2.0], 9, 26, 52),
             Err(TaError::LengthMismatch { expected: 1, got: 1 })
         );
+    }
+
+    #[test]
+    fn squeeze_batch_and_stream_match() {
+        let high: Vec<f64> = (0..240)
+            .map(|i| 52.0 + (i as f64 * 0.31).sin() * 6.0 + (i as f64 * 0.015).cos())
+            .collect();
+        let low: Vec<f64> = high.iter().map(|&h| h - 3.0).collect();
+        let close: Vec<f64> = high
+            .iter()
+            .enumerate()
+            .map(|(i, &h)| h - 1.5 + (i as f64 * 0.07).sin())
+            .collect();
+
+        let (squeeze, on, off, no) = squeeze(&high, &low, &close, 20, 2.0, 20, 1.5, 12, 6).unwrap();
+        assert!(squeeze[..16].iter().all(|&v| v.is_nan()));
+        assert!(squeeze[17..].iter().all(|&v| v.is_finite()));
+        assert!(on[..19].iter().all(|&v| v == 0.0));
+        assert!(off[..19].iter().all(|&v| v == 0.0));
+        assert!(no[..19].iter().all(|&v| v == 1.0));
+        assert!(on[19..].iter().all(|&v| v == 0.0 || v == 1.0));
+        assert!(off[19..].iter().all(|&v| v == 0.0 || v == 1.0));
+        assert!(no[19..].iter().all(|&v| v == 0.0 || v == 1.0));
+        for i in 19..close.len() {
+            assert_eq!(on[i] + off[i] + no[i], 1.0);
+        }
+
+        let mut state = Squeeze::new(20, 2.0, 20, 1.5, 12, 6).unwrap();
+        let replayed: Vec<f64> = high
+            .iter()
+            .zip(&low)
+            .zip(&close)
+            .map(|((&h, &l), &c)| state.append(h, l, c).squeeze)
+            .collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            squeeze.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+
+        let mut state = Squeeze::new(20, 2.0, 20, 1.5, 12, 6).unwrap();
+        let replayed_on: Vec<f64> = high
+            .iter()
+            .zip(&low)
+            .zip(&close)
+            .map(|((&h, &l), &c)| state.append(h, l, c).on)
+            .collect();
+        assert_eq!(
+            replayed_on.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            on.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn squeeze_rejects_bad_params() {
+        assert!(Squeeze::new(0, 2.0, 20, 1.5, 12, 6).is_err());
+        assert!(Squeeze::new(20, 2.0, 0, 1.5, 12, 6).is_err());
+        assert!(Squeeze::new(20, 2.0, 20, 0.0, 12, 6).is_err());
+        assert!(Squeeze::new(20, 0.0, 20, 1.5, 12, 6).is_err());
+        assert_eq!(
+            squeeze(&[1.0, 2.0], &[1.0], &[1.0, 2.0], 20, 2.0, 20, 1.5, 12, 6),
+            Err(TaError::LengthMismatch { expected: 2, got: 1 })
+        );
+    }
+
+    #[test]
+    fn squeeze_pro_batch_and_stream_match() {
+        let high: Vec<f64> = (0..240)
+            .map(|i| 52.0 + (i as f64 * 0.31).sin() * 6.0 + (i as f64 * 0.015).cos())
+            .collect();
+        let low: Vec<f64> = high.iter().map(|&h| h - 3.0).collect();
+        let close: Vec<f64> = high
+            .iter()
+            .enumerate()
+            .map(|(i, &h)| h - 1.5 + (i as f64 * 0.07).sin())
+            .collect();
+
+        let (sq, on_wide, on_normal, on_narrow, off, no) =
+            squeeze_pro(&high, &low, &close, 20, 2.0, 20, 2.0, 1.5, 1.0, 12, 6).unwrap();
+        assert!(sq[..16].iter().all(|&v| v.is_nan()));
+        assert!(sq[17..].iter().all(|&v| v.is_finite()));
+        for column in [&on_wide, &on_normal, &on_narrow, &off, &no] {
+            assert!(column[19..].iter().all(|&v| v == 0.0 || v == 1.0));
+        }
+
+        let mut state = SqueezePro::new(20, 2.0, 20, 2.0, 1.5, 1.0, 12, 6).unwrap();
+        let replayed: Vec<f64> = high
+            .iter()
+            .zip(&low)
+            .zip(&close)
+            .map(|((&h, &l), &c)| state.append(h, l, c).on_narrow)
+            .collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            on_narrow.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn squeeze_pro_rejects_bad_params() {
+        assert!(SqueezePro::new(0, 2.0, 20, 2.0, 1.5, 1.0, 12, 6).is_err());
+        assert!(SqueezePro::new(20, 2.0, 20, 1.5, 1.5, 1.0, 12, 6).is_err());
+        assert!(SqueezePro::new(20, 2.0, 20, 2.0, 1.5, 2.0, 12, 6).is_err());
+        assert!(SqueezePro::new(20, 2.0, 20, 2.0, 1.5, 0.0, 12, 6).is_err());
+        assert_eq!(
+            squeeze_pro(&[1.0, 2.0], &[1.0], &[1.0, 2.0], 20, 2.0, 20, 2.0, 1.5, 1.0, 12, 6),
+            Err(TaError::LengthMismatch { expected: 2, got: 1 })
+        );
+    }
+
+    #[test]
+    fn stc_batch_and_stream_match() {
+        let close: Vec<f64> = (0..300)
+            .map(|i| 100.0 + (i as f64 * 0.07).sin() * 8.0 + (i as f64 * 0.013) * 2.0)
+            .collect();
+
+        let (stc, macd, stoch) = stc(&close, 10, 12, 26, 0.5).unwrap();
+        assert_eq!(stc[0], 0.0);
+        assert_eq!(stoch[0], 0.0);
+        assert!(macd[..24].iter().all(|&v| v.is_nan()));
+        assert!(macd[25..].iter().all(|&v| v.is_finite()));
+        assert!(stc.iter().all(|&v| v.is_finite() && (0.0..=100.0).contains(&v)));
+        assert!(stoch.iter().all(|&v| v.is_finite() && (0.0..=100.0).contains(&v)));
+
+        let mut state = Stc::new(10, 12, 26, 0.5).unwrap();
+        let replayed: Vec<f64> = close.iter().map(|&c| state.append(c).stc).collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            stc.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn stc_swaps_fast_slow_and_rejects_bad_params() {
+        let close: Vec<f64> = (0..200).map(|i| 100.0 + (i as f64 * 0.03).cos()).collect();
+        let (a, _, _) = stc(&close, 10, 12, 26, 0.5).unwrap();
+        let (b, _, _) = stc(&close, 10, 26, 12, 0.5).unwrap();
+        assert_eq!(a, b);
+
+        assert!(Stc::new(0, 12, 26, 0.5).is_err());
+        assert!(Stc::new(10, 0, 26, 0.5).is_err());
+        assert!(Stc::new(10, 12, 26, 0.0).is_err());
+    }
+
+    #[test]
+    fn vortex_batch_and_stream_match() {
+        let high: Vec<f64> = (0..240)
+            .map(|i| 52.0 + (i as f64 * 0.31).sin() * 5.0)
+            .collect();
+        let low: Vec<f64> = high.iter().map(|&h| h - 2.5).collect();
+        let close: Vec<f64> = high
+            .iter()
+            .enumerate()
+            .map(|(i, &h)| h - 1.2 + (i as f64 * 0.05).sin())
+            .collect();
+
+        let (vp, vn) = vortex(&high, &low, &close, 14).unwrap();
+        assert!(vp[..13].iter().all(|&v| v.is_nan()));
+        assert!(vn[..13].iter().all(|&v| v.is_nan()));
+        assert!(vp[14..].iter().all(|&v| v.is_finite() && v >= 0.0));
+        assert!(vn[14..].iter().all(|&v| v.is_finite() && v >= 0.0));
+
+        let mut state = Vortex::new(14).unwrap();
+        let replayed: Vec<f64> = high
+            .iter()
+            .zip(&low)
+            .zip(&close)
+            .map(|((&h, &l), &c)| state.append(h, l, c).vp)
+            .collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            vp.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn vortex_rejects_bad_params() {
+        assert!(Vortex::new(0).is_err());
+        assert_eq!(
+            vortex(&[1.0, 2.0], &[1.0], &[1.0, 2.0], 14),
+            Err(TaError::LengthMismatch { expected: 2, got: 1 })
+        );
+    }
+
+    #[test]
+    fn kst_batch_and_stream_match() {
+        let close: Vec<f64> = (0..400)
+            .map(|i| 100.0 + (i as f64 * 0.05).sin() * 6.0 + i as f64 * 0.01)
+            .collect();
+
+        let (kst, signal) = kst(&close, 10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
+        assert!(kst[..43].iter().all(|&v| v.is_nan()));
+        assert!(signal[..43].iter().all(|&v| v.is_nan()));
+        assert!(kst[44..].iter().all(|&v| v.is_finite()));
+        assert!(signal[52..].iter().all(|&v| v.is_finite()));
+
+        let mut state = Kst::new(10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
+        let replayed: Vec<f64> = close.iter().map(|&c| state.append(c).kst).collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            kst.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn kst_rejects_bad_params() {
+        assert!(Kst::new(0, 15, 20, 30, 10, 10, 10, 15, 9).is_err());
+        assert!(Kst::new(10, 15, 20, 30, 10, 10, 10, 15, 0).is_err());
     }
 }

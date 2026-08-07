@@ -181,6 +181,11 @@ from .frac_diff import FracDiff
 from .kalman_hedge_ratio import KalmanHedgeRatio
 from .supertrend import Supertrend
 from .ichimoku import Ichimoku
+from .squeeze import Squeeze
+from .squeeze_pro import SqueezePro
+from .stc import Stc
+from .vortex import Vortex
+from .kst import Kst
 
 __all__ = [
     "talib",
@@ -351,5 +356,10 @@ __all__ = [
     "KalmanHedgeRatio",
     "Supertrend",
     "Ichimoku",
+    "Squeeze",
+    "SqueezePro",
+    "Stc",
+    "Vortex",
+    "Kst",
     "__version__",
 ]

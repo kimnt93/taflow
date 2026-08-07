@@ -135,6 +135,11 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::KalmanHedgeRatioOperator>()?;
     m.add_class::<indicators::SupertrendOperator>()?;
     m.add_class::<indicators::IchimokuOperator>()?;
+    m.add_class::<indicators::SqueezeOperator>()?;
+    m.add_class::<indicators::SqueezeProOperator>()?;
+    m.add_class::<indicators::StcOperator>()?;
+    m.add_class::<indicators::VortexOperator>()?;
+    m.add_class::<indicators::KstOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;
