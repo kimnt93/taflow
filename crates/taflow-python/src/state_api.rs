@@ -14,6 +14,7 @@ use taflow::stream::{
     JurikMovingAverage,
     SmoothedTrendChannel, PremiumDiscount, HeikinAshi,
     FibonacciRetracement,
+    OpeningRange,
 };
 use taflow::MaType;
 
@@ -182,6 +183,38 @@ pub struct StatefulHeikinAshi {
 pub struct StatefulFibonacciRetracement {
     inner: FibonacciRetracement,
     levels: [Vec<f64>; 7],
+}
+
+/// Native state adapter for opening range and breakout flags.
+#[pyclass]
+pub struct StatefulOpeningRange {
+    inner: OpeningRange,
+    highs: Vec<f64>,
+    lows: Vec<f64>,
+    breakouts: Vec<i32>,
+}
+
+#[pymethods]
+impl StatefulOpeningRange {
+    #[new]
+    #[pyo3(signature = (bars=30))]
+    fn new(bars: usize) -> Self { Self { inner: OpeningRange::new(bars), highs: Vec::new(), lows: Vec::new(), breakouts: Vec::new() } }
+    fn append(&mut self, high: f64, low: f64, close: f64, anchor: bool) -> (f64, f64, i32) {
+        let value = self.inner.append(high, low, close, anchor);
+        self.highs.push(value.0); self.lows.push(value.1); self.breakouts.push(value.2); value
+    }
+    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
+        let (high, low, close, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, anchor.as_slice()?);
+        if high.len() != low.len() || high.len() != close.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
+        for (((&high, &low), &close), &anchor) in high.iter().zip(low).zip(close).zip(anchor) { self.append(high, low, close, anchor); }
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<i32>>) {
+        (PyArray1::from_vec(py, self.highs.clone()), PyArray1::from_vec(py, self.lows.clone()), PyArray1::from_vec(py, self.breakouts.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, i32)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.highs.clear(); self.lows.clear(); self.breakouts.clear(); }
 }
 
 #[pymethods]

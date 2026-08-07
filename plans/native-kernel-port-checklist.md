@@ -36,7 +36,8 @@ For each item:
   four-output adapter, and constructor-history runtime check verified.
 - [ ] `AnchoredVolumeWeightedAveragePrice` (`anchored_vwap`)
 - [ ] `PivotPoints` (`pivot_points`)
-- [ ] `OpeningRange` (`opening_range`)
+- [x] `OpeningRange` (`opening_range`) — Rust causal session-range kernel,
+  native multi-output adapter, and anchor-history check verified.
 - [x] `PremiumDiscount` (`premium_discount`) — Rust rolling range/midpoint
   kernel, native two-output adapter, and constructor-history check verified.
 - [x] `EvenBetterSinewave` (`ebsw`) — Rust streaming kernel, native adapter,

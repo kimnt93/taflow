@@ -1,23 +1,58 @@
-"""Opening range high/low and breakout flags."""
+"""Native opening-range breakout interface."""
+
+from typing import Any
+
 import numpy as np
+
+from ._native import StatefulOpeningRange
+
+
 class OpeningRange:
-    """Stateful OpeningRange indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Track session opening high/low levels and breakout direction.
+
+    Parameters
+    ----------
+    high, low, close : array-like, optional
+        Initial aligned OHLC history.
+    anchor : array-like of bool, optional
+        Session-boundary flags for the initial history.
+    bars : int, default 30
+        Number of bars used to form each opening range.
     """
-    def __init__(self, high=None, low=None, close=None, anchor=None, bars= opening if False else 30):
-        self.bars=int(bars); self.reset()
-        if close is not None: self.extend(high,low,close,anchor)
-    def append(self, high, low, close, anchor=False):
-        if anchor: self._n=0; self._hi=-np.inf; self._lo=np.inf
-        if self._n<self.bars: self._hi=max(self._hi,float(high)); self._lo=min(self._lo,float(low)); self._n+=1
-        b=1 if close>self._hi else -1 if close<self._lo else 0; self._v.append((self._hi,self._lo,b)); return self._v[-1]
-    def extend(self, high, low, close, anchor=None):
-        if anchor is None: anchor=[False]*len(close)
-        for row in zip(high,low,close,anchor): self.append(*row)
+
+    def __init__(self, high: Any | None = None, low: Any | None = None,
+                 close: Any | None = None, anchor: Any | None = None,
+                 bars: int = 30):
+        self._state = StatefulOpeningRange(bars)
+        if high is not None or low is not None or close is not None:
+            self.extend(high, low, close, anchor)
+
+    def append(self, high: float, low: float, close: float,
+               anchor: bool = False):
+        """Process one bar and return opening high, low, and breakout flag."""
+        return self._state.append(float(high), float(low), float(close), bool(anchor))
+
+    def extend(self, high: Any, low: Any, close: Any,
+               anchor: Any | None = None):
+        """Process aligned OHLC history and return this indicator."""
+        close_array = np.asarray(close, dtype=np.float64)
+        if anchor is None:
+            anchor = np.zeros(close_array.shape, dtype=np.bool_)
+        self._state.extend(np.asarray(high, dtype=np.float64),
+                           np.asarray(low, dtype=np.float64),
+                           close_array, np.asarray(anchor, dtype=np.bool_))
         return self
-    def compute(self): return tuple(np.asarray(v) for v in zip(*self._v)) if self._v else (np.array([]),)*3
+
+    def compute(self):
+        """Return opening highs, lows, and breakout flags."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._v[-1] if self._v else None
-    def reset(self): self._n=0; self._hi=-np.inf; self._lo=np.inf; self._v=[]; return self
+    def value(self):
+        """Return the latest opening range tuple."""
+        return self._state.value
+
+    def reset(self):
+        """Clear current session and output history."""
+        self._state.reset()
+        return self
