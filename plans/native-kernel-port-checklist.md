@@ -47,7 +47,9 @@ For each item:
 - [x] `SessionVolumeLevels` (`session_volume_levels`) — Rust fixed-bin
   histogram kernel, native three-output adapter, and constructor-history
   runtime check verified.
-- [ ] `KlingerVolumeOscillator` (`klinger_volume_oscillator`)
+- [x] `KlingerVolumeOscillator` (`klinger_volume_oscillator`) — Rust signed
+  volume/EMA kernel, native two-output adapter, and constructor-history check
+  verified.
 
 These are intentionally not duplicated as Python fallbacks: until ported,
 the Python implementations remain visible for compatibility but are not
