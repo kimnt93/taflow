@@ -130,6 +130,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollSpreadOperator>()?;
     m.add_class::<indicators::OuHalfLifeOperator>()?;
     m.add_class::<indicators::CusumOperator>()?;
+    m.add_class::<indicators::SpreadZscoreOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;

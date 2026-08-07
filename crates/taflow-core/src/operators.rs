@@ -2089,6 +2089,66 @@ pub fn cusum(input: &[f64], threshold: f64) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&change| state.append(change)).collect())
 }
 
+/// Pairs-trading z-score: rolling OLS hedge ratio `β` of `y` on `x`, spread
+/// `s = y − β·x`, then `(s − mean(s)) / std(s)` over the same window —
+/// composition of the `HedgeRatio` and `RollingZscore` definitions.
+#[derive(Debug, Clone)]
+pub struct SpreadZscore {
+    values: VecDeque<(f64, f64)>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl SpreadZscore {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+    }
+
+    pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod {
+            self.values.pop_front();
+        }
+        self.values.push_back((x, y));
+        self.value = if self.values.len() == self.timeperiod {
+            let n = self.timeperiod as f64;
+            let mean_x = self.values.iter().map(|&(x, _)| x).sum::<f64>() / n;
+            let mean_y = self.values.iter().map(|&(_, y)| y).sum::<f64>() / n;
+            let covariance = self.values.iter().map(|&(x, y)| (x - mean_x) * (y - mean_y)).sum::<f64>();
+            let variance = self.values.iter().map(|&(x, _)| (x - mean_x).powi(2)).sum::<f64>();
+            let beta = if variance > 0.0 { covariance / variance } else { 0.0 };
+            let spread = (y - beta * x);
+            let mean_spread = self.values.iter().map(|&(x, y)| y - beta * x).sum::<f64>() / n;
+            let std_spread = (self
+                .values
+                .iter()
+                .map(|&(x, y)| (y - beta * x - mean_spread).powi(2))
+                .sum::<f64>()
+                / n)
+                .sqrt();
+            Some(if std_spread > 0.0 { (spread - mean_spread) / std_spread } else { 0.0 })
+        } else {
+            None
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
+    }
+}
+
+pub fn spread_zscore(x: &[f64], y: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if x.len() != y.len() {
+        return Err(TaError::LengthMismatch { expected: x.len(), got: y.len() });
+    }
+    let mut state = SpreadZscore::new(timeperiod)?;
+    Ok(x.iter().zip(y).map(|(&x, &y)| state.append(x, y).unwrap_or(f64::NAN)).collect())
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
@@ -3070,6 +3130,37 @@ mod tests {
         assert_eq!(cusum_batch, vec![0.0, 0.0, 1.0, 0.0]);
 
         assert_eq!(adv(&close, &volume[..5], 3), Err(TaError::LengthMismatch { expected: 6, got: 5 }));
+    }
+
+    #[test]
+    fn spread_zscore_matches_hedge_ratio_composition() {
+        let x = vec![10.0, 11.0, 9.0, 12.0, 13.0, 11.5];
+        let y = vec![20.0, 22.0, 18.5, 23.0, 25.0, 22.0];
+        let period = 4;
+
+        let z = spread_zscore(&x, &y, period).unwrap();
+        assert!(z[..period - 1].iter().all(|&value| value.is_nan()));
+
+        let beta = hedge_ratio(&x, &y, period).unwrap();
+        for i in period - 1..x.len() {
+            let window_x = &x[i + 1 - period..=i];
+            let window_y = &y[i + 1 - period..=i];
+            let spreads: Vec<f64> = window_x.iter().zip(window_y).map(|(&x, &y)| y - beta[i] * x).collect();
+            let mean = spreads.iter().sum::<f64>() / period as f64;
+            let variance = spreads.iter().map(|&s| (s - mean).powi(2)).sum::<f64>() / period as f64;
+            let expected = if variance > 0.0 { (spreads[period - 1] - mean) / variance.sqrt() } else { 0.0 };
+            assert!((z[i] - expected).abs() < 1e-9, "index {i}");
+        }
+
+        let mut state = SpreadZscore::new(period).unwrap();
+        let mut replayed = Vec::new();
+        for (&x, &y) in x.iter().zip(&y) {
+            replayed.push(state.append(x, y).unwrap_or(f64::NAN));
+        }
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            z.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
     }
 
     #[test]

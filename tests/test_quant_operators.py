@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from taflow import Adv, Amihud, Cusum, OuHalfLife, RollSpread
+from taflow import Adv, Amihud, Cusum, OuHalfLife, RollSpread, SpreadZscore
 
 
 def make_close_volume(n=500):
@@ -141,3 +141,48 @@ def test_append_matches_extend():
     for c in np.diff(close):
         cusum_append.append(c)
     assert np.allclose(cusum_append.compute(), Cusum().extend(np.diff(close)).compute())
+
+
+def test_spread_zscore_matches_hedge_ratio_composition():
+    rng = np.random.default_rng(5)
+    x = 100.0 + np.cumsum(rng.normal(0.0, 0.2, 300))
+    beta = 1.5
+    y = 10.0 + beta * x + rng.normal(0.0, 0.3, len(x))
+    period = 20
+
+    z = SpreadZscore(timeperiod=period).extend(x, y).compute()
+    assert np.isnan(z[: period - 1]).all()
+
+    from taflow import HedgeRatio
+
+    hedge = HedgeRatio(timeperiod=period).extend(x, y).compute()
+    manual = np.full(len(x), np.nan)
+    for i in range(period - 1, len(x)):
+        window_x = x[i + 1 - period : i + 1]
+        window_y = y[i + 1 - period : i + 1]
+        spreads = window_y - hedge[i] * window_x
+        mean = spreads.mean()
+        var = spreads.var()
+        manual[i] = (spreads[-1] - mean) / np.sqrt(var) if var > 0 else 0.0
+    assert np.allclose(z, manual, equal_nan=True)
+
+
+def test_spread_zscore_reset_and_bad_inputs():
+    rng = np.random.default_rng(9)
+    x = 100.0 + np.cumsum(rng.normal(0.0, 0.1, 100))
+    y = 1.2 * x + rng.normal(0.0, 0.1, len(x))
+
+    with pytest.raises(ValueError):
+        SpreadZscore(timeperiod=0)
+    state = SpreadZscore()
+    with pytest.raises(ValueError):
+        state.extend(x[:-1], y)
+    state.reset()
+    assert len(state.compute()) == 0
+
+    sz = SpreadZscore().extend(x, y)
+    sz.reset()
+    assert len(sz.compute()) == 0
+    sz.extend(x, y)
+    assert len(sz.compute()) == 100
+    assert sz.value is not None

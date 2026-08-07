@@ -176,6 +176,7 @@ from .amihud import Amihud
 from .roll_spread import RollSpread
 from .ou_half_life import OuHalfLife
 from .cusum import Cusum
+from .spread_zscore import SpreadZscore
 
 __all__ = [
     "talib",
@@ -341,5 +342,6 @@ __all__ = [
     "RollingAlpha", "RollingInformationRatio",
     "CloseToCloseSigma", "Parkinson", "GarmanKlass", "RogersSatchell", "GkYangZhang", "YangZhang",
     "Adv", "Amihud", "RollSpread", "OuHalfLife", "Cusum",
+    "SpreadZscore",
     "__version__",
 ]

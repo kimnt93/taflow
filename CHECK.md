@@ -379,7 +379,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | adv | adv | _ |
 | [ ] | kalman_hedge_ratio | kalman_hedge_ratio | _ |
 | [x] | ou_half_life | ou_half_life | _ |
-| [ ] | spread_zscore | spread_zscore | _ |
+| [x] | spread_zscore | spread_zscore | _ |
 | [x] | cusum | cusum | _ |
 | [ ] | frac_diff | frac_diff | _ |
 | [x] | amihud | amihud | _ |
