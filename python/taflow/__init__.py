@@ -179,6 +179,8 @@ from .cusum import Cusum
 from .spread_zscore import SpreadZscore
 from .frac_diff import FracDiff
 from .kalman_hedge_ratio import KalmanHedgeRatio
+from .supertrend import Supertrend
+from .ichimoku import Ichimoku
 
 __all__ = [
     "talib",
@@ -347,5 +349,7 @@ __all__ = [
     "SpreadZscore",
     "FracDiff",
     "KalmanHedgeRatio",
+    "Supertrend",
+    "Ichimoku",
     "__version__",
 ]

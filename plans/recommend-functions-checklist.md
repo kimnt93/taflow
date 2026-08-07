@@ -89,8 +89,8 @@ fork/successor version) unless noted.
 
 | Done | Function | Reference (Impl / Theory) | Implementation & speed note |
 |---|---|---|---|
-| [ ] | Supertrend | Impl: pandas-ta `overlap/supertrend.py`; Theory: Olivier Seban | O(1): `Atr` + band-ratchet state machine. Seed/first-trend conventions differ across libraries — match pandas-ta exactly, document. |
-| [ ] | Ichimoku | Impl: pandas-ta `overlap/ichimoku.py`; Theory: Hosoda 9/26/52 | O(1) amortized: three midpoints = paired MonotonicMax/Min deques; chikou/senkou displacement: **emit non-shifted values** (causal) plus the displacement constant in metadata — plotting shift is presentation, not computation. Document that pandas-ta's shifted columns need re-alignment in oracle tests. |
+| [x] | Supertrend | Impl: pandas-ta `overlap/supertrend.py` (pinned pandas-ta classic 0.6.52); Theory: Olivier Seban | O(1): band-ratchet state machine over inline Wilder RMA using the package's seed (mean of first `length−1` TRs at bar `length−1` — NOT the stream `Atr` seed, so the ATR is computed inside the state). Direction starts `+1`; oracle test compares from bar `length−1` (package seeds bar 0 with trend `0`/dir `+1`). |
+| [x] | Ichimoku | Impl: pandas-ta `overlap/ichimoku.py`; Theory: Hosoda 9/26/52 | O(1) amortized: three `Midprice` (RollingExtrema pair) states; chikou/senkou displacement: **emit non-shifted values** (causal) plus the displacement constant in metadata — plotting shift is presentation, not computation. Document that pandas-ta's shifted columns need re-alignment in oracle tests. |
 | [ ] | Squeeze / Squeeze Pro | Impl: pandas-ta `momentum/squeeze.py`, `squeeze_pro.py`; Theory: John Carter | Pure composition of BBANDS + Keltner + linreg momentum — wire existing states. |
 | [ ] | Schaff Trend Cycle | Impl: pandas-ta `trend/stc.py` | O(1): MACD + two stochastic-of-stochastic recurrences. |
 | [ ] | Vortex (VI±) | Impl: bukosabino ta `trend.VortexIndicator`; Theory: Botes & Siepman, TASC Jan 2010 | O(1): three rolling `Sum` states. |

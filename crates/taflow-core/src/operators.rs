@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::error::{TaError, TaResult};
-use crate::stream::Atr;
+use crate::stream::{Atr, Midprice};
 
 fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
@@ -2333,6 +2333,282 @@ pub fn kalman_hedge_ratio(x: &[f64], y: &[f64], delta: f64, observation_variance
     Ok(x.iter().zip(y).map(|(&x, &y)| state.append(x, y).unwrap_or(f64::NAN)).collect())
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SupertrendValue {
+    pub trend: f64,
+    pub direction: f64,
+    pub long: f64,
+    pub short: f64,
+}
+
+/// Stateful Supertrend (pandas-ta classic `overlap/supertrend.py`, theory:
+/// Olivier Seban). Band = `hl2 ± multiplier·ATR`; the direction flips when
+/// close crosses the previous final band, otherwise the band ratchets
+/// monotonic while the trend persists.
+///
+/// ATR uses pandas-ta classic 0.6.52's RMA seed convention: true range of
+/// bar 0 is NaN, the seed is the mean of the first `length − 1` true ranges
+/// placed at bar `length − 1`, then Wilder smoothing. This differs from the
+/// TA-Lib ATR seed (bar `length`, `length` true ranges) — the first output
+/// therefore lands at bar `length − 1`. Direction starts at `+1`; `long` is
+/// the lower band when direction is `+1`, `short` is the upper band when
+/// `−1`, the unused band is NaN.
+#[derive(Debug, Clone)]
+pub struct Supertrend {
+    period: usize,
+    multiplier: f64,
+    alpha: f64,
+    tr_count: usize,
+    tr_sum: f64,
+    previous_close: Option<f64>,
+    atr: Option<f64>,
+    direction: f64,
+    upper: Option<f64>,
+    lower: Option<f64>,
+    value: Option<SupertrendValue>,
+}
+
+impl Supertrend {
+    pub fn new(period: usize, multiplier: f64) -> TaResult<Self> {
+        validate_period(period)?;
+        if !(multiplier > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "multiplier",
+                value: multiplier.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        Ok(Self {
+            period,
+            multiplier,
+            alpha: 1.0 / period as f64,
+            tr_count: 0,
+            tr_sum: 0.0,
+            previous_close: None,
+            atr: None,
+            direction: 1.0,
+            upper: None,
+            lower: None,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<SupertrendValue> {
+        let Some(previous_close) = self.previous_close.replace(close) else {
+            return None;
+        };
+        let true_range = (high - low)
+            .max((high - previous_close).abs())
+            .max((low - previous_close).abs());
+        self.tr_count += 1;
+
+        if self.period == 1 {
+            self.atr = Some(true_range);
+        } else if self.tr_count < self.period - 1 {
+            self.tr_sum += true_range;
+            return None;
+        } else if self.tr_count == self.period - 1 {
+            self.atr = Some((self.tr_sum + true_range) / (self.period - 1) as f64);
+        } else if let Some(previous) = self.atr {
+            self.atr = Some(previous + self.alpha * (true_range - previous));
+        }
+
+        let atr = self.atr?;
+        let hl2 = (high + low) * 0.5;
+        let mut raw_upper = hl2 + self.multiplier * atr;
+        let mut raw_lower = hl2 - self.multiplier * atr;
+
+        if let (Some(previous_upper), Some(previous_lower)) = (self.upper, self.lower) {
+            let direction = if close > previous_upper {
+                1.0
+            } else if close < previous_lower {
+                -1.0
+            } else {
+                let direction = self.direction;
+                if direction > 0.0 && raw_lower < previous_lower {
+                    raw_lower = previous_lower;
+                }
+                if direction < 0.0 && raw_upper > previous_upper {
+                    raw_upper = previous_upper;
+                }
+                direction
+            };
+            self.direction = direction;
+        }
+
+        self.upper = Some(raw_upper);
+        self.lower = Some(raw_lower);
+
+        let (trend, long, short) = if self.direction > 0.0 {
+            (raw_lower, raw_lower, f64::NAN)
+        } else {
+            (raw_upper, f64::NAN, raw_upper)
+        };
+        let value = SupertrendValue {
+            trend,
+            direction: self.direction,
+            long,
+            short,
+        };
+        self.value = Some(value);
+        Some(value)
+    }
+
+    pub fn value(&self) -> Option<SupertrendValue> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.tr_count = 0;
+        self.tr_sum = 0.0;
+        self.previous_close = None;
+        self.atr = None;
+        self.direction = 1.0;
+        self.upper = None;
+        self.lower = None;
+        self.value = None;
+    }
+}
+
+pub fn supertrend(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    length: usize,
+    multiplier: f64,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
+    }
+    let mut state = Supertrend::new(length, multiplier)?;
+    let mut trend = Vec::with_capacity(high.len());
+    let mut direction = Vec::with_capacity(high.len());
+    let mut long = Vec::with_capacity(high.len());
+    let mut short = Vec::with_capacity(high.len());
+    for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+        match state.append(high, low, close) {
+            Some(value) => {
+                trend.push(value.trend);
+                direction.push(value.direction);
+                long.push(value.long);
+                short.push(value.short);
+            }
+            None => {
+                trend.push(f64::NAN);
+                direction.push(f64::NAN);
+                long.push(f64::NAN);
+                short.push(f64::NAN);
+            }
+        }
+    }
+    Ok((trend, direction, long, short))
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct IchimokuValue {
+    pub tenkan_sen: f64,
+    pub kijun_sen: f64,
+    pub span_a: f64,
+    pub span_b: f64,
+    pub chikou_span: f64,
+}
+
+/// Stateful Ichimoku Kinkō Hyō (pandas-ta classic `overlap/ichimoku.py`).
+///
+/// Tenkan/Kijun are rolling `(max high + min low)/2` over their windows;
+/// `span_a = 0.5·(tenkan + kijun)`; `span_b` is the same midpoint over the
+/// Senkou window. All components are emitted **causally** at bar `i`: the
+/// package displaces `span_a`/`span_b` forward `kijun` bars and chikou
+/// backward `kijun` bars for plotting — that shift is presentation, so
+/// taflow keeps the raw values and documents the displacement constants
+/// instead (re-align in tests by `span.shift(kijun)`, `chikou.shift(-kijun)`).
+#[derive(Debug, Clone)]
+pub struct Ichimoku {
+    tenkan: Midprice,
+    kijun: Midprice,
+    senkou: Midprice,
+    value: Option<IchimokuValue>,
+}
+
+impl Ichimoku {
+    pub fn new(tenkan: usize, kijun: usize, senkou: usize) -> TaResult<Self> {
+        validate_period(tenkan)?;
+        validate_period(kijun)?;
+        validate_period(senkou)?;
+        Ok(Self {
+            tenkan: Midprice::new(tenkan)?,
+            kijun: Midprice::new(kijun)?,
+            senkou: Midprice::new(senkou)?,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> IchimokuValue {
+        let tenkan = self.tenkan.append(high, low).unwrap_or(f64::NAN);
+        let kijun = self.kijun.append(high, low).unwrap_or(f64::NAN);
+        let span_b = self.senkou.append(high, low).unwrap_or(f64::NAN);
+        let span_a = if tenkan.is_nan() || kijun.is_nan() {
+            f64::NAN
+        } else {
+            0.5 * (tenkan + kijun)
+        };
+        let value = IchimokuValue {
+            tenkan_sen: tenkan,
+            kijun_sen: kijun,
+            span_a,
+            span_b,
+            chikou_span: close,
+        };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<IchimokuValue> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.tenkan.reset();
+        self.kijun.reset();
+        self.senkou.reset();
+        self.value = None;
+    }
+}
+
+pub fn ichimoku(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    tenkan: usize,
+    kijun: usize,
+    senkou: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().min(close.len()),
+        });
+    }
+    let mut state = Ichimoku::new(tenkan, kijun, senkou)?;
+    let mut tenkan_sen = Vec::with_capacity(high.len());
+    let mut kijun_sen = Vec::with_capacity(high.len());
+    let mut span_a = Vec::with_capacity(high.len());
+    let mut span_b = Vec::with_capacity(high.len());
+    let mut chikou_span = Vec::with_capacity(high.len());
+    for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+        let value = state.append(high, low, close);
+        tenkan_sen.push(value.tenkan_sen);
+        kijun_sen.push(value.kijun_sen);
+        span_a.push(value.span_a);
+        span_b.push(value.span_b);
+        chikou_span.push(value.chikou_span);
+    }
+    Ok((tenkan_sen, kijun_sen, span_a, span_b, chikou_span))
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
@@ -3435,5 +3711,100 @@ mod tests {
         assert!(RollSpread::new(0).is_err());
         assert!(OuHalfLife::new(0).is_err());
         assert!(Cusum::new(-1.0).is_err());
+    }
+
+    #[test]
+    fn supertrend_batch_and_stream_match() {
+        let high: Vec<f64> = (0..200)
+            .map(|i| 52.0 + (i as f64 * 0.3).sin() * 5.0 + (i as f64 * 0.01).cos())
+            .collect();
+        let low: Vec<f64> = high.iter().map(|&h| h - 2.0).collect();
+        let close: Vec<f64> = high
+            .iter()
+            .enumerate()
+            .map(|(i, &h)| h - 1.0 + (i as f64 * 0.05).sin())
+            .collect();
+
+        let (trend, direction, long, short) = supertrend(&high, &low, &close, 7, 3.0).unwrap();
+        assert!(trend[..6].iter().all(|&value| value.is_nan()));
+        assert!(trend[6..].iter().all(|&value| value.is_finite()));
+        assert!(direction[6..].iter().all(|&value| value == 1.0 || value == -1.0));
+
+        let mut state = Supertrend::new(7, 3.0).unwrap();
+        let replayed: Vec<f64> = high
+            .iter()
+            .zip(&low)
+            .zip(&close)
+            .map(|((&h, &l), &c)| state.append(h, l, c).map_or(f64::NAN, |v| v.trend))
+            .collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            trend.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+
+        let mut flipped = 0;
+        for pair in direction.windows(2) {
+            if pair[0] != pair[1] {
+                flipped += 1;
+            }
+        }
+        assert!(flipped >= 2, "expected direction flips on the synthetic series");
+    }
+
+    #[test]
+    fn supertrend_rejects_bad_params() {
+        assert!(Supertrend::new(0, 3.0).is_err());
+        assert!(Supertrend::new(7, 0.0).is_err());
+        assert!(Supertrend::new(7, -1.0).is_err());
+        assert_eq!(
+            supertrend(&[1.0, 2.0], &[1.0], &[1.0, 2.0], 7, 3.0),
+            Err(TaError::LengthMismatch { expected: 2, got: 1 })
+        );
+    }
+
+    #[test]
+    fn ichimoku_batch_and_stream_match() {
+        let high: Vec<f64> = (0..200)
+            .map(|i| 52.0 + (i as f64 * 0.3).sin() * 5.0)
+            .collect();
+        let low: Vec<f64> = high.iter().map(|&h| h - 2.0).collect();
+        let close: Vec<f64> = high.iter().enumerate().map(|(i, &h)| h - 1.0 + (i as f64 * 0.02).sin()).collect();
+
+        let (tenkan, kijun, span_a, span_b, chikou) = ichimoku(&high, &low, &close, 9, 26, 52).unwrap();
+        assert!(tenkan[..8].iter().all(|&v| v.is_nan()));
+        assert!(kijun[..25].iter().all(|&v| v.is_nan()));
+        assert!(span_a[..25].iter().all(|&v| v.is_nan()));
+        assert!(span_b[..51].iter().all(|&v| v.is_nan()));
+        assert!(tenkan[8..].iter().all(|&v| v.is_finite()));
+        assert!(span_b[51..].iter().all(|&v| v.is_finite()));
+
+        // span_a = 0.5 * (tenkan + kijun); chikou = current close (causal).
+        for i in 25..close.len() {
+            assert!((span_a[i] - 0.5 * (tenkan[i] + kijun[i])).abs() < 1e-12);
+            assert_eq!(chikou[i], close[i]);
+        }
+
+        let mut state = Ichimoku::new(9, 26, 52).unwrap();
+        let replayed: Vec<f64> = high
+            .iter()
+            .zip(&low)
+            .zip(&close)
+            .map(|((&h, &l), &c)| state.append(h, l, c).span_b)
+            .collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            span_b.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn ichimoku_rejects_bad_params() {
+        assert!(Ichimoku::new(0, 26, 52).is_err());
+        assert!(Ichimoku::new(9, 0, 52).is_err());
+        assert!(Ichimoku::new(9, 26, 0).is_err());
+        assert_eq!(
+            ichimoku(&[1.0], &[1.0], &[1.0, 2.0], 9, 26, 52),
+            Err(TaError::LengthMismatch { expected: 1, got: 1 })
+        );
     }
 }

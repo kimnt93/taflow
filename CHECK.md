@@ -340,8 +340,8 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | sessions | sessions | _ |
 | [x] | retracements | retracements | _ |
 | [ ] | premium_discount | premium_discount | _ |
-| [ ] | supertrend | supertrend | _ |
-| [ ] | ichimoku | ichimoku | _ |
+| [x] | supertrend | supertrend | _ |
+| [x] | ichimoku | ichimoku | _ |
 | [ ] | squeeze | squeeze | _ |
 | [ ] | schaff_trend_cycle | schaff_trend_cycle | _ |
 | [ ] | vortex | vortex | _ |
