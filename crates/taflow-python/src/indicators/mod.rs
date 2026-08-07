@@ -36,6 +36,7 @@ mod bar_helpers;
 mod state_helpers;
 mod swing;
 mod session;
+mod session_flags;
 mod previous_high_low;
 mod sessions;
 mod retracements;
@@ -188,6 +189,7 @@ pub use bar_helpers::{GapDownOperator, GapUpOperator, HigherHighOperator, Inside
 pub use state_helpers::{BarsSinceOperator, EntryExitOperator, HighestSinceOperator, LowestSinceOperator, PositionHoldOperator, SignalDelayOperator, ValueWhenOperator};
 pub use swing::SwingHighLowOperator;
 pub use session::SessionExtremaOperator;
+pub use session_flags::session_flags_array;
 pub use previous_high_low::PreviousHighLowOperator;
 pub use sessions::SessionsOperator;
 pub use retracements::RetracementsOperator;

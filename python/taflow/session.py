@@ -3,17 +3,26 @@
 from typing import Any
 import numpy as np
 from ._native import SessionExtremaOperator as _Native
+from ._native import session_flags_array as _native_session_flags
 from ._series import as_float64_series
 
 
 def session_flags(session_id: Any) -> np.ndarray:
-    """Return an aligned ``new_session`` flag from precomputed session IDs."""
-    values = np.asarray(session_id)
-    flags = np.zeros(values.size, dtype=bool)
-    if values.size:
-        flags[0] = True
-        flags[1:] = values[1:] != values[:-1]
-    return flags
+    """Return causal session-boundary flags from numeric session IDs.
+
+    Parameters
+    ----------
+    session_id : array-like
+        Numeric identifier for each bar's session.
+
+    Returns
+    -------
+    numpy.ndarray
+        Boolean values aligned with `session_id`; the first bar and every
+        identifier change are marked true.
+    """
+    values = np.asarray(session_id, dtype=np.float64)
+    return _native_session_flags(values)
 
 
 class SessionExtrema:

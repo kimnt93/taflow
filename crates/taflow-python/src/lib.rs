@@ -116,6 +116,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::EntryExitOperator>()?;
     m.add_class::<indicators::SwingHighLowOperator>()?;
     m.add_class::<indicators::SessionExtremaOperator>()?;
+    m.add_function(wrap_pyfunction!(indicators::session_flags_array, m)?)?;
     m.add_class::<indicators::PreviousHighLowOperator>()?;
     m.add_class::<indicators::SessionsOperator>()?;
     m.add_class::<indicators::RetracementsOperator>()?;
