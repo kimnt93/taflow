@@ -8,6 +8,32 @@ use crate::ma_type::MaType;
 
 use super::{moving_average::MovingAverageDispatcher, RollingStandardDeviation, StreamingIndicator};
 
+/// Computes aligned upper, middle, and lower Bollinger Band vectors.
+pub fn bollinger_bands(
+    input: &[f64],
+    timeperiod: usize,
+    nbdevup: f64,
+    nbdevdn: f64,
+    matype: MaType,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+    let mut state = BollingerBands::new(timeperiod, nbdevup, nbdevdn, matype)?;
+    let mut upper = Vec::with_capacity(input.len());
+    let mut middle = Vec::with_capacity(input.len());
+    let mut lower = Vec::with_capacity(input.len());
+    for &value in input {
+        if let Some(output) = state.append(value) {
+            upper.push(output.upper);
+            middle.push(output.middle);
+            lower.push(output.lower);
+        } else {
+            upper.push(f64::NAN);
+            middle.push(f64::NAN);
+            lower.push(f64::NAN);
+        }
+    }
+    Ok((upper, middle, lower))
+}
+
 /// One aligned upper, middle, and lower Bollinger Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BollingerBandsValue {

@@ -163,7 +163,7 @@ pub use accbands::{AccelerationBands, AccelerationBandsValue};
 pub use adx::AverageDirectionalIndex;
 pub use adxr::AverageDirectionalIndexRating;
 pub use apo::AbsolutePriceOscillator;
-pub use bbands::{BollingerBands, BollingerBandsValue};
+pub use bbands::{BollingerBands, BollingerBandsValue, bollinger_bands};
 pub use cci::{CommodityChannelIndex, commodity_channel_index};
 pub use cdl_doji::CandleDoji;
 pub use cdl_dojistar::CandleDojiStar;
