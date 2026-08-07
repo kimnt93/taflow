@@ -126,6 +126,7 @@ from ..swing import SwingHighLow, SwingHigh, SwingLow
 from ..session import SessionExtrema, session_flags
 from ..zones import ActiveZoneList
 from ..fvg import Fvg
+from ..bos_choch import BosChoch
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -222,4 +223,5 @@ __all__ = [
     "SessionExtrema", "session_flags",
     "ActiveZoneList",
     "Fvg",
+    "BosChoch",
 ]

@@ -118,6 +118,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::SessionExtremaOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
+    m.add_class::<indicators::BosChochOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

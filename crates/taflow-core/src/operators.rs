@@ -278,6 +278,134 @@ pub fn fvg(
     Ok((signal, top, bottom, mitigated))
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BosChochValue {
+    pub bos: f64,
+    pub choch: f64,
+    pub level: f64,
+    pub broken: f64,
+}
+
+/// Causal break-of-structure and change-of-character events.
+#[derive(Debug, Clone)]
+pub struct BosChoch {
+    swing: Swing,
+    swings: VecDeque<(f64, f64)>,
+    pending: Option<(f64, f64)>,
+    trend: Option<f64>,
+    value: Option<BosChochValue>,
+}
+
+impl BosChoch {
+    pub fn new(swing_length: usize) -> TaResult<Self> {
+        Ok(Self {
+            swing: Swing::new(swing_length)?,
+            swings: VecDeque::with_capacity(4),
+            pending: None,
+            trend: None,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> BosChochValue {
+        let mut bos = f64::NAN;
+        let mut choch = f64::NAN;
+        let mut level = f64::NAN;
+        let mut broken = f64::NAN;
+
+        if let Some((direction, pending_level)) = self.pending {
+            let crossed = (direction > 0.0 && close > pending_level)
+                || (direction < 0.0 && close < pending_level);
+            if crossed {
+                broken = direction;
+                level = pending_level;
+                self.pending = None;
+                self.trend = Some(direction);
+            }
+        }
+
+        if let Some(swing) = self.swing.append(high, low) {
+            self.swings.push_back((swing.signal, swing.level));
+            if self.swings.len() > 4 {
+                self.swings.pop_front();
+            }
+            if self.swings.len() == 4 {
+                let items: Vec<_> = self.swings.iter().copied().collect();
+                let bullish = items[0].0 < 0.0
+                    && items[1].0 > 0.0
+                    && items[2].0 < 0.0
+                    && items[3].0 > 0.0
+                    && items[0].1 < items[2].1
+                    && items[1].1 < items[3].1;
+                let bearish = items[0].0 > 0.0
+                    && items[1].0 < 0.0
+                    && items[2].0 > 0.0
+                    && items[3].0 < 0.0
+                    && items[0].1 > items[2].1
+                    && items[1].1 > items[3].1;
+                let direction = if bullish {
+                    Some(1.0)
+                } else if bearish {
+                    Some(-1.0)
+                } else {
+                    None
+                };
+                if let Some(direction) = direction {
+                    bos = direction;
+                    choch = if self.trend.is_some_and(|trend| trend != direction) {
+                        direction
+                    } else {
+                        f64::NAN
+                    };
+                    level = items[1].1;
+                    self.pending = Some((direction, level));
+                }
+            }
+        }
+
+        let value = BosChochValue { bos, choch, level, broken };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn value(&self) -> Option<BosChochValue> { self.value }
+
+    pub fn reset(&mut self) {
+        self.swing.reset();
+        self.swings.clear();
+        self.pending = None;
+        self.trend = None;
+        self.value = None;
+    }
+}
+
+pub fn bos_choch(
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    swing_length: usize,
+) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
+    if high.len() != low.len() || low.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: high.len(),
+            got: low.len().max(close.len()),
+        });
+    }
+    let mut state = BosChoch::new(swing_length)?;
+    let mut bos = Vec::with_capacity(high.len());
+    let mut choch = Vec::with_capacity(high.len());
+    let mut level = Vec::with_capacity(high.len());
+    let mut broken = Vec::with_capacity(high.len());
+    for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+        let value = state.append(high, low, close);
+        bos.push(value.bos);
+        choch.push(value.choch);
+        level.push(value.level);
+        broken.push(value.broken);
+    }
+    Ok((bos, choch, level, broken))
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
