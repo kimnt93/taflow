@@ -349,7 +349,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | kst | kst | _ |
 | [x] | mass_index | mass_index | _ |
 | [x] | dpo | dpo | _ |
-| [ ] | cmf | cmf | _ |
+| [x] | cmf | cmf | _ |
 | [ ] | kvo | kvo | _ |
 | [ ] | vpt | vpt | _ |
 | [ ] | nvi | nvi | _ |

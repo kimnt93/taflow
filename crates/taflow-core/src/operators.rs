@@ -4621,6 +4621,49 @@ pub fn dpo(input: &[f64], period: usize) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+/// Stateful Chaikin Money Flow, aligned to `ta.volume.ChaikinMoneyFlowIndicator`.
+#[derive(Debug, Clone)]
+pub struct Cmf {
+    mfv: crate::stream::Sum,
+    volume: crate::stream::Sum,
+    value: Option<f64>,
+}
+
+impl Cmf {
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self { mfv: crate::stream::Sum::new(period)?, volume: crate::stream::Sum::new(period)?, value: None })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
+        let multiplier = if high != low { ((close - low) - (high - close)) / (high - low) } else { 0.0 };
+        let mfv = self.mfv.append(multiplier * volume);
+        let volume_sum = self.volume.append(volume);
+        self.value = match (mfv, volume_sum) {
+            (Some(mfv), Some(volume)) if volume != 0.0 => Some(mfv / volume),
+            (Some(_), Some(_)) => Some(0.0),
+            _ => None,
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.mfv.reset();
+        self.volume.reset();
+        self.value = None;
+    }
+}
+
+pub fn cmf(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], period: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
+        return Err(TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
+    }
+    let mut state = Cmf::new(period)?;
+    Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&h, &l), &c), &v)| state.append(h, l, c, v).unwrap_or(f64::NAN)).collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -5180,5 +5223,19 @@ mod tests {
         assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
         assert!(batch[..30].iter().all(|value| value.is_nan()));
         assert!(batch[30..].iter().all(|value| value.is_finite()));
+    }
+
+    #[test]
+    fn cmf_batch_and_stream_match() {
+        let close: Vec<f64> = (0..100).map(|i| 100.0 + i as f64 * 0.1).collect();
+        let high: Vec<f64> = close.iter().map(|value| value + 1.0).collect();
+        let low: Vec<f64> = close.iter().map(|value| value - 1.0).collect();
+        let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
+        let batch = cmf(&high, &low, &close, &volume, 20).unwrap();
+        let mut state = Cmf::new(20).unwrap();
+        let replayed: Vec<f64> = high.iter().zip(&low).zip(&close).zip(&volume).map(|(((&h, &l), &c), &v)| state.append(h, l, c, v).unwrap_or(f64::NAN)).collect();
+        assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
+        assert!(batch[..19].iter().all(|value| value.is_nan()));
+        assert!(batch[19..].iter().all(|value| value.is_finite()));
     }
 }

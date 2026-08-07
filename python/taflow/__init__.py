@@ -188,6 +188,7 @@ from .vortex import Vortex
 from .kst import Kst
 from .mass_index import MassIndex
 from .dpo import Dpo
+from .cmf import Cmf
 
 __all__ = [
     "talib",
@@ -365,5 +366,6 @@ __all__ = [
     "Kst",
     "MassIndex",
     "Dpo",
+    "Cmf",
     "__version__",
 ]

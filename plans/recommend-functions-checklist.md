@@ -97,7 +97,7 @@ fork/successor version) unless noted.
 | [x] | KST | Impl: ta `trend.KSTIndicator`; Theory: Martin Pring | O(1): 4×(ROC→SMA) + signal SMA, all existing states. |
 | [x] | Mass Index | Impl: ta `trend.MassIndex`; Theory: Donald Dorsey | O(1): EMA(9) of range, EMA of that, `Sum(25)` of ratio. |
 | [x] | DPO | Impl: pandas-ta `trend/dpo.py` | **Causality trap**: pandas-ta default `centered=True` is non-causal. taflow implements `centered=False` only; docstring explains the difference. O(1): SMA + delay ring. |
-| [ ] | CMF | Impl: ta `volume.ChaikinMoneyFlowIndicator` | O(1): two `Sum` states. |
+| [x] | CMF | Impl: ta `volume.ChaikinMoneyFlowIndicator` | O(1): two `Sum` states. |
 | [ ] | Klinger VO | Impl: pandas-ta `volume/kvo.py` (definitions vary — pin pandas-ta's) | O(1): trend-flip state + two EMAs. |
 | [ ] | VPT | Impl: ta `volume.VolumePriceTrendIndicator` | O(1) cumulative recurrence. |
 | [ ] | NVI / PVI | Impl: ta `volume.NegativeVolumeIndexIndicator`; pandas-ta `pvi` | O(1): recurrence gated on volume direction. |
