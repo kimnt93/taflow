@@ -3,6 +3,38 @@
 //! SAREXT preserves TA-Lib's signed output, optional starting direction,
 //! reversal offset, and independent long/short acceleration schedules.
 
+use crate::TaResult;
+
+/// Computes an aligned extended Parabolic SAR vector from high and low slices.
+#[allow(clippy::too_many_arguments)]
+pub fn extended_parabolic_sar(
+    high: &[f64],
+    low: &[f64],
+    startvalue: f64,
+    offsetonreverse: f64,
+    accelerationinitlong: f64,
+    accelerationlong: f64,
+    accelerationmaxlong: f64,
+    accelerationinitshort: f64,
+    accelerationshort: f64,
+    accelerationmaxshort: f64,
+) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len() });
+    }
+    let mut state = ParabolicSarExtended::new(
+        startvalue,
+        offsetonreverse,
+        accelerationinitlong,
+        accelerationlong,
+        accelerationmaxlong,
+        accelerationinitshort,
+        accelerationshort,
+        accelerationmaxshort,
+    );
+    Ok(high.iter().zip(low).map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental extended Parabolic SAR with a one-bar lookback.
 #[derive(Debug, Clone)]
 pub struct ParabolicSarExtended {

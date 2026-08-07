@@ -3,6 +3,17 @@
 //! SAR keeps only the current direction, extreme point, acceleration factor,
 //! projected stop, and previous bar required by TA-Lib's reversal recurrence.
 
+use crate::TaResult;
+
+/// Computes an aligned Parabolic SAR vector from high and low slices.
+pub fn parabolic_sar(high: &[f64], low: &[f64], acceleration: f64, maximum: f64) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len() });
+    }
+    let mut state = ParabolicSar::new(acceleration, maximum);
+    Ok(high.iter().zip(low).map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental Parabolic SAR with a one-bar lookback.
 #[derive(Debug, Clone)]
 pub struct ParabolicSar {
