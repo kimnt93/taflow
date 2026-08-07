@@ -32,12 +32,11 @@ Modes per size:
 
 | Mode | What is timed |
 |---|---|
-| `talib_batch` | `talib.FN(*arrays, **params)` |
-| `taflow_batch` | `taflow.talib.FN(*arrays, **params)` |
-| `taflow_state_cold` | construct state + `extend(arrays)` — the "backfill from empty" path |
+| `taflow_backfill` | construct canonical state + `extend(arrays)` |
+| `taflow_continue` | warmed state + scalar `append` updates |
 
 Metrics per cell: mean wall ms, **ops/sec** (`bars / mean_seconds`),
-speedup vs `talib_batch`. Latency percentiles are redundant with ops/sec
+throughput and continuation latency. Latency percentiles are redundant with ops/sec
 here (single call over one array) — skipped, per the contract.
 
 The 10M size is guarded by `--max-size` (default includes it; CI quick mode
@@ -125,13 +124,13 @@ function:
 
 ```python
 {
-  "name": "EMA",                    # uppercase TA-Lib alias
+  "name": "ExponentialMovingAverage",
   "class": taflow.ExponentialMovingAverage,
-  "batch": taflow.talib.EMA,
+  "state": taflow.ExponentialMovingAverage,
   "params": {"timeperiod": 20},     # benchmark defaults = TA-Lib defaults
   "inputs": ("close",),             # which OHLCV series it consumes
   "outputs": 1,
-  "in_talib": True,                 # False → scenario S4
+  "continuous": True,
   "input_domain": "prices",         # prices | unit | signed | positive | periods
 }
 ```

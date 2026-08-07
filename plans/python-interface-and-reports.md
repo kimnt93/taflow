@@ -90,8 +90,8 @@ benchmark pass across the completed surface.
    multi-input and multi-output state.
 4. Implement the Hilbert/cycle and candlestick-pattern families with bounded
    per-bar state.
-5. Export every descriptive class and uppercase TA-Lib alias from
-   `taflow.indicators`, then make `taflow.talib` a forwarding alias.
+5. Export every descriptive CamelCase class from `taflow.indicators` and the
+   root `taflow` namespace. No compatibility alias package is shipped.
 6. Only after every item is implemented: execute exhaustive TA-Lib oracle
    comparisons, batch/stream parity, real-data alignment, and benchmarks.
 

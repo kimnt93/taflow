@@ -33,7 +33,7 @@ TAFlow's primary contract is a persistent, causal indicator object:
 - [x] Canonical Python adapters use native state/indicator classes.
 - [x] Root namespace no longer exports one-shot helpers.
 - [x] Execution helpers moved to `taflow.executions`.
-- [x] Remove the remaining `taflow.talib` batch/stream/abstract surface.
+- [x] Remove the `taflow.talib` compatibility surface entirely.
 - [x] Remove one-shot `func_api` registration from the PyO3 module.
 - [x] Update verification and benchmark runners to use canonical states and
       the independent external TA-Lib package only when an oracle is desired.

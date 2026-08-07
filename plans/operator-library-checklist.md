@@ -150,12 +150,12 @@ remain covered by the operator tests.
 ## Renamed, not duplicated (one kernel, two surfaces — see `CHECK.md` §2)
 
 These are NOT separate checklist items: each is one Rust kernel already in
-`full-ta-checklist.md`, exposed under its canonical `taflow` name with the
-TA-Lib uppercase name living only in `taflow.talib`. Per the rolling
+`full-ta-functions-checklist.md`, exposed under its canonical `taflow` name.
+Per the rolling
 rename rule, the un-prefixed name (`min`, `max`, `sum`, …) does not exist
 in `taflow` at all.
 
-| taflow canonical name | taflow.talib alias |
+| taflow canonical name | TA function |
 |---|---|
 | rolling_min / rolling_max | MIN / MAX |
 | rolling_sum | SUM |
