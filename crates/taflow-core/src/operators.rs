@@ -143,7 +143,17 @@ pub fn arnaud_legoux_moving_average(input: &[f64], timeperiod: usize, offset: f6
 pub fn true_strength_index(input: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { let mut state=TrueStrengthIndex::new(fast,slow)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn awesome_oscillator(high: &[f64], low: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=AwesomeOscillator::new(fast,slow)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 pub fn fisher_transform(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=FisherTransform::new(timeperiod)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
-pub fn ulcer_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=UlcerIndex::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+/// Compute the causal ulcer index for an aligned price series.
+///
+/// Parameters are the input prices and rolling period; the returned vector
+/// preserves input length and uses `NaN` during warm-up.
+pub fn ulcer_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = UlcerIndex::new(timeperiod)?;
+    Ok(input
+        .iter()
+        .map(|&value| state.append(value).unwrap_or(f64::NAN))
+        .collect())
+}
 /// Computes or updates `chaikin_volatility` through the native Rust kernel.
 ///
 /// Parameters are the typed series and configuration values in the signature.
@@ -181,6 +191,10 @@ since_extreme!(HighestSince,f64::max); since_extreme!(LowestSince,f64::min);
 pub fn rising(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Rising::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn falling(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Falling::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
+/// Compute rolling Shannon entropy over an aligned input series.
+///
+/// Parameters are the input values and window length; the result is aligned
+/// to the input and is undefined (`NaN`) until the window is full.
 pub fn rolling_entropy(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let mut state = RollingEntropy::new(timeperiod)?;
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
@@ -267,6 +281,7 @@ impl RollingAlpha {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -296,6 +311,7 @@ impl RollingInformationRatio {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -317,7 +333,8 @@ impl Hurst {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, input: f64) -> Option<f64> {
+/// Append one observation and return the latest exponentially weighted value.
+pub fn append(&mut self, input: f64) -> Option<f64> {
         if self.values.len() == self.period { self.values.pop_front(); }
         self.values.push_back(input);
         self.value = (self.values.len() == self.period).then(|| {
@@ -339,6 +356,7 @@ impl Hurst {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -386,6 +404,7 @@ impl RollingEntropy {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -437,6 +456,7 @@ impl RollingAutocorr {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -497,6 +517,7 @@ impl HedgeRatio {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.values.clear();
         self.value = None;
@@ -638,6 +659,7 @@ impl FairValueGap {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<FairValueGapValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.bars.clear();
         self.zones.clear();
@@ -779,6 +801,7 @@ impl BosChoch {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<BosChochValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.swing.reset();
         self.swings.clear();
@@ -989,6 +1012,7 @@ impl OrderBlock {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<OrderBlockValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.atr.reset();
         self.internal.reset();
@@ -1174,6 +1198,7 @@ impl Liquidity {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<LiquidityValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.swing.reset();
         self.high_pools.clear();
@@ -1304,6 +1329,7 @@ impl EqualHighsLows {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<EqualHighsLowsValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.atr.reset();
         self.swing.reset();
@@ -1424,6 +1450,7 @@ impl PreviousHighLow {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<PreviousHighLowValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.running_high = None;
         self.running_low = None;
@@ -1528,6 +1555,7 @@ impl Sessions {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<SessionsValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.session_high = None;
         self.session_low = None;
@@ -1671,6 +1699,7 @@ impl Retracements {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<RetracementsValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.swing.reset();
         self.last_high = None;
@@ -1765,6 +1794,7 @@ impl CloseToCloseSigma {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.mean.reset();
         self.squares.reset();
@@ -1822,6 +1852,7 @@ impl Parkinson {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.mean.reset();
         self.value = None;
@@ -1880,6 +1911,7 @@ impl GarmanKlass {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.mean.reset();
         self.value = None;
@@ -1953,6 +1985,7 @@ impl RogersSatchell {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.mean.reset();
         self.value = None;
@@ -2032,6 +2065,7 @@ impl GarmanKlassYangZhang {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.mean.reset();
         self.previous_close = None;
@@ -2142,6 +2176,7 @@ impl YangZhang {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.overnight.reset();
         self.open_close.reset();
@@ -2254,6 +2289,7 @@ impl AverageDailyDollarValue {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.sum = 0.0;
         self.window.clear();
@@ -2318,6 +2354,7 @@ impl Amihud {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.mean.reset();
         self.previous_close = None;
@@ -2442,6 +2479,7 @@ impl RollSpread {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.previous_price = None;
         self.delta_previous = None;
@@ -2522,6 +2560,7 @@ impl OrnsteinUhlenbeckHalfLife {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.moments.reset();
         self.previous_price = None;
@@ -2594,6 +2633,7 @@ impl Cusum {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.s_positive = 0.0;
         self.s_negative = 0.0;
@@ -2672,6 +2712,7 @@ impl SpreadZscore {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.values.clear();
         self.value = None;
@@ -2767,6 +2808,7 @@ impl FracDiff {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.window.clear();
         self.value = None;
@@ -4452,6 +4494,7 @@ impl ActiveZoneList {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn zones(&self) -> &[Zone] { &self.zones }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.zones.clear();
         self.index = 0;
@@ -4489,6 +4532,7 @@ impl SessionExtrema {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<SessionExtremaValue> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.high = None;
         self.low = None;
@@ -4813,6 +4857,7 @@ impl Lag {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -4836,6 +4881,7 @@ impl LogReturn {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.lag.reset(); self.value = None; }
 }
 
@@ -4884,6 +4930,7 @@ impl RollingMean {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.values.clear();
         self.sum = 0.0;
@@ -4936,6 +4983,7 @@ impl RollingMedian {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -4983,6 +5031,7 @@ impl RollingMode {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -5029,6 +5078,7 @@ impl RollingQuantile {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -5070,6 +5120,7 @@ impl RollingRank {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -5111,6 +5162,7 @@ impl RollingZscore {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -5149,6 +5201,7 @@ macro_rules! rolling_moment_operator {
             ///
             /// Returns the computed value, aligned history, or a validation error.
             pub fn value(&self) -> Option<f64> { self.value }
+            /// Reset the persistent state and clear the latest value.
             pub fn reset(&mut self) { self.values.clear(); self.value = None; }
         }
     };
@@ -5199,6 +5252,7 @@ impl RollingIqr {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.quantile.reset(); self.value = None; }
 }
 
@@ -5237,6 +5291,7 @@ impl RollingCov {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -5283,6 +5338,7 @@ impl RollingWinsorize {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -5320,6 +5376,7 @@ impl ExponentiallyWeightedVariance {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.mean = None; self.variance = 0.0; self.value = None; }
 }
 
@@ -5335,6 +5392,7 @@ impl ExponentiallyWeightedStandardDeviation {
     pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { variance: ExponentiallyWeightedVariance::new(timeperiod)?, value: None }) }
     pub fn append(&mut self, input: f64) -> f64 { let value = self.variance.append(input).sqrt(); self.value = Some(value); value }
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.variance.reset(); self.value = None; }
 }
 
@@ -5371,6 +5429,7 @@ impl ExponentiallyWeightedCovariance {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.mean0 = None; self.mean1 = None; self.var0 = 0.0; self.var1 = 0.0; self.covariance = 0.0; self.value = None; }
 }
 
@@ -5397,6 +5456,7 @@ impl ExponentiallyWeightedCorrelation {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.covariance.reset(); self.value = None; }
 }
 
@@ -5422,6 +5482,7 @@ macro_rules! cumulative_operator {
             ///
             /// Returns the computed value, aligned history, or a validation error.
             pub fn value(&self) -> Option<f64> { self.value }
+            /// Reset the persistent state and clear the latest value.
             pub fn reset(&mut self) { self.total = $initial; self.value = None; }
         }
         impl Default for $name { fn default() -> Self { Self::new() } }
@@ -5444,6 +5505,7 @@ macro_rules! cumulative_extrema_operator {
             pub fn new() -> Self { Self { extreme: $initial, value: None } }
             pub fn append(&mut self, input: f64) -> f64 { self.extreme = $operation(self.extreme, input); self.value = Some(self.extreme); self.extreme }
             pub fn value(&self) -> Option<f64> { self.value }
+            /// Reset the persistent state and clear the latest value.
             pub fn reset(&mut self) { self.extreme = $initial; self.value = None; }
         }
         impl Default for $name { fn default() -> Self { Self::new() } }
@@ -5464,6 +5526,7 @@ impl Drawdown {
     pub fn new() -> Self { Self { maximum: Cummax::new(), value: None } }
     pub fn append(&mut self, input: f64) -> f64 { let maximum = self.maximum.append(input); let value = if maximum != 0.0 { input / maximum - 1.0 } else { 0.0 }; self.value = Some(value); value }
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.maximum.reset(); self.value = None; }
 }
 impl Default for Drawdown { fn default() -> Self { Self::new() } }
@@ -5491,6 +5554,7 @@ macro_rules! rolling_risk_operator {
             ///
             /// Returns the computed value, aligned history, or a validation error.
             pub fn value(&self) -> Option<f64> { self.value }
+            /// Reset the persistent state and clear the latest value.
             pub fn reset(&mut self) { self.values.clear(); self.value = None; }
         }
     };
@@ -5577,6 +5641,7 @@ impl SignalDelay {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
@@ -5704,6 +5769,7 @@ impl MassIndex {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.ema_range.reset();
         self.ema_signal.reset();
@@ -5767,6 +5833,7 @@ impl DetrendedPriceOscillator {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.sma.reset();
         self.delay.clear();
@@ -5825,6 +5892,7 @@ impl ChaikinMoneyFlow {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
 
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.mfv.reset();
         self.volume.reset();
@@ -5868,6 +5936,7 @@ impl VolumePriceTrend {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.previous_close = None; self.total = 0.0; self.value = None; }
 }
 
@@ -5957,6 +6026,7 @@ impl McGinleyDynamic {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<f64> { self.value }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) { self.value = None; }
 }
 /// Computes the causal mcginley dynamic series.

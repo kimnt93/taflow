@@ -50,6 +50,7 @@ impl HilbertTransformSineWave {
     pub fn value(&self) -> Option<HtSineValue> {
         self.value
     }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.phase.reset();
         self.value = None;

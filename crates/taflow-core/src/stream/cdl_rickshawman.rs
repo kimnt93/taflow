@@ -68,6 +68,7 @@ impl CandleRickshawman {
     pub fn value(&self) -> Option<i32> {
         self.value
     }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         *self = Self::new();
     }

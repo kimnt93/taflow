@@ -37,6 +37,7 @@ impl MinusDirectionalIndicator {
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.directional.reset();
         self.value = None;

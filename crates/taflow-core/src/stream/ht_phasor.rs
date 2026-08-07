@@ -170,6 +170,7 @@ impl HilbertTransformPhasor {
     pub fn value(&self) -> Option<HtPhasorValue> {
         self.value
     }
+    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         *self = Self::new();
     }
