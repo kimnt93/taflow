@@ -62,10 +62,10 @@ they are not re-proposed later.
 
 ## Extended volume indicators
 
-- [ ] VWAP (rolling; session/anchored variant is in
+- [x] VWAP (rolling; session/anchored variant is in
       `recommend-functions-checklist.md` P4)
-- [ ] Force Index
-- [ ] Ease of Movement
+- [x] Force Index
+- [x] Ease of Movement
 
 ## Signal and strategy helpers
 

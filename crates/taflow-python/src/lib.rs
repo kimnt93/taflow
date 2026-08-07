@@ -98,6 +98,9 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::CrossOperator>()?;
     m.add_class::<indicators::RisingOperator>()?;
     m.add_class::<indicators::FallingOperator>()?;
+    m.add_class::<indicators::VwapOperator>()?;
+    m.add_class::<indicators::ForceIndexOperator>()?;
+    m.add_class::<indicators::EaseOfMovementOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

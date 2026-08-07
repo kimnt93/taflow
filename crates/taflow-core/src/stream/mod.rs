@@ -220,7 +220,7 @@ pub use tema::Tema;
 pub use trix::Trix;
 pub use trima::Trima;
 pub use ultosc::Ultosc;
-pub use crate::operators::{Alma, AwesomeOscillator, ChaikinVolatility, Cross, Crossover, Crossunder, Cumsum, Cummax, Cummin, Cumprod, Donchian, DonchianValue, Drawdown, EwmCorr, EwmCov, EwmStd, EwmVar, FisherTransform, Falling, Hma, KeltnerChannels, KeltnerValue, Lag, LogReturn, Rising, RollingCalmar, RollingCov, RollingIqr, RollingKurtosis, RollingMedian, RollingMode, RollingQuantile, RollingRank, RollingSharpe, RollingSkew, RollingSortino, RollingWinsorize, RollingZscore, Tsi, UlcerIndex, Vwma, Zlema};
+pub use crate::operators::{Alma, AwesomeOscillator, ChaikinVolatility, Cross, Crossover, Crossunder, Cumsum, Cummax, Cummin, Cumprod, Donchian, DonchianValue, Drawdown, EaseOfMovement, EwmCorr, EwmCov, EwmStd, EwmVar, FisherTransform, Falling, ForceIndex, Hma, KeltnerChannels, KeltnerValue, Lag, LogReturn, Rising, RollingCalmar, RollingCov, RollingIqr, RollingKurtosis, RollingMedian, RollingMode, RollingQuantile, RollingRank, RollingSharpe, RollingSkew, RollingSortino, RollingWinsorize, RollingZscore, Tsi, UlcerIndex, Vwap, Vwma, Zlema};
 pub use window::Window;
 pub use wma::Wma;
 

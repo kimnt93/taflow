@@ -117,6 +117,9 @@ from ..crossunder import Crossunder
 from ..cross import Cross
 from ..rising import Rising
 from ..falling import Falling
+from ..vwap import Vwap
+from ..force_index import ForceIndex
+from ..ease_of_movement import EaseOfMovement
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -203,4 +206,5 @@ __all__ = [
     "Donchian", "UlcerIndex",
     "KeltnerChannels", "ChaikinVolatility",
     "Crossover", "Crossunder", "Cross", "Rising", "Falling",
+    "Vwap", "ForceIndex", "EaseOfMovement",
 ]
