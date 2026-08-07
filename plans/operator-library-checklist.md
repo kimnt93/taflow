@@ -29,7 +29,7 @@ they are not re-proposed later.
 - [x] rolling_skew / rolling_kurtosis / rolling_iqr
 - [x] rolling_cov (plain covariance; TA-Lib has only CORREL/BETA)
 - [x] rolling_winsorize
-- [ ] rolling_apply (explicitly non-streaming unless an incremental reducer is supplied)
+- [x] rolling_apply (explicitly non-streaming unless an incremental reducer is supplied)
 
 ## Exponentially weighted operators
 

@@ -90,6 +90,7 @@ from ..rolling_kurtosis import RollingKurtosis
 from ..rolling_iqr import RollingIqr
 from ..rolling_cov import RollingCov
 from ..rolling_winsorize import RollingWinsorize
+from ..rolling_apply import rolling_apply
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -167,4 +168,5 @@ __all__ = [
     "RollingQuantile", "RollingPercentile", "RollingRank", "RollingZscore",
     "RollingSkew", "RollingKurtosis", "RollingIqr",
     "RollingCov", "RollingWinsorize",
+    "rolling_apply",
 ]
