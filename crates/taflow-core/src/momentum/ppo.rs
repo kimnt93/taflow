@@ -4,7 +4,7 @@ use crate::ma_type::{compute_ma, MaType};
 /// Percentage Price Oscillator (PPO)
 ///
 /// PPO = ((MA(fast) - MA(slow)) / MA(slow)) * 100
-pub fn ppo(
+pub fn percentage_price_oscillator(
     input: &[f64],
     fastperiod: usize,
     slowperiod: usize,

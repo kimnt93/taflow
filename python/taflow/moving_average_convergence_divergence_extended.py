@@ -15,7 +15,7 @@ class MovingAverageConvergenceDivergenceExtended:
         slow_average_type=1,
         signal_period=9,
         signal_average_type=1,
-        input: Any | None = None,
+        _input: Any | None = None,
     ):
         self._state = StatefulMacdExt(
             fast_period,
@@ -25,14 +25,14 @@ class MovingAverageConvergenceDivergenceExtended:
             signal_period,
             signal_average_type,
         )
-        if input is not None:
-            self.extend(input)
+        if _input is not None:
+            self.extend(_input)
 
-    def append(self, input):
-        return self._state.append(input)
+    def append(self, _input):
+        return self._state.append(_input)
 
-    def extend(self, input):
-        return self._state.extend(input)
+    def extend(self, _input):
+        return self._state.extend(_input)
 
     @property
     def value(self):

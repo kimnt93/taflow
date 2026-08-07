@@ -8,7 +8,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// Two temp arrays (tp_arr, mf_arr) trade 16KB allocation at 1K bars
 /// for 4× fewer FP ops per sliding window step at all sizes.
-pub fn mfi(
+pub fn money_flow_index(
     high: &[f64],
     low: &[f64],
     close: &[f64],

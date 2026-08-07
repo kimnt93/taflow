@@ -6,7 +6,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Computes aligned MACD, signal, and histogram arrays for TA-Lib MACDFIX.
-pub fn macd_fix(input: &[f64], signalperiod: usize) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
+pub fn moving_average_convergence_divergence_fixed(input: &[f64], signalperiod: usize) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
     if signalperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "signalperiod",
@@ -74,6 +74,6 @@ mod tests {
 
     #[test]
     fn rejects_zero_signal_period() {
-        assert!(macd_fix(&[1.0; 30], 0).is_err());
+        assert!(moving_average_convergence_divergence_fixed(&[1.0; 30], 0).is_err());
     }
 }

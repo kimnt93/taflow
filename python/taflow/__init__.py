@@ -3,6 +3,7 @@
 __version__ = "0.1.2"
 
 from . import talib
+from .talib import MaType
 from .acceleration_bands import AccelerationBands
 from .average_directional_index import AverageDirectionalIndex
 from .average_directional_index_rating import AverageDirectionalIndexRating
@@ -268,6 +269,7 @@ __all__ = [
     "PivotPoints",
     "Pipeline",
     "Expr",
+    "MaType",
     "NumpyAdapter",
     "PythonListAdapter",
     "ArrowAdapter",

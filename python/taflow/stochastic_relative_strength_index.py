@@ -13,7 +13,7 @@ class StochasticRelativeStrengthIndex:
         fast_k_period=5,
         fast_d_period=3,
         fast_d_average_type=0,
-        input: Any | None = None,
+        _input: Any | None = None,
     ):
         self._state = StatefulStochrsi(
             time_period,
@@ -21,14 +21,14 @@ class StochasticRelativeStrengthIndex:
             fast_d_period,
             fast_d_average_type,
         )
-        if input is not None:
-            self.extend(input)
+        if _input is not None:
+            self.extend(_input)
 
-    def append(self, input):
-        return self._state.append(input)
+    def append(self, _input):
+        return self._state.append(_input)
 
-    def extend(self, input):
-        return self._state.extend(input)
+    def extend(self, _input):
+        return self._state.extend(_input)
 
     @property
     def value(self):

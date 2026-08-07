@@ -4,7 +4,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// MOM = close - close[timeperiod ago]
 /// lookback = timeperiod
-pub fn mom(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn momentum(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -40,7 +40,7 @@ mod tests {
     #[test]
     fn test_mom_basic() {
         let input = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-        let result = mom(&input, 2).unwrap();
+        let result = momentum(&input, 2).unwrap();
         assert!(result[1].is_nan());
         assert!((result[2] - 2.0).abs() < 1e-10);
         assert!((result[3] - 2.0).abs() < 1e-10);

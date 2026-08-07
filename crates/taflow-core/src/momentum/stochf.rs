@@ -7,7 +7,7 @@ use crate::error::{TaError, TaResult};
 use crate::ma_type::{compute_ma, MaType};
 
 /// Computes aligned fast %K and fast %D output arrays.
-pub fn stochf(
+pub fn fast_stochastic_oscillator(
     high: &[f64],
     low: &[f64],
     close: &[f64],
@@ -82,7 +82,7 @@ mod tests {
         let low: Vec<f64> = close.iter().map(|value| value - 1.2).collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let (fastk, fastd) = stochf(&high, &low, &close, 5, 13, ma_type).unwrap();
+            let (fastk, fastd) = fast_stochastic_oscillator(&high, &low, &close, 5, 13, ma_type).unwrap();
             let expected_start = 4 + ma_type.lookback(13);
             assert!(fastk[..expected_start].iter().all(|value| value.is_nan()));
             assert!(fastd[..expected_start].iter().all(|value| value.is_nan()));

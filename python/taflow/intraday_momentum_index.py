@@ -7,18 +7,18 @@ from typing import Any
 class IntradayMomentumIndex:
     """Incrementally compare rolling intraday candle gains and losses."""
 
-    def __init__(self, period: int = 14, open: Any | None = None,
+    def __init__(self, period: int = 14, _open: Any | None = None,
                  close: Any | None = None):
-        """Create IMI with an optional aligned open/close history."""
+        """Create IMI with an optional aligned _open/close history."""
         self._state = StatefulImi(period)
-        if open is not None or close is not None:
-            self.extend(open, close)
+        if _open is not None or close is not None:
+            self.extend(_open, close)
 
-    def append(self, open, close):
-        return self._state.append(open, close)
+    def append(self, _open, close):
+        return self._state.append(_open, close)
 
-    def extend(self, open, close):
-        return self._state.extend(open, close)
+    def extend(self, _open, close):
+        return self._state.extend(_open, close)
 
     @property
     def value(self):

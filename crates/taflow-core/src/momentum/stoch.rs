@@ -8,7 +8,7 @@ use crate::error::{TaError, TaResult};
 use crate::ma_type::{compute_ma, MaType};
 
 /// Computes aligned slow %K and slow %D output arrays.
-pub fn stoch(
+pub fn stochastic_oscillator(
     high: &[f64],
     low: &[f64],
     close: &[f64],
@@ -102,7 +102,7 @@ mod tests {
                 let slowk_type = MaType::try_from(slowk_code).unwrap();
                 let slowd_type = MaType::try_from(slowd_code).unwrap();
                 let (slowk, slowd) =
-                    stoch(&high, &low, &close, 5, 13, slowk_type, 11, slowd_type).unwrap();
+                    stochastic_oscillator(&high, &low, &close, 5, 13, slowk_type, 11, slowd_type).unwrap();
                 let expected_start = 4 + slowk_type.lookback(13) + slowd_type.lookback(11);
                 assert!(slowk[..expected_start].iter().all(|value| value.is_nan()));
                 assert!(slowd[..expected_start].iter().all(|value| value.is_nan()));

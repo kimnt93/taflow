@@ -1,7 +1,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Plus Directional Movement (+DM).
-pub fn plus_dm(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn plus_directional_movement(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() {
         return Err(TaError::LengthMismatch {

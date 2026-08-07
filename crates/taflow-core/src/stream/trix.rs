@@ -67,7 +67,7 @@ mod tests {
         let input: Vec<f64> = (0..96)
             .map(|i| 100.0 + i as f64 * 0.2 + (i as f64 * 0.3).sin())
             .collect();
-        let expected = crate::momentum::trix(&input, 7).unwrap();
+        let expected = crate::momentum::triple_exponential_rate_of_change(&input, 7).unwrap();
         let mut state = Trix::new(7).unwrap();
         let mut actual = state.extend(input[..43].iter().copied());
         actual.extend(state.extend(input[43..].iter().copied()));

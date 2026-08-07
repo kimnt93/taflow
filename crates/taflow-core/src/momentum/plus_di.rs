@@ -1,7 +1,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Plus Directional Indicator (+DI).
-pub fn plus_di(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn plus_directional_indicator(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {

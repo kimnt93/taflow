@@ -17,7 +17,7 @@ For each item:
 5. Run `cargo check --workspace`, `maturin develop --release`, the adapter
    smoke check, and the benchmark before checking the item here.
 
-## Pending ports
+## Completed ports
 
 - [x] `VariableIndexDynamicAverage` (`vidya`) — Rust streaming kernel,
   native adapter, and causal history smoke check verified.
@@ -58,6 +58,6 @@ For each item:
   volume/EMA kernel, native two-output adapter, and constructor-history check
   verified.
 
-These are intentionally not duplicated as Python fallbacks: until ported,
-the Python implementations remain visible for compatibility but are not
-considered compliant with the native-kernel gate.
+All entries above are implemented once in Rust, exposed through PyO3, and
+wrapped by thin Python adapters. No numerical Python fallback remains for
+these interfaces.

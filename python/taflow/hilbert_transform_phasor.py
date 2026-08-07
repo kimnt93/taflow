@@ -13,10 +13,10 @@ class HilbertTransformPhasor:
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
     """
-    def __init__(self, input: Any | None = None):
+    def __init__(self, _input: Any | None = None):
         self._state = _Native()
-        if input is not None:
-            self.extend(input)
+        if _input is not None:
+            self.extend(_input)
 
     def append(self, value: float):
         self._state.append(float(value))

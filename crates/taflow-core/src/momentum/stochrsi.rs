@@ -7,16 +7,16 @@ use crate::error::TaResult;
 use crate::ma_type::MaType;
 
 /// Computes aligned stochastic-RSI fast %K and fast %D arrays.
-pub fn stochrsi(
+pub fn stochastic_relative_strength_index(
     input: &[f64],
     timeperiod: usize,
     fastk_period: usize,
     fastd_period: usize,
     fastd_matype: MaType,
 ) -> TaResult<(Vec<f64>, Vec<f64>)> {
-    let rsi_values = super::rsi::rsi(input, timeperiod)?;
+    let rsi_values = super::rsi::relative_strength_index(input, timeperiod)?;
     let rsi_valid = &rsi_values[timeperiod..];
-    let (stochastic_k, stochastic_d) = super::stochf::stochf(
+    let (stochastic_k, stochastic_d) = super::stochf::fast_stochastic_oscillator(
         rsi_valid,
         rsi_valid,
         rsi_valid,
@@ -43,7 +43,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let (fastk, fastd) = stochrsi(&input, 14, 5, 13, ma_type).unwrap();
+            let (fastk, fastd) = stochastic_relative_strength_index(&input, 14, 5, 13, ma_type).unwrap();
             let expected_start = 14 + 4 + ma_type.lookback(13);
             assert!(fastk[..expected_start].iter().all(|value| value.is_nan()));
             assert!(fastd[..expected_start].iter().all(|value| value.is_nan()));

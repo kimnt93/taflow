@@ -10,11 +10,11 @@ class RollingPercentile:
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
     """
-    def __init__(self, timeperiod: int, percentile: float, input: Any | None = None):
+    def __init__(self, timeperiod: int, percentile: float, _input: Any | None = None):
         self._state = _Native(timeperiod, percentile)
-        if input is not None: self.extend(input)
-    def append(self, input: float): self._state.append(input); return self
-    def extend(self, input: Any): self._state.extend(as_float64_series(input)); return self
+        if _input is not None: self.extend(_input)
+    def append(self, _input: float): self._state.append(_input); return self
+    def extend(self, _input: Any): self._state.extend(as_float64_series(_input)); return self
     def compute(self) -> np.ndarray: return self._state.compute()
     @property
     def value(self): return self._state.value

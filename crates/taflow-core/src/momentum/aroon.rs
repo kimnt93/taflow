@@ -40,7 +40,7 @@ pub fn aroon(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<(Vec<f64>
 ///
 /// Tracks both highest and lowest in one pass (3-way cache: high + low + output).
 /// Uses pre-computed inv_period to eliminate per-bar division.
-pub fn aroon_osc(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn aroon_oscillator(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() {
         return Err(TaError::LengthMismatch {

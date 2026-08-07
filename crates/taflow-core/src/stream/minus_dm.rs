@@ -69,7 +69,7 @@ mod tests {
     fn matches_batch() {
         let high: Vec<f64> = (0..40).map(|i| 100.0 + i as f64 * 0.1).collect();
         let low: Vec<f64> = (0..40).map(|i| 98.0 - i as f64 * 0.3).collect();
-        let expected = crate::momentum::minus_dm(&high, &low, 14).unwrap();
+        let expected = crate::momentum::minus_directional_movement(&high, &low, 14).unwrap();
         let mut state = MinusDm::new(14).unwrap();
 
         for ((&high, &low), expected) in high.iter().zip(&low).zip(&expected) {

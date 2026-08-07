@@ -12,9 +12,9 @@ class BarsSince:
     def reset(self):self._state.reset();return self
 def _make(native,name):
     class State:
-        def __init__(self,condition:Any|None=None,input:Any|None=None):self._state=native();self.extend(condition,input) if condition is not None or input is not None else None
-        def append(self,condition:bool,input:float):self._state.append(condition,input);return self
-        def extend(self,condition:Any,input:Any):self._state.extend(np.asarray(condition,dtype=bool),as_float64_series(input));return self
+        def __init__(self,condition:Any|None=None,_input:Any|None=None):self._state=native();self.extend(condition,_input) if condition is not None or _input is not None else None
+        def append(self,condition:bool,_input:float):self._state.append(condition,_input);return self
+        def extend(self,condition:Any,_input:Any):self._state.extend(np.asarray(condition,dtype=bool),as_float64_series(_input));return self
         def compute(self)->np.ndarray:return self._state.compute()
         @property
         def value(self):return self._state.value
@@ -23,17 +23,17 @@ def _make(native,name):
     return State
 ValueWhen=_make(ValueWhenOperator,'ValueWhen'); HighestSince=_make(HighestSinceOperator,'HighestSince'); LowestSince=_make(LowestSinceOperator,'LowestSince')
 class SignalDelay:
-    def __init__(self,timeperiod:int,input:Any|None=None):self._state=SignalDelayOperator(timeperiod);self.extend(input) if input is not None else None
-    def append(self,input:float):self._state.append(input);return self
-    def extend(self,input:Any):self._state.extend(as_float64_series(input));return self
+    def __init__(self,timeperiod:int,_input:Any|None=None):self._state=SignalDelayOperator(timeperiod);self.extend(_input) if _input is not None else None
+    def append(self,_input:float):self._state.append(_input);return self
+    def extend(self,_input:Any):self._state.extend(as_float64_series(_input));return self
     def compute(self)->np.ndarray:return self._state.compute()
     @property
     def value(self):return self._state.value
     def reset(self):self._state.reset();return self
 class PositionHold:
-    def __init__(self,input:Any|None=None):self._state=PositionHoldOperator();self.extend(input) if input is not None else None
-    def append(self,input:float):self._state.append(input);return self
-    def extend(self,input:Any):self._state.extend(as_float64_series(input));return self
+    def __init__(self,_input:Any|None=None):self._state=PositionHoldOperator();self.extend(_input) if _input is not None else None
+    def append(self,_input:float):self._state.append(_input);return self
+    def extend(self,_input:Any):self._state.extend(as_float64_series(_input));return self
     def compute(self)->np.ndarray:return self._state.compute()
     @property
     def value(self):return self._state.value

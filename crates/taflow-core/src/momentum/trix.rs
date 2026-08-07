@@ -8,7 +8,7 @@ use crate::simd::sum_f64;
 ///
 /// 优化版本：3 层 EMA 标量级联 + ROC，仅 1 个输出 Vec，无中间分配。
 /// EMA formulation: k*(x - prev) + prev — matches C TA-Lib, shorter critical path.
-pub fn trix(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn triple_exponential_rate_of_change(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -87,7 +87,7 @@ mod tests {
     #[test]
     fn test_trix_basic() {
         let input: Vec<f64> = (1..=60).map(|x| (x as f64) * 1.1 + 0.3).collect();
-        let result = trix(&input, 5).unwrap();
+        let result = triple_exponential_rate_of_change(&input, 5).unwrap();
         let lookback = 3 * 4 + 1; // 13
         assert!(result[lookback - 1].is_nan());
         assert!(!result[lookback].is_nan());

@@ -9,7 +9,7 @@ use crate::error::{TaError, TaResult};
 ///   sum_down = sum_down - (sum_down / period) + current_down
 /// CMO = 100 * (sum_up - sum_down) / (sum_up + sum_down)
 /// lookback = timeperiod
-pub fn cmo(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn chande_momentum_oscillator(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",

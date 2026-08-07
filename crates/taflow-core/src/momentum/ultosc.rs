@@ -6,7 +6,7 @@ use crate::error::{TaError, TaResult};
 /// 其中 avg_n = sum(BP, n) / sum(TR, n)
 /// BP (Buying Pressure) = close - min(low, prev_close)
 /// TR (True Range) = max(high, prev_close) - min(low, prev_close)
-pub fn ultosc(
+pub fn ultimate_oscillator(
     high: &[f64],
     low: &[f64],
     close: &[f64],

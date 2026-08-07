@@ -10,9 +10,9 @@ class TripleExponentialRateOfChange:
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
     """
-    def __init__(self, input: Any | None = None, timeperiod: int = 30) -> None:
+    def __init__(self, _input: Any | None = None, timeperiod: int = 30) -> None:
         self._state = _Native(timeperiod)
-        if input is not None: self.extend(input)
+        if _input is not None: self.extend(_input)
     def append(self, value: float) -> "TripleExponentialRateOfChange": self._state.append(float(value)); return self
     def extend(self, values: Any) -> "TripleExponentialRateOfChange": self._state.extend(as_float64_series(values)); return self
     def compute(self) -> np.ndarray: return self._state.compute()

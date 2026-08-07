@@ -11,7 +11,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// Net effect: ~50% less work per bar vs C TA-Lib / original implementation.
 /// lookback = timeperiod - 1
-pub fn cci(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn commodity_channel_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {
@@ -115,7 +115,7 @@ mod tests {
         let close: Vec<f64> = (0..30)
             .map(|i| 50.0 + (i as f64 * 0.3).sin() * 5.0)
             .collect();
-        let result = cci(&high, &low, &close, 14).unwrap();
+        let result = commodity_channel_index(&high, &low, &close, 14).unwrap();
         assert!(result[12].is_nan());
         assert!(!result[13].is_nan());
     }

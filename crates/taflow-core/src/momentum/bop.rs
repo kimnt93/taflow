@@ -4,7 +4,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// BOP = (Close - Open) / (High - Low)
 /// lookback = 0
-pub fn bop(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
+pub fn balance_of_power(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
     let len = open.len();
     if len != high.len() || len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {

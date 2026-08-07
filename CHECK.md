@@ -165,12 +165,12 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | macd | macd | MACD |
 | [x] | macdext | macdext | MACDEXT |
 | [x] | macdfix | macdfix | MACDFIX |
-| [ ] | mfi | mfi | MFI |
-| [ ] | minus_di | minus_di | MINUS_DI |
-| [ ] | minus_dm | minus_dm | MINUS_DM |
+| [x] | money_flow_index | money_flow_index | MFI |
+| [x] | minus_directional_indicator | minus_directional_indicator | MINUS_DI |
+| [x] | minus_directional_movement | minus_directional_movement | MINUS_DM |
 | [x] | mom | mom | MOM |
-| [ ] | plus_di | plus_di | PLUS_DI |
-| [ ] | plus_dm | plus_dm | PLUS_DM |
+| [x] | plus_directional_indicator | plus_directional_indicator | PLUS_DI |
+| [x] | plus_directional_movement | plus_directional_movement | PLUS_DM |
 | [x] | ppo | ppo | PPO |
 | [x] | roc | roc | ROC |
 | [x] | rocp | rocp | ROCP |
@@ -180,8 +180,8 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | stoch | stoch | STOCH |
 | [x] | stochf | stochf | STOCHF |
 | [x] | stochrsi | stochrsi | STOCHRSI |
-| [ ] | trix | trix | TRIX |
-| [ ] | ultosc | ultosc | ULTOSC |
+| [x] | triple_exponential_rate_of_change | triple_exponential_rate_of_change | TRIX |
+| [x] | ultimate_oscillator | ultimate_oscillator | ULTOSC |
 | [x] | willr | willr | WILLR |
 | [x] | add | add | ADD |
 | [x] | div | div | DIV |
@@ -198,72 +198,72 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | median_price | median_price | MEDPRICE |
 | [x] | typical_price | typical_price | TYPPRICE |
 | [x] | weighted_close | weighted_close | WCLPRICE |
-| [ ] | ht_dcperiod | ht_dcperiod | HT_DCPERIOD |
-| [ ] | ht_dcphase | ht_dcphase | HT_DCPHASE |
-| [ ] | ht_phasor | ht_phasor | HT_PHASOR |
-| [ ] | ht_sine | ht_sine | HT_SINE |
-| [ ] | ht_trendmode | ht_trendmode | HT_TRENDMODE |
-| [ ] | candle_2crows | candle_2crows | CDL2CROWS |
-| [ ] | candle_3blackcrows | candle_3blackcrows | CDL3BLACKCROWS |
-| [ ] | candle_3inside | candle_3inside | CDL3INSIDE |
-| [ ] | candle_3linestrike | candle_3linestrike | CDL3LINESTRIKE |
-| [ ] | candle_3outside | candle_3outside | CDL3OUTSIDE |
-| [ ] | candle_3starsinsouth | candle_3starsinsouth | CDL3STARSINSOUTH |
-| [ ] | candle_3whitesoldiers | candle_3whitesoldiers | CDL3WHITESOLDIERS |
-| [ ] | candle_abandonedbaby | candle_abandonedbaby | CDLABANDONEDBABY |
-| [ ] | candle_advanceblock | candle_advanceblock | CDLADVANCEBLOCK |
-| [ ] | candle_belthold | candle_belthold | CDLBELTHOLD |
-| [ ] | candle_breakaway | candle_breakaway | CDLBREAKAWAY |
-| [ ] | candle_closingmarubozu | candle_closingmarubozu | CDLCLOSINGMARUBOZU |
-| [ ] | candle_concealbabyswall | candle_concealbabyswall | CDLCONCEALBABYSWALL |
-| [ ] | candle_counterattack | candle_counterattack | CDLCOUNTERATTACK |
-| [ ] | candle_darkcloudcover | candle_darkcloudcover | CDLDARKCLOUDCOVER |
-| [ ] | candle_doji | candle_doji | CDLDOJI |
-| [ ] | candle_dojistar | candle_dojistar | CDLDOJISTAR |
-| [ ] | candle_dragonflydoji | candle_dragonflydoji | CDLDRAGONFLYDOJI |
-| [ ] | candle_engulfing | candle_engulfing | CDLENGULFING |
-| [ ] | candle_eveningdojistar | candle_eveningdojistar | CDLEVENINGDOJISTAR |
-| [ ] | candle_eveningstar | candle_eveningstar | CDLEVENINGSTAR |
-| [ ] | candle_gapsidesidewhite | candle_gapsidesidewhite | CDLGAPSIDESIDEWHITE |
-| [ ] | candle_gravestonedoji | candle_gravestonedoji | CDLGRAVESTONEDOJI |
-| [ ] | candle_hammer | candle_hammer | CDLHAMMER |
-| [ ] | candle_hangingman | candle_hangingman | CDLHANGINGMAN |
-| [ ] | candle_harami | candle_harami | CDLHARAMI |
-| [ ] | candle_haramicross | candle_haramicross | CDLHARAMICROSS |
-| [ ] | candle_highwave | candle_highwave | CDLHIGHWAVE |
-| [ ] | candle_hikkake | candle_hikkake | CDLHIKKAKE |
-| [ ] | candle_hikkakemod | candle_hikkakemod | CDLHIKKAKEMOD |
-| [ ] | candle_homingpigeon | candle_homingpigeon | CDLHOMINGPIGEON |
-| [ ] | candle_identical3crows | candle_identical3crows | CDLIDENTICAL3CROWS |
-| [ ] | candle_inneck | candle_inneck | CDLINNECK |
-| [ ] | candle_invertedhammer | candle_invertedhammer | CDLINVERTEDHAMMER |
-| [ ] | candle_kicking | candle_kicking | CDLKICKING |
-| [ ] | candle_kickingbylength | candle_kickingbylength | CDLKICKINGBYLENGTH |
-| [ ] | candle_ladderbottom | candle_ladderbottom | CDLLADDERBOTTOM |
-| [ ] | candle_longleggeddoji | candle_longleggeddoji | CDLLONGLEGGEDDOJI |
-| [ ] | candle_longline | candle_longline | CDLLONGLINE |
-| [ ] | candle_marubozu | candle_marubozu | CDLMARUBOZU |
-| [ ] | candle_matchinglow | candle_matchinglow | CDLMATCHINGLOW |
-| [ ] | candle_mathold | candle_mathold | CDLMATHOLD |
-| [ ] | candle_morningdojistar | candle_morningdojistar | CDLMORNINGDOJISTAR |
-| [ ] | candle_morningstar | candle_morningstar | CDLMORNINGSTAR |
-| [ ] | candle_onneck | candle_onneck | CDLONNECK |
-| [ ] | candle_piercing | candle_piercing | CDLPIERCING |
-| [ ] | candle_rickshawman | candle_rickshawman | CDLRICKSHAWMAN |
-| [ ] | candle_risefall3methods | candle_risefall3methods | CDLRISEFALL3METHODS |
-| [ ] | candle_separatinglines | candle_separatinglines | CDLSEPARATINGLINES |
-| [ ] | candle_shootingstar | candle_shootingstar | CDLSHOOTINGSTAR |
-| [ ] | candle_shortline | candle_shortline | CDLSHORTLINE |
-| [ ] | candle_spinningtop | candle_spinningtop | CDLSPINNINGTOP |
-| [ ] | candle_stalledpattern | candle_stalledpattern | CDLSTALLEDPATTERN |
-| [ ] | candle_sticksandwich | candle_sticksandwich | CDLSTICKSANDWICH |
-| [ ] | candle_takuri | candle_takuri | CDLTAKURI |
-| [ ] | candle_tasukigap | candle_tasukigap | CDLTASUKIGAP |
-| [ ] | candle_thrusting | candle_thrusting | CDLTHRUSTING |
-| [ ] | candle_tristar | candle_tristar | CDLTRISTAR |
-| [ ] | candle_unique3river | candle_unique3river | CDLUNIQUE3RIVER |
-| [ ] | candle_upsidegap2crows | candle_upsidegap2crows | CDLUPSIDEGAP2CROWS |
-| [ ] | candle_xsidegap3methods | candle_xsidegap3methods | CDLXSIDEGAP3METHODS |
+| [x] | ht_dcperiod | ht_dcperiod | HT_DCPERIOD |
+| [x] | ht_dcphase | ht_dcphase | HT_DCPHASE |
+| [x] | ht_phasor | ht_phasor | HT_PHASOR |
+| [x] | ht_sine | ht_sine | HT_SINE |
+| [x] | ht_trendmode | ht_trendmode | HT_TRENDMODE |
+| [x] | candle_2crows | candle_2crows | CDL2CROWS |
+| [x] | candle_3blackcrows | candle_3blackcrows | CDL3BLACKCROWS |
+| [x] | candle_3inside | candle_3inside | CDL3INSIDE |
+| [x] | candle_3linestrike | candle_3linestrike | CDL3LINESTRIKE |
+| [x] | candle_3outside | candle_3outside | CDL3OUTSIDE |
+| [x] | candle_3starsinsouth | candle_3starsinsouth | CDL3STARSINSOUTH |
+| [x] | candle_3whitesoldiers | candle_3whitesoldiers | CDL3WHITESOLDIERS |
+| [x] | candle_abandonedbaby | candle_abandonedbaby | CDLABANDONEDBABY |
+| [x] | candle_advanceblock | candle_advanceblock | CDLADVANCEBLOCK |
+| [x] | candle_belthold | candle_belthold | CDLBELTHOLD |
+| [x] | candle_breakaway | candle_breakaway | CDLBREAKAWAY |
+| [x] | candle_closingmarubozu | candle_closingmarubozu | CDLCLOSINGMARUBOZU |
+| [x] | candle_concealbabyswall | candle_concealbabyswall | CDLCONCEALBABYSWALL |
+| [x] | candle_counterattack | candle_counterattack | CDLCOUNTERATTACK |
+| [x] | candle_darkcloudcover | candle_darkcloudcover | CDLDARKCLOUDCOVER |
+| [x] | candle_doji | candle_doji | CDLDOJI |
+| [x] | candle_dojistar | candle_dojistar | CDLDOJISTAR |
+| [x] | candle_dragonflydoji | candle_dragonflydoji | CDLDRAGONFLYDOJI |
+| [x] | candle_engulfing | candle_engulfing | CDLENGULFING |
+| [x] | candle_eveningdojistar | candle_eveningdojistar | CDLEVENINGDOJISTAR |
+| [x] | candle_eveningstar | candle_eveningstar | CDLEVENINGSTAR |
+| [x] | candle_gapsidesidewhite | candle_gapsidesidewhite | CDLGAPSIDESIDEWHITE |
+| [x] | candle_gravestonedoji | candle_gravestonedoji | CDLGRAVESTONEDOJI |
+| [x] | candle_hammer | candle_hammer | CDLHAMMER |
+| [x] | candle_hangingman | candle_hangingman | CDLHANGINGMAN |
+| [x] | candle_harami | candle_harami | CDLHARAMI |
+| [x] | candle_haramicross | candle_haramicross | CDLHARAMICROSS |
+| [x] | candle_highwave | candle_highwave | CDLHIGHWAVE |
+| [x] | candle_hikkake | candle_hikkake | CDLHIKKAKE |
+| [x] | candle_hikkakemod | candle_hikkakemod | CDLHIKKAKEMOD |
+| [x] | candle_homingpigeon | candle_homingpigeon | CDLHOMINGPIGEON |
+| [x] | candle_identical3crows | candle_identical3crows | CDLIDENTICAL3CROWS |
+| [x] | candle_inneck | candle_inneck | CDLINNECK |
+| [x] | candle_invertedhammer | candle_invertedhammer | CDLINVERTEDHAMMER |
+| [x] | candle_kicking | candle_kicking | CDLKICKING |
+| [x] | candle_kickingbylength | candle_kickingbylength | CDLKICKINGBYLENGTH |
+| [x] | candle_ladderbottom | candle_ladderbottom | CDLLADDERBOTTOM |
+| [x] | candle_longleggeddoji | candle_longleggeddoji | CDLLONGLEGGEDDOJI |
+| [x] | candle_longline | candle_longline | CDLLONGLINE |
+| [x] | candle_marubozu | candle_marubozu | CDLMARUBOZU |
+| [x] | candle_matchinglow | candle_matchinglow | CDLMATCHINGLOW |
+| [x] | candle_mathold | candle_mathold | CDLMATHOLD |
+| [x] | candle_morningdojistar | candle_morningdojistar | CDLMORNINGDOJISTAR |
+| [x] | candle_morningstar | candle_morningstar | CDLMORNINGSTAR |
+| [x] | candle_onneck | candle_onneck | CDLONNECK |
+| [x] | candle_piercing | candle_piercing | CDLPIERCING |
+| [x] | candle_rickshawman | candle_rickshawman | CDLRICKSHAWMAN |
+| [x] | candle_risefall3methods | candle_risefall3methods | CDLRISEFALL3METHODS |
+| [x] | candle_separatinglines | candle_separatinglines | CDLSEPARATINGLINES |
+| [x] | candle_shootingstar | candle_shootingstar | CDLSHOOTINGSTAR |
+| [x] | candle_shortline | candle_shortline | CDLSHORTLINE |
+| [x] | candle_spinningtop | candle_spinningtop | CDLSPINNINGTOP |
+| [x] | candle_stalledpattern | candle_stalledpattern | CDLSTALLEDPATTERN |
+| [x] | candle_sticksandwich | candle_sticksandwich | CDLSTICKSANDWICH |
+| [x] | candle_takuri | candle_takuri | CDLTAKURI |
+| [x] | candle_tasukigap | candle_tasukigap | CDLTASUKIGAP |
+| [x] | candle_thrusting | candle_thrusting | CDLTHRUSTING |
+| [x] | candle_tristar | candle_tristar | CDLTRISTAR |
+| [x] | candle_unique3river | candle_unique3river | CDLUNIQUE3RIVER |
+| [x] | candle_upsidegap2crows | candle_upsidegap2crows | CDLUPSIDEGAP2CROWS |
+| [x] | candle_xsidegap3methods | candle_xsidegap3methods | CDLXSIDEGAP3METHODS |
 | [x] | ad | ad | AD |
 | [x] | adosc | adosc | ADOSC |
 | [x] | obv | obv | OBV |
@@ -355,7 +355,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | previous_high_low | previous_high_low | _ |
 | [x] | sessions | sessions | _ |
 | [x] | retracements | retracements | _ |
-| [ ] | premium_discount | premium_discount | _ |
+| [x] | premium_discount | premium_discount | _ |
 | [x] | supertrend | supertrend | _ |
 | [x] | ichimoku | ichimoku | _ |
 | [x] | squeeze | squeeze | _ |
@@ -371,20 +371,20 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | negative_volume_index | negative_volume_index | _ |
 | [x] | positive_volume_index | positive_volume_index | _ |
 | [x] | mcginley | mcginley_dynamic | _ |
-| [ ] | vidya | vidya | _ |
-| [ ] | laguerre_rsi | laguerre_rsi | _ |
-| [ ] | rmi | rmi | _ |
-| [ ] | jma | jma | _ |
-| [ ] | ssl_channel | ssl_channel | _ |
-| [ ] | pmax | pmax | _ |
-| [ ] | td_sequential | td_sequential | _ |
-| [ ] | even_better_sinewave | even_better_sinewave | _ |
-| [ ] | fib_retracement | fib_retracement | _ |
-| [ ] | heikin_ashi | heikin_ashi | _ |
-| [ ] | anchored_vwap | anchored_vwap | _ |
-| [ ] | pivot_points | pivot_points | _ |
-| [ ] | opening_range | opening_range | _ |
-| [ ] | session_volume_levels | session_volume_levels | _ |
+| [x] | vidya | vidya | _ |
+| [x] | laguerre_rsi | laguerre_rsi | _ |
+| [x] | rmi | rmi | _ |
+| [x] | jma | jma | _ |
+| [x] | ssl_channel | ssl_channel | _ |
+| [x] | pmax | pmax | _ |
+| [x] | td_sequential | td_sequential | _ |
+| [x] | even_better_sinewave | even_better_sinewave | _ |
+| [x] | fib_retracement | fib_retracement | _ |
+| [x] | heikin_ashi | heikin_ashi | _ |
+| [x] | anchored_vwap | anchored_vwap | _ |
+| [x] | pivot_points | pivot_points | _ |
+| [x] | opening_range | opening_range | _ |
+| [x] | session_volume_levels | session_volume_levels | _ |
 | [x] | parkinson | parkinson | _ |
 | [x] | garman_klass | garman_klass | _ |
 | [x] | rogers_satchell | rogers_satchell | _ |

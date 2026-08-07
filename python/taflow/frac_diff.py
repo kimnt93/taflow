@@ -11,14 +11,14 @@ class FracDiff:
     ``append`` returns the current value and ``compute`` returns
     the aligned history with NaN warm-up where applicable.
     """
-    def __init__(self, input: Any | None = None, d: float = 0.5, threshold: float = 1e-5):
-        """Create fractional differencing with optional input history.
+    def __init__(self, _input: Any | None = None, d: float = 0.5, threshold: float = 1e-5):
+        """Create fractional differencing with optional _input history.
 
-        Parameters are ``input`` (the aligned source series), ``d`` (the
+        Parameters are ``_input`` (the aligned source series), ``d`` (the
         differencing order), and ``threshold`` (the smallest retained weight).
         """
         self._state = _Native(d, threshold)
-        self.extend(input) if input is not None else None
+        self.extend(_input) if _input is not None else None
 
     def append(self, _input: float):
         self._state.append(_input)

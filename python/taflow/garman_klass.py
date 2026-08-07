@@ -13,22 +13,22 @@ class GarmanKlass:
     """
     def __init__(
         self,
-        open: Any | None = None,
+        _open: Any | None = None,
         high: Any | None = None,
         low: Any | None = None,
         close: Any | None = None,
         timeperiod: int = 20,
     ):
         self._state = _Native(timeperiod)
-        self.extend(open, high, low, close) if any(value is not None for value in (open, high, low, close)) else None
+        self.extend(_open, high, low, close) if any(value is not None for value in (_open, high, low, close)) else None
 
-    def append(self, open: float, high: float, low: float, close: float):
-        self._state.append(open, high, low, close)
+    def append(self, _open: float, high: float, low: float, close: float):
+        self._state.append(_open, high, low, close)
         return self
 
-    def extend(self, open: Any, high: Any, low: Any, close: Any):
+    def extend(self, _open: Any, high: Any, low: Any, close: Any):
         self._state.extend(
-            as_float64_series(open),
+            as_float64_series(_open),
             as_float64_series(high),
             as_float64_series(low),
             as_float64_series(close),

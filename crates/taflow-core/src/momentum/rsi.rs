@@ -6,7 +6,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Computes an aligned Wilder RSI output array.
-pub fn rsi(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn relative_strength_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -81,7 +81,7 @@ mod tests {
     fn test_rsi_basic() {
         // 持续上涨应该 RSI 接近 100
         let input: Vec<f64> = (1..=30).map(|x| x as f64).collect();
-        let result = rsi(&input, 14).unwrap();
+        let result = relative_strength_index(&input, 14).unwrap();
         assert!(result[13].is_nan());
         assert!(!result[14].is_nan());
         assert!(result[14] > 90.0); // 持续上涨 RSI 应很高
@@ -92,7 +92,7 @@ mod tests {
         let input: Vec<f64> = (0..100)
             .map(|i| 50.0 + 10.0 * (i as f64 * 0.5).sin())
             .collect();
-        let result = rsi(&input, 14).unwrap();
+        let result = relative_strength_index(&input, 14).unwrap();
         for v in &result[14..] {
             assert!(*v >= 0.0 && *v <= 100.0, "RSI out of range: {}", v);
         }
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn flat_input_returns_zero() {
-        let result = rsi(&vec![42.0; 100], 14).unwrap();
+        let result = relative_strength_index(&vec![42.0; 100], 14).unwrap();
         assert!(result[14..].iter().all(|value| *value == 0.0));
     }
 }

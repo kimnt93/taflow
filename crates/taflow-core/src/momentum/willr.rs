@@ -4,7 +4,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// WILLR = -100 * (highest_high - close) / (highest_high - lowest_low)
 /// lookback = timeperiod - 1
-pub fn willr(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn williams_r(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {

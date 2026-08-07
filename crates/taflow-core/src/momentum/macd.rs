@@ -6,7 +6,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Computes aligned MACD, signal, and histogram arrays.
-pub fn macd(
+pub fn moving_average_convergence_divergence(
     input: &[f64],
     fastperiod: usize,
     slowperiod: usize,
@@ -96,7 +96,7 @@ mod tests {
     #[test]
     fn test_macd_basic() {
         let input: Vec<f64> = (1..=50).map(|x| x as f64).collect();
-        let (macd_line, signal, hist) = macd(&input, 12, 26, 9).unwrap();
+        let (macd_line, signal, hist) = moving_average_convergence_divergence(&input, 12, 26, 9).unwrap();
         // C TA-Lib: all three outputs start at index slowperiod-1 + signalperiod-1 = 25+8 = 33
         assert!(macd_line[32].is_nan());
         assert!(!macd_line[33].is_nan());

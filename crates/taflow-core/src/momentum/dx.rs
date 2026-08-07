@@ -35,7 +35,7 @@ fn tr_pdm_mdm(high: &[f64], low: &[f64], close: &[f64]) -> (Vec<f64>, Vec<f64>, 
 /// DX = 100 * |+DI - -DI| / (+DI + -DI)
 ///
 /// Computes TR, +DM, -DM in a single pass, then applies Wilder smoothing once.
-pub fn dx(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn directional_movement_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {

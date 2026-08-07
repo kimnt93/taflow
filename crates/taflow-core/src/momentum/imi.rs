@@ -1,7 +1,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Intraday Momentum Index (IMI).
-pub fn imi(open: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn intraday_momentum_index(open: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = open.len();
     if len != close.len() {
         return Err(TaError::LengthMismatch {

@@ -6,7 +6,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// Computes TR, +DM, -DM inline (no intermediate Vec allocations),
 /// applies Wilder smoothing for DI, then Wilder smoothing for ADX.
-pub fn adx(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn average_directional_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {
@@ -138,7 +138,7 @@ mod tests {
         let close: Vec<f64> = (0..50)
             .map(|i| 50.0 + (i as f64 * 0.3).sin() * 5.0)
             .collect();
-        let result = adx(&high, &low, &close, 14).unwrap();
+        let result = average_directional_index(&high, &low, &close, 14).unwrap();
         // 找到第一个非 NaN 值
         let first_valid = result.iter().position(|v| !v.is_nan()).unwrap();
         assert!(first_valid > 0, "should have NaN lookback prefix");
