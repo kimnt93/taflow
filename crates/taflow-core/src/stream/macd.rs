@@ -7,7 +7,7 @@ use crate::error::{TaError, TaResult};
 
 /// The three values produced by a warmed MACD state machine.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct MacdValue {
+pub struct MovingAverageConvergenceDivergenceValue {
     pub macd: f64,
     pub signal: f64,
     pub histogram: f64,
@@ -28,7 +28,7 @@ pub struct MovingAverageConvergenceDivergence {
     signal_count: usize,
     signal_sum: f64,
     signal_ema: Option<f64>,
-    value: Option<MacdValue>,
+    value: Option<MovingAverageConvergenceDivergenceValue>,
 }
 
 impl MovingAverageConvergenceDivergence {
@@ -64,7 +64,7 @@ impl MovingAverageConvergenceDivergence {
     }
 
     /// Appends one close value.
-    pub fn append(&mut self, input: f64) -> Option<MacdValue> {
+    pub fn append(&mut self, input: f64) -> Option<MovingAverageConvergenceDivergenceValue> {
         let macd = match (self.fast_ema, self.slow_ema) {
             (Some(fast), Some(slow)) => {
                 let fast = self.fast_k.mul_add(input - fast, fast);
@@ -103,7 +103,7 @@ impl MovingAverageConvergenceDivergence {
             self.signal_ema = Some(next);
             next
         };
-        self.value = Some(MacdValue {
+        self.value = Some(MovingAverageConvergenceDivergenceValue {
             macd,
             signal,
             histogram: macd - signal,
@@ -112,7 +112,7 @@ impl MovingAverageConvergenceDivergence {
     }
 
     /// Returns the latest warmed output.
-    pub fn value(&self) -> Option<MacdValue> {
+    pub fn value(&self) -> Option<MovingAverageConvergenceDivergenceValue> {
         self.value
     }
 

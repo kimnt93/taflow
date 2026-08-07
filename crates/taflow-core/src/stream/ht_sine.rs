@@ -6,7 +6,7 @@ const DEG2RAD: f64 = std::f64::consts::PI / 180.0;
 
 /// Sine and lead-sine values returned by [`HilbertTransformSineWave`].
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct HtSineValue {
+pub struct HilbertTransformSineWaveValue {
     pub sine: f64,
     pub leadsine: f64,
 }
@@ -14,7 +14,7 @@ pub struct HtSineValue {
 /// Incremental HT_SINE state.
 pub struct HilbertTransformSineWave {
     phase: HilbertTransformDominantCyclePhase,
-    value: Option<HtSineValue>,
+    value: Option<HilbertTransformSineWaveValue>,
 }
 
 impl Default for HilbertTransformSineWave {
@@ -35,8 +35,8 @@ impl HilbertTransformSineWave {
         }
     }
     /// Appends one price and returns values after TA-Lib's 63-bar warmup.
-    pub fn append(&mut self, input: f64) -> Option<HtSineValue> {
-        self.value = self.phase.append(input).map(|phase| HtSineValue {
+    pub fn append(&mut self, input: f64) -> Option<HilbertTransformSineWaveValue> {
+        self.value = self.phase.append(input).map(|phase| HilbertTransformSineWaveValue {
             sine: (phase * DEG2RAD).sin(),
             leadsine: ((phase + 45.0) * DEG2RAD).sin(),
         });
@@ -47,7 +47,7 @@ impl HilbertTransformSineWave {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<HtSineValue> {
+    pub fn value(&self) -> Option<HilbertTransformSineWaveValue> {
         self.value
     }
     /// Reset the persistent state and clear the latest value.

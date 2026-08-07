@@ -16,7 +16,7 @@ const LOOKBACK: usize = 32;
 
 /// One aligned MAMA/FAMA observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct MamaValue {
+pub struct MesaAdaptiveMovingAverageValue {
     pub mama: f64,
     pub fama: f64,
 }
@@ -47,7 +47,7 @@ pub struct MesaAdaptiveMovingAverage {
     prev_phase: f64,
     prev_mama: f64,
     prev_fama: f64,
-    value: Option<MamaValue>,
+    value: Option<MesaAdaptiveMovingAverageValue>,
 }
 
 impl MesaAdaptiveMovingAverage {
@@ -130,9 +130,9 @@ impl MesaAdaptiveMovingAverage {
 }
 
 impl StreamingIndicator for MesaAdaptiveMovingAverage {
-    type Output = MamaValue;
+    type Output = MesaAdaptiveMovingAverageValue;
 
-    fn append(&mut self, input: f64) -> Option<MamaValue> {
+    fn append(&mut self, input: f64) -> Option<MesaAdaptiveMovingAverageValue> {
         let today = self.index;
         let smoothed = self.next_smoothed(input);
         self.index += 1;
@@ -237,14 +237,14 @@ impl StreamingIndicator for MesaAdaptiveMovingAverage {
         self.prev_fama = 0.5 * alpha * self.prev_mama + (1.0 - 0.5 * alpha) * self.prev_fama;
         self.prev_phase = phase;
 
-        self.value = (today >= LOOKBACK).then_some(MamaValue {
+        self.value = (today >= LOOKBACK).then_some(MesaAdaptiveMovingAverageValue {
             mama: self.prev_mama,
             fama: self.prev_fama,
         });
         self.value
     }
 
-    fn value(&self) -> Option<MamaValue> {
+    fn value(&self) -> Option<MesaAdaptiveMovingAverageValue> {
         self.value
     }
 

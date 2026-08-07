@@ -1,7 +1,7 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{HilbertTransformPhasor as NativeHilbertTransformPhasor, HtPhasorValue};
+use taflow::stream::{HilbertTransformPhasor as NativeHilbertTransformPhasor, HilbertTransformPhasorValue};
 
 #[pyclass]
 pub struct HilbertTransformPhasor {
@@ -44,7 +44,7 @@ impl HilbertTransformPhasor {
     #[getter]
     fn value(&self) -> Option<(f64, f64)> {
         self.inner.value().map(
-            |HtPhasorValue {
+            |HilbertTransformPhasorValue {
                  inphase,
                  quadrature,
              }| (inphase, quadrature),

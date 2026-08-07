@@ -5,7 +5,7 @@
 
 use crate::error::{TaError, TaResult};
 
-use super::MacdValue;
+use super::MovingAverageConvergenceDivergenceValue;
 
 /// Incremental MACDFIX with fixed 12/26 smoothing and configurable signal EMA.
 #[derive(Debug, Clone)]
@@ -18,7 +18,7 @@ pub struct MovingAverageConvergenceDivergenceFixed {
     signal_count: usize,
     signal_sum: f64,
     signal_ema: Option<f64>,
-    value: Option<MacdValue>,
+    value: Option<MovingAverageConvergenceDivergenceValue>,
 }
 
 impl MovingAverageConvergenceDivergenceFixed {
@@ -50,7 +50,7 @@ impl MovingAverageConvergenceDivergenceFixed {
     }
 
     /// Appends one close value.
-    pub fn append(&mut self, input: f64) -> Option<MacdValue> {
+    pub fn append(&mut self, input: f64) -> Option<MovingAverageConvergenceDivergenceValue> {
         let macd = match (self.fast_ema, self.slow_ema) {
             (Some(fast), Some(slow)) => {
                 let fast = Self::FAST_K.mul_add(input - fast, fast);
@@ -89,7 +89,7 @@ impl MovingAverageConvergenceDivergenceFixed {
             self.signal_ema = Some(next);
             next
         };
-        self.value = Some(MacdValue {
+        self.value = Some(MovingAverageConvergenceDivergenceValue {
             macd,
             signal,
             histogram: macd - signal,
@@ -98,7 +98,7 @@ impl MovingAverageConvergenceDivergenceFixed {
     }
 
     /// Returns the latest warmed output.
-    pub fn value(&self) -> Option<MacdValue> {
+    pub fn value(&self) -> Option<MovingAverageConvergenceDivergenceValue> {
         self.value
     }
 

@@ -9,7 +9,7 @@ use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
 /// One aligned upper, middle, and lower Acceleration Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct AccbandsValue {
+pub struct AccelerationBandsValue {
     pub upper: f64,
     pub middle: f64,
     pub lower: f64,
@@ -21,7 +21,7 @@ pub struct AccelerationBands {
     upper: SimpleMovingAverage,
     middle: SimpleMovingAverage,
     lower: SimpleMovingAverage,
-    value: Option<AccbandsValue>,
+    value: Option<AccelerationBandsValue>,
 }
 
 impl AccelerationBands {
@@ -39,7 +39,7 @@ impl AccelerationBands {
     }
 
     /// Appends one high, low, and close bar.
-    pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<AccbandsValue> {
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<AccelerationBandsValue> {
         let denominator = high + low;
         let (upper_input, lower_input) = if denominator == 0.0 {
             (high, low)
@@ -53,7 +53,7 @@ impl AccelerationBands {
         self.value = upper
             .zip(middle)
             .zip(lower)
-            .map(|((upper, middle), lower)| AccbandsValue {
+            .map(|((upper, middle), lower)| AccelerationBandsValue {
                 upper,
                 middle,
                 lower,
@@ -66,7 +66,7 @@ impl AccelerationBands {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<AccbandsValue> {
+    pub fn value(&self) -> Option<AccelerationBandsValue> {
         self.value
     }
 

@@ -10,7 +10,7 @@ use super::{RelativeStrengthIndex, FastStochasticOscillator, StreamingIndicator}
 
 /// One aligned stochastic-RSI fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct StochrsiValue {
+pub struct StochasticRelativeStrengthIndexValue {
     pub fastk: f64,
     pub fastd: f64,
 }
@@ -19,7 +19,7 @@ pub struct StochrsiValue {
 pub struct StochasticRelativeStrengthIndex {
     rsi: RelativeStrengthIndex,
     stochastic: FastStochasticOscillator,
-    value: Option<StochrsiValue>,
+    value: Option<StochasticRelativeStrengthIndexValue>,
 }
 
 impl StochasticRelativeStrengthIndex {
@@ -38,11 +38,11 @@ impl StochasticRelativeStrengthIndex {
     }
 
     /// Appends one close value.
-    pub fn append(&mut self, input: f64) -> Option<StochrsiValue> {
+    pub fn append(&mut self, input: f64) -> Option<StochasticRelativeStrengthIndexValue> {
         self.value = self.rsi.append(input).and_then(|rsi| {
             self.stochastic
                 .append(rsi, rsi, rsi)
-                .map(|value| StochrsiValue {
+                .map(|value| StochasticRelativeStrengthIndexValue {
                     fastk: value.fastk,
                     fastd: value.fastd,
                 })
@@ -51,7 +51,7 @@ impl StochasticRelativeStrengthIndex {
     }
 
     /// Returns the latest warmed output.
-    pub fn value(&self) -> Option<StochrsiValue> {
+    pub fn value(&self) -> Option<StochasticRelativeStrengthIndexValue> {
         self.value
     }
 

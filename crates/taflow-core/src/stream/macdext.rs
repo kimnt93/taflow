@@ -7,7 +7,7 @@
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverageDispatcher, MacdValue};
+use super::{moving_average::MovingAverageDispatcher, MovingAverageConvergenceDivergenceValue};
 
 /// Incremental MACDEXT with aligned fast/slow seeds.
 pub struct MovingAverageConvergenceDivergenceExtended {
@@ -17,7 +17,7 @@ pub struct MovingAverageConvergenceDivergenceExtended {
     fast_start: usize,
     slow_start: usize,
     index: usize,
-    value: Option<MacdValue>,
+    value: Option<MovingAverageConvergenceDivergenceValue>,
 }
 
 impl MovingAverageConvergenceDivergenceExtended {
@@ -57,7 +57,7 @@ impl MovingAverageConvergenceDivergenceExtended {
     }
 
     /// Appends one close value.
-    pub fn append(&mut self, input: f64) -> Option<MacdValue> {
+    pub fn append(&mut self, input: f64) -> Option<MovingAverageConvergenceDivergenceValue> {
         let index = self.index;
         self.index += 1;
         let fast = if index >= self.fast_start {
@@ -72,7 +72,7 @@ impl MovingAverageConvergenceDivergenceExtended {
         };
         self.value = fast.zip(slow).and_then(|(fast, slow)| {
             let macd = fast - slow;
-            self.signal.append(macd).map(|signal| MacdValue {
+            self.signal.append(macd).map(|signal| MovingAverageConvergenceDivergenceValue {
                 macd,
                 signal,
                 histogram: macd - signal,
@@ -82,7 +82,7 @@ impl MovingAverageConvergenceDivergenceExtended {
     }
 
     /// Returns the latest warmed output.
-    pub fn value(&self) -> Option<MacdValue> {
+    pub fn value(&self) -> Option<MovingAverageConvergenceDivergenceValue> {
         self.value
     }
 

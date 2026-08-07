@@ -10,7 +10,7 @@ use super::{moving_average::MovingAverageDispatcher, RollingStandardDeviation, S
 
 /// One aligned upper, middle, and lower Bollinger Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct BbandsValue {
+pub struct BollingerBandsValue {
     pub upper: f64,
     pub middle: f64,
     pub lower: f64,
@@ -22,7 +22,7 @@ pub struct BollingerBands {
     deviation: RollingStandardDeviation,
     deviations_up: f64,
     deviations_down: f64,
-    value: Option<BbandsValue>,
+    value: Option<BollingerBandsValue>,
 }
 
 impl BollingerBands {
@@ -44,14 +44,14 @@ impl BollingerBands {
 }
 
 impl StreamingIndicator for BollingerBands {
-    type Output = BbandsValue;
+    type Output = BollingerBandsValue;
 
-    fn append(&mut self, input: f64) -> Option<BbandsValue> {
+    fn append(&mut self, input: f64) -> Option<BollingerBandsValue> {
         let middle = self.middle.append(input);
         let deviation = self.deviation.append(input);
         self.value = middle
             .zip(deviation)
-            .map(|(middle, deviation)| BbandsValue {
+            .map(|(middle, deviation)| BollingerBandsValue {
                 upper: middle + self.deviations_up * deviation,
                 middle,
                 lower: middle - self.deviations_down * deviation,
@@ -59,7 +59,7 @@ impl StreamingIndicator for BollingerBands {
         self.value
     }
 
-    fn value(&self) -> Option<BbandsValue> {
+    fn value(&self) -> Option<BollingerBandsValue> {
         self.value
     }
 

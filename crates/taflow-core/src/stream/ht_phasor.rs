@@ -9,7 +9,7 @@ const LOOKBACK: usize = 32;
 
 /// In-phase and quadrature components returned by [`HilbertTransformPhasor`].
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct HtPhasorValue {
+pub struct HilbertTransformPhasorValue {
     pub inphase: f64,
     pub quadrature: f64,
 }
@@ -35,7 +35,7 @@ pub struct HilbertTransformPhasor {
     odd3: f64,
     even2: f64,
     even3: f64,
-    value: Option<HtPhasorValue>,
+    value: Option<HilbertTransformPhasorValue>,
 }
 
 impl Default for HilbertTransformPhasor {
@@ -99,7 +99,7 @@ impl HilbertTransformPhasor {
     }
 
     /// Appends one price and returns components after TA-Lib's 32-bar warmup.
-    pub fn append(&mut self, input: f64) -> Option<HtPhasorValue> {
+    pub fn append(&mut self, input: f64) -> Option<HilbertTransformPhasorValue> {
         let today = self.index;
         let smoothed = self.smooth(input);
         self.index += 1;
@@ -155,7 +155,7 @@ impl HilbertTransformPhasor {
             self.period = 50.0;
         }
         self.period = 0.2 * self.period + 0.8 * previous;
-        self.value = (today >= LOOKBACK).then_some(HtPhasorValue {
+        self.value = (today >= LOOKBACK).then_some(HilbertTransformPhasorValue {
             inphase,
             quadrature,
         });
@@ -167,7 +167,7 @@ impl HilbertTransformPhasor {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<HtPhasorValue> {
+    pub fn value(&self) -> Option<HilbertTransformPhasorValue> {
         self.value
     }
     /// Reset the persistent state and clear the latest value.

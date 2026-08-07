@@ -11,7 +11,7 @@ use super::{moving_average::MovingAverageDispatcher, RollingMax, RollingMin, Str
 
 /// One aligned slow %K and slow %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct StochValue {
+pub struct StochasticOscillatorValue {
     pub slowk: f64,
     pub slowd: f64,
 }
@@ -22,7 +22,7 @@ pub struct StochasticOscillator {
     lowest: RollingMin,
     slowk: MovingAverageDispatcher,
     slowd: MovingAverageDispatcher,
-    value: Option<StochValue>,
+    value: Option<StochasticOscillatorValue>,
 }
 
 impl StochasticOscillator {
@@ -44,7 +44,7 @@ impl StochasticOscillator {
     }
 
     /// Appends one high, low, and close bar.
-    pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<StochValue> {
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<StochasticOscillatorValue> {
         let fastk =
             self.highest
                 .append(high)
@@ -62,13 +62,13 @@ impl StochasticOscillator {
             .and_then(|slowk| {
                 self.slowd
                     .append(slowk)
-                    .map(|slowd| StochValue { slowk, slowd })
+                    .map(|slowd| StochasticOscillatorValue { slowk, slowd })
             });
         self.value
     }
 
     /// Returns the latest warmed output.
-    pub fn value(&self) -> Option<StochValue> {
+    pub fn value(&self) -> Option<StochasticOscillatorValue> {
         self.value
     }
 
