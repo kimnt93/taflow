@@ -2149,6 +2149,78 @@ pub fn spread_zscore(x: &[f64], y: &[f64], timeperiod: usize) -> TaResult<Vec<f6
     Ok(x.iter().zip(y).map(|(&x, &y)| state.append(x, y).unwrap_or(f64::NAN)).collect())
 }
 
+/// Fractionally-differentiated series (AFML §5.4, fixed-width window).
+///
+/// Weights `w_0 = 1`, `w_k = −w_{k−1}·(d−k+1)/k` truncated once
+/// `|w_k| < threshold`; each output is the dot product of the weights with the
+/// last `len(weights)` inputs — O(w) per bar over a ring buffer.
+#[derive(Debug, Clone)]
+pub struct FracDiff {
+    weights: Vec<f64>,
+    window: VecDeque<f64>,
+    value: Option<f64>,
+}
+
+impl FracDiff {
+    pub fn new(d: f64, threshold: f64) -> TaResult<Self> {
+        if !(d > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "d",
+                value: d.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        if !(threshold > 0.0) {
+            return Err(TaError::InvalidParameter {
+                name: "threshold",
+                value: threshold.to_string(),
+                reason: "must be > 0",
+            });
+        }
+        let mut weights = vec![1.0];
+        let mut k = 1usize;
+        loop {
+            let wk = -weights[k - 1] * (d - k as f64 + 1.0) / k as f64;
+            if wk.abs() < threshold {
+                break;
+            }
+            weights.push(wk);
+            k += 1;
+        }
+        let capacity = weights.len();
+        Ok(Self { weights, window: VecDeque::with_capacity(capacity), value: None })
+    }
+
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.window.len() == self.weights.len() {
+            self.window.pop_front();
+        }
+        self.window.push_back(input);
+        self.value = if self.window.len() == self.weights.len() {
+            let mut acc = 0.0;
+            for (i, &w) in self.weights.iter().enumerate() {
+                acc += w * self.window[self.window.len() - 1 - i];
+            }
+            Some(acc)
+        } else {
+            None
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.window.clear();
+        self.value = None;
+    }
+}
+
+pub fn frac_diff(input: &[f64], d: f64, threshold: f64) -> TaResult<Vec<f64>> {
+    let mut state = FracDiff::new(d, threshold)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
@@ -3161,6 +3233,49 @@ mod tests {
             replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
             z.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
         );
+    }
+
+    #[test]
+    fn frac_diff_matches_reference_weights() {
+        let d = 0.5;
+        let threshold = 1e-3;
+        let mut weights = vec![1.0];
+        let mut k = 1usize;
+        loop {
+            let wk = -weights[k - 1] * (d - k as f64 + 1.0) / k as f64;
+            if wk.abs() < threshold {
+                break;
+            }
+            weights.push(wk);
+            k += 1;
+        }
+        assert!(weights.len() > 2, "truncation should retain several weights");
+
+        let input: Vec<f64> = (1..=200).map(|x| x as f64).collect();
+        let output = frac_diff(&input, d, threshold).unwrap();
+        let w = weights.len();
+        assert!(output[..w - 1].iter().all(|&v| v.is_nan()));
+        for i in w - 1..input.len() {
+            let mut expected = 0.0;
+            for (j, &weight) in weights.iter().enumerate() {
+                expected += weight * input[i - j];
+            }
+            assert!((output[i] - expected).abs() < 1e-9, "index {i}");
+        }
+
+        let mut state = FracDiff::new(d, threshold).unwrap();
+        let replayed: Vec<f64> = input.iter().map(|&v| state.append(v).unwrap_or(f64::NAN)).collect();
+        assert_eq!(
+            replayed.iter().map(|&v| v.to_bits()).collect::<Vec<_>>(),
+            output.iter().map(|&v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn frac_diff_rejects_bad_params() {
+        assert!(FracDiff::new(0.0, 1e-5).is_err());
+        assert!(FracDiff::new(0.5, 0.0).is_err());
+        assert!(FracDiff::new(-1.0, 1e-5).is_err());
     }
 
     #[test]

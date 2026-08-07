@@ -168,7 +168,7 @@ tier does not (see non-goals).
 | [x] | OU half-life | Theory: `−ln(2)/λ`, λ from regressing Δp on lagged p; Impl: robotwealth "Mean Reversion and Cointegration pt 2" | O(1): `RollingPairMoments(Δp, p_lag)` slope → closed form; λ≥0 → NaN. |
 | [x] | Rolling spread z-score | composition | `(spread − mean)/std` over rolling window given hedge ratio — pure composition. |
 | [x] | CUSUM event flags | Theory: *AFML* §2.5.2; Impl: mlfinlab `filters.cusum_filter` | Same-size 0/±1 flag series, O(1): two accumulators + reset. (Reclassified here from the ML family — as a flag series it fits the contract.) |
-| [ ] | Fractional differentiation (FFD) | Theory: *AFML* ch. 5; Impl: mlfinlab `frac_diff_ffd(d, thres)` | Same-size output. Precompute truncated weights (`w_k = −w_{k−1}(d−k+1)/k`, stop at |w|<thres); per bar = dot product over ring buffer — O(w) fixed, SIMD FMA loop shaped like WMA bulk. `min_ffd` (ADF scan) stays Python-layer. |
+| [x] | Fractional differentiation (FFD) | Theory: *AFML* ch. 5; Impl: mlfinlab `frac_diff_ffd(d, thres)` | Same-size output. Precompute truncated weights (`w_k = −w_{k−1}(d−k+1)/k`, stop at |w|<thres); per bar = dot product over ring buffer — O(w) fixed, SIMD FMA loop shaped like WMA bulk. `min_ffd` (ADF scan) stays Python-layer. |
 | [x] | Amihud illiquidity | Amihud (2002), *J. Fin. Markets* 5:31-56 | O(1): rolling mean of `|ret|/(close×volume)` — `Sma` composition. |
 | [x] | Roll spread | Roll (1984), *J. Finance* 39:1127-1139 | O(1): `2√max(0, −cov(Δp_t, Δp_{t−1}))` via `RollingPairMoments`. |
 

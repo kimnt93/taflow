@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from taflow import Adv, Amihud, Cusum, OuHalfLife, RollSpread, SpreadZscore
+from taflow import Adv, Amihud, Cusum, FracDiff, OuHalfLife, RollSpread, SpreadZscore
 
 
 def make_close_volume(n=500):
@@ -186,3 +186,56 @@ def test_spread_zscore_reset_and_bad_inputs():
     sz.extend(x, y)
     assert len(sz.compute()) == 100
     assert sz.value is not None
+
+
+def _frac_diff_weights(d, threshold):
+    weights = [1.0]
+    k = 1
+    while True:
+        wk = -weights[-1] * (d - k + 1) / k
+        if abs(wk) < threshold:
+            break
+        weights.append(wk)
+        k += 1
+    return weights
+
+
+def test_frac_diff_matches_reference_weights():
+    rng = np.random.default_rng(13)
+    price = 100.0 + np.cumsum(rng.normal(0.0, 0.2, 300))
+    d, threshold = 0.5, 1e-3
+
+    fd = FracDiff(d=d, threshold=threshold).extend(price).compute()
+    weights = _frac_diff_weights(d, threshold)
+    w = len(weights)
+    assert np.isnan(fd[: w - 1]).all()
+
+    manual = np.full(len(price), np.nan)
+    for i in range(w - 1, len(price)):
+        manual[i] = sum(weight * price[i - j] for j, weight in enumerate(weights))
+    assert np.allclose(fd, manual, equal_nan=True)
+
+
+def test_frac_diff_reset_and_bad_params():
+    with pytest.raises(ValueError):
+        FracDiff(d=0.0)
+    with pytest.raises(ValueError):
+        FracDiff(threshold=0.0)
+    with pytest.raises(ValueError):
+        FracDiff(d=-0.5)
+
+    price = np.arange(50.0)
+    state = FracDiff().extend(price)
+    state.reset()
+    assert len(state.compute()) == 0
+    state.extend(price)
+    assert len(state.compute()) == 50
+
+
+def test_frac_diff_append_matches_extend():
+    rng = np.random.default_rng(17)
+    price = 100.0 + np.cumsum(rng.normal(0.0, 0.2, 200))
+    fd_append = FracDiff()
+    for p in price:
+        fd_append.append(p)
+    assert np.allclose(fd_append.compute(), FracDiff().extend(price).compute(), equal_nan=True)

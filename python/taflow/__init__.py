@@ -177,6 +177,7 @@ from .roll_spread import RollSpread
 from .ou_half_life import OuHalfLife
 from .cusum import Cusum
 from .spread_zscore import SpreadZscore
+from .frac_diff import FracDiff
 
 __all__ = [
     "talib",
@@ -343,5 +344,6 @@ __all__ = [
     "CloseToCloseSigma", "Parkinson", "GarmanKlass", "RogersSatchell", "GkYangZhang", "YangZhang",
     "Adv", "Amihud", "RollSpread", "OuHalfLife", "Cusum",
     "SpreadZscore",
+    "FracDiff",
     "__version__",
 ]
