@@ -8,6 +8,20 @@ use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, Window};
 
+/// Computes an aligned Commodity Channel Index vector from HLC slices.
+pub fn commodity_channel_index(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() {
+        return Err(TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()) });
+    }
+    let mut state = CommodityChannelIndex::new(timeperiod)?;
+    Ok(high
+        .iter()
+        .zip(low)
+        .zip(close)
+        .map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN))
+        .collect())
+}
+
 /// Persistent Commodity Channel Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
 pub struct CommodityChannelIndex {

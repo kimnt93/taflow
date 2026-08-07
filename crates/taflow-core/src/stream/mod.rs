@@ -164,7 +164,7 @@ pub use adx::AverageDirectionalIndex;
 pub use adxr::AverageDirectionalIndexRating;
 pub use apo::AbsolutePriceOscillator;
 pub use bbands::{BollingerBands, BollingerBandsValue};
-pub use cci::CommodityChannelIndex;
+pub use cci::{CommodityChannelIndex, commodity_channel_index};
 pub use cdl_doji::CandleDoji;
 pub use cdl_dojistar::CandleDojiStar;
 pub use cdl_dragonflydoji::CandleDragonflyDoji;
