@@ -187,6 +187,7 @@ from .stc import Stc
 from .vortex import Vortex
 from .kst import Kst
 from .mass_index import MassIndex
+from .dpo import Dpo
 
 __all__ = [
     "talib",
@@ -363,5 +364,6 @@ __all__ = [
     "Vortex",
     "Kst",
     "MassIndex",
+    "Dpo",
     "__version__",
 ]

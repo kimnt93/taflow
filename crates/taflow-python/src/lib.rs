@@ -141,6 +141,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::VortexOperator>()?;
     m.add_class::<indicators::KstOperator>()?;
     m.add_class::<indicators::MassIndexOperator>()?;
+    m.add_class::<indicators::DpoOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;

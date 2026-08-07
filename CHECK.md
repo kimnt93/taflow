@@ -348,7 +348,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | vortex | vortex | _ |
 | [x] | kst | kst | _ |
 | [x] | mass_index | mass_index | _ |
-| [ ] | dpo | dpo | _ |
+| [x] | dpo | dpo | _ |
 | [ ] | cmf | cmf | _ |
 | [ ] | kvo | kvo | _ |
 | [ ] | vpt | vpt | _ |

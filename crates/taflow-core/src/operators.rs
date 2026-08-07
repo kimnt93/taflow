@@ -4587,6 +4587,40 @@ pub fn mass_index(
     Ok(high.iter().zip(low).map(|(&h, &l)| state.append(h, l).unwrap_or(f64::NAN)).collect())
 }
 
+/// Stateful causal Detrended Price Oscillator. The centered pandas-ta form is
+/// intentionally excluded because it shifts future values backward.
+#[derive(Debug, Clone)]
+pub struct Dpo {
+    sma: Sma,
+    delay: Window,
+    value: Option<f64>,
+}
+
+impl Dpo {
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self { sma: Sma::new(period)?, delay: Window::new(period / 2 + 1)?, value: None })
+    }
+
+    pub fn append(&mut self, close: f64) -> Option<f64> {
+        self.value = self.sma.append(close).and_then(|mean| self.delay.push(mean).map(|delayed| close - delayed));
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.sma.reset();
+        self.delay.clear();
+        self.value = None;
+    }
+}
+
+pub fn dpo(input: &[f64], period: usize) -> TaResult<Vec<f64>> {
+    let mut state = Dpo::new(period)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -5135,5 +5169,16 @@ mod tests {
         );
         assert!(batch[..40].iter().all(|value| value.is_nan()));
         assert!(batch[40..].iter().all(|value| value.is_finite()));
+    }
+
+    #[test]
+    fn dpo_batch_and_stream_match() {
+        let input: Vec<f64> = (0..100).map(|i| i as f64 + (i as f64 * 0.2).sin()).collect();
+        let batch = dpo(&input, 20).unwrap();
+        let mut state = Dpo::new(20).unwrap();
+        let replayed: Vec<f64> = input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect();
+        assert_eq!(batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(), replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
+        assert!(batch[..30].iter().all(|value| value.is_nan()));
+        assert!(batch[30..].iter().all(|value| value.is_finite()));
     }
 }
