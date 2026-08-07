@@ -247,7 +247,7 @@ pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 pub use mavp::VariablePeriodMovingAverage;
 pub use mfi::MoneyFlowIndex;
 pub use minus_di::MinusDirectionalIndicator;
-pub use minus_dm::MinusDirectionalMovement;
+pub use minus_dm::{MinusDirectionalMovement, minus_directional_movement};
 pub use ppo::PercentagePriceOscillator;
 pub use plus_di::PlusDirectionalIndicator;
 pub use plus_dm::{PlusDirectionalMovement, plus_directional_movement};
