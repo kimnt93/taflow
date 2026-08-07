@@ -1,19 +1,47 @@
-"""Ehlers Even Better Sinewave-style detrended cycle oscillator."""
+"""Native Even Better Sinewave interface."""
+
+from typing import Any
+
 import numpy as np
+
+from ._native import StatefulEvenBetterSinewave
+
+
 class EvenBetterSinewave:
-    """Stateful EvenBetterSinewave indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute a causal detrended cycle oscillator from close prices.
+
+    Parameters
+    ----------
+    close : array-like, optional
+        Initial aligned close history.
+    length : int, default 40
+        Nominal cycle length used to configure the oscillator state.
     """
-    def __init__(self, close=None, length=40): self.length=int(length); self.reset(); self.extend(close) if close is not None else None
-    def append(self, close):
-        x=float(close); self._c.append(x); hp=0 if len(self._c)<3 else .5*(1-.5)*(x-2*self._c[-2]+self._c[-3]) + 1.0*self._hp[-1] if self._hp else 0
-        v=hp if not self._v else .5*hp+.5*self._v[-1]; self._hp.append(hp); self._v.append(v); return v
-    def extend(self, close):
-        for x in close: self.append(x)
+
+    def __init__(self, close: Any | None = None, length: int = 40):
+        self._state = StatefulEvenBetterSinewave(length)
+        if close is not None:
+            self.extend(close)
+
+    def append(self, close: float):
+        """Process one close and return the current oscillator value."""
+        return self._state.append(float(close))
+
+    def extend(self, close: Any):
+        """Process an aligned close history and return this indicator."""
+        self._state.extend(np.asarray(close, dtype=np.float64))
         return self
-    def compute(self): return np.asarray(self._v,dtype=float)
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned oscillator history."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._v[-1] if self._v else None
-    def reset(self): self._c=[]; self._hp=[]; self._v=[]; return self
+    def value(self):
+        """Return the latest oscillator value."""
+        return self._state.value
+
+    def reset(self):
+        """Clear state and accumulated output."""
+        self._state.reset()
+        return self

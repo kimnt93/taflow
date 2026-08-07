@@ -34,7 +34,8 @@ For each item:
 - [ ] `PivotPoints` (`pivot_points`)
 - [ ] `OpeningRange` (`opening_range`)
 - [ ] `PremiumDiscount` (`premium_discount`)
-- [ ] `EvenBetterSinewave` (`ebsw`)
+- [x] `EvenBetterSinewave` (`ebsw`) — Rust streaming kernel, native adapter,
+  and finite-output smoke check verified.
 - [ ] `FibonacciRetracement` (`fibonacci_retracement`)
 - [ ] `SessionVolumeLevels` (`session_volume_levels`)
 - [ ] `KlingerVolumeOscillator` (`klinger_volume_oscillator`)
