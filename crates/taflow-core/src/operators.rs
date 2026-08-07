@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use crate::error::{TaError, TaResult};
 use crate::stream::{AverageTrueRange, CumulativeMaximum, ExponentialMovingAverage, RollingMidprice, SimpleMovingAverage, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
 
-fn validate_period(timeperiod: usize) -> TaResult<()> {
+pub(crate) fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -4921,73 +4921,6 @@ pub fn ewm_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<V
 }
 
 #[derive(Debug, Clone)]
-pub struct Lag {
-    values: VecDeque<f64>,
-    timeperiod: usize,
-    value: Option<f64>,
-}
-
-impl Lag {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(timeperiod: usize) -> TaResult<Self> {
-        validate_period(timeperiod)?;
-        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
-    }
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = if self.values.len() == self.timeperiod {
-            let value = self.values.pop_front().expect("lag window is full");
-            self.values.push_back(input);
-            Some(value)
-        } else {
-            self.values.push_back(input);
-            None
-        };
-        self.value
-    }
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<f64> { self.value }
-    /// Reset the persistent state and clear the latest value.
-    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
-}
-
-#[derive(Debug, Clone)]
-pub struct LogReturn { lag: Lag, value: Option<f64> }
-
-impl LogReturn {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { lag: Lag::new(timeperiod)?, value: None }) }
-    pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self.lag.append(input).map(|previous| (input / previous).ln());
-        self.value
-    }
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<f64> { self.value }
-    /// Reset the persistent state and clear the latest value.
-    pub fn reset(&mut self) { self.lag.reset(); self.value = None; }
-}
-
-#[derive(Debug, Clone)]
 pub struct RollingMean {
     values: VecDeque<f64>,
     timeperiod: usize,
@@ -6110,7 +6043,7 @@ pub fn mcginley_dynamic(input: &[f64], length: usize, c: f64) -> TaResult<Vec<f6
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::stream::{CumulativeProduct, CumulativeSum};
+    use crate::stream::{CumulativeProduct, CumulativeSum, LogReturn};
 
     #[test]
     fn batch_and_stream_match() {
