@@ -333,12 +333,12 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_information_ratio | rolling_information_ratio | _ |
 | [x] | fvg | fvg | _ |
 | [x] | bos_choch | bos_choch | _ |
-| [ ] | ob | ob | _ |
-| [ ] | liquidity | liquidity | _ |
-| [ ] | equal_highs_lows | equal_highs_lows | _ |
-| [ ] | previous_high_low | previous_high_low | _ |
-| [ ] | sessions | sessions | _ |
-| [ ] | retracements | retracements | _ |
+| [x] | ob | ob | _ |
+| [x] | liquidity | liquidity | _ |
+| [x] | equal_highs_lows | equal_highs_lows | _ |
+| [x] | previous_high_low | previous_high_low | _ |
+| [x] | sessions | sessions | _ |
+| [x] | retracements | retracements | _ |
 | [ ] | premium_discount | premium_discount | _ |
 | [ ] | supertrend | supertrend | _ |
 | [ ] | ichimoku | ichimoku | _ |
@@ -368,11 +368,12 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | pivot_points | pivot_points | _ |
 | [ ] | opening_range | opening_range | _ |
 | [ ] | session_volume_levels | session_volume_levels | _ |
-| [ ] | parkinson | parkinson | _ |
-| [ ] | garman_klass | garman_klass | _ |
-| [ ] | rogers_satchell | rogers_satchell | _ |
-| [ ] | gk_yang_zhang | gk_yang_zhang | _ |
-| [ ] | yang_zhang | yang_zhang | _ |
+| [x] | parkinson | parkinson | _ |
+| [x] | garman_klass | garman_klass | _ |
+| [x] | rogers_satchell | rogers_satchell | _ |
+| [x] | gk_yang_zhang | gk_yang_zhang | _ |
+| [x] | yang_zhang | yang_zhang | _ |
+| [x] | close_to_close_sigma | close_to_close_sigma | _ |
 | [ ] | ts_rank | ts_rank | _ |
 | [ ] | signedpower | signedpower | _ |
 | [ ] | kalman_hedge_ratio | kalman_hedge_ratio | _ |

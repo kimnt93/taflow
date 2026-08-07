@@ -142,6 +142,12 @@ from ..rolling_autocorr import RollingAutocorr
 from ..hurst import Hurst
 from ..fractal_dimension import FractalDimension
 from ..rolling_alpha import RollingAlpha, RollingInformationRatio
+from ..close_to_close_sigma import CloseToCloseSigma
+from ..parkinson import Parkinson
+from ..garman_klass import GarmanKlass
+from ..rogers_satchell import RogersSatchell
+from ..gk_yang_zhang import GkYangZhang
+from ..yang_zhang import YangZhang
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -249,4 +255,5 @@ __all__ = [
     "RollingEntropy", "RollingAutocorr",
     "Hurst", "FractalDimension",
     "RollingAlpha", "RollingInformationRatio",
+    "CloseToCloseSigma", "Parkinson", "GarmanKlass", "RogersSatchell", "GkYangZhang", "YangZhang",
 ]

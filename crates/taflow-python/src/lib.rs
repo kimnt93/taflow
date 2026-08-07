@@ -119,6 +119,12 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::PreviousHighLowOperator>()?;
     m.add_class::<indicators::SessionsOperator>()?;
     m.add_class::<indicators::RetracementsOperator>()?;
+    m.add_class::<indicators::CloseToCloseSigmaOperator>()?;
+    m.add_class::<indicators::ParkinsonOperator>()?;
+    m.add_class::<indicators::GarmanKlassOperator>()?;
+    m.add_class::<indicators::RogersSatchellOperator>()?;
+    m.add_class::<indicators::GkYangZhangOperator>()?;
+    m.add_class::<indicators::YangZhangOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;

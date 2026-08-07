@@ -1409,6 +1409,352 @@ pub fn retracements(
     Ok((direction, current_retracement_pct, deepest_retracement_pct))
 }
 
+/// Rolling standard deviation of log returns (close-to-close volatility).
+/// Warm-up values are `NaN`.
+#[derive(Debug, Clone)]
+pub struct CloseToCloseSigma {
+    mean: RollingMean,
+    squares: RollingMean,
+    previous_close: Option<f64>,
+    value: Option<f64>,
+}
+
+impl CloseToCloseSigma {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self {
+            mean: RollingMean::new(timeperiod)?,
+            squares: RollingMean::new(timeperiod)?,
+            previous_close: None,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, close: f64) -> Option<f64> {
+        if let Some(previous_close) = self.previous_close.replace(close) {
+            if close > 0.0 && previous_close > 0.0 {
+                let log_return = (close / previous_close).ln();
+                let _ = self.mean.append(log_return);
+                let _ = self.squares.append(log_return * log_return);
+                self.value = match (self.mean.value(), self.squares.value()) {
+                    (Some(mean), Some(squares)) => Some((squares - mean * mean).max(0.0).sqrt()),
+                    _ => None,
+                };
+            }
+        }
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.mean.reset();
+        self.squares.reset();
+        self.previous_close = None;
+        self.value = None;
+    }
+}
+
+pub fn close_to_close_sigma(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = CloseToCloseSigma::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+/// Rolling mean of `ln(H/L)² / (4 ln 2)` (Parkinson volatility).
+#[derive(Debug, Clone)]
+pub struct Parkinson {
+    mean: RollingMean,
+    value: Option<f64>,
+}
+
+impl Parkinson {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self { mean: RollingMean::new(timeperiod)?, value: None })
+    }
+
+    pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+        let term = if high > low && high > 0.0 && low > 0.0 {
+            (high / low).ln().powi(2) / (4.0 * 2.0f64.ln())
+        } else {
+            0.0
+        };
+        self.value = self.mean.append(term).map(|mean| mean.sqrt());
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.mean.reset();
+        self.value = None;
+    }
+}
+
+pub fn parkinson(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() {
+        return Err(TaError::LengthMismatch { expected: high.len(), got: low.len() });
+    }
+    let mut state = Parkinson::new(timeperiod)?;
+    Ok(high.iter().zip(low).map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN)).collect())
+}
+
+/// Rolling mean of `0.5·ln(H/L)² − (2ln2−1)·ln(C/O)²` (Garman-Klass).
+#[derive(Debug, Clone)]
+pub struct GarmanKlass {
+    mean: RollingMean,
+    value: Option<f64>,
+}
+
+impl GarmanKlass {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self { mean: RollingMean::new(timeperiod)?, value: None })
+    }
+
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+        let term = if high > 0.0 && low > 0.0 && open > 0.0 && close > 0.0 {
+            0.5 * (high / low).ln().powi(2) - (2.0 * 2.0f64.ln() - 1.0) * (close / open).ln().powi(2)
+        } else {
+            0.0
+        };
+        self.value = self.mean.append(term).map(|mean| mean.sqrt());
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.mean.reset();
+        self.value = None;
+    }
+}
+
+pub fn garman_klass(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
+    if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: open.len(),
+            got: high.len().max(low.len()).max(close.len()),
+        });
+    }
+    let mut state = GarmanKlass::new(timeperiod)?;
+    Ok(open
+        .iter()
+        .zip(high)
+        .zip(low)
+        .zip(close)
+        .map(|((( &open, &high), &low), &close)| state.append(open, high, low, close).unwrap_or(f64::NAN))
+        .collect())
+}
+
+/// Rolling mean of `ln(H/C)ln(H/O) + ln(L/C)ln(L/O)` (Rogers-Satchell).
+#[derive(Debug, Clone)]
+pub struct RogersSatchell {
+    mean: RollingMean,
+    value: Option<f64>,
+}
+
+impl RogersSatchell {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self { mean: RollingMean::new(timeperiod)?, value: None })
+    }
+
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+        let term = if open > 0.0 && high > 0.0 && low > 0.0 && close > 0.0 {
+            (high / close).ln() * (high / open).ln() + (low / close).ln() * (low / open).ln()
+        } else {
+            0.0
+        };
+        self.value = self.mean.append(term).map(|mean| mean.sqrt());
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.mean.reset();
+        self.value = None;
+    }
+}
+
+pub fn rogers_satchell(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
+    if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: open.len(),
+            got: high.len().max(low.len()).max(close.len()),
+        });
+    }
+    let mut state = RogersSatchell::new(timeperiod)?;
+    Ok(open
+        .iter()
+        .zip(high)
+        .zip(low)
+        .zip(close)
+        .map(|((( &open, &high), &low), &close)| state.append(open, high, low, close).unwrap_or(f64::NAN))
+        .collect())
+}
+
+/// Garman-Klass with the overnight term `ln(O/C_prev)²` added (GK-Yang-Zhang).
+#[derive(Debug, Clone)]
+pub struct GkYangZhang {
+    mean: RollingMean,
+    previous_close: Option<f64>,
+    value: Option<f64>,
+}
+
+impl GkYangZhang {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self { mean: RollingMean::new(timeperiod)?, previous_close: None, value: None })
+    }
+
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+        if let Some(previous_close) = self.previous_close.replace(close) {
+            let term = if open > 0.0 && high > 0.0 && low > 0.0 && close > 0.0 && previous_close > 0.0 {
+                let gk = 0.5 * (high / low).ln().powi(2)
+                    - (2.0 * 2.0f64.ln() - 1.0) * (close / open).ln().powi(2);
+                let overnight = (open / previous_close).ln().powi(2);
+                gk + overnight
+            } else {
+                0.0
+            };
+            self.value = self.mean.append(term).map(|mean| mean.sqrt());
+        }
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.mean.reset();
+        self.previous_close = None;
+        self.value = None;
+    }
+}
+
+pub fn gk_yang_zhang(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
+    if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: open.len(),
+            got: high.len().max(low.len()).max(close.len()),
+        });
+    }
+    let mut state = GkYangZhang::new(timeperiod)?;
+    Ok(open
+        .iter()
+        .zip(high)
+        .zip(low)
+        .zip(close)
+        .map(|((( &open, &high), &low), &close)| state.append(open, high, low, close).unwrap_or(f64::NAN))
+        .collect())
+}
+
+/// Yang-Zhang volatility: `σ² = σ²_on + k·σ²_oc + (1−k)·σ²_RS` with
+/// `k = 0.34/(1.34 + (n+1)/(n−1))`. Highest-efficiency estimator.
+#[derive(Debug, Clone)]
+pub struct YangZhang {
+    overnight: RollingMean,
+    open_close: RollingMean,
+    rs: RollingMean,
+    timeperiod: usize,
+    previous_close: Option<f64>,
+    value: Option<f64>,
+}
+
+impl YangZhang {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        if timeperiod < 2 {
+            return Err(TaError::InvalidParameter {
+                name: "timeperiod",
+                value: timeperiod.to_string(),
+                reason: "must be >= 2 for Yang-Zhang",
+            });
+        }
+        Ok(Self {
+            overnight: RollingMean::new(timeperiod)?,
+            open_close: RollingMean::new(timeperiod)?,
+            rs: RollingMean::new(timeperiod)?,
+            timeperiod,
+            previous_close: None,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+        let previous_close = self.previous_close.replace(close);
+        if open > 0.0 && high > 0.0 && low > 0.0 && close > 0.0 {
+            if let Some(previous_close) = previous_close {
+                if previous_close > 0.0 {
+                    let overnight = (open / previous_close).ln().powi(2);
+                    let open_close = (close / open).ln().powi(2);
+                    let rs = (high / close).ln() * (high / open).ln()
+                        + (low / close).ln() * (low / open).ln();
+                    let _ = self.overnight.append(overnight);
+                    let _ = self.open_close.append(open_close);
+                    let _ = self.rs.append(rs);
+                }
+            }
+        }
+        self.value = match (self.overnight.value(), self.open_close.value(), self.rs.value()) {
+            (Some(on), Some(oc), Some(rs)) => {
+                let n = self.timeperiod as f64;
+                let k = 0.34 / (1.34 + (n + 1.0) / (n - 1.0));
+                Some((on + k * oc + (1.0 - k) * rs).max(0.0).sqrt())
+            }
+            _ => None,
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.overnight.reset();
+        self.open_close.reset();
+        self.rs.reset();
+        self.previous_close = None;
+        self.value = None;
+    }
+}
+
+pub fn yang_zhang(
+    open: &[f64],
+    high: &[f64],
+    low: &[f64],
+    close: &[f64],
+    timeperiod: usize,
+) -> TaResult<Vec<f64>> {
+    if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
+        return Err(TaError::LengthMismatch {
+            expected: open.len(),
+            got: high.len().max(low.len()).max(close.len()),
+        });
+    }
+    let mut state = YangZhang::new(timeperiod)?;
+    Ok(open
+        .iter()
+        .zip(high)
+        .zip(low)
+        .zip(close)
+        .map(|((( &open, &high), &low), &close)| state.append(open, high, low, close).unwrap_or(f64::NAN))
+        .collect())
+}
+
 impl ActiveZoneList {
     pub fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
@@ -1715,6 +2061,43 @@ impl LogReturn {
     }
     pub fn value(&self) -> Option<f64> { self.value }
     pub fn reset(&mut self) { self.lag.reset(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingMean {
+    values: VecDeque<f64>,
+    timeperiod: usize,
+    sum: f64,
+    value: Option<f64>,
+}
+
+impl RollingMean {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, sum: 0.0, value: None })
+    }
+
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod {
+            self.sum -= self.values.pop_front().expect("ring is full");
+        }
+        self.values.push_back(input);
+        self.sum += input;
+        self.value = if self.values.len() == self.timeperiod {
+            Some(self.sum / self.timeperiod as f64)
+        } else {
+            None
+        };
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> { self.value }
+
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.sum = 0.0;
+        self.value = None;
+    }
 }
 
 #[derive(Debug, Clone)]

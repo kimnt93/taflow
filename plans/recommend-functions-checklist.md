@@ -139,12 +139,12 @@ evidence in the research round).
 
 | Done | Function | Reference (Theory) | Implementation & speed note |
 |---|---|---|---|
-| [ ] | Close-to-close σ | textbook | `RollingMoments` on log returns; baseline for the family's tests. |
-| [ ] | Parkinson | Parkinson (1980), *J. Business* 53:61-65 | rolling mean of `ln(H/L)²` × `1/(4 ln 2)`. Zero-drift assumption — document. |
-| [ ] | Garman-Klass | Garman & Klass (1980), *J. Business* 53:67-78 | rolling mean of `0.5·ln(H/L)² − (2ln2−1)·ln(C/O)²`. |
-| [ ] | Rogers-Satchell | Rogers & Satchell (1991), *Ann. Appl. Prob.* 1:504-512 | rolling mean of `ln(H/C)ln(H/O) + ln(L/C)ln(L/O)`; drift-independent. |
-| [ ] | GK-Yang-Zhang | Yang & Zhang (2000) extension | GK + overnight term `ln(O/C_prev)²`; one prev-close float. |
-| [ ] | Yang-Zhang | Yang & Zhang (2000), *J. Business* 73:477-491 | `σ²_YZ = σ²_on + k·σ²_oc + (1−k)·σ²_RS`, `k = 0.34/(1.34+(n+1)/(n−1))`; three moment sets + prev close. Highest efficiency (~14×) — headline function. |
+| [x] | Close-to-close σ | textbook | `RollingMoments` on log returns; baseline for the family's tests. |
+| [x] | Parkinson | Parkinson (1980), *J. Business* 53:61-65 | rolling mean of `ln(H/L)²` × `1/(4 ln 2)`. Zero-drift assumption — document. |
+| [x] | Garman-Klass | Garman & Klass (1980), *J. Business* 53:67-78 | rolling mean of `0.5·ln(H/L)² − (2ln2−1)·ln(C/O)²`. |
+| [x] | Rogers-Satchell | Rogers & Satchell (1991), *Ann. Appl. Prob.* 1:504-512 | rolling mean of `ln(H/C)ln(H/O) + ln(L/C)ln(L/O)`; drift-independent. |
+| [x] | GK-Yang-Zhang | Yang & Zhang (2000) extension | GK + overnight term `ln(O/C_prev)²`; one prev-close float. |
+| [x] | Yang-Zhang | Yang & Zhang (2000), *J. Business* 73:477-491 | `σ²_YZ = σ²_on + k·σ²_oc + (1−k)·σ²_RS`, `k = 0.34/(1.34+(n+1)/(n−1))`; three moment sets + prev close. Highest efficiency (~14×) — headline function. |
 
 ## P6 — time-series alpha operators (`ops` extension)
 
