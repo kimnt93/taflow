@@ -302,10 +302,10 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | awesome_oscillator | awesome_oscillator | _ |
 | [x] | fisher_transform | fisher_transform | _ |
 | [x] | keltner_channels | keltner_channels | _ |
-| [ ] | donchian_channels | donchian_channels | _ |
+| [x] | donchian_channels | donchian_channels | _ |
 | [x] | chaikin_volatility | chaikin_volatility | _ |
 | [x] | ulcer_index | ulcer_index | _ |
-| [ ] | rolling_vwap | rolling_vwap | _ |
+| [x] | rolling_vwap | rolling_vwap | _ |
 | [x] | force_index | force_index | _ |
 | [x] | ease_of_movement | ease_of_movement | _ |
 | [x] | crossover | crossover | _ |
@@ -323,7 +323,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | highest_since | highest_since | _ |
 | [x] | lowest_since | lowest_since | _ |
 | [x] | signal_delay | signal_delay | _ |
-| [ ] | swing_highs_lows | swing_highs_lows | _ |
+| [x] | swing_highs_lows | swing_highs_lows | _ |
 | [x] | hedge_ratio | hedge_ratio | _ |
 | [x] | rolling_entropy | rolling_entropy | _ |
 | [x] | rolling_autocorr | rolling_autocorr | _ |

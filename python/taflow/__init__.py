@@ -149,6 +149,9 @@ from .swing import SwingHighLow, SwingHigh, SwingLow
 from .session import SessionExtrema, session_flags
 from .zones import ActiveZoneList
 from .fvg import Fvg
+from .donchian_channels import DonchianChannels
+from .rolling_vwap import RollingVwap
+from .swing_highs_lows import SwingHighsLows
 from .bos_choch import BosChoch
 from .hedge_ratio import HedgeRatio
 from .rolling_entropy import RollingEntropy
@@ -308,6 +311,7 @@ __all__ = [
     "SessionExtrema", "session_flags",
     "ActiveZoneList",
     "Fvg",
+    "DonchianChannels", "RollingVwap", "SwingHighsLows",
     "BosChoch",
     "HedgeRatio",
     "RollingEntropy", "RollingAutocorr",
