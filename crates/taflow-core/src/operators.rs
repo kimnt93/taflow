@@ -121,6 +121,28 @@ pub fn rolling_winsorize(input: &[f64], timeperiod: usize, lower: f64, upper: f6
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+pub fn ewm_var(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = EwmVar::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value)).collect())
+}
+
+pub fn ewm_std(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = EwmStd::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value)).collect())
+}
+
+pub fn ewm_cov(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if input0.len() != input1.len() { return Err(TaError::LengthMismatch { expected: input0.len(), got: input1.len() }); }
+    let mut state = EwmCov::new(timeperiod)?;
+    Ok(input0.iter().zip(input1).map(|(&left, &right)| state.append(left, right)).collect())
+}
+
+pub fn ewm_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if input0.len() != input1.len() { return Err(TaError::LengthMismatch { expected: input0.len(), got: input1.len() }); }
+    let mut state = EwmCorr::new(timeperiod)?;
+    Ok(input0.iter().zip(input1).map(|(&left, &right)| state.append(left, right)).collect())
+}
+
 #[derive(Debug, Clone)]
 pub struct Lag {
     values: VecDeque<f64>,
@@ -426,6 +448,85 @@ impl RollingWinsorize {
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
+fn ewm_alpha(timeperiod: usize) -> TaResult<f64> {
+    validate_period(timeperiod)?;
+    Ok(2.0 / (timeperiod as f64 + 1.0))
+}
+
+#[derive(Debug, Clone)]
+pub struct EwmVar { alpha: f64, mean: Option<f64>, variance: f64, value: Option<f64> }
+
+impl EwmVar {
+    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { alpha: ewm_alpha(timeperiod)?, mean: None, variance: 0.0, value: None }) }
+    pub fn append(&mut self, input: f64) -> f64 {
+        let variance = match self.mean {
+            None => { self.mean = Some(input); 0.0 }
+            Some(previous) => {
+                let delta = input - previous;
+                self.mean = Some(previous + self.alpha * delta);
+                (1.0 - self.alpha) * (self.variance + self.alpha * delta * delta)
+            }
+        };
+        self.variance = variance;
+        self.value = Some(variance);
+        variance
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.mean = None; self.variance = 0.0; self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct EwmStd { variance: EwmVar, value: Option<f64> }
+
+impl EwmStd {
+    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { variance: EwmVar::new(timeperiod)?, value: None }) }
+    pub fn append(&mut self, input: f64) -> f64 { let value = self.variance.append(input).sqrt(); self.value = Some(value); value }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.variance.reset(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct EwmCov { alpha: f64, mean0: Option<f64>, mean1: Option<f64>, var0: f64, var1: f64, covariance: f64, value: Option<f64> }
+
+impl EwmCov {
+    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { alpha: ewm_alpha(timeperiod)?, mean0: None, mean1: None, var0: 0.0, var1: 0.0, covariance: 0.0, value: None }) }
+    pub fn append(&mut self, left: f64, right: f64) -> f64 {
+        let covariance = match (self.mean0, self.mean1) {
+            (Some(previous0), Some(previous1)) => {
+                let delta0 = left - previous0;
+                let delta1 = right - previous1;
+                self.mean0 = Some(previous0 + self.alpha * delta0);
+                self.mean1 = Some(previous1 + self.alpha * delta1);
+                self.var0 = (1.0 - self.alpha) * (self.var0 + self.alpha * delta0 * delta0);
+                self.var1 = (1.0 - self.alpha) * (self.var1 + self.alpha * delta1 * delta1);
+                (1.0 - self.alpha) * (self.covariance + self.alpha * delta0 * delta1)
+            }
+            _ => { self.mean0 = Some(left); self.mean1 = Some(right); 0.0 }
+        };
+        self.covariance = covariance;
+        self.value = Some(covariance);
+        covariance
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.mean0 = None; self.mean1 = None; self.var0 = 0.0; self.var1 = 0.0; self.covariance = 0.0; self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct EwmCorr { covariance: EwmCov, value: Option<f64> }
+
+impl EwmCorr {
+    pub fn new(timeperiod: usize) -> TaResult<Self> { Ok(Self { covariance: EwmCov::new(timeperiod)?, value: None }) }
+    pub fn append(&mut self, left: f64, right: f64) -> f64 {
+        self.covariance.append(left, right);
+        let denominator = (self.covariance.var0 * self.covariance.var1).sqrt();
+        let value = if denominator > 0.0 { self.covariance.covariance / denominator } else { 0.0 };
+        self.value = Some(value);
+        value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.covariance.reset(); self.value = None; }
+}
+
 macro_rules! cumulative_operator {
     ($name:ident, $initial:expr, $operation:expr) => {
         #[derive(Debug, Clone)]
@@ -501,5 +602,7 @@ mod tests {
         assert_eq!(rolling_iqr(&input, 3).unwrap()[2], 1.5);
         assert!((rolling_cov(&input, &[2.0, 8.0, 4.0, 16.0], 3).unwrap()[2] - 28.0 / 9.0).abs() < 1e-12);
         assert_eq!(rolling_winsorize(&input, 3, 0.0, 0.5).unwrap()[2], 2.0);
+        assert_eq!(ewm_var(&input, 2).unwrap()[0], 0.0);
+        assert_eq!(ewm_std(&input, 2).unwrap()[0], 0.0);
     }
 }

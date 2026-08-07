@@ -91,6 +91,10 @@ from ..rolling_iqr import RollingIqr
 from ..rolling_cov import RollingCov
 from ..rolling_winsorize import RollingWinsorize
 from ..rolling_apply import rolling_apply
+from ..ewm_var import EwmVar
+from ..ewm_std import EwmStd
+from ..ewm_cov import EwmCov
+from ..ewm_corr import EwmCorr
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -169,4 +173,5 @@ __all__ = [
     "RollingSkew", "RollingKurtosis", "RollingIqr",
     "RollingCov", "RollingWinsorize",
     "rolling_apply",
+    "EwmVar", "EwmStd", "EwmCov", "EwmCorr",
 ]

@@ -33,8 +33,8 @@ they are not re-proposed later.
 
 ## Exponentially weighted operators
 
-- [ ] ewm_var / ewm_std
-- [ ] ewm_cov / ewm_corr
+- [x] ewm_var / ewm_std
+- [x] ewm_cov / ewm_corr
 
 ## Return and risk features
 
