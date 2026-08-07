@@ -120,6 +120,7 @@ from ..falling import Falling
 from ..vwap import Vwap
 from ..force_index import ForceIndex
 from ..ease_of_movement import EaseOfMovement
+from ..bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -207,4 +208,5 @@ __all__ = [
     "KeltnerChannels", "ChaikinVolatility",
     "Crossover", "Crossunder", "Cross", "Rising", "Falling",
     "Vwap", "ForceIndex", "EaseOfMovement",
+    "HigherHigh", "LowerLow", "InsideBar", "OutsideBar", "GapUp", "GapDown",
 ]

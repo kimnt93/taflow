@@ -101,6 +101,12 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::VwapOperator>()?;
     m.add_class::<indicators::ForceIndexOperator>()?;
     m.add_class::<indicators::EaseOfMovementOperator>()?;
+    m.add_class::<indicators::HigherHighOperator>()?;
+    m.add_class::<indicators::LowerLowOperator>()?;
+    m.add_class::<indicators::InsideBarOperator>()?;
+    m.add_class::<indicators::OutsideBarOperator>()?;
+    m.add_class::<indicators::GapUpOperator>()?;
+    m.add_class::<indicators::GapDownOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

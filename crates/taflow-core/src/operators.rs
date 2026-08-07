@@ -102,6 +102,14 @@ pub fn chaikin_volatility(high: &[f64], low: &[f64], timeperiod: usize, roc_peri
 pub fn vwap(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len()||high.len()!=close.len()||high.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=Vwap::new(timeperiod)?;Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&h,&l),&c),&v)|state.append(h,l,c,v).unwrap_or(f64::NAN)).collect()) }
 pub fn force_index(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> { if close.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:close.len(),got:volume.len()});}let mut state=ForceIndex::new();Ok(close.iter().zip(volume).map(|(&c,&v)|state.append(c,v).unwrap_or(f64::NAN)).collect()) }
 pub fn ease_of_movement(high: &[f64], low: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> { if high.len()!=low.len()||high.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=EaseOfMovement::new();Ok(high.iter().zip(low).zip(volume).map(|((&h,&l),&v)|state.append(h,l,v).unwrap_or(f64::NAN)).collect()) }
+
+macro_rules! bar_relation_operator { ($name:ident,$predicate:expr)=>{#[derive(Debug,Clone)]pub struct $name{previous:Option<(f64,f64)>,value:Option<f64>}impl $name{pub fn new()->Self{Self{previous:None,value:None}}pub fn append(&mut self,high:f64,low:f64)->Option<f64>{self.value=self.previous.map(|(ph,pl)|if $predicate(high,low,ph,pl){1.0}else{0.0});self.previous=Some((high,low));self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.previous=None;self.value=None;}}impl Default for $name{fn default()->Self{Self::new()}}};}
+bar_relation_operator!(HigherHigh, |h:f64,_l:f64,ph:f64,_pl:f64| h>ph);
+bar_relation_operator!(LowerLow, |_h:f64,l:f64,_ph:f64,pl:f64| l<pl);
+bar_relation_operator!(InsideBar, |h:f64,l:f64,ph:f64,pl:f64| h<ph&&l>pl);
+bar_relation_operator!(OutsideBar, |h:f64,l:f64,ph:f64,pl:f64| h>ph&&l<pl);
+bar_relation_operator!(GapUp, |_h:f64,l:f64,ph:f64,_pl:f64| l>ph);
+bar_relation_operator!(GapDown, |h:f64,_l:f64,_ph:f64,pl:f64| h<pl);
 pub fn rising(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Rising::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn falling(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Falling::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
