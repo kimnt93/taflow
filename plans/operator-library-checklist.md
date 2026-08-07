@@ -103,7 +103,7 @@ Two aligned input series are within the contract (like BETA/CORREL).
 - [x] hedge_ratio (rolling OLS slope of y on x price levels; distinct from
       TA-Lib BETA, which regresses percent returns)
 - [x] rolling_entropy / rolling_autocorr
-- [ ] hurst / fractal_dimension (rolling-window variants)
+- [x] hurst / fractal_dimension (rolling-window variants)
 - [ ] rolling_alpha / rolling_information_ratio
 
 ## Execution and adapters

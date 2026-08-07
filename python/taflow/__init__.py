@@ -153,6 +153,8 @@ from .bos_choch import BosChoch
 from .hedge_ratio import HedgeRatio
 from .rolling_entropy import RollingEntropy
 from .rolling_autocorr import RollingAutocorr
+from .hurst import Hurst
+from .fractal_dimension import FractalDimension
 
 __all__ = [
     "talib",
@@ -308,5 +310,6 @@ __all__ = [
     "BosChoch",
     "HedgeRatio",
     "RollingEntropy", "RollingAutocorr",
+    "Hurst", "FractalDimension",
     "__version__",
 ]

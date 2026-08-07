@@ -132,6 +132,44 @@ pub fn rolling_autocorr(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> 
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+pub fn hurst(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = Hurst::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn fractal_dimension(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = Hurst::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).map(|hurst| 2.0 - hurst).unwrap_or(f64::NAN)).collect())
+}
+
+#[derive(Debug, Clone)]
+pub struct Hurst { values: VecDeque<f64>, period: usize, value: Option<f64> }
+
+impl Hurst {
+    pub fn new(period: usize) -> TaResult<Self> {
+        if period < 2 { return Err(TaError::InvalidParameter { name: "timeperiod", value: period.to_string(), reason: "must be >= 2" }); }
+        Ok(Self { values: VecDeque::with_capacity(period), period, value: None })
+    }
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.period { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = (self.values.len() == self.period).then(|| {
+            let n = self.period as f64;
+            let mean = self.values.iter().sum::<f64>() / n;
+            let mut cumulative = 0.0;
+            let mut minimum = f64::INFINITY;
+            let mut maximum = f64::NEG_INFINITY;
+            for &value in &self.values { cumulative += value - mean; minimum = minimum.min(cumulative); maximum = maximum.max(cumulative); }
+            let standard_deviation = (self.values.iter().map(|&value| (value - mean).powi(2)).sum::<f64>() / n).sqrt();
+            let rescaled_range = (maximum - minimum) / standard_deviation;
+            if rescaled_range > 0.0 { (rescaled_range.ln() / n.ln()).clamp(0.0, 1.0) } else { 0.5 }
+        });
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
 #[derive(Debug, Clone)]
 pub struct RollingEntropy {
     values: VecDeque<f64>,
