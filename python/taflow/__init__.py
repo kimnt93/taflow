@@ -108,6 +108,9 @@ from .rolling_quantile import RollingQuantile
 from .rolling_percentile import RollingPercentile
 from .rolling_rank import RollingRank
 from .rolling_zscore import RollingZscore
+from .rolling_skew import RollingSkew
+from .rolling_kurtosis import RollingKurtosis
+from .rolling_iqr import RollingIqr
 
 __all__ = [
     "talib",
@@ -239,5 +242,6 @@ __all__ = [
     "UpsideGapTwoCrows", "CDLUPSIDEGAP2CROWS",
     "Lag", "LogReturn", "Cumsum", "Cumprod", "RollingMedian", "RollingMode",
     "RollingQuantile", "RollingPercentile", "RollingRank", "RollingZscore",
+    "RollingSkew", "RollingKurtosis", "RollingIqr",
     "__version__",
 ]

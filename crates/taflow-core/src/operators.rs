@@ -95,6 +95,21 @@ pub fn rolling_zscore(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+pub fn rolling_skew(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingSkew::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_kurtosis(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingKurtosis::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_iqr(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = RollingIqr::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 #[derive(Debug, Clone)]
 pub struct Lag {
     values: VecDeque<f64>,
@@ -283,6 +298,69 @@ impl RollingZscore {
     pub fn reset(&mut self) { self.values.clear(); self.value = None; }
 }
 
+macro_rules! rolling_moment_operator {
+    ($name:ident, $formula:expr) => {
+        #[derive(Debug, Clone)]
+        pub struct $name { values: VecDeque<f64>, timeperiod: usize, value: Option<f64> }
+        impl $name {
+            pub fn new(timeperiod: usize) -> TaResult<Self> {
+                validate_period(timeperiod)?;
+                Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+            }
+            pub fn append(&mut self, input: f64) -> Option<f64> {
+                if self.values.len() == self.timeperiod { self.values.pop_front(); }
+                self.values.push_back(input);
+                self.value = if self.values.len() == self.timeperiod {
+                    let mean = self.values.iter().sum::<f64>() / self.timeperiod as f64;
+                    let result = $formula(&self.values, mean);
+                    Some(result)
+                } else { None };
+                self.value
+            }
+            pub fn value(&self) -> Option<f64> { self.value }
+            pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+        }
+    };
+}
+
+rolling_moment_operator!(RollingSkew, |values: &VecDeque<f64>, mean: f64| {
+    let m2 = values.iter().map(|&value| (value - mean).powi(2)).sum::<f64>() / values.len() as f64;
+    let m3 = values.iter().map(|&value| (value - mean).powi(3)).sum::<f64>() / values.len() as f64;
+    if m2 > 0.0 { m3 / m2.powf(1.5) } else { 0.0 }
+});
+
+rolling_moment_operator!(RollingKurtosis, |values: &VecDeque<f64>, mean: f64| {
+    let m2 = values.iter().map(|&value| (value - mean).powi(2)).sum::<f64>() / values.len() as f64;
+    let m4 = values.iter().map(|&value| (value - mean).powi(4)).sum::<f64>() / values.len() as f64;
+    if m2 > 0.0 { m4 / m2.powi(2) - 3.0 } else { 0.0 }
+});
+
+#[derive(Debug, Clone)]
+pub struct RollingIqr { quantile: RollingQuantile, value: Option<f64> }
+
+impl RollingIqr {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self { quantile: RollingQuantile::new(timeperiod, 0.25)?, value: None })
+    }
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        self.quantile.append(input);
+        self.value = if self.quantile.values.len() == self.quantile.timeperiod {
+            let mut sorted: Vec<f64> = self.quantile.values.iter().copied().collect();
+            sorted.sort_by(f64::total_cmp);
+            let quantile = |q: f64| {
+                let position = q * (sorted.len() - 1) as f64;
+                let lower = position.floor() as usize;
+                let upper = position.ceil() as usize;
+                sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower as f64)
+            };
+            Some(quantile(0.75) - quantile(0.25))
+        } else { None };
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.quantile.reset(); self.value = None; }
+}
+
 macro_rules! cumulative_operator {
     ($name:ident, $initial:expr, $operation:expr) => {
         #[derive(Debug, Clone)]
@@ -355,5 +433,6 @@ mod tests {
         assert_eq!(rolling_percentile(&input, 3, 50.0).unwrap()[2..], [2.0, 4.0]);
         assert_eq!(rolling_rank(&input, 3).unwrap()[2..], [2.0 / 3.0, 1.0]);
         assert!((rolling_zscore(&input, 3).unwrap()[2] - (-0.2672612419)).abs() < 1e-9);
+        assert_eq!(rolling_iqr(&input, 3).unwrap()[2], 1.5);
     }
 }
