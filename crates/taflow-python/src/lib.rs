@@ -91,6 +91,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::FisherTransformOperator>()?;
     m.add_class::<indicators::DonchianOperator>()?;
     m.add_class::<indicators::UlcerIndexOperator>()?;
+    m.add_class::<indicators::KeltnerChannelsOperator>()?;
+    m.add_class::<indicators::ChaikinVolatilityOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

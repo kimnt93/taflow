@@ -110,6 +110,8 @@ from ..awesome_oscillator import AwesomeOscillator
 from ..fisher_transform import FisherTransform
 from ..donchian import Donchian
 from ..ulcer_index import UlcerIndex
+from ..keltner_channels import KeltnerChannels
+from ..chaikin_volatility import ChaikinVolatility
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -194,4 +196,5 @@ __all__ = [
     "Hma", "Vwma", "Zlema", "Alma",
     "Tsi", "AwesomeOscillator", "FisherTransform",
     "Donchian", "UlcerIndex",
+    "KeltnerChannels", "ChaikinVolatility",
 ]

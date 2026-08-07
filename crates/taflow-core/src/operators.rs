@@ -98,6 +98,7 @@ pub fn tsi(input: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { let 
 pub fn awesome_oscillator(high: &[f64], low: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=AwesomeOscillator::new(fast,slow)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 pub fn fisher_transform(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=FisherTransform::new(timeperiod)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 pub fn ulcer_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=UlcerIndex::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+pub fn chaikin_volatility(high: &[f64], low: &[f64], timeperiod: usize, roc_period: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=ChaikinVolatility::new(timeperiod,roc_period)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 
 /// Rolling median. Warm-up values are `NaN`; even windows average the two
 /// central values.
@@ -677,6 +678,16 @@ impl Donchian { pub fn new(period:usize)->TaResult<Self>{validate_period(period)
 #[derive(Debug, Clone)]
 pub struct UlcerIndex { values: VecDeque<f64>, period: usize, value: Option<f64> }
 impl UlcerIndex { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{values:VecDeque::with_capacity(period),period,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back(input);self.value=(self.values.len()==self.period).then(||{let mut peak=f64::NEG_INFINITY;let sum=self.values.iter().map(|&v|{peak=peak.max(v);let drawdown=if peak!=0.0{100.0*(v-peak)/peak}else{0.0};drawdown*drawdown}).sum::<f64>();(sum/self.period as f64).sqrt()});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct KeltnerValue { pub upper: f64, pub middle: f64, pub lower: f64 }
+#[derive(Debug, Clone)]
+pub struct KeltnerChannels { period: usize, multiplier: f64, ema: Option<f64>, range_ema: Option<f64>, alpha: f64, value: Option<KeltnerValue> }
+impl KeltnerChannels { pub fn new(period:usize,multiplier:f64)->TaResult<Self>{validate_period(period)?;Ok(Self{period,multiplier,ema:None,range_ema:None,alpha:2.0/(period as f64+1.0),value:None})}pub fn append(&mut self,high:f64,low:f64,close:f64)->Option<KeltnerValue>{let typical=(high+low+close)/3.0;let range=high-low;let ema=self.ema.map_or(typical,|v|v+self.alpha*(typical-v));let re=self.range_ema.map_or(range,|v|v+self.alpha*(range-v));self.ema=Some(ema);self.range_ema=Some(re);self.value=Some(KeltnerValue{upper:ema+self.multiplier*re,middle:ema,lower:ema-self.multiplier*re});self.value}pub fn value(&self)->Option<KeltnerValue>{self.value}pub fn reset(&mut self){self.ema=None;self.range_ema=None;self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct ChaikinVolatility { period: usize, roc_period: usize, alpha: f64, ema: Option<f64>, history: VecDeque<f64>, value: Option<f64> }
+impl ChaikinVolatility { pub fn new(period:usize,roc_period:usize)->TaResult<Self>{validate_period(period)?;validate_period(roc_period)?;Ok(Self{period,roc_period,alpha:2.0/(period as f64+1.0),ema:None,history:VecDeque::with_capacity(roc_period+1),value:None})}pub fn append(&mut self,high:f64,low:f64)->Option<f64>{let range=high-low;let ema=self.ema.map_or(range,|v|v+self.alpha*(range-v));self.ema=Some(ema);if self.history.len()==self.roc_period+1{self.history.pop_front();}self.history.push_back(ema);self.value=(self.history.len()==self.roc_period+1).then(||{let old=self.history.front().copied().unwrap();if old!=0.0{(ema-old)/old*100.0}else{0.0}});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.ema=None;self.history.clear();self.value=None;}}
 
 rolling_risk_operator!(RollingSharpe, |values: &VecDeque<f64>| {
     let average = mean(values);
