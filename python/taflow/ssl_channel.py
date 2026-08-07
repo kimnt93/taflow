@@ -36,7 +36,7 @@ class SmoothedTrendChannel:
         close : object
             Close-price series or the current bar close.
         length : object
-            Values or parameters consumed by this operation.
+            Indicator lookback or state length in bars.
 
         Returns
         -------

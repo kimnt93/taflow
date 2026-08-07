@@ -29,9 +29,9 @@ class AwesomeOscillator:
         low : object
             Low-price series or the current bar low.
         fast : object
-            Values or parameters consumed by this operation.
+            Fast smoothing period in bars.
         slow : object
-            Values or parameters consumed by this operation.
+            Slow smoothing period in bars.
 
         Returns
         -------

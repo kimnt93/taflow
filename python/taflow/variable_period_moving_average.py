@@ -50,7 +50,7 @@ class VariablePeriodMovingAverage:
         _input : object
             Input series or the current scalar observation.
         periods : object
-            Values or parameters consumed by this operation.
+            Lookback periods used by the estimator.
 
         Returns
         -------

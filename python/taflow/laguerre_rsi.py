@@ -26,7 +26,7 @@ class LaguerreRelativeStrengthIndex:
         close : object
             Close-price series or the current bar close.
         gamma : object
-            Values or parameters consumed by this operation.
+            Laguerre smoothing factor.
 
         Returns
         -------

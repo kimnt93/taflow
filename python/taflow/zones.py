@@ -31,11 +31,11 @@ class ActiveZoneList:
         Parameters
         ----------
         top : object
-            Values or parameters consumed by this operation.
+            Upper zone boundary.
         bottom : object
-            Values or parameters consumed by this operation.
+            Lower zone boundary.
         flags : object
-            Values or parameters consumed by this operation.
+            Integer zone flags.
 
         Returns
         -------
@@ -52,7 +52,7 @@ class ActiveZoneList:
         price : object
             Price series or the current price observation.
         max_age : object
-            Values or parameters consumed by this operation.
+            Maximum age retained for a zone.
 
         Returns
         -------

@@ -33,23 +33,23 @@ class KnowSureThing:
         close : object
             Close-price series or the current bar close.
         roc1 : object
-            Values or parameters consumed by this operation.
+            First rate-of-change period.
         roc2 : object
-            Values or parameters consumed by this operation.
+            Second rate-of-change period.
         roc3 : object
-            Values or parameters consumed by this operation.
+            Third rate-of-change period.
         roc4 : object
-            Values or parameters consumed by this operation.
+            Fourth rate-of-change period.
         sma1 : object
-            Values or parameters consumed by this operation.
+            First SMA smoothing period.
         sma2 : object
-            Values or parameters consumed by this operation.
+            Second SMA smoothing period.
         sma3 : object
-            Values or parameters consumed by this operation.
+            Third SMA smoothing period.
         sma4 : object
-            Values or parameters consumed by this operation.
+            Fourth SMA smoothing period.
         signal : object
-            Values or parameters consumed by this operation.
+            Signal smoothing period in bars.
 
         Returns
         -------

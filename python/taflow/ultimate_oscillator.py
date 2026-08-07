@@ -33,11 +33,11 @@ class UltimateOscillator:
         close : object
             Close-price series or the current bar close.
         timeperiod1 : object
-            Values or parameters consumed by this operation.
+            First trailing period.
         timeperiod2 : object
-            Values or parameters consumed by this operation.
+            Second trailing period.
         timeperiod3 : object
-            Values or parameters consumed by this operation.
+            Third trailing period.
 
         Returns
         -------

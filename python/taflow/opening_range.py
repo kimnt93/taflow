@@ -41,7 +41,7 @@ class OpeningRange:
         anchor : object
             Boolean series marking reset or anchor bars.
         bars : object
-            Values or parameters consumed by this operation.
+            Number of bars in the opening range.
 
         Returns
         -------

@@ -25,13 +25,13 @@ class KalmanHedgeRatio:
         Parameters
         ----------
         x : object
-            Values or parameters consumed by this operation.
+            First aligned input series or scalar observation.
         y : object
-            Values or parameters consumed by this operation.
+            Second aligned input series or scalar observation.
         delta : object
-            Values or parameters consumed by this operation.
+            Kalman process-noise parameter.
         observation_variance : object
-            Values or parameters consumed by this operation.
+            Kalman observation-noise parameter.
 
         Returns
         -------
@@ -48,9 +48,9 @@ class KalmanHedgeRatio:
         Parameters
         ----------
         x : object
-            Values or parameters consumed by this operation.
+            First aligned input series or scalar observation.
         y : object
-            Values or parameters consumed by this operation.
+            Second aligned input series or scalar observation.
 
         Returns
         -------
@@ -66,9 +66,9 @@ class KalmanHedgeRatio:
         Parameters
         ----------
         x : object
-            Values or parameters consumed by this operation.
+            First aligned input series or scalar observation.
         y : object
-            Values or parameters consumed by this operation.
+            Second aligned input series or scalar observation.
 
         Returns
         -------

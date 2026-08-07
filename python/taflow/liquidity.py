@@ -29,9 +29,9 @@ class Liquidity:
         low : object
             Low-price series or the current bar low.
         swing_length : object
-            Values or parameters consumed by this operation.
+            Number of bars used to confirm a swing.
         range_percent : object
-            Values or parameters consumed by this operation.
+            Allowed range percentage.
 
         Returns
         -------

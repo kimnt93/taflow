@@ -23,7 +23,7 @@ class RollingQuantile:
         timeperiod : object
             Trailing window length in bars.
         quantile : object
-            Values or parameters consumed by this operation.
+            Requested trailing quantile.
         _input : object
             Input series or the current scalar observation.
 

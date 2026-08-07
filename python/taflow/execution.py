@@ -40,11 +40,11 @@ class Expr:
         Parameters
         ----------
         fn : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         deps : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         name : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -74,11 +74,11 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         op : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         symbol : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -102,7 +102,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -117,7 +117,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -132,7 +132,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -147,7 +147,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -162,7 +162,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -177,7 +177,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -192,7 +192,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -207,7 +207,7 @@ class Expr:
         Parameters
         ----------
         other : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -237,7 +237,7 @@ class _Source(Expr):
         Parameters
         ----------
         field : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -257,11 +257,11 @@ class _Indicator(Expr):
         Parameters
         ----------
         name : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         state : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         inputs : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -278,9 +278,9 @@ class _Indicator(Expr):
         Parameters
         ----------
         row : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         cache : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -312,7 +312,7 @@ class _Expression(Expr):
         Parameters
         ----------
         expression : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -328,9 +328,9 @@ class _Expression(Expr):
         Parameters
         ----------
         row : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         cache : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -346,11 +346,11 @@ def _evaluate(expr: Expr, row: object, cache: object) -> object:
     Parameters
     ----------
     expr : object
-        Values or parameters consumed by this operation.
+        Input parameter or configuration value for this operation.
     row : object
-        Values or parameters consumed by this operation.
+        Input parameter or configuration value for this operation.
     cache : object
-        Values or parameters consumed by this operation.
+        Input parameter or configuration value for this operation.
 
     Returns
     -------
@@ -543,7 +543,7 @@ class ArrowAdapter:
         values : object
             Input values processed in chronological order.
         column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -598,7 +598,7 @@ class PolarsAdapter:
         values : object
             Input values processed in chronological order.
         column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------

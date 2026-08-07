@@ -33,11 +33,11 @@ class Ichimoku:
         close : object
             Close-price series or the current bar close.
         tenkan : object
-            Values or parameters consumed by this operation.
+            Ichimoku conversion-line period.
         kijun : object
-            Values or parameters consumed by this operation.
+            Ichimoku base-line period.
         senkou : object
-            Values or parameters consumed by this operation.
+            Ichimoku leading-span period.
 
         Returns
         -------

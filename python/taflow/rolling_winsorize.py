@@ -27,9 +27,9 @@ class RollingWinsorize:
         timeperiod : object
             Trailing window length in bars.
         lower : object
-            Values or parameters consumed by this operation.
+            Lower clipping or quantile bound.
         upper : object
-            Values or parameters consumed by this operation.
+            Upper clipping or quantile bound.
         _input : object
             Input series or the current scalar observation.
 

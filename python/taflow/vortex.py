@@ -31,7 +31,7 @@ class Vortex:
         close : object
             Close-price series or the current bar close.
         window : object
-            Values or parameters consumed by this operation.
+            Trailing window length in bars.
 
         Returns
         -------

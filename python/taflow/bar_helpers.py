@@ -9,9 +9,9 @@ def _make(native: object, name: object) -> object:
     Parameters
     ----------
     native : object
-        Values or parameters consumed by this operation.
+        Input parameter or configuration value for this operation.
     name : object
-        Values or parameters consumed by this operation.
+        Input parameter or configuration value for this operation.
 
     Returns
     -------

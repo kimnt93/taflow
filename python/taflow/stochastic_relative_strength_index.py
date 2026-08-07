@@ -22,13 +22,13 @@ class StochasticRelativeStrengthIndex:
         Parameters
         ----------
         time_period : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         fast_k_period : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         fast_d_period : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         fast_d_average_type : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         _input : object
             Input series or the current scalar observation.
 

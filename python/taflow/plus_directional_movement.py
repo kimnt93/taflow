@@ -40,9 +40,9 @@ class PlusDirectionalMovement:
         Parameters
         ----------
         h : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         l : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -58,9 +58,9 @@ class PlusDirectionalMovement:
         Parameters
         ----------
         h : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         l : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------

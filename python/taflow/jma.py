@@ -30,9 +30,9 @@ class JurikMovingAverage:
         close : object
             Close-price series or the current bar close.
         length : object
-            Values or parameters consumed by this operation.
+            Indicator lookback or state length in bars.
         phase : object
-            Values or parameters consumed by this operation.
+            Hilbert transform phase parameter.
 
         Returns
         -------

@@ -31,7 +31,7 @@ class BreakOfStructureChangeOfCharacter:
         close : object
             Close-price series or the current bar close.
         swing_length : object
-            Values or parameters consumed by this operation.
+            Number of bars used to confirm a swing.
 
         Returns
         -------

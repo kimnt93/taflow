@@ -44,7 +44,7 @@ class AnchoredVolumeWeightedAveragePrice:
         anchor : object
             Boolean series marking reset or anchor bars.
         stdev : object
-            Values or parameters consumed by this operation.
+            Standard-deviation multiplier.
 
         Returns
         -------

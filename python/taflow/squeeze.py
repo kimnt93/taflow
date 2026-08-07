@@ -36,17 +36,17 @@ class Squeeze:
         close : object
             Close-price series or the current bar close.
         bb_length : object
-            Values or parameters consumed by this operation.
+            Bollinger-band lookback in bars.
         bb_std : object
-            Values or parameters consumed by this operation.
+            Bollinger-band standard-deviation multiplier.
         kc_length : object
-            Values or parameters consumed by this operation.
+            Keltner-channel lookback in bars.
         kc_scalar : object
-            Values or parameters consumed by this operation.
+            Keltner-channel range multiplier.
         mom_length : object
-            Values or parameters consumed by this operation.
+            Momentum lookback in bars.
         mom_smooth : object
-            Values or parameters consumed by this operation.
+            Momentum smoothing length in bars.
 
         Returns
         -------

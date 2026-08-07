@@ -19,7 +19,7 @@ class CumulativeSumControlChart:
         Parameters
         ----------
         change : object
-            Values or parameters consumed by this operation.
+            Input change series processed chronologically.
         threshold : object
             Detection threshold applied to the input changes.
 
@@ -37,7 +37,7 @@ class CumulativeSumControlChart:
         Parameters
         ----------
         change : object
-            Values or parameters consumed by this operation.
+            Input change series processed chronologically.
 
         Returns
         -------
@@ -53,7 +53,7 @@ class CumulativeSumControlChart:
         Parameters
         ----------
         change : object
-            Values or parameters consumed by this operation.
+            Input change series processed chronologically.
 
         Returns
         -------

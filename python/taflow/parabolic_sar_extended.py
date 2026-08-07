@@ -27,21 +27,21 @@ class ParabolicSarExtended:
         Parameters
         ----------
         start_value : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         offset_on_reverse : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         acceleration_init_long : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         acceleration_long : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         acceleration_max_long : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         acceleration_init_short : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         acceleration_short : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         acceleration_max_short : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         high : object
             High-price series or the current bar high.
         low : object

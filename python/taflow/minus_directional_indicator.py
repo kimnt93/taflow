@@ -46,11 +46,11 @@ class MinusDirectionalIndicator:
         Parameters
         ----------
         h : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         l : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         c : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -66,11 +66,11 @@ class MinusDirectionalIndicator:
         Parameters
         ----------
         h : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         l : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         c : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------

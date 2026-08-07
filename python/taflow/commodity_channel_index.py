@@ -37,11 +37,11 @@ class CommodityChannelIndex:
         timeperiod : object
             Trailing window length in bars.
         high_column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         low_column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         close_column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -100,11 +100,11 @@ class CommodityChannelIndex:
         close : object
             Close-price series or the current bar close.
         high_column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         low_column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         close_column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------

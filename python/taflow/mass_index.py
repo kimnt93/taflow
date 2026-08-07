@@ -31,9 +31,9 @@ class MassIndex:
         low : object
             Low-price series or the current bar low.
         ema_period : object
-            Values or parameters consumed by this operation.
+            EMA smoothing period in bars.
         sum_period : object
-            Values or parameters consumed by this operation.
+            Cumulative sum lookback in bars.
 
         Returns
         -------

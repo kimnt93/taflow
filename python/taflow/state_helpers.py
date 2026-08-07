@@ -108,9 +108,9 @@ def _make(native: object, name: object) -> object:
     Parameters
     ----------
     native : object
-        Values or parameters consumed by this operation.
+        Input parameter or configuration value for this operation.
     name : object
-        Values or parameters consumed by this operation.
+        Input parameter or configuration value for this operation.
 
     Returns
     -------
@@ -425,9 +425,9 @@ class EntryExit:
         Parameters
         ----------
         entry : object
-            Values or parameters consumed by this operation.
+            Boolean entry signal series or current signal.
         _exit : object
-            Values or parameters consumed by this operation.
+            Boolean exit signal series or current signal.
 
         Returns
         -------
@@ -443,9 +443,9 @@ class EntryExit:
         Parameters
         ----------
         entry : object
-            Values or parameters consumed by this operation.
+            Boolean entry signal series or current signal.
         _exit : object
-            Values or parameters consumed by this operation.
+            Boolean exit signal series or current signal.
 
         Returns
         -------
@@ -461,9 +461,9 @@ class EntryExit:
         Parameters
         ----------
         entry : object
-            Values or parameters consumed by this operation.
+            Boolean entry signal series or current signal.
         _exit : object
-            Values or parameters consumed by this operation.
+            Boolean exit signal series or current signal.
 
         Returns
         -------

@@ -38,21 +38,21 @@ class SqueezePro:
         close : object
             Close-price series or the current bar close.
         bb_length : object
-            Values or parameters consumed by this operation.
+            Bollinger-band lookback in bars.
         bb_std : object
-            Values or parameters consumed by this operation.
+            Bollinger-band standard-deviation multiplier.
         kc_length : object
-            Values or parameters consumed by this operation.
+            Keltner-channel lookback in bars.
         kc_scalar_wide : object
-            Values or parameters consumed by this operation.
+            Wide Keltner multiplier.
         kc_scalar_normal : object
-            Values or parameters consumed by this operation.
+            Normal Keltner multiplier.
         kc_scalar_narrow : object
-            Values or parameters consumed by this operation.
+            Narrow Keltner multiplier.
         mom_length : object
-            Values or parameters consumed by this operation.
+            Momentum lookback in bars.
         mom_smooth : object
-            Values or parameters consumed by this operation.
+            Momentum smoothing length in bars.
 
         Returns
         -------

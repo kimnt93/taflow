@@ -24,11 +24,11 @@ class BollingerBands:
         period : object
             Trailing window length in bars.
         deviations_up : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         deviations_down : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         moving_average_type : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         values : object
             Input values processed in chronological order.
 

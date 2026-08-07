@@ -34,7 +34,7 @@ class Supertrend:
         timeperiod : object
             Trailing window length in bars.
         multiplier : object
-            Values or parameters consumed by this operation.
+            Channel or volatility multiplier.
 
         Returns
         -------

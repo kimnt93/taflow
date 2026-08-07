@@ -47,9 +47,9 @@ class SessionVolumeLevels:
         anchor : object
             Boolean series marking reset or anchor bars.
         bins : object
-            Values or parameters consumed by this operation.
+            Number of histogram bins.
         value_area : object
-            Values or parameters consumed by this operation.
+            Fraction of volume included in the value area.
 
         Returns
         -------

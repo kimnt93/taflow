@@ -27,9 +27,9 @@ class ArnaudLegouxMovingAverage:
         timeperiod : object
             Trailing window length in bars.
         offset : object
-            Values or parameters consumed by this operation.
+            Moving-average center offset.
         sigma : object
-            Values or parameters consumed by this operation.
+            Moving-average Gaussian width.
         _input : object
             Input series or the current scalar observation.
 

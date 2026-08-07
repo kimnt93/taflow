@@ -33,11 +33,11 @@ class EqualHighsLows:
         close : object
             Close-price series or the current bar close.
         eq_len : object
-            Values or parameters consumed by this operation.
+            Equal-high/low lookback in bars.
         atr_period : object
-            Values or parameters consumed by this operation.
+            ATR lookback used for normalization.
         eq_threshold : object
-            Values or parameters consumed by this operation.
+            Equality tolerance for level matching.
 
         Returns
         -------

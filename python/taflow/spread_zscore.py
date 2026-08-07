@@ -21,9 +21,9 @@ class SpreadZScore:
         Parameters
         ----------
         x : object
-            Values or parameters consumed by this operation.
+            First aligned input series or scalar observation.
         y : object
-            Values or parameters consumed by this operation.
+            Second aligned input series or scalar observation.
         timeperiod : object
             Trailing window length in bars.
 
@@ -42,9 +42,9 @@ class SpreadZScore:
         Parameters
         ----------
         x : object
-            Values or parameters consumed by this operation.
+            First aligned input series or scalar observation.
         y : object
-            Values or parameters consumed by this operation.
+            Second aligned input series or scalar observation.
 
         Returns
         -------
@@ -60,9 +60,9 @@ class SpreadZScore:
         Parameters
         ----------
         x : object
-            Values or parameters consumed by this operation.
+            First aligned input series or scalar observation.
         y : object
-            Values or parameters consumed by this operation.
+            Second aligned input series or scalar observation.
 
         Returns
         -------

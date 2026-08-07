@@ -37,11 +37,11 @@ class OrderBlock:
         volume : object
             Volume series or the current bar volume.
         swing_length : object
-            Values or parameters consumed by this operation.
+            Number of bars used to confirm a swing.
         internal_length : object
-            Values or parameters consumed by this operation.
+            Internal swing confirmation length in bars.
         atr_period : object
-            Values or parameters consumed by this operation.
+            ATR lookback used for normalization.
         threshold : object
             Detection threshold applied to the input changes.
 

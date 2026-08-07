@@ -26,15 +26,15 @@ class MovingAverageConvergenceDivergenceExtended:
         fast_period : object
             Fast smoothing length in bars.
         fast_average_type : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         slow_period : object
             Slow smoothing length in bars.
         slow_average_type : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         signal_period : object
             Signal smoothing length in bars.
         signal_average_type : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         _input : object
             Input series or the current scalar observation.
 

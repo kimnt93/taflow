@@ -31,7 +31,7 @@ class ChaikinVolatility:
         timeperiod : object
             Trailing window length in bars.
         roc_period : object
-            Values or parameters consumed by this operation.
+            Rate-of-change lookback period.
 
         Returns
         -------

@@ -23,7 +23,7 @@ class RollingPercentile:
         timeperiod : object
             Trailing window length in bars.
         percentile : object
-            Values or parameters consumed by this operation.
+            Requested trailing percentile.
         _input : object
             Input series or the current scalar observation.
 

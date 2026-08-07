@@ -25,15 +25,15 @@ class StochasticOscillator:
         Parameters
         ----------
         fast_k_period : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         slow_k_period : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         slow_k_average_type : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         slow_d_period : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         slow_d_average_type : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
         high : object
             High-price series or the current bar high.
         low : object

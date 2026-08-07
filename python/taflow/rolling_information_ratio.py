@@ -26,7 +26,7 @@ class RollingInformationRatio:
         _input : object
             Input series or the current scalar observation.
         benchmark : object
-            Values or parameters consumed by this operation.
+            Benchmark series aligned with the input observations.
         timeperiod : object
             Trailing window length in bars.
 
@@ -50,7 +50,7 @@ class RollingInformationRatio:
         _input : object
             Input series or the current scalar observation.
         benchmark : object
-            Values or parameters consumed by this operation.
+            Benchmark series aligned with the input observations.
 
         Returns
         -------
@@ -68,7 +68,7 @@ class RollingInformationRatio:
         _input : object
             Input series or the current scalar observation.
         benchmark : object
-            Values or parameters consumed by this operation.
+            Benchmark series aligned with the input observations.
 
         Returns
         -------

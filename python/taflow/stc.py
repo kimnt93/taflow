@@ -28,13 +28,13 @@ class SchaffTrendCycle:
         close : object
             Close-price series or the current bar close.
         tclength : object
-            Values or parameters consumed by this operation.
+            Schaff cycle length.
         fast : object
-            Values or parameters consumed by this operation.
+            Fast smoothing period in bars.
         slow : object
-            Values or parameters consumed by this operation.
+            Slow smoothing period in bars.
         factor : object
-            Values or parameters consumed by this operation.
+            Trend multiplier.
 
         Returns
         -------

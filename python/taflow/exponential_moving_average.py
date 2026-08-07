@@ -29,7 +29,7 @@ class ExponentialMovingAverage:
         timeperiod : object
             Trailing window length in bars.
         column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
@@ -66,7 +66,7 @@ class ExponentialMovingAverage:
         values : object
             Input values processed in chronological order.
         column : object
-            Values or parameters consumed by this operation.
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
