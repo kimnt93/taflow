@@ -13,6 +13,7 @@ use taflow::stream::{
     EvenBetterSinewave,
     JurikMovingAverage,
     SmoothedTrendChannel, PremiumDiscount, HeikinAshi,
+    FibonacciRetracement,
 };
 use taflow::MaType;
 
@@ -174,6 +175,36 @@ pub struct StatefulHeikinAshi {
     high: Vec<f64>,
     low: Vec<f64>,
     close: Vec<f64>,
+}
+
+/// Native state adapter for rolling Fibonacci retracement levels.
+#[pyclass]
+pub struct StatefulFibonacciRetracement {
+    inner: FibonacciRetracement,
+    levels: [Vec<f64>; 7],
+}
+
+#[pymethods]
+impl StatefulFibonacciRetracement {
+    #[new]
+    #[pyo3(signature = (window=120))]
+    fn new(window: usize) -> PyResult<Self> {
+        Ok(Self { inner: FibonacciRetracement::new(window).map_err(py_value_error)?, levels: std::array::from_fn(|_| Vec::new()) })
+    }
+    fn append(&mut self, close: f64) -> (f64, f64, f64, f64, f64, f64, f64) {
+        let value = self.inner.append(close);
+        for (index, level) in value.iter().enumerate() { self.levels[index].push(*level); }
+        (value[0], value[1], value[2], value[3], value[4], value[5], value[6])
+    }
+    fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        for &value in close.as_slice()? { self.append(value); } Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (PyArray1::from_vec(py, self.levels[0].clone()), PyArray1::from_vec(py, self.levels[1].clone()), PyArray1::from_vec(py, self.levels[2].clone()), PyArray1::from_vec(py, self.levels[3].clone()), PyArray1::from_vec(py, self.levels[4].clone()), PyArray1::from_vec(py, self.levels[5].clone()), PyArray1::from_vec(py, self.levels[6].clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64, f64, f64, f64, f64)> { self.inner.value().map(|v| (v[0], v[1], v[2], v[3], v[4], v[5], v[6])) }
+    fn reset(&mut self) { self.inner.reset(); for level in &mut self.levels { level.clear(); } }
 }
 
 #[pymethods]

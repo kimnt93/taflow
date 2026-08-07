@@ -239,6 +239,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulSmoothedTrendChannel>()?;
     m.add_class::<state_api::StatefulPremiumDiscount>()?;
     m.add_class::<state_api::StatefulHeikinAshi>()?;
+    m.add_class::<state_api::StatefulFibonacciRetracement>()?;
     m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::StatefulAd>()?;

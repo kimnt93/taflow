@@ -41,7 +41,8 @@ For each item:
   kernel, native two-output adapter, and constructor-history check verified.
 - [x] `EvenBetterSinewave` (`ebsw`) — Rust streaming kernel, native adapter,
   and finite-output smoke check verified.
-- [ ] `FibonacciRetracement` (`fibonacci_retracement`)
+- [x] `FibonacciRetracement` (`fibonacci_retracement`) — Rust rolling-level
+  kernel, native seven-output adapter, and constructor-history check verified.
 - [ ] `SessionVolumeLevels` (`session_volume_levels`)
 - [ ] `KlingerVolumeOscillator` (`klinger_volume_oscillator`)
 

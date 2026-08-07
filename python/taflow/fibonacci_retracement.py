@@ -1,22 +1,47 @@
-"""Rolling Fibonacci retracement levels."""
+"""Native Fibonacci retracement interface."""
+
+from typing import Any
+
 import numpy as np
+
+from ._native import StatefulFibonacciRetracement
+
+
 class FibonacciRetracement:
-    """Stateful FibonacciRetracement indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute rolling Fibonacci levels from close-price ranges.
+
+    Parameters
+    ----------
+    close : array-like, optional
+        Initial aligned close history.
+    window : int, default 120
+        Rolling range used to determine high and low anchors.
     """
-    def __init__(self, close=None, window=120):
-        if int(window)<1: raise ValueError("window must be positive")
-        self.window=int(window); self.reset()
-        if close is not None: self.extend(close)
-    def append(self, close):
-        self._close.append(float(close)); lo=min(self._close[-self.window:]); hi=max(self._close[-self.window:]); span=hi-lo
-        v=tuple(hi-span*r for r in (0,.236,.382,.5,.618,.786,1)); self._values.append(v); return v
-    def extend(self, close):
-        for v in close: self.append(v)
+
+    def __init__(self, close: Any | None = None, window: int = 120):
+        self._state = StatefulFibonacciRetracement(window)
+        if close is not None:
+            self.extend(close)
+
+    def append(self, close: float):
+        """Process one close and return seven retracement levels."""
+        return self._state.append(float(close))
+
+    def extend(self, close: Any):
+        """Process an aligned close history and return this indicator."""
+        self._state.extend(np.asarray(close, dtype=np.float64))
         return self
-    def compute(self): return tuple(np.asarray(v) for v in zip(*self._values)) if self._values else (np.array([]),)*7
+
+    def compute(self):
+        """Return seven aligned retracement level histories."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._values[-1] if self._values else None
-    def reset(self): self._close=[]; self._values=[]; return self
+    def value(self):
+        """Return the latest seven retracement levels."""
+        return self._state.value
+
+    def reset(self):
+        """Clear rolling history and level output."""
+        self._state.reset()
+        return self
