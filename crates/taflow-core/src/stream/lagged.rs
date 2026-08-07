@@ -3,8 +3,22 @@
 use std::collections::VecDeque;
 
 use crate::error::TaResult;
+use crate::error::TaError;
 
 use super::{invalid_period, StreamingIndicator};
+
+/// Computes a same-length momentum vector from the lagged stream state.
+pub fn momentum(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if timeperiod == 0 {
+        return Err(TaError::InvalidParameter {
+            name: "timeperiod",
+            value: "0".to_string(),
+            reason: "must be >= 1",
+        });
+    }
+    let mut state = Momentum::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
 
 #[derive(Debug, Clone)]
 struct LaggedValue {

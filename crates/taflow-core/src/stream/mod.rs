@@ -248,7 +248,7 @@ pub use plus_dm::PlusDirectionalMovement;
 pub use rsi::{RelativeStrengthIndex, relative_strength_index};
 pub use rolling_sum::RollingSum;
 pub use math_price::{Acos, Add, AveragePrice, Asin, Atan, Ceil, Cos, Cosh, Div, Exp, Floor, Ln, Log10, MedianPrice, Mult, Sin, Sinh, Sqrt, Sub, Tan, Tanh, TypicalPrice, WeightedClose};
-pub use lagged::{Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent};
+pub use lagged::{Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent, momentum};
 pub use rolling_extrema::{RollingArgmax, RollingArgmin, RollingMax, RollingMin, RollingMinmax, RollingMinmaxIndex, RollingMinmaxIndexValue, RollingMinmaxValue};
 pub use rolling_median::RollingMedian;
 pub use rolling_mode::RollingMode;
