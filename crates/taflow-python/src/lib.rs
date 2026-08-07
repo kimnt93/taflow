@@ -235,6 +235,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulVariableIndexDynamicAverage>()?;
     m.add_class::<state_api::StatefulLaguerreRelativeStrengthIndex>()?;
     m.add_class::<state_api::StatefulEvenBetterSinewave>()?;
+    m.add_class::<state_api::StatefulJurikMovingAverage>()?;
     m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::StatefulAd>()?;

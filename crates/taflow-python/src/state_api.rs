@@ -11,6 +11,7 @@ use taflow::stream::{
     VariableIndexDynamicAverage,
     LaguerreRelativeStrengthIndex,
     EvenBetterSinewave,
+    JurikMovingAverage,
 };
 use taflow::MaType;
 
@@ -117,6 +118,32 @@ pub struct StatefulLaguerreRelativeStrengthIndex {
 pub struct StatefulEvenBetterSinewave {
     inner: EvenBetterSinewave,
     output: Vec<f64>,
+}
+
+/// Native state adapter for Jurik-like adaptive moving average.
+#[pyclass]
+pub struct StatefulJurikMovingAverage {
+    inner: JurikMovingAverage,
+    output: Vec<f64>,
+}
+
+#[pymethods]
+impl StatefulJurikMovingAverage {
+    #[new]
+    #[pyo3(signature = (length=7, phase=0.0))]
+    fn new(length: usize, phase: f64) -> PyResult<Self> {
+        Ok(Self { inner: JurikMovingAverage::new(length, phase).map_err(py_value_error)?, output: Vec::new() })
+    }
+    fn append(&mut self, input: f64) -> Option<f64> {
+        let value = self.inner.append(input); self.output.push(value.unwrap_or(f64::NAN)); value
+    }
+    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        for &value in input.as_slice()? { self.append(value); } Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> { PyArray1::from_vec(py, self.output.clone()) }
+    #[getter]
+    fn value(&self) -> Option<f64> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.output.clear(); }
 }
 
 #[pymethods]

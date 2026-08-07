@@ -25,7 +25,8 @@ For each item:
   kernel, native adapter, and bounded-output smoke check verified.
 - [x] `RelativeMomentumIndex` (`rmi`) — Rust streaming kernel and native
   Python adapter verified with warm-up and monotonic-input checks.
-- [ ] `JurikMovingAverage` (`jma`)
+- [x] `JurikMovingAverage` (`jma`) — Rust streaming kernel, native adapter,
+  constructor-history and finite-output checks verified.
 - [ ] `SSLChannel` (`ssl_channel`)
 - [ ] `ParabolicMovingAverageStop` (`pmax`)
 - [ ] `TDSequential` (`td_sequential`)
