@@ -56,6 +56,10 @@ from .moving_average import MovingAverage
 from .minus_directional_indicator import MinusDirectionalIndicator
 from .minus_directional_movement import MinusDirectionalMovement
 from .money_flow_index import MoneyFlowIndex
+from .average_price import AveragePrice
+from .median_price import MedianPrice
+from .typical_price import TypicalPrice
+from .weighted_close import WeightedClose
 from .moving_average_convergence_divergence_fixed import (
     MovingAverageConvergenceDivergenceFixed,
 )
@@ -257,6 +261,10 @@ __all__ = [
     "MinusDirectionalIndicator",
     "MinusDirectionalMovement",
     "MoneyFlowIndex",
+    "AveragePrice",
+    "MedianPrice",
+    "TypicalPrice",
+    "WeightedClose",
     "MovingAverageConvergenceDivergenceFixed",
     "MovingAverageConvergenceDivergenceExtended",
     "BollingerBands",
