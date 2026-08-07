@@ -14,6 +14,9 @@ from .accumulation_distribution import AccumulationDistribution
 from .accumulation_distribution_oscillator import AccumulationDistributionOscillator
 from .balance_of_power import BalanceOfPower
 from .on_balance_volume import OnBalanceVolume
+from .absolute_price_oscillator import AbsolutePriceOscillator
+from .percentage_price_oscillator import PercentagePriceOscillator
+from .chande_momentum_oscillator import ChandeMomentumOscillator
 from .momentum import Momentum
 from .rate_of_change import RateOfChange
 from .rate_of_change_percent import RateOfChangePercent
@@ -335,6 +338,9 @@ __all__ = [
     "AccumulationDistributionOscillator",
     "BalanceOfPower",
     "OnBalanceVolume",
+    "AbsolutePriceOscillator",
+    "PercentagePriceOscillator",
+    "ChandeMomentumOscillator",
     "Momentum",
     "RateOfChange",
     "RateOfChangePercent",

@@ -12,7 +12,7 @@ class UnaryStateAdapter:
 
     _native_cls = None
 
-    def __init__(self, timeperiod: int = 14, _input: Any | None = None) -> None:
+    def __init__(self, _input: Any | None = None, timeperiod: int = 14) -> None:
         """Create the native state and optionally process an input history."""
         if self._native_cls is None:
             raise TypeError("a native state class must be configured")
