@@ -3,6 +3,8 @@
 from taflow._native import StatefulAdxr
 from typing import Any
 
+import numpy as np
+
 
 class AverageDirectionalIndexRating:
     """Incrementally compute the lag-averaged Average Directional Index."""
@@ -16,6 +18,7 @@ class AverageDirectionalIndexRating:
     ):
         """Create ADXR with an optional aligned high/low/close history."""
         self._state = StatefulAdxr(period)
+        self._values: list[float] = []
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
@@ -36,7 +39,9 @@ class AverageDirectionalIndexRating:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(high, low, close)
+        result = self._state.append(high, low, close)
+        self._values.append(np.nan if result is None else float(result))
+        return self
 
     def extend(self, high, low, close):
         """Append aligned input series to the native Rust state.
@@ -55,7 +60,13 @@ class AverageDirectionalIndexRating:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(high, low, close)
+        result = self._state.extend(high, low, close)
+        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        return self
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned native output history."""
+        return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self):
@@ -77,3 +88,5 @@ class AverageDirectionalIndexRating:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self

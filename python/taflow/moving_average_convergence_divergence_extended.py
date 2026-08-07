@@ -3,6 +3,8 @@
 from taflow._native import StatefulMacdExt
 from typing import Any
 
+import numpy as np
+
 
 class MovingAverageConvergenceDivergenceExtended:
     """Incrementally compute MACDEXT with independently selected MA types."""
@@ -49,6 +51,7 @@ class MovingAverageConvergenceDivergenceExtended:
             signal_period,
             signal_average_type,
         )
+        self._values: list[tuple[float, ...]] = []
         if _input is not None:
             self.extend(_input)
 
@@ -65,7 +68,11 @@ class MovingAverageConvergenceDivergenceExtended:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(_input)
+        result = self._state.append(_input)
+        self._values.append(
+            (np.nan, np.nan, np.nan) if result is None else tuple(result)
+        )
+        return self
 
     def extend(self, _input):
         """Append aligned input series to the native Rust state.
@@ -80,7 +87,19 @@ class MovingAverageConvergenceDivergenceExtended:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(_input)
+        result = self._state.extend(_input)
+        arrays = [np.asarray(item, dtype=np.float64) for item in result]
+        self._values.extend(zip(*arrays))
+        return self
+
+    def compute(self) -> tuple[np.ndarray, ...]:
+        """Return the aligned native output histories."""
+        if not self._values:
+            empty = np.empty(0, dtype=np.float64)
+            return tuple(empty.copy() for _ in range(3))
+        return tuple(
+            np.asarray(values, dtype=np.float64) for values in zip(*self._values)
+        )
 
     @property
     def value(self):
@@ -102,3 +121,5 @@ class MovingAverageConvergenceDivergenceExtended:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self

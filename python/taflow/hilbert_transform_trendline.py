@@ -3,6 +3,8 @@
 from taflow._native import StatefulHtTrendline
 from typing import Any
 
+import numpy as np
+
 
 class HilbertTransformTrendline:
     """Incrementally compute the instantaneous Hilbert Transform trendline."""
@@ -10,6 +12,7 @@ class HilbertTransformTrendline:
     def __init__(self, _input: Any | None = None):
         """Create the trendline with an optional initial price series."""
         self._state = StatefulHtTrendline()
+        self._values: list[float] = []
         if _input is not None:
             self.extend(_input)
 
@@ -26,7 +29,9 @@ class HilbertTransformTrendline:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(_input)
+        result = self._state.append(_input)
+        self._values.append(np.nan if result is None else float(result))
+        return self
 
     def extend(self, _input):
         """Append aligned input series to the native Rust state.
@@ -41,7 +46,13 @@ class HilbertTransformTrendline:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(_input)
+        result = self._state.extend(_input)
+        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        return self
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned native output history."""
+        return np.asarray(self._values, dtype=np.float64)
 
     @property
     def value(self):
@@ -63,3 +74,5 @@ class HilbertTransformTrendline:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self

@@ -3,6 +3,8 @@
 from taflow._native import StatefulStoch
 from typing import Any
 
+import numpy as np
+
 
 class StochasticOscillator:
     """Incrementally compute aligned slow %K and slow %D."""
@@ -51,6 +53,7 @@ class StochasticOscillator:
             slow_d_period,
             slow_d_average_type,
         )
+        self._values: list[tuple[float, ...]] = []
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
@@ -71,7 +74,9 @@ class StochasticOscillator:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.append(high, low, close)
+        result = self._state.append(high, low, close)
+        self._values.append((np.nan, np.nan) if result is None else tuple(result))
+        return self
 
     def extend(self, high, low, close):
         """Append aligned input series to the native Rust state.
@@ -90,7 +95,19 @@ class StochasticOscillator:
         object
             The updated adapter, native value, aligned output array, or execution node.
         """
-        return self._state.extend(high, low, close)
+        result = self._state.extend(high, low, close)
+        arrays = [np.asarray(item, dtype=np.float64) for item in result]
+        self._values.extend(zip(*arrays))
+        return self
+
+    def compute(self) -> tuple[np.ndarray, ...]:
+        """Return the aligned native output histories."""
+        if not self._values:
+            empty = np.empty(0, dtype=np.float64)
+            return tuple(empty.copy() for _ in range(2))
+        return tuple(
+            np.asarray(values, dtype=np.float64) for values in zip(*self._values)
+        )
 
     @property
     def value(self):
@@ -112,3 +129,5 @@ class StochasticOscillator:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._values.clear()
+        return self
