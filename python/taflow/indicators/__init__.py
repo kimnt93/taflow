@@ -79,8 +79,8 @@ from ..unique_three_river import CandleUniqueThreeRiver
 from ..upside_gap_two_crows import CandleUpsideGapTwoCrows
 from ..lag import Lag
 from ..log_return import LogReturn
-from ..cumsum import CumulativeSum
-from ..cumprod import CumulativeProduct
+from ..cumulative_sum import CumulativeSum
+from ..cumulative_product import CumulativeProduct
 from ..rolling_median import RollingMedian
 from ..rolling_mode import RollingMode
 from ..rolling_quantile import RollingQuantile
@@ -97,8 +97,8 @@ from ..ewm_var import ExponentiallyWeightedVariance
 from ..ewm_std import ExponentiallyWeightedStandardDeviation
 from ..ewm_cov import ExponentiallyWeightedCovariance
 from ..ewm_corr import ExponentiallyWeightedCorrelation
-from ..cummax import CumulativeMaximum
-from ..cummin import CumulativeMinimum
+from ..cumulative_maximum import CumulativeMaximum
+from ..cumulative_minimum import CumulativeMinimum
 from ..drawdown import Drawdown
 from ..rolling_sharpe import RollingSharpe
 from ..rolling_sortino import RollingSortino
@@ -142,7 +142,7 @@ from ..fvg import FairValueGap
 from ..donchian_channels import DonchianChannels
 from ..rolling_vwap import RollingVolumeWeightedAveragePrice
 from ..swing_highs_lows import SwingHighsLows
-from ..bos_choch import BreakOfStructureChangeOfCharacter
+from ..break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from ..ob import OrderBlock
 from ..liquidity import Liquidity
 from ..equal_highs_lows import EqualHighsLows
@@ -157,7 +157,7 @@ from ..close_to_close_sigma import CloseToCloseSigma
 from ..parkinson import Parkinson
 from ..garman_klass import GarmanKlass
 from ..rogers_satchell import RogersSatchell
-from ..gk_yang_zhang import GarmanKlassYangZhang
+from ..garman_klass_yang_zhang import GarmanKlassYangZhang
 from ..yang_zhang import YangZhang
 
 __all__ = [
