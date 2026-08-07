@@ -1,30 +1,63 @@
-"""Session volume-profile levels using a bounded fixed-bin histogram."""
+"""Native session volume-profile level interface."""
+
+from typing import Any
+
 import numpy as np
+
+from ._native import StatefulSessionVolumeLevels
+
+
 class SessionVolumeLevels:
-    """Stateful SessionVolumeLevels indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute point of control and value-area bounds per session.
+
+    Parameters
+    ----------
+    high, low, close, volume : array-like, optional
+        Initial aligned OHLCV history.
+    anchor : array-like of bool, optional
+        Session-boundary flags for the initial history.
+    bins : int, default 24
+        Number of fixed histogram price bins.
+    value_area : float, default 0.7
+        Fraction of session volume included in the value area.
     """
-    def __init__(self, high=None, low=None, close=None, volume=None, anchor=None, bins=24, value_area=.7):
-        self.bins=int(bins); self.value_area=float(value_area); self.reset()
-        if close is not None: self.extend(high,low,close,volume,anchor)
-    def append(self, high, low, close, volume, anchor=False):
-        if anchor or self._lo is None: self._lo=float(low); self._hi=float(high); self._hist=np.zeros(self.bins); self._step=max((self._hi-self._lo)/self.bins,1e-12)
-        self._lo=min(self._lo,float(low)); self._hi=max(self._hi,float(high)); idx=min(self.bins-1,max(0,int((float(close)-self._lo)/self._step))); self._hist[idx]+=float(volume)
-        poc=int(np.argmax(self._hist)); total=self._hist.sum(); target=total*self.value_area; left=right=poc; acc=self._hist[poc]
-        while acc<target and (left>0 or right<self.bins-1):
-            if left==0: right+=1
-            elif right==self.bins-1: left-=1
-            elif self._hist[left-1]>=self._hist[right+1]: left-=1
-            else: right+=1
-            acc=self._hist[left:right+1].sum()
-        out=((poc+.5)*self._step+self._lo,(right+.5)*self._step+self._lo,(left+.5)*self._step+self._lo); self._v.append(out); return out
-    def extend(self, high, low, close, volume, anchor=None):
-        if anchor is None: anchor=[False]*len(close)
-        for row in zip(high,low,close,volume,anchor): self.append(*row)
+
+    def __init__(self, high: Any | None = None, low: Any | None = None,
+                 close: Any | None = None, volume: Any | None = None,
+                 anchor: Any | None = None, bins: int = 24,
+                 value_area: float = 0.7):
+        self._state = StatefulSessionVolumeLevels(bins, value_area)
+        if close is not None:
+            self.extend(high, low, close, volume, anchor)
+
+    def append(self, high: float, low: float, close: float, volume: float,
+               anchor: bool = False):
+        """Process one OHLCV bar and return profile levels."""
+        return self._state.append(float(high), float(low), float(close),
+                                  float(volume), bool(anchor))
+
+    def extend(self, high: Any, low: Any, close: Any, volume: Any,
+               anchor: Any | None = None):
+        """Process aligned OHLCV history and return this indicator."""
+        close_array = np.asarray(close, dtype=np.float64)
+        if anchor is None:
+            anchor = np.zeros(close_array.shape, dtype=np.bool_)
+        self._state.extend(np.asarray(high, dtype=np.float64),
+                           np.asarray(low, dtype=np.float64), close_array,
+                           np.asarray(volume, dtype=np.float64),
+                           np.asarray(anchor, dtype=np.bool_))
         return self
-    def compute(self): return tuple(np.asarray(v) for v in zip(*self._v)) if self._v else (np.array([]),)*3
+
+    def compute(self):
+        """Return point-of-control, value-area-high, and value-area-low histories."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._v[-1] if self._v else None
-    def reset(self): self._lo=self._hi=None; self._hist=None; self._step=1.; self._v=[]; return self
+    def value(self):
+        """Return the latest profile-level tuple."""
+        return self._state.value
+
+    def reset(self):
+        """Clear profile histogram and session state."""
+        self._state.reset()
+        return self

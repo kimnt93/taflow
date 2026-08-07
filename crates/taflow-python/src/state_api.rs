@@ -15,6 +15,7 @@ use taflow::stream::{
     SmoothedTrendChannel, PremiumDiscount, HeikinAshi,
     FibonacciRetracement,
     OpeningRange,
+    SessionVolumeLevels,
 };
 use taflow::MaType;
 
@@ -192,6 +193,40 @@ pub struct StatefulOpeningRange {
     highs: Vec<f64>,
     lows: Vec<f64>,
     breakouts: Vec<i32>,
+}
+
+/// Native state adapter for session volume-profile levels.
+#[pyclass]
+pub struct StatefulSessionVolumeLevels {
+    inner: SessionVolumeLevels,
+    poc: Vec<f64>,
+    value_area_high: Vec<f64>,
+    value_area_low: Vec<f64>,
+}
+
+#[pymethods]
+impl StatefulSessionVolumeLevels {
+    #[new]
+    #[pyo3(signature = (bins=24, value_area=0.7))]
+    fn new(bins: usize, value_area: f64) -> PyResult<Self> {
+        Ok(Self { inner: SessionVolumeLevels::new(bins, value_area).map_err(py_value_error)?, poc: Vec::new(), value_area_high: Vec::new(), value_area_low: Vec::new() })
+    }
+    fn append(&mut self, high: f64, low: f64, close: f64, volume: f64, anchor: bool) -> (f64, f64, f64) {
+        let value = self.inner.append(high, low, close, volume, anchor);
+        self.poc.push(value.0); self.value_area_high.push(value.1); self.value_area_low.push(value.2); value
+    }
+    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, volume: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
+        let (high, low, close, volume, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, volume.as_slice()?, anchor.as_slice()?);
+        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
+        for ((((&high, &low), &close), &volume), &anchor) in high.iter().zip(low).zip(close).zip(volume).zip(anchor) { self.append(high, low, close, volume, anchor); }
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (PyArray1::from_vec(py, self.poc.clone()), PyArray1::from_vec(py, self.value_area_high.clone()), PyArray1::from_vec(py, self.value_area_low.clone()))
+    }
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); self.poc.clear(); self.value_area_high.clear(); self.value_area_low.clear(); }
 }
 
 #[pymethods]

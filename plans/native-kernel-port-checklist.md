@@ -44,7 +44,9 @@ For each item:
   and finite-output smoke check verified.
 - [x] `FibonacciRetracement` (`fibonacci_retracement`) — Rust rolling-level
   kernel, native seven-output adapter, and constructor-history check verified.
-- [ ] `SessionVolumeLevels` (`session_volume_levels`)
+- [x] `SessionVolumeLevels` (`session_volume_levels`) — Rust fixed-bin
+  histogram kernel, native three-output adapter, and constructor-history
+  runtime check verified.
 - [ ] `KlingerVolumeOscillator` (`klinger_volume_oscillator`)
 
 These are intentionally not duplicated as Python fallbacks: until ported,
