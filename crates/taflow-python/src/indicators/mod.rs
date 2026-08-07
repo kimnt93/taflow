@@ -36,6 +36,8 @@ mod bar_helpers;
 mod state_helpers;
 mod swing;
 mod session;
+mod previous_high_low;
+mod sessions;
 mod zones;
 mod fvg;
 mod bos_choch;
@@ -157,6 +159,8 @@ pub use bar_helpers::{GapDownOperator, GapUpOperator, HigherHighOperator, Inside
 pub use state_helpers::{BarsSinceOperator, EntryExitOperator, HighestSinceOperator, LowestSinceOperator, PositionHoldOperator, SignalDelayOperator, ValueWhenOperator};
 pub use swing::SwingHighLowOperator;
 pub use session::SessionExtremaOperator;
+pub use previous_high_low::PreviousHighLowOperator;
+pub use sessions::SessionsOperator;
 pub use zones::ActiveZoneListOperator;
 pub use fvg::FvgOperator;
 pub use bos_choch::BosChochOperator;

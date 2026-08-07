@@ -116,6 +116,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::EntryExitOperator>()?;
     m.add_class::<indicators::SwingHighLowOperator>()?;
     m.add_class::<indicators::SessionExtremaOperator>()?;
+    m.add_class::<indicators::PreviousHighLowOperator>()?;
+    m.add_class::<indicators::SessionsOperator>()?;
     m.add_class::<indicators::ActiveZoneListOperator>()?;
     m.add_class::<indicators::FvgOperator>()?;
     m.add_class::<indicators::BosChochOperator>()?;

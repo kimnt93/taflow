@@ -147,6 +147,8 @@ from .bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, Gap
 from .state_helpers import BarsSince, ValueWhen, HighestSince, LowestSince, SignalDelay, PositionHold, EntryExit
 from .swing import SwingHighLow, SwingHigh, SwingLow
 from .session import SessionExtrema, session_flags
+from .previous_high_low import PreviousHighLow
+from .sessions import Sessions
 from .zones import ActiveZoneList
 from .fvg import Fvg
 from .donchian_channels import DonchianChannels
@@ -312,6 +314,7 @@ __all__ = [
     "EntryExit",
     "SwingHighLow", "SwingHigh", "SwingLow",
     "SessionExtrema", "session_flags",
+    "PreviousHighLow", "Sessions",
     "ActiveZoneList",
     "Fvg",
     "DonchianChannels", "RollingVwap", "SwingHighsLows",
