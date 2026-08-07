@@ -68,6 +68,7 @@ from .fibonacci_retracement import FibonacciRetracement
 from .anchored_vwap import AnchoredVolumeWeightedAveragePrice
 from .vidya import VariableIndexDynamicAverage
 from .laguerre_rsi import LaguerreRelativeStrengthIndex
+from .relative_strength_index import RelativeStrengthIndex
 from .rmi import RelativeMomentumIndex
 from .ssl_channel import SmoothedTrendChannel
 from .jma import JurikMovingAverage
@@ -266,6 +267,7 @@ __all__ = [
     "AnchoredVolumeWeightedAveragePrice",
     "VariableIndexDynamicAverage",
     "LaguerreRelativeStrengthIndex",
+    "RelativeStrengthIndex",
     "RelativeMomentumIndex",
     "SmoothedTrendChannel",
     "JurikMovingAverage",
