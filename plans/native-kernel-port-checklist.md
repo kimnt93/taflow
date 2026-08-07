@@ -41,7 +41,8 @@ For each item:
 - [x] `AnchoredVolumeWeightedAveragePrice` (`anchored_vwap`) — Rust running
   weighted-moment kernel, native three-output adapter, and anchor-history
   runtime check verified.
-- [ ] `PivotPoints` (`pivot_points`)
+- [x] `PivotPoints` (`pivot_points`) — Rust causal session-pivot kernel,
+  native five-output adapter, and anchor-history runtime check verified.
 - [x] `OpeningRange` (`opening_range`) — Rust causal session-range kernel,
   native multi-output adapter, and anchor-history check verified.
 - [x] `PremiumDiscount` (`premium_discount`) — Rust rolling range/midpoint

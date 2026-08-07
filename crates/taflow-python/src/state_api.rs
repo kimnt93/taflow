@@ -20,6 +20,7 @@ use taflow::stream::{
     ParabolicMovingAverageStop,
     TomDeMarkSequential,
     AnchoredVolumeWeightedAveragePrice,
+    PivotPoints,
 };
 use taflow::MaType;
 
@@ -239,6 +240,37 @@ pub struct StatefulAnchoredVolumeWeightedAveragePrice {
     means: Vec<f64>,
     uppers: Vec<f64>,
     lowers: Vec<f64>,
+}
+
+/// Native state adapter for classic pivot levels.
+#[pyclass]
+pub struct StatefulPivotPoints {
+    inner: PivotPoints,
+    levels: [Vec<f64>; 5],
+}
+
+#[pymethods]
+impl StatefulPivotPoints {
+    #[new]
+    fn new() -> Self { Self { inner: PivotPoints::new(), levels: std::array::from_fn(|_| Vec::new()) } }
+    fn append(&mut self, high: f64, low: f64, close: f64, anchor: bool) -> (f64, f64, f64, f64, f64) {
+        let value = self.inner.append(high, low, close, anchor);
+        let values = [value.0, value.1, value.2, value.3, value.4];
+        for (index, level) in values.iter().enumerate() { self.levels[index].push(*level); }
+        value
+    }
+    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>, close: PyReadonlyArray1<f64>, anchor: PyReadonlyArray1<bool>) -> PyResult<()> {
+        let (high, low, close, anchor) = (high.as_slice()?, low.as_slice()?, close.as_slice()?, anchor.as_slice()?);
+        if high.len() != low.len() || high.len() != close.len() || high.len() != anchor.len() { return Err(PyValueError::new_err("inputs must have equal lengths")); }
+        for (((&high, &low), &close), &anchor) in high.iter().zip(low).zip(close).zip(anchor) { self.append(high, low, close, anchor); }
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (PyArray1::from_vec(py, self.levels[0].clone()), PyArray1::from_vec(py, self.levels[1].clone()), PyArray1::from_vec(py, self.levels[2].clone()), PyArray1::from_vec(py, self.levels[3].clone()), PyArray1::from_vec(py, self.levels[4].clone()))
+    }
+    #[getter]
+    fn value(&self) -> (f64, f64, f64, f64, f64) { self.inner.value() }
+    fn reset(&mut self) { self.inner.reset(); for level in &mut self.levels { level.clear(); } }
 }
 
 #[pymethods]

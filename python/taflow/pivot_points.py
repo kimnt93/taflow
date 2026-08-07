@@ -1,24 +1,55 @@
-"""Classic session pivot levels."""
+"""Native classic pivot-level interface."""
+
+from typing import Any
+
 import numpy as np
+
+from ._native import StatefulPivotPoints
+
+
 class PivotPoints:
-    """Stateful PivotPoints indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute classic pivot, resistance, and support levels by session.
+
+    Parameters
+    ----------
+    high, low, close : array-like, optional
+        Initial aligned OHLC history.
+    anchor : array-like of bool, optional
+        Session-boundary flags for the initial history.
     """
-    def __init__(self, high=None, low=None, close=None, anchor=None): self.reset(); self.extend(high,low,close,anchor) if close is not None else None
-    def append(self, high, low, close, anchor=False):
-        if anchor and self._h is not None:
-            p=(self._h+self._l+self._c)/3; self._levels=(p,2*p-self._l,2*p-self._h,p-(self._h-self._l),p+(self._h-self._l))
-            self._h,self._l,self._c=float(high),float(low),float(close)
-        else:
-            self._h=float(high) if self._h is None else max(self._h,float(high)); self._l=float(low) if self._l is None else min(self._l,float(low)); self._c=float(close)
-        self._v.append(self._levels); return self._levels
-    def extend(self, high, low, close, anchor=None):
-        if anchor is None: anchor=[False]*len(close)
-        for row in zip(high,low,close,anchor): self.append(*row)
+
+    def __init__(self, high: Any | None = None, low: Any | None = None,
+                 close: Any | None = None, anchor: Any | None = None):
+        self._state = StatefulPivotPoints()
+        if close is not None:
+            self.extend(high, low, close, anchor)
+
+    def append(self, high: float, low: float, close: float,
+               anchor: bool = False):
+        """Process one OHLC bar and return five pivot levels."""
+        return self._state.append(float(high), float(low), float(close), bool(anchor))
+
+    def extend(self, high: Any, low: Any, close: Any,
+               anchor: Any | None = None):
+        """Process aligned OHLC history and return this indicator."""
+        close_array = np.asarray(close, dtype=np.float64)
+        if anchor is None:
+            anchor = np.zeros(close_array.shape, dtype=np.bool_)
+        self._state.extend(np.asarray(high, dtype=np.float64),
+                           np.asarray(low, dtype=np.float64), close_array,
+                           np.asarray(anchor, dtype=np.bool_))
         return self
-    def compute(self): return tuple(np.asarray(v) for v in zip(*self._v)) if self._v else (np.array([]),)*5
+
+    def compute(self):
+        """Return pivot, resistance, and support level histories."""
+        return self._state.compute()
+
     @property
-    def value(self): return self._v[-1] if self._v else None
-    def reset(self): self._h=self._l=self._c=None; self._levels=(np.nan,)*5; self._v=[]; return self
+    def value(self):
+        """Return the latest five pivot levels."""
+        return self._state.value
+
+    def reset(self):
+        """Clear session extrema and pivot output."""
+        self._state.reset()
+        return self
