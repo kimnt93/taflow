@@ -141,7 +141,7 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.3).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 0.7).collect();
         let volume: Vec<f64> = (0..96).map(|index| 1_000.0 + index as f64 * 17.0).collect();
-        let expected = crate::momentum::money_flow_index(&high, &low, &close, &volume, 14).unwrap();
+        let expected = crate::stream::money_flow_index(&high, &low, &close, &volume, 14).unwrap();
 
         let mut state = MoneyFlowIndex::new(14).unwrap();
         let mut actual = state

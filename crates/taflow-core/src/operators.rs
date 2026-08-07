@@ -2341,7 +2341,7 @@ pub fn signed_power(input: &[f64], exponent: f64) -> Vec<f64> {
 /// WorldQuant Alpha101 `decay_linear(x, d)`: verified alias of the weighted
 /// moving average with weights `d..=1` — re-exported, zero additional code.
 pub fn decay_linear(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    crate::overlap::weighted_moving_average(input, timeperiod)
+    crate::stream::weighted_moving_average(input, timeperiod)
 }
 
 /// Average daily dollar value traded: SMA of `close × volume`.
@@ -6017,7 +6017,7 @@ mod tests {
         );
         assert_eq!(
             decay_linear(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>(),
-            crate::overlap::weighted_moving_average(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>()
+            crate::stream::weighted_moving_average(&close, 3).unwrap().iter().map(|&x| x.to_bits()).collect::<Vec<_>>()
         );
         assert_eq!(signed_power(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
 

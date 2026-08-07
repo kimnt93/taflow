@@ -108,7 +108,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let (upper, middle, lower) = overlap::bollinger_bands(&input, 13, 2.0, 1.5, ma_type).unwrap();
+            let (upper, middle, lower) = bollinger_bands(&input, 13, 2.0, 1.5, ma_type).unwrap();
             let mut state = BollingerBands::new(13, 2.0, 1.5, ma_type).unwrap();
             for (index, &input) in input.iter().enumerate() {
                 match state.append(input) {

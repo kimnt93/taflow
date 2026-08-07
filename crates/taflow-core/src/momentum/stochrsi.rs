@@ -14,7 +14,7 @@ pub fn stochastic_relative_strength_index(
     fastd_period: usize,
     fastd_matype: MaType,
 ) -> TaResult<(Vec<f64>, Vec<f64>)> {
-    let rsi_values = super::rsi::relative_strength_index(input, timeperiod)?;
+    let rsi_values = crate::stream::relative_strength_index(input, timeperiod)?;
     let rsi_valid = &rsi_values[timeperiod..];
     let (stochastic_k, stochastic_d) = super::stochf::fast_stochastic_oscillator(
         rsi_valid,

@@ -339,21 +339,21 @@ mod tests {
         let input: Vec<f64> = (0..80)
             .map(|i| 100.0 + (i as f64 * 0.37).sin() * 8.0 + i as f64 * 0.05)
             .collect();
-        let sma_batch = overlap::simple_moving_average(&input, 7).unwrap();
-        let ema_batch = overlap::exponential_moving_average(&input, 7).unwrap();
-        let wma_batch = overlap::weighted_moving_average(&input, 7).unwrap();
-        let dema_batch = overlap::double_exponential_moving_average(&input, 7).unwrap();
-        let tema_batch = overlap::triple_exponential_moving_average(&input, 7).unwrap();
-        let trima_batch = overlap::triangular_moving_average(&input, 7).unwrap();
-        let kama_batch = overlap::kaufman_adaptive_moving_average(&input, 7).unwrap();
+        let sma_batch = simple_moving_average(&input, 7).unwrap();
+        let ema_batch = exponential_moving_average(&input, 7).unwrap();
+        let wma_batch = weighted_moving_average(&input, 7).unwrap();
+        let dema_batch = double_exponential_moving_average(&input, 7).unwrap();
+        let tema_batch = triple_exponential_moving_average(&input, 7).unwrap();
+        let trima_batch = triangular_moving_average(&input, 7).unwrap();
+        let kama_batch = kaufman_adaptive_moving_average(&input, 7).unwrap();
         let midpoint_batch = overlap::midpoint(&input, 7).unwrap();
-        let rsi_batch = momentum::relative_strength_index(&input, 14).unwrap();
-        let cmo_batch = momentum::chande_momentum_oscillator(&input, 14).unwrap();
-        let mom_batch = momentum::momentum(&input, 7).unwrap();
-        let roc_batch = momentum::rate_of_change(&input, 7).unwrap();
-        let rocp_batch = momentum::rate_of_change_percent(&input, 7).unwrap();
-        let rocr_batch = momentum::rate_of_change_ratio(&input, 7).unwrap();
-        let rocr100_batch = momentum::rate_of_change_ratio_percent(&input, 7).unwrap();
+        let rsi_batch = relative_strength_index(&input, 14).unwrap();
+        let cmo_batch = chande_momentum_oscillator(&input, 14).unwrap();
+        let mom_batch = momentum(&input, 7).unwrap();
+        let roc_batch = rate_of_change(&input, 7).unwrap();
+        let rocp_batch = rate_of_change_percent(&input, 7).unwrap();
+        let rocr_batch = rate_of_change_ratio(&input, 7).unwrap();
+        let rocr100_batch = rate_of_change_ratio_percent(&input, 7).unwrap();
         let mut sma = SimpleMovingAverage::new(7).unwrap();
         let mut ema = ExponentialMovingAverage::new(7).unwrap();
         let mut wma = WeightedMovingAverage::new(7).unwrap();
@@ -683,8 +683,8 @@ mod tests {
             low[index] = close[index];
         }
         let period = 14;
-        let bop_expected = momentum::balance_of_power(&open, &high, &low, &close).unwrap();
-        let willr_expected = momentum::williams_r(&high, &low, &close, period).unwrap();
+        let bop_expected = balance_of_power(&open, &high, &low, &close).unwrap();
+        let willr_expected = williams_r(&high, &low, &close, period).unwrap();
         let (down_expected, up_expected) = momentum::aroon(&high, &low, period).unwrap();
         let osc_expected = momentum::aroon_oscillator(&high, &low, period).unwrap();
         let mut bop = BalanceOfPower::new();

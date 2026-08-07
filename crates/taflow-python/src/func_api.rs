@@ -29,7 +29,7 @@ pub fn ACCBANDS(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (upper, middle, lower) = ta_err!(core::overlap::acceleration_bands(
+    let (upper, middle, lower) = ta_err!(core::stream::acceleration_bands(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -54,7 +54,7 @@ pub fn SMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::simple_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::simple_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -70,7 +70,7 @@ pub fn EMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::exponential_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::exponential_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -86,7 +86,7 @@ pub fn WMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::weighted_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::weighted_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -102,7 +102,7 @@ pub fn DEMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::double_exponential_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::double_exponential_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -118,7 +118,7 @@ pub fn TEMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::triple_exponential_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::triple_exponential_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -134,7 +134,7 @@ pub fn TRIMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::triangular_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::triangular_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -150,7 +150,7 @@ pub fn KAMA(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::kaufman_adaptive_moving_average(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::kaufman_adaptive_moving_average(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -167,7 +167,7 @@ pub fn TripleExponentialAverage(
     timeperiod: usize,
     vfactor: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::triple_exponential_average(_input.as_slice()?, timeperiod, vfactor))?;
+    let result = ta_err!(core::stream::triple_exponential_average(_input.as_slice()?, timeperiod, vfactor))?;
     Ok(to_py_array(py, result))
 }
 
@@ -205,7 +205,7 @@ pub fn BBANDS(
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let (upper, middle, lower) = ta_err!(core::overlap::bollinger_bands(
+    let (upper, middle, lower) = ta_err!(core::stream::bollinger_bands(
         _input.as_slice()?,
         timeperiod,
         nbdevup,
@@ -233,7 +233,7 @@ pub fn SAR(
     acceleration: f64,
     maximum: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::parabolic_sar(
+    let result = ta_err!(core::stream::parabolic_sar(
         high.as_slice()?,
         low.as_slice()?,
         acceleration,
@@ -262,7 +262,7 @@ pub fn SAREXT(
     accelerationshort: f64,
     accelerationmaxshort: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::extended_parabolic_sar(
+    let result = ta_err!(core::stream::extended_parabolic_sar(
         high.as_slice()?,
         low.as_slice()?,
         startvalue,
@@ -331,7 +331,7 @@ pub fn MAVP(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::overlap::moving_average_variable_period(
+    let result = ta_err!(core::stream::moving_average_variable_period(
         _input.as_slice()?,
         periods.as_slice()?,
         minperiod,
@@ -408,7 +408,7 @@ pub fn RSI(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::relative_strength_index(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::relative_strength_index(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -637,7 +637,7 @@ pub fn CCI(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::commodity_channel_index(
+    let result = ta_err!(core::stream::commodity_channel_index(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -658,7 +658,7 @@ pub fn MOM(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::momentum(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::momentum(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -674,7 +674,7 @@ pub fn ROC(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rate_of_change(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -690,7 +690,7 @@ pub fn ROCP(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change_percent(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rate_of_change_percent(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -706,7 +706,7 @@ pub fn ROCR(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change_ratio(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rate_of_change_ratio(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -722,7 +722,7 @@ pub fn ROCR100(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::rate_of_change_ratio_percent(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::rate_of_change_ratio_percent(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -740,7 +740,7 @@ pub fn WILLR(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::williams_r(
+    let result = ta_err!(core::stream::williams_r(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -765,7 +765,7 @@ pub fn APO(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::momentum::absolute_price_oscillator(
+    let result = ta_err!(core::stream::absolute_price_oscillator(
         _input.as_slice()?,
         fastperiod,
         slowperiod,
@@ -790,7 +790,7 @@ pub fn PPO(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::momentum::percentage_price_oscillator(
+    let result = ta_err!(core::stream::percentage_price_oscillator(
         _input.as_slice()?,
         fastperiod,
         slowperiod,
@@ -812,7 +812,7 @@ pub fn BOP(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::balance_of_power(
+    let result = ta_err!(core::stream::balance_of_power(
         _open.as_slice()?,
         high.as_slice()?,
         low.as_slice()?,
@@ -833,7 +833,7 @@ pub fn CMO(
     _input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::chande_momentum_oscillator(_input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::stream::chande_momentum_oscillator(_input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -894,7 +894,7 @@ pub fn MFI(
     volume: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::money_flow_index(
+    let result = ta_err!(core::stream::money_flow_index(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -961,7 +961,7 @@ pub fn DX(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::directional_movement_index(
+    let result = ta_err!(core::stream::directional_movement_index(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -984,7 +984,7 @@ pub fn PLUS_DI(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::plus_directional_indicator(
+    let result = ta_err!(core::stream::plus_directional_indicator(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -1007,7 +1007,7 @@ pub fn MINUS_DI(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::minus_directional_indicator(
+    let result = ta_err!(core::stream::minus_directional_indicator(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -1029,7 +1029,7 @@ pub fn PLUS_DM(
     low: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::plus_directional_movement(
+    let result = ta_err!(core::stream::plus_directional_movement(
         high.as_slice()?,
         low.as_slice()?,
         timeperiod
@@ -1050,7 +1050,7 @@ pub fn MINUS_DM(
     low: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::momentum::minus_directional_movement(
+    let result = ta_err!(core::stream::minus_directional_movement(
         high.as_slice()?,
         low.as_slice()?,
         timeperiod

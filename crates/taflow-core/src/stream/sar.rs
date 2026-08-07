@@ -157,7 +157,7 @@ mod tests {
             .collect();
         let high: Vec<f64> = center.iter().map(|value| value + 1.5).collect();
         let low: Vec<f64> = center.iter().map(|value| value - 1.2).collect();
-        let expected = overlap::parabolic_sar(&high, &low, 0.02, 0.2).unwrap();
+        let expected = parabolic_sar(&high, &low, 0.02, 0.2).unwrap();
         let mut state = ParabolicSar::new(0.02, 0.2);
         for index in 0..center.len() {
             let actual = state.append(high[index], low[index]);

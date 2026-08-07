@@ -68,13 +68,13 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
     }
     use crate::overlap;
     match ma_type {
-        MaType::SimpleMovingAverage => overlap::simple_moving_average(input, period),
-        MaType::ExponentialMovingAverage => overlap::exponential_moving_average(input, period),
-        MaType::WeightedMovingAverage => overlap::weighted_moving_average(input, period),
-        MaType::DoubleExponentialMovingAverage => overlap::double_exponential_moving_average(input, period),
-        MaType::TripleExponentialMovingAverage => overlap::triple_exponential_moving_average(input, period),
-        MaType::TriangularMovingAverage => overlap::triangular_moving_average(input, period),
-        MaType::KaufmanAdaptiveMovingAverage => overlap::kaufman_adaptive_moving_average(input, period),
+        MaType::SimpleMovingAverage => crate::stream::simple_moving_average(input, period),
+        MaType::ExponentialMovingAverage => crate::stream::exponential_moving_average(input, period),
+        MaType::WeightedMovingAverage => crate::stream::weighted_moving_average(input, period),
+        MaType::DoubleExponentialMovingAverage => crate::stream::double_exponential_moving_average(input, period),
+        MaType::TripleExponentialMovingAverage => crate::stream::triple_exponential_moving_average(input, period),
+        MaType::TriangularMovingAverage => crate::stream::triangular_moving_average(input, period),
+        MaType::KaufmanAdaptiveMovingAverage => crate::stream::kaufman_adaptive_moving_average(input, period),
         // MAMA/TripleExponentialAverage 通过 MA 调度器调用时使用固定默认值，与 C TA-Lib ta_MA.c 完全一致:
         //   MAMA: fastlimit=0.5, slowlimit=0.05 (忽略 period)
         //   TripleExponentialAverage:   vfactor=0.7 (period 正常传递)
@@ -82,7 +82,7 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
             let (mama, _fama) = overlap::mesa_adaptive_moving_average(input, 0.5, 0.05)?;
             Ok(mama)
         }
-        MaType::TripleExponentialAverage => overlap::triple_exponential_average(input, period, 0.7),
+        MaType::TripleExponentialAverage => crate::stream::triple_exponential_average(input, period, 0.7),
     }
 }
 

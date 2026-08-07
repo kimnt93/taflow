@@ -61,7 +61,6 @@ impl StreamingIndicator for AbsolutePriceOscillator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::momentum;
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {
@@ -70,7 +69,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = momentum::absolute_price_oscillator(&input, 7, 13, ma_type).unwrap();
+            let expected = absolute_price_oscillator(&input, 7, 13, ma_type).unwrap();
             let mut state = AbsolutePriceOscillator::new(7, 13, ma_type).unwrap();
             for (&input, expected) in input.iter().zip(expected) {
                 let actual = state.append(input);

@@ -108,7 +108,7 @@ mod tests {
         let input: Vec<f64> = (0..200)
             .map(|index| 100.0 + (index as f64 * 0.23).sin() * 9.0 + index as f64 * 0.04)
             .collect();
-        let expected = overlap::triple_exponential_average(&input, 7, 0.7).unwrap();
+        let expected = triple_exponential_average(&input, 7, 0.7).unwrap();
         let mut state = TripleExponentialAverage::new(7, 0.7).unwrap();
         for (&input, expected) in input.iter().zip(expected) {
             let actual = state.append(input);
