@@ -17,7 +17,7 @@ pub struct BbandsValue {
 }
 
 /// Incremental Bollinger Bands with constant per-bar work.
-pub struct Bbands {
+pub struct BollingerBands {
     middle: MovingAverageDispatcher,
     deviation: RollingStandardDeviation,
     deviations_up: f64,
@@ -25,7 +25,7 @@ pub struct Bbands {
     value: Option<BbandsValue>,
 }
 
-impl Bbands {
+impl BollingerBands {
     /// Creates a BBANDS state for a period of at least two bars.
     pub fn new(
         period: usize,
@@ -43,7 +43,7 @@ impl Bbands {
     }
 }
 
-impl StreamingIndicator for Bbands {
+impl StreamingIndicator for BollingerBands {
     type Output = BbandsValue;
 
     fn append(&mut self, input: f64) -> Option<BbandsValue> {
@@ -83,7 +83,7 @@ mod tests {
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
             let (upper, middle, lower) = overlap::bollinger_bands(&input, 13, 2.0, 1.5, ma_type).unwrap();
-            let mut state = Bbands::new(13, 2.0, 1.5, ma_type).unwrap();
+            let mut state = BollingerBands::new(13, 2.0, 1.5, ma_type).unwrap();
             for (index, &input) in input.iter().enumerate() {
                 match state.append(input) {
                     Some(actual) => {

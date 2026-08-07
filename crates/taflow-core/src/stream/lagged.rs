@@ -83,23 +83,23 @@ macro_rules! lagged_indicator {
     };
 }
 
-lagged_indicator!(Mom, |current: f64, previous: f64| current - previous);
-lagged_indicator!(Roc, |current: f64, previous: f64| if previous != 0.0 {
+lagged_indicator!(Momentum, |current: f64, previous: f64| current - previous);
+lagged_indicator!(RateOfChange, |current: f64, previous: f64| if previous != 0.0 {
     (current - previous) / previous * 100.0
 } else {
     0.0
 });
-lagged_indicator!(Rocp, |current: f64, previous: f64| if previous != 0.0 {
+lagged_indicator!(RateOfChangePercent, |current: f64, previous: f64| if previous != 0.0 {
     (current - previous) / previous
 } else {
     0.0
 });
-lagged_indicator!(Rocr, |current: f64, previous: f64| if previous != 0.0 {
+lagged_indicator!(RateOfChangeRatio, |current: f64, previous: f64| if previous != 0.0 {
     current / previous
 } else {
     0.0
 });
-lagged_indicator!(Rocr100, |current: f64, previous: f64| if previous != 0.0 {
+lagged_indicator!(RateOfChangeRatioPercent, |current: f64, previous: f64| if previous != 0.0 {
     current / previous * 100.0
 } else {
     0.0

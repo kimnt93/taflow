@@ -143,7 +143,7 @@ pub use accbands::{AccelerationBands, AccbandsValue};
 pub use adx::AverageDirectionalIndex;
 pub use adxr::AverageDirectionalIndexRating;
 pub use apo::AbsolutePriceOscillator;
-pub use bbands::{Bbands, BbandsValue};
+pub use bbands::{BollingerBands, BbandsValue};
 pub use cci::CommodityChannelIndex;
 pub use cdl_doji::CandleDoji;
 pub use cdl_dojistar::CandleDojiStar;
@@ -233,8 +233,8 @@ pub use plus_di::PlusDirectionalIndicator;
 pub use plus_dm::PlusDirectionalMovement;
 pub use rsi::RelativeStrengthIndex;
 pub use rolling_sum::RollingSum;
-pub use math_price::{Acos, Add, AveragePrice, Asin, Atan, Ceil, Cos, Cosh, Div, Exp, Floor, Ln, Log10, Medprice, Mult, Sin, Sinh, Sqrt, Sub, Tan, Tanh, Typprice, Wclprice};
-pub use lagged::{Mom, Roc, Rocp, Rocr, Rocr100};
+pub use math_price::{Acos, Add, AveragePrice, Asin, Atan, Ceil, Cos, Cosh, Div, Exp, Floor, Ln, Log10, MedianPrice, Mult, Sin, Sinh, Sqrt, Sub, Tan, Tanh, TypicalPrice, WeightedClose};
+pub use lagged::{Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent};
 pub use rolling_extrema::{RollingArgmax, RollingArgmin, RollingMax, RollingMin, RollingMinmax, RollingMinmaxIndex, RollingMinmaxIndexValue, RollingMinmaxValue};
 use rolling_extrema::RollingExtrema;
 pub use rolling_price::{RollingMidpoint, RollingMidprice};
@@ -340,11 +340,11 @@ mod tests {
         let mut midpoint = RollingMidpoint::new(7).unwrap();
         let mut rsi = RelativeStrengthIndex::new(14).unwrap();
         let mut cmo = ChandeMomentumOscillator::new(14).unwrap();
-        let mut mom = Mom::new(7).unwrap();
-        let mut roc = Roc::new(7).unwrap();
-        let mut rocp = Rocp::new(7).unwrap();
-        let mut rocr = Rocr::new(7).unwrap();
-        let mut rocr100 = Rocr100::new(7).unwrap();
+        let mut mom = Momentum::new(7).unwrap();
+        let mut roc = RateOfChange::new(7).unwrap();
+        let mut rocp = RateOfChangePercent::new(7).unwrap();
+        let mut rocr = RateOfChangeRatio::new(7).unwrap();
+        let mut rocr100 = RateOfChangeRatioPercent::new(7).unwrap();
 
         for index in 0..input.len() {
             let value = input[index];
@@ -441,9 +441,9 @@ mod tests {
         let typ = price_transform::typical_price(&high, &low, close).unwrap();
         let wcl = price_transform::weighted_close(&high, &low, close).unwrap();
         let mut avg_state = AveragePrice::new();
-        let mut med_state = Medprice::new();
-        let mut typ_state = Typprice::new();
-        let mut wcl_state = Wclprice::new();
+        let mut med_state = MedianPrice::new();
+        let mut typ_state = TypicalPrice::new();
+        let mut wcl_state = WeightedClose::new();
         for index in 0..input.len() {
             assert_eq!(
                 avg_state.append(open[index], high[index], low[index], close[index]),

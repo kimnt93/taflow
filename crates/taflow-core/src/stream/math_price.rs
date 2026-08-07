@@ -155,7 +155,7 @@ impl AveragePrice {
     }
 }
 
-binary_indicator!(Medprice, |high: f64, low: f64| (high + low) * 0.5);
+binary_indicator!(MedianPrice, |high: f64, low: f64| (high + low) * 0.5);
 
 macro_rules! price3_indicator {
     ($name:ident, $operation:expr) => {
@@ -206,11 +206,11 @@ macro_rules! price3_indicator {
     };
 }
 
-price3_indicator!(Typprice, |high: f64, low: f64, close: f64| (high
+price3_indicator!(TypicalPrice, |high: f64, low: f64, close: f64| (high
     + low
     + close)
     * (1.0 / 3.0));
-price3_indicator!(Wclprice, |high: f64, low: f64, close: f64| (high
+price3_indicator!(WeightedClose, |high: f64, low: f64, close: f64| (high
     + low
     + close
     + close)

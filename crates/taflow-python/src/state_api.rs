@@ -6,7 +6,7 @@ use pyo3::prelude::*;
 use taflow::stream::{
     self, AverageDirectionalIndex, AverageDirectionalIndexRating, AverageTrueRange, CommodityChannelIndex, DoubleExponentialMovingAverage, DirectionalMovementIndex, ExponentialMovingAverage, HilbertTransformTrendline, IntradayMomentumIndex, MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended, MovingAverageConvergenceDivergenceFixed, MesaAdaptiveMovingAverage,
     MovingAverageVariablePeriod,
-    RollingMidpoint, RollingMidprice, Mom, NormalizedAverageTrueRange, Roc, Rocp, Rocr, Rocr100, RelativeStrengthIndex, SimpleMovingAverage, StochasticOscillator, FastStochasticOscillator, StochasticRelativeStrengthIndex,
+    RollingMidpoint, RollingMidprice, Momentum, NormalizedAverageTrueRange, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent, RelativeStrengthIndex, SimpleMovingAverage, StochasticOscillator, FastStochasticOscillator, StochasticRelativeStrengthIndex,
     StreamingIndicator, TripleExponentialMovingAverage, TrueRange, TriangularMovingAverage, WeightedMovingAverage, RelativeMomentumIndex,
     VariableIndexDynamicAverage,
     LaguerreRelativeStrengthIndex,
@@ -82,11 +82,11 @@ macro_rules! scalar_state_class {
     };
 }
 
-scalar_state_class!(StatefulMom, Mom, 10);
-scalar_state_class!(StatefulRoc, Roc, 10);
-scalar_state_class!(StatefulRocp, Rocp, 10);
-scalar_state_class!(StatefulRocr, Rocr, 10);
-scalar_state_class!(StatefulRocr100, Rocr100, 10);
+scalar_state_class!(StatefulMom, Momentum, 10);
+scalar_state_class!(StatefulRoc, RateOfChange, 10);
+scalar_state_class!(StatefulRocp, RateOfChangePercent, 10);
+scalar_state_class!(StatefulRocr, RateOfChangeRatio, 10);
+scalar_state_class!(StatefulRocr100, RateOfChangeRatioPercent, 10);
 scalar_state_class!(StatefulMidpoint, RollingMidpoint, 14);
 scalar_state_class!(StatefulMax, stream::RollingMax, 30);
 scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);
@@ -827,7 +827,7 @@ impl StatefulMa {
 
 #[pyclass]
 pub struct StatefulBbands {
-    inner: stream::Bbands,
+    inner: stream::BollingerBands,
 }
 
 #[pymethods]
@@ -836,7 +836,7 @@ impl StatefulBbands {
     #[pyo3(signature = (timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0))]
     fn new(timeperiod: usize, nbdevup: f64, nbdevdn: f64, matype: i32) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Bbands::new(
+            inner: stream::BollingerBands::new(
                 timeperiod,
                 nbdevup,
                 nbdevdn,
@@ -1747,7 +1747,7 @@ binary_state_class!(StatefulAdd, Add);
 binary_state_class!(StatefulSub, Sub);
 binary_state_class!(StatefulMult, Mult);
 binary_state_class!(StatefulDiv, Div);
-binary_state_class!(StatefulMedprice, Medprice);
+binary_state_class!(StatefulMedprice, MedianPrice);
 
 macro_rules! price3_state_class {
     ($class:ident, $inner:ident) => {
@@ -1802,8 +1802,8 @@ macro_rules! price3_state_class {
     };
 }
 
-price3_state_class!(StatefulTypprice, Typprice);
-price3_state_class!(StatefulWclprice, Wclprice);
+price3_state_class!(StatefulTypprice, TypicalPrice);
+price3_state_class!(StatefulWclprice, WeightedClose);
 
 #[pyclass]
 pub struct StatefulAvgprice {
