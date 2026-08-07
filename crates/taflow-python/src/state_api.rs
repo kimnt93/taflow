@@ -4,10 +4,10 @@ use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
-    self, Adx, Adxr, Atr, Cci, Dema, Dx, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama,
+    self, Adx, Adxr, AverageTrueRange, Cci, Dema, Dx, Ema, HtTrendline, Imi, Macd, MacdExt, MacdFix, Mama,
     Mavp,
-    Midpoint, Midprice, Mom, Natr, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi,
-    StreamingIndicator, Tema, Trange, Trima, Wma, RelativeMomentumIndex,
+    RollingMidpoint, RollingMidprice, Mom, NormalizedAverageTrueRange, Roc, Rocp, Rocr, Rocr100, Rsi, Sma, Stoch, Stochf, Stochrsi,
+    StreamingIndicator, Tema, TrueRange, Trima, Wma, RelativeMomentumIndex,
     VariableIndexDynamicAverage,
     LaguerreRelativeStrengthIndex,
     EvenBetterSinewave,
@@ -87,13 +87,13 @@ scalar_state_class!(StatefulRoc, Roc, 10);
 scalar_state_class!(StatefulRocp, Rocp, 10);
 scalar_state_class!(StatefulRocr, Rocr, 10);
 scalar_state_class!(StatefulRocr100, Rocr100, 10);
-scalar_state_class!(StatefulMidpoint, Midpoint, 14);
-scalar_state_class!(StatefulMax, stream::Max, 30);
-scalar_state_class!(StatefulMaxindex, stream::Maxindex, 30);
-scalar_state_class!(StatefulMin, stream::Min, 30);
-scalar_state_class!(StatefulMinindex, stream::Minindex, 30);
+scalar_state_class!(StatefulMidpoint, RollingMidpoint, 14);
+scalar_state_class!(StatefulMax, stream::RollingMax, 30);
+scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);
+scalar_state_class!(StatefulMin, stream::RollingMin, 30);
+scalar_state_class!(StatefulMinindex, stream::RollingArgmin, 30);
 scalar_state_class!(StatefulSum, stream::RollingSum, 30);
-scalar_state_class!(StatefulAvgdev, stream::Avgdev, 14);
+scalar_state_class!(StatefulAvgdev, stream::RollingAverageDeviation, 14);
 scalar_state_class!(StatefulCmo, stream::Cmo, 14);
 scalar_state_class!(StatefulKama, stream::Kama, 30);
 scalar_state_class!(StatefulLinearreg, stream::Linearreg, 14);
@@ -1118,8 +1118,8 @@ macro_rules! deviation_state_class {
     };
 }
 
-deviation_state_class!(StatefulVar, Var);
-deviation_state_class!(StatefulStddev, Stddev);
+deviation_state_class!(StatefulVar, RollingVariance);
+deviation_state_class!(StatefulStddev, RollingStandardDeviation);
 
 macro_rules! bivariate_statistic_class {
     ($class:ident, $inner:ident) => {
@@ -1172,12 +1172,12 @@ macro_rules! bivariate_statistic_class {
     };
 }
 
-bivariate_statistic_class!(StatefulBeta, Beta);
-bivariate_statistic_class!(StatefulCorrel, Correl);
+bivariate_statistic_class!(StatefulBeta, RollingBeta);
+bivariate_statistic_class!(StatefulCorrel, RollingCorrelation);
 
 #[pyclass]
 pub struct StatefulAd {
-    inner: stream::Ad,
+    inner: stream::AccumulationDistribution,
 }
 
 #[pymethods]
@@ -1185,7 +1185,7 @@ impl StatefulAd {
     #[new]
     fn new() -> Self {
         Self {
-            inner: stream::Ad::new(),
+            inner: stream::AccumulationDistribution::new(),
         }
     }
 
@@ -1230,7 +1230,7 @@ impl StatefulAd {
 
 #[pyclass]
 pub struct StatefulAdosc {
-    inner: stream::Adosc,
+    inner: stream::AccumulationDistributionOscillator,
 }
 
 #[pymethods]
@@ -1239,7 +1239,7 @@ impl StatefulAdosc {
     #[pyo3(signature = (fastperiod=3, slowperiod=10))]
     fn new(fastperiod: usize, slowperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Adosc::new(fastperiod, slowperiod).map_err(py_value_error)?,
+            inner: stream::AccumulationDistributionOscillator::new(fastperiod, slowperiod).map_err(py_value_error)?,
         })
     }
 
@@ -1283,7 +1283,7 @@ impl StatefulAdosc {
 
 #[pyclass]
 pub struct StatefulObv {
-    inner: stream::Obv,
+    inner: stream::OnBalanceVolume,
 }
 
 #[pymethods]
@@ -1291,7 +1291,7 @@ impl StatefulObv {
     #[new]
     fn new() -> Self {
         Self {
-            inner: stream::Obv::new(),
+            inner: stream::OnBalanceVolume::new(),
         }
     }
 
@@ -1330,7 +1330,7 @@ impl StatefulObv {
 
 #[pyclass]
 pub struct StatefulBop {
-    inner: stream::Bop,
+    inner: stream::BalanceOfPower,
 }
 
 #[pymethods]
@@ -1338,7 +1338,7 @@ impl StatefulBop {
     #[new]
     fn new() -> Self {
         Self {
-            inner: stream::Bop::new(),
+            inner: stream::BalanceOfPower::new(),
         }
     }
 
@@ -1383,7 +1383,7 @@ impl StatefulBop {
 
 #[pyclass]
 pub struct StatefulWillr {
-    inner: stream::Willr,
+    inner: stream::WilliamsPercentR,
 }
 
 #[pymethods]
@@ -1392,7 +1392,7 @@ impl StatefulWillr {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Willr::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::WilliamsPercentR::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -1489,7 +1489,7 @@ impl StatefulAroon {
 
 #[pyclass]
 pub struct StatefulAroonosc {
-    inner: stream::Aroonosc,
+    inner: stream::AroonOscillator,
 }
 
 #[pymethods]
@@ -1498,7 +1498,7 @@ impl StatefulAroonosc {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Aroonosc::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::AroonOscillator::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -1533,7 +1533,7 @@ impl StatefulAroonosc {
 
 #[pyclass]
 pub struct StatefulMinmax {
-    inner: stream::Minmax,
+    inner: stream::RollingMinmax,
 }
 
 #[pymethods]
@@ -1542,7 +1542,7 @@ impl StatefulMinmax {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Minmax::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::RollingMinmax::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -1585,7 +1585,7 @@ impl StatefulMinmax {
 
 #[pyclass]
 pub struct StatefulMinmaxindex {
-    inner: stream::Minmaxindex,
+    inner: stream::RollingMinmaxIndex,
 }
 
 #[pymethods]
@@ -1594,7 +1594,7 @@ impl StatefulMinmaxindex {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::Minmaxindex::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::RollingMinmaxIndex::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -1807,7 +1807,7 @@ price3_state_class!(StatefulWclprice, Wclprice);
 
 #[pyclass]
 pub struct StatefulAvgprice {
-    inner: stream::Avgprice,
+    inner: stream::AveragePrice,
 }
 
 #[pymethods]
@@ -1815,7 +1815,7 @@ impl StatefulAvgprice {
     #[new]
     fn new() -> Self {
         Self {
-            inner: stream::Avgprice::new(),
+            inner: stream::AveragePrice::new(),
         }
     }
 
@@ -1859,7 +1859,7 @@ impl StatefulAvgprice {
 
 #[pyclass]
 pub struct StatefulMidprice {
-    inner: Midprice,
+    inner: RollingMidprice,
 }
 
 #[pymethods]
@@ -1868,7 +1868,7 @@ impl StatefulMidprice {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Midprice::new(timeperiod).map_err(py_value_error)?,
+            inner: RollingMidprice::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2174,7 +2174,7 @@ impl StatefulRsi {
 
 #[pyclass]
 pub struct StatefulAtr {
-    inner: Atr,
+    inner: AverageTrueRange,
 }
 
 #[pymethods]
@@ -2183,7 +2183,7 @@ impl StatefulAtr {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Atr::new(timeperiod).map_err(py_value_error)?,
+            inner: AverageTrueRange::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
@@ -2226,7 +2226,7 @@ impl StatefulAtr {
 
 #[pyclass]
 pub struct StatefulTrange {
-    inner: Trange,
+    inner: TrueRange,
 }
 
 #[pymethods]
@@ -2234,7 +2234,7 @@ impl StatefulTrange {
     #[new]
     fn new() -> Self {
         Self {
-            inner: Trange::new(),
+            inner: TrueRange::new(),
         }
     }
 
@@ -2279,7 +2279,7 @@ impl StatefulTrange {
 
 #[pyclass]
 pub struct StatefulNatr {
-    inner: Natr,
+    inner: NormalizedAverageTrueRange,
 }
 
 #[pymethods]
@@ -2288,7 +2288,7 @@ impl StatefulNatr {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Natr::new(timeperiod).map_err(py_value_error)?,
+            inner: NormalizedAverageTrueRange::new(timeperiod).map_err(py_value_error)?,
         })
     }
 

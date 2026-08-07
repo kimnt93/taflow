@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::error::{TaError, TaResult};
-use crate::stream::{Atr, Ema, Midprice, Sma, Stddev, StreamingIndicator, Trange, Window};
+use crate::stream::{AverageTrueRange, Ema, RollingMidprice, Sma, RollingStandardDeviation, StreamingIndicator, TrueRange, Window};
 
 fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {
@@ -678,7 +678,7 @@ struct ObZone {
 /// being order blocks.
 #[derive(Debug, Clone)]
 pub struct OrderBlock {
-    atr: Atr,
+    atr: AverageTrueRange,
     internal: Swing,
     structure: Swing,
     internal_low: Option<(f64, f64, bool)>,
@@ -714,7 +714,7 @@ impl OrderBlock {
             });
         }
         Ok(Self {
-            atr: Atr::new(atr_period)?,
+            atr: AverageTrueRange::new(atr_period)?,
             internal: Swing::new(internal_length)?,
             structure: Swing::new(swing_length)?,
             internal_low: None,
@@ -1021,7 +1021,7 @@ pub struct EqualHighsLowsValue {
 /// `eq_threshold * ATR(atr_period)`, matching the LuxAlgo Pine variant.
 #[derive(Debug, Clone)]
 pub struct EqualHighsLows {
-    atr: Atr,
+    atr: AverageTrueRange,
     swing: Swing,
     previous_high: Option<f64>,
     previous_low: Option<f64>,
@@ -1047,7 +1047,7 @@ impl EqualHighsLows {
             });
         }
         Ok(Self {
-            atr: Atr::new(atr_period)?,
+            atr: AverageTrueRange::new(atr_period)?,
             swing: Swing::new(eq_len)?,
             previous_high: None,
             previous_low: None,
@@ -2554,9 +2554,9 @@ pub struct IchimokuValue {
 /// instead (re-align in tests by `span.shift(kijun)`, `chikou.shift(-kijun)`).
 #[derive(Debug, Clone)]
 pub struct Ichimoku {
-    tenkan: Midprice,
-    kijun: Midprice,
-    senkou: Midprice,
+    tenkan: RollingMidprice,
+    kijun: RollingMidprice,
+    senkou: RollingMidprice,
     value: Option<IchimokuValue>,
 }
 
@@ -2566,9 +2566,9 @@ impl Ichimoku {
         validate_period(kijun)?;
         validate_period(senkou)?;
         Ok(Self {
-            tenkan: Midprice::new(tenkan)?,
-            kijun: Midprice::new(kijun)?,
-            senkou: Midprice::new(senkou)?,
+            tenkan: RollingMidprice::new(tenkan)?,
+            kijun: RollingMidprice::new(kijun)?,
+            senkou: RollingMidprice::new(senkou)?,
             value: None,
         })
     }
@@ -2703,10 +2703,10 @@ pub struct Squeeze {
     mom_length: usize,
     mom_smooth: usize,
     bb_mid: Sma,
-    bb_dev: Stddev,
+    bb_dev: RollingStandardDeviation,
     kc_basis: Sma,
     tr_band: SqueezeTrBand,
-    trange: Trange,
+    trange: TrueRange,
     close_window: Window,
     mom_smooth_sma: Sma,
     value: Option<SqueezeValue>,
@@ -2747,10 +2747,10 @@ impl Squeeze {
             mom_length,
             mom_smooth,
             bb_mid: Sma::new(bb_length)?,
-            bb_dev: Stddev::new(bb_length, 1.0)?,
+            bb_dev: RollingStandardDeviation::new(bb_length, 1.0)?,
             kc_basis: Sma::new(kc_length)?,
             tr_band: SqueezeTrBand::new(kc_length)?,
-            trange: Trange::new(),
+            trange: TrueRange::new(),
             close_window: Window::new(mom_length)?,
             mom_smooth_sma: Sma::new(mom_smooth)?,
             value: None,
@@ -2876,10 +2876,10 @@ pub struct SqueezePro {
     mom_length: usize,
     mom_smooth: usize,
     bb_mid: Sma,
-    bb_dev: Stddev,
+    bb_dev: RollingStandardDeviation,
     kc_basis: Sma,
     tr_band: SqueezeTrBand,
-    trange: Trange,
+    trange: TrueRange,
     close_window: Window,
     mom_smooth_sma: Sma,
     value: Option<SqueezeProValue>,
@@ -2935,10 +2935,10 @@ impl SqueezePro {
             mom_length,
             mom_smooth,
             bb_mid: Sma::new(bb_length)?,
-            bb_dev: Stddev::new(bb_length, 1.0)?,
+            bb_dev: RollingStandardDeviation::new(bb_length, 1.0)?,
             kc_basis: Sma::new(kc_length)?,
             tr_band: SqueezeTrBand::new(kc_length)?,
-            trange: Trange::new(),
+            trange: TrueRange::new(),
             close_window: Window::new(mom_length)?,
             mom_smooth_sma: Sma::new(mom_smooth)?,
             value: None,

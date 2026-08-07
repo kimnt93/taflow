@@ -6,7 +6,7 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, Max, Min, StreamingIndicator};
+use super::{moving_average::MovingAverage, RollingMax, RollingMin, StreamingIndicator};
 
 /// One aligned fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -17,8 +17,8 @@ pub struct StochfValue {
 
 /// Incremental STOCHF with amortized constant work per bar.
 pub struct Stochf {
-    highest: Max,
-    lowest: Min,
+    highest: RollingMax,
+    lowest: RollingMin,
     fastd: MovingAverage,
     value: Option<StochfValue>,
 }
@@ -27,8 +27,8 @@ impl Stochf {
     /// Creates a STOCHF state for the selected fast %D moving-average type.
     pub fn new(fastk_period: usize, fastd_period: usize, fastd_matype: MaType) -> TaResult<Self> {
         Ok(Self {
-            highest: Max::new(fastk_period)?,
-            lowest: Min::new(fastk_period)?,
+            highest: RollingMax::new(fastk_period)?,
+            lowest: RollingMin::new(fastk_period)?,
             fastd: MovingAverage::new(fastd_period, fastd_matype)?,
             value: None,
         })

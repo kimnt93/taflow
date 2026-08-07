@@ -468,22 +468,22 @@ macro_rules! rolling_extrema_indicator {
     };
 }
 
-rolling_extrema_indicator!(Max, |(maximum, _)| maximum);
-rolling_extrema_indicator!(Min, |(_, minimum)| minimum);
+rolling_extrema_indicator!(RollingMax, |(maximum, _)| maximum);
+rolling_extrema_indicator!(RollingMin, |(_, minimum)| minimum);
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct MinmaxValue {
+pub struct RollingMinmaxValue {
     pub minimum: f64,
     pub maximum: f64,
 }
 
 #[derive(Debug, Clone)]
-pub struct Minmax {
+pub struct RollingMinmax {
     extrema: RollingExtrema,
-    value: Option<MinmaxValue>,
+    value: Option<RollingMinmaxValue>,
 }
 
-impl Minmax {
+impl RollingMinmax {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             extrema: RollingExtrema::new(period)?,
@@ -491,15 +491,15 @@ impl Minmax {
         })
     }
 
-    pub fn append(&mut self, input: f64) -> Option<MinmaxValue> {
+    pub fn append(&mut self, input: f64) -> Option<RollingMinmaxValue> {
         self.value = self
             .extrema
             .append(input)
-            .map(|(maximum, minimum)| MinmaxValue { minimum, maximum });
+            .map(|(maximum, minimum)| RollingMinmaxValue { minimum, maximum });
         self.value
     }
 
-    pub fn value(&self) -> Option<MinmaxValue> {
+    pub fn value(&self) -> Option<RollingMinmaxValue> {
         self.value
     }
 
@@ -510,7 +510,7 @@ impl Minmax {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct MinmaxIndexValue {
+pub struct RollingMinmaxIndexValue {
     pub minimum: usize,
     pub maximum: usize,
 }
@@ -538,7 +538,7 @@ impl RollingIndexExtrema {
         })
     }
 
-    fn append(&mut self, input: f64) -> MinmaxIndexValue {
+    fn append(&mut self, input: f64) -> RollingMinmaxIndexValue {
         let index = self.index;
         self.index += 1;
         if self.window.len() == self.period {
@@ -546,7 +546,7 @@ impl RollingIndexExtrema {
         }
         self.window.push_back((index, input));
         if self.window.len() < self.period {
-            return MinmaxIndexValue {
+            return RollingMinmaxIndexValue {
                 minimum: 0,
                 maximum: 0,
             };
@@ -571,7 +571,7 @@ impl RollingIndexExtrema {
         } else if self.minimum.is_some_and(|(_, value)| input <= value) {
             self.minimum = Some((index, input));
         }
-        MinmaxIndexValue {
+        RollingMinmaxIndexValue {
             minimum: self.minimum.expect("full window has a minimum").0,
             maximum: self.maximum.expect("full window has a maximum").0,
         }
@@ -623,16 +623,16 @@ macro_rules! rolling_index_indicator {
     };
 }
 
-rolling_index_indicator!(Maxindex, |value: MinmaxIndexValue| value.maximum);
-rolling_index_indicator!(Minindex, |value: MinmaxIndexValue| value.minimum);
+rolling_index_indicator!(RollingArgmax, |value: RollingMinmaxIndexValue| value.maximum);
+rolling_index_indicator!(RollingArgmin, |value: RollingMinmaxIndexValue| value.minimum);
 
 #[derive(Debug, Clone)]
-pub struct Minmaxindex {
+pub struct RollingMinmaxIndex {
     extrema: RollingIndexExtrema,
-    value: Option<MinmaxIndexValue>,
+    value: Option<RollingMinmaxIndexValue>,
 }
 
-impl Minmaxindex {
+impl RollingMinmaxIndex {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             extrema: RollingIndexExtrema::new(period)?,
@@ -640,13 +640,13 @@ impl Minmaxindex {
         })
     }
 
-    pub fn append(&mut self, input: f64) -> MinmaxIndexValue {
+    pub fn append(&mut self, input: f64) -> RollingMinmaxIndexValue {
         let value = self.extrema.append(input);
         self.value = Some(value);
         value
     }
 
-    pub fn value(&self) -> Option<MinmaxIndexValue> {
+    pub fn value(&self) -> Option<RollingMinmaxIndexValue> {
         self.value
     }
 
@@ -658,12 +658,12 @@ impl Minmaxindex {
 
 /// Stateful midpoint of the rolling highest and lowest input values.
 #[derive(Debug, Clone)]
-pub struct Midpoint {
+pub struct RollingMidpoint {
     extrema: RollingExtrema,
     value: Option<f64>,
 }
 
-impl Midpoint {
+impl RollingMidpoint {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             extrema: RollingExtrema::new(period)?,
@@ -672,7 +672,7 @@ impl Midpoint {
     }
 }
 
-impl StreamingIndicator for Midpoint {
+impl StreamingIndicator for RollingMidpoint {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -695,13 +695,13 @@ impl StreamingIndicator for Midpoint {
 
 /// Stateful midpoint of rolling high maxima and low minima.
 #[derive(Debug, Clone)]
-pub struct Midprice {
+pub struct RollingMidprice {
     highs: RollingExtrema,
     lows: RollingExtrema,
     value: Option<f64>,
 }
 
-impl Midprice {
+impl RollingMidprice {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             highs: RollingExtrema::new(period)?,
@@ -812,11 +812,11 @@ binary_indicator!(Div, |left: f64, right: f64| left / right);
 
 /// Stateful average price `(open + high + low + close) / 4`.
 #[derive(Debug, Clone, Default)]
-pub struct Avgprice {
+pub struct AveragePrice {
     value: Option<f64>,
 }
 
-impl Avgprice {
+impl AveragePrice {
     pub fn new() -> Self {
         Self::default()
     }
@@ -923,12 +923,12 @@ impl RollingMoments {
 
 /// Stateful population variance. TA-Lib accepts but ignores `nbdev` for VAR.
 #[derive(Debug, Clone)]
-pub struct Var {
+pub struct RollingVariance {
     moments: RollingMoments,
     value: Option<f64>,
 }
 
-impl Var {
+impl RollingVariance {
     pub fn new(period: usize, _nbdev: f64) -> TaResult<Self> {
         Ok(Self {
             moments: RollingMoments::new(period)?,
@@ -937,7 +937,7 @@ impl Var {
     }
 }
 
-impl StreamingIndicator for Var {
+impl StreamingIndicator for RollingVariance {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -957,13 +957,13 @@ impl StreamingIndicator for Var {
 
 /// Stateful population standard deviation multiplied by `nbdev`.
 #[derive(Debug, Clone)]
-pub struct Stddev {
+pub struct RollingStandardDeviation {
     moments: RollingMoments,
     nbdev: f64,
     value: Option<f64>,
 }
 
-impl Stddev {
+impl RollingStandardDeviation {
     pub fn new(period: usize, nbdev: f64) -> TaResult<Self> {
         Ok(Self {
             moments: RollingMoments::new(period)?,
@@ -973,7 +973,7 @@ impl Stddev {
     }
 }
 
-impl StreamingIndicator for Stddev {
+impl StreamingIndicator for RollingStandardDeviation {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -996,13 +996,13 @@ impl StreamingIndicator for Stddev {
 
 /// Stateful average absolute deviation with TA-Lib's newest-to-oldest summation order.
 #[derive(Debug, Clone)]
-pub struct Avgdev {
+pub struct RollingAverageDeviation {
     period: usize,
     window: Window,
     value: Option<f64>,
 }
 
-impl Avgdev {
+impl RollingAverageDeviation {
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -1015,7 +1015,7 @@ impl Avgdev {
     }
 }
 
-impl StreamingIndicator for Avgdev {
+impl StreamingIndicator for RollingAverageDeviation {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
@@ -1118,14 +1118,14 @@ impl RollingPairMoments {
 
 /// Stateful Pearson correlation over paired observations.
 #[derive(Debug, Clone)]
-pub struct Correl {
+pub struct RollingCorrelation {
     period: f64,
     moments: RollingPairMoments,
     seeded: bool,
     value: Option<f64>,
 }
 
-impl Correl {
+impl RollingCorrelation {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period: period as f64,
@@ -1170,14 +1170,14 @@ impl Correl {
 
 /// Stateful TA-Lib BETA over percentage returns of two input series.
 #[derive(Debug, Clone)]
-pub struct Beta {
+pub struct RollingBeta {
     period: f64,
     previous: Option<(f64, f64)>,
     returns: RollingPairMoments,
     value: Option<f64>,
 }
 
-impl Beta {
+impl RollingBeta {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period: period as f64,
@@ -1352,12 +1352,12 @@ fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {
 
 /// Stateful Chaikin accumulation/distribution line.
 #[derive(Debug, Clone, Default)]
-pub struct Ad {
+pub struct AccumulationDistribution {
     total: f64,
     value: Option<f64>,
 }
 
-impl Ad {
+impl AccumulationDistribution {
     pub fn new() -> Self {
         Self::default()
     }
@@ -1380,7 +1380,7 @@ impl Ad {
 
 /// Stateful Chaikin A/D oscillator with first-value EMA seeds.
 #[derive(Debug, Clone)]
-pub struct Adosc {
+pub struct AccumulationDistributionOscillator {
     lookback: usize,
     index: usize,
     fast_k: f64,
@@ -1391,7 +1391,7 @@ pub struct Adosc {
     value: Option<f64>,
 }
 
-impl Adosc {
+impl AccumulationDistributionOscillator {
     pub fn new(fast_period: usize, slow_period: usize) -> TaResult<Self> {
         if fast_period < 2 || slow_period < 2 {
             return Err(TaError::InvalidParameter {
@@ -1449,13 +1449,13 @@ impl Adosc {
 
 /// Stateful on-balance volume.
 #[derive(Debug, Clone, Default)]
-pub struct Obv {
+pub struct OnBalanceVolume {
     previous_close: Option<f64>,
     total: f64,
     value: Option<f64>,
 }
 
-impl Obv {
+impl OnBalanceVolume {
     pub fn new() -> Self {
         Self::default()
     }
@@ -1484,11 +1484,11 @@ impl Obv {
 
 /// Stateful balance of power.
 #[derive(Debug, Clone, Default)]
-pub struct Bop {
+pub struct BalanceOfPower {
     value: Option<f64>,
 }
 
-impl Bop {
+impl BalanceOfPower {
     pub fn new() -> Self {
         Self::default()
     }
@@ -1515,13 +1515,13 @@ impl Bop {
 
 /// Stateful Williams %R.
 #[derive(Debug, Clone)]
-pub struct Willr {
+pub struct WilliamsPercentR {
     highs: RollingExtrema,
     lows: RollingExtrema,
     value: Option<f64>,
 }
 
-impl Willr {
+impl WilliamsPercentR {
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -1615,12 +1615,12 @@ impl Aroon {
 }
 
 #[derive(Debug, Clone)]
-pub struct Aroonosc {
+pub struct AroonOscillator {
     aroon: Aroon,
     value: Option<f64>,
 }
 
-impl Aroonosc {
+impl AroonOscillator {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             aroon: Aroon::new(period)?,
@@ -1648,7 +1648,7 @@ impl Aroonosc {
 
 /// Stateful Average True Range.  Each appended bar is `(high, low, close)`.
 #[derive(Debug, Clone)]
-pub struct Atr {
+pub struct AverageTrueRange {
     period: usize,
     previous_close: Option<f64>,
     tr_count: usize,
@@ -1658,12 +1658,12 @@ pub struct Atr {
 
 /// Stateful true range. The first bar has no previous close and is not warm.
 #[derive(Debug, Clone)]
-pub struct Trange {
+pub struct TrueRange {
     previous_close: Option<f64>,
     value: Option<f64>,
 }
 
-impl Trange {
+impl TrueRange {
     pub fn new() -> Self {
         Self {
             previous_close: None,
@@ -1691,7 +1691,7 @@ impl Trange {
     }
 }
 
-impl Default for Trange {
+impl Default for TrueRange {
     fn default() -> Self {
         Self::new()
     }
@@ -1699,15 +1699,15 @@ impl Default for Trange {
 
 /// Stateful normalized ATR, matching `NATR = ATR / close * 100`.
 #[derive(Debug, Clone)]
-pub struct Natr {
-    atr: Atr,
+pub struct NormalizedAverageTrueRange {
+    atr: AverageTrueRange,
     value: Option<f64>,
 }
 
-impl Natr {
+impl NormalizedAverageTrueRange {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
-            atr: Atr::new(period)?,
+            atr: AverageTrueRange::new(period)?,
             value: None,
         })
     }
@@ -1733,7 +1733,7 @@ impl Natr {
     }
 }
 
-impl Atr {
+impl AverageTrueRange {
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(invalid_period("timeperiod", period, 1));
@@ -1834,7 +1834,7 @@ mod tests {
         let mut tema = Tema::new(7).unwrap();
         let mut trima = Trima::new(7).unwrap();
         let mut kama = Kama::new(7).unwrap();
-        let mut midpoint = Midpoint::new(7).unwrap();
+        let mut midpoint = RollingMidpoint::new(7).unwrap();
         let mut rsi = Rsi::new(14).unwrap();
         let mut cmo = Cmo::new(14).unwrap();
         let mut mom = Mom::new(7).unwrap();
@@ -1879,7 +1879,7 @@ mod tests {
             .map(|(i, value)| value - 0.8 - (i % 4) as f64 * 0.15)
             .collect();
         let expected = overlap::midprice(&high, &low, 7).unwrap();
-        let mut state = Midprice::new(7).unwrap();
+        let mut state = RollingMidprice::new(7).unwrap();
         for index in 0..close.len() {
             assert_optional_eq(state.append(high[index], low[index]), expected[index]);
         }
@@ -1937,7 +1937,7 @@ mod tests {
         let med = price_transform::median_price(&high, &low).unwrap();
         let typ = price_transform::typical_price(&high, &low, close).unwrap();
         let wcl = price_transform::weighted_close(&high, &low, close).unwrap();
-        let mut avg_state = Avgprice::new();
+        let mut avg_state = AveragePrice::new();
         let mut med_state = Medprice::new();
         let mut typ_state = Typprice::new();
         let mut wcl_state = Wclprice::new();
@@ -1971,13 +1971,13 @@ mod tests {
         let minindex_expected = math_operator::minindex(&input, period).unwrap();
         let (minmax_min, minmax_max) = math_operator::minmax(&input, period).unwrap();
         let (minidx, maxidx) = math_operator::minmaxindex(&input, period).unwrap();
-        let mut max = Max::new(period).unwrap();
-        let mut min = Min::new(period).unwrap();
+        let mut max = RollingMax::new(period).unwrap();
+        let mut min = RollingMin::new(period).unwrap();
         let mut sum = RollingSum::new(period).unwrap();
-        let mut maxindex = Maxindex::new(period).unwrap();
-        let mut minindex = Minindex::new(period).unwrap();
-        let mut minmax = Minmax::new(period).unwrap();
-        let mut minmaxindex = Minmaxindex::new(period).unwrap();
+        let mut maxindex = RollingArgmax::new(period).unwrap();
+        let mut minindex = RollingArgmin::new(period).unwrap();
+        let mut minmax = RollingMinmax::new(period).unwrap();
+        let mut minmaxindex = RollingMinmaxIndex::new(period).unwrap();
 
         for index in 0..input.len() {
             assert_optional_eq(max.append(input[index]), max_expected[index]);
@@ -2012,9 +2012,9 @@ mod tests {
         let avgdev_expected = statistic::avgdev(&input, period).unwrap();
         let var_expected = statistic::var(&input, period, 2.0).unwrap();
         let stddev_expected = statistic::stddev(&input, period, 2.0).unwrap();
-        let mut avgdev = Avgdev::new(period).unwrap();
-        let mut var = Var::new(period, 2.0).unwrap();
-        let mut stddev = Stddev::new(period, 2.0).unwrap();
+        let mut avgdev = RollingAverageDeviation::new(period).unwrap();
+        let mut var = RollingVariance::new(period, 2.0).unwrap();
+        let mut stddev = RollingStandardDeviation::new(period, 2.0).unwrap();
         for index in 0..input.len() {
             assert_optional_eq(avgdev.append(input[index]), avgdev_expected[index]);
             assert_optional_eq(var.append(input[index]), var_expected[index]);
@@ -2023,7 +2023,7 @@ mod tests {
 
         let constant = vec![42.0; 30];
         let expected = statistic::stddev(&constant, 5, 3.0).unwrap();
-        let mut state = Stddev::new(5, 3.0).unwrap();
+        let mut state = RollingStandardDeviation::new(5, 3.0).unwrap();
         for (input, expected) in constant.into_iter().zip(expected) {
             assert_optional_eq(state.append(input), expected);
         }
@@ -2042,8 +2042,8 @@ mod tests {
         let period = 10;
         let beta_expected = statistic::beta(&market, &asset, period).unwrap();
         let correl_expected = statistic::correl(&market, &asset, period).unwrap();
-        let mut beta = Beta::new(period).unwrap();
-        let mut correl = Correl::new(period).unwrap();
+        let mut beta = RollingBeta::new(period).unwrap();
+        let mut correl = RollingCorrelation::new(period).unwrap();
         for index in 0..market.len() {
             let beta_actual = beta.append(market[index], asset[index]);
             let correl_actual = correl.append(market[index], asset[index]);
@@ -2112,9 +2112,9 @@ mod tests {
         let ad_expected = volume::accumulation_distribution(&high, &low, &close, &volumes).unwrap();
         let adosc_expected = volume::accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
         let obv_expected = volume::on_balance_volume(&close, &volumes).unwrap();
-        let mut ad = Ad::new();
-        let mut adosc = Adosc::new(3, 10).unwrap();
-        let mut obv = Obv::new();
+        let mut ad = AccumulationDistribution::new();
+        let mut adosc = AccumulationDistributionOscillator::new(3, 10).unwrap();
+        let mut obv = OnBalanceVolume::new();
         for index in 0..close.len() {
             assert_eq!(
                 ad.append(high[index], low[index], close[index], volumes[index]),
@@ -2160,10 +2160,10 @@ mod tests {
         let willr_expected = momentum::williams_r(&high, &low, &close, period).unwrap();
         let (down_expected, up_expected) = momentum::aroon(&high, &low, period).unwrap();
         let osc_expected = momentum::aroon_oscillator(&high, &low, period).unwrap();
-        let mut bop = Bop::new();
-        let mut willr = Willr::new(period).unwrap();
+        let mut bop = BalanceOfPower::new();
+        let mut willr = WilliamsPercentR::new(period).unwrap();
         let mut aroon = Aroon::new(period).unwrap();
-        let mut oscillator = Aroonosc::new(period).unwrap();
+        let mut oscillator = AroonOscillator::new(period).unwrap();
         for index in 0..close.len() {
             assert_eq!(
                 bop.append(open[index], high[index], low[index], close[index]),
@@ -2202,9 +2202,9 @@ mod tests {
         let natr_batch = volatility::normalized_average_true_range(&high, &low, &close, 14).unwrap();
         let (macd_batch, signal_batch, histogram_batch) =
             momentum::moving_average_convergence_divergence(&close, 12, 26, 9).unwrap();
-        let mut atr = Atr::new(14).unwrap();
-        let mut trange = Trange::new();
-        let mut natr = Natr::new(14).unwrap();
+        let mut atr = AverageTrueRange::new(14).unwrap();
+        let mut trange = TrueRange::new();
+        let mut natr = NormalizedAverageTrueRange::new(14).unwrap();
         let mut macd = Macd::new(12, 26, 9).unwrap();
 
         for i in 0..close.len() {

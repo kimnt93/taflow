@@ -61,7 +61,7 @@ pub fn williams_r(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -
         let h = high[today];
         let l = low[today];
 
-        // Max tracking on high[] — scalar brute rescan
+        // RollingMax tracking on high[] — scalar brute rescan
         if highest_idx < trailing_idx {
             highest_idx = trailing_idx;
             highest = high[trailing_idx];
@@ -76,7 +76,7 @@ pub fn williams_r(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -
             highest = h;
         }
 
-        // Min tracking on low[] — scalar brute rescan
+        // RollingMin tracking on low[] — scalar brute rescan
         if lowest_idx < trailing_idx {
             lowest_idx = trailing_idx;
             lowest = low[trailing_idx];

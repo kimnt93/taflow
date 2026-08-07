@@ -115,7 +115,7 @@ fn var_internal(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
         sum += input[j];
         sum_sq = input[j].mul_add(input[j], sum_sq);
     }
-    // Var = E(X²) - E(X)² = sum_sq*inv_n - (sum*inv_n)²
+    // RollingVariance = E(X²) - E(X)² = sum_sq*inv_n - (sum*inv_n)²
     let mean = sum * inv_n;
     output[lookback] = sum_sq * inv_n - mean * mean;
 
@@ -132,7 +132,7 @@ fn var_internal(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     Ok(output)
 }
 
-/// Beta — O(n) 滑动窗口算法
+/// RollingBeta — O(n) 滑动窗口算法
 ///
 /// C TA-Lib BETA 使用百分比收益率:
 ///   x[i] = (input0[i] - input0[i-1]) / input0[i-1]  (input0 的百分比收益)

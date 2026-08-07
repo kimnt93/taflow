@@ -7,7 +7,7 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverage, Max, Min, StreamingIndicator};
+use super::{moving_average::MovingAverage, RollingMax, RollingMin, StreamingIndicator};
 
 /// One aligned slow %K and slow %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -18,8 +18,8 @@ pub struct StochValue {
 
 /// Incremental STOCH with amortized constant work per bar.
 pub struct Stoch {
-    highest: Max,
-    lowest: Min,
+    highest: RollingMax,
+    lowest: RollingMin,
     slowk: MovingAverage,
     slowd: MovingAverage,
     value: Option<StochValue>,
@@ -35,8 +35,8 @@ impl Stoch {
         slowd_matype: MaType,
     ) -> TaResult<Self> {
         Ok(Self {
-            highest: Max::new(fastk_period)?,
-            lowest: Min::new(fastk_period)?,
+            highest: RollingMax::new(fastk_period)?,
+            lowest: RollingMin::new(fastk_period)?,
             slowk: MovingAverage::new(slowk_period, slowk_matype)?,
             slowd: MovingAverage::new(slowd_period, slowd_matype)?,
             value: None,

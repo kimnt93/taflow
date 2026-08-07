@@ -93,7 +93,7 @@ fn bbands_sma(
         sum_sq += v * v;
     }
 
-    // C TA-Lib 的 stddev 使用 population variance: Var = E(X^2) - E(X)^2
+    // C TA-Lib 的 stddev 使用 population variance: RollingVariance = E(X^2) - E(X)^2
     // stddev = sqrt(sum_sq/n - (sum/n)^2)
     let ma_val = sum * inv_n;
     let variance = sum_sq * inv_n - ma_val * ma_val;
