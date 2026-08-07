@@ -4,6 +4,15 @@ use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, Window};
 
+/// Computes an aligned Money Flow Index vector from HLCV slices.
+pub fn money_flow_index(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
+        return Err(crate::TaError::LengthMismatch { expected: high.len(), got: low.len().min(close.len()).min(volume.len()) });
+    }
+    let mut state = MoneyFlowIndex::new(timeperiod)?;
+    Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&high, &low), &close), &volume)| state.append(high, low, close, volume).unwrap_or(f64::NAN)).collect())
+}
+
 /// Persistent Money Flow Index with O(1) updates after each HLCV bar.
 #[derive(Debug, Clone)]
 pub struct MoneyFlowIndex {
