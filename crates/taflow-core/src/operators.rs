@@ -5231,6 +5231,7 @@ impl RollingIqr {
     pub fn new(timeperiod: usize) -> TaResult<Self> {
         Ok(Self { quantile: RollingQuantile::new(timeperiod, 0.25)?, value: None })
     }
+    /// Append one value and return the current interquartile range.
     pub fn append(&mut self, input: f64) -> Option<f64> {
         self.quantile.append(input);
         self.value = if self.quantile.values.len() == self.quantile.timeperiod {
