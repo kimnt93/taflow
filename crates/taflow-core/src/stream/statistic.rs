@@ -78,42 +78,22 @@ pub(crate) fn linearreg_components(
     let mut intercept = vec![0.0_f64; len];
     intercept[..lookback].fill(f64::NAN);
     let n = timeperiod as f64;
-    let p = timeperiod;
 
     // 常量: sum_x = 0+1+...+(p-1), sum_x2 = 0²+1²+...+(p-1)²
     let sum_x = n * (n - 1.0) / 2.0;
     let sum_x2 = n * (n - 1.0) * (2.0 * n - 1.0) / 6.0;
     let denom = n * sum_x2 - sum_x * sum_x;
 
-    // 初始化第一个窗口 [0..timeperiod]
-    let init_window = &input[0..p];
-    let mut sum_y = crate::simd::sum_f64(init_window);
-    // ws = Σ k * input[k], k = 0..p-1 (加权和，权重为窗口内位置索引)
-    let mut ws: f64 = init_window
-        .iter()
-        .enumerate()
-        .map(|(k, &v)| k as f64 * v)
-        .sum();
-
-    if denom != 0.0 {
-        let m = (n * ws - sum_x * sum_y) / denom;
-        let b = (sum_y - m * sum_x) / n;
-        slope[lookback] = m;
-        intercept[lookback] = b;
-    }
-
-    // O(1) 滑动: 窗口从 [0..p] 逐步移到 [i-p+1..i+1]
-    for i in p..len {
-        let old_val = input[i - p]; // 离开窗口的旧元素 (位置索引为0)
-        let new_val = input[i]; // 进入窗口的新元素 (位置索引为p-1)
-                                // ws 更新推导:
-                                //   旧窗口各元素的位置索引各减1 => ws -= sum_y_old
-                                //   旧元素 (索引0) 离开 => 需补回减掉的 old_val => ws += old_val
-                                //   新元素以索引 (p-1) 进入 => ws += (p-1) * new_val
-        ws = ws - sum_y + old_val + (n - 1.0) * new_val;
-        // 更新 sum_y: 减去离开的旧值，加上进入的新值
-        sum_y = sum_y - old_val + new_val;
-
+    // Recompute each bounded window in chronological order. This matches the
+    // TA-Lib summation order and avoids drift from subtractive rolling sums.
+    for i in lookback..len {
+        let window = &input[i + 1 - timeperiod..=i];
+        let mut sum_y = 0.0;
+        let mut ws = 0.0;
+        for (k, &value) in window.iter().enumerate() {
+            sum_y += value;
+            ws += k as f64 * value;
+        }
         if denom != 0.0 {
             let m = (n * ws - sum_x * sum_y) / denom;
             let b = (sum_y - m * sum_x) / n;

@@ -52,8 +52,8 @@ impl CandleTriStar {
             let b = self.candles[11];
             let doji = self.candles.iter().take(10).map(|x| x.range()).sum::<f64>() * 0.01;
             let base = a.body() <= doji && b.body() <= doji && cur.body() <= doji;
-            let bear = base && b.o.min(b.c) > a.o.max(a.c) && !(cur.o.min(cur.c) > b.o.max(b.c));
-            let bull = base && b.o.max(b.c) < a.o.min(a.c) && !(cur.o.max(cur.c) < b.o.min(b.c));
+            let bear = base && b.o.min(b.c) > a.o.max(a.c) && cur.o.max(cur.c) < b.o.max(b.c);
+            let bull = base && b.o.max(b.c) < a.o.min(a.c) && cur.o.min(cur.c) > b.o.min(b.c);
             Some((bull as i32) * 100 - (bear as i32) * 100)
         } else {
             None
@@ -128,11 +128,11 @@ pub fn candle_tri_star(
         // Bearish: 2nd gaps up
         let bear = base
             && real_body_gap_up(open, close, i - 1, i - 2)
-            && !real_body_gap_up(open, close, i, i - 1);
+            && open[i].max(close[i]) < open[i - 1].max(close[i - 1]);
         // Bullish: 2nd gaps down
         let bull = base
             && real_body_gap_down(open, close, i - 1, i - 2)
-            && !real_body_gap_down(open, close, i, i - 1);
+            && open[i].min(close[i]) > open[i - 1].min(close[i - 1]);
         output[i] = (bull as i32) * 100 - (bear as i32) * 100;
         body_sum += cr(BODY_DOJI, open, high, low, close, i - 2)
             - cr(

@@ -62,14 +62,25 @@ impl CandleLadderBottom {
             let b = self.candles[11];
             let cnd = self.candles[12];
             let d = self.candles[13];
-            let shadow = self.candles.iter().skip(3).map(|x| x.range()).sum::<f64>() * 0.01;
+            let shadow = self
+                .candles
+                .iter()
+                .skip(3)
+                .take(SHADOW_VERY_SHORT.avg_period)
+                .map(|x| x.range())
+                .sum::<f64>()
+                * SHADOW_VERY_SHORT.factor
+                / SHADOW_VERY_SHORT.avg_period as f64;
             Some(
                 (a.color() == -1
                     && b.color() == -1
                     && cnd.color() == -1
                     && d.color() == -1
-                    && b.c < a.c
-                    && cnd.c < b.c
+                    && a.o > b.o
+                    && b.o > cnd.o
+                    && a.c > b.c
+                    && b.c > cnd.c
+                    && d.color() == -1
                     && d.upper() > shadow
                     && cur.color() == 1
                     && cur.o > d.o
@@ -145,8 +156,10 @@ pub fn candle_ladder_bottom(
             && candle_color(open[i-3], close[i-3]) == -1
             && candle_color(open[i-2], close[i-2]) == -1
             && candle_color(open[i-1], close[i-1]) == -1
-            && close[i-3] < close[i-4] && close[i-2] < close[i-3]
+            && open[i-4] > open[i-3] && open[i-3] > open[i-2]
+            && close[i-4] > close[i-3] && close[i-3] > close[i-2]
             // 4th: upper shadow exceeds very short
+            && candle_color(open[i-1], close[i-1]) == -1
             && upper_shadow(open[i-1], high[i-1], close[i-1]) > ca(SHADOW_VERY_SHORT, shadow_sum, open, high, low, close, i-1)
             // 5th: white, opens above 4th open, closes above 4th high
             && candle_color(open[i], close[i]) == 1

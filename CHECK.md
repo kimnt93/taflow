@@ -474,24 +474,19 @@ For every function claimed done, verify ALL of:
    thresholds; wire the parameter through for full parity (CDLABANDONEDBABY,
    CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD,
    CDLMORNINGDOJISTAR, CDLMORNINGSTAR).
-2. Pattern logic still disagrees with TA-Lib (verify/REPORT.md run of
-   2026-08-07, 10k bars): CDLLADDERBOTTOM and CDLTRISTAR — diff against
-   TA-Lib C source. CDLHIKKAKEMOD and CDLUNIQUE3RIVER now pass after
-   aligning breakout and close-direction rules.
-   (CDL3LINESTRIKE, CDLADVANCEBLOCK, CDL-GAP patterns also pass.)
-3. Remaining numeric drift vs TA-Lib (verify run @10k):
-   LINEARREG_SLOPE 1.7e-10, LINEARREG_ANGLE 9.5e-9 — parity-contract
-   decision + accumulator reseeding (optimize-methods §6.1/§6.2).
-   STDDEV/VAR/CORREL/CCI now pass at this size.
+2. Pattern and regression parity are now aligned with TA-Lib at the 10k-bar
+   verification size: CDLLADDERBOTTOM, CDLTRISTAR, LINEARREG_SLOPE, and
+   LINEARREG_ANGLE use the reference candle predicates and ordered regression
+   sums. STDDEV/VAR/CORREL/CCI also pass at this size.
 4. SUM batch/state arithmetic order is now aligned: the rolling batch path
    uses the same left-to-right subtract-then-add recurrence as `RollingSum`,
    so a 9k-`extend` + 1k-`append` split is bitwise-identical to one-shot
    output.
-5. **rolling_skew / rolling_kurtosis parity debt**: the kernels now
-   anchor-subtract each window and use compensated moment sums, but still
-   differ from pandas after the exact population-form conversion (current
-   errors 3.8e-7 / 1.7e-4). A stronger incremental central-moment update or
-   reference-aligned accumulation order is still required.
+5. **rolling_skew / rolling_kurtosis parity debt**: the kernels use
+   population central moments with compensated sums, but still differ from
+   pandas' online rolling algorithm after the population-form conversion
+   (current errors 3.8e-7 / 1.7e-4). A pandas-compatible incremental
+   central-moment update remains required for that optional oracle.
 
 ## 5. How to run the review
 

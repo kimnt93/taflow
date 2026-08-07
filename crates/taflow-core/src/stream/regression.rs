@@ -17,8 +17,6 @@ struct RegressionCore {
     sum_x: f64,
     denominator: f64,
     window: Window,
-    sum_y: f64,
-    weighted_sum: f64,
     seeded: bool,
 }
 
@@ -36,8 +34,6 @@ impl RegressionCore {
             sum_x,
             denominator: period_f * sum_x2 - sum_x * sum_x,
             window: Window::new(period)?,
-            sum_y: 0.0,
-            weighted_sum: 0.0,
             seeded: false,
         })
     }
@@ -48,30 +44,23 @@ impl RegressionCore {
             if !self.window.is_full() {
                 return None;
             }
-            let values: Vec<f64> = self.window.iter().copied().collect();
-            self.sum_y = crate::simd::sum_f64(&values);
-            self.weighted_sum = values
-                .iter()
-                .enumerate()
-                .map(|(index, value)| index as f64 * value)
-                .sum();
             self.seeded = true;
         } else {
-            let old = self.window.push(input).expect("regression window is full");
-            self.weighted_sum =
-                self.weighted_sum - self.sum_y + old + (self.period_f - 1.0) * input;
-            self.sum_y = self.sum_y - old + input;
+            self.window.push(input).expect("regression window is full");
         }
-        let slope =
-            (self.period_f * self.weighted_sum - self.sum_x * self.sum_y) / self.denominator;
-        let intercept = (self.sum_y - slope * self.sum_x) / self.period_f;
+        let mut sum_y = 0.0;
+        let mut weighted_sum = 0.0;
+        for (index, &value) in self.window.iter().enumerate() {
+            sum_y += value;
+            weighted_sum += index as f64 * value;
+        }
+        let slope = (self.period_f * weighted_sum - self.sum_x * sum_y) / self.denominator;
+        let intercept = (sum_y - slope * self.sum_x) / self.period_f;
         Some(RegressionValue { slope, intercept })
     }
 
     fn reset(&mut self) {
         self.window.clear();
-        self.sum_y = 0.0;
-        self.weighted_sum = 0.0;
         self.seeded = false;
     }
 }

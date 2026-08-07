@@ -648,9 +648,9 @@
   "function": "CDLLADDERBOTTOM",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
-   "passed": false,
+   "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 100.0
+   "max_abs_error": 0.0
   },
   "state": "missing"
  },
@@ -858,9 +858,9 @@
   "function": "CDLTRISTAR",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
-   "passed": false,
+   "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 100.0
+   "max_abs_error": 0.0
   },
   "state": "missing"
  },
@@ -1160,28 +1160,28 @@
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.0833147712219215e-09
+   "max_abs_error": 5.968558980384842e-13
   },
   "continue_vs_batch_bitwise": true,
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.0833147712219215e-09
+   "max_abs_error": 5.968558980384842e-13
   }
  },
  {
   "function": "LINEARREG_ANGLE",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
-   "passed": false,
+   "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 9.513690724105572e-09
+   "max_abs_error": 4.924061158817494e-12
   },
   "continue_vs_batch_bitwise": true,
   "continue_vs_oracle": {
-   "passed": false,
+   "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 9.513690724105572e-09
+   "max_abs_error": 4.924061158817494e-12
   }
  },
  {
@@ -1190,28 +1190,28 @@
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.0840324193850392e-09
+   "max_abs_error": 5.968558980384842e-13
   },
   "continue_vs_batch_bitwise": true,
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.0840324193850392e-09
+   "max_abs_error": 5.968558980384842e-13
   }
  },
  {
   "function": "LINEARREG_SLOPE",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
-   "passed": false,
+   "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.6671880542773465e-10
+   "max_abs_error": 9.137135492665038e-14
   },
   "continue_vs_batch_bitwise": true,
   "continue_vs_oracle": {
-   "passed": false,
+   "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.6671880542773465e-10
+   "max_abs_error": 9.137135492665038e-14
   }
  },
  {
@@ -1940,13 +1940,13 @@
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.2500294133133139e-09
+   "max_abs_error": 6.821210263296962e-13
   },
   "continue_vs_batch_bitwise": true,
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 1.2500294133133139e-09
+   "max_abs_error": 6.821210263296962e-13
   }
  },
  {
