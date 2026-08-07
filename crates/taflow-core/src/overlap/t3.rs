@@ -9,7 +9,7 @@ use crate::simd::sum_f64;
 /// lookback = 6 * (timeperiod - 1)
 ///
 /// 优化版本：6 次 EMA 逐层级联计算，仅 1 个输出 Vec，无中间分配。
-pub fn t3(input: &[f64], timeperiod: usize, v_factor: f64) -> TaResult<Vec<f64>> {
+pub fn triple_exponential_average(input: &[f64], timeperiod: usize, v_factor: f64) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -128,7 +128,7 @@ mod tests {
     #[test]
     fn test_t3_basic() {
         let input: Vec<f64> = (1..=50).map(|x| x as f64).collect();
-        let result = t3(&input, 5, 0.7).unwrap();
+        let result = triple_exponential_average(&input, 5, 0.7).unwrap();
         // lookback = 6*(5-1) = 24
         assert!(result[23].is_nan());
         assert!(!result[24].is_nan());
@@ -139,7 +139,7 @@ mod tests {
     fn test_t3_values_reasonable() {
         for period in [2, 3, 5] {
             let input: Vec<f64> = (1..=80).map(|x| (x as f64) * 1.1 + 0.3).collect();
-            let result = t3(&input, period, 0.7).unwrap();
+            let result = triple_exponential_average(&input, period, 0.7).unwrap();
             let lookback = 6 * (period - 1);
             // NaN before lookback
             for i in 0..lookback { assert!(result[i].is_nan()); }

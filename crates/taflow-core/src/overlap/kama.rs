@@ -4,7 +4,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// Uses C TA-Lib formulation for the serial chain:
 /// prev_kama += sc² × (input[i] - prev_kama)
-pub fn kama(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn kaufman_adaptive_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -71,7 +71,7 @@ mod tests {
     #[test]
     fn test_kama_basic() {
         let input: Vec<f64> = (1..=20).map(|x| x as f64).collect();
-        let result = kama(&input, 10).unwrap();
+        let result = kaufman_adaptive_moving_average(&input, 10).unwrap();
         assert!(result[9].is_nan());
         assert!(!result[10].is_nan());
     }
@@ -79,6 +79,6 @@ mod tests {
     #[test]
     fn period_one_is_identity() {
         let input = vec![3.0, 1.0, 4.0, 1.0, 5.0];
-        assert_eq!(kama(&input, 1).unwrap(), input);
+        assert_eq!(kaufman_adaptive_moving_average(&input, 1).unwrap(), input);
     }
 }

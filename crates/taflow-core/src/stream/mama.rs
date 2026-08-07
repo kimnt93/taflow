@@ -265,7 +265,7 @@ mod tests {
         let input: Vec<f64> = (0..200)
             .map(|index| 100.0 + (index as f64 * 0.23).sin() * 9.0 + index as f64 * 0.04)
             .collect();
-        let (expected_mama, expected_fama) = overlap::mama(&input, 0.5, 0.05).unwrap();
+        let (expected_mama, expected_fama) = overlap::mesa_adaptive_moving_average(&input, 0.5, 0.05).unwrap();
         let mut state = Mama::new(0.5, 0.05).unwrap();
         for ((&input, expected_mama), expected_fama) in input
             .iter()

@@ -111,7 +111,7 @@ impl WmaState {
 ///
 /// Faithful port of C TA-Lib ta_HT_TRENDLINE.c.
 /// lookback = 63
-pub fn ht_trendline(input: &[f64]) -> TaResult<Vec<f64>> {
+pub fn hilbert_transform_trendline(input: &[f64]) -> TaResult<Vec<f64>> {
     let len = input.len();
     let lookback: usize = 63;
 
@@ -307,7 +307,7 @@ mod tests {
         let input: Vec<f64> = (0..200)
             .map(|i| 50.0 + 10.0 * (i as f64 * 0.2).sin())
             .collect();
-        let result = ht_trendline(&input).unwrap();
+        let result = hilbert_transform_trendline(&input).unwrap();
         assert!(result[62].is_nan());
         assert!(!result[63].is_nan());
     }

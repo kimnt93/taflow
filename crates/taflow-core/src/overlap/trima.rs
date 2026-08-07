@@ -6,7 +6,7 @@ use crate::error::{TaError, TaResult};
 ///   奇数 period: p1 = p2 = (period + 1) / 2
 ///   偶数 period: p1 = period/2 + 1, p2 = period/2
 /// lookback = timeperiod - 1
-pub fn trima(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn triangular_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -67,7 +67,7 @@ mod tests {
     #[test]
     fn test_trima_basic() {
         let input = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
-        let result = trima(&input, 5).unwrap();
+        let result = triangular_moving_average(&input, 5).unwrap();
         assert!(result[3].is_nan());
         assert!(!result[4].is_nan());
     }
@@ -75,7 +75,7 @@ mod tests {
     #[test]
     fn test_trima_period_1() {
         let input = vec![1.0, 2.0, 3.0];
-        let result = trima(&input, 1).unwrap();
+        let result = triangular_moving_average(&input, 1).unwrap();
         assert!((result[0] - 1.0).abs() < 1e-10);
     }
 }

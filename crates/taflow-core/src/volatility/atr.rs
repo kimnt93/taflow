@@ -1,7 +1,7 @@
 use crate::error::{TaError, TaResult};
 
 /// True Range (TRANGE) — zip-based for auto-vectorization
-pub fn trange(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
+pub fn true_range(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {
@@ -33,7 +33,7 @@ pub fn trange(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
 /// Average True Range (ATR) — inline TR, no temporary Vec
 ///
 /// Wilder smoothing, lookback = timeperiod
-pub fn atr(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {
@@ -85,7 +85,7 @@ pub fn atr(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaRes
 /// Normalized Average True Range (NATR)
 ///
 /// NATR = (ATR / Close) * 100
-pub fn natr(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn normalized_average_true_range(high: &[f64], low: &[f64], close: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {
@@ -158,7 +158,7 @@ mod tests {
         let close: Vec<f64> = (0..30)
             .map(|i| 50.0 + (i as f64 * 0.3).sin() * 5.0)
             .collect();
-        let result = atr(&high, &low, &close, 14).unwrap();
+        let result = average_true_range(&high, &low, &close, 14).unwrap();
         assert!(result[13].is_nan());
         assert!(!result[14].is_nan());
         assert!(result[14] > 0.0);

@@ -242,7 +242,7 @@ mod tests {
         let input: Vec<f64> = (0..700)
             .map(|index| 100.0 + (index as f64 * 0.17).sin() * 8.0 + index as f64 * 0.01)
             .collect();
-        let expected = overlap::ht_trendline(&input).unwrap();
+        let expected = overlap::hilbert_transform_trendline(&input).unwrap();
         let mut state = HtTrendline::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {

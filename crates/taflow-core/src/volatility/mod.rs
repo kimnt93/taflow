@@ -1,6 +1,6 @@
 mod atr;
 
-pub use atr::{atr, natr, trange};
+pub use atr::{average_true_range, normalized_average_true_range, true_range};
 
 /// True Range array (used by multiple modules)
 pub fn true_range_array(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {

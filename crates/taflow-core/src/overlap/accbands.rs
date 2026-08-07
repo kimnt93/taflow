@@ -6,7 +6,7 @@ use crate::error::{TaError, TaResult};
 /// - upper: `high * (1 + 4 * (high - low) / (high + low))`
 /// - middle: `close`
 /// - lower: `low * (1 - 4 * (high - low) / (high + low))`
-pub fn accbands(
+pub fn acceleration_bands(
     high: &[f64],
     low: &[f64],
     close: &[f64],

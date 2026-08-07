@@ -1,7 +1,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Average Price: (O + H + L + C) / 4
-pub fn avgprice(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
+pub fn average_price(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
     let len = open.len();
     validate_ohlc_len(len, high, low, close)?;
     let mut output = Vec::with_capacity(len);
@@ -16,7 +16,7 @@ pub fn avgprice(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaRes
 }
 
 /// Median Price: (H + L) / 2
-pub fn medprice(high: &[f64], low: &[f64]) -> TaResult<Vec<f64>> {
+pub fn median_price(high: &[f64], low: &[f64]) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() {
         return Err(TaError::LengthMismatch {
@@ -34,7 +34,7 @@ pub fn medprice(high: &[f64], low: &[f64]) -> TaResult<Vec<f64>> {
 }
 
 /// Typical Price: (H + L + C) / 3
-pub fn typprice(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
+pub fn typical_price(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {
@@ -54,7 +54,7 @@ pub fn typprice(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> 
 }
 
 /// Weighted Close Price: (H + L + 2*C) / 4
-pub fn wclprice(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
+pub fn weighted_close(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() {
         return Err(TaError::LengthMismatch {

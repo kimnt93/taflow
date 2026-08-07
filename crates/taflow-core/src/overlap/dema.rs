@@ -7,7 +7,7 @@ use crate::simd::sum_f64;
 /// lookback = 2 * (timeperiod - 1)
 ///
 /// 优化版本：两次 EMA 在原地计算，无需中间 Vec 分配。
-pub fn dema(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn double_exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -64,7 +64,7 @@ mod tests {
     #[test]
     fn test_dema_basic() {
         let input: Vec<f64> = (1..=20).map(|x| x as f64).collect();
-        let result = dema(&input, 5).unwrap();
+        let result = double_exponential_moving_average(&input, 5).unwrap();
         // 前 8 个应为 NaN (lookback = 2*(5-1) = 8)
         assert!(result[7].is_nan());
         assert!(!result[8].is_nan());

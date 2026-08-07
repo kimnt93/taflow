@@ -9,7 +9,7 @@ use crate::simd::sum_f64;
 ///
 /// 优化版本：三层 EMA 标量级联，仅 1 个输出 Vec，无中间分配。
 /// EMA formulation: k*(x - prev) + prev — matches C TA-Lib, shorter critical path.
-pub fn tema(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn triple_exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -75,7 +75,7 @@ mod tests {
     #[test]
     fn test_tema_basic() {
         let input: Vec<f64> = (1..=30).map(|x| x as f64).collect();
-        let result = tema(&input, 5).unwrap();
+        let result = triple_exponential_moving_average(&input, 5).unwrap();
         assert!(result[11].is_nan());
         assert!(!result[12].is_nan());
     }

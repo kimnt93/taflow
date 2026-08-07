@@ -68,21 +68,21 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
     }
     use crate::overlap;
     match ma_type {
-        MaType::Sma => overlap::sma(input, period),
-        MaType::Ema => overlap::ema(input, period),
-        MaType::Wma => overlap::wma(input, period),
-        MaType::Dema => overlap::dema(input, period),
-        MaType::Tema => overlap::tema(input, period),
-        MaType::Trima => overlap::trima(input, period),
-        MaType::Kama => overlap::kama(input, period),
+        MaType::Sma => overlap::simple_moving_average(input, period),
+        MaType::Ema => overlap::exponential_moving_average(input, period),
+        MaType::Wma => overlap::weighted_moving_average(input, period),
+        MaType::Dema => overlap::double_exponential_moving_average(input, period),
+        MaType::Tema => overlap::triple_exponential_moving_average(input, period),
+        MaType::Trima => overlap::triangular_moving_average(input, period),
+        MaType::Kama => overlap::kaufman_adaptive_moving_average(input, period),
         // MAMA/T3 通过 MA 调度器调用时使用固定默认值，与 C TA-Lib ta_MA.c 完全一致:
         //   MAMA: fastlimit=0.5, slowlimit=0.05 (忽略 period)
         //   T3:   vfactor=0.7 (period 正常传递)
         MaType::Mama => {
-            let (mama, _fama) = overlap::mama(input, 0.5, 0.05)?;
+            let (mama, _fama) = overlap::mesa_adaptive_moving_average(input, 0.5, 0.05)?;
             Ok(mama)
         }
-        MaType::T3 => overlap::t3(input, period, 0.7),
+        MaType::T3 => overlap::triple_exponential_average(input, period, 0.7),
     }
 }
 

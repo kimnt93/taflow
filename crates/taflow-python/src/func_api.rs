@@ -24,7 +24,7 @@ pub fn ACCBANDS(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (upper, middle, lower) = ta_err!(core::overlap::accbands(
+    let (upper, middle, lower) = ta_err!(core::overlap::acceleration_bands(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -44,7 +44,7 @@ pub fn SMA(
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::sma(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::simple_moving_average(input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -55,7 +55,7 @@ pub fn EMA(
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::ema(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::exponential_moving_average(input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -66,7 +66,7 @@ pub fn WMA(
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::wma(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::weighted_moving_average(input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -77,7 +77,7 @@ pub fn DEMA(
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::dema(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::double_exponential_moving_average(input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -88,7 +88,7 @@ pub fn TEMA(
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::tema(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::triple_exponential_moving_average(input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -99,7 +99,7 @@ pub fn TRIMA(
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::trima(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::triangular_moving_average(input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -110,7 +110,7 @@ pub fn KAMA(
     input: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::kama(input.as_slice()?, timeperiod))?;
+    let result = ta_err!(core::overlap::kaufman_adaptive_moving_average(input.as_slice()?, timeperiod))?;
     Ok(to_py_array(py, result))
 }
 
@@ -122,7 +122,7 @@ pub fn T3(
     timeperiod: usize,
     vfactor: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::t3(input.as_slice()?, timeperiod, vfactor))?;
+    let result = ta_err!(core::overlap::triple_exponential_average(input.as_slice()?, timeperiod, vfactor))?;
     Ok(to_py_array(py, result))
 }
 
@@ -134,7 +134,7 @@ pub fn MAMA(
     fastlimit: f64,
     slowlimit: f64,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (mama, fama) = ta_err!(core::overlap::mama(input.as_slice()?, fastlimit, slowlimit))?;
+    let (mama, fama) = ta_err!(core::overlap::mesa_adaptive_moving_average(input.as_slice()?, fastlimit, slowlimit))?;
     Ok((to_py_array(py, mama), to_py_array(py, fama)))
 }
 
@@ -150,7 +150,7 @@ pub fn BBANDS(
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let (upper, middle, lower) = ta_err!(core::overlap::bbands(
+    let (upper, middle, lower) = ta_err!(core::overlap::bollinger_bands(
         input.as_slice()?,
         timeperiod,
         nbdevup,
@@ -173,7 +173,7 @@ pub fn SAR(
     acceleration: f64,
     maximum: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::sar(
+    let result = ta_err!(core::overlap::parabolic_sar(
         high.as_slice()?,
         low.as_slice()?,
         acceleration,
@@ -197,7 +197,7 @@ pub fn SAREXT(
     accelerationshort: f64,
     accelerationmaxshort: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::sar_ext(
+    let result = ta_err!(core::overlap::extended_parabolic_sar(
         high.as_slice()?,
         low.as_slice()?,
         startvalue,
@@ -251,7 +251,7 @@ pub fn MAVP(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::overlap::mavp(
+    let result = ta_err!(core::overlap::moving_average_variable_period(
         input.as_slice()?,
         periods.as_slice()?,
         minperiod,
@@ -263,7 +263,7 @@ pub fn MAVP(
 
 #[pyfunction]
 pub fn HT_TRENDLINE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::overlap::ht_trendline(input.as_slice()?))?;
+    let result = ta_err!(core::overlap::hilbert_transform_trendline(input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -277,7 +277,7 @@ pub fn MA(
 ) -> PyResult<Py<PyArray1<f64>>> {
     let ma = core::MaType::try_from(matype)
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = ta_err!(core::overlap::ma(input.as_slice()?, timeperiod, ma))?;
+    let result = ta_err!(core::overlap::moving_average(input.as_slice()?, timeperiod, ma))?;
     Ok(to_py_array(py, result))
 }
 
@@ -826,7 +826,7 @@ pub fn ATR(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volatility::atr(
+    let result = ta_err!(core::volatility::average_true_range(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -844,7 +844,7 @@ pub fn NATR(
     close: PyReadonlyArray1<f64>,
     timeperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volatility::natr(
+    let result = ta_err!(core::volatility::normalized_average_true_range(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -860,7 +860,7 @@ pub fn TRANGE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volatility::trange(
+    let result = ta_err!(core::volatility::true_range(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -880,7 +880,7 @@ pub fn AD(
     close: PyReadonlyArray1<f64>,
     volume: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volume::ad(
+    let result = ta_err!(core::volume::accumulation_distribution(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -900,7 +900,7 @@ pub fn ADOSC(
     fastperiod: usize,
     slowperiod: usize,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volume::adosc(
+    let result = ta_err!(core::volume::accumulation_distribution_oscillator(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?,
@@ -917,7 +917,7 @@ pub fn OBV(
     close: PyReadonlyArray1<f64>,
     volume: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::volume::obv(close.as_slice()?, volume.as_slice()?))?;
+    let result = ta_err!(core::volume::on_balance_volume(close.as_slice()?, volume.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -933,7 +933,7 @@ pub fn AVGPRICE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::avgprice(
+    let result = ta_err!(core::price_transform::average_price(
         open.as_slice()?,
         high.as_slice()?,
         low.as_slice()?,
@@ -948,7 +948,7 @@ pub fn MEDPRICE(
     high: PyReadonlyArray1<f64>,
     low: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::medprice(
+    let result = ta_err!(core::price_transform::median_price(
         high.as_slice()?,
         low.as_slice()?
     ))?;
@@ -962,7 +962,7 @@ pub fn TYPPRICE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::typprice(
+    let result = ta_err!(core::price_transform::typical_price(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -977,7 +977,7 @@ pub fn WCLPRICE(
     low: PyReadonlyArray1<f64>,
     close: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::price_transform::wclprice(
+    let result = ta_err!(core::price_transform::weighted_close(
         high.as_slice()?,
         low.as_slice()?,
         close.as_slice()?
@@ -1296,13 +1296,13 @@ pub fn MINMAXINDEX(
 
 #[pyfunction]
 pub fn HT_DCPERIOD(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::cycle::ht_dcperiod(input.as_slice()?))?;
+    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_period(input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
 #[pyfunction]
 pub fn HT_DCPHASE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<f64>>> {
-    let result = ta_err!(core::cycle::ht_dcphase(input.as_slice()?))?;
+    let result = ta_err!(core::cycle::hilbert_transform_dominant_cycle_phase(input.as_slice()?))?;
     Ok(to_py_array(py, result))
 }
 
@@ -1311,7 +1311,7 @@ pub fn HT_PHASOR(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (inphase, quadrature) = ta_err!(core::cycle::ht_phasor(input.as_slice()?))?;
+    let (inphase, quadrature) = ta_err!(core::cycle::hilbert_transform_phasor(input.as_slice()?))?;
     Ok((to_py_array(py, inphase), to_py_array(py, quadrature)))
 }
 
@@ -1320,13 +1320,13 @@ pub fn HT_SINE(
     py: Python<'_>,
     input: PyReadonlyArray1<f64>,
 ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-    let (sine, leadsine) = ta_err!(core::cycle::ht_sine(input.as_slice()?))?;
+    let (sine, leadsine) = ta_err!(core::cycle::hilbert_transform_sine_wave(input.as_slice()?))?;
     Ok((to_py_array(py, sine), to_py_array(py, leadsine)))
 }
 
 #[pyfunction]
 pub fn HT_TRENDMODE(py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<Py<PyArray1<i32>>> {
-    let result = ta_err!(core::cycle::ht_trendmode(input.as_slice()?))?;
+    let result = ta_err!(core::cycle::hilbert_transform_trend_mode(input.as_slice()?))?;
     Ok(crate::conversion::to_py_array_i32(py, result))
 }
 

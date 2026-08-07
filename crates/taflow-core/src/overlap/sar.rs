@@ -4,7 +4,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// acceleration 默认 0.02, maximum 默认 0.2
 /// lookback = 1
-pub fn sar(high: &[f64], low: &[f64], acceleration: f64, maximum: f64) -> TaResult<Vec<f64>> {
+pub fn parabolic_sar(high: &[f64], low: &[f64], acceleration: f64, maximum: f64) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() {
         return Err(TaError::LengthMismatch {
@@ -131,7 +131,7 @@ pub fn sar(high: &[f64], low: &[f64], acceleration: f64, maximum: f64) -> TaResu
 /// 支持多空不同加速因子、startvalue 指定初始方向、offsetonreverse 反转偏移。
 /// 输出: 正值 = 多头 SAR, 负值 = 空头 SAR
 /// lookback = 1
-pub fn sar_ext(
+pub fn extended_parabolic_sar(
     high: &[f64],
     low: &[f64],
     startvalue: f64,
@@ -290,7 +290,7 @@ mod tests {
     fn test_sar_basic() {
         let high = vec![10.0, 11.0, 12.0, 11.5, 13.0, 12.0, 11.0, 10.5, 10.0, 9.0];
         let low = vec![9.0, 9.5, 10.0, 10.0, 11.0, 10.5, 9.5, 9.0, 8.5, 8.0];
-        let result = sar(&high, &low, 0.02, 0.2).unwrap();
+        let result = parabolic_sar(&high, &low, 0.02, 0.2).unwrap();
         assert_eq!(result.len(), 10);
         assert!(result[0].is_nan()); // C TA-Lib lookback = 1
         assert!(!result[1].is_nan());
@@ -300,7 +300,7 @@ mod tests {
     fn test_sar_updates_across_bars() {
         let high = vec![10.0, 11.0, 12.0, 13.0, 14.0];
         let low = vec![9.0, 9.5, 10.0, 10.5, 11.0];
-        let result = sar(&high, &low, 0.02, 0.2).unwrap();
+        let result = parabolic_sar(&high, &low, 0.02, 0.2).unwrap();
         assert!(result[2] > result[1], "SAR should increase in uptrend");
         assert!(result[3] > result[2], "SAR should keep increasing");
     }
@@ -309,7 +309,7 @@ mod tests {
     fn test_sar_ext_sign_convention() {
         let high = vec![10.0, 11.0, 12.0, 13.0, 14.0];
         let low = vec![9.0, 9.5, 10.0, 10.5, 11.0];
-        let result = sar_ext(&high, &low, 0.0, 0.0, 0.02, 0.02, 0.2, 0.02, 0.02, 0.2).unwrap();
+        let result = extended_parabolic_sar(&high, &low, 0.0, 0.0, 0.02, 0.02, 0.2, 0.02, 0.02, 0.2).unwrap();
         for i in 1..result.len() {
             assert!(result[i] > 0.0, "Long SAR should be positive at index {}", i);
         }
@@ -319,8 +319,8 @@ mod tests {
     fn test_sar_ext_long_short_differ() {
         let high = vec![10.0, 11.0, 12.0, 11.0, 10.0, 9.0, 8.0, 9.0, 10.0, 11.0];
         let low = vec![9.0, 10.0, 11.0, 10.0, 9.0, 8.0, 7.0, 8.0, 9.0, 10.0];
-        let r1 = sar_ext(&high, &low, 0.0, 0.0, 0.02, 0.02, 0.2, 0.02, 0.02, 0.2).unwrap();
-        let r2 = sar_ext(&high, &low, 0.0, 0.0, 0.04, 0.04, 0.4, 0.02, 0.02, 0.2).unwrap();
+        let r1 = extended_parabolic_sar(&high, &low, 0.0, 0.0, 0.02, 0.02, 0.2, 0.02, 0.02, 0.2).unwrap();
+        let r2 = extended_parabolic_sar(&high, &low, 0.0, 0.0, 0.04, 0.04, 0.4, 0.02, 0.02, 0.2).unwrap();
         let diff: f64 = r1
             .iter()
             .zip(r2.iter())

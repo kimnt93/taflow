@@ -117,7 +117,7 @@ mod tests {
         let input: Vec<f64> = (0..400)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let expected = crate::cycle::ht_trendmode(&input).unwrap();
+        let expected = crate::cycle::hilbert_transform_trend_mode(&input).unwrap();
         let mut state = HtTrendmode::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {

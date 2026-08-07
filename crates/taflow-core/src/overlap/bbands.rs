@@ -8,7 +8,7 @@ use crate::ma_type::{compute_ma, MaType};
 /// upperband = middleband + nbdevup * stddev
 /// lowerband = middleband - nbdevdn * stddev
 /// lookback = timeperiod - 1
-pub fn bbands(
+pub fn bollinger_bands(
     input: &[f64],
     timeperiod: usize,
     nbdevup: f64,
@@ -126,7 +126,7 @@ mod tests {
     #[test]
     fn test_bbands_basic() {
         let input = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
-        let (upper, middle, lower) = bbands(&input, 5, 2.0, 2.0, MaType::Sma).unwrap();
+        let (upper, middle, lower) = bollinger_bands(&input, 5, 2.0, 2.0, MaType::Sma).unwrap();
 
         assert!(upper[3].is_nan());
         assert!(!upper[4].is_nan());

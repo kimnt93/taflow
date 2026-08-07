@@ -10,7 +10,7 @@ use crate::error::{TaError, TaResult};
 ///
 /// 复杂度: O(n) 而非 O(n*period)
 /// lookback = timeperiod - 1
-pub fn wma(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+pub fn weighted_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod == 0 {
         return Err(TaError::InvalidParameter {
             name: "timeperiod",
@@ -63,7 +63,7 @@ mod tests {
     #[test]
     fn test_wma_basic() {
         let input = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-        let result = wma(&input, 3).unwrap();
+        let result = weighted_moving_average(&input, 3).unwrap();
 
         assert!(result[0].is_nan());
         assert!(result[1].is_nan());
@@ -76,7 +76,7 @@ mod tests {
         // 验证递推结果与暴力计算一致
         let input: Vec<f64> = (1..=100).map(|x| x as f64).collect();
         let period = 10;
-        let result = wma(&input, period).unwrap();
+        let result = weighted_moving_average(&input, period).unwrap();
         let divider = (period * (period + 1)) as f64 / 2.0;
 
         for i in (period - 1)..100 {

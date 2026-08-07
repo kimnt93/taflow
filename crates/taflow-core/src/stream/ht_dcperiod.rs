@@ -182,7 +182,7 @@ mod tests {
         let input: Vec<f64> = (0..300)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let expected = crate::cycle::ht_dcperiod(&input).unwrap();
+        let expected = crate::cycle::hilbert_transform_dominant_cycle_period(&input).unwrap();
         let mut state = HtDcperiod::new();
         for (&input, &expected) in input.iter().zip(&expected) {
             match state.append(input) {

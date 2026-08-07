@@ -93,7 +93,7 @@ mod tests {
             .enumerate()
             .map(|(index, close)| close - 1.0 - (index as f64 * 0.13).cos().abs())
             .collect();
-        let (upper, middle, lower) = overlap::accbands(&high, &low, &close, 13).unwrap();
+        let (upper, middle, lower) = overlap::acceleration_bands(&high, &low, &close, 13).unwrap();
         let mut state = Accbands::new(13).unwrap();
         for index in 0..close.len() {
             match state.append(high[index], low[index], close[index]) {

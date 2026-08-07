@@ -14,7 +14,7 @@ fn selected_period(value: f64, minperiod: usize, maxperiod: usize) -> usize {
 }
 
 /// Computes a TA-Lib-compatible variable-period moving average.
-pub fn mavp(
+pub fn moving_average_variable_period(
     input: &[f64],
     periods: &[f64],
     minperiod: usize,
@@ -79,7 +79,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let output = mavp(&input, &periods, 2, 12, ma_type).unwrap();
+            let output = moving_average_variable_period(&input, &periods, 2, 12, ma_type).unwrap();
             let lookback = ma_type.lookback(12);
             assert!(output[..lookback].iter().all(|value| value.is_nan()));
             assert!(output[lookback..].iter().all(|value| value.is_finite()));

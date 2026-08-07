@@ -11,7 +11,7 @@ const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 /// Returns (mama, fama).
 /// fastlimit default 0.5, slowlimit default 0.05.
 /// lookback = 32
-pub fn mama(input: &[f64], fastlimit: f64, slowlimit: f64) -> TaResult<(Vec<f64>, Vec<f64>)> {
+pub fn mesa_adaptive_moving_average(input: &[f64], fastlimit: f64, slowlimit: f64) -> TaResult<(Vec<f64>, Vec<f64>)> {
     let len = input.len();
     let lookback = 32;
 
@@ -237,7 +237,7 @@ mod tests {
         let input: Vec<f64> = (0..100)
             .map(|i| 50.0 + 10.0 * (i as f64 * 0.3).sin())
             .collect();
-        let (mama, fama) = mama(&input, 0.5, 0.05).unwrap();
+        let (mama, fama) = mesa_adaptive_moving_average(&input, 0.5, 0.05).unwrap();
         // lookback = 32
         assert!(mama[31].is_nan());
         assert!(!mama[32].is_nan());
@@ -247,15 +247,15 @@ mod tests {
     #[test]
     fn test_mama_insufficient_data() {
         let input = vec![1.0; 32];
-        assert!(mama(&input, 0.5, 0.05).is_err());
+        assert!(mesa_adaptive_moving_average(&input, 0.5, 0.05).is_err());
     }
 
     #[test]
     fn test_mama_invalid_params() {
         let input: Vec<f64> = (0..100).map(|i| i as f64).collect();
-        assert!(mama(&input, 0.0, 0.05).is_err());
-        assert!(mama(&input, 0.5, 0.5).is_err());
-        assert!(mama(&input, 0.5, 0.6).is_err());
-        assert!(mama(&input, 0.5, 0.0).is_err());
+        assert!(mesa_adaptive_moving_average(&input, 0.0, 0.05).is_err());
+        assert!(mesa_adaptive_moving_average(&input, 0.5, 0.5).is_err());
+        assert!(mesa_adaptive_moving_average(&input, 0.5, 0.6).is_err());
+        assert!(mesa_adaptive_moving_average(&input, 0.5, 0.0).is_err());
     }
 }

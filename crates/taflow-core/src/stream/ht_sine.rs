@@ -54,7 +54,7 @@ mod tests {
         let input: Vec<f64> = (0..400)
             .map(|i| 100.0 + (i as f64 * 0.11).sin() * 8.0)
             .collect();
-        let (sine, leadsine) = crate::cycle::ht_sine(&input).unwrap();
+        let (sine, leadsine) = crate::cycle::hilbert_transform_sine_wave(&input).unwrap();
         let mut state = HtSine::new();
         for ((&input, &sine), &leadsine) in input.iter().zip(&sine).zip(&leadsine) {
             match state.append(input) {

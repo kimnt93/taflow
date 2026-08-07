@@ -106,7 +106,7 @@ mod tests {
             .collect();
         for code in 0..=8 {
             let ma_type = MaType::try_from(code).unwrap();
-            let expected = overlap::mavp(&input, &periods, 2, 12, ma_type).unwrap();
+            let expected = overlap::moving_average_variable_period(&input, &periods, 2, 12, ma_type).unwrap();
             let mut state = Mavp::new(2, 12, ma_type).unwrap();
             for index in 0..input.len() {
                 match state.append(input[index], periods[index]) {

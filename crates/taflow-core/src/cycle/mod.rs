@@ -150,7 +150,7 @@ impl WmaState {
 /// HT_DCPERIOD - Hilbert Transform - Dominant Cycle Period
 ///
 /// lookback = 32
-pub fn ht_dcperiod(input: &[f64]) -> TaResult<Vec<f64>> {
+pub fn hilbert_transform_dominant_cycle_period(input: &[f64]) -> TaResult<Vec<f64>> {
     let len = input.len();
     let lookback: usize = 32;
 
@@ -279,7 +279,7 @@ pub fn ht_dcperiod(input: &[f64]) -> TaResult<Vec<f64>> {
 ///
 /// Returns (inphase, quadrature) = (I1, Q1).
 /// lookback = 32
-pub fn ht_phasor(input: &[f64]) -> TaResult<(Vec<f64>, Vec<f64>)> {
+pub fn hilbert_transform_phasor(input: &[f64]) -> TaResult<(Vec<f64>, Vec<f64>)> {
     let len = input.len();
     let lookback: usize = 32;
 
@@ -606,7 +606,7 @@ fn ht_dc_phase_core(input: &[f64]) -> DcPhaseResult {
 /// HT_DCPHASE - Hilbert Transform - Dominant Cycle Phase
 ///
 /// lookback = 63
-pub fn ht_dcphase(input: &[f64]) -> TaResult<Vec<f64>> {
+pub fn hilbert_transform_dominant_cycle_phase(input: &[f64]) -> TaResult<Vec<f64>> {
     let len = input.len();
     let lookback = 63;
 
@@ -629,7 +629,7 @@ pub fn ht_dcphase(input: &[f64]) -> TaResult<Vec<f64>> {
 ///
 /// Returns (sine, leadsine).
 /// lookback = 63
-pub fn ht_sine(input: &[f64]) -> TaResult<(Vec<f64>, Vec<f64>)> {
+pub fn hilbert_transform_sine_wave(input: &[f64]) -> TaResult<(Vec<f64>, Vec<f64>)> {
     let len = input.len();
     let lookback = 63;
 
@@ -666,7 +666,7 @@ pub fn ht_sine(input: &[f64]) -> TaResult<(Vec<f64>, Vec<f64>)> {
 ///
 /// Returns 1 (trend) or 0 (cycle).
 /// lookback = 63
-pub fn ht_trendmode(input: &[f64]) -> TaResult<Vec<i32>> {
+pub fn hilbert_transform_trend_mode(input: &[f64]) -> TaResult<Vec<i32>> {
     let len = input.len();
     let lookback: usize = 63;
 
@@ -929,7 +929,7 @@ mod tests {
     #[test]
     fn test_ht_dcperiod_basic() {
         let input = make_test_data(200);
-        let result = ht_dcperiod(&input).unwrap();
+        let result = hilbert_transform_dominant_cycle_period(&input).unwrap();
         assert!(result[31].is_nan());
         assert!(!result[32].is_nan());
         for i in 32..200 {
@@ -945,13 +945,13 @@ mod tests {
     #[test]
     fn test_ht_dcperiod_insufficient_data() {
         let input = vec![1.0; 32];
-        assert!(ht_dcperiod(&input).is_err());
+        assert!(hilbert_transform_dominant_cycle_period(&input).is_err());
     }
 
     #[test]
     fn test_ht_dcphase_basic() {
         let input = make_test_data(200);
-        let result = ht_dcphase(&input).unwrap();
+        let result = hilbert_transform_dominant_cycle_phase(&input).unwrap();
         assert!(result[62].is_nan());
         assert!(!result[63].is_nan());
     }
@@ -959,13 +959,13 @@ mod tests {
     #[test]
     fn test_ht_dcphase_insufficient_data() {
         let input = vec![1.0; 63];
-        assert!(ht_dcphase(&input).is_err());
+        assert!(hilbert_transform_dominant_cycle_phase(&input).is_err());
     }
 
     #[test]
     fn test_ht_phasor_basic() {
         let input = make_test_data(200);
-        let (inphase, quadrature) = ht_phasor(&input).unwrap();
+        let (inphase, quadrature) = hilbert_transform_phasor(&input).unwrap();
         assert!(inphase[31].is_nan());
         assert!(!inphase[32].is_nan());
         assert!(quadrature[31].is_nan());
@@ -975,13 +975,13 @@ mod tests {
     #[test]
     fn test_ht_phasor_insufficient_data() {
         let input = vec![1.0; 32];
-        assert!(ht_phasor(&input).is_err());
+        assert!(hilbert_transform_phasor(&input).is_err());
     }
 
     #[test]
     fn test_ht_sine_basic() {
         let input = make_test_data(200);
-        let (sine, leadsine) = ht_sine(&input).unwrap();
+        let (sine, leadsine) = hilbert_transform_sine_wave(&input).unwrap();
         assert!(sine[62].is_nan());
         assert!(!sine[63].is_nan());
         assert!(!leadsine[63].is_nan());
@@ -1004,13 +1004,13 @@ mod tests {
     #[test]
     fn test_ht_sine_insufficient_data() {
         let input = vec![1.0; 63];
-        assert!(ht_sine(&input).is_err());
+        assert!(hilbert_transform_sine_wave(&input).is_err());
     }
 
     #[test]
     fn test_ht_trendmode_basic() {
         let input = make_test_data(200);
-        let result = ht_trendmode(&input).unwrap();
+        let result = hilbert_transform_trend_mode(&input).unwrap();
         for i in 0..63 {
             assert_eq!(result[i], 0);
         }
@@ -1026,6 +1026,6 @@ mod tests {
     #[test]
     fn test_ht_trendmode_insufficient_data() {
         let input = vec![1.0; 63];
-        assert!(ht_trendmode(&input).is_err());
+        assert!(hilbert_transform_trend_mode(&input).is_err());
     }
 }

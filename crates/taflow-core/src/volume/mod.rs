@@ -1,7 +1,7 @@
 use crate::error::{TaError, TaResult};
 
 /// Chaikin A/D Line (AD)
-pub fn ad(high: &[f64], low: &[f64], close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+pub fn accumulation_distribution(high: &[f64], low: &[f64], close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     let len = high.len();
     if len != low.len() || len != close.len() || len != volume.len() {
         return Err(TaError::LengthMismatch {
@@ -29,7 +29,7 @@ pub fn ad(high: &[f64], low: &[f64], close: &[f64], volume: &[f64]) -> TaResult<
 /// Chaikin A/D Oscillator (ADOSC) — inlined AD + dual EMA, no intermediate Vec
 ///
 /// ADOSC = EMA(AD, fastperiod) - EMA(AD, slowperiod)
-pub fn adosc(
+pub fn accumulation_distribution_oscillator(
     high: &[f64],
     low: &[f64],
     close: &[f64],
@@ -93,7 +93,7 @@ pub fn adosc(
 }
 
 /// On Balance Volume (OBV)
-pub fn obv(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
+pub fn on_balance_volume(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
     let len = close.len();
     if len != volume.len() {
         return Err(TaError::LengthMismatch {
@@ -134,7 +134,7 @@ mod tests {
     fn test_obv_basic() {
         let close = vec![1.0, 2.0, 1.5, 3.0, 2.5];
         let volume = vec![100.0, 200.0, 150.0, 300.0, 250.0];
-        let result = obv(&close, &volume).unwrap();
+        let result = on_balance_volume(&close, &volume).unwrap();
         assert!((result[0] - 100.0).abs() < 1e-10);
         assert!((result[1] - 300.0).abs() < 1e-10);
         assert!((result[2] - 150.0).abs() < 1e-10);

@@ -1851,13 +1851,13 @@ mod tests {
         let input: Vec<f64> = (0..80)
             .map(|i| 100.0 + (i as f64 * 0.37).sin() * 8.0 + i as f64 * 0.05)
             .collect();
-        let sma_batch = overlap::sma(&input, 7).unwrap();
-        let ema_batch = overlap::ema(&input, 7).unwrap();
-        let wma_batch = overlap::wma(&input, 7).unwrap();
-        let dema_batch = overlap::dema(&input, 7).unwrap();
-        let tema_batch = overlap::tema(&input, 7).unwrap();
-        let trima_batch = overlap::trima(&input, 7).unwrap();
-        let kama_batch = overlap::kama(&input, 7).unwrap();
+        let sma_batch = overlap::simple_moving_average(&input, 7).unwrap();
+        let ema_batch = overlap::exponential_moving_average(&input, 7).unwrap();
+        let wma_batch = overlap::weighted_moving_average(&input, 7).unwrap();
+        let dema_batch = overlap::double_exponential_moving_average(&input, 7).unwrap();
+        let tema_batch = overlap::triple_exponential_moving_average(&input, 7).unwrap();
+        let trima_batch = overlap::triangular_moving_average(&input, 7).unwrap();
+        let kama_batch = overlap::kaufman_adaptive_moving_average(&input, 7).unwrap();
         let midpoint_batch = overlap::midpoint(&input, 7).unwrap();
         let rsi_batch = momentum::relative_strength_index(&input, 14).unwrap();
         let cmo_batch = momentum::chande_momentum_oscillator(&input, 14).unwrap();
@@ -1972,10 +1972,10 @@ mod tests {
         let high: Vec<_> = input.iter().map(|value| value + 0.2).collect();
         let low: Vec<_> = input.iter().map(|value| value - 0.1).collect();
         let close = &other;
-        let avg = price_transform::avgprice(open, &high, &low, close).unwrap();
-        let med = price_transform::medprice(&high, &low).unwrap();
-        let typ = price_transform::typprice(&high, &low, close).unwrap();
-        let wcl = price_transform::wclprice(&high, &low, close).unwrap();
+        let avg = price_transform::average_price(open, &high, &low, close).unwrap();
+        let med = price_transform::median_price(&high, &low).unwrap();
+        let typ = price_transform::typical_price(&high, &low, close).unwrap();
+        let wcl = price_transform::weighted_close(&high, &low, close).unwrap();
         let mut avg_state = Avgprice::new();
         let mut med_state = Medprice::new();
         let mut typ_state = Typprice::new();
@@ -2148,9 +2148,9 @@ mod tests {
         let volumes: Vec<f64> = (0..close.len())
             .map(|index| 1_000.0 + (index % 13) as f64 * 37.0)
             .collect();
-        let ad_expected = volume::ad(&high, &low, &close, &volumes).unwrap();
-        let adosc_expected = volume::adosc(&high, &low, &close, &volumes, 3, 10).unwrap();
-        let obv_expected = volume::obv(&close, &volumes).unwrap();
+        let ad_expected = volume::accumulation_distribution(&high, &low, &close, &volumes).unwrap();
+        let adosc_expected = volume::accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
+        let obv_expected = volume::on_balance_volume(&close, &volumes).unwrap();
         let mut ad = Ad::new();
         let mut adosc = Adosc::new(3, 10).unwrap();
         let mut obv = Obv::new();
@@ -2236,9 +2236,9 @@ mod tests {
             .collect();
         let high: Vec<f64> = close.iter().map(|v| v + 1.5).collect();
         let low: Vec<f64> = close.iter().map(|v| v - 1.0).collect();
-        let atr_batch = volatility::atr(&high, &low, &close, 14).unwrap();
-        let trange_batch = volatility::trange(&high, &low, &close).unwrap();
-        let natr_batch = volatility::natr(&high, &low, &close, 14).unwrap();
+        let atr_batch = volatility::average_true_range(&high, &low, &close, 14).unwrap();
+        let trange_batch = volatility::true_range(&high, &low, &close).unwrap();
+        let natr_batch = volatility::normalized_average_true_range(&high, &low, &close, 14).unwrap();
         let (macd_batch, signal_batch, histogram_batch) =
             momentum::moving_average_convergence_divergence(&close, 12, 26, 9).unwrap();
         let mut atr = Atr::new(14).unwrap();
