@@ -11,6 +11,21 @@ use crate::ma_type::MaType;
 
 use super::moving_average::MovingAverageDispatcher;
 
+/// Computes an aligned variable-period moving-average vector.
+pub fn moving_average_variable_period(
+    input: &[f64],
+    periods: &[f64],
+    minperiod: usize,
+    maxperiod: usize,
+    matype: MaType,
+) -> TaResult<Vec<f64>> {
+    if input.len() != periods.len() {
+        return Err(crate::TaError::LengthMismatch { expected: input.len(), got: periods.len() });
+    }
+    let mut state = VariablePeriodMovingAverage::new(minperiod, maxperiod, matype)?;
+    Ok(input.iter().zip(periods).map(|(&value, &period)| state.append(value, period).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental MAVP with TA-Lib-compatible truncation and clamping.
 pub struct VariablePeriodMovingAverage {
     minperiod: usize,
