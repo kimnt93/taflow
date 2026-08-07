@@ -56,6 +56,24 @@ pub fn cumprod(input: &[f64]) -> Vec<f64> {
     input.iter().map(|&value| { total *= value; total }).collect()
 }
 
+pub fn cummax(input: &[f64]) -> Vec<f64> {
+    let mut maximum = f64::NEG_INFINITY;
+    input.iter().map(|&value| { maximum = maximum.max(value); maximum }).collect()
+}
+
+pub fn cummin(input: &[f64]) -> Vec<f64> {
+    let mut minimum = f64::INFINITY;
+    input.iter().map(|&value| { minimum = minimum.min(value); minimum }).collect()
+}
+
+pub fn drawdown(input: &[f64]) -> Vec<f64> {
+    let mut maximum = f64::NEG_INFINITY;
+    input.iter().map(|&value| {
+        maximum = maximum.max(value);
+        if maximum != 0.0 { value / maximum - 1.0 } else { 0.0 }
+    }).collect()
+}
+
 /// Rolling median. Warm-up values are `NaN`; even windows average the two
 /// central values.
 pub fn rolling_median(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
@@ -548,6 +566,33 @@ macro_rules! cumulative_operator {
 cumulative_operator!(Cumsum, 0.0, |total: f64, input: f64| total + input);
 cumulative_operator!(Cumprod, 1.0, |total: f64, input: f64| total * input);
 
+macro_rules! cumulative_extrema_operator {
+    ($name:ident, $initial:expr, $operation:expr) => {
+        #[derive(Debug, Clone)]
+        pub struct $name { extreme: f64, value: Option<f64> }
+        impl $name {
+            pub fn new() -> Self { Self { extreme: $initial, value: None } }
+            pub fn append(&mut self, input: f64) -> f64 { self.extreme = $operation(self.extreme, input); self.value = Some(self.extreme); self.extreme }
+            pub fn value(&self) -> Option<f64> { self.value }
+            pub fn reset(&mut self) { self.extreme = $initial; self.value = None; }
+        }
+        impl Default for $name { fn default() -> Self { Self::new() } }
+    };
+}
+
+cumulative_extrema_operator!(Cummax, f64::NEG_INFINITY, f64::max);
+cumulative_extrema_operator!(Cummin, f64::INFINITY, f64::min);
+
+#[derive(Debug, Clone)]
+pub struct Drawdown { maximum: Cummax, value: Option<f64> }
+impl Drawdown {
+    pub fn new() -> Self { Self { maximum: Cummax::new(), value: None } }
+    pub fn append(&mut self, input: f64) -> f64 { let maximum = self.maximum.append(input); let value = if maximum != 0.0 { input / maximum - 1.0 } else { 0.0 }; self.value = Some(value); value }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.maximum.reset(); self.value = None; }
+}
+impl Default for Drawdown { fn default() -> Self { Self::new() } }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -558,6 +603,9 @@ mod tests {
         assert_eq!(lag(&input, 2).unwrap()[2..], [2.0, 4.0, 1.0]);
         assert_eq!(cumsum(&input), vec![2.0, 6.0, 7.0, 15.0, 17.0]);
         assert_eq!(cumprod(&input), vec![2.0, 8.0, 8.0, 64.0, 128.0]);
+        assert_eq!(cummax(&input), vec![2.0, 4.0, 4.0, 8.0, 8.0]);
+        assert_eq!(cummin(&input), vec![2.0, 2.0, 1.0, 1.0, 1.0]);
+        assert_eq!(drawdown(&input), vec![0.0, 0.0, -0.75, 0.0, -0.75]);
         let expected = log_return(&input, 2).unwrap();
         let mut state = LogReturn::new(2).unwrap();
         for (input, expected) in input.iter().zip(expected) {

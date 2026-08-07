@@ -95,6 +95,9 @@ from ..ewm_var import EwmVar
 from ..ewm_std import EwmStd
 from ..ewm_cov import EwmCov
 from ..ewm_corr import EwmCorr
+from ..cummax import Cummax
+from ..cummin import Cummin
+from ..drawdown import Drawdown
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -174,4 +177,5 @@ __all__ = [
     "RollingCov", "RollingWinsorize",
     "rolling_apply",
     "EwmVar", "EwmStd", "EwmCov", "EwmCorr",
+    "Cummax", "Cummin", "Drawdown",
 ]

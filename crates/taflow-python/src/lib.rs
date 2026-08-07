@@ -76,6 +76,9 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::EwmStdOperator>()?;
     m.add_class::<indicators::EwmCovOperator>()?;
     m.add_class::<indicators::EwmCorrOperator>()?;
+    m.add_class::<indicators::CummaxOperator>()?;
+    m.add_class::<indicators::CumminOperator>()?;
+    m.add_class::<indicators::DrawdownOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

@@ -38,7 +38,7 @@ they are not re-proposed later.
 
 ## Return and risk features
 
-- [ ] drawdown (needs a running-max state; also expose cummax / cummin as
+- [x] drawdown (needs a running-max state; also expose cummax / cummin as
       the underlying primitives)
 - [ ] rolling_sharpe / rolling_sortino / rolling_calmar
 
