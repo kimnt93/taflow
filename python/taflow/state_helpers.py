@@ -1,221 +1,64 @@
+"""Compatibility exports for stateful signal helpers.
+
+The concrete lifecycle adapters live in one module per public indicator;
+the three condition/value helpers retain a shared native-backed factory.
+"""
+
 from typing import Any
+
 import numpy as np
-from ._native import (
-    BarsSinceOperator,
-    ValueWhenOperator,
-    HighestSinceOperator,
-    LowestSinceOperator,
-    SignalDelayOperator,
-    PositionHoldOperator,
-    EntryExitOperator,
-)
+
+from ._native import HighestSinceOperator, LowestSinceOperator, ValueWhenOperator
 from ._series import as_float64_series
+from .bars_since import BarsSince
+from .entry_exit import EntryExit
+from .position_hold import PositionHold
+from .signal_delay import SignalDelay
 
 
-class BarsSince:
-    """Track the number of bars since a boolean condition was true.
-
-    Parameters
-    ----------
-    condition : array-like, optional
-        Initial boolean condition history.
-    """
-
-    def __init__(self, condition: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
-
-        Parameters
-        ----------
-        condition : object
-            Boolean condition series or the current condition.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = BarsSinceOperator()
-        self.extend(condition) if condition is not None else None
-
-    def append(self, condition: bool) -> object:
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        condition : object
-            Boolean condition series or the current condition.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(condition)
-        return self
-
-    def extend(self, condition: Any) -> object:
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        condition : object
-            Boolean condition series or the current condition.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(np.asarray(condition, dtype=bool))
-        return self
-
-    def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.compute()
-
-    @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> object:
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
-
-
-def _make(native: object, name: object) -> object:
-    """Execute the _make operation through the native Rust implementation.
-
-    Parameters
-    ----------
-    native : object
-        Input parameter or configuration value for this operation.
-    name : object
-        Input parameter or configuration value for this operation.
-
-    Returns
-    -------
-    object
-        The updated adapter, native value, aligned output array, or execution node.
-    """
+def _make(native: object, name: str) -> type:
+    """Create a native-backed two-input state adapter class."""
 
     class State:
-        """Adapt a native two-input state helper to the Python lifecycle API."""
+        """Track a condition and associated value series."""
 
         def __init__(
             self, condition: Any | None = None, _input: Any | None = None
         ) -> None:
-            """Initialize this adapter and optionally process the supplied input series.
-
-            Parameters
-            ----------
-            condition : object
-                Boolean condition series or the current condition.
-            _input : object
-                Input series or the current scalar observation.
-
-            Returns
-            -------
-            None
-                The constructor initializes the adapter and returns no value.
-            """
+            """Create the state and optionally process aligned histories."""
             self._state = native()
-            (
+            if condition is not None or _input is not None:
                 self.extend(condition, _input)
-                if condition is not None or _input is not None
-                else None
-            )
 
-        def append(self, condition: bool, _input: float) -> object:
-            """Append one observation or aligned bar to the native Rust state.
-
-            Parameters
-            ----------
-            condition : object
-                Boolean condition series or the current condition.
-            _input : object
-                Input series or the current scalar observation.
-
-            Returns
-            -------
-            Self
-                The updated adapter, native value, aligned output array, or execution node.
-            """
+        def append(self, condition: bool, _input: float) -> "State":
+            """Append one condition/value pair to the native state."""
             self._state.append(condition, _input)
             return self
 
-        def extend(self, condition: Any, _input: Any) -> object:
-            """Append aligned input series to the native Rust state.
-
-            Parameters
-            ----------
-            condition : object
-                Boolean condition series or the current condition.
-            _input : object
-                Input series or the current scalar observation.
-
-            Returns
-            -------
-            Self
-                The updated adapter, native value, aligned output array, or execution node.
-            """
+        def extend(self, condition: Any, _input: Any) -> "State":
+            """Process aligned condition and value histories in native Rust."""
             self._state.extend(
                 np.asarray(condition, dtype=bool), as_float64_series(_input)
             )
             return self
 
         def compute(self) -> np.ndarray:
-            """Return the aligned output history as a NumPy array.
-
-            Returns
-            -------
-            numpy.ndarray or tuple of numpy.ndarray
-                The updated adapter, native value, aligned output array, or execution node.
-            """
+            """Return the aligned native output history."""
             return self._state.compute()
 
         @property
         def value(self) -> object:
-            """Return the latest computed value, or None during warm-up.
-
-            Returns
-            -------
-            float, tuple, or None
-                The updated adapter, native value, aligned output array, or execution node.
-            """
+            """Return the latest native output."""
             return self._state.value
 
-        def reset(self) -> object:
-            """Execute the reset operation through the native Rust implementation.
-
-            Returns
-            -------
-            Self
-                The updated adapter, native value, aligned output array, or execution node.
-            """
+        def reset(self) -> "State":
+            """Reset the native state and accumulated history."""
             self._state.reset()
             return self
 
     State.__name__ = name
+    State.__qualname__ = name
+    State.__module__ = __name__
     return State
 
 
@@ -223,284 +66,12 @@ ValueWhen = _make(ValueWhenOperator, "ValueWhen")
 HighestSince = _make(HighestSinceOperator, "HighestSince")
 LowestSince = _make(LowestSinceOperator, "LowestSince")
 
-
-class SignalDelay:
-    """Delay a scalar series by a fixed causal number of bars.
-
-    Parameters
-    ----------
-    timeperiod : int
-        Number of bars to delay.
-    _input : array-like, optional
-        Initial input history.
-    """
-
-    def __init__(self, timeperiod: int, _input: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
-
-        Parameters
-        ----------
-        timeperiod : object
-            Trailing window length in bars.
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = SignalDelayOperator(timeperiod)
-        self.extend(_input) if _input is not None else None
-
-    def append(self, _input: float) -> object:
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(_input)
-        return self
-
-    def extend(self, _input: Any) -> object:
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(_input))
-        return self
-
-    def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.compute()
-
-    @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> object:
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
-
-
-class PositionHold:
-    """Hold the most recently supplied position value.
-
-    Parameters
-    ----------
-    _input : array-like, optional
-        Initial position history.
-    """
-
-    def __init__(self, _input: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = PositionHoldOperator()
-        self.extend(_input) if _input is not None else None
-
-    def append(self, _input: float) -> object:
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(_input)
-        return self
-
-    def extend(self, _input: Any) -> object:
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(_input))
-        return self
-
-    def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.compute()
-
-    @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> object:
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
-
-
-class EntryExit:
-    """Track entry and exit events as a stateful position signal.
-
-    Parameters
-    ----------
-    entry : array-like, optional
-        Initial entry-event history.
-    _exit : array-like, optional
-        Initial exit-event history.
-    """
-
-    def __init__(self, entry: Any | None = None, _exit: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
-
-        Parameters
-        ----------
-        entry : object
-            Boolean entry signal series or current signal.
-        _exit : object
-            Boolean exit signal series or current signal.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = EntryExitOperator()
-        self.extend(entry, _exit) if entry is not None or _exit is not None else None
-
-    def append(self, entry: bool, _exit: bool) -> object:
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        entry : object
-            Boolean entry signal series or current signal.
-        _exit : object
-            Boolean exit signal series or current signal.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(entry, _exit)
-        return self
-
-    def extend(self, entry: Any, _exit: Any) -> object:
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        entry : object
-            Boolean entry signal series or current signal.
-        _exit : object
-            Boolean exit signal series or current signal.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(np.asarray(entry, dtype=bool), np.asarray(_exit, dtype=bool))
-        return self
-
-    def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.compute()
-
-    @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> object:
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
+__all__ = [
+    "BarsSince",
+    "ValueWhen",
+    "HighestSince",
+    "LowestSince",
+    "SignalDelay",
+    "PositionHold",
+    "EntryExit",
+]
