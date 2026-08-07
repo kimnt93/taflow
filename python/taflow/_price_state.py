@@ -36,7 +36,7 @@ class OhlcPriceState:
             self.extend(_open, high, low, close)
 
     def append(self, _open: object, high: object, low: object, close: object) -> object:
-        """Append one OHLC bar to native state..
+        """Append one OHLC bar to native state
 
         Parameters
         ----------
@@ -52,7 +52,7 @@ class OhlcPriceState:
         return self
 
     def extend(self, _open: object, high: object, low: object, close: object) -> object:
-        """Append aligned OHLC histories to native state..
+        """Append aligned OHLC histories to native state
 
         Parameters
         ----------
@@ -74,7 +74,7 @@ class OhlcPriceState:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history..
+        """Return aligned native output history
 
         Returns
         -------
@@ -85,7 +85,7 @@ class OhlcPriceState:
 
     @property
     def value(self) -> object:
-        """Return latest native output..
+        """Return latest native output
 
         Returns
         -------
@@ -95,7 +95,7 @@ class OhlcPriceState:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------
@@ -132,7 +132,7 @@ class HlcPriceState:
             self.extend(high, low, close)
 
     def append(self, high: object, low: object, close: object) -> object:
-        """Append one HLC bar to native state..
+        """Append one HLC bar to native state
 
         Parameters
         ----------
@@ -148,7 +148,7 @@ class HlcPriceState:
         return self
 
     def extend(self, high: object, low: object, close: object) -> object:
-        """Append aligned HLC histories to native state..
+        """Append aligned HLC histories to native state
 
         Parameters
         ----------
@@ -167,7 +167,7 @@ class HlcPriceState:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history..
+        """Return aligned native output history
 
         Returns
         -------
@@ -178,7 +178,7 @@ class HlcPriceState:
 
     @property
     def value(self) -> object:
-        """Return latest native output..
+        """Return latest native output
 
         Returns
         -------
@@ -188,7 +188,7 @@ class HlcPriceState:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------
@@ -223,7 +223,7 @@ class HlPriceState:
             self.extend(high, low)
 
     def append(self, high: object, low: object) -> object:
-        """Append one high/low observation to native state..
+        """Append one high/low observation to native state
 
         Parameters
         ----------
@@ -239,7 +239,7 @@ class HlPriceState:
         return self
 
     def extend(self, high: object, low: object) -> object:
-        """Append aligned high/low histories to native state..
+        """Append aligned high/low histories to native state
 
         Parameters
         ----------
@@ -256,7 +256,7 @@ class HlPriceState:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history..
+        """Return aligned native output history
 
         Returns
         -------
@@ -267,7 +267,7 @@ class HlPriceState:
 
     @property
     def value(self) -> object:
-        """Return latest native output..
+        """Return latest native output
 
         Returns
         -------
@@ -277,7 +277,7 @@ class HlPriceState:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

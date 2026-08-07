@@ -64,7 +64,7 @@ class MovingAverageConvergenceDivergenceFixed:
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return aligned MACD, signal, and histogram histories..
+        """Return aligned MACD, signal, and histogram histories
 
         Returns
         -------

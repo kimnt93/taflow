@@ -569,7 +569,7 @@ class NumpyAdapter:
 
     @staticmethod
     def input(values: object, *, column: object = None) -> object:
-        """Convert an array-like input to contiguous float64 values..
+        """Convert an array-like input to contiguous float64 values
 
         Parameters
         ----------
@@ -585,7 +585,7 @@ class NumpyAdapter:
 
     @staticmethod
     def output(values: object) -> object:
-        """Return contiguous float64 NumPy output..
+        """Return contiguous float64 NumPy output
 
         Parameters
         ----------
@@ -615,7 +615,7 @@ class PythonListAdapter:
 
     @staticmethod
     def input(values: object, *, column: object = None) -> object:
-        """Convert a Python sequence to contiguous float64 values..
+        """Convert a Python sequence to contiguous float64 values
 
         Parameters
         ----------
@@ -631,7 +631,7 @@ class PythonListAdapter:
 
     @staticmethod
     def output(values: object) -> object:
-        """Return output as a Python list of floats..
+        """Return output as a Python list of floats
 
         Parameters
         ----------
@@ -707,7 +707,7 @@ class ArrowAdapter:
 
     @classmethod
     def output(cls, values: object) -> object:
-        """Convert values to an Arrow array..
+        """Convert values to an Arrow array
 
         Parameters
         ----------
@@ -781,7 +781,7 @@ class PolarsAdapter:
 
     @classmethod
     def output(cls, values: object, name: object = "value") -> object:
-        """Convert values to a Polars Series..
+        """Convert values to a Polars Series
 
         Parameters
         ----------

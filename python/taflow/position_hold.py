@@ -24,7 +24,7 @@ class PositionHold:
             self.extend(_input)
 
     def append(self, _input: float) -> "PositionHold":
-        """Append one position value and update the native result..
+        """Append one position value and update the native result
 
         Parameters
         ----------
@@ -40,7 +40,7 @@ class PositionHold:
         return self
 
     def extend(self, _input: Any) -> "PositionHold":
-        """Process an aligned position series in native Rust..
+        """Process an aligned position series in native Rust
 
         Parameters
         ----------
@@ -56,7 +56,7 @@ class PositionHold:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned held-position series..
+        """Return the aligned held-position series
 
         Returns
         -------
@@ -67,7 +67,7 @@ class PositionHold:
 
     @property
     def value(self) -> object:
-        """Return the latest held position..
+        """Return the latest held position
 
         Returns
         -------
@@ -77,7 +77,7 @@ class PositionHold:
         return self._state.value
 
     def reset(self) -> "PositionHold":
-        """Reset the native state and accumulated history..
+        """Reset the native state and accumulated history
 
         Returns
         -------

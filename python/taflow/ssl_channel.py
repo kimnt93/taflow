@@ -48,7 +48,7 @@ class SmoothedTrendChannel:
             self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> object:
-        """Process one OHLC bar and return lower/upper channel values..
+        """Process one OHLC bar and return lower/upper channel values
 
         Parameters
         ----------
@@ -63,7 +63,7 @@ class SmoothedTrendChannel:
         return self._state.append(float(high), float(low), float(close))
 
     def extend(self, high: Any, low: Any, close: Any) -> object:
-        """Process aligned OHLC history and return this indicator..
+        """Process aligned OHLC history and return this indicator
 
         Parameters
         ----------
@@ -83,7 +83,7 @@ class SmoothedTrendChannel:
         return self
 
     def compute(self) -> object:
-        """Return lower and upper channel histories..
+        """Return lower and upper channel histories
 
         Returns
         -------
@@ -94,7 +94,7 @@ class SmoothedTrendChannel:
 
     @property
     def value(self) -> object:
-        """Return the latest channel pair, or ``None`` if not warm..
+        """Return the latest channel pair, or ``None`` if not warm
 
         Returns
         -------
@@ -104,7 +104,7 @@ class SmoothedTrendChannel:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear state and accumulated channel history..
+        """Clear state and accumulated channel history
 
         Returns
         -------

@@ -32,7 +32,7 @@ class UnaryStateAdapter:
             self.extend(_input)
 
     def append(self, _input: float) -> object:
-        """Append one value and update the native state..
+        """Append one value and update the native state
 
         Parameters
         ----------
@@ -49,7 +49,7 @@ class UnaryStateAdapter:
         return self
 
     def extend(self, _input: Any) -> object:
-        """Append an aligned input history to the native state..
+        """Append an aligned input history to the native state
 
         Parameters
         ----------
@@ -66,7 +66,7 @@ class UnaryStateAdapter:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history..
+        """Return the aligned native output history
 
         Returns
         -------
@@ -77,7 +77,7 @@ class UnaryStateAdapter:
 
     @property
     def value(self) -> object:
-        """Return the latest native output, or ``None`` during warm-up..
+        """Return the latest native output, or ``None`` during warm-up
 
         Returns
         -------
@@ -87,7 +87,7 @@ class UnaryStateAdapter:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

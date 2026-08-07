@@ -44,7 +44,7 @@ class RelativeMomentumIndex:
             self.extend(close)
 
     def append(self, close: float) -> object:
-        """Process one close and return the current RMI value when warm..
+        """Process one close and return the current RMI value when warm
 
         Parameters
         ----------
@@ -59,7 +59,7 @@ class RelativeMomentumIndex:
         return self._state.append(float(close))
 
     def extend(self, close: Any) -> object:
-        """Process an aligned close history and return this indicator..
+        """Process an aligned close history and return this indicator
 
         Parameters
         ----------
@@ -75,7 +75,7 @@ class RelativeMomentumIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return all processed values with NaN warm-up entries..
+        """Return all processed values with NaN warm-up entries
 
         Returns
         -------
@@ -86,7 +86,7 @@ class RelativeMomentumIndex:
 
     @property
     def value(self) -> object:
-        """Return the most recently computed value, or ``None`` if cold..
+        """Return the most recently computed value, or ``None`` if cold
 
         Returns
         -------
@@ -96,7 +96,7 @@ class RelativeMomentumIndex:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear state and previously computed output values..
+        """Clear state and previously computed output values
 
         Returns
         -------

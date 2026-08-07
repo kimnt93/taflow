@@ -32,7 +32,7 @@ class AroonOscillator:
             self.extend(high, low)
 
     def append(self, high: float, low: float) -> "AroonOscillator":
-        """Append one high/low bar and update the native state..
+        """Append one high/low bar and update the native state
 
         Parameters
         ----------
@@ -49,7 +49,7 @@ class AroonOscillator:
         return self
 
     def extend(self, high: Any, low: Any) -> "AroonOscillator":
-        """Append aligned high and low histories to the native state..
+        """Append aligned high and low histories to the native state
 
         Parameters
         ----------
@@ -66,7 +66,7 @@ class AroonOscillator:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned oscillator history..
+        """Return the aligned oscillator history
 
         Returns
         -------
@@ -77,7 +77,7 @@ class AroonOscillator:
 
     @property
     def value(self) -> float | None:
-        """Return the latest oscillator value, or ``None`` during warm-up..
+        """Return the latest oscillator value, or ``None`` during warm-up
 
         Returns
         -------
@@ -87,7 +87,7 @@ class AroonOscillator:
         return self._state.value
 
     def reset(self) -> "AroonOscillator":
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

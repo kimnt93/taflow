@@ -38,7 +38,7 @@ class LaguerreRelativeStrengthIndex:
             self.extend(close)
 
     def append(self, close: float) -> object:
-        """Process one close and return the current oscillator value..
+        """Process one close and return the current oscillator value
 
         Parameters
         ----------
@@ -53,7 +53,7 @@ class LaguerreRelativeStrengthIndex:
         return self._state.append(float(close))
 
     def extend(self, close: Any) -> object:
-        """Process an aligned close history and return this indicator..
+        """Process an aligned close history and return this indicator
 
         Parameters
         ----------
@@ -69,7 +69,7 @@ class LaguerreRelativeStrengthIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned oscillator history..
+        """Return the aligned oscillator history
 
         Returns
         -------
@@ -80,7 +80,7 @@ class LaguerreRelativeStrengthIndex:
 
     @property
     def value(self) -> object:
-        """Return the latest oscillator value, or ``None`` if empty..
+        """Return the latest oscillator value, or ``None`` if empty
 
         Returns
         -------
@@ -90,7 +90,7 @@ class LaguerreRelativeStrengthIndex:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear state and accumulated output..
+        """Clear state and accumulated output
 
         Returns
         -------

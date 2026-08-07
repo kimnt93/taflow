@@ -63,7 +63,7 @@ class MovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned moving-average history..
+        """Return the aligned moving-average history
 
         Returns
         -------

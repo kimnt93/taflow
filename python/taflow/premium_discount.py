@@ -38,7 +38,7 @@ class PremiumDiscount:
             self.extend(close)
 
     def append(self, close: float) -> object:
-        """Process one close and return `(zone, equilibrium)`..
+        """Process one close and return `(zone, equilibrium)`
 
         Parameters
         ----------
@@ -53,7 +53,7 @@ class PremiumDiscount:
         return self._state.append(float(close))
 
     def extend(self, close: Any) -> object:
-        """Process an aligned close history and return this indicator..
+        """Process an aligned close history and return this indicator
 
         Parameters
         ----------
@@ -69,7 +69,7 @@ class PremiumDiscount:
         return self
 
     def compute(self) -> object:
-        """Return zone and equilibrium histories..
+        """Return zone and equilibrium histories
 
         Returns
         -------
@@ -80,7 +80,7 @@ class PremiumDiscount:
 
     @property
     def value(self) -> object:
-        """Return the latest zone and equilibrium pair..
+        """Return the latest zone and equilibrium pair
 
         Returns
         -------
@@ -90,7 +90,7 @@ class PremiumDiscount:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear rolling history and output..
+        """Clear rolling history and output
 
         Returns
         -------

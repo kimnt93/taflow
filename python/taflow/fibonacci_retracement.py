@@ -38,7 +38,7 @@ class FibonacciRetracement:
             self.extend(close)
 
     def append(self, close: float) -> object:
-        """Process one close and return seven retracement levels..
+        """Process one close and return seven retracement levels
 
         Parameters
         ----------
@@ -53,7 +53,7 @@ class FibonacciRetracement:
         return self._state.append(float(close))
 
     def extend(self, close: Any) -> object:
-        """Process an aligned close history and return this indicator..
+        """Process an aligned close history and return this indicator
 
         Parameters
         ----------
@@ -69,7 +69,7 @@ class FibonacciRetracement:
         return self
 
     def compute(self) -> object:
-        """Return seven aligned retracement level histories..
+        """Return seven aligned retracement level histories
 
         Returns
         -------
@@ -80,7 +80,7 @@ class FibonacciRetracement:
 
     @property
     def value(self) -> object:
-        """Return the latest seven retracement levels..
+        """Return the latest seven retracement levels
 
         Returns
         -------
@@ -90,7 +90,7 @@ class FibonacciRetracement:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear rolling history and level output..
+        """Clear rolling history and level output
 
         Returns
         -------

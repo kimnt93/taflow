@@ -63,7 +63,7 @@ class SessionVolumeLevels:
     def append(
         self, high: float, low: float, close: float, volume: float, anchor: bool = False
     ) -> object:
-        """Process one OHLCV bar and return profile levels..
+        """Process one OHLCV bar and return profile levels
 
         Parameters
         ----------
@@ -82,7 +82,7 @@ class SessionVolumeLevels:
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any, anchor: Any | None = None
     ) -> object:
-        """Process aligned OHLCV history and return this indicator..
+        """Process aligned OHLCV history and return this indicator
 
         Parameters
         ----------
@@ -107,7 +107,7 @@ class SessionVolumeLevels:
         return self
 
     def compute(self) -> object:
-        """Return point-of-control, value-area-high, and value-area-low histories..
+        """Return point-of-control, value-area-high, and value-area-low histories
 
         Returns
         -------
@@ -118,7 +118,7 @@ class SessionVolumeLevels:
 
     @property
     def value(self) -> object:
-        """Return the latest profile-level tuple..
+        """Return the latest profile-level tuple
 
         Returns
         -------
@@ -128,7 +128,7 @@ class SessionVolumeLevels:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear profile histogram and session state..
+        """Clear profile histogram and session state
 
         Returns
         -------

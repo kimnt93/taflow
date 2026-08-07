@@ -25,7 +25,7 @@ class EntryExit:
             self.extend(entry, _exit)
 
     def append(self, entry: bool, _exit: bool) -> "EntryExit":
-        """Append one entry/exit pair and update the native result..
+        """Append one entry/exit pair and update the native result
 
         Parameters
         ----------
@@ -41,7 +41,7 @@ class EntryExit:
         return self
 
     def extend(self, entry: Any, _exit: Any) -> "EntryExit":
-        """Process aligned entry and exit series in native Rust..
+        """Process aligned entry and exit series in native Rust
 
         Parameters
         ----------
@@ -57,7 +57,7 @@ class EntryExit:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned entry/exit state history..
+        """Return the aligned entry/exit state history
 
         Returns
         -------
@@ -68,7 +68,7 @@ class EntryExit:
 
     @property
     def value(self) -> object:
-        """Return the latest entry/exit state..
+        """Return the latest entry/exit state
 
         Returns
         -------
@@ -78,7 +78,7 @@ class EntryExit:
         return self._state.value
 
     def reset(self) -> "EntryExit":
-        """Reset the native state and accumulated history..
+        """Reset the native state and accumulated history
 
         Returns
         -------

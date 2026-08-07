@@ -55,7 +55,7 @@ class OpeningRange:
     def append(
         self, high: float, low: float, close: float, anchor: bool = False
     ) -> object:
-        """Process one bar and return opening high, low, and breakout flag..
+        """Process one bar and return opening high, low, and breakout flag
 
         Parameters
         ----------
@@ -72,7 +72,7 @@ class OpeningRange:
     def extend(
         self, high: Any, low: Any, close: Any, anchor: Any | None = None
     ) -> object:
-        """Process aligned OHLC history and return this indicator..
+        """Process aligned OHLC history and return this indicator
 
         Parameters
         ----------
@@ -96,7 +96,7 @@ class OpeningRange:
         return self
 
     def compute(self) -> object:
-        """Return opening highs, lows, and breakout flags..
+        """Return opening highs, lows, and breakout flags
 
         Returns
         -------
@@ -107,7 +107,7 @@ class OpeningRange:
 
     @property
     def value(self) -> object:
-        """Return the latest opening range tuple..
+        """Return the latest opening range tuple
 
         Returns
         -------
@@ -117,7 +117,7 @@ class OpeningRange:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear current session and output history..
+        """Clear current session and output history
 
         Returns
         -------

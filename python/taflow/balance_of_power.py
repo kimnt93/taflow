@@ -33,7 +33,7 @@ class BalanceOfPower:
             self.extend(_open, high, low, close)
 
     def append(self, _open: float, high: float, low: float, close: float) -> object:
-        """Append one OHLC bar and update native state..
+        """Append one OHLC bar and update native state
 
         Parameters
         ----------
@@ -50,7 +50,7 @@ class BalanceOfPower:
         return self
 
     def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
-        """Append aligned OHLC histories to native state..
+        """Append aligned OHLC histories to native state
 
         Parameters
         ----------
@@ -72,7 +72,7 @@ class BalanceOfPower:
         return self
 
     def compute(self) -> object:
-        """Return aligned native Balance of Power history..
+        """Return aligned native Balance of Power history
 
         Returns
         -------
@@ -85,7 +85,7 @@ class BalanceOfPower:
 
     @property
     def value(self) -> object:
-        """Return the latest native value..
+        """Return the latest native value
 
         Returns
         -------
@@ -95,7 +95,7 @@ class BalanceOfPower:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

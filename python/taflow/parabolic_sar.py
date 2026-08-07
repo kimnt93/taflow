@@ -71,7 +71,7 @@ class ParabolicSar:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned Parabolic SAR values..
+        """Return aligned Parabolic SAR values
 
         Returns
         -------

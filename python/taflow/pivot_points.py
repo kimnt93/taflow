@@ -50,7 +50,7 @@ class PivotPoints:
     def append(
         self, high: float, low: float, close: float, anchor: bool = False
     ) -> object:
-        """Process one OHLC bar and return five pivot levels..
+        """Process one OHLC bar and return five pivot levels
 
         Parameters
         ----------
@@ -67,7 +67,7 @@ class PivotPoints:
     def extend(
         self, high: Any, low: Any, close: Any, anchor: Any | None = None
     ) -> object:
-        """Process aligned OHLC history and return this indicator..
+        """Process aligned OHLC history and return this indicator
 
         Parameters
         ----------
@@ -91,7 +91,7 @@ class PivotPoints:
         return self
 
     def compute(self) -> object:
-        """Return pivot, resistance, and support level histories..
+        """Return pivot, resistance, and support level histories
 
         Returns
         -------
@@ -102,7 +102,7 @@ class PivotPoints:
 
     @property
     def value(self) -> object:
-        """Return the latest five pivot levels..
+        """Return the latest five pivot levels
 
         Returns
         -------
@@ -112,7 +112,7 @@ class PivotPoints:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear session extrema and pivot output..
+        """Clear session extrema and pivot output
 
         Returns
         -------

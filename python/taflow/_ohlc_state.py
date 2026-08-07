@@ -40,7 +40,7 @@ class OhlcStateAdapter:
             self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> object:
-        """Append one OHLC bar and update the native state..
+        """Append one OHLC bar and update the native state
 
         Parameters
         ----------
@@ -57,7 +57,7 @@ class OhlcStateAdapter:
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> object:
-        """Append aligned high, low, and close histories to native state..
+        """Append aligned high, low, and close histories to native state
 
         Parameters
         ----------
@@ -76,7 +76,7 @@ class OhlcStateAdapter:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history..
+        """Return the aligned native output history
 
         Returns
         -------
@@ -87,7 +87,7 @@ class OhlcStateAdapter:
 
     @property
     def value(self) -> object:
-        """Return the latest native output, or ``None`` during warm-up..
+        """Return the latest native output, or ``None`` during warm-up
 
         Returns
         -------
@@ -97,7 +97,7 @@ class OhlcStateAdapter:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

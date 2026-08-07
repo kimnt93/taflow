@@ -137,7 +137,7 @@ class CommodityChannelIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return every aligned CCI result accumulated by this object..
+        """Return every aligned CCI result accumulated by this object
 
         Returns
         -------

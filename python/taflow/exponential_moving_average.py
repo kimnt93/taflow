@@ -87,7 +87,7 @@ class ExponentialMovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return every aligned result accumulated by this object..
+        """Return every aligned result accumulated by this object
 
         Returns
         -------
@@ -99,7 +99,7 @@ class ExponentialMovingAverage:
 
     @property
     def value(self) -> float | None:
-        """Return the latest warm value without materializing history..
+        """Return the latest warm value without materializing history
 
         Returns
         -------

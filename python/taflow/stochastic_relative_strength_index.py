@@ -93,7 +93,7 @@ class StochasticRelativeStrengthIndex:
         return self
 
     def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the aligned native output histories..
+        """Return the aligned native output histories
 
         Returns
         -------

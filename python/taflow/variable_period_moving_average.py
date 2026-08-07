@@ -75,7 +75,7 @@ class VariablePeriodMovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned variable-period moving-average values..
+        """Return aligned variable-period moving-average values
 
         Returns
         -------

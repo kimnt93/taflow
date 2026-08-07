@@ -57,7 +57,7 @@ class KlingerVolumeOscillator:
             self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> object:
-        """Process one OHLCV bar and return oscillator and signal values..
+        """Process one OHLCV bar and return oscillator and signal values
 
         Parameters
         ----------
@@ -72,7 +72,7 @@ class KlingerVolumeOscillator:
         return self._state.append(float(high), float(low), float(close), float(volume))
 
     def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
-        """Process aligned OHLCV history and return this indicator..
+        """Process aligned OHLCV history and return this indicator
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class KlingerVolumeOscillator:
         return self
 
     def compute(self) -> object:
-        """Return oscillator and signal histories..
+        """Return oscillator and signal histories
 
         Returns
         -------
@@ -104,7 +104,7 @@ class KlingerVolumeOscillator:
 
     @property
     def value(self) -> object:
-        """Return the latest oscillator and signal pair..
+        """Return the latest oscillator and signal pair
 
         Returns
         -------
@@ -114,7 +114,7 @@ class KlingerVolumeOscillator:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear EMA state and accumulated output..
+        """Clear EMA state and accumulated output
 
         Returns
         -------

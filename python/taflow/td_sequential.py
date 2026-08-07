@@ -34,7 +34,7 @@ class TomDeMarkSequential:
             self.extend(close)
 
     def append(self, close: float) -> object:
-        """Process one close and return buy and sell counts..
+        """Process one close and return buy and sell counts
 
         Parameters
         ----------
@@ -49,7 +49,7 @@ class TomDeMarkSequential:
         return self._state.append(float(close))
 
     def extend(self, close: Any) -> object:
-        """Process aligned close history and return this indicator..
+        """Process aligned close history and return this indicator
 
         Parameters
         ----------
@@ -65,7 +65,7 @@ class TomDeMarkSequential:
         return self
 
     def compute(self) -> object:
-        """Return buy and sell setup-count histories..
+        """Return buy and sell setup-count histories
 
         Returns
         -------
@@ -76,7 +76,7 @@ class TomDeMarkSequential:
 
     @property
     def value(self) -> object:
-        """Return the latest buy and sell counts..
+        """Return the latest buy and sell counts
 
         Returns
         -------
@@ -86,7 +86,7 @@ class TomDeMarkSequential:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear close history and setup counts..
+        """Clear close history and setup counts
 
         Returns
         -------

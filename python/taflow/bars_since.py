@@ -23,7 +23,7 @@ class BarsSince:
             self.extend(condition)
 
     def append(self, condition: bool) -> "BarsSince":
-        """Append one condition and update the native result..
+        """Append one condition and update the native result
 
         Parameters
         ----------
@@ -39,7 +39,7 @@ class BarsSince:
         return self
 
     def extend(self, condition: Any) -> "BarsSince":
-        """Process an aligned boolean condition series in native Rust..
+        """Process an aligned boolean condition series in native Rust
 
         Parameters
         ----------
@@ -55,7 +55,7 @@ class BarsSince:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned bars-since history..
+        """Return the aligned bars-since history
 
         Returns
         -------
@@ -66,7 +66,7 @@ class BarsSince:
 
     @property
     def value(self) -> object:
-        """Return the latest bars-since value..
+        """Return the latest bars-since value
 
         Returns
         -------
@@ -76,7 +76,7 @@ class BarsSince:
         return self._state.value
 
     def reset(self) -> "BarsSince":
-        """Reset the native state and accumulated history..
+        """Reset the native state and accumulated history
 
         Returns
         -------

@@ -115,7 +115,7 @@ class ParabolicSarExtended:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned extended Parabolic SAR values..
+        """Return aligned extended Parabolic SAR values
 
         Returns
         -------

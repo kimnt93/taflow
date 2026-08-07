@@ -26,7 +26,7 @@ class SignalDelay:
             self.extend(_input)
 
     def append(self, _input: float) -> "SignalDelay":
-        """Append one value and update the native delayed result..
+        """Append one value and update the native delayed result
 
         Parameters
         ----------
@@ -42,7 +42,7 @@ class SignalDelay:
         return self
 
     def extend(self, _input: Any) -> "SignalDelay":
-        """Process an aligned input series in native Rust..
+        """Process an aligned input series in native Rust
 
         Parameters
         ----------
@@ -58,7 +58,7 @@ class SignalDelay:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned delayed series..
+        """Return the aligned delayed series
 
         Returns
         -------
@@ -69,7 +69,7 @@ class SignalDelay:
 
     @property
     def value(self) -> object:
-        """Return the latest delayed value..
+        """Return the latest delayed value
 
         Returns
         -------
@@ -79,7 +79,7 @@ class SignalDelay:
         return self._state.value
 
     def reset(self) -> "SignalDelay":
-        """Reset the native state and accumulated history..
+        """Reset the native state and accumulated history
 
         Returns
         -------

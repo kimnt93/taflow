@@ -35,7 +35,7 @@ class AbsolutePriceOscillator:
             self.extend(_input)
 
     def append(self, _input: float) -> object:
-        """Append one input value to native APO state..
+        """Append one input value to native APO state
 
         Parameters
         ----------
@@ -52,7 +52,7 @@ class AbsolutePriceOscillator:
         return self
 
     def extend(self, _input: Any) -> object:
-        """Append an aligned input history to native APO state..
+        """Append an aligned input history to native APO state
 
         Parameters
         ----------
@@ -69,7 +69,7 @@ class AbsolutePriceOscillator:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned APO history..
+        """Return aligned APO history
 
         Returns
         -------
@@ -80,7 +80,7 @@ class AbsolutePriceOscillator:
 
     @property
     def value(self) -> object:
-        """Return the latest APO value..
+        """Return the latest APO value
 
         Returns
         -------
@@ -90,7 +90,7 @@ class AbsolutePriceOscillator:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

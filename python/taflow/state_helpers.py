@@ -42,7 +42,7 @@ def _make(native: object, name: str) -> type:
                 self.extend(condition, _input)
 
         def append(self, condition: bool, _input: float) -> "State":
-            """Append one condition/value pair to the native state..
+            """Append one condition/value pair to the native state
 
             Parameters
             ----------
@@ -58,7 +58,7 @@ def _make(native: object, name: str) -> type:
             return self
 
         def extend(self, condition: Any, _input: Any) -> "State":
-            """Process aligned condition and value histories in native Rust..
+            """Process aligned condition and value histories in native Rust
 
             Parameters
             ----------
@@ -76,7 +76,7 @@ def _make(native: object, name: str) -> type:
             return self
 
         def compute(self) -> np.ndarray:
-            """Return the aligned native output history..
+            """Return the aligned native output history
 
             Returns
             -------
@@ -87,7 +87,7 @@ def _make(native: object, name: str) -> type:
 
         @property
         def value(self) -> object:
-            """Return the latest native output..
+            """Return the latest native output
 
             Returns
             -------
@@ -97,7 +97,7 @@ def _make(native: object, name: str) -> type:
             return self._state.value
 
         def reset(self) -> "State":
-            """Reset the native state and accumulated history..
+            """Reset the native state and accumulated history
 
             Returns
             -------

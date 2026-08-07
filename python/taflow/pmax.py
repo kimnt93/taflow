@@ -53,7 +53,7 @@ class ParabolicMovingAverageStop:
             self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> object:
-        """Process one OHLC bar and return stop and trend direction..
+        """Process one OHLC bar and return stop and trend direction
 
         Parameters
         ----------
@@ -68,7 +68,7 @@ class ParabolicMovingAverageStop:
         return self._state.append(float(high), float(low), float(close))
 
     def extend(self, high: Any, low: Any, close: Any) -> object:
-        """Process aligned OHLC history and return this indicator..
+        """Process aligned OHLC history and return this indicator
 
         Parameters
         ----------
@@ -88,7 +88,7 @@ class ParabolicMovingAverageStop:
         return self
 
     def compute(self) -> object:
-        """Return stop and trend histories..
+        """Return stop and trend histories
 
         Returns
         -------
@@ -99,7 +99,7 @@ class ParabolicMovingAverageStop:
 
     @property
     def value(self) -> object:
-        """Return the latest stop and trend pair..
+        """Return the latest stop and trend pair
 
         Returns
         -------
@@ -109,7 +109,7 @@ class ParabolicMovingAverageStop:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear EMA, range, and trend state..
+        """Clear EMA, range, and trend state
 
         Returns
         -------

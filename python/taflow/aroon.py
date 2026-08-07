@@ -32,7 +32,7 @@ class Aroon:
             self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Aroon":
-        """Append one high/low bar and update the native state..
+        """Append one high/low bar and update the native state
 
         Parameters
         ----------
@@ -50,7 +50,7 @@ class Aroon:
         return self
 
     def extend(self, high: Any, low: Any) -> "Aroon":
-        """Append aligned high and low histories to the native state..
+        """Append aligned high and low histories to the native state
 
         Parameters
         ----------
@@ -68,7 +68,7 @@ class Aroon:
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray]:
-        """Return aligned down and up Aroon histories..
+        """Return aligned down and up Aroon histories
 
         Returns
         -------
@@ -79,7 +79,7 @@ class Aroon:
 
     @property
     def value(self) -> tuple[float, float] | None:
-        """Return the latest down/up pair, or ``None`` during warm-up..
+        """Return the latest down/up pair, or ``None`` during warm-up
 
         Returns
         -------
@@ -89,7 +89,7 @@ class Aroon:
         return self._state.value
 
     def reset(self) -> "Aroon":
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

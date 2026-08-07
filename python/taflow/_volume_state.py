@@ -38,7 +38,7 @@ class OhlcvStateAdapter:
             self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> object:
-        """Append one OHLCV bar and update native state..
+        """Append one OHLCV bar and update native state
 
         Parameters
         ----------
@@ -55,7 +55,7 @@ class OhlcvStateAdapter:
         return self
 
     def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
-        """Append aligned OHLCV histories to native state..
+        """Append aligned OHLCV histories to native state
 
         Parameters
         ----------
@@ -77,7 +77,7 @@ class OhlcvStateAdapter:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history..
+        """Return aligned native output history
 
         Returns
         -------
@@ -88,7 +88,7 @@ class OhlcvStateAdapter:
 
     @property
     def value(self) -> object:
-        """Return latest native output, or ``None`` during warm-up..
+        """Return latest native output, or ``None`` during warm-up
 
         Returns
         -------
@@ -98,7 +98,7 @@ class OhlcvStateAdapter:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------
@@ -133,7 +133,7 @@ class CloseVolumeStateAdapter:
             self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> object:
-        """Append one close/volume observation and update native state..
+        """Append one close/volume observation and update native state
 
         Parameters
         ----------
@@ -150,7 +150,7 @@ class CloseVolumeStateAdapter:
         return self
 
     def extend(self, close: Any, volume: Any) -> object:
-        """Append aligned close and volume histories to native state..
+        """Append aligned close and volume histories to native state
 
         Parameters
         ----------
@@ -167,7 +167,7 @@ class CloseVolumeStateAdapter:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history..
+        """Return aligned native output history
 
         Returns
         -------
@@ -178,7 +178,7 @@ class CloseVolumeStateAdapter:
 
     @property
     def value(self) -> object:
-        """Return latest native output, or ``None`` during warm-up..
+        """Return latest native output, or ``None`` during warm-up
 
         Returns
         -------
@@ -188,7 +188,7 @@ class CloseVolumeStateAdapter:
         return self._state.value
 
     def reset(self) -> object:
-        """Reset native state and accumulated output history..
+        """Reset native state and accumulated output history
 
         Returns
         -------

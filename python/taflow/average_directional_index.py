@@ -80,7 +80,7 @@ class AverageDirectionalIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history..
+        """Return the aligned native output history
 
         Returns
         -------

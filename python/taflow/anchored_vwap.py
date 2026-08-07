@@ -58,7 +58,7 @@ class AnchoredVolumeWeightedAveragePrice:
     def append(
         self, high: float, low: float, close: float, volume: float, anchor: bool = False
     ) -> object:
-        """Process one OHLCV bar and return mean, upper, and lower bands..
+        """Process one OHLCV bar and return mean, upper, and lower bands
 
         Parameters
         ----------
@@ -77,7 +77,7 @@ class AnchoredVolumeWeightedAveragePrice:
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any, anchor: Any | None = None
     ) -> object:
-        """Process aligned OHLCV history and return this indicator..
+        """Process aligned OHLCV history and return this indicator
 
         Parameters
         ----------
@@ -102,7 +102,7 @@ class AnchoredVolumeWeightedAveragePrice:
         return self
 
     def compute(self) -> object:
-        """Return mean, upper-band, and lower-band histories..
+        """Return mean, upper-band, and lower-band histories
 
         Returns
         -------
@@ -113,7 +113,7 @@ class AnchoredVolumeWeightedAveragePrice:
 
     @property
     def value(self) -> object:
-        """Return the latest weighted mean and bands..
+        """Return the latest weighted mean and bands
 
         Returns
         -------
@@ -123,7 +123,7 @@ class AnchoredVolumeWeightedAveragePrice:
         return self._state.value
 
     def reset(self) -> object:
-        """Clear weighted moments and output history..
+        """Clear weighted moments and output history
 
         Returns
         -------

@@ -3,7 +3,7 @@
 use std::collections::VecDeque;
 
 use crate::TaResult;
-use super::operators::validate_period;
+use super::operator_states::validate_period;
 
 /// Delays a scalar series by a fixed number of bars.
 #[derive(Debug, Clone)]

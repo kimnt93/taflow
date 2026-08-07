@@ -1264,6 +1264,7 @@ pub fn candle_hikkake_modified(open: &[f64], high: &[f64], low: &[f64], close: &
             {
                 pattern_result = 100;
                 pattern_idx = i as i32;
+                output[i] = pattern_result;
             }
             // Bearish: bar[i] breaks up (higher high AND higher low)
             else if high[i] > high[i-1] && low[i] > low[i-1]
@@ -1272,6 +1273,7 @@ pub fn candle_hikkake_modified(open: &[f64], high: &[f64], low: &[f64], close: &
             {
                 pattern_result = -100;
                 pattern_idx = i as i32;
+                output[i] = pattern_result;
             }
         }
 
@@ -3310,7 +3312,7 @@ pub fn candle_unique_three_river(open: &[f64], high: &[f64], low: &[f64], close:
             // 3rd: small white, close <= 2nd close
             && candle_color(open[i], close[i]) == 1
             && real_body(open[i], close[i]) < ca(BODY_SHORT, body_short_sum, open, high, low, close, i)
-            && close[i] < close[i-1]) as i32 * 100;
+            && close[i] > close[i-1]) as i32 * 100;
         body_long_sum += cr(BODY_LONG, open, high, low, close, i-2) - cr(BODY_LONG, open, high, low, close, i - 2 - BODY_LONG.avg_period);
         body_short_sum += cr(BODY_SHORT, open, high, low, close, i) - cr(BODY_SHORT, open, high, low, close, i - BODY_SHORT.avg_period);
     }
