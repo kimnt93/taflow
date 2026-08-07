@@ -978,7 +978,13 @@ class Function:
 
     @property
     def input_names(self) -> OrderedDict:
-        """Ordered dict mapping input group keys to their price series names."""
+        """Return ordered input groups and their series names.
+
+        Returns
+        -------
+        OrderedDict
+            TA-Lib-compatible input-group mapping for this function.
+        """
         return self._info["input_names"]
 
     @input_names.setter
@@ -997,10 +1003,24 @@ class Function:
 
     @property
     def output_names(self) -> list:
+        """Return the ordered names of this function's outputs.
+
+        Returns
+        -------
+        list
+            Output names reported by the TA-Lib compatibility metadata.
+        """
         return self._info["output_names"]
 
     @property
     def output_flags(self) -> OrderedDict:
+        """Return output flags reported by the compatibility metadata.
+
+        Returns
+        -------
+        OrderedDict
+            Mapping of output names to TA-Lib output flags.
+        """
         return self._info["output_flags"]
 
     @property

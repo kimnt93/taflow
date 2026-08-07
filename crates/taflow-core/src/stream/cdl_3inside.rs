@@ -18,16 +18,16 @@ impl Candle {
     }
 }
 /// Incremental CDL3INSIDE state.
-pub struct Candle3Inside {
+pub struct CandleThreeInside {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Candle3Inside {
+impl Default for CandleThreeInside {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Candle3Inside {
+impl CandleThreeInside {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -94,7 +94,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let expected = crate::pattern::cdl_3inside(&open, &high, &low, &close).unwrap();
-        let mut s = Candle3Inside::new();
+        let mut s = CandleThreeInside::new();
         for (((&o, &h), &l), (&c, &e)) in open
             .iter()
             .zip(&high)

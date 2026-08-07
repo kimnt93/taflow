@@ -41,6 +41,18 @@ def _stream_wrapper(func_name):
     func = getattr(_native, func_name)
 
     def wrapper(*args, **kwargs):
+        """Run a TA-Lib-compatible function and return its latest output.
+
+        Parameters
+        ----------
+        *args, **kwargs : object
+            Arguments accepted by the wrapped batch function.
+
+        Returns
+        -------
+        float or tuple of float
+            The latest aligned output value or values.
+        """
         result = func(*args, **kwargs)
         return _last(result)
 

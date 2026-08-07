@@ -258,13 +258,13 @@ impl BalanceOfPower {
 
 /// Stateful Williams %R.
 #[derive(Debug, Clone)]
-pub struct WilliamsPercentR {
+pub struct WilliamsR {
     highs: RollingExtrema,
     lows: RollingExtrema,
     value: Option<f64>,
 }
 
-impl WilliamsPercentR {
+impl WilliamsR {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.

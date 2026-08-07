@@ -8,18 +8,18 @@ struct Candle {
     body: f64,
 }
 /// Incremental CDL2CROWS state.
-pub struct Candle2Crows {
+pub struct CandleTwoCrows {
     candles: VecDeque<Candle>,
     bodies: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for Candle2Crows {
+impl Default for CandleTwoCrows {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Candle2Crows {
+impl CandleTwoCrows {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -93,7 +93,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let expected = crate::pattern::cdl_2crows(&open, &high, &low, &close).unwrap();
-        let mut state = Candle2Crows::new();
+        let mut state = CandleTwoCrows::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

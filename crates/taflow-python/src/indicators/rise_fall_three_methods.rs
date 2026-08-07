@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleRiseFall3Methods;
+use taflow::stream::CandleRiseFallThreeMethods as CandleRiseFall3Methods;
 #[pyclass]
 /// Stateful CandleRiseFallThreeMethods candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.

@@ -25,18 +25,18 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleIdentical3Crows candle recognizer.
+/// Stateful CandleIdenticalThreeCrows candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleIdentical3Crows {
+pub struct CandleIdenticalThreeCrows {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CandleIdentical3Crows {
+impl Default for CandleIdenticalThreeCrows {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleIdentical3Crows {
+impl CandleIdenticalThreeCrows {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -112,7 +112,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_identical3crows(&o, &h, &l, &c).unwrap();
-        let mut s = CandleIdentical3Crows::new();
+        let mut s = CandleIdenticalThreeCrows::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

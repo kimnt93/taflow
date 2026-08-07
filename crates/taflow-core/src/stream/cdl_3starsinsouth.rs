@@ -25,16 +25,16 @@ impl Candle {
     }
 }
 /// Incremental CDL3STARSINSOUTH state.
-pub struct Candle3StarsInSouth {
+pub struct CandleThreeStarsInSouth {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Candle3StarsInSouth {
+impl Default for CandleThreeStarsInSouth {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Candle3StarsInSouth {
+impl CandleThreeStarsInSouth {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -125,7 +125,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let e = crate::pattern::cdl_3starsinsouth(&open, &high, &low, &close).unwrap();
-        let mut s = Candle3StarsInSouth::new();
+        let mut s = CandleThreeStarsInSouth::new();
         for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
         {
             match s.append(o, h, l, c) {

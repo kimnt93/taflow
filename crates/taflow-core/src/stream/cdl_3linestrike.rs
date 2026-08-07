@@ -20,16 +20,16 @@ impl Candle {
     }
 }
 /// Incremental CDL3LINESTRIKE state.
-pub struct Candle3LineStrike {
+pub struct CandleThreeLineStrike {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Candle3LineStrike {
+impl Default for CandleThreeLineStrike {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Candle3LineStrike {
+impl CandleThreeLineStrike {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -122,7 +122,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let e = crate::pattern::cdl_3linestrike(&open, &high, &low, &close).unwrap();
-        let mut s = Candle3LineStrike::new();
+        let mut s = CandleThreeLineStrike::new();
         for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
         {
             match s.append(o, h, l, c) {

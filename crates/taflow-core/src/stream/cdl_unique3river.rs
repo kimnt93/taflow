@@ -19,18 +19,18 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleUnique3River candle recognizer.
+/// Stateful CandleUniqueThreeRiver candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleUnique3River {
+pub struct CandleUniqueThreeRiver {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for CandleUnique3River {
+impl Default for CandleUniqueThreeRiver {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleUnique3River {
+impl CandleUniqueThreeRiver {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -102,7 +102,7 @@ mod tests {
             .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
             .collect();
         let e = crate::pattern::cdl_unique3river(&o, &h, &l, &c).unwrap();
-        let mut s = CandleUnique3River::new();
+        let mut s = CandleUniqueThreeRiver::new();
         for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
             match s.append(o, h, l, c) {
                 Some(v) => assert_eq!(v, e),

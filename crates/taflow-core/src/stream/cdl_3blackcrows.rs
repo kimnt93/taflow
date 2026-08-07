@@ -19,16 +19,16 @@ impl Candle {
     }
 }
 /// Incremental CDL3BLACKCROWS state.
-pub struct Candle3BlackCrows {
+pub struct CandleThreeBlackCrows {
     candles: VecDeque<Candle>,
     value: Option<i32>,
 }
-impl Default for Candle3BlackCrows {
+impl Default for CandleThreeBlackCrows {
     fn default() -> Self {
         Self::new()
     }
 }
-impl Candle3BlackCrows {
+impl CandleThreeBlackCrows {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -106,7 +106,7 @@ mod tests {
         let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
         let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
         let expected = crate::pattern::cdl_3blackcrows(&open, &high, &low, &close).unwrap();
-        let mut state = Candle3BlackCrows::new();
+        let mut state = CandleThreeBlackCrows::new();
         for (((&o, &h), &l), (&c, &expected)) in open
             .iter()
             .zip(&high)

@@ -1383,7 +1383,7 @@ impl StatefulBop {
 
 #[pyclass]
 pub struct StatefulWillr {
-    inner: stream::WilliamsPercentR,
+    inner: stream::WilliamsR,
 }
 
 #[pymethods]
@@ -1392,7 +1392,7 @@ impl StatefulWillr {
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::WilliamsPercentR::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::WilliamsR::new(timeperiod).map_err(py_value_error)?,
         })
     }
 
