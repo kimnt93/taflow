@@ -334,17 +334,28 @@ def adapt_input(values, *, adapter="numpy", column=None):
     numpy.ndarray
         Contiguous float64 input values.
     """
-    adapters = {"numpy": NumpyAdapter, "list": PythonListAdapter, "arrow": ArrowAdapter, "polars": PolarsAdapter}
-    try: cls = adapters[adapter]
-    except KeyError as error: raise ValueError(f"unknown adapter: {adapter}") from error
-    return cls.input(values, column=column)
+    adapters = {
+        "numpy": NumpyAdapter,
+        "list": PythonListAdapter,
+        "arrow": ArrowAdapter,
+        "polars": PolarsAdapter,
+    }
+    try:
+        adapter_cls = adapters[adapter]
+    except KeyError as error:
+        raise ValueError(f"unknown adapter: {adapter}") from error
+    return adapter_cls.input(values, column=column)
 
 
 class AdapterGateway:
     """Single dispatch gateway for supported input and output containers."""
 
-    _adapters = {"numpy": NumpyAdapter, "list": PythonListAdapter,
-                 "arrow": ArrowAdapter, "polars": PolarsAdapter}
+    _adapters = {
+        "numpy": NumpyAdapter,
+        "list": PythonListAdapter,
+        "arrow": ArrowAdapter,
+        "polars": PolarsAdapter,
+    }
 
     @classmethod
     def register(cls, name: str, adapter: type) -> None:
@@ -356,13 +367,17 @@ class AdapterGateway:
     @classmethod
     def input(cls, values, *, adapter="numpy", column=None):
         """Convert an input container through a registered adapter."""
-        try: adapter_cls = cls._adapters[adapter]
-        except KeyError as error: raise ValueError(f"unknown adapter: {adapter}") from error
+        try:
+            adapter_cls = cls._adapters[adapter]
+        except KeyError as error:
+            raise ValueError(f"unknown adapter: {adapter}") from error
         return adapter_cls.input(values, column=column)
 
     @classmethod
     def output(cls, values, *, adapter="numpy", **kwargs):
         """Convert values to a registered output container."""
-        try: adapter_cls = cls._adapters[adapter]
-        except KeyError as error: raise ValueError(f"unknown adapter: {adapter}") from error
+        try:
+            adapter_cls = cls._adapters[adapter]
+        except KeyError as error:
+            raise ValueError(f"unknown adapter: {adapter}") from error
         return adapter_cls.output(values, **kwargs)
