@@ -1,0 +1,147 @@
+{
+  "schema_version": 4,
+  "canonical_class": "CandleUpDownSideGapThreeMethods",
+  "snake_name": "candle_up_down_side_gap_three_methods",
+  "talib_name": "CDLXSIDEGAP3METHODS",
+  "constructor_kwargs": {},
+  "inputs": [
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "CDLXSIDEGAP3METHODS",
+    "taflow_class": "CandleUpDownSideGapThreeMethods",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.01291423271550456,
+        "min_ms": 0.012877379082082965,
+        "p50_ms": 0.01292983627537511,
+        "p99_ms": 0.012935369858781994,
+        "samples_s": [
+          1.292983627537511e-05,
+          1.2877379082082965e-05,
+          1.2935482789055605e-05
+        ],
+        "bars_per_second": 77433946.09882016
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.010299675570228092,
+        "min_ms": 0.010225146458583433,
+        "p50_ms": 0.01033491506602641,
+        "p99_ms": 0.01033888418367347,
+        "samples_s": [
+          1.033896518607443e-05,
+          1.033491506602641e-05,
+          1.0225146458583433e-05
+        ],
+        "bars_per_second": 97090436.7988607
+      },
+      "talib_original": {
+        "mean_ms": 0.031949010647010646,
+        "min_ms": 0.03123406265356265,
+        "p50_ms": 0.032079271498771496,
+        "p99_ms": 0.03252460926289926,
+        "samples_s": [
+          3.20792714987715e-05,
+          3.253369778869779e-05,
+          3.123406265356265e-05
+        ],
+        "bars_per_second": 31299873.7597393
+      },
+      "speedup_canonical": 2.4739379683512537,
+      "speedup_kernel": 3.1019433990097145
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.11274329142857144,
+        "min_ms": 0.11257161714285714,
+        "p50_ms": 0.11262666285714286,
+        "p99_ms": 0.11302349565714286,
+        "samples_s": [
+          0.00011303159428571429,
+          0.00011262666285714286,
+          0.00011257161714285714
+        ],
+        "bars_per_second": 88697073.44259596
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.11038546265938069,
+        "min_ms": 0.10960371038251367,
+        "p50_ms": 0.11070725136612021,
+        "p99_ms": 0.11084266273224043,
+        "samples_s": [
+          0.00011070725136612022,
+          0.00011084542622950819,
+          0.00010960371038251366
+        ],
+        "bars_per_second": 90591639.14416213
+      },
+      "talib_original": {
+        "mean_ms": 0.08576206131260794,
+        "min_ms": 0.08406690673575129,
+        "p50_ms": 0.08538281606217615,
+        "p99_ms": 0.08778738823834197,
+        "samples_s": [
+          8.783646113989637e-05,
+          8.406690673575129e-05,
+          8.538281606217616e-05
+        ],
+        "bars_per_second": 116601674.99413745
+      },
+      "speedup_canonical": 0.7606843850832804,
+      "speedup_kernel": 0.7769325710691287
+    }
+  ]
+}

@@ -55,15 +55,16 @@ impl CandleTakuri {
             let upper_shadow = high - open.max(close);
             let lower_shadow = open.min(close) - low;
             Some(
-                (body <= self.body_sum / 10.0
+                (body <= self.body_sum / 100.0
                     && upper_shadow < self.range_sum * 0.01
-                    && lower_shadow > body) as i32
+                    && lower_shadow > body * 2.0) as i32
                     * 100,
             )
         } else {
             None
         };
-        Self::push(&mut self.bodies, &mut self.body_sum, body);
+        // BODY_DOJI uses the high-low range (factor 0.1), not the real body.
+        Self::push(&mut self.bodies, &mut self.body_sum, range);
         Self::push(&mut self.ranges, &mut self.range_sum, range);
         self.value = output;
         output

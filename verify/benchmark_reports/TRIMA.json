@@ -1,0 +1,146 @@
+{
+  "schema_version": 4,
+  "canonical_class": "TriangularMovingAverage",
+  "snake_name": "triangular_moving_average",
+  "talib_name": "TRIMA",
+  "constructor_kwargs": {
+    "timeperiod": 30
+  },
+  "inputs": [
+    "price"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "TRIMA",
+    "taflow_class": "TriangularMovingAverage",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 6.821210263296962e-13
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 6.821210263296962e-13
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.05014648098705502,
+        "min_ms": 0.04993332766990291,
+        "p50_ms": 0.05018953155339806,
+        "p99_ms": 0.05031404269417476,
+        "samples_s": [
+          4.9933327669902914e-05,
+          5.031658373786408e-05,
+          5.018953155339806e-05
+        ],
+        "bars_per_second": 19941578.757204186
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.008781786927796131,
+        "min_ms": 0.008762871401604531,
+        "p50_ms": 0.008764492449268522,
+        "p99_ms": 0.008816926842850402,
+        "samples_s": [
+          8.817996932515338e-06,
+          8.76287140160453e-06,
+          8.764492449268522e-06
+        ],
+        "bars_per_second": 113872040.87527993
+      },
+      "talib_original": {
+        "mean_ms": 0.034698138617886176,
+        "min_ms": 0.034518963414634146,
+        "p50_ms": 0.03469017804878049,
+        "p99_ms": 0.034881372463414634,
+        "samples_s": [
+          3.469017804878049e-05,
+          3.4885274390243907e-05,
+          3.4518963414634145e-05
+        ],
+        "bars_per_second": 28819989.76984087
+      },
+      "speedup_canonical": 0.6919356639769652,
+      "speedup_kernel": 3.9511478589920634
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.47809176515151514,
+        "min_ms": 0.47593320454545457,
+        "p50_ms": 0.4782470909090909,
+        "p99_ms": 0.4800580418181818,
+        "samples_s": [
+          0.000480095,
+          0.0004782470909090909,
+          0.0004759332045454546
+        ],
+        "bars_per_second": 20916486.60133444
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.08070358364779875,
+        "min_ms": 0.07992835849056605,
+        "p50_ms": 0.0809846754716981,
+        "p99_ms": 0.08119345615094341,
+        "samples_s": [
+          7.992835849056605e-05,
+          8.119771698113209e-05,
+          8.09846754716981e-05
+        ],
+        "bars_per_second": 123910234.81238875
+      },
+      "talib_original": {
+        "mean_ms": 0.06249165782312926,
+        "min_ms": 0.061764453061224495,
+        "p50_ms": 0.06209291224489796,
+        "p99_ms": 0.06358711424489796,
+        "samples_s": [
+          6.209291224489796e-05,
+          6.361760816326531e-05,
+          6.17644530612245e-05
+        ],
+        "bars_per_second": 160021358.82365447
+      },
+      "speedup_canonical": 0.130710592355266,
+      "speedup_kernel": 0.7743355994679396
+    }
+  ]
+}

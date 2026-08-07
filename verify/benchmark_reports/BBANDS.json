@@ -1,0 +1,149 @@
+{
+  "schema_version": 4,
+  "canonical_class": "BollingerBands",
+  "snake_name": "bollinger_bands",
+  "talib_name": "BBANDS",
+  "constructor_kwargs": {
+    "period": 5,
+    "deviations_up": 2.0,
+    "deviations_down": 2.0,
+    "moving_average_type": 0
+  },
+  "inputs": [
+    "price"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "BBANDS",
+    "taflow_class": "BollingerBands",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 7.926814760139678e-10
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 7.926814760139678e-10
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.21096271367521366,
+        "min_ms": 0.20791096153846153,
+        "p50_ms": 0.21167107692307693,
+        "p99_ms": 0.21327340205128203,
+        "samples_s": [
+          0.00021330610256410255,
+          0.00020791096153846154,
+          0.00021167107692307693
+        ],
+        "bars_per_second": 4740174.140628206
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.024891410205869467,
+        "min_ms": 0.024625019053876478,
+        "p50_ms": 0.024715830486202368,
+        "p99_ms": 0.025321030065703024,
+        "samples_s": [
+          2.5333381077529568e-05,
+          2.4625019053876477e-05,
+          2.4715830486202367e-05
+        ],
+        "bars_per_second": 40174501.63447136
+      },
+      "talib_original": {
+        "mean_ms": 0.05347450270562771,
+        "min_ms": 0.05273946103896104,
+        "p50_ms": 0.05354153896103896,
+        "p99_ms": 0.05413048873376624,
+        "samples_s": [
+          5.2739461038961034e-05,
+          5.414250811688312e-05,
+          5.354153896103896e-05
+        ],
+        "bars_per_second": 18700501.162299898
+      },
+      "speedup_canonical": 0.25347845490816945,
+      "speedup_kernel": 2.1483114963497836
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 2.2462886666666666,
+        "min_ms": 2.24390175,
+        "p50_ms": 2.246592,
+        "p99_ms": 2.248336645,
+        "samples_s": [
+          0.002246592,
+          0.00224837225,
+          0.00224390175
+        ],
+        "bars_per_second": 4451787.585626424
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.2265969843137255,
+        "min_ms": 0.22369278235294118,
+        "p50_ms": 0.2271148705882353,
+        "p99_ms": 0.2289459314117647,
+        "samples_s": [
+          0.0002236927823529412,
+          0.00022711487058823529,
+          0.0002289833
+        ],
+        "bars_per_second": 44131213.971298546
+      },
+      "talib_original": {
+        "mean_ms": 0.10474884239130434,
+        "min_ms": 0.10073679619565218,
+        "p50_ms": 0.10180668478260871,
+        "p99_ms": 0.1115051189673913,
+        "samples_s": [
+          0.00010073679619565218,
+          0.00011170304619565217,
+          0.0001018066847826087
+        ],
+        "bars_per_second": 95466448.80946334
+      },
+      "speedup_canonical": 0.046631959616634765,
+      "speedup_kernel": 0.46226935768164795
+    }
+  ]
+}

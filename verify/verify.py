@@ -96,20 +96,15 @@ def continue_series(spec: Spec, arrays, split: int) -> tuple:
 def chunked_series(spec: Spec, arrays, chunk: int) -> tuple:
     """Feed a complete history through repeated native ``extend`` calls."""
     state = spec.new_state()
-    pieces: list[tuple[np.ndarray, ...]] = []
     for start in range(0, len(arrays[0]), chunk):
         stop = min(start + chunk, len(arrays[0]))
         result = state.extend(*[array[start:stop] for array in arrays])
-        if result is state:
-            result = state.compute()
-            values = result if isinstance(result, tuple) else (result,)
-            pieces.append(tuple(np.asarray(value)[-(stop - start):]
-                                for value in values))
-        else:
-            pieces.append(result if isinstance(result, tuple) else (result,))
-    arity = len(pieces[0])
-    return tuple(np.concatenate([np.asarray(piece[i]) for piece in pieces])
-                 for i in range(arity))
+        if result is not state:
+            # Canonical adapters are fluent and return themselves. Retain a
+            # defensive fallback for a value-returning adapter.
+            return result if isinstance(result, tuple) else (result,)
+    result = state.compute()
+    return result if isinstance(result, tuple) else (result,)
 
 
 # ---------------------------------------------------------------------------

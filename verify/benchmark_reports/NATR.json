@@ -1,0 +1,148 @@
+{
+  "schema_version": 4,
+  "canonical_class": "NormalizedAverageTrueRange",
+  "snake_name": "normalized_average_true_range",
+  "talib_name": "NATR",
+  "constructor_kwargs": {
+    "timeperiod": 14
+  },
+  "inputs": [
+    "high",
+    "low",
+    "close"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "NATR",
+    "taflow_class": "NormalizedAverageTrueRange",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.04950950637755102,
+        "min_ms": 0.049256150510204086,
+        "p50_ms": 0.049430071428571434,
+        "p99_ms": 0.049834052678571425,
+        "samples_s": [
+          4.984229719387755e-05,
+          4.925615051020408e-05,
+          4.943007142857143e-05
+        ],
+        "bars_per_second": 20198141.188768297
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.008090156742125985,
+        "min_ms": 0.008064434547244094,
+        "p50_ms": 0.008098779281496065,
+        "p99_ms": 0.00810708685531496,
+        "samples_s": [
+          8.098779281496064e-06,
+          8.064434547244094e-06,
+          8.107256397637795e-06
+        ],
+        "bars_per_second": 123606999.45316677
+      },
+      "talib_original": {
+        "mean_ms": 0.03883196700083542,
+        "min_ms": 0.038330555137844606,
+        "p50_ms": 0.03900857894736842,
+        "p99_ms": 0.03915380315789473,
+        "samples_s": [
+          3.833055513784461e-05,
+          3.900857894736842e-05,
+          3.915676691729323e-05
+        ],
+        "bars_per_second": 25751979.03259668
+      },
+      "speedup_canonical": 0.7843335521204652,
+      "speedup_kernel": 4.799902923837653
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.46774714074074075,
+        "min_ms": 0.4649570444444444,
+        "p50_ms": 0.46677902222222223,
+        "p99_ms": 0.47141082888888886,
+        "samples_s": [
+          0.00046495704444444444,
+          0.00047150535555555553,
+          0.00046677902222222223
+        ],
+        "bars_per_second": 21379072.42824328
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.06638497773972604,
+        "min_ms": 0.0657249109589041,
+        "p50_ms": 0.0666091147260274,
+        "p99_ms": 0.0668166716780822,
+        "samples_s": [
+          6.57249109589041e-05,
+          6.682090753424658e-05,
+          6.66091147260274e-05
+        ],
+        "bars_per_second": 150636489.4661373
+      },
+      "talib_original": {
+        "mean_ms": 0.08885359052453468,
+        "min_ms": 0.08852481218274111,
+        "p50_ms": 0.08899878934010153,
+        "p99_ms": 0.08903640243654821,
+        "samples_s": [
+          8.903717005076142e-05,
+          8.852481218274111e-05,
+          8.899878934010153e-05
+        ],
+        "bars_per_second": 112544692.23996921
+      },
+      "speedup_canonical": 0.18996073473334976,
+      "speedup_kernel": 1.3384592953077543
+    }
+  ]
+}

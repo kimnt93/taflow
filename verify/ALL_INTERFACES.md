@@ -2,7 +2,7 @@
 
 Indicator oracle: constructor history == native `extend` history == one-bar `append` history; helper functions also receive smoke checks.
 
-- Passed: **303**
+- Passed: **305**
 - Failed: **0**
 
 | Interface | Status | Error |
@@ -23,6 +23,7 @@ Indicator oracle: constructor history == native `extend` history == one-bar `app
 | `TypicalPrice` | PASS |  |
 | `WeightedClose` | PASS |  |
 | `MovingAverageConvergenceDivergenceFixed` | PASS |  |
+| `MovingAverageConvergenceDivergence` | PASS |  |
 | `MovingAverageConvergenceDivergenceExtended` | PASS |  |
 | `BollingerBands` | PASS |  |
 | `CommodityChannelIndex` | PASS |  |
@@ -76,6 +77,7 @@ Indicator oracle: constructor history == native `extend` history == one-bar `app
 | `TrueRange` | PASS |  |
 | `TriangularMovingAverage` | PASS |  |
 | `TripleExponentialMovingAverage` | PASS |  |
+| `TripleExponentialAverage` | PASS |  |
 | `WeightedMovingAverage` | PASS |  |
 | `Aroon` | PASS |  |
 | `AroonOscillator` | PASS |  |

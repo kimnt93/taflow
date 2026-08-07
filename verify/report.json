@@ -1,6 +1,3459 @@
 [
  {
+  "function": "ACCBANDS",
+  "taflow_class": "AccelerationBands",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "BBANDS",
+  "taflow_class": "BollingerBands",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.926814760139678e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.926814760139678e-10
+  }
+ },
+ {
+  "function": "DEMA",
+  "taflow_class": "DoubleExponentialMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "EMA",
+  "taflow_class": "ExponentialMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "HT_TRENDLINE",
+  "taflow_class": "HilbertTransformTrendline",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "KAMA",
+  "taflow_class": "KaufmanAdaptiveMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "MA",
+  "taflow_class": "MovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MAMA",
+  "taflow_class": "MesaAdaptiveMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MAVP",
+  "taflow_class": "VariablePeriodMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MIDPOINT",
+  "taflow_class": "RollingMidpoint",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MIDPRICE",
+  "taflow_class": "RollingMidprice",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SAR",
+  "taflow_class": "ParabolicSar",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SAREXT",
+  "taflow_class": "ParabolicSarExtended",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SMA",
+  "taflow_class": "SimpleMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "T3",
+  "taflow_class": "TripleExponentialAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080801e-13
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080801e-13
+  }
+ },
+ {
+  "function": "TEMA",
+  "taflow_class": "TripleExponentialMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TRIMA",
+  "taflow_class": "TriangularMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.821210263296962e-13
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.821210263296962e-13
+  }
+ },
+ {
+  "function": "WMA",
+  "taflow_class": "WeightedMovingAverage",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.8569323856354458e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.8569323856354458e-10
+  }
+ },
+ {
+  "function": "ATR",
+  "taflow_class": "AverageTrueRange",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "NATR",
+  "taflow_class": "NormalizedAverageTrueRange",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TRANGE",
+  "taflow_class": "TrueRange",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AVGDEV",
+  "taflow_class": "RollingAverageDeviation",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "BETA",
+  "taflow_class": "RollingBeta",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.6630256040079985e-12
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.6630256040079985e-12
+  }
+ },
+ {
+  "function": "CORREL",
+  "taflow_class": "RollingCorrelation",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.616695997190391e-11
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.616695997190391e-11
+  }
+ },
+ {
+  "function": "LINEARREG",
+  "taflow_class": "RollingLinearRegression",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.968558980384842e-13
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.968558980384842e-13
+  }
+ },
+ {
+  "function": "LINEARREG_ANGLE",
+  "taflow_class": "RollingLinearRegressionAngle",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 4.924061158817494e-12
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 4.924061158817494e-12
+  }
+ },
+ {
+  "function": "LINEARREG_INTERCEPT",
+  "taflow_class": "RollingLinearRegressionIntercept",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.968558980384842e-13
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.968558980384842e-13
+  }
+ },
+ {
+  "function": "LINEARREG_SLOPE",
+  "taflow_class": "RollingLinearRegressionSlope",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 9.137135492665038e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 9.137135492665038e-14
+  }
+ },
+ {
+  "function": "STDDEV",
+  "taflow_class": "RollingStandardDeviation",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'nbdev' (default 1.0) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.9633842041642e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.9633842041642e-10
+  }
+ },
+ {
+  "function": "TSF",
+  "taflow_class": "RollingTimeSeriesForecast",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.821210263296962e-13
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.821210263296962e-13
+  }
+ },
+ {
+  "function": "VAR",
+  "taflow_class": "RollingVariance",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'nbdev' (default 1.0) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.055902197957039e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 3.055902197957039e-10
+  }
+ },
+ {
+  "function": "ADX",
+  "taflow_class": "AverageDirectionalIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "ADXR",
+  "taflow_class": "AverageDirectionalIndexRating",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.1316282072803006e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.1316282072803006e-14
+  }
+ },
+ {
+  "function": "APO",
+  "taflow_class": "AbsolutePriceOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AROON",
+  "taflow_class": "Aroon",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AROONOSC",
+  "taflow_class": "AroonOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "BOP",
+  "taflow_class": "BalanceOfPower",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CCI",
+  "taflow_class": "CommodityChannelIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.609965576994e-10
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.609965576994e-10
+  }
+ },
+ {
+  "function": "CMO",
+  "taflow_class": "ChandeMomentumOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.816769371198461e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 6.816769371198461e-14
+  }
+ },
+ {
+  "function": "DX",
+  "taflow_class": "DirectionalMovementIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "IMI",
+  "taflow_class": "IntradayMomentumIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "MACD",
+  "taflow_class": "MovingAverageConvergenceDivergence",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "MACDEXT",
+  "taflow_class": "MovingAverageConvergenceDivergenceExtended",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MACDFIX",
+  "taflow_class": "MovingAverageConvergenceDivergenceFixed",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "MFI",
+  "taflow_class": "MoneyFlowIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "MINUS_DI",
+  "taflow_class": "MinusDirectionalIndicator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "MINUS_DM",
+  "taflow_class": "MinusDirectionalMovement",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MOM",
+  "taflow_class": "Momentum",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "PLUS_DI",
+  "taflow_class": "PlusDirectionalIndicator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "PLUS_DM",
+  "taflow_class": "PlusDirectionalMovement",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "PPO",
+  "taflow_class": "PercentagePriceOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ROC",
+  "taflow_class": "RateOfChange",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "ROCP",
+  "taflow_class": "RateOfChangePercent",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ROCR",
+  "taflow_class": "RateOfChangeRatio",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ROCR100",
+  "taflow_class": "RateOfChangeRatioPercent",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "RSI",
+  "taflow_class": "RelativeStrengthIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "STOCH",
+  "taflow_class": "StochasticOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "STOCHF",
+  "taflow_class": "FastStochasticOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "STOCHRSI",
+  "taflow_class": "StochasticRelativeStrengthIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TRIX",
+  "taflow_class": "TripleExponentialRateOfChange",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.1102230246251565e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.1102230246251565e-14
+  }
+ },
+ {
+  "function": "ULTOSC",
+  "taflow_class": "UltimateOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4210854715202004e-14
+  }
+ },
+ {
+  "function": "WILLR",
+  "taflow_class": "WilliamsPercentR",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 2.842170943040401e-14
+  }
+ },
+ {
+  "function": "ADD",
+  "taflow_class": "MathAdd",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "DIV",
+  "taflow_class": "MathDivide",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MAX",
+  "taflow_class": "RollingMax",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MAXINDEX",
+  "taflow_class": "RollingArgmax",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MIN",
+  "taflow_class": "RollingMin",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MININDEX",
+  "taflow_class": "RollingArgmin",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MINMAX",
+  "taflow_class": "RollingMinMax",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MINMAXINDEX",
+  "taflow_class": "RollingMinMaxIndex",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "MULT",
+  "taflow_class": "MathMultiply",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SUB",
+  "taflow_class": "MathSubtract",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SUM",
+  "taflow_class": "RollingSum",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AVGPRICE",
+  "taflow_class": "AveragePrice",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "MEDPRICE",
+  "taflow_class": "MedianPrice",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TYPPRICE",
+  "taflow_class": "TypicalPrice",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "WCLPRICE",
+  "taflow_class": "WeightedClose",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 5.684341886080802e-14
+  }
+ },
+ {
+  "function": "HT_DCPERIOD",
+  "taflow_class": "HilbertTransformDominantCyclePeriod",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "HT_DCPHASE",
+  "taflow_class": "HilbertTransformDominantCyclePhase",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "HT_PHASOR",
+  "taflow_class": "HilbertTransformPhasor",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "HT_SINE",
+  "taflow_class": "HilbertTransformSineWave",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "HT_TRENDMODE",
+  "taflow_class": "HilbertTransformTrendMode",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDL2CROWS",
+  "taflow_class": "CandleTwoCrows",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDL3BLACKCROWS",
+  "taflow_class": "CandleThreeBlackCrows",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDL3INSIDE",
+  "taflow_class": "CandleThreeInside",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDL3LINESTRIKE",
+  "taflow_class": "CandleThreeLineStrike",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDL3OUTSIDE",
+  "taflow_class": "CandleThreeOutside",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDL3STARSINSOUTH",
+  "taflow_class": "CandleThreeStarsInSouth",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDL3WHITESOLDIERS",
+  "taflow_class": "CandleThreeWhiteSoldiers",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLABANDONEDBABY",
+  "taflow_class": "CandleAbandonedBaby",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'penetration' (default 0.3) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLADVANCEBLOCK",
+  "taflow_class": "CandleAdvanceBlock",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLBELTHOLD",
+  "taflow_class": "CandleBeltHold",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLBREAKAWAY",
+  "taflow_class": "CandleBreakaway",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLCLOSINGMARUBOZU",
+  "taflow_class": "CandleClosingMarubozu",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLCONCEALBABYSWALL",
+  "taflow_class": "CandleConcealBabySwall",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLCOUNTERATTACK",
+  "taflow_class": "CandleCounterAttack",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLDARKCLOUDCOVER",
+  "taflow_class": "CandleDarkCloudCover",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'penetration' (default 0.5) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLDOJI",
+  "taflow_class": "CandleDoji",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLDOJISTAR",
+  "taflow_class": "CandleDojiStar",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLDRAGONFLYDOJI",
+  "taflow_class": "CandleDragonflyDoji",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLENGULFING",
+  "taflow_class": "CandleEngulfing",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLEVENINGDOJISTAR",
+  "taflow_class": "CandleEveningDojiStar",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'penetration' (default 0.3) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLEVENINGSTAR",
+  "taflow_class": "CandleEveningStar",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'penetration' (default 0.3) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLGAPSIDESIDEWHITE",
+  "taflow_class": "CandleGapSideSideWhite",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLGRAVESTONEDOJI",
+  "taflow_class": "CandleGravestoneDoji",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLHAMMER",
+  "taflow_class": "CandleHammer",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLHANGINGMAN",
+  "taflow_class": "CandleHangingMan",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLHARAMI",
+  "taflow_class": "CandleHarami",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLHARAMICROSS",
+  "taflow_class": "CandleHaramiCross",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLHIGHWAVE",
+  "taflow_class": "CandleHighWave",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLHIKKAKE",
+  "taflow_class": "CandleHikkake",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLHIKKAKEMOD",
+  "taflow_class": "CandleHikkakeModified",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 100.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": false,
+   "nan_mismatches": 0,
+   "max_abs_error": 100.0
+  }
+ },
+ {
+  "function": "CDLHOMINGPIGEON",
+  "taflow_class": "CandleHomingPigeon",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLIDENTICAL3CROWS",
+  "taflow_class": "CandleIdenticalThreeCrows",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLINNECK",
+  "taflow_class": "CandleInNeck",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLINVERTEDHAMMER",
+  "taflow_class": "CandleInvertedHammer",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLKICKING",
+  "taflow_class": "CandleKicking",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLKICKINGBYLENGTH",
+  "taflow_class": "CandleKickingByLength",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLLADDERBOTTOM",
+  "taflow_class": "CandleLadderBottom",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLLONGLEGGEDDOJI",
+  "taflow_class": "CandleLongLeggedDoji",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLLONGLINE",
+  "taflow_class": "CandleLongLine",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLMARUBOZU",
+  "taflow_class": "CandleMarubozu",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLMATCHINGLOW",
+  "taflow_class": "CandleMatchingLow",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLMATHOLD",
+  "taflow_class": "CandleMatHold",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'penetration' (default 0.5) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLMORNINGDOJISTAR",
+  "taflow_class": "CandleMorningDojiStar",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'penetration' (default 0.3) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLMORNINGSTAR",
+  "taflow_class": "CandleMorningStar",
+  "oracle": "TA-Lib",
+  "warnings": [
+   "talib param 'penetration' (default 0.3) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLONNECK",
+  "taflow_class": "CandleOnNeck",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLPIERCING",
+  "taflow_class": "CandlePiercing",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLRICKSHAWMAN",
+  "taflow_class": "CandleRickshawman",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLRISEFALL3METHODS",
+  "taflow_class": "CandleRiseFallThreeMethods",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLSEPARATINGLINES",
+  "taflow_class": "CandleSeparatingLines",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLSHOOTINGSTAR",
+  "taflow_class": "CandleShootingStar",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLSHORTLINE",
+  "taflow_class": "CandleShortLine",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLSPINNINGTOP",
+  "taflow_class": "CandleSpinningTop",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLSTALLEDPATTERN",
+  "taflow_class": "CandleStalledPattern",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLSTICKSANDWICH",
+  "taflow_class": "CandleStickSandwich",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLTAKURI",
+  "taflow_class": "CandleTakuri",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLTASUKIGAP",
+  "taflow_class": "CandleTasukiGap",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLTHRUSTING",
+  "taflow_class": "CandleThrusting",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLTRISTAR",
+  "taflow_class": "CandleTriStar",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLUNIQUE3RIVER",
+  "taflow_class": "CandleUniqueThreeRiver",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLUPSIDEGAP2CROWS",
+  "taflow_class": "CandleUpsideGapTwoCrows",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CDLXSIDEGAP3METHODS",
+  "taflow_class": "CandleUpDownSideGapThreeMethods",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "AD",
+  "taflow_class": "AccumulationDistribution",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ADOSC",
+  "taflow_class": "AccumulationDistributionOscillator",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4901161193847656e-08
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.4901161193847656e-08
+  }
+ },
+ {
+  "function": "OBV",
+  "taflow_class": "OnBalanceVolume",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ACOS",
+  "taflow_class": "MathAcos",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ASIN",
+  "taflow_class": "MathAsin",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "ATAN",
+  "taflow_class": "MathAtan",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "CEIL",
+  "taflow_class": "MathCeil",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "COS",
+  "taflow_class": "MathCos",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "COSH",
+  "taflow_class": "MathCosh",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "EXP",
+  "taflow_class": "MathExp",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "FLOOR",
+  "taflow_class": "MathFloor",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "LN",
+  "taflow_class": "MathLn",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "LOG10",
+  "taflow_class": "MathLog10",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SIN",
+  "taflow_class": "MathSin",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SINH",
+  "taflow_class": "MathSinh",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "SQRT",
+  "taflow_class": "MathSqrt",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TAN",
+  "taflow_class": "MathTan",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "TANH",
+  "taflow_class": "MathTanh",
+  "oracle": "TA-Lib",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "lag",
+  "taflow_class": "Lag",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "log_return",
+  "taflow_class": "LogReturn",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "cumulative_sum",
+  "taflow_class": "CumulativeSum",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "cumulative_product",
+  "taflow_class": "CumulativeProduct",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
   "function": "rolling_median",
+  "taflow_class": "RollingMedian",
   "oracle": "pandas",
   "batch_vs_oracle": {
    "passed": true,
@@ -8,14 +3461,31 @@
    "max_abs_error": 0.0
   },
   "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
    "max_abs_error": 0.0
+  }
+ },
+ {
+  "function": "rolling_mode",
+  "taflow_class": "RollingMode",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
   }
  },
  {
   "function": "rolling_quantile",
+  "taflow_class": "RollingQuantile",
   "oracle": "pandas",
   "batch_vs_oracle": {
    "passed": true,
@@ -23,6 +3493,11 @@
    "max_abs_error": 0.0
   },
   "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
@@ -30,93 +3505,1372 @@
   }
  },
  {
-  "function": "rolling_skew",
-  "oracle": "pandas",
-  "batch_vs_oracle": {
-   "passed": true,
-   "nan_mismatches": 0,
-   "max_abs_error": 4.440892098500626e-16
-  },
+  "function": "rolling_rank",
+  "taflow_class": "RollingRank",
+  "oracle": "self",
   "continue_vs_batch_bitwise": true,
-  "continue_vs_oracle": {
-   "passed": true,
-   "nan_mismatches": 0,
-   "max_abs_error": 4.440892098500626e-16
-  }
- },
- {
-  "function": "rolling_kurtosis",
-  "oracle": "pandas",
-  "batch_vs_oracle": {
-   "passed": true,
-   "nan_mismatches": 0,
-   "max_abs_error": 1.3322676295501878e-15
-  },
-  "continue_vs_batch_bitwise": true,
-  "continue_vs_oracle": {
-   "passed": true,
-   "nan_mismatches": 0,
-   "max_abs_error": 1.3322676295501878e-15
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
   }
  },
  {
   "function": "rolling_zscore",
+  "taflow_class": "RollingZScore",
   "oracle": "pandas",
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 3.26577431764008e-10
+   "max_abs_error": 6.426930099223682e-10
   },
   "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 3.26577431764008e-10
+   "max_abs_error": 6.426930099223682e-10
+  }
+ },
+ {
+  "function": "rolling_skew",
+  "taflow_class": "RollingSkew",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 8.881784197001252e-16
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 8.881784197001252e-16
+  }
+ },
+ {
+  "function": "rolling_kurtosis",
+  "taflow_class": "RollingKurtosis",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.3322676295501878e-15
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 1.3322676295501878e-15
   }
  },
  {
   "function": "rolling_cov",
+  "taflow_class": "RollingCov",
   "oracle": "pandas",
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 5.834666083615048e-12
+   "max_abs_error": 1.2823520023630408e-11
   },
   "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 5.834666083615048e-12
+   "max_abs_error": 1.2823520023630408e-11
   }
  },
  {
-  "function": "ewm_std",
-  "oracle": "pandas",
-  "batch_vs_oracle": {
-   "passed": true,
-   "nan_mismatches": 0,
-   "max_abs_error": 3.907985046680551e-14
-  },
+  "function": "rolling_winsorize",
+  "taflow_class": "RollingWinsorize",
+  "oracle": "self",
   "continue_vs_batch_bitwise": true,
-  "continue_vs_oracle": {
-   "passed": true,
-   "nan_mismatches": 0,
-   "max_abs_error": 3.907985046680551e-14
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
   }
  },
  {
   "function": "ewm_var",
+  "taflow_class": "ExponentiallyWeightedVariance",
   "oracle": "pandas",
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 4.121147867408581e-13
+   "max_abs_error": 1.9042545318370685e-12
   },
   "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 4.121147867408581e-13
+   "max_abs_error": 1.9042545318370685e-12
+  }
+ },
+ {
+  "function": "ewm_std",
+  "taflow_class": "ExponentiallyWeightedStandardDeviation",
+  "oracle": "pandas",
+  "batch_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.815970093361102e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  },
+  "continue_vs_oracle": {
+   "passed": true,
+   "nan_mismatches": 0,
+   "max_abs_error": 7.815970093361102e-14
+  }
+ },
+ {
+  "function": "ewm_cov",
+  "taflow_class": "ExponentiallyWeightedCovariance",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "ewm_corr",
+  "taflow_class": "ExponentiallyWeightedCorrelation",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "drawdown",
+  "taflow_class": "Drawdown",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "cumulative_maximum",
+  "taflow_class": "CumulativeMaximum",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "cumulative_minimum",
+  "taflow_class": "CumulativeMinimum",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_sharpe",
+  "taflow_class": "RollingSharpe",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_sortino",
+  "taflow_class": "RollingSortino",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_calmar",
+  "taflow_class": "RollingCalmar",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "hull_moving_average",
+  "taflow_class": "HullMovingAverage",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "volume_weighted_moving_average",
+  "taflow_class": "VolumeWeightedMovingAverage",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "zero_lag_exponential_moving_average",
+  "taflow_class": "ZeroLagExponentialMovingAverage",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "arnaud_legoux_moving_average",
+  "taflow_class": "ArnaudLegouxMovingAverage",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "true_strength_index",
+  "taflow_class": "TrueStrengthIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "awesome_oscillator",
+  "taflow_class": "AwesomeOscillator",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "fisher_transform",
+  "taflow_class": "FisherTransform",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "keltner_channels",
+  "taflow_class": "KeltnerChannels",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "donchian_channels",
+  "taflow_class": "Donchian",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "chaikin_volatility",
+  "taflow_class": "ChaikinVolatility",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "ulcer_index",
+  "taflow_class": "UlcerIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_vwap",
+  "taflow_class": "RollingVolumeWeightedAveragePrice",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "force_index",
+  "taflow_class": "ForceIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "ease_of_movement",
+  "taflow_class": "EaseOfMovement",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "crossover",
+  "taflow_class": "Crossover",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "crossunder",
+  "taflow_class": "Crossunder",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rising",
+  "taflow_class": "Rising",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "falling",
+  "taflow_class": "Falling",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "higher_high",
+  "taflow_class": "HigherHigh",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "lower_low",
+  "taflow_class": "LowerLow",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "inside_bar",
+  "taflow_class": "InsideBar",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "outside_bar",
+  "taflow_class": "OutsideBar",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "gap_up",
+  "taflow_class": "GapUp",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "gap_down",
+  "taflow_class": "GapDown",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "bars_since",
+  "taflow_class": "BarsSince",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "value_when",
+  "taflow_class": "ValueWhen",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "highest_since",
+  "taflow_class": "HighestSince",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "lowest_since",
+  "taflow_class": "LowestSince",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "signal_delay",
+  "taflow_class": "SignalDelay",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "swing_highs_lows",
+  "taflow_class": "SwingHighLow",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "hedge_ratio",
+  "taflow_class": "HedgeRatio",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_entropy",
+  "taflow_class": "RollingEntropy",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_autocorr",
+  "taflow_class": "RollingAutocorr",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "hurst",
+  "taflow_class": "Hurst",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "fractal_dimension",
+  "taflow_class": "FractalDimension",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_alpha",
+  "taflow_class": "RollingAlpha",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rolling_information_ratio",
+  "taflow_class": "RollingInformationRatio",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "fair_value_gap",
+  "taflow_class": "FairValueGap",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "break_of_structure_change_of_character",
+  "taflow_class": "BreakOfStructureChangeOfCharacter",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "order_block",
+  "taflow_class": "OrderBlock",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "liquidity",
+  "taflow_class": "Liquidity",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "equal_highs_lows",
+  "taflow_class": "EqualHighsLows",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "previous_high_low",
+  "taflow_class": "PreviousHighLow",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "sessions",
+  "taflow_class": "Sessions",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "retracements",
+  "taflow_class": "Retracements",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "premium_discount",
+  "taflow_class": "PremiumDiscount",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "supertrend",
+  "taflow_class": "Supertrend",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "ichimoku",
+  "taflow_class": "Ichimoku",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "squeeze",
+  "taflow_class": "Squeeze",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "squeeze_pro",
+  "taflow_class": "SqueezePro",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "schaff_trend_cycle",
+  "taflow_class": "SchaffTrendCycle",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "vortex",
+  "taflow_class": "Vortex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "know_sure_thing",
+  "taflow_class": "KnowSureThing",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "mass_index",
+  "taflow_class": "MassIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "detrended_price_oscillator",
+  "taflow_class": "DetrendedPriceOscillator",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "chaikin_money_flow",
+  "taflow_class": "ChaikinMoneyFlow",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "kvo",
+  "taflow_class": "KlingerVolumeOscillator",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "volume_price_trend",
+  "taflow_class": "VolumePriceTrend",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "negative_volume_index",
+  "taflow_class": "NegativeVolumeIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "positive_volume_index",
+  "taflow_class": "PositiveVolumeIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "mcginley",
+  "taflow_class": "McGinleyDynamic",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "vidya",
+  "taflow_class": "VariableIndexDynamicAverage",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "laguerre_rsi",
+  "taflow_class": "LaguerreRelativeStrengthIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rmi",
+  "taflow_class": "RelativeMomentumIndex",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "jma",
+  "taflow_class": "JurikMovingAverage",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "ssl_channel",
+  "taflow_class": "SmoothedTrendChannel",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "pmax",
+  "taflow_class": "ParabolicMovingAverageStop",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "td_sequential",
+  "taflow_class": "TomDeMarkSequential",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "even_better_sinewave",
+  "taflow_class": "EvenBetterSinewave",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "fib_retracement",
+  "taflow_class": "FibonacciRetracement",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "heikin_ashi",
+  "taflow_class": "HeikinAshi",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "anchored_vwap",
+  "taflow_class": "AnchoredVolumeWeightedAveragePrice",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "pivot_points",
+  "taflow_class": "PivotPoints",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "opening_range",
+  "taflow_class": "OpeningRange",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "session_volume_levels",
+  "taflow_class": "SessionVolumeLevels",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "parkinson",
+  "taflow_class": "Parkinson",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "garman_klass",
+  "taflow_class": "GarmanKlass",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "rogers_satchell",
+  "taflow_class": "RogersSatchell",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "garman_klass_yang_zhang",
+  "taflow_class": "GarmanKlassYangZhang",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "yang_zhang",
+  "taflow_class": "YangZhang",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "close_to_close_sigma",
+  "taflow_class": "CloseToCloseSigma",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "time_series_rank",
+  "taflow_class": "TimeSeriesRank",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "signed_power",
+  "taflow_class": "SignedPower",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "decay_linear",
+  "taflow_class": "DecayLinear",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "cumulative_count",
+  "taflow_class": "CumulativeCount",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "exponentially_weighted_sum",
+  "taflow_class": "ExponentiallyWeightedSum",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_abs",
+  "taflow_class": "MathAbs",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_acosh",
+  "taflow_class": "MathAcosh",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_asinh",
+  "taflow_class": "MathAsinh",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_atanh",
+  "taflow_class": "MathAtanh",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_cbrt",
+  "taflow_class": "MathCbrt",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_cot",
+  "taflow_class": "MathCot",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_degrees",
+  "taflow_class": "MathDegrees",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_log1p",
+  "taflow_class": "MathLog1p",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "math_radians",
+  "taflow_class": "MathRadians",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "average_daily_dollar_value",
+  "taflow_class": "AverageDailyDollarValue",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "kalman_hedge_ratio",
+  "taflow_class": "KalmanHedgeRatio",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "ornstein_uhlenbeck_half_life",
+  "taflow_class": "OrnsteinUhlenbeckHalfLife",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "spread_zscore",
+  "taflow_class": "SpreadZScore",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "cumulative_sum_control_chart",
+  "taflow_class": "CumulativeSumControlChart",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "frac_diff",
+  "taflow_class": "FracDiff",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "amihud",
+  "taflow_class": "Amihud",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
+  }
+ },
+ {
+  "function": "roll_spread",
+  "taflow_class": "RollSpread",
+  "oracle": "self",
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+   "1": true,
+   "10": true,
+   "1000": true
   }
  }
 ]

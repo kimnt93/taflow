@@ -111,8 +111,8 @@ impl CandleShortLine {
         let v = if self.b.len() == 10 {
             Some(
                 (body < self.bs / 10.
-                    && h - o.max(c) < self.ss / 10.
-                    && o.min(c) - l < self.ss / 10.) as i32
+                    && h - o.max(c) < self.ss / 20.
+                    && o.min(c) - l < self.ss / 20.) as i32
                     * if c >= o { 100 } else { -100 },
             )
         } else {

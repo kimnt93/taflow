@@ -64,6 +64,10 @@
     "status": "PASS"
   },
   {
+    "name": "MovingAverageConvergenceDivergence",
+    "status": "PASS"
+  },
+  {
     "name": "MovingAverageConvergenceDivergenceExtended",
     "status": "PASS"
   },
@@ -273,6 +277,10 @@
   },
   {
     "name": "TripleExponentialMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "TripleExponentialAverage",
     "status": "PASS"
   },
   {

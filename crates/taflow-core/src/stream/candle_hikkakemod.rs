@@ -62,6 +62,7 @@ impl CandleHikkakeModified {
         let i = self.index;
         self.index += 1;
         let mut result = 0;
+        let mut new_pattern = false;
         if i >= 10 && self.candles.len() == 8 {
             let a = self.candles[5];
             let b = self.candles[6];
@@ -70,19 +71,23 @@ impl CandleHikkakeModified {
                 let near = self.near();
                 if high < c.high && low < c.low && b.close <= b.low + near {
                     self.pending = Some((i, 100, c.high));
+                    new_pattern = true;
                 } else if high > c.high && low > c.low && b.close >= b.high - near {
                     self.pending = Some((i, -100, c.low));
+                    new_pattern = true;
                 }
             }
-            if let Some((setup, direction, threshold)) = self.pending {
-                if i <= setup + 3
-                    && ((direction > 0 && close > threshold)
-                        || (direction < 0 && close < threshold))
-                {
-                    result = direction + direction.signum() * 100;
-                    self.pending = None;
-                } else if i > setup + 3 {
-                    self.pending = None;
+            if !new_pattern {
+                if let Some((setup, direction, threshold)) = self.pending {
+                    if i <= setup + 3
+                        && ((direction > 0 && close > threshold)
+                            || (direction < 0 && close < threshold))
+                    {
+                        result = direction + direction.signum() * 100;
+                        self.pending = None;
+                    } else if i > setup + 3 {
+                        self.pending = None;
+                    }
                 }
             }
         }
@@ -144,7 +149,9 @@ pub fn candle_hikkake_modified(
 
     // Initialize Near sum for bar (start - 3), i.e. the "2nd candle" at start
     let mut near_sum = 0.0;
-    let near_bar = lookback - 3; // the 2nd bar of the pattern at first evaluation
+    // The first evaluated fourth candle is `lookback`; its second candle is
+    // two bars earlier, and Near averages the five bars immediately before it.
+    let near_bar = lookback - 2;
     if NEAR.avg_period > 0 && near_bar >= NEAR.avg_period {
         for j in (near_bar - NEAR.avg_period)..near_bar {
             near_sum += cr(NEAR, open, high, low, close, j);
@@ -158,6 +165,7 @@ pub fn candle_hikkake_modified(
         // C TA-Lib indices: i is current bar
         // Pattern: bar[i-3] contains bar[i-2], bar[i-2] contains bar[i-1]
         // Then bar[i] breaks out
+        let mut new_pattern = false;
         if high[i-1] < high[i-2] && low[i-1] > low[i-2]   // bar[i-1] inside bar[i-2]
             && high[i-2] < high[i-3] && low[i-2] > low[i-3]
         // bar[i-2] inside bar[i-3]
@@ -171,6 +179,7 @@ pub fn candle_hikkake_modified(
                 pattern_result = 100;
                 pattern_idx = i as i32;
                 output[i] = pattern_result;
+                new_pattern = true;
             }
             // Bearish: bar[i] breaks up (higher high AND higher low)
             else if high[i] > high[i-1] && low[i] > low[i-1]
@@ -180,11 +189,12 @@ pub fn candle_hikkake_modified(
                 pattern_result = -100;
                 pattern_idx = i as i32;
                 output[i] = pattern_result;
+                new_pattern = true;
             }
         }
 
         // Confirmation: within 3 bars of pattern
-        if pattern_idx >= 0 && (i as i32) <= pattern_idx + 3 {
+        if !new_pattern && pattern_idx >= 0 && (i as i32) <= pattern_idx + 3 {
             if pattern_result > 0 && close[i] > high[(pattern_idx - 1) as usize] {
                 output[i] = pattern_result + 100;
                 pattern_idx = -10;

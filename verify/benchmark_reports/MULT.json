@@ -1,0 +1,145 @@
+{
+  "schema_version": 4,
+  "canonical_class": "MathMultiply",
+  "snake_name": "math_multiply",
+  "talib_name": "MULT",
+  "constructor_kwargs": {},
+  "inputs": [
+    "price0",
+    "price1"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "MULT",
+    "taflow_class": "MathMultiply",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.26346905761316874,
+        "min_ms": 0.25587099999999996,
+        "p50_ms": 0.26228001234567905,
+        "p99_ms": 0.27205663753086423,
+        "samples_s": [
+          0.00026228001234567905,
+          0.0002722561604938272,
+          0.00025587099999999996
+        ],
+        "bars_per_second": 3795512.114626465
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.0012367320252532135,
+        "min_ms": 0.0012173630262978608,
+        "p50_ms": 0.0012403778103283825,
+        "p99_ms": 0.0012522136905572965,
+        "samples_s": [
+          1.2403778103283826e-06,
+          1.252455239133397e-06,
+          1.2173630262978607e-06
+        ],
+        "bars_per_second": 808582602.844182
+      },
+      "talib_original": {
+        "mean_ms": 0.03029974095607235,
+        "min_ms": 0.028961398255813953,
+        "p50_ms": 0.029886044573643408,
+        "p99_ms": 0.032008465329457364,
+        "samples_s": [
+          2.8961398255813953e-05,
+          2.988604457364341e-05,
+          3.205178003875969e-05
+        ],
+        "bars_per_second": 33003582.4877107
+      },
+      "speedup_canonical": 0.11500303386881626,
+      "speedup_kernel": 24.499843407765443
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 2.600976722222222,
+        "min_ms": 2.5409777499999997,
+        "p50_ms": 2.6256504166666668,
+        "p99_ms": 2.6360889683333335,
+        "samples_s": [
+          0.0026256504166666667,
+          0.00254097775,
+          0.002636302
+        ],
+        "bars_per_second": 3844709.5333695263
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.004664340575212083,
+        "min_ms": 0.00456719103041589,
+        "p50_ms": 0.004658724084419616,
+        "p99_ms": 0.004764938960273122,
+        "samples_s": [
+          4.6587240844196156e-06,
+          4.567191030415891e-06,
+          4.767106610800745e-06
+        ],
+        "bars_per_second": 2143925778.735681
+      },
+      "talib_original": {
+        "mean_ms": 0.03509587481481481,
+        "min_ms": 0.03449222111111111,
+        "p50_ms": 0.035214772222222225,
+        "p99_ms": 0.035573313933333336,
+        "samples_s": [
+          3.449222111111111e-05,
+          3.558063111111111e-05,
+          3.521477222222223e-05
+        ],
+        "bars_per_second": 284933772.21013904
+      },
+      "speedup_canonical": 0.013493344448246196,
+      "speedup_kernel": 7.524295074276182
+    }
+  ]
+}

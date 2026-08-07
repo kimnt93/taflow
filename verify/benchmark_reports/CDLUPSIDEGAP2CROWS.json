@@ -1,0 +1,147 @@
+{
+  "schema_version": 4,
+  "canonical_class": "CandleUpsideGapTwoCrows",
+  "snake_name": "candle_upside_gap_two_crows",
+  "talib_name": "CDLUPSIDEGAP2CROWS",
+  "constructor_kwargs": {},
+  "inputs": [
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "CDLUPSIDEGAP2CROWS",
+    "taflow_class": "CandleUpsideGapTwoCrows",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.028834666666666668,
+        "min_ms": 0.028672823992994742,
+        "p50_ms": 0.028704088441331,
+        "p99_ms": 0.029118627583187392,
+        "samples_s": [
+          2.9127087565674256e-05,
+          2.8704088441331e-05,
+          2.8672823992994743e-05
+        ],
+        "bars_per_second": 34680477.20336632
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.027241396892655367,
+        "min_ms": 0.02690065324858757,
+        "p50_ms": 0.027320299435028252,
+        "p99_ms": 0.02749957922316384,
+        "samples_s": [
+          2.690065324858757e-05,
+          2.732029943502825e-05,
+          2.7503237994350282e-05
+        ],
+        "bars_per_second": 36708837.06663416
+      },
+      "talib_original": {
+        "mean_ms": 0.03270842034632035,
+        "min_ms": 0.03214706233766234,
+        "p50_ms": 0.03263026103896104,
+        "p99_ms": 0.033333584129870135,
+        "samples_s": [
+          3.263026103896104e-05,
+          3.214706233766234e-05,
+          3.3347937662337665e-05
+        ],
+        "bars_per_second": 30573167.074774325
+      },
+      "speedup_canonical": 1.134343626178686,
+      "speedup_kernel": 1.2006880732000553
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.29581158685446013,
+        "min_ms": 0.2919203661971831,
+        "p50_ms": 0.2935561267605634,
+        "p99_ms": 0.3017902247887324,
+        "samples_s": [
+          0.00030195826760563384,
+          0.0002935561267605634,
+          0.0002919203661971831
+        ],
+        "bars_per_second": 33805301.902930595
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.2891495955882353,
+        "min_ms": 0.28821799264705883,
+        "p50_ms": 0.2891633602941176,
+        "p99_ms": 0.29004935235294116,
+        "samples_s": [
+          0.0002891633602941176,
+          0.00028821799264705885,
+          0.00029006743382352937
+        ],
+        "bars_per_second": 34584174.256430715
+      },
+      "talib_original": {
+        "mean_ms": 0.12369564054726367,
+        "min_ms": 0.12284564179104476,
+        "p50_ms": 0.1232579253731343,
+        "p99_ms": 0.12494884589552238,
+        "samples_s": [
+          0.00012498335447761193,
+          0.0001232579253731343,
+          0.00012284564179104477
+        ],
+        "bars_per_second": 80843592.83607118
+      },
+      "speedup_canonical": 0.41815684727766317,
+      "speedup_kernel": 0.42779115874473844
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": 4,
+  "canonical_class": "RollingLinearRegressionIntercept",
+  "snake_name": "rolling_linreg_intercept",
+  "talib_name": "LINEARREG_INTERCEPT",
+  "constructor_kwargs": {
+    "timeperiod": 14
+  },
+  "inputs": [
+    "price"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "LINEARREG_INTERCEPT",
+    "taflow_class": "RollingLinearRegressionIntercept",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 5.968558980384842e-13
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 5.968558980384842e-13
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.0679867002314815,
+        "min_ms": 0.06700732638888889,
+        "p50_ms": 0.06715653993055556,
+        "p99_ms": 0.06974344048611111,
+        "samples_s": [
+          6.715653993055557e-05,
+          6.9796234375e-05,
+          6.700732638888889e-05
+        ],
+        "bars_per_second": 14708759.163118588
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.026546915384615382,
+        "min_ms": 0.026331955244755248,
+        "p50_ms": 0.0266039013986014,
+        "p99_ms": 0.026702869748251746,
+        "samples_s": [
+          2.6331955244755247e-05,
+          2.6704889510489507e-05,
+          2.66039013986014e-05
+        ],
+        "bars_per_second": 37669159.88211292
+      },
+      "talib_original": {
+        "mean_ms": 0.04323230084745763,
+        "min_ms": 0.0429945466101695,
+        "p50_ms": 0.04328119350282486,
+        "p99_ms": 0.04341836305084746,
+        "samples_s": [
+          4.342116242937853e-05,
+          4.328119350282486e-05,
+          4.2994546610169496e-05
+        ],
+        "bars_per_second": 23130853.098206248
+      },
+      "speedup_canonical": 0.6358935012327419,
+      "speedup_kernel": 1.6285244526944875
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.6567772708333334,
+        "min_ms": 0.64879515625,
+        "p50_ms": 0.6590225,
+        "p99_ms": 0.662444323125,
+        "samples_s": [
+          0.00064879515625,
+          0.0006590225,
+          0.00066251415625
+        ],
+        "bars_per_second": 15225861.862289755
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.26072453164556963,
+        "min_ms": 0.25940225316455695,
+        "p50_ms": 0.2594499746835443,
+        "p99_ms": 0.2632439392405064,
+        "samples_s": [
+          0.0002633213670886076,
+          0.0002594499746835443,
+          0.00025940225316455697
+        ],
+        "bars_per_second": 38354657.06615615
+      },
+      "talib_original": {
+        "mean_ms": 0.15790806510416666,
+        "min_ms": 0.1548018515625,
+        "p50_ms": 0.1577329921875,
+        "p99_ms": 0.161120224375,
+        "samples_s": [
+          0.0001577329921875,
+          0.0001548018515625,
+          0.0001611893515625
+        ],
+        "bars_per_second": 63327987.67056853
+      },
+      "speedup_canonical": 0.24042863862174987,
+      "speedup_kernel": 0.6056509685050571
+    }
+  ]
+}

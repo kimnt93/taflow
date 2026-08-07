@@ -1,0 +1,108 @@
+{
+  "schema_version": 4,
+  "canonical_class": "RollingRank",
+  "snake_name": "rolling_rank",
+  "talib_name": null,
+  "constructor_kwargs": {
+    "timeperiod": 5
+  },
+  "inputs": [
+    "close"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "rolling_rank",
+    "taflow_class": "RollingRank",
+    "oracle": "self",
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.016214912464319695,
+        "min_ms": 0.016144865842055184,
+        "p50_ms": 0.01614719933396765,
+        "p99_ms": 0.016348562759276878,
+        "samples_s": [
+          1.6144865842055185e-05,
+          1.635267221693625e-05,
+          1.614719933396765e-05
+        ],
+        "bars_per_second": 61671624.944042236
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.01508476683222958,
+        "min_ms": 0.014854242549668875,
+        "p50_ms": 0.015087658526490067,
+        "p99_ms": 0.015307904602649008,
+        "samples_s": [
+          1.53123994205298e-05,
+          1.5087658526490067e-05,
+          1.4854242549668874e-05
+        ],
+        "bars_per_second": 66292042.238494225
+      }
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.1458826241134752,
+        "min_ms": 0.14521961347517728,
+        "p50_ms": 0.1459593581560284,
+        "p99_ms": 0.146458709858156,
+        "samples_s": [
+          0.0001452196134751773,
+          0.00014646890070921985,
+          0.00014595935815602838
+        ],
+        "bars_per_second": 68548259.6763647
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.14426735862068965,
+        "min_ms": 0.13923757931034486,
+        "p50_ms": 0.1410564551724138,
+        "p99_ms": 0.1522790096551724,
+        "samples_s": [
+          0.0001410564551724138,
+          0.00013923757931034485,
+          0.00015250804137931034
+        ],
+        "bars_per_second": 69315748.86799017
+      }
+    }
+  ]
+}

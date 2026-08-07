@@ -60,12 +60,12 @@ impl CandleUniqueThreeRiver {
                 (a.color() == -1
                     && a.body() > long
                     && b.color() == -1
-                    && b.o.max(b.c) < a.o.max(a.c)
-                    && b.o.min(b.c) > a.o.min(a.c)
+                    && b.c > a.c
+                    && b.o <= a.o
                     && b.l < a.l
                     && cur.color() == 1
                     && cur.body() < short
-                    && cur.c < b.c) as i32
+                    && cur.o > b.l) as i32
                     * 100,
             )
         } else {
@@ -139,15 +139,15 @@ pub fn candle_unique_three_river(
     for i in start..len {
         output[i] = (candle_color(open[i-2], close[i-2]) == -1
             && real_body(open[i-2], close[i-2]) > ca(BODY_LONG, body_long_sum, open, high, low, close, i-2)
-            // 2nd: black, harami, lower low
+            // 2nd: black, higher close, open no higher than first open, lower low
             && candle_color(open[i-1], close[i-1]) == -1
-            && open[i-1].max(close[i-1]) < open[i-2].max(close[i-2])
-            && open[i-1].min(close[i-1]) > open[i-2].min(close[i-2])
+            && close[i-1] > close[i-2]
+            && open[i-1] <= open[i-2]
             && low[i-1] < low[i-2]
-            // 3rd: small white, close <= 2nd close
+            // 3rd: small white, open above second low
             && candle_color(open[i], close[i]) == 1
             && real_body(open[i], close[i]) < ca(BODY_SHORT, body_short_sum, open, high, low, close, i)
-            && close[i] > close[i-1]) as i32
+            && open[i] > low[i-1]) as i32
             * 100;
         body_long_sum += cr(BODY_LONG, open, high, low, close, i - 2)
             - cr(

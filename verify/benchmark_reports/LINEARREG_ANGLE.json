@@ -1,0 +1,146 @@
+{
+  "schema_version": 4,
+  "canonical_class": "RollingLinearRegressionAngle",
+  "snake_name": "rolling_linreg_angle",
+  "talib_name": "LINEARREG_ANGLE",
+  "constructor_kwargs": {
+    "timeperiod": 14
+  },
+  "inputs": [
+    "price"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "LINEARREG_ANGLE",
+    "taflow_class": "RollingLinearRegressionAngle",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 4.924061158817494e-12
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 4.924061158817494e-12
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.07704973828647925,
+        "min_ms": 0.07582149799196787,
+        "p50_ms": 0.07609925702811246,
+        "p99_ms": 0.07916587578313253,
+        "samples_s": [
+          7.922845983935742e-05,
+          7.609925702811246e-05,
+          7.582149799196787e-05
+        ],
+        "bars_per_second": 12978629.41833614
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.03653198386095592,
+        "min_ms": 0.03616917318435754,
+        "p50_ms": 0.036304292364990685,
+        "p99_ms": 0.037106122160148976,
+        "samples_s": [
+          3.616917318435754e-05,
+          3.630429236499069e-05,
+          3.712248603351955e-05
+        ],
+        "bars_per_second": 27373273.89079366
+      },
+      "talib_original": {
+        "mean_ms": 0.05166295435897436,
+        "min_ms": 0.05077199692307692,
+        "p50_ms": 0.051618887692307686,
+        "p99_ms": 0.05257839664615385,
+        "samples_s": [
+          5.077199692307692e-05,
+          5.161888769230769e-05,
+          5.259797846153847e-05
+        ],
+        "bars_per_second": 19356229.47637895
+      },
+      "speedup_canonical": 0.6705143392815419,
+      "speedup_kernel": 1.4141841996757774
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.7812203533333334,
+        "min_ms": 0.77537338,
+        "p50_ms": 0.7822058,
+        "p99_ms": 0.7860043583999999,
+        "samples_s": [
+          0.0007822058,
+          0.00077537338,
+          0.00078608188
+        ],
+        "bars_per_second": 12800485.749419754
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.36863755333333337,
+        "min_ms": 0.35918103999999995,
+        "p50_ms": 0.36165916,
+        "p99_ms": 0.384604194,
+        "samples_s": [
+          0.00038507246000000003,
+          0.00036165915999999997,
+          0.00035918104
+        ],
+        "bars_per_second": 27126916.152673393
+      },
+      "talib_original": {
+        "mean_ms": 0.24735946969696967,
+        "min_ms": 0.24528261038961038,
+        "p50_ms": 0.24834324025974025,
+        "p99_ms": 0.24845037207792206,
+        "samples_s": [
+          0.00024834324025974026,
+          0.00024528261038961037,
+          0.00024845255844155843
+        ],
+        "bars_per_second": 40426994.81952563
+      },
+      "speedup_canonical": 0.3166321366840088,
+      "speedup_kernel": 0.6710099594039451
+    }
+  ]
+}

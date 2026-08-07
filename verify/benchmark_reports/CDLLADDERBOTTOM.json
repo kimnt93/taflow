@@ -1,0 +1,147 @@
+{
+  "schema_version": 4,
+  "canonical_class": "CandleLadderBottom",
+  "snake_name": "candle_ladder_bottom",
+  "talib_name": "CDLLADDERBOTTOM",
+  "constructor_kwargs": {},
+  "inputs": [
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "CDLLADDERBOTTOM",
+    "taflow_class": "CandleLadderBottom",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.021945589084065242,
+        "min_ms": 0.0214442747804266,
+        "p50_ms": 0.021748468005018822,
+        "p99_ms": 0.02262611333751568,
+        "samples_s": [
+          2.1444274780426602e-05,
+          2.264402446675031e-05,
+          2.1748468005018822e-05
+        ],
+        "bars_per_second": 45567243.42961944
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.019894936781609193,
+        "min_ms": 0.019557136363636363,
+        "p50_ms": 0.01983260867293626,
+        "p99_ms": 0.02028581617554859,
+        "samples_s": [
+          1.983260867293626e-05,
+          1.955713636363636e-05,
+          2.0295065308254964e-05
+        ],
+        "bars_per_second": 50264045.1174691
+      },
+      "talib_original": {
+        "mean_ms": 0.03233324743024963,
+        "min_ms": 0.03124463876651982,
+        "p50_ms": 0.03285719603524229,
+        "p99_ms": 0.03289709325991189,
+        "samples_s": [
+          3.124463876651982e-05,
+          3.289790748898678e-05,
+          3.285719603524229e-05
+        ],
+        "bars_per_second": 30927917.22072562
+      },
+      "speedup_canonical": 1.473336956524302,
+      "speedup_kernel": 1.6251998076283594
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.2009715224719101,
+        "min_ms": 0.20042062921348316,
+        "p50_ms": 0.2007631966292135,
+        "p99_ms": 0.20171139067415728,
+        "samples_s": [
+          0.00020042062921348316,
+          0.0002017307415730337,
+          0.0002007631966292135
+        ],
+        "bars_per_second": 49758293.498511486
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.20264585057471265,
+        "min_ms": 0.20151609770114942,
+        "p50_ms": 0.20161075287356323,
+        "p99_ms": 0.20474670218390803,
+        "samples_s": [
+          0.00020481070114942526,
+          0.00020161075287356323,
+          0.00020151609770114942
+        ],
+        "bars_per_second": 49347173.75973678
+      },
+      "talib_original": {
+        "mean_ms": 0.08563920396825396,
+        "min_ms": 0.08365517857142857,
+        "p50_ms": 0.08598126904761903,
+        "p99_ms": 0.08725516638095238,
+        "samples_s": [
+          8.728116428571428e-05,
+          8.365517857142857e-05,
+          8.598126904761904e-05
+        ],
+        "bars_per_second": 116768950.86165154
+      },
+      "speedup_canonical": 0.426126064603127,
+      "speedup_kernel": 0.4226052678866967
+    }
+  ]
+}

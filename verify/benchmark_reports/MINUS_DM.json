@@ -1,0 +1,147 @@
+{
+  "schema_version": 4,
+  "canonical_class": "MinusDirectionalMovement",
+  "snake_name": "minus_directional_movement",
+  "talib_name": "MINUS_DM",
+  "constructor_kwargs": {
+    "timeperiod": 14
+  },
+  "inputs": [
+    "high",
+    "low"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "MINUS_DM",
+    "taflow_class": "MinusDirectionalMovement",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 0.0
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.007567742838254739,
+        "min_ms": 0.007406435434111945,
+        "p50_ms": 0.0074811996474217725,
+        "p99_ms": 0.007808905557514324,
+        "samples_s": [
+          7.406435434111944e-06,
+          7.481199647421772e-06,
+          7.8155934332305e-06
+        ],
+        "bars_per_second": 132139796.68350074
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.005970768863938187,
+        "min_ms": 0.0059181455994205,
+        "p50_ms": 0.0059913406374502,
+        "p99_ms": 0.006002590760593988,
+        "samples_s": [
+          5.9181455994205e-06,
+          6.002820354943861e-06,
+          5.9913406374502e-06
+        ],
+        "bars_per_second": 167482617.86513406
+      },
+      "talib_original": {
+        "mean_ms": 0.03660313009143807,
+        "min_ms": 0.0361511608478803,
+        "p50_ms": 0.03623425436408977,
+        "p99_ms": 0.03740018064837906,
+        "samples_s": [
+          3.7423975062344143e-05,
+          3.6234254364089774e-05,
+          3.61511608478803e-05
+        ],
+        "bars_per_second": 27320067.915009063
+      },
+      "speedup_canonical": 4.8367301682623545,
+      "speedup_kernel": 6.130388049772112
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.05766311772486773,
+        "min_ms": 0.05532374206349207,
+        "p50_ms": 0.05766044642857143,
+        "p99_ms": 0.05995827031746032,
+        "samples_s": [
+          6.0005164682539685e-05,
+          5.766044642857143e-05,
+          5.532374206349207e-05
+        ],
+        "bars_per_second": 173421077.36376196
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.051151350694444445,
+        "min_ms": 0.05071396875,
+        "p50_ms": 0.05122179817708333,
+        "p99_ms": 0.05151235541666667,
+        "samples_s": [
+          5.151828515625e-05,
+          5.122179817708333e-05,
+          5.071396875e-05
+        ],
+        "bars_per_second": 195498258.87757254
+      },
+      "talib_original": {
+        "mean_ms": 0.08128635856269113,
+        "min_ms": 0.08027001834862385,
+        "p50_ms": 0.08167066743119267,
+        "p99_ms": 0.0819134354587156,
+        "samples_s": [
+          8.027001834862385e-05,
+          8.191838990825688e-05,
+          8.167066743119267e-05
+        ],
+        "bars_per_second": 123021872.01912385
+      },
+      "speedup_canonical": 1.4096767876918954,
+      "speedup_kernel": 1.5891341569504176
+    }
+  ]
+}

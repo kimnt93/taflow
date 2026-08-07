@@ -1,0 +1,147 @@
+{
+  "schema_version": 4,
+  "canonical_class": "AveragePrice",
+  "snake_name": "avg_price",
+  "talib_name": "AVGPRICE",
+  "constructor_kwargs": {},
+  "inputs": [
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "environment": {
+    "date": "2026-08-08",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "rustflags": "",
+    "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
+  },
+  "protocol": {
+    "repeats": 3,
+    "sizes": [
+      1000,
+      10000
+    ],
+    "warmup_bars": 1500,
+    "continue_bars": 100,
+    "chunks": [
+      1,
+      10,
+      100
+    ],
+    "threads": [
+      1,
+      2
+    ]
+  },
+  "correctness": {
+    "function": "AVGPRICE",
+    "taflow_class": "AveragePrice",
+    "oracle": "TA-Lib",
+    "batch_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 5.684341886080802e-14
+    },
+    "continue_vs_batch_bitwise": true,
+    "chunk_invariance": {
+      "1": true,
+      "10": true,
+      "1000": true
+    },
+    "continue_vs_oracle": {
+      "passed": true,
+      "nan_mismatches": 0,
+      "max_abs_error": 5.684341886080802e-14
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.04510689071637426,
+        "min_ms": 0.04485312061403509,
+        "p50_ms": 0.04486201315789474,
+        "p99_ms": 0.045590667872807016,
+        "samples_s": [
+          4.485312061403509e-05,
+          4.560553837719298e-05,
+          4.4862013157894735e-05
+        ],
+        "bars_per_second": 22169561.770237245
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.0021945485243208356,
+        "min_ms": 0.0021790019362788243,
+        "p50_ms": 0.0021983362964266852,
+        "p99_ms": 0.0022061479193803907,
+        "samples_s": [
+          2.206307340256997e-06,
+          2.1983362964266854e-06,
+          2.1790019362788242e-06
+        ],
+        "bars_per_second": 455674590.43061167
+      },
+      "talib_original": {
+        "mean_ms": 0.03057326258503401,
+        "min_ms": 0.03037035,
+        "p50_ms": 0.030654963265306125,
+        "p99_ms": 0.030693684265306127,
+        "samples_s": [
+          3.037035e-05,
+          3.069447448979592e-05,
+          3.0654963265306124e-05
+        ],
+        "bars_per_second": 32708318.165870603
+      },
+      "speedup_canonical": 0.6777958333965947,
+      "speedup_kernel": 13.931458906562916
+    },
+    {
+      "bars": 10000,
+      "taflow_canonical_vector": {
+        "mean_ms": 0.4113752163120568,
+        "min_ms": 0.40926228723404257,
+        "p50_ms": 0.4115929361702128,
+        "p99_ms": 0.4132368757446809,
+        "samples_s": [
+          0.00040926228723404257,
+          0.0004115929361702128,
+          0.0004132704255319149
+        ],
+        "bars_per_second": 24308707.971396852
+      },
+      "taflow_native_kernel": {
+        "mean_ms": 0.008286014793911407,
+        "min_ms": 0.008244576192919444,
+        "p50_ms": 0.008290527193432528,
+        "p99_ms": 0.008322292719343254,
+        "samples_s": [
+          8.244576192919445e-06,
+          8.322940995382247e-06,
+          8.290527193432528e-06
+        ],
+        "bars_per_second": 1206852781.30906
+      },
+      "talib_original": {
+        "mean_ms": 0.035977256877022655,
+        "min_ms": 0.035587307038834955,
+        "p50_ms": 0.0360557390776699,
+        "p99_ms": 0.036284064805825245,
+        "samples_s": [
+          3.558730703883495e-05,
+          3.60557390776699e-05,
+          3.6288724514563106e-05
+        ],
+        "bars_per_second": 277953375.7724211
+      },
+      "speedup_canonical": 0.08745606310354728,
+      "speedup_kernel": 4.3419252525905305
+    }
+  ]
+}

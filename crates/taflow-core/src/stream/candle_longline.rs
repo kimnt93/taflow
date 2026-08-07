@@ -53,8 +53,8 @@ impl CandleLongLine {
         let value = if self.bodies.len() == 10 && self.shadows.len() == 10 {
             Some(
                 (body > self.body_sum / 10.0
-                    && upper < self.shadow_sum / 10.0
-                    && lower < self.shadow_sum / 10.0) as i32
+                    && upper < self.shadow_sum / 20.0
+                    && lower < self.shadow_sum / 20.0) as i32
                     * if close >= open { 100 } else { -100 },
             )
         } else {
