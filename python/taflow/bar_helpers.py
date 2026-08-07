@@ -3,7 +3,7 @@ import numpy as np
 from ._series import as_float64_series
 
 
-def _make(native, name):
+def _make(native: object, name: object) -> object:
     """Execute the _make operation through the native Rust implementation.
 
     Parameters
@@ -19,7 +19,7 @@ def _make(native, name):
         The updated adapter, native value, aligned output array, or execution node.
     """
 
-    def init(self, high: Any | None = None, low: Any | None = None):
+    def init(self, high: Any | None = None, low: Any | None = None) -> object:
         """Execute the init operation through the native Rust implementation.
 
         Parameters
@@ -37,7 +37,7 @@ def _make(native, name):
         self._state = native()
         self.extend(high, low) if high is not None or low is not None else None
 
-    def append(self, high: float, low: float):
+    def append(self, high: float, low: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -55,7 +55,7 @@ def _make(native, name):
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any):
+    def extend(self, high: Any, low: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters

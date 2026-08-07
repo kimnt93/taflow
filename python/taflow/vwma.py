@@ -15,7 +15,7 @@ class VolumeWeightedMovingAverage:
 
     def __init__(
         self, timeperiod: int, price: Any | None = None, volume: Any | None = None
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -35,7 +35,7 @@ class VolumeWeightedMovingAverage:
         self._state = _Native(timeperiod)
         self.extend(price, volume) if price is not None or volume is not None else None
 
-    def append(self, price: float, volume: float):
+    def append(self, price: float, volume: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -53,7 +53,7 @@ class VolumeWeightedMovingAverage:
         self._state.append(price, volume)
         return self
 
-    def extend(self, price: Any, volume: Any):
+    def extend(self, price: Any, volume: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -82,7 +82,7 @@ class VolumeWeightedMovingAverage:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -92,7 +92,7 @@ class VolumeWeightedMovingAverage:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

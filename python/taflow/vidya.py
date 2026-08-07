@@ -22,7 +22,7 @@ class VariableIndexDynamicAverage:
 
     def __init__(
         self, close: Any | None = None, length: int = 14, alpha: float | None = None
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -43,11 +43,11 @@ class VariableIndexDynamicAverage:
         if close is not None:
             self.extend(close)
 
-    def append(self, close: float):
+    def append(self, close: float) -> object:
         """Process one close and return the current average."""
         return self._state.append(float(close))
 
-    def extend(self, close: Any):
+    def extend(self, close: Any) -> object:
         """Process an aligned close history and return this indicator."""
         self._state.extend(np.asarray(close, dtype=np.float64))
         return self
@@ -57,11 +57,11 @@ class VariableIndexDynamicAverage:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest average value."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear state and accumulated output."""
         self._state.reset()
         return self

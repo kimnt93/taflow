@@ -27,7 +27,7 @@ class KlingerVolumeOscillator:
         fast: int = 34,
         slow: int = 55,
         signal: int = 13,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -56,11 +56,11 @@ class KlingerVolumeOscillator:
         if close is not None:
             self.extend(high, low, close, volume)
 
-    def append(self, high: float, low: float, close: float, volume: float):
+    def append(self, high: float, low: float, close: float, volume: float) -> object:
         """Process one OHLCV bar and return oscillator and signal values."""
         return self._state.append(float(high), float(low), float(close), float(volume))
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any):
+    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
         """Process aligned OHLCV history and return this indicator."""
         self._state.extend(
             np.asarray(high, dtype=np.float64),
@@ -70,16 +70,16 @@ class KlingerVolumeOscillator:
         )
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return oscillator and signal histories."""
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest oscillator and signal pair."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear EMA state and accumulated output."""
         self._state.reset()
         return self

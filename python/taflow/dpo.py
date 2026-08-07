@@ -11,7 +11,7 @@ from ._series import as_float64_series
 class DetrendedPriceOscillator:
     """Causal DPO; pandas-ta centered/lookahead output is not exposed."""
 
-    def __init__(self, close: Any | None = None, period=20):
+    def __init__(self, close: Any | None = None, period: object = 20) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -29,7 +29,7 @@ class DetrendedPriceOscillator:
         self._state = _Native(period)
         self.extend(close) if close is not None else None
 
-    def append(self, close: float):
+    def append(self, close: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -45,7 +45,7 @@ class DetrendedPriceOscillator:
         self._state.append(close)
         return self
 
-    def extend(self, close: Any):
+    def extend(self, close: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -72,7 +72,7 @@ class DetrendedPriceOscillator:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -82,7 +82,7 @@ class DetrendedPriceOscillator:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

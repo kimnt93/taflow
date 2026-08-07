@@ -13,7 +13,7 @@ class RollingZscore:
     the aligned history with NaN warm-up where applicable.
     """
 
-    def __init__(self, timeperiod: int, _input: Any | None = None):
+    def __init__(self, timeperiod: int, _input: Any | None = None) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -32,7 +32,7 @@ class RollingZscore:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: float):
+    def append(self, _input: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -48,7 +48,7 @@ class RollingZscore:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any):
+    def extend(self, _input: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -75,7 +75,7 @@ class RollingZscore:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -85,7 +85,7 @@ class RollingZscore:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -17,7 +17,7 @@ class CandleShortLine:
         high: Any | None = None,
         low: Any | None = None,
         close: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -43,7 +43,7 @@ class CandleShortLine:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float):
+    def append(self, _open: float, high: float, low: float, close: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleShortLine:
         self._state.append(_open, high, low, close)
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any):
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -103,7 +103,7 @@ class CandleShortLine:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -113,7 +113,7 @@ class CandleShortLine:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

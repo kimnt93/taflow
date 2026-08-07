@@ -58,8 +58,14 @@ _LOWER_LIMIT = ["Lower Limit"]
 
 
 def _make_info(
-    name, group, display_name, input_names, parameters, output_names, output_flags=None
-):
+    name: object,
+    group: object,
+    display_name: object,
+    input_names: object,
+    parameters: object,
+    output_names: object,
+    output_flags: object = None,
+) -> object:
     """Helper to build a function info dict."""
     if output_flags is None:
         output_flags = {n: _LINE for n in output_names}
@@ -74,39 +80,39 @@ def _make_info(
     }
 
 
-def _close():
+def _close() -> object:
     return [("price", ["close"])]
 
 
-def _close_volume():
+def _close_volume() -> object:
     return [("price", ["close"]), ("price1", ["volume"])]
 
 
-def _high_low():
+def _high_low() -> object:
     return [("prices", ["high", "low"])]
 
 
-def _high_low_close():
+def _high_low_close() -> object:
     return [("prices", ["high", "low", "close"])]
 
 
-def _ohlc():
+def _ohlc() -> object:
     return [("prices", ["open", "high", "low", "close"])]
 
 
-def _ohlcv():
+def _ohlcv() -> object:
     return [("prices", ["open", "high", "low", "close"]), ("price1", ["volume"])]
 
 
-def _hlcv():
+def _hlcv() -> object:
     return [("prices", ["high", "low", "close"]), ("price1", ["volume"])]
 
 
-def _two_series():
+def _two_series() -> object:
     return [("price0", ["close"]), ("price1", ["close"])]
 
 
-def _close_periods():
+def _close_periods() -> object:
     return [("price", ["close"]), ("periods", ["periods"])]
 
 
@@ -115,8 +121,14 @@ _FUNC_INFO: Dict[str, dict] = {}
 
 
 def _reg(
-    name, group, display_name, input_names, parameters, output_names, output_flags=None
-):
+    name: object,
+    group: object,
+    display_name: object,
+    input_names: object,
+    parameters: object,
+    output_names: object,
+    output_flags: object = None,
+) -> object:
     _FUNC_INFO[name] = _make_info(
         name, group, display_name, input_names, parameters, output_names, output_flags
     )
@@ -893,7 +905,7 @@ for _cdl_name, _cdl_display in _CDL_NAMES:
 # ---------------------------------------------------------------------------
 
 
-def _get_array(input_arrays, key):
+def _get_array(input_arrays: object, key: object) -> object:
     """Extract a numpy array from input_arrays (dict or DataFrame) by key."""
     if hasattr(input_arrays, "to_numpy"):
         # pandas Series
@@ -908,7 +920,7 @@ def _get_array(input_arrays, key):
     )
 
 
-def _resolve_inputs(info, input_arrays):
+def _resolve_inputs(info: object, input_arrays: object) -> object:
     """
     Resolve the ordered positional input arrays required to call the underlying
     C function, based on the metadata input_names.
@@ -943,13 +955,15 @@ class Function:
         >>> result = sma({'close': close_array})
     """
 
-    def __new__(cls, function_name, *args, **kwargs):
+    def __new__(cls, function_name: object, *args: object, **kwargs: object) -> object:
         # When called as Function('SMA', ...) we want to return a Function
         # *instance*, not a bare Rust function.  __new__ + __init__ is the
         # standard pattern.
         return super().__new__(cls)
 
-    def __init__(self, function_name, func_object=None, **kwargs):
+    def __init__(
+        self, function_name: object, func_object: object = None, **kwargs: object
+    ) -> None:
         self._name = function_name.upper()
         if self._name not in _FUNC_INFO:
             raise ValueError(f"Invalid function name: {self._name}")
@@ -988,7 +1002,7 @@ class Function:
         return self._info["input_names"]
 
     @input_names.setter
-    def input_names(self, new_names):
+    def input_names(self, new_names: object) -> object:
         self._info["input_names"] = OrderedDict(new_names)
 
     @property
@@ -997,7 +1011,7 @@ class Function:
         return self._info["parameters"]
 
     @parameters.setter
-    def parameters(self, new_params):
+    def parameters(self, new_params: object) -> object:
         """Set one or more parameters by dict."""
         self.set_parameters(new_params)
 
@@ -1062,13 +1076,13 @@ class Function:
 
     # ---- Parameter helpers ----
 
-    def set_parameters(self, new_params: dict):
+    def set_parameters(self, new_params: dict) -> object:
         """Update parameters, ignoring unknown keys."""
         for key, value in new_params.items():
             if key in self._info["parameters"]:
                 self._info["parameters"][key] = value
 
-    def set_function_args(self, *args, **kwargs):
+    def set_function_args(self, *args: object, **kwargs: object) -> object:
         """
         Set input arrays (positional) and parameters (keyword).
         Returns self for chaining.
@@ -1081,7 +1095,7 @@ class Function:
 
     # ---- Calling ----
 
-    def _call(self, input_arrays, **kwargs):
+    def _call(self, input_arrays: object, **kwargs: object) -> object:
         """Internal: build args and call the Rust function."""
         # Merge any override kwargs into parameters
         params = OrderedDict(self._info["parameters"])
@@ -1097,14 +1111,14 @@ class Function:
 
         return self._func(*all_args)
 
-    def run(self, input_arrays, **kwargs):
+    def run(self, input_arrays: object, **kwargs: object) -> object:
         """
         Run the function with the given input arrays and optional parameter
         overrides.  Same as calling the instance directly.
         """
         return self(input_arrays, **kwargs)
 
-    def __call__(self, input_arrays=None, **kwargs):
+    def __call__(self, input_arrays: object = None, **kwargs: object) -> object:
         """
         Call the function.
 
@@ -1128,10 +1142,10 @@ class Function:
 
     # ---- Representation ----
 
-    def __repr__(self):
+    def __repr__(self) -> object:
         return f"Function({self._name!r})"
 
-    def __str__(self):
+    def __str__(self) -> object:
         return f"{self._name}({', '.join(f'{k}={v}' for k, v in self._info['parameters'].items())})"
 
 
@@ -1143,7 +1157,7 @@ class Function:
 # ---------------------------------------------------------------------------
 
 
-def _make_func(name):
+def _make_func(name: object) -> object:
     """Create a module-level callable Function instance."""
     return Function(name)
 
@@ -1154,7 +1168,7 @@ for _fname in _FUNC_INFO:
     globals()[_fname] = _make_func(_fname)
 
 
-def __getattr__(name):
+def __getattr__(name: object) -> object:
     """
     Fallback for attribute access on the module.
     Allows ``talib.abstract.SMA`` even if not yet in globals

@@ -15,7 +15,7 @@ class HedgeRatio:
 
     def __init__(
         self, x: Any | None = None, y: Any | None = None, timeperiod: int = 20
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -35,7 +35,7 @@ class HedgeRatio:
         self._state = _Native(timeperiod)
         self.extend(x, y) if x is not None or y is not None else None
 
-    def append(self, x: float, y: float):
+    def append(self, x: float, y: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -53,7 +53,7 @@ class HedgeRatio:
         self._state.append(x, y)
         return self
 
-    def extend(self, x: Any, y: Any):
+    def extend(self, x: Any, y: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -82,7 +82,7 @@ class HedgeRatio:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -92,7 +92,7 @@ class HedgeRatio:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

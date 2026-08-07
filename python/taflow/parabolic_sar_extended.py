@@ -11,17 +11,17 @@ class ParabolicSarExtended:
 
     def __init__(
         self,
-        start_value=0.0,
-        offset_on_reverse=0.0,
-        acceleration_init_long=0.02,
-        acceleration_long=0.02,
-        acceleration_max_long=0.2,
-        acceleration_init_short=0.02,
-        acceleration_short=0.02,
-        acceleration_max_short=0.2,
+        start_value: object = 0.0,
+        offset_on_reverse: object = 0.0,
+        acceleration_init_long: object = 0.02,
+        acceleration_long: object = 0.02,
+        acceleration_max_long: object = 0.2,
+        acceleration_init_short: object = 0.02,
+        acceleration_short: object = 0.02,
+        acceleration_max_short: object = 0.2,
         high: Any | None = None,
         low: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -109,7 +109,7 @@ class ParabolicSarExtended:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns

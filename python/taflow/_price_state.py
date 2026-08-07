@@ -12,19 +12,25 @@ class OhlcPriceState:
 
     _native_cls = None
 
-    def __init__(self, _open: Any | None = None, high=None, low=None, close=None):
+    def __init__(
+        self,
+        _open: Any | None = None,
+        high: object = None,
+        low: object = None,
+        close: object = None,
+    ) -> None:
         """Create native state and optionally process initial OHLC data."""
         self._state = self._native_cls()
         self._values: list[float] = []
         if any(value is not None for value in (_open, high, low, close)):
             self.extend(_open, high, low, close)
 
-    def append(self, _open, high, low, close):
+    def append(self, _open: object, high: object, low: object, close: object) -> object:
         """Append one OHLC bar to native state."""
         self._values.append(self._state.append(_open, high, low, close))
         return self
 
-    def extend(self, _open, high, low, close):
+    def extend(self, _open: object, high: object, low: object, close: object) -> object:
         """Append aligned OHLC histories to native state."""
         values = self._state.extend(
             as_float64_series(_open),
@@ -40,11 +46,11 @@ class OhlcPriceState:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return latest native output."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()
@@ -56,19 +62,21 @@ class HlcPriceState:
 
     _native_cls = None
 
-    def __init__(self, high: Any | None = None, low=None, close=None):
+    def __init__(
+        self, high: Any | None = None, low: object = None, close: object = None
+    ) -> None:
         """Create native state and optionally process initial HLC data."""
         self._state = self._native_cls()
         self._values: list[float] = []
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
-    def append(self, high, low, close):
+    def append(self, high: object, low: object, close: object) -> object:
         """Append one HLC bar to native state."""
         self._values.append(self._state.append(high, low, close))
         return self
 
-    def extend(self, high, low, close):
+    def extend(self, high: object, low: object, close: object) -> object:
         """Append aligned HLC histories to native state."""
         values = self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
@@ -81,11 +89,11 @@ class HlcPriceState:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return latest native output."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()
@@ -97,19 +105,19 @@ class HlPriceState:
 
     _native_cls = None
 
-    def __init__(self, high: Any | None = None, low=None):
+    def __init__(self, high: Any | None = None, low: object = None) -> None:
         """Create native state and optionally process initial high/low data."""
         self._state = self._native_cls()
         self._values: list[float] = []
         if high is not None or low is not None:
             self.extend(high, low)
 
-    def append(self, high, low):
+    def append(self, high: object, low: object) -> object:
         """Append one high/low observation to native state."""
         self._values.append(self._state.append(high, low))
         return self
 
-    def extend(self, high, low):
+    def extend(self, high: object, low: object) -> object:
         """Append aligned high/low histories to native state."""
         values = self._state.extend(as_float64_series(high), as_float64_series(low))
         self._values.extend(values.tolist())
@@ -120,11 +128,11 @@ class HlPriceState:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return latest native output."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()

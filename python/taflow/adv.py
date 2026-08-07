@@ -15,7 +15,7 @@ class AverageDailyDollarValue:
 
     def __init__(
         self, close: Any | None = None, volume: Any | None = None, timeperiod: int = 20
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -39,7 +39,7 @@ class AverageDailyDollarValue:
             else None
         )
 
-    def append(self, close: float, volume: float):
+    def append(self, close: float, volume: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -57,7 +57,7 @@ class AverageDailyDollarValue:
         self._state.append(close, volume)
         return self
 
-    def extend(self, close: Any, volume: Any):
+    def extend(self, close: Any, volume: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -86,7 +86,7 @@ class AverageDailyDollarValue:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -96,7 +96,7 @@ class AverageDailyDollarValue:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

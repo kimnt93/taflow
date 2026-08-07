@@ -11,10 +11,10 @@ class AccumulationDistributionOscillator(OhlcvStateAdapter):
 
     def __init__(
         self,
-        high=None,
-        low=None,
-        close=None,
-        volume=None,
+        high: object = None,
+        low: object = None,
+        close: object = None,
+        volume: object = None,
         fastperiod: int = 3,
         slowperiod: int = 10,
     ) -> None:

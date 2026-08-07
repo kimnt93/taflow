@@ -19,7 +19,7 @@ class KalmanHedgeRatio:
         y: Any | None = None,
         delta: float = 1e-4,
         observation_variance: float = 1e-3,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -42,7 +42,7 @@ class KalmanHedgeRatio:
         if x is not None or y is not None:
             self.extend(x, y)
 
-    def append(self, x: float, y: float):
+    def append(self, x: float, y: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -60,7 +60,7 @@ class KalmanHedgeRatio:
         self._state.append(x, y)
         return self
 
-    def extend(self, x: Any, y: Any):
+    def extend(self, x: Any, y: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -89,7 +89,7 @@ class KalmanHedgeRatio:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -100,7 +100,7 @@ class KalmanHedgeRatio:
         return self._state.value
 
     @property
-    def alpha(self):
+    def alpha(self) -> object:
         """Execute the alpha operation through the native Rust implementation.
 
         Returns
@@ -111,7 +111,7 @@ class KalmanHedgeRatio:
         return self._state.alpha
 
     @property
-    def innovation(self):
+    def innovation(self) -> object:
         """Execute the innovation operation through the native Rust implementation.
 
         Returns
@@ -122,7 +122,7 @@ class KalmanHedgeRatio:
         return self._state.innovation
 
     @property
-    def std(self):
+    def std(self) -> object:
         """Execute the std operation through the native Rust implementation.
 
         Returns
@@ -132,7 +132,7 @@ class KalmanHedgeRatio:
         """
         return self._state.std
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

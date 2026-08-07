@@ -15,14 +15,14 @@ class DirectionalMovementIndex:
         high: Any | None = None,
         low: Any | None = None,
         close: Any | None = None,
-    ):
+    ) -> None:
         """Create DX with an optional aligned high/low/close history."""
         self._state = StatefulDx(period)
         self._values: list[float] = []
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
-    def append(self, high, low, close):
+    def append(self, high: object, low: object, close: object) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -43,7 +43,7 @@ class DirectionalMovementIndex:
         self._values.append(np.nan if result is None else float(result))
         return self
 
-    def extend(self, high, low, close):
+    def extend(self, high: object, low: object, close: object) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -69,7 +69,7 @@ class DirectionalMovementIndex:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -79,7 +79,7 @@ class DirectionalMovementIndex:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

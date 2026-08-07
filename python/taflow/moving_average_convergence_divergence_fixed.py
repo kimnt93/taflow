@@ -9,7 +9,7 @@ import numpy as np
 class MovingAverageConvergenceDivergenceFixed:
     """Incrementally compute TA-Lib's fixed 12/26 MACD variant."""
 
-    def __init__(self, signal_period: int = 9, value: Any | None = None):
+    def __init__(self, signal_period: int = 9, value: Any | None = None) -> None:
         """Create fixed MACD with an optional initial price series."""
         self._state = StatefulMacdFix(signal_period)
         self._values: list[tuple[float, float, float]] = []
@@ -63,7 +63,7 @@ class MovingAverageConvergenceDivergenceFixed:
         )
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns

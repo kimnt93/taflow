@@ -24,7 +24,7 @@ class PivotPoints:
         low: Any | None = None,
         close: Any | None = None,
         anchor: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -47,11 +47,15 @@ class PivotPoints:
         if close is not None:
             self.extend(high, low, close, anchor)
 
-    def append(self, high: float, low: float, close: float, anchor: bool = False):
+    def append(
+        self, high: float, low: float, close: float, anchor: bool = False
+    ) -> object:
         """Process one OHLC bar and return five pivot levels."""
         return self._state.append(float(high), float(low), float(close), bool(anchor))
 
-    def extend(self, high: Any, low: Any, close: Any, anchor: Any | None = None):
+    def extend(
+        self, high: Any, low: Any, close: Any, anchor: Any | None = None
+    ) -> object:
         """Process aligned OHLC history and return this indicator."""
         close_array = np.asarray(close, dtype=np.float64)
         if anchor is None:
@@ -64,16 +68,16 @@ class PivotPoints:
         )
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return pivot, resistance, and support level histories."""
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest five pivot levels."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear session extrema and pivot output."""
         self._state.reset()
         return self

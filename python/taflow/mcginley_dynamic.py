@@ -13,7 +13,9 @@ class McGinleyDynamic:
     the aligned history with NaN warm-up where applicable.
     """
 
-    def __init__(self, close: Any | None = None, length=10, c=1.0):
+    def __init__(
+        self, close: Any | None = None, length: object = 10, c: object = 1.0
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -33,7 +35,7 @@ class McGinleyDynamic:
         self._state = _Native(length, c)
         self.extend(close) if close is not None else None
 
-    def append(self, close: float):
+    def append(self, close: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -49,7 +51,7 @@ class McGinleyDynamic:
         self._state.append(close)
         return self
 
-    def extend(self, close: Any):
+    def extend(self, close: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -76,7 +78,7 @@ class McGinleyDynamic:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -86,7 +88,7 @@ class McGinleyDynamic:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

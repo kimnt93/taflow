@@ -17,7 +17,7 @@ import numpy as np
 import taflow._native as _native
 
 
-def _last(result):
+def _last(result: object) -> object:
     """
     Extract the last non-NaN value from a result.
     If the result is a tuple of arrays, return a tuple of last values.
@@ -28,7 +28,7 @@ def _last(result):
     return _scalar(result)
 
 
-def _scalar(arr):
+def _scalar(arr: object) -> object:
     """Return the last element of an array as a Python float/int."""
     a = np.asarray(arr)
     if a.size == 0:
@@ -36,11 +36,11 @@ def _scalar(arr):
     return float(a[-1])
 
 
-def _stream_wrapper(func_name):
+def _stream_wrapper(func_name: object) -> object:
     """Create a stream wrapper for a given _native function."""
     func = getattr(_native, func_name)
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: object, **kwargs: object) -> object:
         """Run a TA-Lib-compatible function and return its latest output.
 
         Parameters

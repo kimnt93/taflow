@@ -15,7 +15,7 @@ class RollingCov:
 
     def __init__(
         self, timeperiod: int, left: Any | None = None, right: Any | None = None
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -36,7 +36,7 @@ class RollingCov:
         if left is not None or right is not None:
             self.extend(left, right)
 
-    def append(self, left: float, right: float):
+    def append(self, left: float, right: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -54,7 +54,7 @@ class RollingCov:
         self._state.append(left, right)
         return self
 
-    def extend(self, left: Any, right: Any):
+    def extend(self, left: Any, right: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -83,7 +83,7 @@ class RollingCov:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -93,7 +93,7 @@ class RollingCov:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

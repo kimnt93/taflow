@@ -13,7 +13,7 @@ class HilbertTransformSineWave:
     the aligned history with NaN warm-up where applicable.
     """
 
-    def __init__(self, _input: Any | None = None):
+    def __init__(self, _input: Any | None = None) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -30,7 +30,7 @@ class HilbertTransformSineWave:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, value: float):
+    def append(self, value: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -46,7 +46,7 @@ class HilbertTransformSineWave:
         self._state.append(float(value))
         return self
 
-    def extend(self, values: Any):
+    def extend(self, values: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -73,7 +73,7 @@ class HilbertTransformSineWave:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -83,7 +83,7 @@ class HilbertTransformSineWave:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

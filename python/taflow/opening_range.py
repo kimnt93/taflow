@@ -27,7 +27,7 @@ class OpeningRange:
         close: Any | None = None,
         anchor: Any | None = None,
         bars: int = 30,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -52,11 +52,15 @@ class OpeningRange:
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close, anchor)
 
-    def append(self, high: float, low: float, close: float, anchor: bool = False):
+    def append(
+        self, high: float, low: float, close: float, anchor: bool = False
+    ) -> object:
         """Process one bar and return opening high, low, and breakout flag."""
         return self._state.append(float(high), float(low), float(close), bool(anchor))
 
-    def extend(self, high: Any, low: Any, close: Any, anchor: Any | None = None):
+    def extend(
+        self, high: Any, low: Any, close: Any, anchor: Any | None = None
+    ) -> object:
         """Process aligned OHLC history and return this indicator."""
         close_array = np.asarray(close, dtype=np.float64)
         if anchor is None:
@@ -69,16 +73,16 @@ class OpeningRange:
         )
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return opening highs, lows, and breakout flags."""
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest opening range tuple."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear current session and output history."""
         self._state.reset()
         return self

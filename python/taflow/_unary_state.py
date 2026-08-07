@@ -21,13 +21,13 @@ class UnaryStateAdapter:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: float):
+    def append(self, _input: float) -> object:
         """Append one value and update the native state."""
         value = self._state.append(float(_input))
         self._values.append(np.nan if value is None else value)
         return self
 
-    def extend(self, _input: Any):
+    def extend(self, _input: Any) -> object:
         """Append an aligned input history to the native state."""
         values = self._state.extend(as_float64_series(_input))
         self._values.extend(np.asarray(values, dtype=np.float64).tolist())
@@ -38,11 +38,11 @@ class UnaryStateAdapter:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest native output, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()

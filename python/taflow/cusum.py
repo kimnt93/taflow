@@ -13,7 +13,7 @@ class Cusum:
     the aligned history with NaN warm-up where applicable.
     """
 
-    def __init__(self, change: Any | None = None, threshold: float = 1.0):
+    def __init__(self, change: Any | None = None, threshold: float = 1.0) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -31,7 +31,7 @@ class Cusum:
         self._state = _Native(threshold)
         self.extend(change) if change is not None else None
 
-    def append(self, change: float):
+    def append(self, change: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +47,7 @@ class Cusum:
         self._state.append(change)
         return self
 
-    def extend(self, change: Any):
+    def extend(self, change: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -74,7 +74,7 @@ class Cusum:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -84,7 +84,7 @@ class Cusum:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

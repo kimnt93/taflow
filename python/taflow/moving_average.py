@@ -11,7 +11,7 @@ class MovingAverage:
 
     def __init__(
         self, period: int = 30, moving_average_type: int = 0, values: Any | None = None
-    ):
+    ) -> None:
         """Create a selectable moving average with optional initial values."""
         self._state = StatefulMa(period, moving_average_type)
         self._values: list[float] = []
@@ -57,7 +57,7 @@ class MovingAverage:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns

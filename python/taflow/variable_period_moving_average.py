@@ -16,7 +16,7 @@ class VariablePeriodMovingAverage:
         average_type: int = 0,
         _input: Any | None = None,
         periods: Any | None = None,
-    ):
+    ) -> None:
         """Create MAVP with optional values and per-bar periods."""
         self._state = StatefulMavp(min_period, max_period, average_type)
         self._values: list[float] = []
@@ -69,7 +69,7 @@ class VariablePeriodMovingAverage:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns

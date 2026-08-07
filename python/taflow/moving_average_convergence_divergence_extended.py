@@ -11,14 +11,14 @@ class MovingAverageConvergenceDivergenceExtended:
 
     def __init__(
         self,
-        fast_period=12,
-        fast_average_type=1,
-        slow_period=26,
-        slow_average_type=1,
-        signal_period=9,
-        signal_average_type=1,
+        fast_period: object = 12,
+        fast_average_type: object = 1,
+        slow_period: object = 26,
+        slow_average_type: object = 1,
+        signal_period: object = 9,
+        signal_average_type: object = 1,
         _input: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -55,7 +55,7 @@ class MovingAverageConvergenceDivergenceExtended:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input):
+    def append(self, _input: object) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -74,7 +74,7 @@ class MovingAverageConvergenceDivergenceExtended:
         )
         return self
 
-    def extend(self, _input):
+    def extend(self, _input: object) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -102,7 +102,7 @@ class MovingAverageConvergenceDivergenceExtended:
         )
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -112,7 +112,7 @@ class MovingAverageConvergenceDivergenceExtended:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -13,7 +13,7 @@ class OrnsteinUhlenbeckHalfLife:
     the aligned history with NaN warm-up where applicable.
     """
 
-    def __init__(self, price: Any | None = None, timeperiod: int = 20):
+    def __init__(self, price: Any | None = None, timeperiod: int = 20) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -31,7 +31,7 @@ class OrnsteinUhlenbeckHalfLife:
         self._state = _Native(timeperiod)
         self.extend(price) if price is not None else None
 
-    def append(self, price: float):
+    def append(self, price: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +47,7 @@ class OrnsteinUhlenbeckHalfLife:
         self._state.append(price)
         return self
 
-    def extend(self, price: Any):
+    def extend(self, price: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -74,7 +74,7 @@ class OrnsteinUhlenbeckHalfLife:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -84,7 +84,7 @@ class OrnsteinUhlenbeckHalfLife:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -22,13 +22,13 @@ class BalanceOfPower:
         if any(value is not None for value in (_open, high, low, close)):
             self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float):
+    def append(self, _open: float, high: float, low: float, close: float) -> object:
         """Append one OHLC bar and update native state."""
         value = self._state.append(_open, high, low, close)
         self._values.append(value)
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any):
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
         """Append aligned OHLC histories to native state."""
         values = self._state.extend(
             as_float64_series(_open),
@@ -39,18 +39,18 @@ class BalanceOfPower:
         self._values.extend(values.tolist())
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return aligned native Balance of Power history."""
         import numpy as np
 
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest native value."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()

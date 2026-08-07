@@ -11,12 +11,12 @@ class StochasticRelativeStrengthIndex:
 
     def __init__(
         self,
-        time_period=14,
-        fast_k_period=5,
-        fast_d_period=3,
-        fast_d_average_type=0,
+        time_period: object = 14,
+        fast_k_period: object = 5,
+        fast_d_period: object = 3,
+        fast_d_average_type: object = 0,
         _input: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -47,7 +47,7 @@ class StochasticRelativeStrengthIndex:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input):
+    def append(self, _input: object) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -64,7 +64,7 @@ class StochasticRelativeStrengthIndex:
         self._values.append((np.nan, np.nan) if result is None else tuple(result))
         return self
 
-    def extend(self, _input):
+    def extend(self, _input: object) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -92,7 +92,7 @@ class StochasticRelativeStrengthIndex:
         )
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -102,7 +102,7 @@ class StochasticRelativeStrengthIndex:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -15,7 +15,7 @@ class ParabolicSar:
         maximum: float = 0.2,
         high: Any | None = None,
         low: Any | None = None,
-    ):
+    ) -> None:
         """Create Parabolic SAR with optional aligned high/low history."""
         self._state = StatefulSar(acceleration, maximum)
         self._values: list[float] = []
@@ -65,7 +65,7 @@ class ParabolicSar:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns

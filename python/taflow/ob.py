@@ -23,7 +23,7 @@ class OrderBlock:
         internal_length: int = 5,
         atr_period: int = 200,
         threshold: float = 2.0,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -57,7 +57,7 @@ class OrderBlock:
             else None
         )
 
-    def append(self, high: float, low: float, close: float, volume: float):
+    def append(self, high: float, low: float, close: float, volume: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -79,7 +79,7 @@ class OrderBlock:
         self._state.append(high, low, close, volume)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any):
+    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -119,7 +119,7 @@ class OrderBlock:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -129,7 +129,7 @@ class OrderBlock:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

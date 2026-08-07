@@ -19,7 +19,7 @@ class Liquidity:
         low: Any | None = None,
         swing_length: int = 50,
         range_percent: float = 0.01,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -45,7 +45,7 @@ class Liquidity:
             else None
         )
 
-    def append(self, high: float, low: float):
+    def append(self, high: float, low: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -63,7 +63,7 @@ class Liquidity:
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any):
+    def extend(self, high: Any, low: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -92,7 +92,7 @@ class Liquidity:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -102,7 +102,7 @@ class Liquidity:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

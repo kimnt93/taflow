@@ -15,7 +15,7 @@ class FracDiff:
 
     def __init__(
         self, _input: Any | None = None, d: float = 0.5, threshold: float = 1e-5
-    ):
+    ) -> None:
         """Create fractional differencing with optional _input history.
 
         Parameters are ``_input`` (the aligned source series), ``d`` (the
@@ -24,7 +24,7 @@ class FracDiff:
         self._state = _Native(d, threshold)
         self.extend(_input) if _input is not None else None
 
-    def append(self, _input: float):
+    def append(self, _input: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -40,7 +40,7 @@ class FracDiff:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any):
+    def extend(self, _input: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -67,7 +67,7 @@ class FracDiff:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -77,7 +77,7 @@ class FracDiff:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

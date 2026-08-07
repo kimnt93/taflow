@@ -20,7 +20,7 @@ class MinusDirectionalMovement:
         high: Any | None = None,
         low: Any | None = None,
         timeperiod: int = 14,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -41,7 +41,7 @@ class MinusDirectionalMovement:
         if high is not None or low is not None:
             self.extend(high, low)
 
-    def append(self, high: float, low: float):
+    def append(self, high: float, low: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -59,7 +59,7 @@ class MinusDirectionalMovement:
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any | None = None):
+    def extend(self, high: Any, low: Any | None = None) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -90,7 +90,7 @@ class MinusDirectionalMovement:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -100,7 +100,7 @@ class MinusDirectionalMovement:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

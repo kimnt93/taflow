@@ -11,7 +11,7 @@ class PercentagePriceOscillator(AbsolutePriceOscillator):
 
     def __init__(
         self,
-        _input=None,
+        _input: object = None,
         fastperiod: int = 12,
         slowperiod: int = 26,
         moving_average_type: int = 0,

@@ -9,14 +9,14 @@ import numpy as np
 class HilbertTransformTrendline:
     """Incrementally compute the instantaneous Hilbert Transform trendline."""
 
-    def __init__(self, _input: Any | None = None):
+    def __init__(self, _input: Any | None = None) -> None:
         """Create the trendline with an optional initial price series."""
         self._state = StatefulHtTrendline()
         self._values: list[float] = []
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input):
+    def append(self, _input: object) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -33,7 +33,7 @@ class HilbertTransformTrendline:
         self._values.append(np.nan if result is None else float(result))
         return self
 
-    def extend(self, _input):
+    def extend(self, _input: object) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -55,7 +55,7 @@ class HilbertTransformTrendline:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -65,7 +65,7 @@ class HilbertTransformTrendline:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

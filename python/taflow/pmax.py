@@ -27,7 +27,7 @@ class ParabolicMovingAverageStop:
         close: Any | None = None,
         length: int = 10,
         multiplier: float = 3.0,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -52,11 +52,11 @@ class ParabolicMovingAverageStop:
         if close is not None:
             self.extend(high, low, close)
 
-    def append(self, high: float, low: float, close: float):
+    def append(self, high: float, low: float, close: float) -> object:
         """Process one OHLC bar and return stop and trend direction."""
         return self._state.append(float(high), float(low), float(close))
 
-    def extend(self, high: Any, low: Any, close: Any):
+    def extend(self, high: Any, low: Any, close: Any) -> object:
         """Process aligned OHLC history and return this indicator."""
         self._state.extend(
             np.asarray(high, dtype=np.float64),
@@ -65,16 +65,16 @@ class ParabolicMovingAverageStop:
         )
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return stop and trend histories."""
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest stop and trend pair."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear EMA, range, and trend state."""
         self._state.reset()
         return self

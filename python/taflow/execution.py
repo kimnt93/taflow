@@ -30,8 +30,11 @@ class Expr:
     """
 
     def __init__(
-        self, fn: Callable[[Mapping[str, float]], float], deps=(), name="expr"
-    ):
+        self,
+        fn: Callable[[Mapping[str, float]], float],
+        deps: object = (),
+        name: object = "expr",
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -65,7 +68,7 @@ class Expr:
         """
         return self._fn(row)
 
-    def _binary(self, other, op, symbol):
+    def _binary(self, other: object, op: object, symbol: object) -> object:
         """Execute the _binary operation through the native Rust implementation.
 
         Parameters
@@ -93,7 +96,7 @@ class Expr:
             f"({self.name}{symbol}{rhs.name})",
         )
 
-    def __add__(self, other):
+    def __add__(self, other: object) -> object:
         """Execute the __add__ operation through the native Rust implementation.
 
         Parameters
@@ -108,7 +111,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: a + b, "+")
 
-    def __radd__(self, other):
+    def __radd__(self, other: object) -> object:
         """Execute the __radd__ operation through the native Rust implementation.
 
         Parameters
@@ -123,7 +126,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: b + a, "+")
 
-    def __sub__(self, other):
+    def __sub__(self, other: object) -> object:
         """Execute the __sub__ operation through the native Rust implementation.
 
         Parameters
@@ -138,7 +141,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: a - b, "-")
 
-    def __rsub__(self, other):
+    def __rsub__(self, other: object) -> object:
         """Execute the __rsub__ operation through the native Rust implementation.
 
         Parameters
@@ -153,7 +156,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: b - a, "-")
 
-    def __mul__(self, other):
+    def __mul__(self, other: object) -> object:
         """Execute the __mul__ operation through the native Rust implementation.
 
         Parameters
@@ -168,7 +171,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: a * b, "*")
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: object) -> object:
         """Execute the __rmul__ operation through the native Rust implementation.
 
         Parameters
@@ -183,7 +186,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: b * a, "*")
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: object) -> object:
         """Execute the __truediv__ operation through the native Rust implementation.
 
         Parameters
@@ -198,7 +201,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: a / b if b else np.nan, "/")
 
-    def __rtruediv__(self, other):
+    def __rtruediv__(self, other: object) -> object:
         """Execute the __rtruediv__ operation through the native Rust implementation.
 
         Parameters
@@ -213,7 +216,7 @@ class Expr:
         """
         return self._binary(other, lambda a, b: b / a if a else np.nan, "/")
 
-    def __neg__(self):
+    def __neg__(self) -> object:
         """Execute the __neg__ operation through the native Rust implementation.
 
         Returns
@@ -228,7 +231,7 @@ class Expr:
 class _Source(Expr):
     field: str = ""
 
-    def __init__(self, field: str):
+    def __init__(self, field: str) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -248,7 +251,7 @@ class _Source(Expr):
 
 
 class _Indicator(Expr):
-    def __init__(self, name: str, state: Any, inputs: Sequence[Expr]):
+    def __init__(self, name: str, state: Any, inputs: Sequence[Expr]) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -269,7 +272,7 @@ class _Indicator(Expr):
         super().__init__(lambda row: self._value, self.inputs, name)
         self._value = np.nan
 
-    def step(self, row, cache):
+    def step(self, row: object, cache: object) -> object:
         """Execute the step operation through the native Rust implementation.
 
         Parameters
@@ -289,7 +292,7 @@ class _Indicator(Expr):
         self._value = np.nan if value is None else value
         return self._value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -303,7 +306,7 @@ class _Indicator(Expr):
 
 
 class _Expression(Expr):
-    def __init__(self, expression: Expr):
+    def __init__(self, expression: Expr) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -319,7 +322,7 @@ class _Expression(Expr):
         self.expression = expression
         super().__init__(expression._fn, expression.deps, expression.name)
 
-    def step(self, row, cache):
+    def step(self, row: object, cache: object) -> object:
         """Execute the step operation through the native Rust implementation.
 
         Parameters
@@ -337,7 +340,7 @@ class _Expression(Expr):
         return _evaluate(self.expression, row, cache)
 
 
-def _evaluate(expr: Expr, row, cache):
+def _evaluate(expr: Expr, row: object, cache: object) -> object:
     """Evaluate this execution expression for one input row.
 
     Parameters
@@ -380,7 +383,7 @@ class Pipeline:
     calls, and shared expression nodes are evaluated once per row.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Returns
@@ -452,7 +455,7 @@ class Pipeline:
         """
         return tuple(self._outputs)
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset all stateful nodes and return this pipeline."""
         for node in self._nodes:
             if isinstance(node, _Indicator):
@@ -487,12 +490,12 @@ class NumpyAdapter:
     """Zero-copy where possible NumPy input/output adapter."""
 
     @staticmethod
-    def input(values, *, column=None):
+    def input(values: object, *, column: object = None) -> object:
         """Convert an array-like input to contiguous float64 values."""
         return as_float64_series(values, column=column)
 
     @staticmethod
-    def output(values):
+    def output(values: object) -> object:
         """Return contiguous float64 NumPy output."""
         return np.ascontiguousarray(values, dtype=np.float64)
 
@@ -501,12 +504,12 @@ class PythonListAdapter:
     """Adapter for Python sequences, with explicit list conversion."""
 
     @staticmethod
-    def input(values, *, column=None):
+    def input(values: object, *, column: object = None) -> object:
         """Convert a Python sequence to contiguous float64 values."""
         return as_float64_series(values, column=column)
 
     @staticmethod
-    def output(values):
+    def output(values: object) -> object:
         """Return output as a Python list of floats."""
         return np.asarray(values, dtype=np.float64).tolist()
 
@@ -515,7 +518,7 @@ class ArrowAdapter:
     """Optional Apache Arrow adapter; import is deferred until use."""
 
     @staticmethod
-    def _module():
+    def _module() -> object:
         """Execute the _module operation through the native Rust implementation.
 
         Returns
@@ -532,7 +535,7 @@ class ArrowAdapter:
         return pa
 
     @classmethod
-    def input(cls, values, *, column=None):
+    def input(cls, values: object, *, column: object = None) -> object:
         """Execute the input operation through the native Rust implementation.
 
         Parameters
@@ -561,7 +564,7 @@ class ArrowAdapter:
         )
 
     @classmethod
-    def output(cls, values):
+    def output(cls, values: object) -> object:
         """Convert values to an Arrow array."""
         return cls._module().array(np.asarray(values, dtype=np.float64))
 
@@ -570,7 +573,7 @@ class PolarsAdapter:
     """Optional Polars adapter; import is deferred until use."""
 
     @staticmethod
-    def _module():
+    def _module() -> object:
         """Execute the _module operation through the native Rust implementation.
 
         Returns
@@ -587,7 +590,7 @@ class PolarsAdapter:
         return pl
 
     @classmethod
-    def input(cls, values, *, column=None):
+    def input(cls, values: object, *, column: object = None) -> object:
         """Execute the input operation through the native Rust implementation.
 
         Parameters
@@ -614,12 +617,14 @@ class PolarsAdapter:
         return np.ascontiguousarray(values.to_numpy(), dtype=np.float64)
 
     @classmethod
-    def output(cls, values, name="value"):
+    def output(cls, values: object, name: object = "value") -> object:
         """Convert values to a Polars Series."""
         return cls._module().Series(name, values)
 
 
-def adapt_input(values, *, adapter="numpy", column=None):
+def adapt_input(
+    values: object, *, adapter: object = "numpy", column: object = None
+) -> object:
     """Convert one input through a named adapter.
 
     Parameters
@@ -639,7 +644,9 @@ def adapt_input(values, *, adapter="numpy", column=None):
     return AdapterGateway.input(values, adapter=adapter, column=column)
 
 
-def adapt_output(values, *, adapter="numpy", **kwargs):
+def adapt_output(
+    values: object, *, adapter: object = "numpy", **kwargs: object
+) -> object:
     """Convert computed values through a named output adapter.
 
     Parameters
@@ -690,7 +697,9 @@ class AdapterGateway:
         cls._adapters[name] = adapter
 
     @classmethod
-    def input(cls, values, *, adapter="numpy", column=None):
+    def input(
+        cls, values: object, *, adapter: object = "numpy", column: object = None
+    ) -> object:
         """Convert an input container through a registered adapter.
 
         Parameters
@@ -714,7 +723,9 @@ class AdapterGateway:
         return adapter_cls.input(values, column=column)
 
     @classmethod
-    def output(cls, values, *, adapter="numpy", **kwargs):
+    def output(
+        cls, values: object, *, adapter: object = "numpy", **kwargs: object
+    ) -> object:
         """Convert values to a registered output container.
 
         Parameters

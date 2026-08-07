@@ -19,9 +19,9 @@ class MassIndex:
         self,
         high: Any | None = None,
         low: Any | None = None,
-        ema_period=9,
-        sum_period=25,
-    ):
+        ema_period: object = 9,
+        sum_period: object = 25,
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -43,7 +43,7 @@ class MassIndex:
         self._state = _Native(ema_period, sum_period)
         self.extend(high, low) if high is not None or low is not None else None
 
-    def append(self, high: float, low: float):
+    def append(self, high: float, low: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -61,7 +61,7 @@ class MassIndex:
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any):
+    def extend(self, high: Any, low: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -90,7 +90,7 @@ class MassIndex:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -100,7 +100,7 @@ class MassIndex:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

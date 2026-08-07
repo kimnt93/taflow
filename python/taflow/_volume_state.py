@@ -27,13 +27,13 @@ class OhlcvStateAdapter:
         if any(value is not None for value in (high, low, close, volume)):
             self.extend(high, low, close, volume)
 
-    def append(self, high: float, low: float, close: float, volume: float):
+    def append(self, high: float, low: float, close: float, volume: float) -> object:
         """Append one OHLCV bar and update native state."""
         value = self._state.append(float(high), float(low), float(close), float(volume))
         self._values.append(np.nan if value is None else value)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any):
+    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
         """Append aligned OHLCV histories to native state."""
         values = self._state.extend(
             as_float64_series(high),
@@ -49,11 +49,11 @@ class OhlcvStateAdapter:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return latest native output, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()
@@ -72,13 +72,13 @@ class CloseVolumeStateAdapter:
         if close is not None or volume is not None:
             self.extend(close, volume)
 
-    def append(self, close: float, volume: float):
+    def append(self, close: float, volume: float) -> object:
         """Append one close/volume observation and update native state."""
         value = self._state.append(float(close), float(volume))
         self._values.append(np.nan if value is None else value)
         return self
 
-    def extend(self, close: Any, volume: Any):
+    def extend(self, close: Any, volume: Any) -> object:
         """Append aligned close and volume histories to native state."""
         values = self._state.extend(as_float64_series(close), as_float64_series(volume))
         self._values.extend(np.asarray(values, dtype=np.float64).tolist())
@@ -89,11 +89,11 @@ class CloseVolumeStateAdapter:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return latest native output, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()

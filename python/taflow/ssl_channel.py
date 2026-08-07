@@ -24,7 +24,7 @@ class SmoothedTrendChannel:
         low: Any | None = None,
         close: Any | None = None,
         length: int = 10,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -47,11 +47,11 @@ class SmoothedTrendChannel:
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
-    def append(self, high: float, low: float, close: float):
+    def append(self, high: float, low: float, close: float) -> object:
         """Process one OHLC bar and return lower/upper channel values."""
         return self._state.append(float(high), float(low), float(close))
 
-    def extend(self, high: Any, low: Any, close: Any):
+    def extend(self, high: Any, low: Any, close: Any) -> object:
         """Process aligned OHLC history and return this indicator."""
         self._state.extend(
             np.asarray(high, dtype=np.float64),
@@ -60,16 +60,16 @@ class SmoothedTrendChannel:
         )
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return lower and upper channel histories."""
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest channel pair, or ``None`` if not warm."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear state and accumulated channel history."""
         self._state.reset()
         return self

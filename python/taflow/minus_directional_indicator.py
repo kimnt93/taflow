@@ -17,7 +17,7 @@ class MinusDirectionalIndicator:
         low: Any | None = None,
         close: Any | None = None,
         timeperiod: int = 14,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -40,7 +40,7 @@ class MinusDirectionalIndicator:
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
-    def append(self, h: float, l: float, c: float):
+    def append(self, h: float, l: float, c: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -60,7 +60,7 @@ class MinusDirectionalIndicator:
         self._state.append(h, l, c)
         return self
 
-    def extend(self, h: Any, l: Any | None = None, c: Any | None = None):
+    def extend(self, h: Any, l: Any | None = None, c: Any | None = None) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -95,7 +95,7 @@ class MinusDirectionalIndicator:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -105,7 +105,7 @@ class MinusDirectionalIndicator:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -22,7 +22,7 @@ class HeikinAshi:
         high: Any | None = None,
         low: Any | None = None,
         close: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -50,11 +50,11 @@ class HeikinAshi:
         ):
             self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float):
+    def append(self, _open: float, high: float, low: float, close: float) -> object:
         """Process one OHLC bar and return transformed OHLC values."""
         return self._state.append(float(_open), float(high), float(low), float(close))
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any):
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
         """Process aligned OHLC history and return this indicator."""
         self._state.extend(
             np.asarray(_open, dtype=np.float64),
@@ -64,16 +64,16 @@ class HeikinAshi:
         )
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return transformed _open, high, low, and close histories."""
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest transformed OHLC tuple."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear previous-candle state and output history."""
         self._state.reset()
         return self

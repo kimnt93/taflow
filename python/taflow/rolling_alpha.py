@@ -18,7 +18,7 @@ class RollingAlpha:
         _input: Any | None = None,
         benchmark: Any | None = None,
         timeperiod: int = 20,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -42,7 +42,7 @@ class RollingAlpha:
             else None
         )
 
-    def append(self, _input: float, benchmark: float):
+    def append(self, _input: float, benchmark: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -60,7 +60,7 @@ class RollingAlpha:
         self._state.append(_input, benchmark)
         return self
 
-    def extend(self, _input: Any, benchmark: Any):
+    def extend(self, _input: Any, benchmark: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -89,7 +89,7 @@ class RollingAlpha:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -99,7 +99,7 @@ class RollingAlpha:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -123,7 +123,7 @@ class RollingInformationRatio:
         _input: Any | None = None,
         benchmark: Any | None = None,
         timeperiod: int = 20,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -147,7 +147,7 @@ class RollingInformationRatio:
             else None
         )
 
-    def append(self, _input: float, benchmark: float):
+    def append(self, _input: float, benchmark: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -165,7 +165,7 @@ class RollingInformationRatio:
         self._state.append(_input, benchmark)
         return self
 
-    def extend(self, _input: Any, benchmark: Any):
+    def extend(self, _input: Any, benchmark: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -194,7 +194,7 @@ class RollingInformationRatio:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -204,7 +204,7 @@ class RollingInformationRatio:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

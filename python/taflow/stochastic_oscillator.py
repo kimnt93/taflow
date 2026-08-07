@@ -11,15 +11,15 @@ class StochasticOscillator:
 
     def __init__(
         self,
-        fast_k_period=5,
-        slow_k_period=3,
-        slow_k_average_type=0,
-        slow_d_period=3,
-        slow_d_average_type=0,
+        fast_k_period: object = 5,
+        slow_k_period: object = 3,
+        slow_k_average_type: object = 0,
+        slow_d_period: object = 3,
+        slow_d_average_type: object = 0,
         high: Any | None = None,
         low: Any | None = None,
         close: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -57,7 +57,7 @@ class StochasticOscillator:
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
-    def append(self, high, low, close):
+    def append(self, high: object, low: object, close: object) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -78,7 +78,7 @@ class StochasticOscillator:
         self._values.append((np.nan, np.nan) if result is None else tuple(result))
         return self
 
-    def extend(self, high, low, close):
+    def extend(self, high: object, low: object, close: object) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -110,7 +110,7 @@ class StochasticOscillator:
         )
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -120,7 +120,7 @@ class StochasticOscillator:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

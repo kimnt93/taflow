@@ -29,13 +29,13 @@ class OhlcStateAdapter:
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
-    def append(self, high: float, low: float, close: float):
+    def append(self, high: float, low: float, close: float) -> object:
         """Append one OHLC bar and update the native state."""
         value = self._state.append(float(high), float(low), float(close))
         self._values.append(np.nan if value is None else value)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any):
+    def extend(self, high: Any, low: Any, close: Any) -> object:
         """Append aligned high, low, and close histories to native state."""
         values = self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
@@ -48,11 +48,11 @@ class OhlcStateAdapter:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest native output, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Reset native state and accumulated output history."""
         self._state.reset()
         self._values.clear()

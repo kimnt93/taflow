@@ -11,14 +11,14 @@ class IntradayMomentumIndex:
 
     def __init__(
         self, period: int = 14, _open: Any | None = None, close: Any | None = None
-    ):
+    ) -> None:
         """Create IMI with an optional aligned _open/close history."""
         self._state = StatefulImi(period)
         self._values: list[float] = []
         if _open is not None or close is not None:
             self.extend(_open, close)
 
-    def append(self, _open, close):
+    def append(self, _open: object, close: object) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -37,7 +37,7 @@ class IntradayMomentumIndex:
         self._values.append(np.nan if result is None else float(result))
         return self
 
-    def extend(self, _open, close):
+    def extend(self, _open: object, close: object) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -61,7 +61,7 @@ class IntradayMomentumIndex:
         return np.asarray(self._values, dtype=np.float64)
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -71,7 +71,7 @@ class IntradayMomentumIndex:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -10,7 +10,7 @@ class ActiveZoneList:
     the aligned history with NaN warm-up where applicable.
     """
 
-    def __init__(self, capacity: int = 64):
+    def __init__(self, capacity: int = 64) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -25,7 +25,7 @@ class ActiveZoneList:
         """
         self._state = _Native(capacity)
 
-    def add(self, top: float, bottom: float, flags: int = 0):
+    def add(self, top: float, bottom: float, flags: int = 0) -> object:
         """Execute the add operation through the native Rust implementation.
 
         Parameters
@@ -44,7 +44,7 @@ class ActiveZoneList:
         """
         return self._state.add(top, bottom, flags)
 
-    def advance(self, price: float, max_age: int | None = None):
+    def advance(self, price: float, max_age: int | None = None) -> object:
         """Execute the advance operation through the native Rust implementation.
 
         Parameters
@@ -62,7 +62,7 @@ class ActiveZoneList:
         return self._state.advance(price, max_age)
 
     @property
-    def size(self):
+    def size(self) -> object:
         """Execute the size operation through the native Rust implementation.
 
         Returns
@@ -72,7 +72,7 @@ class ActiveZoneList:
         """
         return self._state.size
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

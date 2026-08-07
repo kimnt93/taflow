@@ -17,7 +17,7 @@ class FastStochasticOscillator:
         high: Any | None = None,
         low: Any | None = None,
         close: Any | None = None,
-    ):
+    ) -> None:
         """Create fast stochastic with optional aligned OHLC history."""
         self._state = StatefulStochf(
             fast_k_period,
@@ -28,7 +28,7 @@ class FastStochasticOscillator:
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
-    def append(self, high, low, close):
+    def append(self, high: object, low: object, close: object) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -49,7 +49,7 @@ class FastStochasticOscillator:
         self._values.append((np.nan, np.nan) if result is None else tuple(result))
         return self
 
-    def extend(self, high, low, close):
+    def extend(self, high: object, low: object, close: object) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -81,7 +81,7 @@ class FastStochasticOscillator:
         )
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -91,7 +91,7 @@ class FastStochasticOscillator:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

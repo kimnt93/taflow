@@ -21,7 +21,7 @@ class BarsSince:
         Initial boolean condition history.
     """
 
-    def __init__(self, condition: Any | None = None):
+    def __init__(self, condition: Any | None = None) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -37,7 +37,7 @@ class BarsSince:
         self._state = BarsSinceOperator()
         self.extend(condition) if condition is not None else None
 
-    def append(self, condition: bool):
+    def append(self, condition: bool) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -53,7 +53,7 @@ class BarsSince:
         self._state.append(condition)
         return self
 
-    def extend(self, condition: Any):
+    def extend(self, condition: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -80,7 +80,7 @@ class BarsSince:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -90,7 +90,7 @@ class BarsSince:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -102,7 +102,7 @@ class BarsSince:
         return self
 
 
-def _make(native, name):
+def _make(native: object, name: object) -> object:
     """Execute the _make operation through the native Rust implementation.
 
     Parameters
@@ -121,7 +121,9 @@ def _make(native, name):
     class State:
         """Adapt a native two-input state helper to the Python lifecycle API."""
 
-        def __init__(self, condition: Any | None = None, _input: Any | None = None):
+        def __init__(
+            self, condition: Any | None = None, _input: Any | None = None
+        ) -> None:
             """Initialize this adapter and optionally process the supplied input series.
 
             Parameters
@@ -143,7 +145,7 @@ def _make(native, name):
                 else None
             )
 
-        def append(self, condition: bool, _input: float):
+        def append(self, condition: bool, _input: float) -> object:
             """Append one observation or aligned bar to the native Rust state.
 
             Parameters
@@ -161,7 +163,7 @@ def _make(native, name):
             self._state.append(condition, _input)
             return self
 
-        def extend(self, condition: Any, _input: Any):
+        def extend(self, condition: Any, _input: Any) -> object:
             """Append aligned input series to the native Rust state.
 
             Parameters
@@ -192,7 +194,7 @@ def _make(native, name):
             return self._state.compute()
 
         @property
-        def value(self):
+        def value(self) -> object:
             """Return the latest computed value, or None during warm-up.
 
             Returns
@@ -202,7 +204,7 @@ def _make(native, name):
             """
             return self._state.value
 
-        def reset(self):
+        def reset(self) -> object:
             """Execute the reset operation through the native Rust implementation.
 
             Returns
@@ -233,7 +235,7 @@ class SignalDelay:
         Initial input history.
     """
 
-    def __init__(self, timeperiod: int, _input: Any | None = None):
+    def __init__(self, timeperiod: int, _input: Any | None = None) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -251,7 +253,7 @@ class SignalDelay:
         self._state = SignalDelayOperator(timeperiod)
         self.extend(_input) if _input is not None else None
 
-    def append(self, _input: float):
+    def append(self, _input: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -267,7 +269,7 @@ class SignalDelay:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any):
+    def extend(self, _input: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -294,7 +296,7 @@ class SignalDelay:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -304,7 +306,7 @@ class SignalDelay:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -325,7 +327,7 @@ class PositionHold:
         Initial position history.
     """
 
-    def __init__(self, _input: Any | None = None):
+    def __init__(self, _input: Any | None = None) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -341,7 +343,7 @@ class PositionHold:
         self._state = PositionHoldOperator()
         self.extend(_input) if _input is not None else None
 
-    def append(self, _input: float):
+    def append(self, _input: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -357,7 +359,7 @@ class PositionHold:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any):
+    def extend(self, _input: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -384,7 +386,7 @@ class PositionHold:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -394,7 +396,7 @@ class PositionHold:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -417,7 +419,7 @@ class EntryExit:
         Initial exit-event history.
     """
 
-    def __init__(self, entry: Any | None = None, exit: Any | None = None):
+    def __init__(self, entry: Any | None = None, exit: Any | None = None) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -435,7 +437,7 @@ class EntryExit:
         self._state = EntryExitOperator()
         self.extend(entry, exit) if entry is not None or exit is not None else None
 
-    def append(self, entry: bool, exit: bool):
+    def append(self, entry: bool, exit: bool) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -453,7 +455,7 @@ class EntryExit:
         self._state.append(entry, exit)
         return self
 
-    def extend(self, entry: Any, exit: Any):
+    def extend(self, entry: Any, exit: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -482,7 +484,7 @@ class EntryExit:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -492,7 +494,7 @@ class EntryExit:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

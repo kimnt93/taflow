@@ -20,7 +20,7 @@ class Supertrend:
         close: Any | None = None,
         timeperiod: int = 7,
         multiplier: float = 3.0,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -48,7 +48,7 @@ class Supertrend:
             else None
         )
 
-    def append(self, high: float, low: float, close: float):
+    def append(self, high: float, low: float, close: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -68,7 +68,7 @@ class Supertrend:
         self._state.append(high, low, close)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any):
+    def extend(self, high: Any, low: Any, close: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -101,7 +101,7 @@ class Supertrend:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -111,7 +111,7 @@ class Supertrend:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

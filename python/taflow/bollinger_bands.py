@@ -11,12 +11,12 @@ class BollingerBands:
 
     def __init__(
         self,
-        period=5,
-        deviations_up=2.0,
-        deviations_down=2.0,
-        moving_average_type=0,
+        period: object = 5,
+        deviations_up: object = 2.0,
+        deviations_down: object = 2.0,
+        moving_average_type: object = 0,
         values: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -97,7 +97,7 @@ class BollingerBands:
         )
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns

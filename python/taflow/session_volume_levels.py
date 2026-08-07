@@ -31,7 +31,7 @@ class SessionVolumeLevels:
         anchor: Any | None = None,
         bins: int = 24,
         value_area: float = 0.7,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -62,7 +62,7 @@ class SessionVolumeLevels:
 
     def append(
         self, high: float, low: float, close: float, volume: float, anchor: bool = False
-    ):
+    ) -> object:
         """Process one OHLCV bar and return profile levels."""
         return self._state.append(
             float(high), float(low), float(close), float(volume), bool(anchor)
@@ -70,7 +70,7 @@ class SessionVolumeLevels:
 
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any, anchor: Any | None = None
-    ):
+    ) -> object:
         """Process aligned OHLCV history and return this indicator."""
         close_array = np.asarray(close, dtype=np.float64)
         if anchor is None:
@@ -84,16 +84,16 @@ class SessionVolumeLevels:
         )
         return self
 
-    def compute(self):
+    def compute(self) -> object:
         """Return point-of-control, value-area-high, and value-area-low histories."""
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest profile-level tuple."""
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Clear profile histogram and session state."""
         self._state.reset()
         return self

@@ -18,7 +18,7 @@ class PreviousHighLow:
         new_session: Any | None = None,
         high: Any | None = None,
         low: Any | None = None,
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -42,7 +42,7 @@ class PreviousHighLow:
             else None
         )
 
-    def append(self, new_session: bool, high: float, low: float):
+    def append(self, new_session: bool, high: float, low: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -62,7 +62,7 @@ class PreviousHighLow:
         self._state.append(new_session, high, low)
         return self
 
-    def extend(self, new_session: Any, high: Any, low: Any):
+    def extend(self, new_session: Any, high: Any, low: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -97,7 +97,7 @@ class PreviousHighLow:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -107,7 +107,7 @@ class PreviousHighLow:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns

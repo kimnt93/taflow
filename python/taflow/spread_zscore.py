@@ -15,7 +15,7 @@ class SpreadZscore:
 
     def __init__(
         self, x: Any | None = None, y: Any | None = None, timeperiod: int = 20
-    ):
+    ) -> None:
         """Initialize this adapter and optionally process the supplied input series.
 
         Parameters
@@ -36,7 +36,7 @@ class SpreadZscore:
         if x is not None or y is not None:
             self.extend(x, y)
 
-    def append(self, x: float, y: float):
+    def append(self, x: float, y: float) -> object:
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -54,7 +54,7 @@ class SpreadZscore:
         self._state.append(x, y)
         return self
 
-    def extend(self, x: Any, y: Any):
+    def extend(self, x: Any, y: Any) -> object:
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -83,7 +83,7 @@ class SpreadZscore:
         return self._state.compute()
 
     @property
-    def value(self):
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -93,7 +93,7 @@ class SpreadZscore:
         """
         return self._state.value
 
-    def reset(self):
+    def reset(self) -> object:
         """Execute the reset operation through the native Rust implementation.
 
         Returns
