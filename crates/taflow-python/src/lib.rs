@@ -70,6 +70,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingSkewOperator>()?;
     m.add_class::<indicators::RollingKurtosisOperator>()?;
     m.add_class::<indicators::RollingIqrOperator>()?;
+    m.add_class::<indicators::RollingCovOperator>()?;
+    m.add_class::<indicators::RollingWinsorizeOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

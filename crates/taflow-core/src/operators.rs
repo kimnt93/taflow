@@ -110,6 +110,17 @@ pub fn rolling_iqr(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
 }
 
+pub fn rolling_cov(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    if input0.len() != input1.len() { return Err(TaError::LengthMismatch { expected: input0.len(), got: input1.len() }); }
+    let mut state = RollingCov::new(timeperiod)?;
+    Ok(input0.iter().zip(input1).map(|(&left, &right)| state.append(left, right).unwrap_or(f64::NAN)).collect())
+}
+
+pub fn rolling_winsorize(input: &[f64], timeperiod: usize, lower: f64, upper: f64) -> TaResult<Vec<f64>> {
+    let mut state = RollingWinsorize::new(timeperiod, lower, upper)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 #[derive(Debug, Clone)]
 pub struct Lag {
     values: VecDeque<f64>,
@@ -361,6 +372,60 @@ impl RollingIqr {
     pub fn reset(&mut self) { self.quantile.reset(); self.value = None; }
 }
 
+#[derive(Debug, Clone)]
+pub struct RollingCov { values: VecDeque<(f64, f64)>, timeperiod: usize, value: Option<f64> }
+
+impl RollingCov {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, value: None })
+    }
+    pub fn append(&mut self, left: f64, right: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod { self.values.pop_front(); }
+        self.values.push_back((left, right));
+        self.value = if self.values.len() == self.timeperiod {
+            let n = self.timeperiod as f64;
+            let left_mean = self.values.iter().map(|&(left, _)| left).sum::<f64>() / n;
+            let right_mean = self.values.iter().map(|&(_, right)| right).sum::<f64>() / n;
+            Some(self.values.iter().map(|&(left, right)| (left - left_mean) * (right - right_mean)).sum::<f64>() / n)
+        } else { None };
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
+#[derive(Debug, Clone)]
+pub struct RollingWinsorize { values: VecDeque<f64>, timeperiod: usize, lower: f64, upper: f64, value: Option<f64> }
+
+impl RollingWinsorize {
+    pub fn new(timeperiod: usize, lower: f64, upper: f64) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        validate_quantile(lower)?;
+        validate_quantile(upper)?;
+        if lower > upper { return Err(TaError::InvalidParameter { name: "lower/upper", value: format!("{lower}/{upper}"), reason: "lower must be <= upper" }); }
+        Ok(Self { values: VecDeque::with_capacity(timeperiod), timeperiod, lower, upper, value: None })
+    }
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod { self.values.pop_front(); }
+        self.values.push_back(input);
+        self.value = if self.values.len() == self.timeperiod {
+            let mut sorted: Vec<f64> = self.values.iter().copied().collect();
+            sorted.sort_by(f64::total_cmp);
+            let quantile = |q: f64| {
+                let position = q * (sorted.len() - 1) as f64;
+                let lower = position.floor() as usize;
+                let upper = position.ceil() as usize;
+                sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower as f64)
+            };
+            Some(input.max(quantile(self.lower)).min(quantile(self.upper)))
+        } else { None };
+        self.value
+    }
+    pub fn value(&self) -> Option<f64> { self.value }
+    pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+}
+
 macro_rules! cumulative_operator {
     ($name:ident, $initial:expr, $operation:expr) => {
         #[derive(Debug, Clone)]
@@ -434,5 +499,7 @@ mod tests {
         assert_eq!(rolling_rank(&input, 3).unwrap()[2..], [2.0 / 3.0, 1.0]);
         assert!((rolling_zscore(&input, 3).unwrap()[2] - (-0.2672612419)).abs() < 1e-9);
         assert_eq!(rolling_iqr(&input, 3).unwrap()[2], 1.5);
+        assert!((rolling_cov(&input, &[2.0, 8.0, 4.0, 16.0], 3).unwrap()[2] - 28.0 / 9.0).abs() < 1e-12);
+        assert_eq!(rolling_winsorize(&input, 3, 0.0, 0.5).unwrap()[2], 2.0);
     }
 }

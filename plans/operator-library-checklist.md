@@ -27,8 +27,8 @@ they are not re-proposed later.
 - [x] rolling_median / rolling_mode
 - [x] rolling_quantile / rolling_percentile / rolling_rank / rolling_zscore
 - [x] rolling_skew / rolling_kurtosis / rolling_iqr
-- [ ] rolling_cov (plain covariance; TA-Lib has only CORREL/BETA)
-- [ ] rolling_winsorize
+- [x] rolling_cov (plain covariance; TA-Lib has only CORREL/BETA)
+- [x] rolling_winsorize
 - [ ] rolling_apply (explicitly non-streaming unless an incremental reducer is supplied)
 
 ## Exponentially weighted operators

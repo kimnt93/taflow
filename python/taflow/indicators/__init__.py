@@ -88,6 +88,8 @@ from ..rolling_zscore import RollingZscore
 from ..rolling_skew import RollingSkew
 from ..rolling_kurtosis import RollingKurtosis
 from ..rolling_iqr import RollingIqr
+from ..rolling_cov import RollingCov
+from ..rolling_winsorize import RollingWinsorize
 
 __all__ = [
     "CommodityChannelIndex", "CCI", "ExponentialMovingAverage", "EMA",
@@ -164,4 +166,5 @@ __all__ = [
     "Lag", "LogReturn", "Cumsum", "Cumprod", "RollingMedian", "RollingMode",
     "RollingQuantile", "RollingPercentile", "RollingRank", "RollingZscore",
     "RollingSkew", "RollingKurtosis", "RollingIqr",
+    "RollingCov", "RollingWinsorize",
 ]
