@@ -128,6 +128,9 @@ from .hma import Hma
 from .vwma import Vwma
 from .zlema import Zlema
 from .alma import Alma
+from .tsi import Tsi
+from .awesome_oscillator import AwesomeOscillator
+from .fisher_transform import FisherTransform
 
 __all__ = [
     "talib",
@@ -266,5 +269,6 @@ __all__ = [
     "Cummax", "Cummin", "Drawdown",
     "RollingSharpe", "RollingSortino", "RollingCalmar",
     "Hma", "Vwma", "Zlema", "Alma",
+    "Tsi", "AwesomeOscillator", "FisherTransform",
     "__version__",
 ]

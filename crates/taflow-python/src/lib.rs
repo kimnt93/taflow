@@ -86,6 +86,9 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::VwmaOperator>()?;
     m.add_class::<indicators::ZlemaOperator>()?;
     m.add_class::<indicators::AlmaOperator>()?;
+    m.add_class::<indicators::TsiOperator>()?;
+    m.add_class::<indicators::AwesomeOscillatorOperator>()?;
+    m.add_class::<indicators::FisherTransformOperator>()?;
     m.add_class::<indicators::ThreeWhiteSoldiers>()?;
     m.add_class::<indicators::AbandonedBaby>()?;
     m.add_class::<indicators::AdvanceBlock>()?;

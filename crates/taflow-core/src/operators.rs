@@ -94,6 +94,10 @@ pub fn vwma(price: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f6
 pub fn zlema(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Zlema::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 pub fn alma(input: &[f64], timeperiod: usize, offset: f64, sigma: f64) -> TaResult<Vec<f64>> { let mut state=Alma::new(timeperiod,offset,sigma)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
+pub fn tsi(input: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { let mut state=Tsi::new(fast,slow)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+pub fn awesome_oscillator(high: &[f64], low: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=AwesomeOscillator::new(fast,slow)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
+pub fn fisher_transform(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=FisherTransform::new(timeperiod)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
+
 /// Rolling median. Warm-up values are `NaN`; even windows average the two
 /// central values.
 pub fn rolling_median(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
@@ -650,6 +654,18 @@ impl Zlema { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;O
 #[derive(Debug, Clone)]
 pub struct Alma { values: VecDeque<f64>, period: usize, weights: Vec<f64>, value: Option<f64> }
 impl Alma { pub fn new(period:usize,offset:f64,sigma:f64)->TaResult<Self>{validate_period(period)?;if !(0.0..=1.0).contains(&offset)||sigma<=0.0{return Err(TaError::InvalidParameter{name:"offset/sigma",value:format!("{offset}/{sigma}"),reason:"offset must be 0..1 and sigma must be positive"});}let m=offset*(period-1)as f64;let weights=(0..period).map(|i|((-(i as f64-m).powi(2)/(2.0*sigma.powi(2)*(period as f64).powi(2))).exp())).collect();Ok(Self{values:VecDeque::with_capacity(period),period,weights,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back(input);self.value=(self.values.len()==self.period).then(||{let total=self.weights.iter().sum::<f64>();self.values.iter().zip(&self.weights).map(|(&v,&w)|v*w).sum::<f64>()/total});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct Tsi { previous: Option<f64>, fast: usize, slow: usize, alpha_fast: f64, alpha_slow: f64, momentum: Option<f64>, absolute: Option<f64>, value: Option<f64> }
+impl Tsi { pub fn new(fast:usize,slow:usize)->TaResult<Self>{validate_period(fast)?;validate_period(slow)?;Ok(Self{previous:None,fast,slow,alpha_fast:2.0/(fast as f64+1.0),alpha_slow:2.0/(slow as f64+1.0),momentum:None,absolute:None,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{let previous=self.previous.replace(input)?;let change=input-previous;let abs=change.abs();let m1=self.momentum.map_or(change,|v|v+self.alpha_fast*(change-v));let a1=self.absolute.map_or(abs,|v|v+self.alpha_fast*(abs-v));self.momentum=Some(m1);self.absolute=Some(a1);let m2=self.momentum.map_or(m1,|v|v+self.alpha_slow*(m1-v));let a2=self.absolute.map_or(a1,|v|v+self.alpha_slow*(a1-v));let value=if a2!=0.0{Some(100.0*m2/a2)}else{Some(0.0)};self.value=value;value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.previous=None;self.momentum=None;self.absolute=None;self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct AwesomeOscillator { fast: usize, slow: usize, values: VecDeque<f64>, value: Option<f64> }
+impl AwesomeOscillator { pub fn new(fast:usize,slow:usize)->TaResult<Self>{validate_period(fast)?;validate_period(slow)?;if fast>slow{return Err(TaError::InvalidParameter{name:"fast/slow",value:format!("{fast}/{slow}"),reason:"fast must be <= slow"});}Ok(Self{fast,slow,values:VecDeque::with_capacity(slow),value:None})}pub fn append(&mut self,high:f64,low:f64)->Option<f64>{if self.values.len()==self.slow{self.values.pop_front();}self.values.push_back((high+low)*0.5);self.value=(self.values.len()==self.slow).then(||{let fast=self.values.iter().rev().take(self.fast).sum::<f64>()/self.fast as f64;let slow=self.values.iter().sum::<f64>()/self.slow as f64;fast-slow});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}
+
+#[derive(Debug, Clone)]
+pub struct FisherTransform { period: usize, values: VecDeque<f64>, previous: f64, value: Option<f64> }
+impl FisherTransform { pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{period,values:VecDeque::with_capacity(period),previous:0.0,value:None})}pub fn append(&mut self,high:f64,low:f64)->Option<f64>{if self.values.len()==self.period{self.values.pop_front();}self.values.push_back((high+low)*0.5);self.value=(self.values.len()==self.period).then(||{let high=self.values.iter().copied().fold(f64::NEG_INFINITY,f64::max);let low=self.values.iter().copied().fold(f64::INFINITY,f64::min);let normalized=if high!=low{2.0*((self.values.back().copied().unwrap()-low)/(high-low)-0.5)}else{0.0};let x=(0.66*normalized+0.67*self.previous).clamp(-0.999, 0.999);self.previous=x;0.5*((1.0+x)/(1.0-x)).ln()});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.previous=0.0;self.value=None;}}
 
 rolling_risk_operator!(RollingSharpe, |values: &VecDeque<f64>| {
     let average = mean(values);

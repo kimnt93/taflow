@@ -48,9 +48,9 @@ they are not re-proposed later.
 
 ## Extended momentum and oscillators
 
-- [ ] TSI
-- [ ] Awesome Oscillator
-- [ ] Fisher Transform
+- [x] TSI
+- [x] Awesome Oscillator
+- [x] Fisher Transform
 
 ## Extended volatility indicators
 
