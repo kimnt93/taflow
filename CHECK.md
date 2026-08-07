@@ -108,6 +108,14 @@ they are named indicators, and `SMA`/`EMA`/… remain the talib aliases.
 - Price-transform descriptive names (`typical_price` ↔ `TYPPRICE`, etc.)
   follow the same one-kernel/two-surfaces rule as rolling ops.
 
+The canonical interface also expands common operator abbreviations: cumulative
+operators use `CumulativeSum`, `CumulativeProduct`, `CumulativeMaximum`, and
+`CumulativeMinimum`; the control-chart accumulator is
+`CumulativeSumControlChart`; and structure/rolling names use
+`BreakOfStructureChangeOfCharacter`, `RollingInterquartileRange`, and
+`RollingZScore`. TA-Lib compatibility names remain confined to
+`taflow.talib`; these canonical names are the only names on `taflow`.
+
 ## 2.5 Master function table (live status)
 
 One row per function: canonical Rust/Python name and the `taflow.talib`

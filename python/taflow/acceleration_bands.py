@@ -36,7 +36,7 @@ class AccelerationBands:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         result = self._state.append(high, low, close)
@@ -59,7 +59,7 @@ class AccelerationBands:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         result = self._state.extend(high, low, close)
@@ -82,7 +82,7 @@ class AccelerationBands:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -92,7 +92,7 @@ class AccelerationBands:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

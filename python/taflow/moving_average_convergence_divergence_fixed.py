@@ -26,7 +26,7 @@ class MovingAverageConvergenceDivergenceFixed:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         result = self._state.append(float(value))
@@ -45,7 +45,7 @@ class MovingAverageConvergenceDivergenceFixed:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         result = self._state.extend(values)
@@ -68,7 +68,7 @@ class MovingAverageConvergenceDivergenceFixed:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -78,7 +78,7 @@ class MovingAverageConvergenceDivergenceFixed:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

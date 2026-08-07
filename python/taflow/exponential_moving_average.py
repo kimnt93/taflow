@@ -50,7 +50,7 @@ class ExponentialMovingAverage:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(value))
@@ -70,7 +70,7 @@ class ExponentialMovingAverage:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(as_float64_series(values, column=column))
@@ -103,7 +103,7 @@ class ExponentialMovingAverage:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

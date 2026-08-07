@@ -34,7 +34,7 @@ class ParabolicSar:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         result = self._state.append(float(high), float(low))
@@ -53,7 +53,7 @@ class ParabolicSar:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         result = self._state.extend(high, low)
@@ -70,7 +70,7 @@ class ParabolicSar:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -80,7 +80,7 @@ class ParabolicSar:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

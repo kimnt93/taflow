@@ -49,7 +49,7 @@ def _make(native: object, name: object) -> object:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(high, low)
@@ -67,7 +67,7 @@ def _make(native: object, name: object) -> object:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(as_float64_series(high), as_float64_series(low))

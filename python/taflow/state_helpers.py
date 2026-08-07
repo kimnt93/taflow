@@ -47,7 +47,7 @@ class BarsSince:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(condition)
@@ -63,7 +63,7 @@ class BarsSince:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(np.asarray(condition, dtype=bool))
@@ -74,7 +74,7 @@ class BarsSince:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -85,7 +85,7 @@ class BarsSince:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -95,7 +95,7 @@ class BarsSince:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
@@ -157,7 +157,7 @@ def _make(native: object, name: object) -> object:
 
             Returns
             -------
-            object
+            Self
                 The updated adapter, native value, aligned output array, or execution node.
             """
             self._state.append(condition, _input)
@@ -175,7 +175,7 @@ def _make(native: object, name: object) -> object:
 
             Returns
             -------
-            object
+            Self
                 The updated adapter, native value, aligned output array, or execution node.
             """
             self._state.extend(
@@ -188,7 +188,7 @@ def _make(native: object, name: object) -> object:
 
             Returns
             -------
-            object
+            numpy.ndarray or tuple of numpy.ndarray
                 The updated adapter, native value, aligned output array, or execution node.
             """
             return self._state.compute()
@@ -199,7 +199,7 @@ def _make(native: object, name: object) -> object:
 
             Returns
             -------
-            object
+            float, tuple, or None
                 The updated adapter, native value, aligned output array, or execution node.
             """
             return self._state.value
@@ -209,7 +209,7 @@ def _make(native: object, name: object) -> object:
 
             Returns
             -------
-            object
+            Self
                 The updated adapter, native value, aligned output array, or execution node.
             """
             self._state.reset()
@@ -263,7 +263,7 @@ class SignalDelay:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(_input)
@@ -279,7 +279,7 @@ class SignalDelay:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(as_float64_series(_input))
@@ -290,7 +290,7 @@ class SignalDelay:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -301,7 +301,7 @@ class SignalDelay:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -311,7 +311,7 @@ class SignalDelay:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
@@ -353,7 +353,7 @@ class PositionHold:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(_input)
@@ -369,7 +369,7 @@ class PositionHold:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(as_float64_series(_input))
@@ -380,7 +380,7 @@ class PositionHold:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -391,7 +391,7 @@ class PositionHold:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -401,7 +401,7 @@ class PositionHold:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
@@ -449,7 +449,7 @@ class EntryExit:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(entry, _exit)
@@ -467,7 +467,7 @@ class EntryExit:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(np.asarray(entry, dtype=bool), np.asarray(_exit, dtype=bool))
@@ -478,7 +478,7 @@ class EntryExit:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -489,7 +489,7 @@ class EntryExit:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -499,7 +499,7 @@ class EntryExit:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

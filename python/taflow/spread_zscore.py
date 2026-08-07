@@ -48,7 +48,7 @@ class SpreadZScore:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(x, y)
@@ -66,7 +66,7 @@ class SpreadZScore:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(as_float64_series(x), as_float64_series(y))
@@ -77,7 +77,7 @@ class SpreadZScore:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -88,7 +88,7 @@ class SpreadZScore:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -98,7 +98,7 @@ class SpreadZScore:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

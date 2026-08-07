@@ -43,7 +43,7 @@ class PositiveVolumeIndex:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(close, volume)
@@ -61,7 +61,7 @@ class PositiveVolumeIndex:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(as_float64_series(close), as_float64_series(volume))
@@ -72,7 +72,7 @@ class PositiveVolumeIndex:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -83,7 +83,7 @@ class PositiveVolumeIndex:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -93,7 +93,7 @@ class PositiveVolumeIndex:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

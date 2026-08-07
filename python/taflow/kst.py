@@ -69,7 +69,7 @@ class KnowSureThing:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(close)
@@ -85,7 +85,7 @@ class KnowSureThing:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.extend(as_float64_series(close))
@@ -96,7 +96,7 @@ class KnowSureThing:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -107,7 +107,7 @@ class KnowSureThing:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -117,7 +117,7 @@ class KnowSureThing:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

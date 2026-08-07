@@ -53,7 +53,7 @@ class MinusDirectionalMovement:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(high, low)
@@ -71,7 +71,7 @@ class MinusDirectionalMovement:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         if low is None:
@@ -84,7 +84,7 @@ class MinusDirectionalMovement:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -95,7 +95,7 @@ class MinusDirectionalMovement:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -105,7 +105,7 @@ class MinusDirectionalMovement:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()

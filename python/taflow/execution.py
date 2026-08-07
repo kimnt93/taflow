@@ -297,7 +297,7 @@ class _Indicator(Expr):
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         if hasattr(self.state, "reset"):

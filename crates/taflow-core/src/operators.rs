@@ -141,7 +141,15 @@ pub fn arnaud_legoux_moving_average(input: &[f64], timeperiod: usize, offset: f6
 /// Parameters: aligned input slices followed by indicator parameters.
 /// Returns: an aligned series, with NaN during warm-up, or a parameter error.
 pub fn true_strength_index(input: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { let mut state=TrueStrengthIndex::new(fast,slow)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+/// Compute the Awesome Oscillator from aligned high and low prices.
+///
+/// `fast` and `slow` are the oscillator windows. The returned series is
+/// input-aligned and contains `NaN` until the slow window is available.
 pub fn awesome_oscillator(high: &[f64], low: &[f64], fast: usize, slow: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=AwesomeOscillator::new(fast,slow)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
+/// Compute the Fisher transform from aligned high and low prices.
+///
+/// `timeperiod` controls the trailing normalization window; warm-up output
+/// is `NaN` and the result has the same length as the inputs.
 pub fn fisher_transform(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=FisherTransform::new(timeperiod)?;Ok(high.iter().zip(low).map(|(&h,&l)|state.append(h,l).unwrap_or(f64::NAN)).collect()) }
 /// Compute the causal ulcer index for an aligned price series.
 ///
@@ -164,10 +172,52 @@ pub fn chaikin_volatility(high: &[f64], low: &[f64], timeperiod: usize, roc_peri
 /// Parameters: aligned input slices followed by indicator parameters.
 /// Returns: an aligned series, with NaN during warm-up, or a parameter error.
 pub fn rolling_volume_weighted_average_price(high: &[f64], low: &[f64], close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { if high.len()!=low.len()||high.len()!=close.len()||high.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=RollingVolumeWeightedAveragePrice::new(timeperiod)?;Ok(high.iter().zip(low).zip(close).zip(volume).map(|(((&h,&l),&c),&v)|state.append(h,l,c,v).unwrap_or(f64::NAN)).collect()) }
+/// Compute the force index from aligned close and volume series.
+///
+/// The result is input-aligned and uses `NaN` while the previous close is
+/// unavailable; mismatched input lengths return an error.
 pub fn force_index(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> { if close.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:close.len(),got:volume.len()});}let mut state=ForceIndex::new();Ok(close.iter().zip(volume).map(|(&c,&v)|state.append(c,v).unwrap_or(f64::NAN)).collect()) }
+/// Compute ease of movement from aligned high, low, and volume series.
+///
+/// The returned series preserves input length and reports `NaN` during its
+/// causal warm-up period.
 pub fn ease_of_movement(high: &[f64], low: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> { if high.len()!=low.len()||high.len()!=volume.len(){return Err(TaError::LengthMismatch{expected:high.len(),got:low.len()});}let mut state=EaseOfMovement::new();Ok(high.iter().zip(low).zip(volume).map(|((&h,&l),&v)|state.append(h,l,v).unwrap_or(f64::NAN)).collect()) }
 
-macro_rules! bar_relation_operator { ($name:ident,$predicate:expr)=>{#[derive(Debug,Clone)]pub struct $name{previous:Option<(f64,f64)>,value:Option<f64>}impl $name{pub fn new()->Self{Self{previous:None,value:None}}pub fn append(&mut self,high:f64,low:f64)->Option<f64>{self.value=self.previous.map(|(ph,pl)|if $predicate(high,low,ph,pl){1.0}else{0.0});self.previous=Some((high,low));self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.previous=None;self.value=None;}}impl Default for $name{fn default()->Self{Self::new()}}};}
+macro_rules! bar_relation_operator {
+    ($name:ident, $predicate:expr) => {
+        #[derive(Debug, Clone)]
+        pub struct $name {
+            previous: Option<(f64, f64)>,
+            value: Option<f64>,
+        }
+        impl $name {
+            /// Create an empty causal bar-relation state.
+            pub fn new() -> Self {
+                Self { previous: None, value: None }
+            }
+            /// Append one high/low bar and return `1`, `0`, or warm-up `None`.
+            pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+                self.value = self.previous.map(|(previous_high, previous_low)| {
+                    if $predicate(high, low, previous_high, previous_low) { 1.0 } else { 0.0 }
+                });
+                self.previous = Some((high, low));
+                self.value
+            }
+            /// Return the latest relation result.
+            pub fn value(&self) -> Option<f64> {
+                self.value
+            }
+            /// Clear the previous bar and latest result.
+            pub fn reset(&mut self) {
+                self.previous = None;
+                self.value = None;
+            }
+        }
+        impl Default for $name {
+            fn default() -> Self { Self::new() }
+        }
+    };
+}
 bar_relation_operator!(HigherHigh, |h:f64,_l:f64,ph:f64,_pl:f64| h>ph);
 bar_relation_operator!(LowerLow, |_h:f64,l:f64,_ph:f64,pl:f64| l<pl);
 bar_relation_operator!(InsideBar, |h:f64,l:f64,ph:f64,pl:f64| h<ph&&l>pl);
@@ -181,7 +231,31 @@ impl Default for BarsSince{fn default()->Self{Self::new()}}
 #[derive(Debug, Clone)] pub struct ValueWhen { latest: Option<f64>, value: Option<f64> }
 impl ValueWhen { pub fn new()->Self{Self{latest:None,value:None}}pub fn append(&mut self,condition:bool,input:f64)->Option<f64>{if condition{self.latest=Some(input);}self.value=self.latest;self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.latest=None;self.value=None;}}
 impl Default for ValueWhen{fn default()->Self{Self::new()}}
-macro_rules! since_extreme {($name:ident,$operation:expr)=>{#[derive(Debug,Clone)]pub struct $name{extreme:Option<f64>,value:Option<f64>}impl $name{pub fn new()->Self{Self{extreme:None,value:None}}pub fn append(&mut self,condition:bool,input:f64)->Option<f64>{self.extreme=Some(if condition{input}else{self.extreme.map_or(input,|v|$operation(v,input))});self.value=self.extreme;self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.extreme=None;self.value=None;}}impl Default for $name{fn default()->Self{Self::new()}}};}
+macro_rules! since_extreme {
+    ($name:ident, $operation:expr) => {
+        #[derive(Debug, Clone)]
+        pub struct $name { extreme: Option<f64>, value: Option<f64> }
+        impl $name {
+            /// Create an empty since-extreme state.
+            pub fn new() -> Self { Self { extreme: None, value: None } }
+            /// Update the extreme after a condition and return its latest value.
+            pub fn append(&mut self, condition: bool, input: f64) -> Option<f64> {
+                self.extreme = Some(if condition {
+                    input
+                } else {
+                    self.extreme.map_or(input, |value| $operation(value, input))
+                });
+                self.value = self.extreme;
+                self.value
+            }
+            /// Return the latest since-extreme value.
+            pub fn value(&self) -> Option<f64> { self.value }
+            /// Clear the accumulated extreme.
+            pub fn reset(&mut self) { self.extreme = None; self.value = None; }
+        }
+        impl Default for $name { fn default() -> Self { Self::new() } }
+    };
+}
 since_extreme!(HighestSince,f64::max); since_extreme!(LowestSince,f64::min);
 /// Computes or updates `rising` through the native Rust kernel.
 ///
@@ -189,6 +263,10 @@ since_extreme!(HighestSince,f64::max); since_extreme!(LowestSince,f64::min);
 ///
 /// Returns the computed value, aligned history, or a validation error.
 pub fn rising(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Rising::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
+/// Compute the causal falling predicate over an aligned input series.
+///
+/// `timeperiod` is the comparison horizon. The returned values are aligned
+/// with `input`, with `NaN` during warm-up.
 pub fn falling(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> { let mut state=Falling::new(timeperiod)?;Ok(input.iter().map(|&v|state.append(v).unwrap_or(f64::NAN)).collect()) }
 
 /// Compute rolling Shannon entropy over an aligned input series.
@@ -5472,6 +5550,7 @@ macro_rules! cumulative_operator {
             ///
             /// Returns the computed value, aligned history, or a validation error.
             pub fn new() -> Self { Self { total: $initial, value: None } }
+            /// Append one value and return the cumulative result.
             pub fn append(&mut self, input: f64) -> f64 {
                 self.total = $operation(self.total, input);
                 self.value = Some(self.total);
@@ -5504,7 +5583,9 @@ macro_rules! cumulative_extrema_operator {
             ///
             /// Returns the computed value, aligned history, or a validation error.
             pub fn new() -> Self { Self { extreme: $initial, value: None } }
+            /// Append one value and return the cumulative extreme.
             pub fn append(&mut self, input: f64) -> f64 { self.extreme = $operation(self.extreme, input); self.value = Some(self.extreme); self.extreme }
+            /// Return the latest cumulative extreme.
             pub fn value(&self) -> Option<f64> { self.value }
             /// Reset the persistent state and clear the latest value.
             pub fn reset(&mut self) { self.extreme = $initial; self.value = None; }
@@ -5667,7 +5748,32 @@ pub struct Cross { crossover:Crossover, crossunder:Crossunder, value:Option<f64>
 impl Cross { pub fn new()->Self{Self{crossover:Crossover::new(),crossunder:Crossunder::new(),value:None}}pub fn append(&mut self,left:f64,right:f64)->f64{let value=(self.crossover.append(left,right)+self.crossunder.append(left,right)).min(1.0);self.value=Some(value);value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.crossover.reset();self.crossunder.reset();self.value=None;}}
 impl Default for Cross{fn default()->Self{Self::new()}}
 
-macro_rules! direction_operator { ($name:ident,$predicate:expr)=>{#[derive(Debug,Clone)]pub struct $name{values:VecDeque<f64>,period:usize,value:Option<f64>}impl $name{pub fn new(period:usize)->TaResult<Self>{validate_period(period)?;Ok(Self{values:VecDeque::with_capacity(period+1),period,value:None})}pub fn append(&mut self,input:f64)->Option<f64>{if self.values.len()==self.period+1{self.values.pop_front();}self.values.push_back(input);self.value=(self.values.len()==self.period+1).then(||if $predicate(input,self.values.front().copied().unwrap()){1.0}else{0.0});self.value}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.values.clear();self.value=None;}}};}
+macro_rules! direction_operator {
+    ($name:ident, $predicate:expr) => {
+        #[derive(Debug, Clone)]
+        pub struct $name { values: VecDeque<f64>, period: usize, value: Option<f64> }
+        impl $name {
+            /// Create a direction detector with the requested comparison period.
+            pub fn new(period: usize) -> TaResult<Self> {
+                validate_period(period)?;
+                Ok(Self { values: VecDeque::with_capacity(period + 1), period, value: None })
+            }
+            /// Append a value and return the causal direction flag.
+            pub fn append(&mut self, input: f64) -> Option<f64> {
+                if self.values.len() == self.period + 1 { self.values.pop_front(); }
+                self.values.push_back(input);
+                self.value = (self.values.len() == self.period + 1).then(|| {
+                    if $predicate(input, self.values.front().copied().unwrap()) { 1.0 } else { 0.0 }
+                });
+                self.value
+            }
+            /// Return the latest direction flag.
+            pub fn value(&self) -> Option<f64> { self.value }
+            /// Clear the comparison history.
+            pub fn reset(&mut self) { self.values.clear(); self.value = None; }
+        }
+    };
+}
 direction_operator!(Rising, |current:f64,previous:f64| current>previous);
 direction_operator!(Falling, |current:f64,previous:f64| current<previous);
 

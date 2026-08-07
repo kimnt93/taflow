@@ -54,7 +54,7 @@ class MinusDirectionalIndicator:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(h, l, c)
@@ -74,7 +74,7 @@ class MinusDirectionalIndicator:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         if l is None or c is None:
@@ -89,7 +89,7 @@ class MinusDirectionalIndicator:
 
         Returns
         -------
-        object
+        numpy.ndarray or tuple of numpy.ndarray
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.compute()
@@ -100,7 +100,7 @@ class MinusDirectionalIndicator:
 
         Returns
         -------
-        object
+        float, tuple, or None
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
@@ -110,7 +110,7 @@ class MinusDirectionalIndicator:
 
         Returns
         -------
-        object
+        Self
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
