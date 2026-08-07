@@ -23,6 +23,11 @@ cd verify && uv run python generate_checklist.py
 The source-of-truth JSON inventory is [`verify/function_inventory.json`](verify/function_inventory.json).
 The installed TA-Lib registry is compared exactly by `verify/verify.py`.
 
+The inventory resolves canonical adapters through their actual `_native` import
+and records the PyO3 state/class name (for example,
+`RateOfChange -> StatefulRoc -> ROC`), so descriptive Python names are not
+mistaken for missing Rust implementations.
+
 
 ## 1. Module contract
 

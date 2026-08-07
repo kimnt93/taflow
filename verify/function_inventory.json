@@ -1,6 +1,7 @@
 {
   "counts": {
-    "native_bindings": 86,
+    "native_functions": 86,
+    "native_state_classes": 283,
     "pandas_ta_symbols": 427,
     "python_exports": 263,
     "rust_exports": 493,
@@ -13,7 +14,254 @@
       "kind": "export",
       "module": "__init__",
       "name": "talib",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ActiveZoneListOperator",
+        "AlmaOperator",
+        "AmihudOperator",
+        "AverageDailyDollarValueOperator",
+        "AwesomeOscillatorOperator",
+        "BarsSinceOperator",
+        "BreakOfStructureChangeOfCharacterOperator",
+        "CandleAbandonedBaby",
+        "CandleAdvanceBlock",
+        "CandleBeltHold",
+        "CandleBreakaway",
+        "CandleClosingMarubozu",
+        "CandleConcealBabySwall",
+        "CandleCounterAttack",
+        "CandleDarkCloudCover",
+        "CandleDoji",
+        "CandleDojiStar",
+        "CandleDragonflyDoji",
+        "CandleEngulfing",
+        "CandleEveningDojiStar",
+        "CandleEveningStar",
+        "CandleGapSideSideWhite",
+        "CandleGravestoneDoji",
+        "CandleHammer",
+        "CandleHangingMan",
+        "CandleHarami",
+        "CandleHaramiCross",
+        "CandleHighWave",
+        "CandleHikkake",
+        "CandleHikkakeModified",
+        "CandleHomingPigeon",
+        "CandleIdenticalThreeCrows",
+        "CandleInNeck",
+        "CandleInvertedHammer",
+        "CandleKicking",
+        "CandleKickingByLength",
+        "CandleLadderBottom",
+        "CandleLongLeggedDoji",
+        "CandleLongLine",
+        "CandleMarubozu",
+        "CandleMatHold",
+        "CandleMatchingLow",
+        "CandleMorningDojiStar",
+        "CandleMorningStar",
+        "CandleOnNeck",
+        "CandlePiercing",
+        "CandleRickshawman",
+        "CandleRiseFallThreeMethods",
+        "CandleSeparatingLines",
+        "CandleShootingStar",
+        "CandleShortLine",
+        "CandleSpinningTop",
+        "CandleStalledPattern",
+        "CandleStickSandwich",
+        "CandleTakuri",
+        "CandleTasukiGap",
+        "CandleThreeBlackCrows",
+        "CandleThreeInside",
+        "CandleThreeLineStrike",
+        "CandleThreeOutside",
+        "CandleThreeStarsInSouth",
+        "CandleThreeWhiteSoldiers",
+        "CandleThrusting",
+        "CandleTriStar",
+        "CandleTwoCrows",
+        "CandleUniqueThreeRiver",
+        "CandleUpDownSideGapThreeMethods",
+        "CandleUpsideGapTwoCrows",
+        "ChaikinMoneyFlowOperator",
+        "ChaikinVolatilityOperator",
+        "CloseToCloseSigmaOperator",
+        "CommodityChannelIndex",
+        "CrossOperator",
+        "CrossoverOperator",
+        "CrossunderOperator",
+        "CumulativeMaximumOperator",
+        "CumulativeMinimumOperator",
+        "CumulativeProductOperator",
+        "CumulativeSumControlChartOperator",
+        "CumulativeSumOperator",
+        "DetrendedPriceOscillatorOperator",
+        "DonchianOperator",
+        "DrawdownOperator",
+        "EaseOfMovementOperator",
+        "EntryExitOperator",
+        "EqualHighsLowsOperator",
+        "EwmCorrOperator",
+        "EwmCovOperator",
+        "EwmStdOperator",
+        "EwmVarOperator",
+        "ExponentialMovingAverage",
+        "FairValueGapOperator",
+        "FallingOperator",
+        "FisherTransformOperator",
+        "ForceIndexOperator",
+        "FracDiffOperator",
+        "FractalDimensionOperator",
+        "GapDownOperator",
+        "GapUpOperator",
+        "GarmanKlassOperator",
+        "GarmanKlassYangZhangOperator",
+        "HedgeRatioOperator",
+        "HigherHighOperator",
+        "HighestSinceOperator",
+        "HilbertTransformDominantCyclePeriod",
+        "HilbertTransformDominantCyclePhase",
+        "HilbertTransformPhasor",
+        "HilbertTransformSineWave",
+        "HilbertTransformTrendMode",
+        "HmaOperator",
+        "HurstOperator",
+        "IchimokuOperator",
+        "InsideBarOperator",
+        "KalmanHedgeRatioOperator",
+        "KeltnerChannelsOperator",
+        "KnowSureThingOperator",
+        "LagOperator",
+        "LiquidityOperator",
+        "LogReturnOperator",
+        "LowerLowOperator",
+        "LowestSinceOperator",
+        "MassIndexOperator",
+        "McGinleyDynamicOperator",
+        "MinusDirectionalIndicator",
+        "MinusDirectionalMovement",
+        "MoneyFlowIndex",
+        "NegativeVolumeIndexOperator",
+        "OrderBlockOperator",
+        "OrnsteinUhlenbeckHalfLifeOperator",
+        "OutsideBarOperator",
+        "ParkinsonOperator",
+        "PlusDirectionalIndicator",
+        "PlusDirectionalMovement",
+        "PositionHoldOperator",
+        "PositiveVolumeIndexOperator",
+        "PreviousHighLowOperator",
+        "RetracementsOperator",
+        "RisingOperator",
+        "RogersSatchellOperator",
+        "RollSpreadOperator",
+        "RollingAlphaOperator",
+        "RollingAutocorrOperator",
+        "RollingCalmarOperator",
+        "RollingCovOperator",
+        "RollingEntropyOperator",
+        "RollingInformationRatioOperator",
+        "RollingInterquartileRangeOperator",
+        "RollingKurtosisOperator",
+        "RollingMedianOperator",
+        "RollingModeOperator",
+        "RollingPercentileOperator",
+        "RollingQuantileOperator",
+        "RollingRankOperator",
+        "RollingSharpeOperator",
+        "RollingSkewOperator",
+        "RollingSortinoOperator",
+        "RollingWinsorizeOperator",
+        "RollingZScoreOperator",
+        "SchaffTrendCycleOperator",
+        "SessionExtremaOperator",
+        "SessionsOperator",
+        "SignalDelayOperator",
+        "SpreadZScoreOperator",
+        "SqueezeOperator",
+        "SqueezeProOperator",
+        "StatefulAccbands",
+        "StatefulAd",
+        "StatefulAdosc",
+        "StatefulAdx",
+        "StatefulAdxr",
+        "StatefulAnchoredVolumeWeightedAveragePrice",
+        "StatefulApo",
+        "StatefulAroon",
+        "StatefulAroonosc",
+        "StatefulAtr",
+        "StatefulAvgprice",
+        "StatefulBbands",
+        "StatefulBop",
+        "StatefulCmo",
+        "StatefulDema",
+        "StatefulDx",
+        "StatefulEvenBetterSinewave",
+        "StatefulFibonacciRetracement",
+        "StatefulHeikinAshi",
+        "StatefulHtTrendline",
+        "StatefulImi",
+        "StatefulJurikMovingAverage",
+        "StatefulKama",
+        "StatefulKlingerVolumeOscillator",
+        "StatefulLaguerreRelativeStrengthIndex",
+        "StatefulMa",
+        "StatefulMacdExt",
+        "StatefulMacdFix",
+        "StatefulMavp",
+        "StatefulMax",
+        "StatefulMaxindex",
+        "StatefulMedprice",
+        "StatefulMin",
+        "StatefulMinindex",
+        "StatefulMom",
+        "StatefulNatr",
+        "StatefulObv",
+        "StatefulOpeningRange",
+        "StatefulParabolicMovingAverageStop",
+        "StatefulPivotPoints",
+        "StatefulPpo",
+        "StatefulPremiumDiscount",
+        "StatefulRelativeMomentumIndex",
+        "StatefulRoc",
+        "StatefulRocp",
+        "StatefulRocr",
+        "StatefulRocr100",
+        "StatefulRsi",
+        "StatefulSar",
+        "StatefulSarext",
+        "StatefulSessionVolumeLevels",
+        "StatefulSma",
+        "StatefulSmoothedTrendChannel",
+        "StatefulStoch",
+        "StatefulStochf",
+        "StatefulStochrsi",
+        "StatefulSum",
+        "StatefulTema",
+        "StatefulTomDeMarkSequential",
+        "StatefulTrange",
+        "StatefulTrima",
+        "StatefulTypprice",
+        "StatefulVariableIndexDynamicAverage",
+        "StatefulWclprice",
+        "StatefulWillr",
+        "StatefulWma",
+        "SupertrendOperator",
+        "SwingHighLowOperator",
+        "TripleExponentialRateOfChange",
+        "TrueStrengthIndexOperator",
+        "UlcerIndexOperator",
+        "UltimateOscillator",
+        "ValueWhenOperator",
+        "VolumePriceTrendOperator",
+        "VortexOperator",
+        "VwapOperator",
+        "VwmaOperator",
+        "YangZhangOperator",
+        "ZlemaOperator",
+        "session_flags_array"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -24,7 +272,10 @@
       "kind": "class",
       "module": "moving_average",
       "name": "MovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMa"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -35,7 +286,11 @@
       "kind": "class",
       "module": "minus_directional_indicator",
       "name": "MinusDirectionalIndicator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "MinusDirectionalIndicator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -46,7 +301,11 @@
       "kind": "class",
       "module": "minus_directional_movement",
       "name": "MinusDirectionalMovement",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "MinusDirectionalMovement",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -57,7 +316,11 @@
       "kind": "class",
       "module": "money_flow_index",
       "name": "MoneyFlowIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "MoneyFlowIndex",
+        "_NativeMoneyFlowIndex"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -68,7 +331,10 @@
       "kind": "class",
       "module": "average_price",
       "name": "AveragePrice",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAvgprice"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -79,7 +345,10 @@
       "kind": "class",
       "module": "median_price",
       "name": "MedianPrice",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMedprice"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -90,7 +359,10 @@
       "kind": "class",
       "module": "typical_price",
       "name": "TypicalPrice",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulTypprice"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -101,7 +373,10 @@
       "kind": "class",
       "module": "weighted_close",
       "name": "WeightedClose",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulWclprice"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -112,7 +387,10 @@
       "kind": "class",
       "module": "moving_average_convergence_divergence_fixed",
       "name": "MovingAverageConvergenceDivergenceFixed",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMacdFix"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -123,7 +401,10 @@
       "kind": "class",
       "module": "moving_average_convergence_divergence_extended",
       "name": "MovingAverageConvergenceDivergenceExtended",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMacdExt"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -134,7 +415,10 @@
       "kind": "class",
       "module": "bollinger_bands",
       "name": "BollingerBands",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulBbands"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -145,7 +429,11 @@
       "kind": "class",
       "module": "commodity_channel_index",
       "name": "CommodityChannelIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CommodityChannelIndex",
+        "_NativeCommodityChannelIndex"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -156,7 +444,10 @@
       "kind": "class",
       "module": "fast_stochastic_oscillator",
       "name": "FastStochasticOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulStochf"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -167,7 +458,10 @@
       "kind": "class",
       "module": "hilbert_transform_trendline",
       "name": "HilbertTransformTrendline",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulHtTrendline"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -178,7 +472,11 @@
       "kind": "class",
       "module": "hikkake",
       "name": "CandleHikkake",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHikkake",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -189,7 +487,11 @@
       "kind": "class",
       "module": "hikkake_modified",
       "name": "CandleHikkakeModified",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHikkakeModified",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -200,7 +502,11 @@
       "kind": "class",
       "module": "hammer",
       "name": "CandleHammer",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHammer",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -211,7 +517,11 @@
       "kind": "class",
       "module": "hilbert_transform_dominant_cycle_period",
       "name": "HilbertTransformDominantCyclePeriod",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HilbertTransformDominantCyclePeriod",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -222,7 +532,11 @@
       "kind": "class",
       "module": "hilbert_transform_dominant_cycle_phase",
       "name": "HilbertTransformDominantCyclePhase",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HilbertTransformDominantCyclePhase",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -233,7 +547,11 @@
       "kind": "class",
       "module": "hilbert_transform_phasor",
       "name": "HilbertTransformPhasor",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HilbertTransformPhasor",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -244,7 +562,11 @@
       "kind": "class",
       "module": "hilbert_transform_sine_wave",
       "name": "HilbertTransformSineWave",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HilbertTransformSineWave",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -255,7 +577,11 @@
       "kind": "class",
       "module": "hilbert_transform_trend_mode",
       "name": "HilbertTransformTrendMode",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HilbertTransformTrendMode",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -266,7 +592,10 @@
       "kind": "class",
       "module": "stochastic_oscillator",
       "name": "StochasticOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulStoch"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -277,7 +606,10 @@
       "kind": "class",
       "module": "stochastic_relative_strength_index",
       "name": "StochasticRelativeStrengthIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulStochrsi"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -288,7 +620,11 @@
       "kind": "class",
       "module": "stick_sandwich",
       "name": "CandleStickSandwich",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleStickSandwich",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -299,7 +635,11 @@
       "kind": "class",
       "module": "triple_exponential_rate_of_change",
       "name": "TripleExponentialRateOfChange",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "TripleExponentialRateOfChange",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -310,7 +650,11 @@
       "kind": "class",
       "module": "three_black_crows",
       "name": "CandleThreeBlackCrows",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleThreeBlackCrows",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -321,7 +665,11 @@
       "kind": "class",
       "module": "three_inside",
       "name": "CandleThreeInside",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleThreeInside",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -332,7 +680,11 @@
       "kind": "class",
       "module": "three_line_strike",
       "name": "CandleThreeLineStrike",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleThreeLineStrike",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -343,7 +695,11 @@
       "kind": "class",
       "module": "three_stars_in_south",
       "name": "CandleThreeStarsInSouth",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleThreeStarsInSouth",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -354,7 +710,11 @@
       "kind": "class",
       "module": "three_outside",
       "name": "CandleThreeOutside",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleThreeOutside",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -365,7 +725,11 @@
       "kind": "class",
       "module": "two_crows",
       "name": "CandleTwoCrows",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleTwoCrows",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -376,7 +740,11 @@
       "kind": "class",
       "module": "ultimate_oscillator",
       "name": "UltimateOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "UltimateOscillator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -387,7 +755,10 @@
       "kind": "class",
       "module": "variable_period_moving_average",
       "name": "VariablePeriodMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMavp"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -398,7 +769,10 @@
       "kind": "class",
       "module": "heikin_ashi",
       "name": "HeikinAshi",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulHeikinAshi"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -409,7 +783,10 @@
       "kind": "class",
       "module": "fibonacci_retracement",
       "name": "FibonacciRetracement",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulFibonacciRetracement"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -420,7 +797,10 @@
       "kind": "class",
       "module": "anchored_vwap",
       "name": "AnchoredVolumeWeightedAveragePrice",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAnchoredVolumeWeightedAveragePrice"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -431,7 +811,10 @@
       "kind": "class",
       "module": "vidya",
       "name": "VariableIndexDynamicAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulVariableIndexDynamicAverage"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -442,7 +825,10 @@
       "kind": "class",
       "module": "laguerre_rsi",
       "name": "LaguerreRelativeStrengthIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulLaguerreRelativeStrengthIndex"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -453,7 +839,10 @@
       "kind": "class",
       "module": "relative_strength_index",
       "name": "RelativeStrengthIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulRsi"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -464,7 +853,10 @@
       "kind": "class",
       "module": "rmi",
       "name": "RelativeMomentumIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulRelativeMomentumIndex"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -475,7 +867,10 @@
       "kind": "class",
       "module": "ssl_channel",
       "name": "SmoothedTrendChannel",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulSmoothedTrendChannel"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -486,7 +881,10 @@
       "kind": "class",
       "module": "jma",
       "name": "JurikMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulJurikMovingAverage"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -497,7 +895,10 @@
       "kind": "class",
       "module": "pmax",
       "name": "ParabolicMovingAverageStop",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulParabolicMovingAverageStop"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -508,7 +909,10 @@
       "kind": "class",
       "module": "td_sequential",
       "name": "TomDeMarkSequential",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulTomDeMarkSequential"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -519,7 +923,10 @@
       "kind": "class",
       "module": "ebsw",
       "name": "EvenBetterSinewave",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulEvenBetterSinewave"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -530,7 +937,10 @@
       "kind": "class",
       "module": "premium_discount",
       "name": "PremiumDiscount",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulPremiumDiscount"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -541,7 +951,10 @@
       "kind": "class",
       "module": "opening_range",
       "name": "OpeningRange",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulOpeningRange"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -552,7 +965,10 @@
       "kind": "class",
       "module": "pivot_points",
       "name": "PivotPoints",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulPivotPoints"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -564,6 +980,7 @@
       "module": "execution",
       "name": "Pipeline",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -575,6 +992,7 @@
       "module": "execution",
       "name": "Expr",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -583,9 +1001,10 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "talib",
       "name": "MaType",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -597,6 +1016,7 @@
       "module": "execution",
       "name": "NumpyAdapter",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -608,6 +1028,7 @@
       "module": "execution",
       "name": "PythonListAdapter",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -619,6 +1040,7 @@
       "module": "execution",
       "name": "ArrowAdapter",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -630,6 +1052,7 @@
       "module": "execution",
       "name": "AdapterGateway",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -641,6 +1064,7 @@
       "module": "execution",
       "name": "adapt_output",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -652,6 +1076,7 @@
       "module": "execution",
       "name": "PolarsAdapter",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -663,6 +1088,7 @@
       "module": "execution",
       "name": "adapt_input",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -673,7 +1099,10 @@
       "kind": "class",
       "module": "klinger_volume_oscillator",
       "name": "KlingerVolumeOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulKlingerVolumeOscillator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -684,7 +1113,10 @@
       "kind": "class",
       "module": "session_volume_levels",
       "name": "SessionVolumeLevels",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulSessionVolumeLevels"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -695,7 +1127,11 @@
       "kind": "class",
       "module": "up_down_side_gap_three_methods",
       "name": "CandleUpDownSideGapThreeMethods",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleUpDownSideGapThreeMethods",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -706,7 +1142,10 @@
       "kind": "class",
       "module": "intraday_momentum_index",
       "name": "IntradayMomentumIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulImi"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -717,7 +1156,10 @@
       "kind": "class",
       "module": "acceleration_bands",
       "name": "AccelerationBands",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAccbands"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -728,7 +1170,10 @@
       "kind": "class",
       "module": "average_true_range",
       "name": "AverageTrueRange",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAtr"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -739,7 +1184,10 @@
       "kind": "class",
       "module": "double_exponential_moving_average",
       "name": "DoubleExponentialMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulDema"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -750,7 +1198,10 @@
       "kind": "class",
       "module": "kaufman_adaptive_moving_average",
       "name": "KaufmanAdaptiveMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulKama"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -761,7 +1212,10 @@
       "kind": "class",
       "module": "simple_moving_average",
       "name": "SimpleMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulSma"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -772,7 +1226,10 @@
       "kind": "class",
       "module": "normalized_average_true_range",
       "name": "NormalizedAverageTrueRange",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulNatr"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -783,7 +1240,10 @@
       "kind": "class",
       "module": "true_range",
       "name": "TrueRange",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulTrange"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -794,7 +1254,10 @@
       "kind": "class",
       "module": "triangular_moving_average",
       "name": "TriangularMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulTrima"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -805,7 +1268,10 @@
       "kind": "class",
       "module": "triple_exponential_moving_average",
       "name": "TripleExponentialMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulTema"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -816,7 +1282,10 @@
       "kind": "class",
       "module": "weighted_moving_average",
       "name": "WeightedMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulWma"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -828,6 +1297,9 @@
       "module": "aroon",
       "name": "Aroon",
       "native_binding": true,
+      "native_symbols": [
+        "StatefulAroon"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -838,7 +1310,10 @@
       "kind": "class",
       "module": "aroon_oscillator",
       "name": "AroonOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAroonosc"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -849,7 +1324,10 @@
       "kind": "class",
       "module": "accumulation_distribution",
       "name": "AccumulationDistribution",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAd"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -860,7 +1338,10 @@
       "kind": "class",
       "module": "accumulation_distribution_oscillator",
       "name": "AccumulationDistributionOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAdosc"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -871,7 +1352,10 @@
       "kind": "class",
       "module": "balance_of_power",
       "name": "BalanceOfPower",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulBop"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -882,7 +1366,10 @@
       "kind": "class",
       "module": "on_balance_volume",
       "name": "OnBalanceVolume",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulObv"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -893,7 +1380,10 @@
       "kind": "class",
       "module": "absolute_price_oscillator",
       "name": "AbsolutePriceOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulApo"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -904,7 +1394,10 @@
       "kind": "class",
       "module": "percentage_price_oscillator",
       "name": "PercentagePriceOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulPpo"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -915,7 +1408,10 @@
       "kind": "class",
       "module": "chande_momentum_oscillator",
       "name": "ChandeMomentumOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulCmo"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -926,7 +1422,10 @@
       "kind": "class",
       "module": "momentum",
       "name": "Momentum",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMom"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -937,7 +1436,10 @@
       "kind": "class",
       "module": "rate_of_change",
       "name": "RateOfChange",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulRoc"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -948,7 +1450,10 @@
       "kind": "class",
       "module": "rate_of_change_percent",
       "name": "RateOfChangePercent",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulRocp"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -959,7 +1464,10 @@
       "kind": "class",
       "module": "rate_of_change_ratio",
       "name": "RateOfChangeRatio",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulRocr"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -970,7 +1478,10 @@
       "kind": "class",
       "module": "rate_of_change_ratio_percent",
       "name": "RateOfChangeRatioPercent",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulRocr100"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -981,7 +1492,10 @@
       "kind": "class",
       "module": "williams_percent_r",
       "name": "WilliamsPercentR",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulWillr"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -992,7 +1506,10 @@
       "kind": "class",
       "module": "average_directional_index",
       "name": "AverageDirectionalIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAdx"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1003,7 +1520,10 @@
       "kind": "class",
       "module": "average_directional_index_rating",
       "name": "AverageDirectionalIndexRating",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulAdxr"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1014,7 +1534,10 @@
       "kind": "class",
       "module": "directional_movement_index",
       "name": "DirectionalMovementIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulDx"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1025,7 +1548,11 @@
       "kind": "class",
       "module": "doji",
       "name": "CandleDoji",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleDoji",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1036,7 +1563,11 @@
       "kind": "class",
       "module": "takuri",
       "name": "CandleTakuri",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleTakuri",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1047,7 +1578,11 @@
       "kind": "class",
       "module": "marubozu",
       "name": "CandleMarubozu",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleMarubozu",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1058,7 +1593,11 @@
       "kind": "class",
       "module": "closing_marubozu",
       "name": "CandleClosingMarubozu",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleClosingMarubozu",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1069,7 +1608,11 @@
       "kind": "class",
       "module": "long_legged_doji",
       "name": "CandleLongLeggedDoji",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleLongLeggedDoji",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1080,7 +1623,11 @@
       "kind": "class",
       "module": "rickshawman",
       "name": "CandleRickshawman",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleRickshawman",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1091,7 +1638,11 @@
       "kind": "class",
       "module": "high_wave",
       "name": "CandleHighWave",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHighWave",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1102,7 +1653,11 @@
       "kind": "class",
       "module": "dragonfly_doji",
       "name": "CandleDragonflyDoji",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleDragonflyDoji",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1113,7 +1668,11 @@
       "kind": "class",
       "module": "gravestone_doji",
       "name": "CandleGravestoneDoji",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleGravestoneDoji",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1124,7 +1683,11 @@
       "kind": "class",
       "module": "short_line",
       "name": "CandleShortLine",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleShortLine",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1135,7 +1698,11 @@
       "kind": "class",
       "module": "spinning_top",
       "name": "CandleSpinningTop",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleSpinningTop",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1146,7 +1713,11 @@
       "kind": "class",
       "module": "long_line",
       "name": "CandleLongLine",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleLongLine",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1157,7 +1728,11 @@
       "kind": "class",
       "module": "doji_star",
       "name": "CandleDojiStar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleDojiStar",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1168,7 +1743,11 @@
       "kind": "class",
       "module": "belt_hold",
       "name": "CandleBeltHold",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleBeltHold",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1179,7 +1758,11 @@
       "kind": "class",
       "module": "engulfing",
       "name": "CandleEngulfing",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleEngulfing",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1190,7 +1773,11 @@
       "kind": "class",
       "module": "exponential_moving_average",
       "name": "ExponentialMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ExponentialMovingAverage",
+        "_NativeExponentialMovingAverage"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1201,7 +1788,10 @@
       "kind": "class",
       "module": "parabolic_sar",
       "name": "ParabolicSar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulSar"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1212,7 +1802,10 @@
       "kind": "class",
       "module": "parabolic_sar_extended",
       "name": "ParabolicSarExtended",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulSarext"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1223,7 +1816,11 @@
       "kind": "class",
       "module": "plus_directional_indicator",
       "name": "PlusDirectionalIndicator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "PlusDirectionalIndicator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1234,7 +1831,11 @@
       "kind": "class",
       "module": "plus_directional_movement",
       "name": "PlusDirectionalMovement",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "PlusDirectionalMovement",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1245,7 +1846,11 @@
       "kind": "class",
       "module": "three_white_soldiers",
       "name": "CandleThreeWhiteSoldiers",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleThreeWhiteSoldiers",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1256,7 +1861,11 @@
       "kind": "class",
       "module": "abandoned_baby",
       "name": "CandleAbandonedBaby",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleAbandonedBaby",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1267,7 +1876,11 @@
       "kind": "class",
       "module": "advance_block",
       "name": "CandleAdvanceBlock",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleAdvanceBlock",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1278,7 +1891,11 @@
       "kind": "class",
       "module": "breakaway",
       "name": "CandleBreakaway",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleBreakaway",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1289,7 +1906,11 @@
       "kind": "class",
       "module": "conceal_baby_swall",
       "name": "CandleConcealBabySwall",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleConcealBabySwall",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1300,7 +1921,11 @@
       "kind": "class",
       "module": "counter_attack",
       "name": "CandleCounterAttack",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleCounterAttack",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1311,7 +1936,11 @@
       "kind": "class",
       "module": "dark_cloud_cover",
       "name": "CandleDarkCloudCover",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleDarkCloudCover",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1322,7 +1951,11 @@
       "kind": "class",
       "module": "evening_doji_star",
       "name": "CandleEveningDojiStar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleEveningDojiStar",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1333,7 +1966,11 @@
       "kind": "class",
       "module": "evening_star",
       "name": "CandleEveningStar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleEveningStar",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1344,7 +1981,11 @@
       "kind": "class",
       "module": "gap_side_side_white",
       "name": "CandleGapSideSideWhite",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleGapSideSideWhite",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1355,7 +1996,11 @@
       "kind": "class",
       "module": "hanging_man",
       "name": "CandleHangingMan",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHangingMan",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1366,7 +2011,11 @@
       "kind": "class",
       "module": "harami",
       "name": "CandleHarami",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHarami",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1377,7 +2026,11 @@
       "kind": "class",
       "module": "harami_cross",
       "name": "CandleHaramiCross",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHaramiCross",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1388,7 +2041,11 @@
       "kind": "class",
       "module": "homing_pigeon",
       "name": "CandleHomingPigeon",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleHomingPigeon",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1399,7 +2056,11 @@
       "kind": "class",
       "module": "identical_three_crows",
       "name": "CandleIdenticalThreeCrows",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleIdenticalThreeCrows",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1410,7 +2071,11 @@
       "kind": "class",
       "module": "in_neck",
       "name": "CandleInNeck",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleInNeck",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1421,7 +2086,11 @@
       "kind": "class",
       "module": "inverted_hammer",
       "name": "CandleInvertedHammer",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleInvertedHammer",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1432,7 +2101,11 @@
       "kind": "class",
       "module": "kicking",
       "name": "CandleKicking",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleKicking",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1443,7 +2116,11 @@
       "kind": "class",
       "module": "kicking_by_length",
       "name": "CandleKickingByLength",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleKickingByLength",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1454,7 +2131,11 @@
       "kind": "class",
       "module": "ladder_bottom",
       "name": "CandleLadderBottom",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleLadderBottom",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1465,7 +2146,11 @@
       "kind": "class",
       "module": "matching_low",
       "name": "CandleMatchingLow",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleMatchingLow",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1476,7 +2161,11 @@
       "kind": "class",
       "module": "mat_hold",
       "name": "CandleMatHold",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleMatHold",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1487,7 +2176,11 @@
       "kind": "class",
       "module": "morning_doji_star",
       "name": "CandleMorningDojiStar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleMorningDojiStar",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1498,7 +2191,11 @@
       "kind": "class",
       "module": "morning_star",
       "name": "CandleMorningStar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleMorningStar",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1509,7 +2206,11 @@
       "kind": "class",
       "module": "on_neck",
       "name": "CandleOnNeck",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleOnNeck",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1520,7 +2221,11 @@
       "kind": "class",
       "module": "piercing",
       "name": "CandlePiercing",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandlePiercing",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1531,7 +2236,11 @@
       "kind": "class",
       "module": "rise_fall_three_methods",
       "name": "CandleRiseFallThreeMethods",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleRiseFallThreeMethods",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1542,7 +2251,11 @@
       "kind": "class",
       "module": "separating_lines",
       "name": "CandleSeparatingLines",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleSeparatingLines",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1553,7 +2266,11 @@
       "kind": "class",
       "module": "shooting_star",
       "name": "CandleShootingStar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleShootingStar",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1564,7 +2281,11 @@
       "kind": "class",
       "module": "stalled_pattern",
       "name": "CandleStalledPattern",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleStalledPattern",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1575,7 +2296,11 @@
       "kind": "class",
       "module": "tasuki_gap",
       "name": "CandleTasukiGap",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleTasukiGap",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1586,7 +2311,11 @@
       "kind": "class",
       "module": "thrusting",
       "name": "CandleThrusting",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleThrusting",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1597,7 +2326,11 @@
       "kind": "class",
       "module": "tri_star",
       "name": "CandleTriStar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleTriStar",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1608,7 +2341,11 @@
       "kind": "class",
       "module": "unique_three_river",
       "name": "CandleUniqueThreeRiver",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleUniqueThreeRiver",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1619,7 +2356,11 @@
       "kind": "class",
       "module": "upside_gap_two_crows",
       "name": "CandleUpsideGapTwoCrows",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CandleUpsideGapTwoCrows",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1630,7 +2371,11 @@
       "kind": "class",
       "module": "lag",
       "name": "Lag",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "LagOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": true,
       "smc_reference": false,
@@ -1641,7 +2386,11 @@
       "kind": "class",
       "module": "log_return",
       "name": "LogReturn",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "LogReturnOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1652,7 +2401,11 @@
       "kind": "class",
       "module": "cumulative_sum",
       "name": "CumulativeSum",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CumulativeSumOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1663,7 +2416,11 @@
       "kind": "class",
       "module": "cumulative_product",
       "name": "CumulativeProduct",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CumulativeProductOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1674,7 +2431,11 @@
       "kind": "class",
       "module": "rolling_median",
       "name": "RollingMedian",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingMedianOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1685,7 +2446,10 @@
       "kind": "class",
       "module": "rolling_min",
       "name": "RollingMin",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMin"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1696,7 +2460,10 @@
       "kind": "class",
       "module": "rolling_max",
       "name": "RollingMax",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMax"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1707,7 +2474,10 @@
       "kind": "class",
       "module": "rolling_sum",
       "name": "RollingSum",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulSum"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1718,7 +2488,10 @@
       "kind": "class",
       "module": "rolling_argmin",
       "name": "RollingArgmin",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMinindex"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1729,7 +2502,10 @@
       "kind": "class",
       "module": "rolling_argmax",
       "name": "RollingArgmax",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMaxindex"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1740,7 +2516,11 @@
       "kind": "class",
       "module": "rolling_mode",
       "name": "RollingMode",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingModeOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1751,7 +2531,11 @@
       "kind": "class",
       "module": "rolling_quantile",
       "name": "RollingQuantile",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingQuantileOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1762,7 +2546,11 @@
       "kind": "class",
       "module": "rolling_percentile",
       "name": "RollingPercentile",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingPercentileOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1773,7 +2561,11 @@
       "kind": "class",
       "module": "rolling_rank",
       "name": "RollingRank",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingRankOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1784,7 +2576,11 @@
       "kind": "class",
       "module": "rolling_zscore",
       "name": "RollingZScore",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingZScoreOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1795,7 +2591,11 @@
       "kind": "class",
       "module": "rolling_skew",
       "name": "RollingSkew",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingSkewOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1806,7 +2606,11 @@
       "kind": "class",
       "module": "rolling_kurtosis",
       "name": "RollingKurtosis",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingKurtosisOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1817,7 +2621,11 @@
       "kind": "class",
       "module": "rolling_iqr",
       "name": "RollingInterquartileRange",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingInterquartileRangeOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1828,7 +2636,11 @@
       "kind": "class",
       "module": "rolling_cov",
       "name": "RollingCov",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingCovOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1839,7 +2651,11 @@
       "kind": "class",
       "module": "rolling_winsorize",
       "name": "RollingWinsorize",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingWinsorizeOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1851,6 +2667,7 @@
       "module": "rolling_apply",
       "name": "rolling_apply",
       "native_binding": false,
+      "native_symbols": [],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1861,7 +2678,11 @@
       "kind": "class",
       "module": "ewm_var",
       "name": "ExponentiallyWeightedVariance",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "EwmVarOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1872,7 +2693,11 @@
       "kind": "class",
       "module": "ewm_std",
       "name": "ExponentiallyWeightedStandardDeviation",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "EwmStdOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1883,7 +2708,11 @@
       "kind": "class",
       "module": "ewm_cov",
       "name": "ExponentiallyWeightedCovariance",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "EwmCovOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1894,7 +2723,11 @@
       "kind": "class",
       "module": "ewm_corr",
       "name": "ExponentiallyWeightedCorrelation",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "EwmCorrOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1905,7 +2738,11 @@
       "kind": "class",
       "module": "cumulative_maximum",
       "name": "CumulativeMaximum",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CumulativeMaximumOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1916,7 +2753,11 @@
       "kind": "class",
       "module": "cumulative_minimum",
       "name": "CumulativeMinimum",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CumulativeMinimumOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -1927,7 +2768,11 @@
       "kind": "class",
       "module": "drawdown",
       "name": "Drawdown",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "DrawdownOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -1938,7 +2783,11 @@
       "kind": "class",
       "module": "rolling_sharpe",
       "name": "RollingSharpe",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingSharpeOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1949,7 +2798,11 @@
       "kind": "class",
       "module": "rolling_sortino",
       "name": "RollingSortino",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingSortinoOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1960,7 +2813,11 @@
       "kind": "class",
       "module": "rolling_calmar",
       "name": "RollingCalmar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingCalmarOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1971,7 +2828,11 @@
       "kind": "class",
       "module": "hma",
       "name": "HullMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HmaOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1982,7 +2843,11 @@
       "kind": "class",
       "module": "vwma",
       "name": "VolumeWeightedMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "VwmaOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -1993,7 +2858,11 @@
       "kind": "class",
       "module": "zlema",
       "name": "ZeroLagExponentialMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ZlemaOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2004,7 +2873,11 @@
       "kind": "class",
       "module": "alma",
       "name": "ArnaudLegouxMovingAverage",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "AlmaOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2015,7 +2888,11 @@
       "kind": "class",
       "module": "tsi",
       "name": "TrueStrengthIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "TrueStrengthIndexOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2026,7 +2903,11 @@
       "kind": "class",
       "module": "awesome_oscillator",
       "name": "AwesomeOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "AwesomeOscillatorOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2037,7 +2918,11 @@
       "kind": "class",
       "module": "fisher_transform",
       "name": "FisherTransform",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "FisherTransformOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2048,7 +2933,11 @@
       "kind": "class",
       "module": "donchian",
       "name": "Donchian",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "DonchianOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -2059,7 +2948,11 @@
       "kind": "class",
       "module": "ulcer_index",
       "name": "UlcerIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "UlcerIndexOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2070,7 +2963,11 @@
       "kind": "class",
       "module": "keltner_channels",
       "name": "KeltnerChannels",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "KeltnerChannelsOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2081,7 +2978,11 @@
       "kind": "class",
       "module": "chaikin_volatility",
       "name": "ChaikinVolatility",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ChaikinVolatilityOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2092,7 +2993,11 @@
       "kind": "class",
       "module": "crossover",
       "name": "Crossover",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CrossoverOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -2103,7 +3008,11 @@
       "kind": "class",
       "module": "crossunder",
       "name": "Crossunder",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CrossunderOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2114,7 +3023,11 @@
       "kind": "class",
       "module": "cross",
       "name": "Cross",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CrossOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -2125,7 +3038,11 @@
       "kind": "class",
       "module": "rising",
       "name": "Rising",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RisingOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2136,7 +3053,11 @@
       "kind": "class",
       "module": "falling",
       "name": "Falling",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "FallingOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2147,7 +3068,11 @@
       "kind": "class",
       "module": "vwap",
       "name": "RollingVolumeWeightedAveragePrice",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "VwapOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2158,7 +3083,11 @@
       "kind": "class",
       "module": "force_index",
       "name": "ForceIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ForceIndexOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2169,7 +3098,11 @@
       "kind": "class",
       "module": "ease_of_movement",
       "name": "EaseOfMovement",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "EaseOfMovementOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2178,9 +3111,17 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "bar_helpers",
       "name": "HigherHigh",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GapDownOperator",
+        "GapUpOperator",
+        "HigherHighOperator",
+        "InsideBarOperator",
+        "LowerLowOperator",
+        "OutsideBarOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2189,9 +3130,17 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "bar_helpers",
       "name": "LowerLow",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GapDownOperator",
+        "GapUpOperator",
+        "HigherHighOperator",
+        "InsideBarOperator",
+        "LowerLowOperator",
+        "OutsideBarOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2200,9 +3149,17 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "bar_helpers",
       "name": "InsideBar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GapDownOperator",
+        "GapUpOperator",
+        "HigherHighOperator",
+        "InsideBarOperator",
+        "LowerLowOperator",
+        "OutsideBarOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2211,9 +3168,17 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "bar_helpers",
       "name": "OutsideBar",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GapDownOperator",
+        "GapUpOperator",
+        "HigherHighOperator",
+        "InsideBarOperator",
+        "LowerLowOperator",
+        "OutsideBarOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2222,9 +3187,17 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "bar_helpers",
       "name": "GapUp",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GapDownOperator",
+        "GapUpOperator",
+        "HigherHighOperator",
+        "InsideBarOperator",
+        "LowerLowOperator",
+        "OutsideBarOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2233,9 +3206,17 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "bar_helpers",
       "name": "GapDown",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GapDownOperator",
+        "GapUpOperator",
+        "HigherHighOperator",
+        "InsideBarOperator",
+        "LowerLowOperator",
+        "OutsideBarOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2246,7 +3227,10 @@
       "kind": "class",
       "module": "bars_since",
       "name": "BarsSince",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "BarsSinceOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2255,9 +3239,18 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "state_helpers",
       "name": "ValueWhen",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "BarsSinceOperator",
+        "EntryExitOperator",
+        "HighestSinceOperator",
+        "LowestSinceOperator",
+        "PositionHoldOperator",
+        "SignalDelayOperator",
+        "ValueWhenOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2266,9 +3259,18 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "state_helpers",
       "name": "HighestSince",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "BarsSinceOperator",
+        "EntryExitOperator",
+        "HighestSinceOperator",
+        "LowestSinceOperator",
+        "PositionHoldOperator",
+        "SignalDelayOperator",
+        "ValueWhenOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2277,9 +3279,18 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "state_helpers",
       "name": "LowestSince",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "BarsSinceOperator",
+        "EntryExitOperator",
+        "HighestSinceOperator",
+        "LowestSinceOperator",
+        "PositionHoldOperator",
+        "SignalDelayOperator",
+        "ValueWhenOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2290,7 +3301,10 @@
       "kind": "class",
       "module": "signal_delay",
       "name": "SignalDelay",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SignalDelayOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2301,7 +3315,10 @@
       "kind": "class",
       "module": "position_hold",
       "name": "PositionHold",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "PositionHoldOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2312,7 +3329,10 @@
       "kind": "class",
       "module": "entry_exit",
       "name": "EntryExit",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "EntryExitOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2323,7 +3343,11 @@
       "kind": "class",
       "module": "swing",
       "name": "SwingHighLow",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SwingHighLowOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2332,9 +3356,12 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "swing",
       "name": "SwingHigh",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SwingHighLowOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2343,9 +3370,12 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "swing",
       "name": "SwingLow",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SwingHighLowOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2356,7 +3386,11 @@
       "kind": "class",
       "module": "retracements",
       "name": "Retracements",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RetracementsOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": true,
@@ -2367,7 +3401,13 @@
       "kind": "class",
       "module": "session",
       "name": "SessionExtrema",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SessionExtremaOperator",
+        "_Native",
+        "session_flags_array",
+        "_native_session_flags"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2378,7 +3418,13 @@
       "kind": "function",
       "module": "session",
       "name": "session_flags",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SessionExtremaOperator",
+        "_Native",
+        "session_flags_array",
+        "_native_session_flags"
+      ],
       "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
@@ -2389,7 +3435,11 @@
       "kind": "class",
       "module": "previous_high_low",
       "name": "PreviousHighLow",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "PreviousHighLowOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2400,7 +3450,11 @@
       "kind": "class",
       "module": "sessions",
       "name": "Sessions",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SessionsOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": true,
@@ -2411,7 +3465,11 @@
       "kind": "class",
       "module": "zones",
       "name": "ActiveZoneList",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ActiveZoneListOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2422,7 +3480,11 @@
       "kind": "class",
       "module": "fvg",
       "name": "FairValueGap",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "FairValueGapOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2431,9 +3493,12 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "donchian_channels",
       "name": "DonchianChannels",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "DonchianOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2444,7 +3509,11 @@
       "kind": "class",
       "module": "vwap",
       "name": "RollingVolumeWeightedAveragePrice",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "VwapOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2453,9 +3522,12 @@
     {
       "exported": true,
       "kind": "export",
-      "module": "__init__",
+      "module": "swing_highs_lows",
       "name": "SwingHighsLows",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SwingHighLowOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2466,7 +3538,11 @@
       "kind": "class",
       "module": "break_of_structure_change_of_character",
       "name": "BreakOfStructureChangeOfCharacter",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "BreakOfStructureChangeOfCharacterOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2477,7 +3553,11 @@
       "kind": "class",
       "module": "ob",
       "name": "OrderBlock",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "OrderBlockOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2488,7 +3568,11 @@
       "kind": "class",
       "module": "liquidity",
       "name": "Liquidity",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "LiquidityOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": true,
@@ -2499,7 +3583,11 @@
       "kind": "class",
       "module": "equal_highs_lows",
       "name": "EqualHighsLows",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "EqualHighsLowsOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2510,7 +3598,11 @@
       "kind": "class",
       "module": "hedge_ratio",
       "name": "HedgeRatio",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HedgeRatioOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2521,7 +3613,11 @@
       "kind": "class",
       "module": "rolling_entropy",
       "name": "RollingEntropy",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingEntropyOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2532,7 +3628,11 @@
       "kind": "class",
       "module": "rolling_autocorr",
       "name": "RollingAutocorr",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingAutocorrOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2543,7 +3643,11 @@
       "kind": "class",
       "module": "hurst",
       "name": "Hurst",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "HurstOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2554,7 +3658,11 @@
       "kind": "class",
       "module": "fractal_dimension",
       "name": "FractalDimension",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "FractalDimensionOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2565,7 +3673,10 @@
       "kind": "class",
       "module": "rolling_alpha",
       "name": "RollingAlpha",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingAlphaOperator"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2576,7 +3687,11 @@
       "kind": "class",
       "module": "rolling_information_ratio",
       "name": "RollingInformationRatio",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollingInformationRatioOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2587,7 +3702,11 @@
       "kind": "class",
       "module": "close_to_close_sigma",
       "name": "CloseToCloseSigma",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CloseToCloseSigmaOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2598,7 +3717,11 @@
       "kind": "class",
       "module": "parkinson",
       "name": "Parkinson",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ParkinsonOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2609,7 +3732,11 @@
       "kind": "class",
       "module": "garman_klass",
       "name": "GarmanKlass",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GarmanKlassOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2620,7 +3747,11 @@
       "kind": "class",
       "module": "rogers_satchell",
       "name": "RogersSatchell",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RogersSatchellOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2631,7 +3762,11 @@
       "kind": "class",
       "module": "garman_klass_yang_zhang",
       "name": "GarmanKlassYangZhang",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "GarmanKlassYangZhangOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2642,7 +3777,11 @@
       "kind": "class",
       "module": "yang_zhang",
       "name": "YangZhang",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "YangZhangOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2653,7 +3792,11 @@
       "kind": "class",
       "module": "adv",
       "name": "AverageDailyDollarValue",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "AverageDailyDollarValueOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2664,7 +3807,11 @@
       "kind": "class",
       "module": "amihud",
       "name": "Amihud",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "AmihudOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2675,7 +3822,11 @@
       "kind": "class",
       "module": "roll_spread",
       "name": "RollSpread",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "RollSpreadOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2686,7 +3837,11 @@
       "kind": "class",
       "module": "ornstein_uhlenbeck_half_life",
       "name": "OrnsteinUhlenbeckHalfLife",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "OrnsteinUhlenbeckHalfLifeOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2697,7 +3852,11 @@
       "kind": "class",
       "module": "cumulative_sum_control_chart",
       "name": "CumulativeSumControlChart",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "CumulativeSumControlChartOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2708,7 +3867,11 @@
       "kind": "class",
       "module": "spread_zscore",
       "name": "SpreadZScore",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SpreadZScoreOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2719,7 +3882,11 @@
       "kind": "class",
       "module": "frac_diff",
       "name": "FracDiff",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "FracDiffOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2730,7 +3897,11 @@
       "kind": "class",
       "module": "kalman_hedge_ratio",
       "name": "KalmanHedgeRatio",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "KalmanHedgeRatioOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2741,7 +3912,11 @@
       "kind": "class",
       "module": "supertrend",
       "name": "Supertrend",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SupertrendOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -2752,7 +3927,11 @@
       "kind": "class",
       "module": "ichimoku",
       "name": "Ichimoku",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "IchimokuOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -2763,7 +3942,11 @@
       "kind": "class",
       "module": "squeeze",
       "name": "Squeeze",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SqueezeOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -2774,7 +3957,11 @@
       "kind": "class",
       "module": "squeeze_pro",
       "name": "SqueezePro",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SqueezeProOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2785,7 +3972,11 @@
       "kind": "class",
       "module": "stc",
       "name": "SchaffTrendCycle",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "SchaffTrendCycleOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2796,7 +3987,11 @@
       "kind": "class",
       "module": "vortex",
       "name": "Vortex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "VortexOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
@@ -2807,7 +4002,11 @@
       "kind": "class",
       "module": "kst",
       "name": "KnowSureThing",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "KnowSureThingOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2818,7 +4017,11 @@
       "kind": "class",
       "module": "mass_index",
       "name": "MassIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "MassIndexOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2829,7 +4032,11 @@
       "kind": "class",
       "module": "dpo",
       "name": "DetrendedPriceOscillator",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "DetrendedPriceOscillatorOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2840,7 +4047,11 @@
       "kind": "class",
       "module": "cmf",
       "name": "ChaikinMoneyFlow",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ChaikinMoneyFlowOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2851,7 +4062,11 @@
       "kind": "class",
       "module": "vpt",
       "name": "VolumePriceTrend",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "VolumePriceTrendOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2862,7 +4077,11 @@
       "kind": "class",
       "module": "nvi",
       "name": "NegativeVolumeIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "NegativeVolumeIndexOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2873,7 +4092,11 @@
       "kind": "class",
       "module": "pvi",
       "name": "PositiveVolumeIndex",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "PositiveVolumeIndexOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2884,7 +4107,11 @@
       "kind": "class",
       "module": "mcginley_dynamic",
       "name": "McGinleyDynamic",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "McGinleyDynamicOperator",
+        "_Native"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
@@ -2895,7 +4122,254 @@
       "kind": "export",
       "module": "__init__",
       "name": "__version__",
-      "native_binding": false,
+      "native_binding": true,
+      "native_symbols": [
+        "ActiveZoneListOperator",
+        "AlmaOperator",
+        "AmihudOperator",
+        "AverageDailyDollarValueOperator",
+        "AwesomeOscillatorOperator",
+        "BarsSinceOperator",
+        "BreakOfStructureChangeOfCharacterOperator",
+        "CandleAbandonedBaby",
+        "CandleAdvanceBlock",
+        "CandleBeltHold",
+        "CandleBreakaway",
+        "CandleClosingMarubozu",
+        "CandleConcealBabySwall",
+        "CandleCounterAttack",
+        "CandleDarkCloudCover",
+        "CandleDoji",
+        "CandleDojiStar",
+        "CandleDragonflyDoji",
+        "CandleEngulfing",
+        "CandleEveningDojiStar",
+        "CandleEveningStar",
+        "CandleGapSideSideWhite",
+        "CandleGravestoneDoji",
+        "CandleHammer",
+        "CandleHangingMan",
+        "CandleHarami",
+        "CandleHaramiCross",
+        "CandleHighWave",
+        "CandleHikkake",
+        "CandleHikkakeModified",
+        "CandleHomingPigeon",
+        "CandleIdenticalThreeCrows",
+        "CandleInNeck",
+        "CandleInvertedHammer",
+        "CandleKicking",
+        "CandleKickingByLength",
+        "CandleLadderBottom",
+        "CandleLongLeggedDoji",
+        "CandleLongLine",
+        "CandleMarubozu",
+        "CandleMatHold",
+        "CandleMatchingLow",
+        "CandleMorningDojiStar",
+        "CandleMorningStar",
+        "CandleOnNeck",
+        "CandlePiercing",
+        "CandleRickshawman",
+        "CandleRiseFallThreeMethods",
+        "CandleSeparatingLines",
+        "CandleShootingStar",
+        "CandleShortLine",
+        "CandleSpinningTop",
+        "CandleStalledPattern",
+        "CandleStickSandwich",
+        "CandleTakuri",
+        "CandleTasukiGap",
+        "CandleThreeBlackCrows",
+        "CandleThreeInside",
+        "CandleThreeLineStrike",
+        "CandleThreeOutside",
+        "CandleThreeStarsInSouth",
+        "CandleThreeWhiteSoldiers",
+        "CandleThrusting",
+        "CandleTriStar",
+        "CandleTwoCrows",
+        "CandleUniqueThreeRiver",
+        "CandleUpDownSideGapThreeMethods",
+        "CandleUpsideGapTwoCrows",
+        "ChaikinMoneyFlowOperator",
+        "ChaikinVolatilityOperator",
+        "CloseToCloseSigmaOperator",
+        "CommodityChannelIndex",
+        "CrossOperator",
+        "CrossoverOperator",
+        "CrossunderOperator",
+        "CumulativeMaximumOperator",
+        "CumulativeMinimumOperator",
+        "CumulativeProductOperator",
+        "CumulativeSumControlChartOperator",
+        "CumulativeSumOperator",
+        "DetrendedPriceOscillatorOperator",
+        "DonchianOperator",
+        "DrawdownOperator",
+        "EaseOfMovementOperator",
+        "EntryExitOperator",
+        "EqualHighsLowsOperator",
+        "EwmCorrOperator",
+        "EwmCovOperator",
+        "EwmStdOperator",
+        "EwmVarOperator",
+        "ExponentialMovingAverage",
+        "FairValueGapOperator",
+        "FallingOperator",
+        "FisherTransformOperator",
+        "ForceIndexOperator",
+        "FracDiffOperator",
+        "FractalDimensionOperator",
+        "GapDownOperator",
+        "GapUpOperator",
+        "GarmanKlassOperator",
+        "GarmanKlassYangZhangOperator",
+        "HedgeRatioOperator",
+        "HigherHighOperator",
+        "HighestSinceOperator",
+        "HilbertTransformDominantCyclePeriod",
+        "HilbertTransformDominantCyclePhase",
+        "HilbertTransformPhasor",
+        "HilbertTransformSineWave",
+        "HilbertTransformTrendMode",
+        "HmaOperator",
+        "HurstOperator",
+        "IchimokuOperator",
+        "InsideBarOperator",
+        "KalmanHedgeRatioOperator",
+        "KeltnerChannelsOperator",
+        "KnowSureThingOperator",
+        "LagOperator",
+        "LiquidityOperator",
+        "LogReturnOperator",
+        "LowerLowOperator",
+        "LowestSinceOperator",
+        "MassIndexOperator",
+        "McGinleyDynamicOperator",
+        "MinusDirectionalIndicator",
+        "MinusDirectionalMovement",
+        "MoneyFlowIndex",
+        "NegativeVolumeIndexOperator",
+        "OrderBlockOperator",
+        "OrnsteinUhlenbeckHalfLifeOperator",
+        "OutsideBarOperator",
+        "ParkinsonOperator",
+        "PlusDirectionalIndicator",
+        "PlusDirectionalMovement",
+        "PositionHoldOperator",
+        "PositiveVolumeIndexOperator",
+        "PreviousHighLowOperator",
+        "RetracementsOperator",
+        "RisingOperator",
+        "RogersSatchellOperator",
+        "RollSpreadOperator",
+        "RollingAlphaOperator",
+        "RollingAutocorrOperator",
+        "RollingCalmarOperator",
+        "RollingCovOperator",
+        "RollingEntropyOperator",
+        "RollingInformationRatioOperator",
+        "RollingInterquartileRangeOperator",
+        "RollingKurtosisOperator",
+        "RollingMedianOperator",
+        "RollingModeOperator",
+        "RollingPercentileOperator",
+        "RollingQuantileOperator",
+        "RollingRankOperator",
+        "RollingSharpeOperator",
+        "RollingSkewOperator",
+        "RollingSortinoOperator",
+        "RollingWinsorizeOperator",
+        "RollingZScoreOperator",
+        "SchaffTrendCycleOperator",
+        "SessionExtremaOperator",
+        "SessionsOperator",
+        "SignalDelayOperator",
+        "SpreadZScoreOperator",
+        "SqueezeOperator",
+        "SqueezeProOperator",
+        "StatefulAccbands",
+        "StatefulAd",
+        "StatefulAdosc",
+        "StatefulAdx",
+        "StatefulAdxr",
+        "StatefulAnchoredVolumeWeightedAveragePrice",
+        "StatefulApo",
+        "StatefulAroon",
+        "StatefulAroonosc",
+        "StatefulAtr",
+        "StatefulAvgprice",
+        "StatefulBbands",
+        "StatefulBop",
+        "StatefulCmo",
+        "StatefulDema",
+        "StatefulDx",
+        "StatefulEvenBetterSinewave",
+        "StatefulFibonacciRetracement",
+        "StatefulHeikinAshi",
+        "StatefulHtTrendline",
+        "StatefulImi",
+        "StatefulJurikMovingAverage",
+        "StatefulKama",
+        "StatefulKlingerVolumeOscillator",
+        "StatefulLaguerreRelativeStrengthIndex",
+        "StatefulMa",
+        "StatefulMacdExt",
+        "StatefulMacdFix",
+        "StatefulMavp",
+        "StatefulMax",
+        "StatefulMaxindex",
+        "StatefulMedprice",
+        "StatefulMin",
+        "StatefulMinindex",
+        "StatefulMom",
+        "StatefulNatr",
+        "StatefulObv",
+        "StatefulOpeningRange",
+        "StatefulParabolicMovingAverageStop",
+        "StatefulPivotPoints",
+        "StatefulPpo",
+        "StatefulPremiumDiscount",
+        "StatefulRelativeMomentumIndex",
+        "StatefulRoc",
+        "StatefulRocp",
+        "StatefulRocr",
+        "StatefulRocr100",
+        "StatefulRsi",
+        "StatefulSar",
+        "StatefulSarext",
+        "StatefulSessionVolumeLevels",
+        "StatefulSma",
+        "StatefulSmoothedTrendChannel",
+        "StatefulStoch",
+        "StatefulStochf",
+        "StatefulStochrsi",
+        "StatefulSum",
+        "StatefulTema",
+        "StatefulTomDeMarkSequential",
+        "StatefulTrange",
+        "StatefulTrima",
+        "StatefulTypprice",
+        "StatefulVariableIndexDynamicAverage",
+        "StatefulWclprice",
+        "StatefulWillr",
+        "StatefulWma",
+        "SupertrendOperator",
+        "SwingHighLowOperator",
+        "TripleExponentialRateOfChange",
+        "TrueStrengthIndexOperator",
+        "UlcerIndexOperator",
+        "UltimateOscillator",
+        "ValueWhenOperator",
+        "VolumePriceTrendOperator",
+        "VortexOperator",
+        "VwapOperator",
+        "VwmaOperator",
+        "YangZhangOperator",
+        "ZlemaOperator",
+        "session_flags_array"
+      ],
       "pandas_ta_reference": false,
       "rust_export": false,
       "smc_reference": false,
