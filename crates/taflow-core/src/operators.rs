@@ -737,6 +737,9 @@ impl SignalDelay {
 pub struct PositionHold { position: f64, value: Option<f64> }
 impl PositionHold { pub fn new()->Self{Self{position:0.0,value:None}}pub fn append(&mut self,input:f64)->f64{if input!=0.0{self.position=input;}self.value=Some(self.position);self.position}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.position=0.0;self.value=None;}}
 impl Default for PositionHold{fn default()->Self{Self::new()}}
+#[derive(Debug, Clone)] pub struct EntryExit { position:f64, value:Option<f64> }
+impl EntryExit { pub fn new()->Self{Self{position:0.0,value:None}}pub fn append(&mut self,entry:bool,exit:bool)->f64{if entry&&!exit{self.position=1.0}else if exit&&!entry{self.position=-1.0}self.value=Some(self.position);self.position}pub fn value(&self)->Option<f64>{self.value}pub fn reset(&mut self){self.position=0.0;self.value=None;}}
+impl Default for EntryExit{fn default()->Self{Self::new()}}
 
 #[derive(Debug, Clone)]
 pub struct Crossover { previous_left: Option<f64>, previous_right: Option<f64>, value: Option<f64> }
