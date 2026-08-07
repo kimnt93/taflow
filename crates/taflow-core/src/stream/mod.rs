@@ -287,7 +287,7 @@ pub use sma::{SimpleMovingAverage, simple_moving_average};
 pub use stoch::{StochasticOscillator, StochasticOscillatorValue};
 pub use stochf::{FastStochasticOscillator, FastStochasticOscillatorValue};
 pub use stochrsi::{StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue};
-pub use t3::TripleExponentialAverage;
+pub use t3::{TripleExponentialAverage, triple_exponential_average};
 pub use tema::{TripleExponentialMovingAverage, triple_exponential_moving_average};
 pub use trix::TripleExponentialRateOfChange;
 pub use trima::{TriangularMovingAverage, triangular_moving_average};

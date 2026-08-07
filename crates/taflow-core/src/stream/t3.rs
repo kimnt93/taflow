@@ -7,6 +7,12 @@ use crate::error::{TaError, TaResult};
 
 use super::{ExponentialMovingAverage, StreamingIndicator};
 
+/// Computes an aligned Tillson Triple Exponential Average vector.
+pub fn triple_exponential_average(input: &[f64], timeperiod: usize, v_factor: f64) -> TaResult<Vec<f64>> {
+    let mut state = TripleExponentialAverage::new(timeperiod, v_factor)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 /// Incremental TripleExponentialAverage with constant work and storage per appended bar.
 #[derive(Debug, Clone)]
 pub struct TripleExponentialAverage {
