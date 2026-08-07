@@ -213,3 +213,30 @@ status table (done | rs | py | talib).
 - [x] CDLUNIQUE3RIVER
 - [x] CDLUPSIDEGAP2CROWS
 - [x] CDLXSIDEGAP3METHODS
+
+## Source-audit and same-shape additions
+
+These taflow-only functions were implemented after the complete Rust/Python
+source audit. They are not TA-Lib compatibility entries, but they satisfy the
+same persistent, causal, same-shape lifecycle required above.
+
+- [x] `DecayLinear` (canonical alias of `WeightedMovingAverage`)
+- [x] `TimeSeriesRank` (canonical alias of `RollingRank`)
+- [x] `SignedPower`
+- [x] `CumulativeCount`
+- [x] `ExponentiallyWeightedSum`
+- [x] `MathAbs`
+- [x] `MathAcosh`
+- [x] `MathAsinh`
+- [x] `MathAtanh`
+- [x] `MathCbrt`
+- [x] `MathCot`
+- [x] `MathDegrees`
+- [x] `MathLog1p`
+- [x] `MathRadians`
+
+The Rust and PyO3 arithmetic states were also renamed to the canonical public
+spellings: `MathAdd`, `MathSubtract`, `MathMultiply`, and `MathDivide`.
+`RollingApply` remains a deliberate Python execution helper because an
+arbitrary Python callback cannot be represented by a general native Rust
+kernel without changing its contract.

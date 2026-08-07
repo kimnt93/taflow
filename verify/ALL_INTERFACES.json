@@ -588,6 +588,10 @@
     "status": "PASS"
   },
   {
+    "name": "CumulativeCount",
+    "status": "PASS"
+  },
+  {
     "name": "RollingMedian",
     "status": "PASS"
   },
@@ -712,7 +716,15 @@
     "status": "PASS"
   },
   {
+    "name": "MathAbs",
+    "status": "PASS"
+  },
+  {
     "name": "MathAcos",
+    "status": "PASS"
+  },
+  {
+    "name": "MathAcosh",
     "status": "PASS"
   },
   {
@@ -720,7 +732,19 @@
     "status": "PASS"
   },
   {
+    "name": "MathAsinh",
+    "status": "PASS"
+  },
+  {
     "name": "MathAtan",
+    "status": "PASS"
+  },
+  {
+    "name": "MathAtanh",
+    "status": "PASS"
+  },
+  {
+    "name": "MathCbrt",
     "status": "PASS"
   },
   {
@@ -733,6 +757,14 @@
   },
   {
     "name": "MathCosh",
+    "status": "PASS"
+  },
+  {
+    "name": "MathCot",
+    "status": "PASS"
+  },
+  {
+    "name": "MathDegrees",
     "status": "PASS"
   },
   {
@@ -749,6 +781,14 @@
   },
   {
     "name": "MathLog10",
+    "status": "PASS"
+  },
+  {
+    "name": "MathLog1p",
+    "status": "PASS"
+  },
+  {
+    "name": "MathRadians",
     "status": "PASS"
   },
   {
@@ -789,6 +829,10 @@
   },
   {
     "name": "ExponentiallyWeightedVariance",
+    "status": "PASS"
+  },
+  {
+    "name": "ExponentiallyWeightedSum",
     "status": "PASS"
   },
   {
@@ -1153,6 +1197,18 @@
   },
   {
     "name": "McGinleyDynamic",
+    "status": "PASS"
+  },
+  {
+    "name": "DecayLinear",
+    "status": "PASS"
+  },
+  {
+    "name": "SignedPower",
+    "status": "PASS"
+  },
+  {
+    "name": "TimeSeriesRank",
     "status": "PASS"
   }
 ]

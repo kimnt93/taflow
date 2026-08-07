@@ -2172,21 +2172,30 @@ macro_rules! unary_state_class {
     };
 }
 
-unary_state_class!(StatefulAcos, Acos);
-unary_state_class!(StatefulAsin, Asin);
-unary_state_class!(StatefulAtan, Atan);
-unary_state_class!(StatefulCeil, Ceil);
-unary_state_class!(StatefulCos, Cos);
-unary_state_class!(StatefulCosh, Cosh);
-unary_state_class!(StatefulExp, Exp);
-unary_state_class!(StatefulFloor, Floor);
-unary_state_class!(StatefulLn, Ln);
-unary_state_class!(StatefulLog10, Log10);
-unary_state_class!(StatefulSin, Sin);
-unary_state_class!(StatefulSinh, Sinh);
-unary_state_class!(StatefulSqrt, Sqrt);
-unary_state_class!(StatefulTan, Tan);
-unary_state_class!(StatefulTanh, Tanh);
+unary_state_class!(StatefulMathAbs, MathAbs);
+unary_state_class!(StatefulMathAcos, MathAcos);
+unary_state_class!(StatefulMathAcosh, MathAcosh);
+unary_state_class!(StatefulMathAsin, MathAsin);
+unary_state_class!(StatefulMathAsinh, MathAsinh);
+unary_state_class!(StatefulMathAtan, MathAtan);
+unary_state_class!(StatefulMathAtanh, MathAtanh);
+unary_state_class!(StatefulMathCbrt, MathCbrt);
+unary_state_class!(StatefulMathCeil, MathCeil);
+unary_state_class!(StatefulMathCos, MathCos);
+unary_state_class!(StatefulMathCosh, MathCosh);
+unary_state_class!(StatefulMathCot, MathCot);
+unary_state_class!(StatefulMathDegrees, MathDegrees);
+unary_state_class!(StatefulMathExp, MathExp);
+unary_state_class!(StatefulMathFloor, MathFloor);
+unary_state_class!(StatefulMathLn, MathLn);
+unary_state_class!(StatefulMathLog10, MathLog10);
+unary_state_class!(StatefulMathLog1p, MathLog1p);
+unary_state_class!(StatefulMathRadians, MathRadians);
+unary_state_class!(StatefulMathSin, MathSin);
+unary_state_class!(StatefulMathSinh, MathSinh);
+unary_state_class!(StatefulMathSqrt, MathSqrt);
+unary_state_class!(StatefulMathTan, MathTan);
+unary_state_class!(StatefulMathTanh, MathTanh);
 
 macro_rules! binary_state_class {
     ($class:ident, $inner:ident) => {
@@ -2238,10 +2247,10 @@ macro_rules! binary_state_class {
     };
 }
 
-binary_state_class!(StatefulAdd, Add);
-binary_state_class!(StatefulSub, Sub);
-binary_state_class!(StatefulMult, Mult);
-binary_state_class!(StatefulDiv, Div);
+binary_state_class!(StatefulMathAdd, MathAdd);
+binary_state_class!(StatefulMathSubtract, MathSubtract);
+binary_state_class!(StatefulMathMultiply, MathMultiply);
+binary_state_class!(StatefulMathDivide, MathDivide);
 binary_state_class!(StatefulMedprice, MedianPrice);
 
 macro_rules! price3_state_class {

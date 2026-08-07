@@ -1,8 +1,10 @@
 //! Batch implementation for `time_series_rank`.
 
-use super::operator_states::*;
 use super::rolling_rank::rolling_rank;
-use crate::error::{TaError, TaResult};
+use crate::error::TaResult;
+
+/// Canonical WorldQuant name for the existing causal rolling-rank state.
+pub type TimeSeriesRank = super::operator_states::RollingRank;
 
 /// WorldQuant Alpha101 time-series rank: the rank of the current value within
 /// the trailing `d`-bar window as a fraction in `(0, 1]`. Shares the rolling

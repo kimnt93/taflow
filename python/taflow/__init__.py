@@ -108,9 +108,10 @@ from .pivot_points import PivotPoints
 from . import executions
 from . import op
 from .math_transform import (
-    MathAcos, MathAsin, MathAtan, MathCeil, MathCos, MathCosh, MathExp,
-    MathFloor, MathLn, MathLog10, MathSin, MathSinh, MathSqrt, MathTan,
-    MathTanh,
+    MathAbs, MathAcos, MathAcosh, MathAsin, MathAsinh, MathAtan, MathAtanh,
+    MathCbrt, MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathExp,
+    MathFloor, MathLn, MathLog10, MathLog1p, MathRadians, MathSin, MathSinh,
+    MathSqrt, MathTan, MathTanh,
     MathAdd, MathSubtract, MathMultiply, MathDivide,
 )
 from .rolling_std import RollingStandardDeviation
@@ -164,6 +165,7 @@ from .lag import Lag
 from .log_return import LogReturn
 from .cumulative_sum import CumulativeSum
 from .cumulative_product import CumulativeProduct
+from .cumulative_count import CumulativeCount
 from .rolling_median import RollingMedian
 from .rolling_min import RollingMin
 from .rolling_max import RollingMax
@@ -181,6 +183,7 @@ from .rolling_iqr import RollingInterquartileRange
 from .rolling_cov import RollingCov
 from .rolling_winsorize import RollingWinsorize
 from .ewm_var import ExponentiallyWeightedVariance
+from .ewm_sum import ExponentiallyWeightedSum
 from .ewm_std import ExponentiallyWeightedStandardDeviation
 from .ewm_cov import ExponentiallyWeightedCovariance
 from .ewm_corr import ExponentiallyWeightedCorrelation
@@ -264,6 +267,9 @@ from .vpt import VolumePriceTrend
 from .nvi import NegativeVolumeIndex
 from .pvi import PositiveVolumeIndex
 from .mcginley_dynamic import McGinleyDynamic
+from .decay_linear import DecayLinear
+from .signed_power import SignedPower
+from .time_series_rank import TimeSeriesRank
 
 __all__ = [
     "MovingAverage",
@@ -406,6 +412,7 @@ __all__ = [
     "LogReturn",
     "CumulativeSum",
     "CumulativeProduct",
+    "CumulativeCount",
     "RollingMedian",
     "RollingMin",
     "RollingMax",
@@ -429,11 +436,14 @@ __all__ = [
     "RollingTimeSeriesForecast", "RollingBeta", "RollingCorrelation",
     "MesaAdaptiveMovingAverage",
     "RollingMinMax", "RollingMinMaxIndex",
-    "MathAcos", "MathAsin", "MathAtan", "MathCeil", "MathCos", "MathCosh",
-    "MathExp", "MathFloor", "MathLn", "MathLog10", "MathSin", "MathSinh",
-    "MathSqrt", "MathTan", "MathTanh",
+    "MathAbs", "MathAcos", "MathAcosh", "MathAsin", "MathAsinh",
+    "MathAtan", "MathAtanh", "MathCbrt", "MathCeil", "MathCos",
+    "MathCosh", "MathCot", "MathDegrees", "MathExp", "MathFloor",
+    "MathLn", "MathLog10", "MathLog1p", "MathRadians", "MathSin",
+    "MathSinh", "MathSqrt", "MathTan", "MathTanh",
     "MathAdd", "MathSubtract", "MathMultiply", "MathDivide",
     "ExponentiallyWeightedVariance",
+    "ExponentiallyWeightedSum",
     "ExponentiallyWeightedStandardDeviation",
     "ExponentiallyWeightedCovariance",
     "ExponentiallyWeightedCorrelation",
@@ -526,6 +536,9 @@ __all__ = [
     "NegativeVolumeIndex",
     "PositiveVolumeIndex",
     "McGinleyDynamic",
+    "DecayLinear",
+    "SignedPower",
+    "TimeSeriesRank",
     "op",
     "__version__",
 ]

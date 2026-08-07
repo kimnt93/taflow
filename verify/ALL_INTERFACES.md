@@ -2,7 +2,7 @@
 
 Indicator oracle: constructor history == native `extend` history == one-bar `append` history; helper functions also receive smoke checks.
 
-- Passed: **289**
+- Passed: **303**
 - Failed: **0**
 
 | Interface | Status | Error |
@@ -154,6 +154,7 @@ Indicator oracle: constructor history == native `extend` history == one-bar `app
 | `LogReturn` | PASS |  |
 | `CumulativeSum` | PASS |  |
 | `CumulativeProduct` | PASS |  |
+| `CumulativeCount` | PASS |  |
 | `RollingMedian` | PASS |  |
 | `RollingMin` | PASS |  |
 | `RollingMax` | PASS |  |
@@ -185,16 +186,25 @@ Indicator oracle: constructor history == native `extend` history == one-bar `app
 | `MesaAdaptiveMovingAverage` | PASS |  |
 | `RollingMinMax` | PASS |  |
 | `RollingMinMaxIndex` | PASS |  |
+| `MathAbs` | PASS |  |
 | `MathAcos` | PASS |  |
+| `MathAcosh` | PASS |  |
 | `MathAsin` | PASS |  |
+| `MathAsinh` | PASS |  |
 | `MathAtan` | PASS |  |
+| `MathAtanh` | PASS |  |
+| `MathCbrt` | PASS |  |
 | `MathCeil` | PASS |  |
 | `MathCos` | PASS |  |
 | `MathCosh` | PASS |  |
+| `MathCot` | PASS |  |
+| `MathDegrees` | PASS |  |
 | `MathExp` | PASS |  |
 | `MathFloor` | PASS |  |
 | `MathLn` | PASS |  |
 | `MathLog10` | PASS |  |
+| `MathLog1p` | PASS |  |
+| `MathRadians` | PASS |  |
 | `MathSin` | PASS |  |
 | `MathSinh` | PASS |  |
 | `MathSqrt` | PASS |  |
@@ -205,6 +215,7 @@ Indicator oracle: constructor history == native `extend` history == one-bar `app
 | `MathMultiply` | PASS |  |
 | `MathDivide` | PASS |  |
 | `ExponentiallyWeightedVariance` | PASS |  |
+| `ExponentiallyWeightedSum` | PASS |  |
 | `ExponentiallyWeightedStandardDeviation` | PASS |  |
 | `ExponentiallyWeightedCovariance` | PASS |  |
 | `ExponentiallyWeightedCorrelation` | PASS |  |
@@ -296,3 +307,6 @@ Indicator oracle: constructor history == native `extend` history == one-bar `app
 | `NegativeVolumeIndex` | PASS |  |
 | `PositiveVolumeIndex` | PASS |  |
 | `McGinleyDynamic` | PASS |  |
+| `DecayLinear` | PASS |  |
+| `SignedPower` | PASS |  |
+| `TimeSeriesRank` | PASS |  |

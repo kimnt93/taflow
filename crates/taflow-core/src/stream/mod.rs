@@ -118,10 +118,12 @@ mod session_flags;
 mod statistic;
 mod volume_states;
 pub use session_flags::session_flags;
+mod cumulative_count;
 mod cumulative_maximum;
 mod cumulative_minimum;
 mod cumulative_product;
 mod cumulative_sum;
+pub use cumulative_count::{cumulative_count, CumulativeCount};
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
 pub use cumulative_product::CumulativeProduct;
@@ -281,8 +283,10 @@ pub use mama::{
 };
 pub use math_operator::rolling_sum;
 pub use math_price::{
-    Acos, Add, Asin, Atan, AveragePrice, Ceil, Cos, Cosh, Div, Exp, Floor, Ln, Log10, MedianPrice,
-    Mult, Sin, Sinh, Sqrt, Sub, Tan, Tanh, TypicalPrice, WeightedClose,
+    AveragePrice, MathAbs, MathAcos, MathAcosh, MathAdd, MathAsin, MathAsinh, MathAtan, MathAtanh,
+    MathCbrt, MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathDivide, MathExp, MathFloor,
+    MathLn, MathLog10, MathLog1p, MathMultiply, MathRadians, MathSin, MathSinh, MathSqrt,
+    MathSubtract, MathTan, MathTanh, MedianPrice, TypicalPrice, WeightedClose,
 };
 pub use mavp::{variable_period_moving_average, VariablePeriodMovingAverage};
 pub use mfi::{money_flow_index, MoneyFlowIndex};
@@ -597,25 +601,39 @@ mod tests {
                 let expected = $batch(&input);
                 let mut state = <$state>::new();
                 for (value, expected) in input.iter().zip(expected) {
-                    assert_optional_eq(state.append(*value), expected);
+                    let actual = state.append(*value).expect("pointwise states are warm");
+                    if expected.is_nan() {
+                        assert!(actual.is_nan());
+                    } else {
+                        assert_eq!(actual, expected);
+                    }
                 }
             }};
         }
-        check_unary!(Acos, crate::stream::acos);
-        check_unary!(Asin, crate::stream::asin);
-        check_unary!(Atan, crate::stream::atan);
-        check_unary!(Ceil, crate::stream::ceil);
-        check_unary!(Cos, crate::stream::cos);
-        check_unary!(Cosh, crate::stream::cosh);
-        check_unary!(Exp, crate::stream::exp);
-        check_unary!(Floor, crate::stream::floor);
-        check_unary!(Ln, crate::stream::ln);
-        check_unary!(Log10, crate::stream::log10);
-        check_unary!(Sin, crate::stream::sin);
-        check_unary!(Sinh, crate::stream::sinh);
-        check_unary!(Sqrt, crate::stream::sqrt);
-        check_unary!(Tan, crate::stream::tan);
-        check_unary!(Tanh, crate::stream::tanh);
+        check_unary!(MathAbs, crate::stream::abs);
+        check_unary!(MathAcos, crate::stream::acos);
+        check_unary!(MathAcosh, crate::stream::acosh);
+        check_unary!(MathAsin, crate::stream::asin);
+        check_unary!(MathAsinh, crate::stream::asinh);
+        check_unary!(MathAtan, crate::stream::atan);
+        check_unary!(MathAtanh, crate::stream::atanh);
+        check_unary!(MathCbrt, crate::stream::cbrt);
+        check_unary!(MathCeil, crate::stream::ceil);
+        check_unary!(MathCos, crate::stream::cos);
+        check_unary!(MathCosh, crate::stream::cosh);
+        check_unary!(MathCot, crate::stream::cot);
+        check_unary!(MathDegrees, crate::stream::degrees);
+        check_unary!(MathExp, crate::stream::exp);
+        check_unary!(MathFloor, crate::stream::floor);
+        check_unary!(MathLn, crate::stream::ln);
+        check_unary!(MathLog10, crate::stream::log10);
+        check_unary!(MathLog1p, crate::stream::log1p);
+        check_unary!(MathRadians, crate::stream::radians);
+        check_unary!(MathSin, crate::stream::sin);
+        check_unary!(MathSinh, crate::stream::sinh);
+        check_unary!(MathSqrt, crate::stream::sqrt);
+        check_unary!(MathTan, crate::stream::tan);
+        check_unary!(MathTanh, crate::stream::tanh);
 
         macro_rules! check_binary {
             ($state:ty, $batch:path) => {{
@@ -626,10 +644,10 @@ mod tests {
                 }
             }};
         }
-        check_binary!(Add, crate::stream::add);
-        check_binary!(Sub, crate::stream::sub);
-        check_binary!(Mult, crate::stream::mult);
-        check_binary!(Div, crate::stream::div);
+        check_binary!(MathAdd, crate::stream::add);
+        check_binary!(MathSubtract, crate::stream::sub);
+        check_binary!(MathMultiply, crate::stream::mult);
+        check_binary!(MathDivide, crate::stream::div);
 
         let open = &input;
         let high: Vec<_> = input.iter().map(|value| value + 0.2).collect();
@@ -936,18 +954,32 @@ mod tests {
         assert_eq!(first, second);
     }
 }
+mod abs;
+pub use abs::abs;
 mod acos;
 pub use acos::acos;
+mod acosh;
+pub use acosh::acosh;
 mod asin;
 pub use asin::asin;
+mod asinh;
+pub use asinh::asinh;
 mod atan;
 pub use atan::atan;
+mod atanh;
+pub use atanh::atanh;
+mod cbrt;
+pub use cbrt::cbrt;
 mod ceil;
 pub use ceil::ceil;
 mod cos;
 pub use cos::cos;
 mod cosh;
 pub use cosh::cosh;
+mod cot;
+pub use cot::cot;
+mod degrees;
+pub use degrees::degrees;
 mod exp;
 pub use exp::exp;
 mod floor;
@@ -956,6 +988,10 @@ mod ln;
 pub use ln::ln;
 mod log10;
 pub use log10::log10;
+mod log1p;
+pub use log1p::log1p;
+mod radians;
+pub use radians::radians;
 mod sin;
 pub use sin::sin;
 mod sinh;
@@ -1061,11 +1097,11 @@ pub use garman_klass_yang_zhang::garman_klass_yang_zhang;
 mod yang_zhang;
 pub use yang_zhang::yang_zhang;
 mod time_series_rank;
-pub use time_series_rank::time_series_rank;
+pub use time_series_rank::{time_series_rank, TimeSeriesRank};
 mod signed_power;
-pub use signed_power::signed_power;
+pub use signed_power::{signed_power, SignedPower};
 mod decay_linear;
-pub use decay_linear::decay_linear;
+pub use decay_linear::{decay_linear, DecayLinear};
 mod average_daily_dollar_value;
 pub use average_daily_dollar_value::average_daily_dollar_value;
 mod amihud;
@@ -1118,6 +1154,8 @@ mod rolling_winsorize;
 pub use rolling_winsorize::rolling_winsorize;
 mod ewm_var;
 pub use ewm_var::ewm_var;
+mod ewm_sum;
+pub use ewm_sum::{ewm_sum, ExponentiallyWeightedSum};
 mod ewm_std;
 pub use ewm_std::ewm_std;
 mod ewm_cov;

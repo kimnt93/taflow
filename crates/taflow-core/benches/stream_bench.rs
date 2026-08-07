@@ -501,21 +501,30 @@ fn append_benchmark(criterion: &mut Criterion) {
             });
         };
     }
-    bench_unary!("acos", Acos);
-    bench_unary!("asin", Asin);
-    bench_unary!("atan", Atan);
-    bench_unary!("ceil", Ceil);
-    bench_unary!("cos", Cos);
-    bench_unary!("cosh", Cosh);
-    bench_unary!("exp", Exp);
-    bench_unary!("floor", Floor);
-    bench_unary!("ln", Ln);
-    bench_unary!("log10", Log10);
-    bench_unary!("sin", Sin);
-    bench_unary!("sinh", Sinh);
-    bench_unary!("sqrt", Sqrt);
-    bench_unary!("tan", Tan);
-    bench_unary!("tanh", Tanh);
+    bench_unary!("abs", MathAbs);
+    bench_unary!("acos", MathAcos);
+    bench_unary!("acosh", MathAcosh);
+    bench_unary!("asin", MathAsin);
+    bench_unary!("asinh", MathAsinh);
+    bench_unary!("atan", MathAtan);
+    bench_unary!("atanh", MathAtanh);
+    bench_unary!("cbrt", MathCbrt);
+    bench_unary!("ceil", MathCeil);
+    bench_unary!("cos", MathCos);
+    bench_unary!("cosh", MathCosh);
+    bench_unary!("cot", MathCot);
+    bench_unary!("degrees", MathDegrees);
+    bench_unary!("exp", MathExp);
+    bench_unary!("floor", MathFloor);
+    bench_unary!("ln", MathLn);
+    bench_unary!("log10", MathLog10);
+    bench_unary!("log1p", MathLog1p);
+    bench_unary!("radians", MathRadians);
+    bench_unary!("sin", MathSin);
+    bench_unary!("sinh", MathSinh);
+    bench_unary!("sqrt", MathSqrt);
+    bench_unary!("tan", MathTan);
+    bench_unary!("tanh", MathTanh);
 
     macro_rules! bench_binary {
         ($name:literal, $state:ident) => {
@@ -532,10 +541,10 @@ fn append_benchmark(criterion: &mut Criterion) {
             });
         };
     }
-    bench_binary!("add", Add);
-    bench_binary!("sub", Sub);
-    bench_binary!("mult", Mult);
-    bench_binary!("div", Div);
+    bench_binary!("add", MathAdd);
+    bench_binary!("sub", MathSubtract);
+    bench_binary!("mult", MathMultiply);
+    bench_binary!("div", MathDivide);
     bench_binary!("medprice", Medprice);
 
     group.bench_function(BenchmarkId::new("avgprice", updates.len()), |bench| {

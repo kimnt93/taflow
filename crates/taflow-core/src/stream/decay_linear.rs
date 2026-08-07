@@ -1,7 +1,9 @@
 //! Batch implementation for `decay_linear`.
 
-use super::operator_states::*;
-use crate::error::{TaError, TaResult};
+use crate::error::TaResult;
+
+/// Canonical WorldQuant name for the linearly weighted moving-average state.
+pub type DecayLinear = super::WeightedMovingAverage;
 
 /// WorldQuant Alpha101 `decay_linear(x, d)`: verified alias of the weighted
 /// Compute the decay linear result for the supplied aligned series.

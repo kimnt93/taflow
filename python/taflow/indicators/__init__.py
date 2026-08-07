@@ -81,6 +81,7 @@ from ..lag import Lag
 from ..log_return import LogReturn
 from ..cumulative_sum import CumulativeSum
 from ..cumulative_product import CumulativeProduct
+from ..cumulative_count import CumulativeCount
 from ..rolling_median import RollingMedian
 from ..rolling_mode import RollingMode
 from ..rolling_quantile import RollingQuantile
@@ -93,6 +94,7 @@ from ..rolling_iqr import RollingInterquartileRange
 from ..rolling_cov import RollingCov
 from ..rolling_winsorize import RollingWinsorize
 from ..ewm_var import ExponentiallyWeightedVariance
+from ..ewm_sum import ExponentiallyWeightedSum
 from ..ewm_std import ExponentiallyWeightedStandardDeviation
 from ..ewm_cov import ExponentiallyWeightedCovariance
 from ..ewm_corr import ExponentiallyWeightedCorrelation
@@ -119,9 +121,10 @@ from ..cross import Cross
 from ..rising import Rising
 from ..falling import Falling
 from ..math_transform import (
-    MathAcos, MathAsin, MathAtan, MathCeil, MathCos, MathCosh, MathExp,
-    MathFloor, MathLn, MathLog10, MathSin, MathSinh, MathSqrt, MathTan,
-    MathTanh,
+    MathAbs, MathAcos, MathAcosh, MathAsin, MathAsinh, MathAtan, MathAtanh,
+    MathCbrt, MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathExp,
+    MathFloor, MathLn, MathLog10, MathLog1p, MathRadians, MathSin, MathSinh,
+    MathSqrt, MathTan, MathTanh,
     MathAdd, MathSubtract, MathMultiply, MathDivide,
 )
 from ..statistics import (
@@ -132,6 +135,9 @@ from ..statistics import (
     RollingTimeSeriesForecast, RollingVariance,
     RollingMinMax, RollingMinMaxIndex,
 )
+from ..decay_linear import DecayLinear
+from ..signed_power import SignedPower
+from ..time_series_rank import TimeSeriesRank
 from ..vwap import RollingVolumeWeightedAveragePrice
 from ..force_index import ForceIndex
 from ..ease_of_movement import EaseOfMovement
@@ -253,6 +259,7 @@ __all__ = [
     "LogReturn",
     "CumulativeSum",
     "CumulativeProduct",
+    "CumulativeCount",
     "RollingMedian",
     "RollingMode",
     "RollingQuantile",
@@ -265,6 +272,7 @@ __all__ = [
     "RollingCov",
     "RollingWinsorize",
     "ExponentiallyWeightedVariance",
+    "ExponentiallyWeightedSum",
     "ExponentiallyWeightedStandardDeviation",
     "ExponentiallyWeightedCovariance",
     "ExponentiallyWeightedCorrelation",
@@ -335,4 +343,7 @@ __all__ = [
     "RogersSatchell",
     "GarmanKlassYangZhang",
     "YangZhang",
+    "DecayLinear",
+    "SignedPower",
+    "TimeSeriesRank",
 ]

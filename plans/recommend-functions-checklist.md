@@ -172,6 +172,25 @@ tier does not (see non-goals).
 | [x] | Amihud illiquidity | Amihud (2002), *J. Fin. Markets* 5:31-56 | O(1): rolling mean of `|ret|/(close×volume)` — `Sma` composition. |
 | [x] | Roll spread | Roll (1984), *J. Finance* 39:1127-1139 | O(1): `2√max(0, −cov(Δp_t, Δp_{t−1}))` via `RollingPairMoments`. |
 
+## P8 — Polars-aligned same-shape computations
+
+Reviewed against the current Polars Series computation API. These operations
+return aligned series, are causal/chunk-invariant, and now have persistent Rust
+state plus canonical Python classes.
+
+- [x] `MathAbs`, `MathAcosh`, `MathAsinh`, `MathAtanh`
+- [x] `MathCbrt`, `MathCot`, `MathDegrees`, `MathRadians`, `MathLog1p`
+- [x] `CumulativeCount`
+- [x] `ExponentiallyWeightedSum`
+- [x] Complete the Rust-only surfaces as `DecayLinear`, `SignedPower`, and
+      `TimeSeriesRank` Python classes.
+
+`RollingApply` remains an explicitly Python-only execution helper because its
+input is an arbitrary Python callback rather than a serializable native
+reducer. Polars `*_by`, scalar reductions, index-returning operations, global
+rank, and future-dependent peak markers remain outside the causal same-shape
+contract.
+
 ## Out of scope under the same-size series contract (explicit non-goals)
 
 Do **not** implement these in the indicator API; revisit only if taflow
