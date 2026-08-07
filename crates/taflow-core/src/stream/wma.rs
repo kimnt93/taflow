@@ -4,6 +4,12 @@ use crate::error::TaResult;
 
 use super::{StreamingIndicator, Window};
 
+/// Computes an aligned Weighted Moving Average vector.
+pub fn weighted_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
+    let mut state = WeightedMovingAverage::new(timeperiod)?;
+    Ok(input.iter().map(|&value| state.append(value).unwrap_or(f64::NAN)).collect())
+}
+
 /// Stateful weighted moving average with O(1) updates.
 #[derive(Debug, Clone)]
 pub struct WeightedMovingAverage {
