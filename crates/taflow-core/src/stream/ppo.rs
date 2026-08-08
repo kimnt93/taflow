@@ -63,6 +63,62 @@ impl PercentagePriceOscillator {
 impl StreamingIndicator for PercentagePriceOscillator {
     type Output = f64;
 
+    /// Bulk kernel. For the EMA MA type the warm steady state advances both
+    /// EMA recurrences in one loop with the scalar states held in locals;
+    /// other MA types fall back to a per-bar loop with no per-bar allocation.
+    /// Bit-identical to per-bar [`Self::append`] in outputs and post-run state.
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        output.reserve(inputs.len());
+        let mut index = 0;
+        if self.fast.is_ema() && self.slow.is_ema() {
+            // Warm-up prologue: per-bar appends until the slow EMA is seeded.
+            // (`self.value` is not a warm gate here: it stays `None` whenever
+            // the slow average is exactly zero.)
+            while index < inputs.len()
+                && self
+                    .slow
+                    .as_ema_mut()
+                    .expect("EMA slow state")
+                    .current()
+                    .is_none()
+            {
+                output.push(self.append(inputs[index]).unwrap_or(f64::NAN));
+                index += 1;
+            }
+            if index < inputs.len() {
+                let (fast_k, mut fast) = {
+                    let state = self.fast.as_ema_mut().expect("EMA fast state");
+                    (state.smoothing(), state.current().expect("warm fast EMA"))
+                };
+                let (slow_k, mut slow) = {
+                    let state = self.slow.as_ema_mut().expect("EMA slow state");
+                    (state.smoothing(), state.current().expect("warm slow EMA"))
+                };
+                let mut last = None;
+                for &input in &inputs[index..] {
+                    fast = fast_k.mul_add(input - fast, fast);
+                    slow = slow_k.mul_add(input - slow, slow);
+                    last = (slow != 0.0).then_some((fast - slow) / slow * 100.0);
+                    output.push(last.unwrap_or(f64::NAN));
+                }
+                let appended = inputs.len() - index;
+                self.fast
+                    .as_ema_mut()
+                    .expect("EMA fast state")
+                    .store_bulk_state(fast, appended);
+                self.slow
+                    .as_ema_mut()
+                    .expect("EMA slow state")
+                    .store_bulk_state(slow, appended);
+                self.value = last;
+            }
+            return;
+        }
+        for &input in &inputs[index..] {
+            output.push(self.append(input).unwrap_or(f64::NAN));
+        }
+    }
+
     fn append(&mut self, input: f64) -> Option<f64> {
         let fast = self.fast.append(input);
         let slow = self.slow.append(input);
@@ -86,6 +142,63 @@ impl StreamingIndicator for PercentagePriceOscillator {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    #[test]
+    fn bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = lcg_series(5_000, 0x5EED_9905);
+        let tail = lcg_series(128, 0x7A11_9905);
+        let combos = [
+            (12usize, 26usize, MaType::ExponentialMovingAverage),
+            (2, 2, MaType::ExponentialMovingAverage),
+            (1, 5, MaType::ExponentialMovingAverage),
+            (3, 10, MaType::ExponentialMovingAverage),
+            (7, 13, MaType::SimpleMovingAverage),
+        ];
+        for (fast, slow, ma_type) in combos {
+            let mut per_bar = PercentagePriceOscillator::new(fast, slow, ma_type).unwrap();
+            let reference: Vec<f64> = input
+                .iter()
+                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
+                .collect();
+            let tail_reference: Vec<f64> = tail
+                .iter()
+                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
+                .collect();
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state = PercentagePriceOscillator::new(fast, slow, ma_type).unwrap();
+                let mut out = Vec::new();
+                for piece in input.chunks(chunk.min(input.len())) {
+                    state.extend_slice_into(piece, &mut out);
+                }
+                let label = format!("{fast}/{slow} chunk {chunk}");
+                assert_same_bits(&out, &reference, &label);
+                let tail_out: Vec<f64> = tail
+                    .iter()
+                    .map(|&x| state.append(x).unwrap_or(f64::NAN))
+                    .collect();
+                assert_same_bits(&tail_out, &tail_reference, &format!("{label} tail"));
+            }
+        }
+    }
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {

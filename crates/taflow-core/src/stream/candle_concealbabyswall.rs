@@ -10,12 +10,6 @@ struct Candle {
     c: f64,
 }
 impl Candle {
-    fn body(self) -> f64 {
-        (self.c - self.o).abs()
-    }
-    fn range(self) -> f64 {
-        self.h - self.l
-    }
     fn upper(self) -> f64 {
         self.h - self.o.max(self.c)
     }
@@ -34,6 +28,7 @@ impl Candle {
 /// Consumes causal OHLC bars and returns an aligned pattern score.
 pub struct CandleConcealBabySwall {
     candles: VecDeque<Candle>,
+    shadow_sum: [f64; 2],
     value: Option<i32>,
 }
 impl Default for CandleConcealBabySwall {
@@ -50,6 +45,7 @@ impl CandleConcealBabySwall {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(13),
+            shadow_sum: [0.0; 2],
             value: None,
         }
     }
@@ -60,19 +56,18 @@ impl CandleConcealBabySwall {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
+        // Deque holds bars i-13..=i-1; bar j maps to index 13 - (i - j).
         let value = if self.candles.len() == 13 {
-            let a = self.candles[10];
-            let b = self.candles[11];
-            let cnd = self.candles[12];
-            let s0 = self.candles.iter().take(10).map(|x| x.range()).sum::<f64>() * 0.01;
-            let s1 = self
-                .candles
-                .iter()
-                .skip(1)
-                .take(10)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.01;
+            let a = self.candles[10]; // bar i-3
+            let b = self.candles[11]; // bar i-2
+            let cnd = self.candles[12]; // bar i-1
+            let s0 = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[0], a.h, a.l);
+            let s1 = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[1], b.h, b.l);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
+            self.shadow_sum[0] += cr_highlow_scalar(a.h, a.l)
+                - cr_highlow_scalar(self.candles[0].h, self.candles[0].l);
+            self.shadow_sum[1] += cr_highlow_scalar(b.h, b.l)
+                - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
             Some(
                 (a.color() == -1
                     && b.color() == -1
@@ -89,6 +84,14 @@ impl CandleConcealBabySwall {
                     * 100,
             )
         } else {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if i < 10 {
+                self.shadow_sum[0] += cr_highlow_scalar(h, l);
+            }
+            if (1..11).contains(&i) {
+                self.shadow_sum[1] += cr_highlow_scalar(h, l);
+            }
             None
         };
         if self.candles.len() == 13 {
@@ -98,6 +101,53 @@ impl CandleConcealBabySwall {
         self.value = value;
         value
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.candles.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_conceal_baby_swall(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -108,7 +158,9 @@ impl CandleConcealBabySwall {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new();
+        self.candles.clear();
+        self.shadow_sum = [0.0; 2];
+        self.value = None;
     }
 }
 
@@ -152,7 +204,7 @@ pub fn candle_conceal_baby_swall(
         let bar = start - 3 + k;
         if bar >= SHADOW_VERY_SHORT.avg_period {
             for j in (bar - SHADOW_VERY_SHORT.avg_period)..bar {
-                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, j);
+                shadow_sum[k] += cr_highlow(open, high, low, close, j);
             }
         }
     }
@@ -163,10 +215,10 @@ pub fn candle_conceal_baby_swall(
             && candle_color(open[i-1], close[i-1]) == -1
             && candle_color(open[i], close[i]) == -1
             // 1st and 2nd: marubozu (very short shadows)
-            && upper_shadow(open[i-3], high[i-3], close[i-3]) < ca(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i-3)
-            && lower_shadow(open[i-3], low[i-3], close[i-3]) < ca(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i-3)
-            && upper_shadow(open[i-2], high[i-2], close[i-2]) < ca(SHADOW_VERY_SHORT, shadow_sum[1], open, high, low, close, i-2)
-            && lower_shadow(open[i-2], low[i-2], close[i-2]) < ca(SHADOW_VERY_SHORT, shadow_sum[1], open, high, low, close, i-2)
+            && upper_shadow(open[i-3], high[i-3], close[i-3]) < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i-3)
+            && lower_shadow(open[i-3], low[i-3], close[i-3]) < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i-3)
+            && upper_shadow(open[i-2], high[i-2], close[i-2]) < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[1], open, high, low, close, i-2)
+            && lower_shadow(open[i-2], low[i-2], close[i-2]) < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[1], open, high, low, close, i-2)
             // 3rd: gaps down, upper shadow into 2nd body
             && real_body_gap_down(open, close, i-1, i-2)
             && high[i-1] > close[i-2]
@@ -176,15 +228,8 @@ pub fn candle_conceal_baby_swall(
         for k in 0..4 {
             let bar = i - 3 + k;
             if SHADOW_VERY_SHORT.avg_period > 0 && bar >= SHADOW_VERY_SHORT.avg_period {
-                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, bar)
-                    - cr(
-                        SHADOW_VERY_SHORT,
-                        open,
-                        high,
-                        low,
-                        close,
-                        bar - SHADOW_VERY_SHORT.avg_period,
-                    );
+                shadow_sum[k] += cr_highlow(open, high, low, close, bar)
+                    - cr_highlow(open, high, low, close, bar - SHADOW_VERY_SHORT.avg_period);
             }
         }
     }

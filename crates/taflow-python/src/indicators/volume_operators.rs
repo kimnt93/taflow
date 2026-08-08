@@ -24,6 +24,7 @@ impl VwapOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
@@ -38,9 +39,11 @@ impl VwapOperator {
         if h.len() != l.len() || h.len() != c.len() || h.len() != vol.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (((&h, &l), &c), &v) in h.iter().zip(l).zip(c).zip(vol) {
-            self.append(h, l, c, v);
-        }
+        py.allow_threads(|| {
+            for (((&h, &l), &c), &v) in h.iter().zip(l).zip(c).zip(vol) {
+                self.append(h, l, c, v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -76,6 +79,7 @@ impl ForceIndexOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         close: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
@@ -83,9 +87,11 @@ impl ForceIndexOperator {
         if c.len() != v.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&c, &v) in c.iter().zip(v) {
-            self.append(c, v);
-        }
+        py.allow_threads(|| {
+            for (&c, &v) in c.iter().zip(v) {
+                self.append(c, v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -121,6 +127,7 @@ impl EaseOfMovementOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
@@ -129,9 +136,11 @@ impl EaseOfMovementOperator {
         if h.len() != l.len() || h.len() != v.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for ((&h, &l), &v) in h.iter().zip(l).zip(v) {
-            self.append(h, l, v);
-        }
+        py.allow_threads(|| {
+            for ((&h, &l), &v) in h.iter().zip(l).zip(v) {
+                self.append(h, l, v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

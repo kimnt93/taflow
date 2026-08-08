@@ -31,7 +31,6 @@ class OhlcPriceState:
     ) -> None:
         """Create native state and optionally process initial OHLC data."""
         self._state = self._native_cls()
-        self._values: list[float] = []
         if any(value is not None for value in (_open, high, low, close)):
             self.extend(_open, high, low, close)
 
@@ -48,7 +47,7 @@ class OhlcPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        self._values.append(self._state.append(_open, high, low, close))
+        self._state.append(_open, high, low, close)
         return self
 
     def extend(self, _open: object, high: object, low: object, close: object) -> object:
@@ -64,13 +63,12 @@ class OhlcPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(
+        self._state.extend(
             as_float64_series(_open),
             as_float64_series(high),
             as_float64_series(low),
             as_float64_series(close),
         )
-        self._values.extend(values.tolist())
         return self
 
     def compute(self) -> np.ndarray:
@@ -81,7 +79,7 @@ class OhlcPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -103,8 +101,10 @@ class OhlcPriceState:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)
 
 
 class HlcPriceState:
@@ -127,7 +127,6 @@ class HlcPriceState:
     ) -> None:
         """Create native state and optionally process initial HLC data."""
         self._state = self._native_cls()
-        self._values: list[float] = []
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
@@ -144,7 +143,7 @@ class HlcPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        self._values.append(self._state.append(high, low, close))
+        self._state.append(high, low, close)
         return self
 
     def extend(self, high: object, low: object, close: object) -> object:
@@ -160,10 +159,9 @@ class HlcPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(
+        self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
         )
-        self._values.extend(values.tolist())
         return self
 
     def compute(self) -> np.ndarray:
@@ -174,7 +172,7 @@ class HlcPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -196,8 +194,10 @@ class HlcPriceState:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)
 
 
 class HlPriceState:
@@ -218,7 +218,6 @@ class HlPriceState:
     def __init__(self, high: Any | None = None, low: object = None) -> None:
         """Create native state and optionally process initial high/low data."""
         self._state = self._native_cls()
-        self._values: list[float] = []
         if high is not None or low is not None:
             self.extend(high, low)
 
@@ -235,7 +234,7 @@ class HlPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        self._values.append(self._state.append(high, low))
+        self._state.append(high, low)
         return self
 
     def extend(self, high: object, low: object) -> object:
@@ -251,8 +250,7 @@ class HlPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(as_float64_series(high), as_float64_series(low))
-        self._values.extend(values.tolist())
+        self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
 
     def compute(self) -> np.ndarray:
@@ -263,7 +261,7 @@ class HlPriceState:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -285,5 +283,7 @@ class HlPriceState:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

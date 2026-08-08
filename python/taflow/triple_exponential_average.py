@@ -18,22 +18,19 @@ class TripleExponentialAverage:
         _input: Any | None = None,
     ) -> None:
         self._state = StatefulT3(timeperiod, volume_factor)
-        self._values: list[float] = []
         if _input is not None:
             self.extend(_input)
 
     def append(self, _input: float) -> "TripleExponentialAverage":
-        value = self._state.append(float(_input))
-        self._values.append(np.nan if value is None else float(value))
+        self._state.append(float(_input))
         return self
 
     def extend(self, _input: Any) -> "TripleExponentialAverage":
-        values = self._state.extend(as_float64_series(_input))
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
+        self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self):
@@ -41,5 +38,7 @@ class TripleExponentialAverage:
 
     def reset(self) -> "TripleExponentialAverage":
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

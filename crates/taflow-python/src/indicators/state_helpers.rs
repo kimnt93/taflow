@@ -24,10 +24,13 @@ macro_rules! one {
                 self.outputs.push(v.unwrap_or(f64::NAN));
                 v
             }
-            fn extend(&mut self, input: PyReadonlyArray1<bool>) -> PyResult<()> {
-                for &v in input.as_slice()? {
-                    self.append(v);
-                }
+            fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<bool>) -> PyResult<()> {
+                let input = input.as_slice()?;
+                py.allow_threads(|| {
+                    for &v in input {
+                        self.append(v);
+                    }
+                });
                 Ok(())
             }
             fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -66,6 +69,7 @@ impl EntryExitOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         entry: PyReadonlyArray1<bool>,
         exit: PyReadonlyArray1<bool>,
     ) -> PyResult<()> {
@@ -75,9 +79,11 @@ impl EntryExitOperator {
                 "inputs must have equal lengths",
             ));
         }
-        for (&e, &x) in e.iter().zip(x) {
-            self.append(e, x);
-        }
+        py.allow_threads(|| {
+            for (&e, &x) in e.iter().zip(x) {
+                self.append(e, x);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -111,10 +117,13 @@ impl PositionHoldOperator {
         self.outputs.push(v);
         v
     }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &v in input.as_slice()? {
-            self.append(v);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        py.allow_threads(|| {
+            for &v in input {
+                self.append(v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -152,6 +161,7 @@ macro_rules! two {
             }
             fn extend(
                 &mut self,
+                py: Python<'_>,
                 condition: PyReadonlyArray1<bool>,
                 input: PyReadonlyArray1<f64>,
             ) -> PyResult<()> {
@@ -161,9 +171,11 @@ macro_rules! two {
                         "inputs must have equal lengths",
                     ));
                 }
-                for (&c, &x) in c.iter().zip(x) {
-                    self.append(c, x);
-                }
+                py.allow_threads(|| {
+                    for (&c, &x) in c.iter().zip(x) {
+                        self.append(c, x);
+                    }
+                });
                 Ok(())
             }
             fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -203,10 +215,13 @@ impl SignalDelayOperator {
         self.outputs.push(v.unwrap_or(f64::NAN));
         v
     }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &v in input.as_slice()? {
-            self.append(v);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        py.allow_threads(|| {
+            for &v in input {
+                self.append(v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

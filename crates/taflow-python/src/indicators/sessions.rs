@@ -33,6 +33,7 @@ impl SessionsOperator {
 
     fn extend(
         &mut self,
+        py: Python<'_>,
         new_session: PyReadonlyArray1<bool>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
@@ -41,9 +42,11 @@ impl SessionsOperator {
         if new_session.len() != high.len() || high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for ((&new_session, &high), &low) in new_session.iter().zip(high).zip(low) {
-            self.append(new_session, high, low);
-        }
+        py.allow_threads(|| {
+            for ((&new_session, &high), &low) in new_session.iter().zip(high).zip(low) {
+                self.append(new_session, high, low);
+            }
+        });
         Ok(())
     }
 

@@ -27,10 +27,13 @@ impl FracDiffOperator {
         value
     }
 
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? {
-            self.append(value);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        py.allow_threads(|| {
+            for &value in input {
+                self.append(value);
+            }
+        });
         Ok(())
     }
 

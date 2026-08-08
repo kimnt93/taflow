@@ -23,7 +23,12 @@ impl PlusDirectionalMovement {
         self.outputs.push(v.unwrap_or(f64::NAN));
         v
     }
-    fn extend(&mut self, h: PyReadonlyArray1<f64>, l: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        h: PyReadonlyArray1<f64>,
+        l: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let h = h.as_slice()?;
         let l = l.as_slice()?;
         if h.len() != l.len() {
@@ -31,11 +36,15 @@ impl PlusDirectionalMovement {
                 "inputs must have equal lengths",
             ));
         }
-        self.outputs.extend(
-            h.iter()
-                .zip(l)
-                .map(|(&h, &l)| self.inner.append(h, l).unwrap_or(f64::NAN)),
-        );
+        let outputs = &mut self.outputs;
+        let inner = &mut self.inner;
+        py.allow_threads(|| {
+            outputs.extend(
+                h.iter()
+                    .zip(l)
+                    .map(|(&h, &l)| inner.append(h, l).unwrap_or(f64::NAN)),
+            );
+        });
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {

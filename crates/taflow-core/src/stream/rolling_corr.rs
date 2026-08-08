@@ -1,12 +1,13 @@
 //! Batch implementation for `rolling_corr`.
 
+use super::rolling_statistics::CORREL_DENOMINATOR_EPSILON;
 use super::statistic::*;
 use crate::error::{TaError, TaResult};
 
 /// Pearson correlation coefficient (CORREL) — O(n) sliding-window algorithm.
 ///
 /// Uses the identity: correl = (n*sxy - sx*sy) /
-/// sqrt((n*sxx - sx²) * (n*syy - sy²)).
+/// sqrt((sxx - sx²/n) * (syy - sy²/n)) — TA_CORREL's exact form.
 /// Compute the rolling corr result for the supplied aligned series.
 ///
 /// # Parameters
@@ -46,11 +47,19 @@ pub fn rolling_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
     let mut syy: f64 = init_y.iter().map(|&v| v * v).sum();
     let mut sxy: f64 = init_x.iter().zip(init_y.iter()).map(|(&x, &y)| x * y).sum();
 
-    let num = n * sxy - sx * sy;
-    let denom = ((n * sxx - sx * sx) * (n * syy - sy * sy)).sqrt();
-    output[lookback] = if denom > 0.0 { num / denom } else { 0.0 };
+    let num = sxy - ((sx * sy) / n);
+    let denom = (sxx - ((sx * sx) / n)) * (syy - ((sy * sy) / n));
+    output[lookback] = if !(denom < CORREL_DENOMINATOR_EPSILON) {
+        num / denom.sqrt()
+    } else {
+        0.0
+    };
 
-    // Slide the window.
+    // Slide the window, reseeding the sums on the same absolute-append
+    // cadence as the streaming state (one append per bar, so the count at
+    // bar `i` is `i + 1`) to bound subtractive-cancellation drift. See
+    // `PAIR_MOMENTS_RESEED_INTERVAL` — streaming and batch stay bitwise equal.
+    let reseed_interval = super::rolling_statistics::PAIR_MOMENTS_RESEED_INTERVAL as usize;
     for i in timeperiod..len {
         let old_x = input0[i - timeperiod];
         let old_y = input1[i - timeperiod];
@@ -63,9 +72,32 @@ pub fn rolling_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
         syy += new_y * new_y - old_y * old_y;
         sxy += new_x * new_y - old_x * old_y;
 
-        let num = n * sxy - sx * sy;
-        let denom = ((n * sxx - sx * sx) * (n * syy - sy * sy)).sqrt();
-        output[i] = if denom > 0.0 { num / denom } else { 0.0 };
+        if (i + 1) % reseed_interval == 0 {
+            // Serial oldest-to-newest recomputation over the current window,
+            // identical to `RollingPairMoments::reseed_serial`.
+            sx = 0.0;
+            sy = 0.0;
+            sxx = 0.0;
+            syy = 0.0;
+            sxy = 0.0;
+            for j in i + 1 - timeperiod..=i {
+                let x = input0[j];
+                let y = input1[j];
+                sx += x;
+                sy += y;
+                sxx += x * x;
+                syy += y * y;
+                sxy += x * y;
+            }
+        }
+
+        let num = sxy - ((sx * sy) / n);
+        let denom = (sxx - ((sx * sx) / n)) * (syy - ((sy * sy) / n));
+        output[i] = if !(denom < CORREL_DENOMINATOR_EPSILON) {
+            num / denom.sqrt()
+        } else {
+            0.0
+        };
     }
     Ok(output)
 }

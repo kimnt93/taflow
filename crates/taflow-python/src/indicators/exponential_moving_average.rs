@@ -38,15 +38,19 @@ impl ExponentialMovingAverage {
     }
 
     /// Processes a contiguous chunk and retains both state and aligned output.
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
         let input = input.as_slice()?;
         self.outputs.reserve(input.len());
-        self.outputs.extend(
-            self.inner
-                .extend_slice(input)
-                .into_iter()
-                .map(|value| value.unwrap_or(f64::NAN)),
-        );
+        let outputs = &mut self.outputs;
+        let inner = &mut self.inner;
+        py.allow_threads(|| {
+            outputs.extend(
+                inner
+                    .extend_slice(input)
+                    .into_iter()
+                    .map(|value| value.unwrap_or(f64::NAN)),
+            );
+        });
         Ok(())
     }
 

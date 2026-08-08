@@ -44,11 +44,9 @@ pub fn parabolic_sar_extended(
         accelerationshort,
         accelerationmaxshort,
     );
-    Ok(high
-        .iter()
-        .zip(low)
-        .map(|(&high, &low)| state.append(high, low).unwrap_or(f64::NAN))
-        .collect())
+    let mut output = Vec::with_capacity(high.len());
+    state.extend_slice_into(high, low, &mut output);
+    Ok(output)
 }
 
 /// Incremental extended Parabolic SAR with a one-bar lookback.
@@ -221,16 +219,45 @@ impl ParabolicSarExtended {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
-        *self = Self::new(
-            self.start_value,
-            self.offset_on_reverse,
-            self.acceleration_init_long,
-            self.acceleration_long,
-            self.acceleration_max_long,
-            self.acceleration_init_short,
-            self.acceleration_short,
-            self.acceleration_max_short,
-        );
+        self.first_bar = None;
+        self.initialized = false;
+        self.is_long = false;
+        self.sar = 0.0;
+        self.extreme = 0.0;
+        self.factor_long = self.acceleration_init_long;
+        self.factor_short = self.acceleration_init_short;
+        self.previous_high = 0.0;
+        self.previous_low = 0.0;
+        self.value = None;
+    }
+
+    /// Bulk kernel over aligned high/low slices.
+    ///
+    /// The recurrence is inherently serial, so the only bulk win is splitting
+    /// the warm-up prologue from a branch-free steady loop that runs the very
+    /// same `advance` step; outputs and exit state stay bit-identical to
+    /// repeated `append`.
+    pub fn extend_slice_into(&mut self, high: &[f64], low: &[f64], output: &mut Vec<f64>) {
+        let len = high.len().min(low.len());
+        output.reserve(len);
+        let mut index = 0;
+        while index < len && !self.initialized {
+            output.push(self.append(high[index], low[index]).unwrap_or(f64::NAN));
+            index += 1;
+        }
+        while index < len {
+            let (high, low) = (high[index], low[index]);
+            let previous_high = self.previous_high;
+            let previous_low = self.previous_low;
+            self.previous_high = high;
+            self.previous_low = low;
+            self.advance(high, low, previous_high, previous_low);
+            output.push(
+                self.value
+                    .expect("an initialized SAREXT always has a value"),
+            );
+            index += 1;
+        }
     }
 }
 
@@ -243,6 +270,101 @@ impl Default for ParabolicSarExtended {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_bars(len: usize, mut seed: u64) -> (Vec<f64>, Vec<f64>) {
+        let mut high = Vec::with_capacity(len);
+        let mut low = Vec::with_capacity(len);
+        let mut center = 100.0_f64;
+        for _ in 0..len {
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let unit = (seed >> 11) as f64 / (1u64 << 53) as f64;
+            center += (unit - 0.5) * 2.0;
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            let spread = 0.2 + ((seed >> 11) as f64 / (1u64 << 53) as f64) * 2.0;
+            high.push(center + spread);
+            low.push(center - spread);
+        }
+        (high, low)
+    }
+
+    const PARAMS: [f64; 8] = [0.0, 0.01, 0.03, 0.02, 0.25, 0.04, 0.03, 0.3];
+
+    fn make_state() -> ParabolicSarExtended {
+        ParabolicSarExtended::new(
+            PARAMS[0], PARAMS[1], PARAMS[2], PARAMS[3], PARAMS[4], PARAMS[5], PARAMS[6], PARAMS[7],
+        )
+    }
+
+    #[test]
+    fn bulk_chunked_and_continuation_match_append_bitwise() {
+        let (high, low) = lcg_bars(5_000, 0xb6b6_0000_0000_0001);
+        let mut reference = make_state();
+        let expected: Vec<Option<f64>> = (0..high.len())
+            .map(|index| reference.append(high[index], low[index]))
+            .collect();
+
+        let bulk = parabolic_sar_extended(
+            &high, &low, PARAMS[0], PARAMS[1], PARAMS[2], PARAMS[3], PARAMS[4], PARAMS[5],
+            PARAMS[6], PARAMS[7],
+        )
+        .unwrap();
+        for (index, (got, want)) in bulk.iter().zip(&expected).enumerate() {
+            assert_eq!(
+                got.to_bits(),
+                want.unwrap_or(f64::NAN).to_bits(),
+                "bulk @{index}"
+            );
+        }
+
+        for chunk in [1_usize, 7, 97] {
+            let mut state = make_state();
+            let mut output = Vec::new();
+            for start in (0..high.len()).step_by(chunk) {
+                let end = (start + chunk).min(high.len());
+                state.extend_slice_into(&high[start..end], &low[start..end], &mut output);
+            }
+            for (index, (got, want)) in output.iter().zip(&expected).enumerate() {
+                assert_eq!(
+                    got.to_bits(),
+                    want.unwrap_or(f64::NAN).to_bits(),
+                    "chunk {chunk} @{index}"
+                );
+            }
+        }
+
+        let split = 2_121;
+        let mut state = make_state();
+        let mut output = Vec::new();
+        state.extend_slice_into(&high[..split], &low[..split], &mut output);
+        for index in split..high.len() {
+            assert_eq!(
+                state.append(high[index], low[index]).map(f64::to_bits),
+                expected[index].map(f64::to_bits),
+                "continuation @{index}"
+            );
+        }
+    }
+
+    #[test]
+    fn reset_in_place_restores_initial_behaviour() {
+        let (high, low) = lcg_bars(600, 0xb6b6_0000_0000_0002);
+        let mut state = make_state();
+        let first: Vec<Option<f64>> = (0..high.len())
+            .map(|index| state.append(high[index], low[index]))
+            .collect();
+        state.reset();
+        assert!(state.value().is_none());
+        for index in 0..high.len() {
+            assert_eq!(
+                state.append(high[index], low[index]).map(f64::to_bits),
+                first[index].map(f64::to_bits)
+            );
+        }
+    }
 
     #[test]
     fn matches_batch_with_asymmetric_parameters_and_reversals() {

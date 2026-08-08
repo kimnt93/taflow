@@ -67,6 +67,65 @@ impl FastStochasticOscillator {
         self.value
     }
 
+    /// Bulk kernel: vHGW sliding extrema for the fast %K window (via the
+    /// `RollingMax`/`RollingMin` bulk paths, which also rebuild their deques),
+    /// then the fast %D sub-state is driven per emitted bar exactly as
+    /// [`Self::append`] does. Outputs and post-run state are bit-identical to
+    /// per-bar [`Self::append`]; warm-up bars are NaN.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        fastk_out: &mut Vec<f64>,
+        fastd_out: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len().min(close.len()),
+            });
+        }
+        let n = high.len();
+        fastk_out.reserve(n);
+        fastd_out.reserve(n);
+        let period = self.highest.period();
+        let consumed = self.highest.count();
+        let mut highest = Vec::with_capacity(n);
+        let mut lowest = Vec::with_capacity(n);
+        self.highest.extend_slice_into(high, &mut highest);
+        self.lowest.extend_slice_into(low, &mut lowest);
+        for index in 0..n {
+            if consumed + index + 1 < period {
+                fastk_out.push(f64::NAN);
+                fastd_out.push(f64::NAN);
+                continue;
+            }
+            let (highest, lowest) = (highest[index], lowest[index]);
+            let divisor = (highest - lowest) / 100.0;
+            let fastk = if divisor.abs() >= 1.0e-14 {
+                (close[index] - lowest) / divisor
+            } else {
+                0.0
+            };
+            self.value = self
+                .fastd
+                .append(fastk)
+                .map(|fastd| FastStochasticOscillatorValue { fastk, fastd });
+            match self.value {
+                Some(value) => {
+                    fastk_out.push(value.fastk);
+                    fastd_out.push(value.fastd);
+                }
+                None => {
+                    fastk_out.push(f64::NAN);
+                    fastd_out.push(f64::NAN);
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// Returns the latest warmed output.
     pub fn value(&self) -> Option<FastStochasticOscillatorValue> {
         self.value
@@ -207,4 +266,93 @@ pub fn fast_stochastic_oscillator(
         fastd[bar] = fastd_values[value_index];
     }
     Ok((fastk, fastd))
+}
+
+#[cfg(test)]
+mod stochf_bulk_tests {
+    use super::*;
+
+    fn lcg_series(len: usize, seed: u64) -> Vec<f64> {
+        let mut state = seed;
+        (0..len)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                ((state >> 33) % 100_003) as f64 / 101.0
+            })
+            .collect()
+    }
+
+    #[test]
+    fn stochf_bulk_matches_append_bitwise() {
+        let close = lcg_series(5_000, 0x9E37_79B9_7F4A_7C15);
+        let high: Vec<f64> = close.iter().map(|v| v + 1.0).collect();
+        let low: Vec<f64> = close.iter().map(|v| v - 1.0).collect();
+        for period in [2usize, 5, 14, 30, 200] {
+            for (fastd, ma) in [
+                (1usize, MaType::SimpleMovingAverage),
+                (4, MaType::ExponentialMovingAverage),
+                (3, MaType::WeightedMovingAverage),
+            ] {
+                let mut reference = FastStochasticOscillator::new(period, fastd, ma).unwrap();
+                let expected: Vec<(f64, f64)> = (0..close.len())
+                    .map(|i| match reference.append(high[i], low[i], close[i]) {
+                        Some(value) => (value.fastk, value.fastd),
+                        None => (f64::NAN, f64::NAN),
+                    })
+                    .collect();
+                for chunk in [1usize, 7, 97, close.len()] {
+                    let mut state = FastStochasticOscillator::new(period, fastd, ma).unwrap();
+                    let (mut k_out, mut d_out) = (Vec::new(), Vec::new());
+                    let mut offset = 0;
+                    while offset < close.len() {
+                        let end = (offset + chunk).min(close.len());
+                        state
+                            .extend_slices_into(
+                                &high[offset..end],
+                                &low[offset..end],
+                                &close[offset..end],
+                                &mut k_out,
+                                &mut d_out,
+                            )
+                            .unwrap();
+                        offset = end;
+                    }
+                    for (i, (ek, ed)) in expected.iter().enumerate() {
+                        assert_eq!(
+                            ek.to_bits(),
+                            k_out[i].to_bits(),
+                            "fastk p={period} c={chunk} i={i}"
+                        );
+                        assert_eq!(
+                            ed.to_bits(),
+                            d_out[i].to_bits(),
+                            "fastd p={period} c={chunk} i={i}"
+                        );
+                    }
+                    for i in 0..256 {
+                        assert_eq!(
+                            reference.append(high[i], low[i], close[i]),
+                            state.append(high[i], low[i], close[i]),
+                            "continue p={period} c={chunk}"
+                        );
+                    }
+                    reference.reset();
+                    for i in 0..close.len() {
+                        reference.append(high[i], low[i], close[i]);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stochf_bulk_validates_lengths() {
+        let mut state = FastStochasticOscillator::new(5, 3, MaType::SimpleMovingAverage).unwrap();
+        let (mut k, mut d) = (Vec::new(), Vec::new());
+        assert!(state
+            .extend_slices_into(&[1.0, 2.0], &[1.0], &[1.0, 2.0], &mut k, &mut d)
+            .is_err());
+    }
 }

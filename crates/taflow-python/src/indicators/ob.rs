@@ -58,6 +58,7 @@ impl OrderBlockOperator {
 
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
@@ -72,9 +73,11 @@ impl OrderBlockOperator {
         if high.len() != low.len() || low.len() != close.len() || close.len() != volume.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (((&high, &low), &close), &volume) in high.iter().zip(low).zip(close).zip(volume) {
-            self.append(high, low, close, volume);
-        }
+        py.allow_threads(|| {
+            for (((&high, &low), &close), &volume) in high.iter().zip(low).zip(close).zip(volume) {
+                self.append(high, low, close, volume);
+            }
+        });
         Ok(())
     }
 

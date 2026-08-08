@@ -24,12 +24,17 @@ macro_rules! bar {
             }
             fn extend(
                 &mut self,
+                py: Python<'_>,
                 high: PyReadonlyArray1<f64>,
                 low: PyReadonlyArray1<f64>,
             ) -> PyResult<()> {
-                for (&h, &l) in high.as_slice()?.iter().zip(low.as_slice()?) {
-                    self.append(h, l);
-                }
+                let high = high.as_slice()?;
+                let low = low.as_slice()?;
+                py.allow_threads(|| {
+                    for (&h, &l) in high.iter().zip(low) {
+                        self.append(h, l);
+                    }
+                });
                 Ok(())
             }
             fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

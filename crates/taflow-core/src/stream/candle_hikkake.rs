@@ -81,6 +81,37 @@ impl CandleHikkake {
         self.value = (i >= 5).then_some(result);
         self.value
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// This state carries a monotonic bar counter and a pending setup that can
+    /// outlive any fixed window, so no from-empty fast path is safe: the bulk
+    /// entry point is the per-bar `append` loop with the `Option` unwrapped in
+    /// place. Bit-identical to calling `append` once per bar.
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -91,7 +122,10 @@ impl CandleHikkake {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new()
+        self.candles.clear();
+        self.index = 0;
+        self.pending = None;
+        self.value = None;
     }
 }
 

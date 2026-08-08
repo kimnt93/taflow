@@ -33,7 +33,6 @@ class AverageDirectionalIndex:
         use ``extend`` for later history.
         """
         self._state = StatefulAdx(period)
-        self._values: list[float] = []
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
@@ -54,8 +53,7 @@ class AverageDirectionalIndex:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(high, low, close)
-        self._values.append(np.nan if result is None else float(result))
+        self._state.append(high, low, close)
         return self
 
     def extend(self, high: object, low: object, close: object) -> object:
@@ -75,8 +73,7 @@ class AverageDirectionalIndex:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(high, low, close)
-        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        self._state.extend(high, low, close)
         return self
 
     def compute(self) -> np.ndarray:
@@ -87,7 +84,7 @@ class AverageDirectionalIndex:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -109,5 +106,7 @@ class AverageDirectionalIndex:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

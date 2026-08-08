@@ -35,7 +35,6 @@ class RelativeStrengthIndex:
             The instance is initialized in place.
         """
         self._state = StatefulRsi(timeperiod)
-        self._values: list[float] = []
         if close is not None:
             self.extend(close)
 
@@ -52,8 +51,7 @@ class RelativeStrengthIndex:
         RelativeStrengthIndex
             This stateful adapter.
         """
-        value = self._state.append(float(close))
-        self._values.append(np.nan if value is None else value)
+        self._state.append(float(close))
         return self
 
     def extend(self, close: Any) -> "RelativeStrengthIndex":
@@ -69,8 +67,7 @@ class RelativeStrengthIndex:
         RelativeStrengthIndex
             This stateful adapter.
         """
-        values = self._state.extend(as_float64_series(close))
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
+        self._state.extend(as_float64_series(close))
         return self
 
     def compute(self) -> np.ndarray:
@@ -81,7 +78,7 @@ class RelativeStrengthIndex:
         numpy.ndarray
             RSI values aligned to all processed close observations.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> float | None:
@@ -103,5 +100,7 @@ class RelativeStrengthIndex:
             This reset adapter.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

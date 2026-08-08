@@ -10,9 +10,6 @@ struct Candle {
     close: f64,
 }
 impl Candle {
-    fn range(self) -> f64 {
-        self.high - self.low
-    }
     fn color(self) -> i32 {
         if self.close >= self.open {
             1
@@ -63,7 +60,7 @@ pub fn candle_three_line_strike(
         let bar = start - k;
         if bar >= NEAR.avg_period {
             for j in (bar - NEAR.avg_period)..bar {
-                near_sum[k] += cr(NEAR, open, high, low, close, j);
+                near_sum[k] += cr_highlow(open, high, low, close, j);
             }
         }
     }
@@ -84,17 +81,21 @@ pub fn candle_three_line_strike(
             let opens_near = if c3 == 1 {
                 open[i - 2] >= open[i - 3].min(close[i - 3])
                     && open[i - 2]
-                        <= close[i - 3] + ca(NEAR, near_sum[3], open, high, low, close, i - 3)
+                        <= close[i - 3]
+                            + ca_highlow(NEAR, near_sum[3], open, high, low, close, i - 3)
                     && open[i - 1] >= open[i - 2].min(close[i - 2])
                     && open[i - 1]
-                        <= close[i - 2] + ca(NEAR, near_sum[2], open, high, low, close, i - 2)
+                        <= close[i - 2]
+                            + ca_highlow(NEAR, near_sum[2], open, high, low, close, i - 2)
             } else {
                 open[i - 2] <= open[i - 3].max(close[i - 3])
                     && open[i - 2]
-                        >= close[i - 3] - ca(NEAR, near_sum[3], open, high, low, close, i - 3)
+                        >= close[i - 3]
+                            - ca_highlow(NEAR, near_sum[3], open, high, low, close, i - 3)
                     && open[i - 1] <= open[i - 2].max(close[i - 2])
                     && open[i - 1]
-                        >= close[i - 2] - ca(NEAR, near_sum[2], open, high, low, close, i - 2)
+                        >= close[i - 2]
+                            - ca_highlow(NEAR, near_sum[2], open, high, low, close, i - 2)
             };
             let strike = if c3 == 1 {
                 open[i] >= close[i - 1] && close[i] <= open[i - 3]
@@ -107,8 +108,8 @@ pub fn candle_three_line_strike(
         for k in [2usize, 3] {
             let bar = i - k;
             if bar >= NEAR.avg_period && NEAR.avg_period > 0 {
-                near_sum[k] += cr(NEAR, open, high, low, close, bar)
-                    - cr(NEAR, open, high, low, close, bar - NEAR.avg_period);
+                near_sum[k] += cr_highlow(open, high, low, close, bar)
+                    - cr_highlow(open, high, low, close, bar - NEAR.avg_period);
             }
         }
     }
@@ -121,6 +122,7 @@ pub fn candle_three_line_strike(
 /// values, and exposes the current result through its public API.
 pub struct CandleThreeLineStrike {
     candles: VecDeque<Candle>,
+    near_sum: [f64; 2],
     value: Option<i32>,
 }
 impl Default for CandleThreeLineStrike {
@@ -137,17 +139,9 @@ impl CandleThreeLineStrike {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(8),
+            near_sum: [0.0; 2],
             value: None,
         }
-    }
-    fn near(&self, start: usize) -> f64 {
-        self.candles
-            .iter()
-            .skip(start)
-            .take(5)
-            .map(|c| c.range())
-            .sum::<f64>()
-            * 0.04
     }
     /// Computes or updates `append` through the native Rust kernel.
     ///
@@ -161,10 +155,13 @@ impl CandleThreeLineStrike {
             low,
             close,
         };
+        // Deque holds bars i-8..=i-1; bar j maps to index 8 - (i - j).
         let output = if self.candles.len() == 8 {
-            let a = self.candles[5];
-            let b = self.candles[6];
-            let c = self.candles[7];
+            let a = self.candles[5]; // bar i-3
+            let b = self.candles[6]; // bar i-2
+            let c = self.candles[7]; // bar i-1
+            let near_a = ca_highlow_scalar(NEAR, self.near_sum[0], a.high, a.low);
+            let near_b = ca_highlow_scalar(NEAR, self.near_sum[1], b.high, b.low);
             let color = a.color();
             let same = color == b.color() && color == c.color() && current.color() != color;
             let progressive = if color == 1 {
@@ -174,22 +171,35 @@ impl CandleThreeLineStrike {
             };
             let opens = if color == 1 {
                 b.open >= a.open.min(a.close)
-                    && b.open <= a.close + self.near(0)
+                    && b.open <= a.close + near_a
                     && c.open >= b.open.min(b.close)
-                    && c.open <= b.close + self.near(1)
+                    && c.open <= b.close + near_b
             } else {
                 b.open <= a.open.max(a.close)
-                    && b.open >= a.close - self.near(0)
+                    && b.open >= a.close - near_a
                     && c.open <= b.open.max(b.close)
-                    && c.open >= b.close - self.near(1)
+                    && c.open >= b.close - near_b
             };
             let strike = if color == 1 {
                 open >= c.close && close <= a.open
             } else {
                 open <= c.close && close >= a.open
             };
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 5).
+            self.near_sum[0] += cr_highlow_scalar(a.high, a.low)
+                - cr_highlow_scalar(self.candles[0].high, self.candles[0].low);
+            self.near_sum[1] += cr_highlow_scalar(b.high, b.low)
+                - cr_highlow_scalar(self.candles[1].high, self.candles[1].low);
             Some((same && progressive && opens && strike) as i32 * color * 100)
         } else {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if i < 5 {
+                self.near_sum[0] += cr_highlow_scalar(high, low);
+            }
+            if (1..6).contains(&i) {
+                self.near_sum[1] += cr_highlow_scalar(high, low);
+            }
             None
         };
         if self.candles.len() == 8 {
@@ -199,6 +209,53 @@ impl CandleThreeLineStrike {
         self.value = output;
         output
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.candles.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_three_line_strike(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -209,7 +266,9 @@ impl CandleThreeLineStrike {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new()
+        self.candles.clear();
+        self.near_sum = [0.0; 2];
+        self.value = None;
     }
 }
 #[cfg(test)]

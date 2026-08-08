@@ -1,9 +1,9 @@
 use std::collections::VecDeque;
 
 use super::{
-    AverageTrueRange, CumulativeMaximum, ExponentialMovingAverage, RollingMedian, RollingMidprice,
-    RollingMode, RollingStandardDeviation, SimpleMovingAverage, StreamingIndicator, TrueRange,
-    Window,
+    AverageTrueRange, CumulativeMaximum, ExponentialMovingAverage, MonotonicMax, MonotonicMin,
+    RollingMedian, RollingMode, RollingStandardDeviation, SimpleMovingAverage, StreamingIndicator,
+    TrueRange, Window,
 };
 use crate::error::{TaError, TaResult};
 
@@ -248,23 +248,34 @@ impl RollingAlpha {
         self.values.push_back((input, benchmark));
         self.value = (self.values.len() == self.period).then(|| {
             let n = self.period as f64;
-            let mean_input = self.values.iter().map(|&(input, _)| input).sum::<f64>() / n;
-            let mean_benchmark = self
-                .values
-                .iter()
-                .map(|&(_, benchmark)| benchmark)
-                .sum::<f64>()
-                / n;
-            let covariance = self
-                .values
-                .iter()
-                .map(|&(input, benchmark)| (input - mean_input) * (benchmark - mean_benchmark))
-                .sum::<f64>();
-            let variance = self
-                .values
-                .iter()
-                .map(|&(_, benchmark)| (benchmark - mean_benchmark).powi(2))
-                .sum::<f64>();
+            // Contiguous two-slice scans with fused accumulators: each
+            // accumulator adds the same terms in the same order as the
+            // original per-quantity passes, so results are bit-identical.
+            let (front, back) = self.values.as_slices();
+            let mut sum_input = 0.0;
+            let mut sum_benchmark = 0.0;
+            for &(input, benchmark) in front {
+                sum_input += input;
+                sum_benchmark += benchmark;
+            }
+            for &(input, benchmark) in back {
+                sum_input += input;
+                sum_benchmark += benchmark;
+            }
+            let mean_input = sum_input / n;
+            let mean_benchmark = sum_benchmark / n;
+            let mut covariance = 0.0;
+            let mut variance = 0.0;
+            for &(input, benchmark) in front {
+                let delta_benchmark = benchmark - mean_benchmark;
+                covariance += (input - mean_input) * delta_benchmark;
+                variance += delta_benchmark * delta_benchmark;
+            }
+            for &(input, benchmark) in back {
+                let delta_benchmark = benchmark - mean_benchmark;
+                covariance += (input - mean_input) * delta_benchmark;
+                variance += delta_benchmark * delta_benchmark;
+            }
             let beta = if variance > 0.0 {
                 covariance / variance
             } else {
@@ -295,7 +306,7 @@ impl RollingAlpha {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct RollingInformationRatio {
-    values: VecDeque<f64>,
+    values: ContiguousWindow,
     period: usize,
     value: Option<f64>,
 }
@@ -308,23 +319,24 @@ impl RollingInformationRatio {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            values: VecDeque::with_capacity(period),
+            values: ContiguousWindow::new(period),
             period,
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// The variance pass needs the window mean, so the two passes cannot be
+    /// collapsed into sliding sums without changing the summation order (and
+    /// therefore the low bits). Both passes now walk one contiguous ring
+    /// slice, so the second pass reads cache-hot memory.
     pub fn append(&mut self, input: f64, benchmark: f64) -> Option<f64> {
-        if self.values.len() == self.period {
-            self.values.pop_front();
-        }
-        self.values.push_back(input - benchmark);
-        self.value = (self.values.len() == self.period).then(|| {
+        self.values.push(input - benchmark);
+        self.value = self.values.is_full().then(|| {
+            let window = self.values.window();
             let n = self.period as f64;
-            let mean = self.values.iter().sum::<f64>() / n;
-            let variance = self
-                .values
+            let mean = window.iter().sum::<f64>() / n;
+            let variance = window
                 .iter()
                 .map(|&value| (value - mean).powi(2))
                 .sum::<f64>()
@@ -360,6 +372,9 @@ impl RollingInformationRatio {
 pub struct Hurst {
     values: VecDeque<f64>,
     period: usize,
+    /// `ln(period)`, invariant for the lifetime of the state; computing it
+    /// once at construction removes one `ln` call per bar.
+    log_period: f64,
     value: Option<f64>,
 }
 
@@ -380,6 +395,7 @@ impl Hurst {
         Ok(Self {
             values: VecDeque::with_capacity(period),
             period,
+            log_period: (period as f64).ln(),
             value: None,
         })
     }
@@ -403,27 +419,60 @@ impl Hurst {
             self.values.pop_front();
         }
         self.values.push_back(input);
+        let log_period = self.log_period;
         self.value = (self.values.len() == self.period).then(|| {
             let n = self.period as f64;
-            let mean = self.values.iter().sum::<f64>() / n;
+            // Contiguous two-slice scans; the R/S walk and the squared-deviation
+            // sum are fused into one pass with independent accumulators, each
+            // adding the same terms in the same order as before (bit-identical).
+            let (front, back) = self.values.as_slices();
+            let mut sum = 0.0;
+            for &value in front {
+                sum += value;
+            }
+            for &value in back {
+                sum += value;
+            }
+            let mean = sum / n;
             let mut cumulative = 0.0;
             let mut minimum = f64::INFINITY;
             let mut maximum = f64::NEG_INFINITY;
-            for &value in &self.values {
-                cumulative += value - mean;
-                minimum = minimum.min(cumulative);
-                maximum = maximum.max(cumulative);
+            let mut squared = 0.0;
+            // Plain comparisons instead of `f64::min`/`f64::max`: the
+            // accumulators start at `±INFINITY` and `f64::min`/`max` never
+            // return NaN when one operand is non-NaN, so they can never hold
+            // NaN. For a non-NaN accumulator the two forms agree on every
+            // input including NaN (`NaN < minimum` is false, and
+            // `f64::min(minimum, NaN) == minimum`), so this is bit-identical
+            // while dropping the NaN fix-up from the dependency chain.
+            for &value in front {
+                let deviation = value - mean;
+                cumulative += deviation;
+                if cumulative < minimum {
+                    minimum = cumulative;
+                }
+                if cumulative > maximum {
+                    maximum = cumulative;
+                }
+                squared += deviation * deviation;
             }
-            let standard_deviation = (self
-                .values
-                .iter()
-                .map(|&value| (value - mean).powi(2))
-                .sum::<f64>()
-                / n)
-                .sqrt();
+            for &value in back {
+                let deviation = value - mean;
+                cumulative += deviation;
+                if cumulative < minimum {
+                    minimum = cumulative;
+                }
+                if cumulative > maximum {
+                    maximum = cumulative;
+                }
+                squared += deviation * deviation;
+            }
+            let standard_deviation = (squared / n).sqrt();
             let rescaled_range = (maximum - minimum) / standard_deviation;
             if rescaled_range > 0.0 {
-                (rescaled_range.ln() / n.ln()).clamp(0.0, 1.0)
+                // `log_period` is `(period as f64).ln()` computed once at
+                // construction — the same value `n.ln()` produced per bar.
+                (rescaled_range.ln() / log_period).clamp(0.0, 1.0)
             } else {
                 0.5
             }
@@ -451,12 +500,27 @@ impl Hurst {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct RollingEntropy {
-    values: VecDeque<f64>,
+    ring: Box<[f64]>,
+    head: usize,
+    len: usize,
+    counts: std::collections::HashMap<u64, u32>,
+    seen: std::collections::HashSet<u64>,
     period: usize,
     value: Option<f64>,
 }
 
 impl RollingEntropy {
+    /// Map key with `f64` equality semantics: `-0.0` and `+0.0` share a bin.
+    /// NaNs are never inserted (NaN equals nothing, so its count is 0).
+    #[inline]
+    fn count_key(value: f64) -> u64 {
+        if value == 0.0 {
+            0.0f64.to_bits()
+        } else {
+            value.to_bits()
+        }
+    }
+
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -465,37 +529,75 @@ impl RollingEntropy {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            values: VecDeque::with_capacity(period),
+            ring: vec![0.0; period].into_boxed_slice(),
+            head: 0,
+            len: 0,
+            counts: std::collections::HashMap::with_capacity(period),
+            seen: std::collections::HashSet::with_capacity(period),
             period,
             value: None,
         })
     }
 
     /// Shannon entropy of exact-value frequencies in the rolling window.
+    ///
+    /// The exact-value counts are maintained incrementally (integer work on
+    /// the two touched bins per bar); the entropy sum itself is recomputed
+    /// per bar in the original iteration order (first occurrence in window
+    /// order) so the floating-point result stays bit-identical to the
+    /// previous full-rescan implementation.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.values.len() == self.period {
-            self.values.pop_front();
+        if self.len == self.period {
+            let evicted = self.ring[self.head];
+            if !evicted.is_nan() {
+                let key = Self::count_key(evicted);
+                let count = self.counts.get_mut(&key).expect("evicted value counted");
+                *count -= 1;
+                if *count == 0 {
+                    self.counts.remove(&key);
+                }
+            }
+        } else {
+            self.len += 1;
         }
-        self.values.push_back(input);
-        self.value = (self.values.len() == self.period).then(|| {
+        self.ring[self.head] = input;
+        self.head += 1;
+        if self.head == self.period {
+            self.head = 0;
+        }
+        if !input.is_nan() {
+            *self.counts.entry(Self::count_key(input)).or_insert(0) += 1;
+        }
+        let value = if self.len == self.period {
             let n = self.period as f64;
             let mut entropy = 0.0;
-            let mut seen = Vec::new();
-            for &candidate in &self.values {
-                if seen.contains(&candidate) {
-                    continue;
+            self.seen.clear();
+            // `head` now points at the oldest value in window order.
+            let start = self.head;
+            for i in 0..self.period {
+                let mut idx = start + i;
+                if idx >= self.period {
+                    idx -= self.period;
                 }
-                seen.push(candidate);
-                let count = self
-                    .values
-                    .iter()
-                    .filter(|&&value| value == candidate)
-                    .count();
-                let probability = count as f64 / n;
+                let candidate = self.ring[idx];
+                let probability = if candidate.is_nan() {
+                    // NaN never equals anything: count 0, exactly as the
+                    // full rescan produced (0.0 * ln(0.0) => NaN result).
+                    0.0
+                } else {
+                    let key = Self::count_key(candidate);
+                    if !self.seen.insert(key) {
+                        continue;
+                    }
+                    *self.counts.get(&key).expect("window value counted") as f64 / n
+                };
                 entropy -= probability * probability.ln();
             }
-            entropy
-        });
+            Some(entropy)
+        } else {
+            None
+        };
+        self.value = value;
         self.value
     }
 
@@ -509,7 +611,10 @@ impl RollingEntropy {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.values.clear();
+        self.head = 0;
+        self.len = 0;
+        self.counts.clear();
+        self.seen.clear();
         self.value = None;
     }
 }
@@ -522,6 +627,10 @@ impl RollingEntropy {
 pub struct RollingAutocorr {
     values: VecDeque<f64>,
     period: usize,
+    /// Reusable contiguous scratch copy of the window; fixed-size, so the
+    /// per-bar refresh is two `copy_from_slice` memcpys with no allocation,
+    /// capacity check or length bookkeeping.
+    scratch: Box<[f64]>,
     value: Option<f64>,
 }
 
@@ -542,6 +651,7 @@ impl RollingAutocorr {
         Ok(Self {
             values: VecDeque::with_capacity(period),
             period,
+            scratch: vec![0.0; period].into_boxed_slice(),
             value: None,
         })
     }
@@ -552,35 +662,48 @@ impl RollingAutocorr {
             self.values.pop_front();
         }
         self.values.push_back(input);
-        self.value = (self.values.len() == self.period).then(|| {
-            let n = self.period as f64;
-            let left_n = (self.period - 1) as f64;
-            let left_mean = self.values.iter().take(self.period - 1).sum::<f64>() / left_n;
-            let right_mean = self.values.iter().skip(1).sum::<f64>() / left_n;
-            let left_variance = self
-                .values
-                .iter()
-                .take(self.period - 1)
-                .map(|&value| (value - left_mean).powi(2))
-                .sum::<f64>();
-            let right_variance = self
-                .values
-                .iter()
-                .skip(1)
-                .map(|&value| (value - right_mean).powi(2))
-                .sum::<f64>();
-            if left_variance == 0.0 || right_variance == 0.0 {
-                return 0.0;
-            }
-            let covariance = self
-                .values
-                .iter()
-                .take(self.period - 1)
-                .zip(self.values.iter().skip(1))
-                .map(|(&left, &right)| (left - left_mean) * (right - right_mean))
-                .sum::<f64>();
+        if self.values.len() < self.period {
+            self.value = None;
+            return None;
+        }
+        // Copy the window into a contiguous scratch buffer (pure memcpy, the
+        // buffer is preallocated) so the lagged scans below index plain
+        // slices. Every accumulator adds the same terms in the same order as
+        // the original take/skip iterator passes, so results are bit-identical.
+        let (front, back) = self.values.as_slices();
+        self.scratch[..front.len()].copy_from_slice(front);
+        self.scratch[front.len()..].copy_from_slice(back);
+        let window = &self.scratch[..];
+        let period = self.period;
+        let left = &window[..period - 1];
+        let right = &window[1..];
+        let left_n = (period - 1) as f64;
+        let mut left_sum = 0.0;
+        for &value in left {
+            left_sum += value;
+        }
+        let mut right_sum = 0.0;
+        for &value in right {
+            right_sum += value;
+        }
+        let left_mean = left_sum / left_n;
+        let right_mean = right_sum / left_n;
+        let mut left_variance = 0.0;
+        let mut right_variance = 0.0;
+        let mut covariance = 0.0;
+        for index in 0..period - 1 {
+            let left_delta = left[index] - left_mean;
+            let right_delta = right[index] - right_mean;
+            left_variance += left_delta * left_delta;
+            right_variance += right_delta * right_delta;
+            covariance += left_delta * right_delta;
+        }
+        let result = if left_variance == 0.0 || right_variance == 0.0 {
+            0.0
+        } else {
             covariance / (left_variance * right_variance).sqrt()
-        });
+        };
+        self.value = Some(result);
         self.value
     }
 
@@ -637,18 +760,34 @@ impl HedgeRatio {
         self.values.push_back((x, y));
         self.value = if self.values.len() == self.period {
             let n = self.period as f64;
-            let mean_x = self.values.iter().map(|&(x, _)| x).sum::<f64>() / n;
-            let mean_y = self.values.iter().map(|&(_, y)| y).sum::<f64>() / n;
-            let covariance = self
-                .values
-                .iter()
-                .map(|&(x, y)| (x - mean_x) * (y - mean_y))
-                .sum::<f64>();
-            let variance = self
-                .values
-                .iter()
-                .map(|&(x, _)| (x - mean_x).powi(2))
-                .sum::<f64>();
+            // Contiguous two-slice scans with fused accumulators: each
+            // accumulator adds the same terms in the same order as the
+            // original per-quantity passes, so results are bit-identical.
+            let (front, back) = self.values.as_slices();
+            let mut sum_x = 0.0;
+            let mut sum_y = 0.0;
+            for &(x, y) in front {
+                sum_x += x;
+                sum_y += y;
+            }
+            for &(x, y) in back {
+                sum_x += x;
+                sum_y += y;
+            }
+            let mean_x = sum_x / n;
+            let mean_y = sum_y / n;
+            let mut covariance = 0.0;
+            let mut variance = 0.0;
+            for &(x, y) in front {
+                let delta_x = x - mean_x;
+                covariance += delta_x * (y - mean_y);
+                variance += delta_x * delta_x;
+            }
+            for &(x, y) in back {
+                let delta_x = x - mean_x;
+                covariance += delta_x * (y - mean_y);
+                variance += delta_x * delta_x;
+            }
             Some(if variance > 0.0 {
                 covariance / variance
             } else {
@@ -913,7 +1052,13 @@ impl BreakOfStructureChangeOfCharacter {
                 self.swings.pop_front();
             }
             if self.swings.len() == 4 {
-                let items: Vec<_> = self.swings.iter().copied().collect();
+                // Stack copy instead of a per-event heap allocation.
+                let items = [
+                    self.swings[0],
+                    self.swings[1],
+                    self.swings[2],
+                    self.swings[3],
+                ];
                 let bullish = items[0].0 < 0.0
                     && items[1].0 > 0.0
                     && items[2].0 < 0.0
@@ -1078,12 +1223,10 @@ impl OrderBlock {
             match internal_swing.signal {
                 signal if signal > 0.0 => {
                     self.internal_high = Some((internal_swing.level, volume, volatile));
-                    if let Some(structure_high) = self.structure_high {
-                        if internal_swing.level > structure_high
-                            && self.internal_low.is_some_and(|(_, _, volatile)| !volatile)
-                        {
-                            let (low_level, low_volume, _) =
-                                self.internal_low.expect("internal low is set");
+                    if let (Some(structure_high), Some((low_level, low_volume, false))) =
+                        (self.structure_high, self.internal_low)
+                    {
+                        if internal_swing.level > structure_high {
                             ob = 1.0;
                             top = internal_swing.level;
                             bottom = low_level;
@@ -1099,12 +1242,10 @@ impl OrderBlock {
                 }
                 signal if signal < 0.0 => {
                     self.internal_low = Some((internal_swing.level, volume, volatile));
-                    if let Some(structure_low) = self.structure_low {
-                        if internal_swing.level < structure_low
-                            && self.internal_high.is_some_and(|(_, _, volatile)| !volatile)
-                        {
-                            let (high_level, high_volume, _) =
-                                self.internal_high.expect("internal high is set");
+                    if let (Some(structure_low), Some((high_level, high_volume, false))) =
+                        (self.structure_low, self.internal_high)
+                    {
+                        if internal_swing.level < structure_low {
                             ob = -1.0;
                             top = high_level;
                             bottom = internal_swing.level;
@@ -1188,13 +1329,21 @@ pub struct LiquidityValue {
 #[derive(Debug, Clone, Copy)]
 struct LiquidityPool {
     level: f64,
-    count: usize,
+    /// Insertion order across both lists of one side; reproduces the original
+    /// single-vector scan order for nearest-pool tie-breaks and sweep output.
+    seq: u64,
 }
 
 /// Causal liquidity-pool clustering with sweep detection. SwingHighLow highs and
 /// lows are clustered into pools when they fall within a `range_percent`
 /// price tolerance; a pool emits a signal once a second swing confirms it.
 /// A pool is swept and removed when price trades beyond its level.
+///
+/// Pools are split per side into `*_candidates` (seen once, never sweepable)
+/// and `*_confirmed` (seen twice or more, kept sorted by insertion `seq`).
+/// The per-bar sweep pass therefore only scans confirmed pools instead of the
+/// unbounded historical candidate list; outputs are identical to the previous
+/// single-vector implementation.
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `Liquidity`.
 ///
@@ -1202,10 +1351,20 @@ struct LiquidityPool {
 /// values, and exposes the current result through its public API.
 pub struct Liquidity {
     swing: SwingHighLow,
-    high_pools: Vec<LiquidityPool>,
-    low_pools: Vec<LiquidityPool>,
+    high_candidates: Vec<LiquidityPool>,
+    high_confirmed: Vec<LiquidityPool>,
+    low_candidates: Vec<LiquidityPool>,
+    low_confirmed: Vec<LiquidityPool>,
+    next_seq: u64,
     range_percent: f64,
     value: Option<LiquidityValue>,
+}
+
+/// Location of the nearest matching pool: candidate list or confirmed list.
+#[derive(Debug, Clone, Copy)]
+enum PoolSlot {
+    Candidate(usize),
+    Confirmed(usize),
 }
 
 impl Liquidity {
@@ -1225,28 +1384,81 @@ impl Liquidity {
         }
         Ok(Self {
             swing: SwingHighLow::new(swing_length)?,
-            high_pools: Vec::new(),
-            low_pools: Vec::new(),
+            high_candidates: Vec::new(),
+            high_confirmed: Vec::new(),
+            low_candidates: Vec::new(),
+            low_confirmed: Vec::new(),
+            next_seq: 0,
             range_percent,
             value: None,
         })
     }
 
+    /// Nearest pool by absolute distance; ties resolve to the earliest
+    /// inserted pool (`seq`), matching the original first-match-wins scan
+    /// over a single insertion-ordered vector.
     fn nearest_pool(
-        pools: &mut Vec<LiquidityPool>,
+        candidates: &[LiquidityPool],
+        confirmed: &[LiquidityPool],
         level: f64,
         range_percent: f64,
-    ) -> Option<usize> {
-        let mut best: Option<(usize, f64)> = None;
-        for (index, pool) in pools.iter().enumerate() {
+    ) -> Option<PoolSlot> {
+        let mut best: Option<(PoolSlot, f64, u64)> = None;
+        let mut consider = |slot: PoolSlot, pool: &LiquidityPool| {
             let distance = (pool.level - level).abs();
             if distance <= range_percent * pool.level
-                && best.map_or(true, |(_, best_distance)| distance < best_distance)
+                && best.map_or(true, |(_, best_distance, best_seq)| {
+                    distance < best_distance || (distance == best_distance && pool.seq < best_seq)
+                })
             {
-                best = Some((index, distance));
+                best = Some((slot, distance, pool.seq));
+            }
+        };
+        for (index, pool) in candidates.iter().enumerate() {
+            consider(PoolSlot::Candidate(index), pool);
+        }
+        for (index, pool) in confirmed.iter().enumerate() {
+            consider(PoolSlot::Confirmed(index), pool);
+        }
+        best.map(|(slot, _, _)| slot)
+    }
+
+    /// Merge a swing into the pools of one side; returns the emitted level if
+    /// the pool is (or becomes) confirmed. `merge_level` is `f64::max` for
+    /// highs and `f64::min` for lows.
+    fn merge_swing(
+        candidates: &mut Vec<LiquidityPool>,
+        confirmed: &mut Vec<LiquidityPool>,
+        next_seq: &mut u64,
+        swing_level: f64,
+        range_percent: f64,
+        merge_level: fn(f64, f64) -> f64,
+    ) -> Option<f64> {
+        match Self::nearest_pool(candidates, confirmed, swing_level, range_percent) {
+            Some(PoolSlot::Confirmed(index)) => {
+                let pool = &mut confirmed[index];
+                pool.level = merge_level(pool.level, swing_level);
+                Some(pool.level)
+            }
+            Some(PoolSlot::Candidate(index)) => {
+                // Second touch: promote to confirmed. `swap_remove` is fine
+                // because candidate order is irrelevant (ties use `seq`);
+                // confirmed stays sorted by `seq` to preserve sweep order.
+                let mut pool = candidates.swap_remove(index);
+                pool.level = merge_level(pool.level, swing_level);
+                let position = confirmed.partition_point(|entry| entry.seq < pool.seq);
+                confirmed.insert(position, pool);
+                Some(confirmed[position].level)
+            }
+            None => {
+                candidates.push(LiquidityPool {
+                    level: swing_level,
+                    seq: *next_seq,
+                });
+                *next_seq += 1;
+                None
             }
         }
-        best.map(|(index, _)| index)
     }
 
     /// Computes or updates `append` through the native Rust kernel.
@@ -1261,52 +1473,46 @@ impl Liquidity {
 
         if let Some(swing) = self.swing.append(high, low) {
             if swing.signal > 0.0 {
-                if let Some(index) =
-                    Self::nearest_pool(&mut self.high_pools, swing.level, self.range_percent)
-                {
-                    let pool = &mut self.high_pools[index];
-                    pool.level = pool.level.max(swing.level);
-                    pool.count += 1;
-                    if pool.count >= 2 {
-                        liquidity = 1.0;
-                        level = pool.level;
-                    }
-                } else {
-                    self.high_pools.push(LiquidityPool {
-                        level: swing.level,
-                        count: 1,
-                    });
+                if let Some(emitted) = Self::merge_swing(
+                    &mut self.high_candidates,
+                    &mut self.high_confirmed,
+                    &mut self.next_seq,
+                    swing.level,
+                    self.range_percent,
+                    f64::max,
+                ) {
+                    liquidity = 1.0;
+                    level = emitted;
                 }
             } else if swing.signal < 0.0 {
-                if let Some(index) =
-                    Self::nearest_pool(&mut self.low_pools, swing.level, self.range_percent)
-                {
-                    let pool = &mut self.low_pools[index];
-                    pool.level = pool.level.min(swing.level);
-                    pool.count += 1;
-                    if pool.count >= 2 {
-                        liquidity = -1.0;
-                        level = pool.level;
-                    }
-                } else {
-                    self.low_pools.push(LiquidityPool {
-                        level: swing.level,
-                        count: 1,
-                    });
+                if let Some(emitted) = Self::merge_swing(
+                    &mut self.low_candidates,
+                    &mut self.low_confirmed,
+                    &mut self.next_seq,
+                    swing.level,
+                    self.range_percent,
+                    f64::min,
+                ) {
+                    liquidity = -1.0;
+                    level = emitted;
                 }
             }
         }
 
-        self.high_pools.retain(|pool| {
-            let swept_pool = pool.count >= 2 && high >= pool.level;
+        // Sweep pass over confirmed pools only (candidates can never satisfy
+        // the original `count >= 2` predicate). Confirmed pools are kept in
+        // insertion order, so the last swept pool sets the outputs exactly as
+        // the original combined retain did.
+        self.high_confirmed.retain(|pool| {
+            let swept_pool = high >= pool.level;
             if swept_pool {
                 swept = 1.0;
                 level = pool.level;
             }
             !swept_pool
         });
-        self.low_pools.retain(|pool| {
-            let swept_pool = pool.count >= 2 && low <= pool.level;
+        self.low_confirmed.retain(|pool| {
+            let swept_pool = low <= pool.level;
             if swept_pool {
                 swept = -1.0;
                 level = pool.level;
@@ -1335,8 +1541,11 @@ impl Liquidity {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.swing.reset();
-        self.high_pools.clear();
-        self.low_pools.clear();
+        self.high_candidates.clear();
+        self.high_confirmed.clear();
+        self.low_candidates.clear();
+        self.low_confirmed.clear();
+        self.next_seq = 0;
         self.value = None;
     }
 }
@@ -2083,10 +2292,17 @@ impl GarmanKlassYangZhang {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct YangZhang {
-    overnight: RollingMean,
-    open_close: RollingMean,
-    rs: RollingMean,
+    /// One shared ring of `[overnight, open_close, rs]` triples: the three
+    /// variance components are pushed and evicted together (M4), so they need
+    /// one window, one length check and one eviction index instead of three.
+    window: Box<[[f64; 3]]>,
+    head: usize,
+    len: usize,
+    sums: [f64; 3],
+    means: Option<[f64; 3]>,
     timeperiod: usize,
+    /// `0.34 / (1.34 + (n + 1) / (n - 1))`, constant for the state's lifetime.
+    k: f64,
     previous_close: Option<f64>,
     value: Option<f64>,
 }
@@ -2106,14 +2322,54 @@ impl YangZhang {
                 reason: "must be >= 2 for Yang-Zhang",
             });
         }
+        let n = timeperiod as f64;
         Ok(Self {
-            overnight: RollingMean::new(timeperiod)?,
-            open_close: RollingMean::new(timeperiod)?,
-            rs: RollingMean::new(timeperiod)?,
+            window: vec![[0.0; 3]; timeperiod].into_boxed_slice(),
+            head: 0,
+            len: 0,
+            sums: [0.0; 3],
+            means: None,
             timeperiod,
+            k: 0.34 / (1.34 + (n + 1.0) / (n - 1.0)),
             previous_close: None,
             value: None,
         })
+    }
+
+    /// Pushes one triple through the shared ring, keeping the per-component
+    /// arithmetic order of the three former `RollingMean` states
+    /// (`sum -= evicted`, then `sum += input`, then `sum / period`).
+    #[inline]
+    fn push(&mut self, sample: [f64; 3]) {
+        let capacity = self.window.len();
+        if self.len == capacity {
+            let evicted = self.window[self.head];
+            for component in 0..3 {
+                self.sums[component] -= evicted[component];
+            }
+            self.window[self.head] = sample;
+            self.head += 1;
+            if self.head == capacity {
+                self.head = 0;
+            }
+        } else {
+            let mut tail = self.head + self.len;
+            if tail >= capacity {
+                tail -= capacity;
+            }
+            self.window[tail] = sample;
+            self.len += 1;
+        }
+        for component in 0..3 {
+            self.sums[component] += sample[component];
+        }
+        self.means = (self.len == capacity).then(|| {
+            [
+                self.sums[0] / self.timeperiod as f64,
+                self.sums[1] / self.timeperiod as f64,
+                self.sums[2] / self.timeperiod as f64,
+            ]
+        });
     }
 
     /// Computes or updates `append` through the native Rust kernel.
@@ -2130,24 +2386,14 @@ impl YangZhang {
                     let open_close = (close / open).ln().powi(2);
                     let rs = (high / close).ln() * (high / open).ln()
                         + (low / close).ln() * (low / open).ln();
-                    let _ = self.overnight.append(overnight);
-                    let _ = self.open_close.append(open_close);
-                    let _ = self.rs.append(rs);
+                    self.push([overnight, open_close, rs]);
                 }
             }
         }
-        self.value = match (
-            self.overnight.value(),
-            self.open_close.value(),
-            self.rs.value(),
-        ) {
-            (Some(on), Some(oc), Some(rs)) => {
-                let n = self.timeperiod as f64;
-                let k = 0.34 / (1.34 + (n + 1.0) / (n - 1.0));
-                Some((on + k * oc + (1.0 - k) * rs).max(0.0).sqrt())
-            }
-            _ => None,
-        };
+        let k = self.k;
+        self.value = self
+            .means
+            .map(|[on, oc, rs]| (on + k * oc + (1.0 - k) * rs).max(0.0).sqrt());
         self.value
     }
 
@@ -2162,9 +2408,10 @@ impl YangZhang {
 
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.overnight.reset();
-        self.open_close.reset();
-        self.rs.reset();
+        self.head = 0;
+        self.len = 0;
+        self.sums = [0.0; 3];
+        self.means = None;
         self.previous_close = None;
         self.value = None;
     }
@@ -2311,9 +2558,11 @@ pub struct RollSpread {
 
 #[derive(Debug, Clone)]
 struct RollingPairMoments {
-    x: VecDeque<f64>,
-    y: VecDeque<f64>,
+    values: VecDeque<(f64, f64)>,
     timeperiod: usize,
+    /// Sample variance of the `y` window, computed in the covariance pass so
+    /// consumers (`OrnsteinUhlenbeckHalfLife`) do not rescan the window.
+    var_y: f64,
     value: Option<f64>,
 }
 
@@ -2321,28 +2570,49 @@ impl RollingPairMoments {
     fn new(timeperiod: usize) -> TaResult<Self> {
         validate_period(timeperiod)?;
         Ok(Self {
-            x: VecDeque::with_capacity(timeperiod),
-            y: VecDeque::with_capacity(timeperiod),
+            values: VecDeque::with_capacity(timeperiod),
             timeperiod,
+            var_y: f64::NAN,
             value: None,
         })
     }
 
     fn append(&mut self, x: f64, y: f64) -> Option<f64> {
-        if self.x.len() == self.timeperiod {
-            self.x.pop_front();
-            self.y.pop_front();
+        if self.values.len() == self.timeperiod {
+            self.values.pop_front();
         }
-        self.x.push_back(x);
-        self.y.push_back(y);
-        self.value = if self.x.len() == self.timeperiod {
+        self.values.push_back((x, y));
+        self.value = if self.values.len() == self.timeperiod {
             let n = self.timeperiod as f64;
-            let mean_x = self.x.iter().sum::<f64>() / n;
-            let mean_y = self.y.iter().sum::<f64>() / n;
-            let mut cov = 0.0;
-            for (x, y) in self.x.iter().zip(self.y.iter()) {
-                cov += (x - mean_x) * (y - mean_y);
+            // Contiguous two-slice scans with fused accumulators: each
+            // accumulator adds the same terms in the same order as the
+            // original per-quantity passes, so results are bit-identical.
+            let (front, back) = self.values.as_slices();
+            let mut sum_x = 0.0;
+            let mut sum_y = 0.0;
+            for &(x, y) in front {
+                sum_x += x;
+                sum_y += y;
             }
+            for &(x, y) in back {
+                sum_x += x;
+                sum_y += y;
+            }
+            let mean_x = sum_x / n;
+            let mean_y = sum_y / n;
+            let mut cov = 0.0;
+            let mut squared_y = 0.0;
+            for &(x, y) in front {
+                let delta_y = y - mean_y;
+                cov += (x - mean_x) * delta_y;
+                squared_y += delta_y * delta_y;
+            }
+            for &(x, y) in back {
+                let delta_y = y - mean_y;
+                cov += (x - mean_x) * delta_y;
+                squared_y += delta_y * delta_y;
+            }
+            self.var_y = squared_y / (n - 1.0);
             Some(cov / (n - 1.0))
         } else {
             None
@@ -2355,8 +2625,8 @@ impl RollingPairMoments {
     }
 
     fn reset(&mut self) {
-        self.x.clear();
-        self.y.clear();
+        self.values.clear();
+        self.var_y = f64::NAN;
         self.value = None;
     }
 }
@@ -2454,15 +2724,10 @@ impl OrnsteinUhlenbeckHalfLife {
             let _ = self.moments.append(delta, previous_price);
         }
         self.value = if let Some(cov) = self.moments.value() {
-            let n = self.moments.timeperiod as f64;
-            let mean_y = self.moments.y.iter().sum::<f64>() / n;
-            let var_y = self
-                .moments
-                .y
-                .iter()
-                .map(|&y| (y - mean_y) * (y - mean_y))
-                .sum::<f64>()
-                / (n - 1.0);
+            // `var_y` is computed inside `RollingPairMoments::append` from the
+            // same window with the same summation order as the scans this
+            // replaced, so the result is bit-identical.
+            let var_y = self.moments.var_y;
             if var_y > 0.0 {
                 let lambda = -cov / var_y;
                 (lambda > 0.0).then_some(2.0f64.ln() / lambda)
@@ -2607,32 +2872,58 @@ impl SpreadZScore {
         self.values.push_back((x, y));
         self.value = if self.values.len() == self.timeperiod {
             let n = self.timeperiod as f64;
-            let mean_x = self.values.iter().map(|&(x, _)| x).sum::<f64>() / n;
-            let mean_y = self.values.iter().map(|&(_, y)| y).sum::<f64>() / n;
-            let covariance = self
-                .values
-                .iter()
-                .map(|&(x, y)| (x - mean_x) * (y - mean_y))
-                .sum::<f64>();
-            let variance = self
-                .values
-                .iter()
-                .map(|&(x, _)| (x - mean_x).powi(2))
-                .sum::<f64>();
+            // Contiguous two-slice scans with fused accumulators: each
+            // accumulator adds the same terms in the same order as the
+            // original per-quantity passes, so results are bit-identical.
+            let (front, back) = self.values.as_slices();
+            let mut sum_x = 0.0;
+            let mut sum_y = 0.0;
+            for &(x, y) in front {
+                sum_x += x;
+                sum_y += y;
+            }
+            for &(x, y) in back {
+                sum_x += x;
+                sum_y += y;
+            }
+            let mean_x = sum_x / n;
+            let mean_y = sum_y / n;
+            let mut covariance = 0.0;
+            let mut variance = 0.0;
+            for &(x, y) in front {
+                let delta_x = x - mean_x;
+                covariance += delta_x * (y - mean_y);
+                variance += delta_x * delta_x;
+            }
+            for &(x, y) in back {
+                let delta_x = x - mean_x;
+                covariance += delta_x * (y - mean_y);
+                variance += delta_x * delta_x;
+            }
             let beta = if variance > 0.0 {
                 covariance / variance
             } else {
                 0.0
             };
-            let spread = (y - beta * x);
-            let mean_spread = self.values.iter().map(|&(x, y)| y - beta * x).sum::<f64>() / n;
-            let std_spread = (self
-                .values
-                .iter()
-                .map(|&(x, y)| (y - beta * x - mean_spread).powi(2))
-                .sum::<f64>()
-                / n)
-                .sqrt();
+            let spread = y - beta * x;
+            let mut spread_sum = 0.0;
+            for &(x, y) in front {
+                spread_sum += y - beta * x;
+            }
+            for &(x, y) in back {
+                spread_sum += y - beta * x;
+            }
+            let mean_spread = spread_sum / n;
+            let mut spread_squared = 0.0;
+            for &(x, y) in front {
+                let delta = y - beta * x - mean_spread;
+                spread_squared += delta * delta;
+            }
+            for &(x, y) in back {
+                let delta = y - beta * x - mean_spread;
+                spread_squared += delta * delta;
+            }
+            let std_spread = (spread_squared / n).sqrt();
             Some(if std_spread > 0.0 {
                 (spread - mean_spread) / std_spread
             } else {
@@ -2671,8 +2962,13 @@ impl SpreadZScore {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct FracDiff {
-    weights: Vec<f64>,
-    window: VecDeque<f64>,
+    weights: Box<[f64]>,
+    /// Double-written ring of `2 * weights.len()` slots: each input is
+    /// written at `pos` and `pos + width`, so the current window is always
+    /// the contiguous slice `buffer[pos..pos + width]` (oldest to newest).
+    buffer: Box<[f64]>,
+    pos: usize,
+    len: usize,
     value: Option<f64>,
 }
 
@@ -2709,8 +3005,10 @@ impl FracDiff {
         }
         let capacity = weights.len();
         Ok(Self {
-            weights,
-            window: VecDeque::with_capacity(capacity),
+            weights: weights.into_boxed_slice(),
+            buffer: vec![0.0; 2 * capacity].into_boxed_slice(),
+            pos: 0,
+            len: 0,
             value: None,
         })
     }
@@ -2720,15 +3018,27 @@ impl FracDiff {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// The dot product accumulates newest-first (`weights[0] * latest`, then
+    /// older bars), in the same order and with the same `acc += w * x`
+    /// operation as the previous `VecDeque` implementation, so results are
+    /// bit-identical; only the storage changed to a contiguous slice.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.window.len() == self.weights.len() {
-            self.window.pop_front();
+        let width = self.weights.len();
+        self.buffer[self.pos] = input;
+        self.buffer[self.pos + width] = input;
+        self.pos += 1;
+        if self.pos == width {
+            self.pos = 0;
         }
-        self.window.push_back(input);
-        self.value = if self.window.len() == self.weights.len() {
+        if self.len < width {
+            self.len += 1;
+        }
+        self.value = if self.len == width {
+            let window = &self.buffer[self.pos..self.pos + width];
             let mut acc = 0.0;
-            for (i, &w) in self.weights.iter().enumerate() {
-                acc += w * self.window[self.window.len() - 1 - i];
+            for (&w, &x) in self.weights.iter().zip(window.iter().rev()) {
+                acc += w * x;
             }
             Some(acc)
         } else {
@@ -2748,7 +3058,8 @@ impl FracDiff {
 
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.window.clear();
+        self.pos = 0;
+        self.len = 0;
         self.value = None;
     }
 }
@@ -3091,9 +3402,13 @@ pub struct IchimokuValue {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct Ichimoku {
-    tenkan: RollingMidprice,
-    kijun: RollingMidprice,
-    senkou: RollingMidprice,
+    /// One shared max/min staircase per side serving all three windows (M1),
+    /// instead of three `RollingMidprice` states with six deques between them.
+    highs: MultiPeriodStaircase,
+    lows: MultiPeriodStaircase,
+    tenkan_period: usize,
+    kijun_period: usize,
+    senkou_period: usize,
     value: Option<IchimokuValue>,
 }
 
@@ -3107,12 +3422,24 @@ impl Ichimoku {
         validate_period(tenkan)?;
         validate_period(kijun)?;
         validate_period(senkou)?;
+        let longest = tenkan.max(kijun).max(senkou);
         Ok(Self {
-            tenkan: RollingMidprice::new(tenkan)?,
-            kijun: RollingMidprice::new(kijun)?,
-            senkou: RollingMidprice::new(senkou)?,
+            highs: MultiPeriodStaircase::new(longest, true),
+            lows: MultiPeriodStaircase::new(longest, false),
+            tenkan_period: tenkan,
+            kijun_period: kijun,
+            senkou_period: senkou,
             value: None,
         })
+    }
+
+    /// Midpoint of the rolling high max and low min over `period` bars.
+    #[inline]
+    fn midprice(&self, period: usize) -> f64 {
+        match (self.highs.extremum(period), self.lows.extremum(period)) {
+            (Some(high), Some(low)) => (high + low) * 0.5,
+            _ => f64::NAN,
+        }
     }
 
     /// Computes or updates `append` through the native Rust kernel.
@@ -3120,10 +3447,17 @@ impl Ichimoku {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// The three extrema pairs share two scans: each bar is pushed once per
+    /// side and each window's midprice is read off the shared staircase. The
+    /// extrema themselves are comparison-only, so tenkan/kijun/span_b are the
+    /// same numbers the three separate `RollingMidprice` states produced.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> IchimokuValue {
-        let tenkan = self.tenkan.append(high, low).unwrap_or(f64::NAN);
-        let kijun = self.kijun.append(high, low).unwrap_or(f64::NAN);
-        let span_b = self.senkou.append(high, low).unwrap_or(f64::NAN);
+        self.highs.push(high);
+        self.lows.push(low);
+        let tenkan = self.midprice(self.tenkan_period);
+        let kijun = self.midprice(self.kijun_period);
+        let span_b = self.midprice(self.senkou_period);
         let span_a = if tenkan.is_nan() || kijun.is_nan() {
             f64::NAN
         } else {
@@ -3155,9 +3489,8 @@ impl Ichimoku {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
-        self.tenkan.reset();
-        self.kijun.reset();
-        self.senkou.reset();
+        self.highs.reset();
+        self.lows.reset();
         self.value = None;
     }
 }
@@ -3238,7 +3571,10 @@ pub struct Squeeze {
     mom_smooth: usize,
     bb_mid: SimpleMovingAverage,
     bb_dev: RollingStandardDeviation,
-    kc_basis: SimpleMovingAverage,
+    /// `None` when `kc_length == bb_length`: the Keltner basis is then the
+    /// same SMA of close as the Bollinger midline, so it is read from
+    /// `bb_mid` rather than maintained a second time (M4).
+    kc_basis: Option<SimpleMovingAverage>,
     tr_band: SqueezeTrBand,
     trange: TrueRange,
     close_window: Window,
@@ -3287,7 +3623,9 @@ impl Squeeze {
             mom_smooth,
             bb_mid: SimpleMovingAverage::new(bb_length)?,
             bb_dev: RollingStandardDeviation::new(bb_length, 1.0)?,
-            kc_basis: SimpleMovingAverage::new(kc_length)?,
+            kc_basis: (kc_length != bb_length)
+                .then(|| SimpleMovingAverage::new(kc_length))
+                .transpose()?,
             tr_band: SqueezeTrBand::new(kc_length)?,
             trange: TrueRange::new(),
             close_window: Window::new(mom_length)?,
@@ -3301,13 +3639,22 @@ impl Squeeze {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// M4: with the default `bb_length == kc_length` the Keltner basis is
+    /// literally the Bollinger midline — the same SMA of close over the same
+    /// window — so only one of the two is maintained. Same inputs, same
+    /// period, same recurrence, therefore the same bits.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> SqueezeValue {
-        let (bb_lower, bb_upper) = match (self.bb_mid.append(close), self.bb_dev.append(close)) {
+        let bb_mid = self.bb_mid.append(close);
+        let (bb_lower, bb_upper) = match (bb_mid, self.bb_dev.append(close)) {
             (Some(mid), Some(std)) => (mid - self.bb_std * std, mid + self.bb_std * std),
             _ => (f64::NAN, f64::NAN),
         };
 
-        let kc_basis = self.kc_basis.append(close);
+        let kc_basis = match self.kc_basis.as_mut() {
+            Some(kc_basis) => kc_basis.append(close),
+            None => bb_mid,
+        };
         let tr = self.trange.append(high, low, close).unwrap_or(f64::NAN);
         let kc_band = self.tr_band.append(tr);
         let (kc_lower, kc_upper) = match (kc_basis, kc_band) {
@@ -3353,7 +3700,9 @@ impl Squeeze {
     pub fn reset(&mut self) {
         self.bb_mid.reset();
         self.bb_dev.reset();
-        self.kc_basis.reset();
+        if let Some(kc_basis) = self.kc_basis.as_mut() {
+            kc_basis.reset();
+        }
         self.tr_band.reset();
         self.trange.reset();
         self.close_window.clear();
@@ -3395,7 +3744,9 @@ pub struct SqueezePro {
     mom_smooth: usize,
     bb_mid: SimpleMovingAverage,
     bb_dev: RollingStandardDeviation,
-    kc_basis: SimpleMovingAverage,
+    /// See [`Squeeze::kc_basis`]: `None` reuses the Bollinger midline when
+    /// `kc_length == bb_length` (M4).
+    kc_basis: Option<SimpleMovingAverage>,
     tr_band: SqueezeTrBand,
     trange: TrueRange,
     close_window: Window,
@@ -3455,7 +3806,9 @@ impl SqueezePro {
             mom_smooth,
             bb_mid: SimpleMovingAverage::new(bb_length)?,
             bb_dev: RollingStandardDeviation::new(bb_length, 1.0)?,
-            kc_basis: SimpleMovingAverage::new(kc_length)?,
+            kc_basis: (kc_length != bb_length)
+                .then(|| SimpleMovingAverage::new(kc_length))
+                .transpose()?,
             tr_band: SqueezeTrBand::new(kc_length)?,
             trange: TrueRange::new(),
             close_window: Window::new(mom_length)?,
@@ -3469,13 +3822,22 @@ impl SqueezePro {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// M4: the three Keltner levels already share one basis and one TR band;
+    /// with `bb_length == kc_length` that basis is also the Bollinger midline,
+    /// so the duplicate SMA of close is dropped (identical recurrence, so
+    /// identical bits).
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> SqueezeProValue {
-        let (bb_lower, bb_upper) = match (self.bb_mid.append(close), self.bb_dev.append(close)) {
+        let bb_mid = self.bb_mid.append(close);
+        let (bb_lower, bb_upper) = match (bb_mid, self.bb_dev.append(close)) {
             (Some(mid), Some(std)) => (mid - self.bb_std * std, mid + self.bb_std * std),
             _ => (f64::NAN, f64::NAN),
         };
 
-        let kc_basis = self.kc_basis.append(close);
+        let kc_basis = match self.kc_basis.as_mut() {
+            Some(kc_basis) => kc_basis.append(close),
+            None => bb_mid,
+        };
         let tr = self.trange.append(high, low, close).unwrap_or(f64::NAN);
         let kc_band = self.tr_band.append(tr);
         let (
@@ -3541,7 +3903,9 @@ impl SqueezePro {
     pub fn reset(&mut self) {
         self.bb_mid.reset();
         self.bb_dev.reset();
-        self.kc_basis.reset();
+        if let Some(kc_basis) = self.kc_basis.as_mut() {
+            kc_basis.reset();
+        }
         self.tr_band.reset();
         self.trange.reset();
         self.close_window.clear();
@@ -3757,6 +4121,79 @@ impl SchaffTrendCycle {
         };
         self.value = Some(value);
         value
+    }
+
+    /// Bulk kernel for the MACD chain: once both EMAs are warm, their scalar
+    /// recurrences advance in locals inside one loop; the two cascaded
+    /// stochastic stages (rolling extrema + smoothing) advance in place with
+    /// the exact per-bar arithmetic. Bit-identical to per-bar [`Self::append`]
+    /// in outputs and post-run streaming state.
+    pub fn extend_slices_into(
+        &mut self,
+        close: &[f64],
+        stc_out: &mut Vec<f64>,
+        macd_out: &mut Vec<f64>,
+        stoch_out: &mut Vec<f64>,
+    ) {
+        stc_out.reserve(close.len());
+        macd_out.reserve(close.len());
+        stoch_out.reserve(close.len());
+        let mut index = 0;
+        // Warm-up prologue: per-bar appends until the slow EMA is seeded
+        // (the fast EMA warms no later than the slow one).
+        while index < close.len() && self.slow_ema.current().is_none() {
+            let value = self.append(close[index]);
+            stc_out.push(value.stc);
+            macd_out.push(value.macd);
+            stoch_out.push(value.stoch);
+            index += 1;
+        }
+        if index == close.len() {
+            return;
+        }
+
+        let fast_k = self.fast_ema.smoothing();
+        let slow_k = self.slow_ema.smoothing();
+        let mut fast = self.fast_ema.current().expect("warm fast EMA");
+        let mut slow = self.slow_ema.current().expect("warm slow EMA");
+        let factor = self.factor;
+        let mut last = self.value;
+        for &close_value in &close[index..] {
+            fast = fast_k.mul_add(close_value - fast, fast);
+            slow = slow_k.mul_add(close_value - slow, slow);
+            let macd = fast - slow;
+
+            let lowest = self.xmacd_low.append(macd).unwrap_or(f64::NAN);
+            let highest = self.xmacd_high.append(macd).unwrap_or(f64::NAN);
+            let range = non_zero(highest - lowest);
+            if lowest > 0.0 {
+                self.stoch1 = 100.0 * ((macd - lowest) / range);
+            }
+            self.pf = round8(self.pf + factor * (self.stoch1 - self.pf));
+
+            let lowest_pf = self.pf_low.append(self.pf).unwrap_or(f64::NAN);
+            let highest_pf = self.pf_high.append(self.pf).unwrap_or(f64::NAN);
+            let range_pf = non_zero(highest_pf - lowest_pf);
+            if range_pf > 0.0 {
+                self.stoch2 = 100.0 * ((self.pf - lowest_pf) / range_pf);
+            }
+            self.pff = round8(self.pff + factor * (self.stoch2 - self.pff));
+
+            let value = SchaffTrendCycleValue {
+                stc: self.pff,
+                macd,
+                stoch: self.pf,
+            };
+            stc_out.push(value.stc);
+            macd_out.push(value.macd);
+            stoch_out.push(value.stoch);
+            last = Some(value);
+        }
+
+        let appended = close.len() - index;
+        self.fast_ema.store_bulk_state(fast, appended);
+        self.slow_ema.store_bulk_state(slow, appended);
+        self.value = last;
     }
 
     /// Computes or updates `value` through the native Rust kernel.
@@ -4165,6 +4602,113 @@ impl KnowSureThing {
         self.signal_state.reset();
         self.value = None;
     }
+
+    /// Bulk kernel: once every ROC/SMA chain is warm, advances the four
+    /// sliding-sum recurrences in one loop with the running sums held in
+    /// locals while the rings advance in place. Bit-identical to per-bar
+    /// [`Self::append`] in outputs and post-run streaming state.
+    pub fn extend_slices_into(
+        &mut self,
+        close: &[f64],
+        kst_out: &mut Vec<f64>,
+        signal_out: &mut Vec<f64>,
+    ) {
+        kst_out.reserve(close.len());
+        signal_out.reserve(close.len());
+        let mut index = 0;
+        // Warm-up prologue: per-bar appends until KST is non-NaN, which
+        // implies every ROC window and every SMA window is full.
+        while index < close.len() && self.value.map_or(true, |value| value.kst.is_nan()) {
+            let value = self.append(close[index]);
+            kst_out.push(value.kst);
+            signal_out.push(value.signal);
+            index += 1;
+        }
+        if index == close.len() {
+            return;
+        }
+
+        let [chain1, chain2, chain3, chain4] = &mut self.rocs;
+        let period1 = chain1.sma.period() as f64;
+        let period2 = chain2.sma.period() as f64;
+        let period3 = chain3.sma.period() as f64;
+        let period4 = chain4.sma.period() as f64;
+        let mut sum1 = chain1.sma.raw_sum();
+        let mut sum2 = chain2.sma.raw_sum();
+        let mut sum3 = chain3.sma.raw_sum();
+        let mut sum4 = chain4.sma.raw_sum();
+        let (mut rocma1, mut rocma2, mut rocma3, mut rocma4) =
+            (f64::NAN, f64::NAN, f64::NAN, f64::NAN);
+        let (mut kst, mut signal) = (f64::NAN, f64::NAN);
+        for &close_value in &close[index..] {
+            let previous1 = chain1
+                .close_window
+                .push(close_value)
+                .expect("full ROC window");
+            let ratio1 = (close_value - previous1) / previous1;
+            let evicted1 = chain1
+                .sma
+                .window_mut()
+                .push(ratio1)
+                .expect("full SMA window");
+            sum1 -= evicted1;
+            sum1 += ratio1;
+            rocma1 = sum1 / period1;
+
+            let previous2 = chain2
+                .close_window
+                .push(close_value)
+                .expect("full ROC window");
+            let ratio2 = (close_value - previous2) / previous2;
+            let evicted2 = chain2
+                .sma
+                .window_mut()
+                .push(ratio2)
+                .expect("full SMA window");
+            sum2 -= evicted2;
+            sum2 += ratio2;
+            rocma2 = sum2 / period2;
+
+            let previous3 = chain3
+                .close_window
+                .push(close_value)
+                .expect("full ROC window");
+            let ratio3 = (close_value - previous3) / previous3;
+            let evicted3 = chain3
+                .sma
+                .window_mut()
+                .push(ratio3)
+                .expect("full SMA window");
+            sum3 -= evicted3;
+            sum3 += ratio3;
+            rocma3 = sum3 / period3;
+
+            let previous4 = chain4
+                .close_window
+                .push(close_value)
+                .expect("full ROC window");
+            let ratio4 = (close_value - previous4) / previous4;
+            let evicted4 = chain4
+                .sma
+                .window_mut()
+                .push(ratio4)
+                .expect("full SMA window");
+            sum4 -= evicted4;
+            sum4 += ratio4;
+            rocma4 = sum4 / period4;
+
+            kst = 100.0 * (rocma1 + 2.0 * rocma2 + 3.0 * rocma3 + 4.0 * rocma4);
+            signal = self.signal_state.append(kst).unwrap_or(f64::NAN);
+            kst_out.push(kst);
+            signal_out.push(signal);
+        }
+
+        chain1.sma.store_bulk_state(sum1, Some(rocma1));
+        chain2.sma.store_bulk_state(sum2, Some(rocma2));
+        chain3.sma.store_bulk_state(sum3, Some(rocma3));
+        chain4.sma.store_bulk_state(sum4, Some(rocma4));
+        self.value = Some(KnowSureThingValue { kst, signal });
+    }
 }
 
 impl ActiveZoneList {
@@ -4313,9 +4857,13 @@ pub struct SwingValue {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct SwingHighLow {
-    highs: VecDeque<f64>,
-    lows: VecDeque<f64>,
-    length: usize,
+    /// Rolling extrema over the confirmation window (`2 * length + 1`).
+    high_extrema: MonotonicMax,
+    low_extrema: MonotonicMin,
+    /// Delay lines of `length + 1` bars: their oldest slot is the center bar
+    /// under test once the confirmation window is full.
+    center_highs: ContiguousWindow,
+    center_lows: ContiguousWindow,
     bars_since: Option<usize>,
     value: Option<SwingValue>,
 }
@@ -4330,9 +4878,10 @@ impl SwingHighLow {
         validate_period(length)?;
         let capacity = length.saturating_mul(2).saturating_add(1);
         Ok(Self {
-            highs: VecDeque::with_capacity(capacity),
-            lows: VecDeque::with_capacity(capacity),
-            length,
+            high_extrema: MonotonicMax::new(capacity)?,
+            low_extrema: MonotonicMin::new(capacity)?,
+            center_highs: ContiguousWindow::new(length + 1),
+            center_lows: ContiguousWindow::new(length + 1),
             bars_since: None,
             value: None,
         })
@@ -4343,23 +4892,25 @@ impl SwingHighLow {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// M1: the two O(2·length) window rescans become amortized-O(1) monotonic
+    /// deques, and the center bar comes from a fixed delay ring instead of
+    /// indexing a `VecDeque`. Extrema are comparison-only, so the confirmed
+    /// signals and levels are bit-identical to the rescan version.
     pub fn append(&mut self, high: f64, low: f64) -> Option<SwingValue> {
-        let capacity = self.length * 2 + 1;
-        if self.highs.len() == capacity {
-            self.highs.pop_front();
-            self.lows.pop_front();
-        }
-        self.highs.push_back(high);
-        self.lows.push_back(low);
+        let window_high = self.high_extrema.append(high);
+        let window_low = self.low_extrema.append(low);
+        self.center_highs.push(high);
+        self.center_lows.push(low);
 
-        if self.highs.len() < capacity {
+        let (Some(window_high), Some(window_low)) = (window_high, window_low) else {
             self.value = None;
             return None;
-        }
-        let center_high = self.highs[self.length];
-        let center_low = self.lows[self.length];
-        let is_high = center_high >= self.highs.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-        let is_low = center_low <= self.lows.iter().copied().fold(f64::INFINITY, f64::min);
+        };
+        let center_high = self.center_highs.window()[0];
+        let center_low = self.center_lows.window()[0];
+        let is_high = center_high >= window_high;
+        let is_low = center_low <= window_low;
         let (signal, level) = match (is_high, is_low) {
             (true, false) => (1.0, center_high),
             (false, true) => (-1.0, center_low),
@@ -4400,8 +4951,10 @@ impl SwingHighLow {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
-        self.highs.clear();
-        self.lows.clear();
+        self.high_extrema.reset();
+        self.low_extrema.reset();
+        self.center_highs.clear();
+        self.center_lows.clear();
         self.bars_since = None;
         self.value = None;
     }
@@ -4473,7 +5026,7 @@ impl RollingMean {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct RollingQuantile {
-    values: VecDeque<f64>,
+    window: super::sorted_ring::SortedRing,
     timeperiod: usize,
     quantile: f64,
     value: Option<f64>,
@@ -4489,7 +5042,7 @@ impl RollingQuantile {
         validate_period(timeperiod)?;
         validate_quantile(quantile)?;
         Ok(Self {
-            values: VecDeque::with_capacity(timeperiod),
+            window: super::sorted_ring::SortedRing::new(timeperiod),
             timeperiod,
             quantile,
             value: None,
@@ -4500,14 +5053,14 @@ impl RollingQuantile {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// The window is a shared sorted ring; the interpolation arithmetic is
+    /// unchanged from the per-bar full-sort implementation, so outputs stay
+    /// bit-identical.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.values.len() == self.timeperiod {
-            self.values.pop_front();
-        }
-        self.values.push_back(input);
-        self.value = if self.values.len() == self.timeperiod {
-            let mut sorted: Vec<f64> = self.values.iter().copied().collect();
-            sorted.sort_by(f64::total_cmp);
+        self.window.push(input);
+        self.value = if self.window.is_full() {
+            let sorted = self.window.sorted();
             let position = self.quantile * (self.timeperiod - 1) as f64;
             let lower = position.floor() as usize;
             let upper = position.ceil() as usize;
@@ -4527,7 +5080,7 @@ impl RollingQuantile {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.values.clear();
+        self.window.clear();
         self.value = None;
     }
 }
@@ -4663,7 +5216,7 @@ macro_rules! rolling_moment_operator {
     ($name:ident, $formula:expr) => {
         #[derive(Debug, Clone)]
         pub struct $name {
-            values: VecDeque<f64>,
+            values: Window,
             timeperiod: usize,
             nobs: usize,
             mean: f64,
@@ -4681,7 +5234,7 @@ macro_rules! rolling_moment_operator {
             pub fn new(timeperiod: usize) -> TaResult<Self> {
                 validate_period(timeperiod)?;
                 Ok(Self {
-                    values: VecDeque::with_capacity(timeperiod),
+                    values: Window::new(timeperiod)?,
                     timeperiod,
                     nobs: 0,
                     mean: 0.0,
@@ -4696,9 +5249,13 @@ macro_rules! rolling_moment_operator {
             /// Parameters are the typed series and configuration values in the signature.
             ///
             /// Returns the computed value, aligned history, or a validation error.
+            ///
+            /// The moment recurrences are already O(1); the window is a fixed
+            /// ring (never a `VecDeque`) and only supplies the evicted value,
+            /// so the arithmetic — and therefore every emitted bit — is
+            /// unchanged.
             pub fn append(&mut self, input: f64) -> Option<f64> {
-                if self.values.len() == self.timeperiod {
-                    let old = self.values.pop_front().expect("full moment window");
+                if let Some(old) = self.values.push(input) {
                     let n = (self.nobs - 1) as f64;
                     let delta = old - self.mean;
                     let delta_n = delta / n;
@@ -4713,7 +5270,6 @@ macro_rules! rolling_moment_operator {
                     self.mean -= delta_n;
                     self.nobs -= 1;
                 }
-                self.values.push_back(input);
                 let n_old = self.nobs as f64;
                 let n = n_old + 1.0;
                 let delta = input - self.mean;
@@ -4797,9 +5353,8 @@ impl RollingInterquartileRange {
     /// Append one value and return the current interquartile range.
     pub fn append(&mut self, input: f64) -> Option<f64> {
         self.quantile.append(input);
-        self.value = if self.quantile.values.len() == self.quantile.timeperiod {
-            let mut sorted: Vec<f64> = self.quantile.values.iter().copied().collect();
-            sorted.sort_by(f64::total_cmp);
+        self.value = if self.quantile.window.is_full() {
+            let sorted = self.quantile.window.sorted();
             let quantile = |q: f64| {
                 let position = q * (sorted.len() - 1) as f64;
                 let lower = position.floor() as usize;
@@ -4899,7 +5454,7 @@ impl RollingCov {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct RollingWinsorize {
-    values: VecDeque<f64>,
+    window: super::sorted_ring::SortedRing,
     timeperiod: usize,
     lower: f64,
     upper: f64,
@@ -4924,7 +5479,7 @@ impl RollingWinsorize {
             });
         }
         Ok(Self {
-            values: VecDeque::with_capacity(timeperiod),
+            window: super::sorted_ring::SortedRing::new(timeperiod),
             timeperiod,
             lower,
             upper,
@@ -4936,14 +5491,14 @@ impl RollingWinsorize {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// The window is a shared sorted ring; the quantile interpolation and
+    /// `max`/`min` clamping are unchanged from the per-bar full-sort
+    /// implementation, so outputs stay bit-identical.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.values.len() == self.timeperiod {
-            self.values.pop_front();
-        }
-        self.values.push_back(input);
-        self.value = if self.values.len() == self.timeperiod {
-            let mut sorted: Vec<f64> = self.values.iter().copied().collect();
-            sorted.sort_by(f64::total_cmp);
+        self.window.push(input);
+        self.value = if self.window.is_full() {
+            let sorted = self.window.sorted();
             let quantile = |q: f64| {
                 let position = q * (sorted.len() - 1) as f64;
                 let lower = position.floor() as usize;
@@ -4966,7 +5521,7 @@ impl RollingWinsorize {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.values.clear();
+        self.window.clear();
         self.value = None;
     }
 }
@@ -5318,14 +5873,203 @@ pub(crate) fn weighted_mean(values: &VecDeque<f64>) -> f64 {
         / denominator
 }
 
+/// Slice twin of [`weighted_mean`]: identical iteration order and arithmetic
+/// (`v * (i + 1)` accumulated oldest → newest), so results are bit-identical
+/// when the slice holds the same values front-to-back as the deque.
+fn weighted_mean_slice(values: &[f64]) -> f64 {
+    let denominator = (values.len() * (values.len() + 1) / 2) as f64;
+    values
+        .iter()
+        .enumerate()
+        .map(|(i, &v)| v * (i + 1) as f64)
+        .sum::<f64>()
+        / denominator
+}
+
+/// Fixed-capacity FIFO whose live window is always one contiguous slice.
+///
+/// Backed by a double-write buffer of `2 * capacity`: every value is stored
+/// at `pos` and `pos + capacity`, so the logical window (oldest → newest) is
+/// a single `&[f64]` — per-window rescans read straight-line memory instead
+/// of chasing a deque. Allocates exactly once; `clear` never reallocates.
+#[derive(Debug, Clone)]
+struct ContiguousWindow {
+    buf: Box<[f64]>,
+    cap: usize,
+    len: usize,
+    /// Next write slot in `0..cap`.
+    pos: usize,
+}
+
+impl ContiguousWindow {
+    fn new(cap: usize) -> Self {
+        debug_assert!(cap >= 1);
+        Self {
+            buf: vec![0.0; 2 * cap].into_boxed_slice(),
+            cap,
+            len: 0,
+            pos: 0,
+        }
+    }
+
+    #[inline]
+    fn push(&mut self, value: f64) {
+        self.buf[self.pos] = value;
+        self.buf[self.pos + self.cap] = value;
+        self.pos += 1;
+        if self.pos == self.cap {
+            self.pos = 0;
+        }
+        if self.len < self.cap {
+            self.len += 1;
+        }
+    }
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    #[inline]
+    fn is_full(&self) -> bool {
+        self.len == self.cap
+    }
+
+    /// The live window, oldest → newest, as one contiguous slice.
+    #[inline]
+    fn window(&self) -> &[f64] {
+        // Newest element sits at `pos - 1` (mod cap); its double-write copy
+        // at `pos - 1 + cap` ends the contiguous run of the last `len` values.
+        let end = self.pos + self.cap;
+        &self.buf[end - self.len..end]
+    }
+
+    #[inline]
+    fn clear(&mut self) {
+        self.len = 0;
+        self.pos = 0;
+    }
+}
+
+/// One monotonic staircase answering rolling max/min for **several** window
+/// lengths at once.
+///
+/// A single deque built for the longest period `P` holds exactly the elements
+/// not dominated by a later one, values strictly monotone from front to back.
+/// For any `p <= P` the extremum of the last `p` bars is the first entry whose
+/// index is still inside that shorter window — found by binary search. Three
+/// nested windows therefore need one staircase per side instead of one deque
+/// each. Backed by a fixed ring (`Box<[(usize, f64)]>`), never a `VecDeque`.
+#[derive(Debug, Clone)]
+struct MultiPeriodStaircase {
+    buf: Box<[(usize, f64)]>,
+    head: usize,
+    len: usize,
+    /// Number of observations consumed since construction/reset.
+    index: usize,
+    /// Longest window this staircase serves.
+    longest: usize,
+    /// `true` for a max staircase, `false` for a min staircase.
+    maximum: bool,
+}
+
+impl MultiPeriodStaircase {
+    fn new(longest: usize, maximum: bool) -> Self {
+        debug_assert!(longest >= 1);
+        Self {
+            buf: vec![(0usize, 0.0f64); longest].into_boxed_slice(),
+            head: 0,
+            len: 0,
+            index: 0,
+            longest,
+            maximum,
+        }
+    }
+
+    #[inline]
+    fn entry(&self, offset: usize) -> (usize, f64) {
+        let capacity = self.buf.len();
+        let mut slot = self.head + offset;
+        if slot >= capacity {
+            slot -= capacity;
+        }
+        self.buf[slot]
+    }
+
+    /// Pushes one observation, evicting entries that can never be an
+    /// extremum again. Pop-on-equal (newest wins) matches `MonotonicMax`.
+    fn push(&mut self, value: f64) {
+        let capacity = self.buf.len();
+        let index = self.index;
+        self.index += 1;
+        while self.len > 0 {
+            let (_, back) = self.entry(self.len - 1);
+            let dominated = if self.maximum {
+                back <= value
+            } else {
+                back >= value
+            };
+            if !dominated {
+                break;
+            }
+            self.len -= 1;
+        }
+        // Drop aged-out entries *before* inserting: the live entries then all
+        // carry distinct indices inside the longest window, so they always fit
+        // the ring's `longest` slots.
+        let first_valid = index.saturating_add(1).saturating_sub(self.longest);
+        while self.len > 0 && self.entry(0).0 < first_valid {
+            self.head += 1;
+            if self.head == capacity {
+                self.head = 0;
+            }
+            self.len -= 1;
+        }
+        let mut tail = self.head + self.len;
+        if tail >= capacity {
+            tail -= capacity;
+        }
+        self.buf[tail] = (index, value);
+        self.len += 1;
+    }
+
+    /// The extremum over the last `period` observations, or `None` while
+    /// fewer than `period` observations have been seen.
+    fn extremum(&self, period: usize) -> Option<f64> {
+        debug_assert!(period <= self.longest);
+        if self.index < period {
+            return None;
+        }
+        let first_valid = self.index - period;
+        // Entries are index-ascending: find the first one inside the window.
+        let mut low = 0;
+        let mut high = self.len;
+        while low < high {
+            let middle = (low + high) / 2;
+            if self.entry(middle).0 < first_valid {
+                low = middle + 1;
+            } else {
+                high = middle;
+            }
+        }
+        Some(self.entry(low).1)
+    }
+
+    fn reset(&mut self) {
+        self.head = 0;
+        self.len = 0;
+        self.index = 0;
+    }
+}
+
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `HullMovingAverage`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct HullMovingAverage {
-    raw: VecDeque<f64>,
-    intermediate: VecDeque<f64>,
+    raw: ContiguousWindow,
+    intermediate: ContiguousWindow,
     period: usize,
     half: usize,
     smooth: usize,
@@ -5337,39 +6081,32 @@ impl HullMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         let half = (period / 2).max(1);
-        let smooth = (period as f64).sqrt().floor() as usize;
+        let smooth = ((period as f64).sqrt().floor() as usize).max(1);
         Ok(Self {
-            raw: VecDeque::with_capacity(period),
-            intermediate: VecDeque::with_capacity(smooth.max(1)),
+            raw: ContiguousWindow::new(period),
+            intermediate: ContiguousWindow::new(smooth),
             period,
             half,
-            smooth: smooth.max(1),
+            smooth,
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// The WMA rescans run over contiguous ring slices in the same
+    /// oldest-to-newest order (and therefore the same rounding) as the
+    /// historical deque implementation, without its per-bar allocation.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.raw.len() == self.period {
-            self.raw.pop_front();
-        }
-        self.raw.push_back(input);
-        if self.raw.len() >= self.half && self.raw.len() >= self.period {
-            let half = weighted_mean(
-                &self
-                    .raw
-                    .iter()
-                    .skip(self.period - self.half)
-                    .copied()
-                    .collect(),
-            );
-            let full = weighted_mean(&self.raw);
-            if self.intermediate.len() == self.smooth {
-                self.intermediate.pop_front();
-            }
-            self.intermediate.push_back(2.0 * half - full);
-            self.value =
-                (self.intermediate.len() == self.smooth).then(|| weighted_mean(&self.intermediate));
+        self.raw.push(input);
+        if self.raw.is_full() {
+            let window = self.raw.window();
+            let half = weighted_mean_slice(&window[self.period - self.half..]);
+            let full = weighted_mean_slice(window);
+            self.intermediate.push(2.0 * half - full);
+            self.value = self
+                .intermediate
+                .is_full()
+                .then(|| weighted_mean_slice(self.intermediate.window()));
         } else {
             self.value = None
         }
@@ -5395,9 +6132,8 @@ impl HullMovingAverage {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct VolumeWeightedMovingAverage {
-    prices: VecDeque<f64>,
-    volumes: VecDeque<f64>,
-    period: usize,
+    prices: ContiguousWindow,
+    volumes: ContiguousWindow,
     value: Option<f64>,
 }
 impl VolumeWeightedMovingAverage {
@@ -5406,27 +6142,28 @@ impl VolumeWeightedMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            prices: VecDeque::with_capacity(period),
-            volumes: VecDeque::with_capacity(period),
-            period,
+            prices: ContiguousWindow::new(period),
+            volumes: ContiguousWindow::new(period),
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// The two window sums stay per-bar rescans over contiguous ring slices:
+    /// converting them to sliding add/evict sums would reassociate the
+    /// additions and change the low bits versus the historical fresh
+    /// oldest-to-newest summation this state has always emitted.
     pub fn append(&mut self, price: f64, volume: f64) -> Option<f64> {
-        if self.prices.len() == self.period {
-            self.prices.pop_front();
-            self.volumes.pop_front();
-        }
-        self.prices.push_back(price);
-        self.volumes.push_back(volume);
-        self.value = (self.prices.len() == self.period).then(|| {
-            let volume = self.volumes.iter().sum::<f64>();
+        self.prices.push(price);
+        self.volumes.push(volume);
+        self.value = self.prices.is_full().then(|| {
+            let prices = self.prices.window();
+            let volumes = self.volumes.window();
+            let volume = volumes.iter().sum::<f64>();
             if volume != 0.0 {
-                self.prices
+                prices
                     .iter()
-                    .zip(&self.volumes)
+                    .zip(volumes)
                     .map(|(&p, &v)| p * v)
                     .sum::<f64>()
                     / volume
@@ -5657,7 +6394,7 @@ impl TrueStrengthIndex {
 pub struct AwesomeOscillator {
     fast: usize,
     slow: usize,
-    values: VecDeque<f64>,
+    values: ContiguousWindow,
     value: Option<f64>,
 }
 impl AwesomeOscillator {
@@ -5676,20 +6413,23 @@ impl AwesomeOscillator {
         Ok(Self {
             fast,
             slow,
-            values: VecDeque::with_capacity(slow),
+            values: ContiguousWindow::new(slow),
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// Both means read one contiguous ring slice (the fast leg is the tail of
+    /// the slow window), so the two SMAs share a single pass over the same
+    /// cache lines. The summation orders are unchanged — the fast sum still
+    /// runs newest → oldest and the slow sum oldest → newest — because
+    /// reassociating either one moves the low bits of the difference.
     pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
-        if self.values.len() == self.slow {
-            self.values.pop_front();
-        }
-        self.values.push_back((high + low) * 0.5);
-        self.value = (self.values.len() == self.slow).then(|| {
-            let fast = self.values.iter().rev().take(self.fast).sum::<f64>() / self.fast as f64;
-            let slow = self.values.iter().sum::<f64>() / self.slow as f64;
+        self.values.push((high + low) * 0.5);
+        self.value = self.values.is_full().then(|| {
+            let window = self.values.window();
+            let fast = window[self.slow - self.fast..].iter().rev().sum::<f64>() / self.fast as f64;
+            let slow = window.iter().sum::<f64>() / self.slow as f64;
             fast - slow
         });
         self.value
@@ -5709,12 +6449,13 @@ impl AwesomeOscillator {
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `FisherTransform`.
+
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct FisherTransform {
-    period: usize,
-    values: VecDeque<f64>,
+    highs: MonotonicMax,
+    lows: MonotonicMin,
     previous: f64,
     value: Option<f64>,
 }
@@ -5724,28 +6465,25 @@ impl FisherTransform {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            period,
-            values: VecDeque::with_capacity(period),
+            highs: MonotonicMax::new(period)?,
+            lows: MonotonicMin::new(period)?,
             previous: 0.0,
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// The window max/min feed is a pair of monotonic deques (amortized O(1))
+    /// instead of an O(period) rescan of a value deque; the extrema they
+    /// report are the same numbers the rescan folded, so the transform is
+    /// bit-identical.
     pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
-        if self.values.len() == self.period {
-            self.values.pop_front();
-        }
-        self.values.push_back((high + low) * 0.5);
-        self.value = (self.values.len() == self.period).then(|| {
-            let high = self
-                .values
-                .iter()
-                .copied()
-                .fold(f64::NEG_INFINITY, f64::max);
-            let low = self.values.iter().copied().fold(f64::INFINITY, f64::min);
+        let midpoint = (high + low) * 0.5;
+        let maximum = self.highs.append(midpoint);
+        let minimum = self.lows.append(midpoint);
+        self.value = maximum.zip(minimum).map(|(high, low)| {
             let normalized = if high != low {
-                2.0 * ((self.values.back().copied().unwrap() - low) / (high - low) - 0.5)
+                2.0 * ((midpoint - low) / (high - low) - 0.5)
             } else {
                 0.0
             };
@@ -5763,7 +6501,8 @@ impl FisherTransform {
     /// Reset the state and clear its accumulated history.
     ///
     pub fn reset(&mut self) {
-        self.values.clear();
+        self.highs.reset();
+        self.lows.reset();
         self.previous = 0.0;
         self.value = None;
     }
@@ -5785,9 +6524,8 @@ pub struct DonchianValue {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct Donchian {
-    highs: VecDeque<f64>,
-    lows: VecDeque<f64>,
-    period: usize,
+    highs: MonotonicMax,
+    lows: MonotonicMin,
     value: Option<DonchianValue>,
 }
 impl Donchian {
@@ -5796,31 +6534,90 @@ impl Donchian {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            highs: VecDeque::with_capacity(period),
-            lows: VecDeque::with_capacity(period),
-            period,
+            highs: MonotonicMax::new(period)?,
+            lows: MonotonicMin::new(period)?,
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// M1: the two O(period) extrema rescans become amortized-O(1) monotonic
+    /// deques. Extrema are comparison-only, so the emitted bands are the same
+    /// values the rescans produced.
     pub fn append(&mut self, high: f64, low: f64) -> Option<DonchianValue> {
-        if self.highs.len() == self.period {
-            self.highs.pop_front();
-            self.lows.pop_front();
-        }
-        self.highs.push_back(high);
-        self.lows.push_back(low);
-        self.value = (self.highs.len() == self.period).then(|| {
-            let upper = self.highs.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-            let lower = self.lows.iter().copied().fold(f64::INFINITY, f64::min);
-            DonchianValue {
-                upper,
-                lower,
-                middle: (upper + lower) * 0.5,
-            }
+        let upper = self.highs.append(high);
+        let lower = self.lows.append(low);
+        self.value = upper.zip(lower).map(|(upper, lower)| DonchianValue {
+            upper,
+            lower,
+            middle: (upper + lower) * 0.5,
         });
         self.value
+    }
+    /// Bulk kernel: one vHGW max pass over `high` and one vHGW min pass over
+    /// `low`, with the midline derived in the same flat loop. The trailing
+    /// `period` inputs are replayed to rebuild the monotonic deques, so outputs
+    /// and post-run state are bit-identical to per-bar [`Self::append`];
+    /// warm-up bars are NaN.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        upper_out: &mut Vec<f64>,
+        lower_out: &mut Vec<f64>,
+        middle_out: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if high.len() != low.len() {
+            return Err(TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len(),
+            });
+        }
+        let n = high.len();
+        let period = self.highs.period();
+        if self.highs.count() != 0 || n < period {
+            upper_out.reserve(n);
+            lower_out.reserve(n);
+            middle_out.reserve(n);
+            for index in 0..n {
+                match self.append(high[index], low[index]) {
+                    Some(value) => {
+                        upper_out.push(value.upper);
+                        lower_out.push(value.lower);
+                        middle_out.push(value.middle);
+                    }
+                    None => {
+                        upper_out.push(f64::NAN);
+                        lower_out.push(f64::NAN);
+                        middle_out.push(f64::NAN);
+                    }
+                }
+            }
+            return Ok(());
+        }
+        let upper_start = upper_out.len();
+        let lower_start = lower_out.len();
+        let middle_start = middle_out.len();
+        upper_out.resize(upper_start + n, f64::NAN);
+        lower_out.resize(lower_start + n, f64::NAN);
+        middle_out.resize(middle_start + n, f64::NAN);
+        super::vhgw::sliding_max_into(high, period, &mut upper_out[upper_start + period - 1..]);
+        super::vhgw::sliding_min_into(low, period, &mut lower_out[lower_start + period - 1..]);
+        for (slot, (&upper, &lower)) in middle_out[middle_start + period - 1..].iter_mut().zip(
+            upper_out[upper_start + period - 1..]
+                .iter()
+                .zip(&lower_out[lower_start + period - 1..]),
+        ) {
+            *slot = (upper + lower) * 0.5;
+        }
+        self.highs.rebuild_from_full_run(high);
+        self.lows.rebuild_from_full_run(low);
+        self.value = Some(DonchianValue {
+            upper: *upper_out.last().expect("at least one warmed bar"),
+            lower: *lower_out.last().expect("at least one warmed bar"),
+            middle: *middle_out.last().expect("at least one warmed bar"),
+        });
+        Ok(())
     }
     /// Return the latest computed result, if warm-up is complete.
     ///
@@ -5830,8 +6627,8 @@ impl Donchian {
     /// Reset the state and clear its accumulated history.
     ///
     pub fn reset(&mut self) {
-        self.highs.clear();
-        self.lows.clear();
+        self.highs.reset();
+        self.lows.reset();
         self.value = None;
     }
 }
@@ -5842,7 +6639,7 @@ impl Donchian {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct UlcerIndex {
-    values: VecDeque<f64>,
+    values: ContiguousWindow,
     period: usize,
     value: Option<f64>,
 }
@@ -5852,22 +6649,25 @@ impl UlcerIndex {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            values: VecDeque::with_capacity(period),
+            values: ContiguousWindow::new(period),
             period,
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// The drawdown peak is a *prefix* maximum inside the window, so every
+    /// squared-drawdown term is re-derived when the window slides: neither a
+    /// rolling-window max structure nor a sliding sum can reproduce this
+    /// series. The scan therefore stays O(period), but over one contiguous
+    /// ring slice instead of a deque, preserving the summation order exactly.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.values.len() == self.period {
-            self.values.pop_front();
-        }
-        self.values.push_back(input);
-        self.value = (self.values.len() == self.period).then(|| {
+        self.values.push(input);
+        self.value = self.values.is_full().then(|| {
             let mut peak = f64::NEG_INFINITY;
             let sum = self
                 .values
+                .window()
                 .iter()
                 .map(|&v| {
                     peak = peak.max(v);
@@ -6033,9 +6833,8 @@ impl ChaikinVolatility {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct RollingVolumeWeightedAveragePrice {
-    prices: VecDeque<f64>,
-    volumes: VecDeque<f64>,
-    period: usize,
+    prices: ContiguousWindow,
+    volumes: ContiguousWindow,
     value: Option<f64>,
 }
 impl RollingVolumeWeightedAveragePrice {
@@ -6044,27 +6843,27 @@ impl RollingVolumeWeightedAveragePrice {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            prices: VecDeque::with_capacity(period),
-            volumes: VecDeque::with_capacity(period),
-            period,
+            prices: ContiguousWindow::new(period),
+            volumes: ContiguousWindow::new(period),
             value: None,
         })
     }
     /// Append one causal observation and return the latest result.
     ///
+    /// Like [`VolumeWeightedMovingAverage`], both window sums are contiguous
+    /// per-bar rescans: sliding add/evict sums would reassociate them and
+    /// perturb the low bits of the historical output.
     pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
-        if self.prices.len() == self.period {
-            self.prices.pop_front();
-            self.volumes.pop_front();
-        }
-        self.prices.push_back((high + low + close) / 3.0);
-        self.volumes.push_back(volume);
-        self.value = (self.prices.len() == self.period).then(|| {
-            let total = self.volumes.iter().sum::<f64>();
+        self.prices.push((high + low + close) / 3.0);
+        self.volumes.push(volume);
+        self.value = self.prices.is_full().then(|| {
+            let prices = self.prices.window();
+            let volumes = self.volumes.window();
+            let total = volumes.iter().sum::<f64>();
             if total != 0.0 {
-                self.prices
+                prices
                     .iter()
-                    .zip(&self.volumes)
+                    .zip(volumes)
                     .map(|(&p, &v)| p * v)
                     .sum::<f64>()
                     / total
@@ -6540,20 +7339,67 @@ rolling_risk_operator!(RollingSortino, |values: &VecDeque<f64>| {
     }
 });
 
-rolling_risk_operator!(RollingCalmar, |values: &VecDeque<f64>| {
-    let average = mean(values);
-    let mut peak = values[0];
-    let mut drawdown: f64 = 0.0;
-    for &value in values {
-        peak = peak.max(value);
-        drawdown = drawdown.min(if peak != 0.0 { value / peak - 1.0 } else { 0.0 });
+/// Rolling Calmar ratio: window mean over the window's maximum drawdown.
+///
+/// Split out of `rolling_risk_operator!` because the maximum drawdown is
+/// driven by a *prefix* maximum inside the window — no rolling-extrema
+/// structure and no sliding sum can reproduce the series when the window
+/// slides. The O(period) rescan is therefore inherent; what this version
+/// removes is the deque (one contiguous ring slice instead) and the second
+/// pass: the window sum is accumulated in the same oldest-to-newest order,
+/// inside the drawdown loop, so the emitted ratio is bit-identical.
+#[derive(Debug, Clone)]
+pub struct RollingCalmar {
+    values: ContiguousWindow,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl RollingCalmar {
+    /// Creates the state for a positive rolling window.
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self {
+            values: ContiguousWindow::new(timeperiod),
+            timeperiod,
+            value: None,
+        })
     }
-    if drawdown < 0.0 {
-        average / -drawdown
-    } else {
-        0.0
+
+    /// Append one causal observation and return the latest result.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        self.values.push(input);
+        self.value = self.values.is_full().then(|| {
+            let window = self.values.window();
+            let mut sum = 0.0;
+            let mut peak = window[0];
+            let mut drawdown: f64 = 0.0;
+            for &value in window {
+                sum += value;
+                peak = peak.max(value);
+                drawdown = drawdown.min(if peak != 0.0 { value / peak - 1.0 } else { 0.0 });
+            }
+            let average = sum / self.timeperiod as f64;
+            if drawdown < 0.0 {
+                average / -drawdown
+            } else {
+                0.0
+            }
+        });
+        self.value
     }
-});
+
+    /// Return the latest computed result, if warm-up is complete.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
+    }
+}
 
 /// Stateful Mass Index (Dorsey): rolling sum of the ratio between a short EMA
 /// of the high-low range and an EMA of that EMA.
@@ -6999,6 +7845,126 @@ mod tests {
     use super::*;
     use crate::stream::*;
     use crate::stream::{CumulativeProduct, CumulativeSum, LogReturn, RollingMedian, RollingMode};
+
+    fn bulk_lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    #[test]
+    fn know_sure_thing_bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = bulk_lcg_series(5_000, 0x5EED_0357);
+        let tail = bulk_lcg_series(128, 0x7A11_0357);
+        let combos = [
+            (
+                10usize, 15usize, 20usize, 30usize, 10usize, 10usize, 10usize, 15usize, 9usize,
+            ),
+            (1, 1, 1, 1, 1, 1, 1, 1, 1),
+            (2, 3, 4, 5, 2, 2, 2, 2, 3),
+            (5, 5, 5, 5, 8, 8, 8, 8, 2),
+        ];
+        for (r1, r2, r3, r4, s1, s2, s3, s4, nsig) in combos {
+            let mut per_bar = KnowSureThing::new(r1, r2, r3, r4, s1, s2, s3, s4, nsig).unwrap();
+            let mut ref_kst = Vec::new();
+            let mut ref_signal = Vec::new();
+            for &x in &input {
+                let value = per_bar.append(x);
+                ref_kst.push(value.kst);
+                ref_signal.push(value.signal);
+            }
+            let mut tail_kst = Vec::new();
+            let mut tail_signal = Vec::new();
+            for &x in &tail {
+                let value = per_bar.append(x);
+                tail_kst.push(value.kst);
+                tail_signal.push(value.signal);
+            }
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state = KnowSureThing::new(r1, r2, r3, r4, s1, s2, s3, s4, nsig).unwrap();
+                let (mut kst_out, mut signal_out) = (Vec::new(), Vec::new());
+                for piece in input.chunks(chunk.min(input.len())) {
+                    state.extend_slices_into(piece, &mut kst_out, &mut signal_out);
+                }
+                let label = format!("kst {r1}/{s1}/{nsig} chunk {chunk}");
+                assert_same_bits(&kst_out, &ref_kst, &label);
+                assert_same_bits(&signal_out, &ref_signal, &label);
+                let (mut tk, mut ts) = (Vec::new(), Vec::new());
+                for &x in &tail {
+                    let value = state.append(x);
+                    tk.push(value.kst);
+                    ts.push(value.signal);
+                }
+                assert_same_bits(&tk, &tail_kst, &format!("{label} tail"));
+                assert_same_bits(&ts, &tail_signal, &format!("{label} tail"));
+            }
+        }
+    }
+
+    #[test]
+    fn schaff_trend_cycle_bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = bulk_lcg_series(5_000, 0x5EED_057C);
+        let tail = bulk_lcg_series(128, 0x7A11_057C);
+        let combos = [
+            (10usize, 23usize, 50usize, 0.5),
+            (1, 2, 2, 0.5),
+            (3, 5, 5, 1.0),
+            (2, 2, 30, 0.25),
+        ];
+        for (tclength, fast, slow, factor) in combos {
+            let mut per_bar = SchaffTrendCycle::new(tclength, fast, slow, factor).unwrap();
+            let (mut ref_stc, mut ref_macd, mut ref_stoch) = (Vec::new(), Vec::new(), Vec::new());
+            for &x in &input {
+                let value = per_bar.append(x);
+                ref_stc.push(value.stc);
+                ref_macd.push(value.macd);
+                ref_stoch.push(value.stoch);
+            }
+            let (mut tail_stc, mut tail_macd, mut tail_stoch) =
+                (Vec::new(), Vec::new(), Vec::new());
+            for &x in &tail {
+                let value = per_bar.append(x);
+                tail_stc.push(value.stc);
+                tail_macd.push(value.macd);
+                tail_stoch.push(value.stoch);
+            }
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state = SchaffTrendCycle::new(tclength, fast, slow, factor).unwrap();
+                let (mut s, mut m, mut t) = (Vec::new(), Vec::new(), Vec::new());
+                for piece in input.chunks(chunk.min(input.len())) {
+                    state.extend_slices_into(piece, &mut s, &mut m, &mut t);
+                }
+                let label = format!("stc {tclength}/{fast}/{slow} chunk {chunk}");
+                assert_same_bits(&s, &ref_stc, &label);
+                assert_same_bits(&m, &ref_macd, &label);
+                assert_same_bits(&t, &ref_stoch, &label);
+                let (mut xs, mut xm, mut xt) = (Vec::new(), Vec::new(), Vec::new());
+                for &x in &tail {
+                    let value = state.append(x);
+                    xs.push(value.stc);
+                    xm.push(value.macd);
+                    xt.push(value.stoch);
+                }
+                assert_same_bits(&xs, &tail_stc, &format!("{label} tail"));
+                assert_same_bits(&xm, &tail_macd, &format!("{label} tail"));
+                assert_same_bits(&xt, &tail_stoch, &format!("{label} tail"));
+            }
+        }
+    }
 
     #[test]
     fn batch_and_stream_match() {
@@ -7716,5 +8682,91 @@ mod tests {
         );
         assert!(batch[0].is_nan());
         assert!(batch[1..].iter().all(|value| value.is_finite()));
+    }
+}
+
+#[cfg(test)]
+mod donchian_bulk_tests {
+    use super::Donchian;
+
+    fn lcg_series(len: usize, seed: u64) -> Vec<f64> {
+        let mut state = seed;
+        (0..len)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                ((state >> 33) % 100_003) as f64 / 101.0
+            })
+            .collect()
+    }
+
+    #[test]
+    fn donchian_bulk_matches_append_bitwise() {
+        let base = lcg_series(5_000, 0x00DC_1A11_2233_4455);
+        let high: Vec<f64> = base.iter().map(|v| v + 0.5).collect();
+        let low: Vec<f64> = base.iter().map(|v| v - 0.5).collect();
+        for period in [2usize, 5, 14, 30, 200] {
+            let mut reference = Donchian::new(period).unwrap();
+            let expected: Vec<(f64, f64, f64)> = (0..base.len())
+                .map(|i| match reference.append(high[i], low[i]) {
+                    Some(value) => (value.upper, value.lower, value.middle),
+                    None => (f64::NAN, f64::NAN, f64::NAN),
+                })
+                .collect();
+            for chunk in [1usize, 7, 97, base.len()] {
+                let mut state = Donchian::new(period).unwrap();
+                let (mut upper, mut lower, mut middle) = (Vec::new(), Vec::new(), Vec::new());
+                let mut offset = 0;
+                while offset < base.len() {
+                    let end = (offset + chunk).min(base.len());
+                    state
+                        .extend_slices_into(
+                            &high[offset..end],
+                            &low[offset..end],
+                            &mut upper,
+                            &mut lower,
+                            &mut middle,
+                        )
+                        .unwrap();
+                    offset = end;
+                }
+                assert_eq!(upper.len(), base.len());
+                for (i, (eu, el, em)) in expected.iter().enumerate() {
+                    assert_eq!(
+                        eu.to_bits(),
+                        upper[i].to_bits(),
+                        "upper p={period} c={chunk} i={i}"
+                    );
+                    assert_eq!(
+                        el.to_bits(),
+                        lower[i].to_bits(),
+                        "lower p={period} c={chunk} i={i}"
+                    );
+                    assert_eq!(
+                        em.to_bits(),
+                        middle[i].to_bits(),
+                        "middle p={period} c={chunk} i={i}"
+                    );
+                }
+                let mut follow = reference.clone();
+                for i in 0..256 {
+                    assert_eq!(
+                        follow.append(high[i], low[i]),
+                        state.append(high[i], low[i]),
+                        "continue p={period} c={chunk}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn donchian_bulk_validates_lengths() {
+        let mut state = Donchian::new(3).unwrap();
+        let (mut u, mut l, mut m) = (Vec::new(), Vec::new(), Vec::new());
+        assert!(state
+            .extend_slices_into(&[1.0, 2.0], &[1.0], &mut u, &mut l, &mut m)
+            .is_err());
     }
 }

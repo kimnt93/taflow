@@ -1,7 +1,5 @@
 //! Stateful Variable Index Dynamic Average.
 
-use std::collections::VecDeque;
-
 use super::StreamingIndicator;
 use crate::error::{TaError, TaResult};
 
@@ -14,7 +12,10 @@ use crate::error::{TaError, TaResult};
 pub struct VariableIndexDynamicAverage {
     period: usize,
     alpha: f64,
-    closes: VecDeque<f64>,
+    /// Fixed ring of the last `period + 1` closes, oldest at `head`.
+    closes: Box<[f64]>,
+    head: usize,
+    len: usize,
     value: Option<f64>,
 }
 
@@ -38,28 +39,45 @@ impl VariableIndexDynamicAverage {
         Ok(Self {
             period,
             alpha,
-            closes: VecDeque::with_capacity(period + 1),
+            closes: vec![0.0; period + 1].into_boxed_slice(),
+            head: 0,
+            len: 0,
             value: None,
         })
     }
-}
 
-impl StreamingIndicator for VariableIndexDynamicAverage {
-    type Output = f64;
+    #[inline]
+    fn push_close(&mut self, input: f64) {
+        let capacity = self.closes.len();
+        if self.len < capacity {
+            // The head stays at 0 until the ring is full.
+            self.closes[self.len] = input;
+            self.len += 1;
+        } else {
+            self.closes[self.head] = input;
+            self.head += 1;
+            if self.head == capacity {
+                self.head = 0;
+            }
+        }
+    }
 
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.closes.push_back(input);
-        if self.closes.len() > self.period + 1 {
-            self.closes.pop_front();
-        }
-        if self.value.is_none() {
-            self.value = Some(input);
-            return self.value;
-        }
+    /// The CMO weight for the retained window, folded oldest-to-newest.
+    #[inline]
+    fn weight_from_ring(&self) -> f64 {
+        // The ring is at most two contiguous runs; `head` only starts moving
+        // once the ring is full, so a partially filled ring is `closes[..len]`.
+        let (first, second): (&[f64], &[f64]) = if self.len < self.closes.len() {
+            (&self.closes[..self.len], &[])
+        } else {
+            let (front, back) = self.closes.split_at(self.head);
+            (back, front)
+        };
         let mut up = 0.0;
         let mut down = 0.0;
-        let mut previous = self.closes.front().copied().unwrap_or(input);
-        for &close in self.closes.iter().skip(1) {
+        let mut iter = first.iter().chain(second.iter());
+        let mut previous = *iter.next().expect("the ring holds at least one close");
+        for &close in iter {
             let change = close - previous;
             if change > 0.0 {
                 up += change;
@@ -68,15 +86,37 @@ impl StreamingIndicator for VariableIndexDynamicAverage {
             }
             previous = close;
         }
+        Self::weight(up, down)
+    }
+
+    #[inline]
+    fn weight(up: f64, down: f64) -> f64 {
         let total = up + down;
-        let weight = if total == 0.0 {
+        if total == 0.0 {
             0.0
         } else {
             (up - down).abs() / total
-        };
+        }
+    }
+
+    #[inline]
+    fn advance(&self, weight: f64, input: f64, previous_value: f64) -> f64 {
+        self.alpha * weight * input + (1.0 - self.alpha * weight) * previous_value
+    }
+}
+
+impl StreamingIndicator for VariableIndexDynamicAverage {
+    type Output = f64;
+
+    fn append(&mut self, input: f64) -> Option<f64> {
+        self.push_close(input);
+        if self.value.is_none() {
+            self.value = Some(input);
+            return self.value;
+        }
+        let weight = self.weight_from_ring();
         let previous_value = self.value.expect("initialized above");
-        self.value =
-            Some(self.alpha * weight * input + (1.0 - self.alpha * weight) * previous_value);
+        self.value = Some(self.advance(weight, input, previous_value));
         self.value
     }
 
@@ -85,7 +125,204 @@ impl StreamingIndicator for VariableIndexDynamicAverage {
     }
 
     fn reset(&mut self) {
-        self.closes.clear();
+        self.closes.fill(0.0);
+        self.head = 0;
+        self.len = 0;
         self.value = None;
+    }
+
+    /// Bulk kernel: once the window is full it is exactly
+    /// `inputs[t - period ..= t]`, so the steady loop folds the slice directly
+    /// with no ring traffic and the identical accumulation order.
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        output.reserve(inputs.len());
+        let period = self.period;
+        let prologue = (period + 1).min(inputs.len());
+        for &input in &inputs[..prologue] {
+            output.push(self.append(input).unwrap_or(f64::NAN));
+        }
+        if inputs.len() <= prologue {
+            return;
+        }
+
+        let mut current = self.value.expect("the first bar seeds VIDYA");
+        for t in prologue..inputs.len() {
+            let window = &inputs[t - period..=t];
+            let mut up = 0.0;
+            let mut down = 0.0;
+            let mut previous = window[0];
+            for &close in &window[1..] {
+                let change = close - previous;
+                if change > 0.0 {
+                    up += change;
+                } else {
+                    down -= change;
+                }
+                previous = close;
+            }
+            let weight = Self::weight(up, down);
+            current = self.advance(weight, inputs[t], current);
+            output.push(current);
+        }
+
+        // Exact state writeback: the ring holds the last `period + 1` closes in
+        // chronological order starting at head 0.
+        self.value = Some(current);
+        let end = inputs.len();
+        let capacity = period + 1;
+        self.closes[..capacity].copy_from_slice(&inputs[end - capacity..end]);
+        self.head = 0;
+        self.len = capacity;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn lcg_series(len: usize, mut seed: u64) -> Vec<f64> {
+        (0..len)
+            .map(|_| {
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                100.0 + ((seed >> 11) as f64 / (1u64 << 53) as f64 - 0.5) * 20.0
+            })
+            .collect()
+    }
+
+    /// Verbatim copy of the pre-optimization `VecDeque` implementation.
+    mod oracle {
+        use std::collections::VecDeque;
+
+        pub struct Vidya {
+            period: usize,
+            alpha: f64,
+            closes: VecDeque<f64>,
+            pub value: Option<f64>,
+        }
+
+        impl Vidya {
+            pub fn new(period: usize, alpha: f64) -> Self {
+                Self {
+                    period,
+                    alpha,
+                    closes: VecDeque::with_capacity(period + 1),
+                    value: None,
+                }
+            }
+
+            pub fn append(&mut self, input: f64) -> Option<f64> {
+                self.closes.push_back(input);
+                if self.closes.len() > self.period + 1 {
+                    self.closes.pop_front();
+                }
+                if self.value.is_none() {
+                    self.value = Some(input);
+                    return self.value;
+                }
+                let mut up = 0.0;
+                let mut down = 0.0;
+                let mut previous = self.closes.front().copied().unwrap_or(input);
+                for &close in self.closes.iter().skip(1) {
+                    let change = close - previous;
+                    if change > 0.0 {
+                        up += change;
+                    } else {
+                        down -= change;
+                    }
+                    previous = close;
+                }
+                let total = up + down;
+                let weight = if total == 0.0 {
+                    0.0
+                } else {
+                    (up - down).abs() / total
+                };
+                let previous_value = self.value.expect("initialized above");
+                self.value = Some(
+                    self.alpha * weight * input + (1.0 - self.alpha * weight) * previous_value,
+                );
+                self.value
+            }
+        }
+    }
+
+    fn oracle_outputs(input: &[f64], period: usize, alpha: f64) -> Vec<Option<f64>> {
+        let mut state = oracle::Vidya::new(period, alpha);
+        input.iter().map(|&bar| state.append(bar)).collect()
+    }
+
+    #[test]
+    fn append_matches_oracle_bitwise() {
+        let input = lcg_series(5_000, 0x71da_0000_0000_0001);
+        for period in [1_usize, 2, 5, 14, 30] {
+            let expected = oracle_outputs(&input, period, 0.2);
+            let mut state = VariableIndexDynamicAverage::new(period, 0.2).unwrap();
+            for (index, (&bar, want)) in input.iter().zip(&expected).enumerate() {
+                assert_eq!(
+                    state.append(bar).map(f64::to_bits),
+                    want.map(f64::to_bits),
+                    "period {period} bar {index}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn bulk_and_chunked_match_append_bitwise() {
+        let input = lcg_series(5_000, 0x71da_0000_0000_0002);
+        for period in [1_usize, 2, 5, 14, 30] {
+            let expected: Vec<f64> = oracle_outputs(&input, period, 0.2)
+                .into_iter()
+                .map(|value| value.unwrap_or(f64::NAN))
+                .collect();
+            for chunk in [1_usize, 7, 97, 5_000] {
+                let mut state = VariableIndexDynamicAverage::new(period, 0.2).unwrap();
+                let mut output = Vec::new();
+                for window in input.chunks(chunk) {
+                    state.extend_slice_into(window, &mut output);
+                }
+                for (index, (got, want)) in output.iter().zip(&expected).enumerate() {
+                    assert_eq!(
+                        got.to_bits(),
+                        want.to_bits(),
+                        "chunk {chunk} period {period} @{index}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn continue_after_bulk_matches_append() {
+        let input = lcg_series(5_000, 0x71da_0000_0000_0003);
+        for period in [2_usize, 14] {
+            let expected = oracle_outputs(&input, period, 0.35);
+            let split = 2_777;
+            let mut state = VariableIndexDynamicAverage::new(period, 0.35).unwrap();
+            let mut output = Vec::new();
+            state.extend_slice_into(&input[..split], &mut output);
+            for (index, (&bar, want)) in input[split..].iter().zip(&expected[split..]).enumerate() {
+                assert_eq!(
+                    state.append(bar).map(f64::to_bits),
+                    want.map(f64::to_bits),
+                    "period {period} continuation bar {index}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn reset_restores_initial_behaviour() {
+        let input = lcg_series(400, 0x71da_0000_0000_0004);
+        let mut state = VariableIndexDynamicAverage::new(11, 0.2).unwrap();
+        let first: Vec<Option<f64>> = input.iter().map(|&bar| state.append(bar)).collect();
+        state.reset();
+        assert!(state.value().is_none());
+        let second: Vec<Option<f64>> = input.iter().map(|&bar| state.append(bar)).collect();
+        for (a, b) in first.iter().zip(&second) {
+            assert_eq!(a.map(f64::to_bits), b.map(f64::to_bits));
+        }
     }
 }

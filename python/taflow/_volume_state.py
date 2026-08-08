@@ -33,7 +33,6 @@ class OhlcvStateAdapter:
     ) -> None:
         """Create native state and optionally process initial OHLCV data."""
         self._state = self._native_cls(*parameters)
-        self._values: list[float] = []
         if any(value is not None for value in (high, low, close, volume)):
             self.extend(high, low, close, volume)
 
@@ -50,8 +49,7 @@ class OhlcvStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        value = self._state.append(float(high), float(low), float(close), float(volume))
-        self._values.append(np.nan if value is None else value)
+        self._state.append(float(high), float(low), float(close), float(volume))
         return self
 
     def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
@@ -67,13 +65,12 @@ class OhlcvStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(
+        self._state.extend(
             as_float64_series(high),
             as_float64_series(low),
             as_float64_series(close),
             as_float64_series(volume),
         )
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
         return self
 
     def compute(self) -> np.ndarray:
@@ -84,7 +81,7 @@ class OhlcvStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -106,8 +103,10 @@ class OhlcvStateAdapter:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)
 
 
 class CloseVolumeStateAdapter:
@@ -128,7 +127,6 @@ class CloseVolumeStateAdapter:
     def __init__(self, close: Any | None = None, volume: Any | None = None) -> None:
         """Create native state and optionally process initial close/volume data."""
         self._state = self._native_cls()
-        self._values: list[float] = []
         if close is not None or volume is not None:
             self.extend(close, volume)
 
@@ -145,8 +143,7 @@ class CloseVolumeStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        value = self._state.append(float(close), float(volume))
-        self._values.append(np.nan if value is None else value)
+        self._state.append(float(close), float(volume))
         return self
 
     def extend(self, close: Any, volume: Any) -> object:
@@ -162,8 +159,7 @@ class CloseVolumeStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(as_float64_series(close), as_float64_series(volume))
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
+        self._state.extend(as_float64_series(close), as_float64_series(volume))
         return self
 
     def compute(self) -> np.ndarray:
@@ -174,7 +170,7 @@ class CloseVolumeStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -196,5 +192,7 @@ class CloseVolumeStateAdapter:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

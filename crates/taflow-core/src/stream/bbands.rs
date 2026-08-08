@@ -7,7 +7,8 @@ use crate::error::TaResult;
 use crate::ma_type::MaType;
 
 use super::{
-    moving_average::MovingAverageDispatcher, RollingStandardDeviation, StreamingIndicator,
+    invalid_period, moving_average::MovingAverageDispatcher, RollingStandardDeviation,
+    StreamingIndicator, Window,
 };
 
 /// Computes aligned upper, middle, and lower Bollinger Band vectors.
@@ -28,20 +29,10 @@ pub fn bollinger_bands(
     matype: MaType,
 ) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>)> {
     let mut state = BollingerBands::new(timeperiod, nbdevup, nbdevdn, matype)?;
-    let mut upper = Vec::with_capacity(input.len());
-    let mut middle = Vec::with_capacity(input.len());
-    let mut lower = Vec::with_capacity(input.len());
-    for &value in input {
-        if let Some(output) = state.append(value) {
-            upper.push(output.upper);
-            middle.push(output.middle);
-            lower.push(output.lower);
-        } else {
-            upper.push(f64::NAN);
-            middle.push(f64::NAN);
-            lower.push(f64::NAN);
-        }
-    }
+    let mut upper = Vec::new();
+    let mut middle = Vec::new();
+    let mut lower = Vec::new();
+    state.extend_slices_into(input, &mut upper, &mut middle, &mut lower);
     Ok((upper, middle, lower))
 }
 
@@ -57,14 +48,91 @@ pub struct BollingerBandsValue {
     pub lower: f64,
 }
 
+/// Shared-ring middle + deviation state for the default SMA matype.
+///
+/// BBANDS with an SMA middle band previously pushed every input into two
+/// parallel rings (the SMA's window and the deviation moments' window).
+/// This variant keeps ONE ring plus both scalar accumulator sets, using
+/// exactly the arithmetic each component used before:
+/// * SMA sum: `sum -= old; sum += input;` and `sum / period as f64`.
+/// * Moments: `sum += input - old` / `(input-old).mul_add(input+old, 0.0)`
+///   when full, `sum += input` / `input.mul_add(input, sum_squares)` while
+///   warming, then `sum_squares/p - mean²` and `.max(0.0).sqrt() * nbdev`
+///   with `nbdev = 1.0` (an exact identity, so the multiply is dropped).
+struct SharedSmaCore {
+    period: usize,
+    inverse_period: f64,
+    window: Window,
+    sma_sum: f64,
+    moments_sum: f64,
+    moments_sum_squares: f64,
+}
+
+impl SharedSmaCore {
+    fn new(period: usize) -> TaResult<Self> {
+        if period < 2 {
+            return Err(invalid_period("timeperiod", period, 2));
+        }
+        Ok(Self {
+            period,
+            inverse_period: 1.0 / period as f64,
+            window: Window::new(period)?,
+            sma_sum: 0.0,
+            moments_sum: 0.0,
+            moments_sum_squares: 0.0,
+        })
+    }
+
+    /// One shared push; returns `(middle, deviation)` once warm.
+    #[inline]
+    fn append(&mut self, input: f64) -> Option<(f64, f64)> {
+        let evicted = self.window.push(input);
+        if let Some(old) = evicted {
+            self.sma_sum -= old;
+            self.sma_sum += input;
+            self.moments_sum += input - old;
+            self.moments_sum_squares += (input - old).mul_add(input + old, 0.0);
+        } else {
+            self.sma_sum += input;
+            self.moments_sum += input;
+            self.moments_sum_squares = input.mul_add(input, self.moments_sum_squares);
+        }
+        self.window.is_full().then(|| self.outputs())
+    }
+
+    #[inline]
+    fn outputs(&self) -> (f64, f64) {
+        let middle = self.sma_sum / self.period as f64;
+        let mean = self.moments_sum * self.inverse_period;
+        let variance = self.moments_sum_squares * self.inverse_period - mean * mean;
+        (middle, variance.max(0.0).sqrt())
+    }
+
+    fn reset(&mut self) {
+        self.window.clear();
+        self.sma_sum = 0.0;
+        self.moments_sum = 0.0;
+        self.moments_sum_squares = 0.0;
+    }
+}
+
+enum BollingerBandsCore {
+    /// Default SMA middle band: one shared ring for mean and moments (M4).
+    Sma(SharedSmaCore),
+    /// Any other matype: dispatched MA plus a separate deviation state.
+    Dispatch {
+        middle: MovingAverageDispatcher,
+        deviation: RollingStandardDeviation,
+    },
+}
+
 /// Incremental Bollinger Bands with constant per-bar work.
 /// Persistent Rust state or aligned output type for `BollingerBands`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct BollingerBands {
-    middle: MovingAverageDispatcher,
-    deviation: RollingStandardDeviation,
+    core: BollingerBandsCore,
     deviations_up: f64,
     deviations_down: f64,
     value: Option<BollingerBandsValue>,
@@ -78,13 +146,126 @@ impl BollingerBands {
         deviations_down: f64,
         ma_type: MaType,
     ) -> TaResult<Self> {
+        let core = if matches!(ma_type, MaType::SimpleMovingAverage) {
+            BollingerBandsCore::Sma(SharedSmaCore::new(period)?)
+        } else {
+            BollingerBandsCore::Dispatch {
+                middle: MovingAverageDispatcher::new(period, ma_type)?,
+                deviation: RollingStandardDeviation::new(period, 1.0)?,
+            }
+        };
         Ok(Self {
-            middle: MovingAverageDispatcher::new(period, ma_type)?,
-            deviation: RollingStandardDeviation::new(period, 1.0)?,
+            core,
             deviations_up,
             deviations_down,
             value: None,
         })
+    }
+
+    #[inline]
+    fn bands(&self, middle: f64, deviation: f64) -> BollingerBandsValue {
+        BollingerBandsValue {
+            upper: middle + self.deviations_up * deviation,
+            middle,
+            lower: middle - self.deviations_down * deviation,
+        }
+    }
+
+    /// Bulk kernel: O(1) add/evict recurrences over the shared ring's sums,
+    /// indexing the input slice directly (SMA matype); other matypes fall
+    /// back to per-bar appends. Bit-identical to [`Self::append`] in outputs
+    /// and post-run streaming state.
+    pub fn extend_slices_into(
+        &mut self,
+        inputs: &[f64],
+        upper_out: &mut Vec<f64>,
+        middle_out: &mut Vec<f64>,
+        lower_out: &mut Vec<f64>,
+    ) {
+        let n = inputs.len();
+        upper_out.reserve(n);
+        middle_out.reserve(n);
+        lower_out.reserve(n);
+        let mut push = |value: Option<BollingerBandsValue>,
+                        upper_out: &mut Vec<f64>,
+                        middle_out: &mut Vec<f64>,
+                        lower_out: &mut Vec<f64>| match value {
+            Some(value) => {
+                upper_out.push(value.upper);
+                middle_out.push(value.middle);
+                lower_out.push(value.lower);
+            }
+            None => {
+                upper_out.push(f64::NAN);
+                middle_out.push(f64::NAN);
+                lower_out.push(f64::NAN);
+            }
+        };
+        let period = match &self.core {
+            BollingerBandsCore::Sma(core) => core.period,
+            BollingerBandsCore::Dispatch { .. } => {
+                for &input in inputs {
+                    let value = self.append(input);
+                    push(value, upper_out, middle_out, lower_out);
+                }
+                return;
+            }
+        };
+        // Warm-up prologue: after `period` appends the shared ring holds
+        // exactly `inputs[..period]`, regardless of prior state.
+        let prologue = n.min(period);
+        for &input in &inputs[..prologue] {
+            let value = self.append(input);
+            push(value, upper_out, middle_out, lower_out);
+        }
+        if n <= period {
+            return;
+        }
+        let BollingerBandsCore::Sma(core) = &mut self.core else {
+            unreachable!("SMA period resolved above");
+        };
+        // Steady loop: same accumulate/evict arithmetic as the shared-ring
+        // append, with the evicted element read from the input slice.
+        let mut sma_sum = core.sma_sum;
+        let mut moments_sum = core.moments_sum;
+        let mut moments_sum_squares = core.moments_sum_squares;
+        let period_f = core.period as f64;
+        let inverse_period = core.inverse_period;
+        let (deviations_up, deviations_down) = (self.deviations_up, self.deviations_down);
+        let mut last = BollingerBandsValue {
+            upper: f64::NAN,
+            middle: f64::NAN,
+            lower: f64::NAN,
+        };
+        for i in period..n {
+            let input = inputs[i];
+            let old = inputs[i - period];
+            sma_sum -= old;
+            sma_sum += input;
+            moments_sum += input - old;
+            moments_sum_squares += (input - old).mul_add(input + old, 0.0);
+            let middle = sma_sum / period_f;
+            let mean = moments_sum * inverse_period;
+            let variance = moments_sum_squares * inverse_period - mean * mean;
+            let deviation = variance.max(0.0).sqrt();
+            last = BollingerBandsValue {
+                upper: middle + deviations_up * deviation,
+                middle,
+                lower: middle - deviations_down * deviation,
+            };
+            upper_out.push(last.upper);
+            middle_out.push(last.middle);
+            lower_out.push(last.lower);
+        }
+        core.sma_sum = sma_sum;
+        core.moments_sum = moments_sum;
+        core.moments_sum_squares = moments_sum_squares;
+        // Rebuild the ring so subsequent appends continue bit-identically.
+        core.window.clear();
+        for &input in &inputs[n - period..] {
+            core.window.push(input);
+        }
+        self.value = Some(last);
     }
 }
 
@@ -92,15 +273,15 @@ impl StreamingIndicator for BollingerBands {
     type Output = BollingerBandsValue;
 
     fn append(&mut self, input: f64) -> Option<BollingerBandsValue> {
-        let middle = self.middle.append(input);
-        let deviation = self.deviation.append(input);
-        self.value = middle
-            .zip(deviation)
-            .map(|(middle, deviation)| BollingerBandsValue {
-                upper: middle + self.deviations_up * deviation,
-                middle,
-                lower: middle - self.deviations_down * deviation,
-            });
+        let outputs = match &mut self.core {
+            BollingerBandsCore::Sma(core) => core.append(input),
+            BollingerBandsCore::Dispatch { middle, deviation } => {
+                let middle = middle.append(input);
+                let deviation = deviation.append(input);
+                middle.zip(deviation)
+            }
+        };
+        self.value = outputs.map(|(middle, deviation)| self.bands(middle, deviation));
         self.value
     }
 
@@ -109,8 +290,13 @@ impl StreamingIndicator for BollingerBands {
     }
 
     fn reset(&mut self) {
-        self.middle.reset();
-        self.deviation.reset();
+        match &mut self.core {
+            BollingerBandsCore::Sma(core) => core.reset(),
+            BollingerBandsCore::Dispatch { middle, deviation } => {
+                middle.reset();
+                deviation.reset();
+            }
+        }
         self.value = None;
     }
 }
@@ -118,6 +304,95 @@ impl StreamingIndicator for BollingerBands {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    #[test]
+    fn bbands_bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = lcg_series(5_000, 0x5EED_00BB);
+        let tail = lcg_series(256, 0x7A11_00BB);
+        for ma_type in [
+            MaType::SimpleMovingAverage,
+            MaType::ExponentialMovingAverage,
+        ] {
+            for period in [2usize, 5, 14, 30, 200] {
+                let mut per_bar = BollingerBands::new(period, 2.0, 1.5, ma_type).unwrap();
+                let mut ref_u = Vec::new();
+                let mut ref_m = Vec::new();
+                let mut ref_l = Vec::new();
+                for &x in &input {
+                    match per_bar.append(x) {
+                        Some(v) => {
+                            ref_u.push(v.upper);
+                            ref_m.push(v.middle);
+                            ref_l.push(v.lower);
+                        }
+                        None => {
+                            ref_u.push(f64::NAN);
+                            ref_m.push(f64::NAN);
+                            ref_l.push(f64::NAN);
+                        }
+                    }
+                }
+                let tail_ref: Vec<Option<BollingerBandsValue>> =
+                    tail.iter().map(|&x| per_bar.append(x)).collect();
+
+                for chunk in [usize::MAX, 1, 7, 97] {
+                    let mut state = BollingerBands::new(period, 2.0, 1.5, ma_type).unwrap();
+                    let mut u = Vec::new();
+                    let mut m = Vec::new();
+                    let mut l = Vec::new();
+                    for piece in input.chunks(chunk.min(input.len())) {
+                        state.extend_slices_into(piece, &mut u, &mut m, &mut l);
+                    }
+                    let label = format!("BBANDS {ma_type:?} p{period} chunk {chunk}");
+                    assert_same_bits(&u, &ref_u, &format!("{label} upper"));
+                    assert_same_bits(&m, &ref_m, &format!("{label} middle"));
+                    assert_same_bits(&l, &ref_l, &format!("{label} lower"));
+                    for (i, expected) in tail_ref.iter().enumerate() {
+                        let actual = state.append(tail[i]);
+                        match (actual, expected) {
+                            (Some(a), Some(e)) => {
+                                assert_eq!(
+                                    a.upper.to_bits(),
+                                    e.upper.to_bits(),
+                                    "{label} tail {i}"
+                                );
+                                assert_eq!(
+                                    a.middle.to_bits(),
+                                    e.middle.to_bits(),
+                                    "{label} tail {i}"
+                                );
+                                assert_eq!(
+                                    a.lower.to_bits(),
+                                    e.lower.to_bits(),
+                                    "{label} tail {i}"
+                                );
+                            }
+                            (None, None) => {}
+                            _ => panic!("{label} tail {i}: warm-up mismatch"),
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn matches_batch_for_all_moving_average_types() {

@@ -176,11 +176,10 @@ pub fn hilbert_transform_trend_mode(input: &[f64]) -> TaResult<Vec<i32>> {
         let mut imag_part = 0.0_f64;
 
         let mut idx = smooth_price_idx;
-        for i in 0..dc_period_int {
-            let angle = (i as f64 * CONST_DEG2RAD_BY360) / dc_period_int as f64;
+        for &(sin_angle, cos_angle) in dc_sin_cos(dc_period_int.max(0) as usize) {
             let price = smooth_price[idx];
-            real_part += angle.sin() * price;
-            imag_part += angle.cos() * price;
+            real_part += sin_angle * price;
+            imag_part += cos_angle * price;
             if idx == 0 {
                 idx = SMOOTH_PRICE_SIZE - 1;
             } else {

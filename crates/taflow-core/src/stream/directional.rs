@@ -14,13 +14,16 @@ pub(super) struct DirectionalValue {
 }
 
 pub(super) struct DirectionalMovement {
-    period: usize,
-    period_f: f64,
-    index: usize,
-    previous: Option<(f64, f64, f64)>,
-    true_range: f64,
-    plus_dm: f64,
-    minus_dm: f64,
+    // Fields are `pub(super)` so sibling bulk kernels (ADX/ADXR/+DI) can hold
+    // the Wilder recurrence state in locals and write it back after a fused
+    // loop; the arithmetic contract lives in `append` below.
+    pub(super) period: usize,
+    pub(super) period_f: f64,
+    pub(super) index: usize,
+    pub(super) previous: Option<(f64, f64, f64)>,
+    pub(super) true_range: f64,
+    pub(super) plus_dm: f64,
+    pub(super) minus_dm: f64,
 }
 
 impl DirectionalMovement {
@@ -94,6 +97,10 @@ impl DirectionalMovement {
     }
 
     pub(super) fn reset(&mut self) {
-        *self = Self::new(self.period).expect("validated directional period remains valid");
+        self.index = 0;
+        self.previous = None;
+        self.true_range = 0.0;
+        self.plus_dm = 0.0;
+        self.minus_dm = 0.0;
     }
 }

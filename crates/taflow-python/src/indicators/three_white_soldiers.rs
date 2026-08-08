@@ -25,6 +25,7 @@ impl CandleThreeWhiteSoldiers {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         o: PyReadonlyArray1<f64>,
         h: PyReadonlyArray1<f64>,
         l: PyReadonlyArray1<f64>,
@@ -34,9 +35,9 @@ impl CandleThreeWhiteSoldiers {
         if o.len() != h.len() || o.len() != l.len() || o.len() != c.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (((&o, &h), &l), &c) in o.iter().zip(h).zip(l).zip(c) {
-            self.append(o, h, l, c);
-        }
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slices_into(o, h, l, c, outputs))
+            .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute<'a>(&self, py: Python<'a>) -> Bound<'a, PyArray1<i32>> {

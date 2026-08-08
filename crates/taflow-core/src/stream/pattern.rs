@@ -17,10 +17,21 @@ pub(crate) enum RangeType {
 /// A candle setting definition matching C TA-Lib defaults
 #[derive(Clone, Copy)]
 pub(crate) struct CandleSetting {
+    #[allow(dead_code)]
     pub(crate) range_type: RangeType,
     pub(crate) avg_period: usize,
     pub(crate) factor: f64,
 }
+
+/// Trailing bars a candle streaming state replays to rebuild itself after a
+/// bulk (batch-kernel) pass over a slice.
+///
+/// Every candle state's fields are a function of a bounded window of recent
+/// bars: the deepest is a 10-bar average (`avg_period`) read at an offset of at
+/// most 4 bars back, i.e. 15 bars. Replaying any tail at least that long from a
+/// pristine state therefore reproduces the exact state a full per-bar run would
+/// have left, so 64 is a comfortable margin at negligible cost.
+pub(crate) const BULK_REPLAY_BARS: usize = 64;
 
 // Default candle settings exactly matching C TA-Lib ta_common.c
 pub(crate) const BODY_LONG: CandleSetting = CandleSetting {
@@ -28,6 +39,7 @@ pub(crate) const BODY_LONG: CandleSetting = CandleSetting {
     avg_period: 10,
     factor: 1.0,
 };
+#[allow(dead_code)]
 pub(crate) const BODY_VERY_LONG: CandleSetting = CandleSetting {
     range_type: RangeType::RealBody,
     avg_period: 10,
@@ -105,65 +117,6 @@ pub(crate) fn candle_color(open: f64, close: f64) -> i32 {
     }
 }
 
-// ========== Monomorphized range/average functions ==========
-// Each RangeType gets its own function to eliminate runtime match dispatch.
-// These inline to 2-3 instructions — equivalent to C TA-Lib macros.
-
-#[inline(always)]
-pub(crate) fn range_realbody(_o: f64, _h: f64, _l: f64, c: f64, o: f64) -> f64 {
-    (c - o).abs()
-}
-#[inline(always)]
-pub(crate) fn range_highlow(_o: f64, h: f64, l: f64, _c: f64, _o2: f64) -> f64 {
-    h - l
-}
-#[inline(always)]
-pub(crate) fn range_shadows(_o: f64, h: f64, l: f64, c: f64, o: f64) -> f64 {
-    (h - l) - (c - o).abs()
-}
-
-/// Compute the range value for a single bar based on the setting's range_type
-#[inline(always)]
-pub(crate) fn candle_range(
-    setting: CandleSetting,
-    open: f64,
-    high: f64,
-    low: f64,
-    close: f64,
-) -> f64 {
-    match setting.range_type {
-        RangeType::RealBody => (close - open).abs(),
-        RangeType::HighLow => high - low,
-        RangeType::Shadows => (high - low) - (close - open).abs(),
-    }
-}
-
-/// Compute candle average = factor * (sum / avg_period) / divisor
-/// When avg_period == 0, use the current bar's range value directly (no averaging)
-/// NOTE: C TA-Lib divides by 2.0 when range_type is Shadows
-#[inline(always)]
-pub(crate) fn candle_average(
-    setting: CandleSetting,
-    sum: f64,
-    open: f64,
-    high: f64,
-    low: f64,
-    close: f64,
-) -> f64 {
-    let divisor = match setting.range_type {
-        RangeType::Shadows => 2.0,
-        _ => 1.0,
-    };
-    if setting.avg_period > 0 {
-        setting.factor * (sum / setting.avg_period as f64) / divisor
-    } else {
-        setting.factor * candle_range(setting, open, high, low, close) / divisor
-    }
-}
-
-// ---- Monomorphized cr/ca per CandleSetting constant ----
-// Eliminates match dispatch in hot loops by hardcoding the range_type.
-
 // RealBody types: BODY_LONG, BODY_VERY_LONG, BODY_SHORT, SHADOW_LONG, SHADOW_VERY_LONG
 #[inline(always)]
 pub(crate) fn cr_realbody(o: &[f64], _h: &[f64], _l: &[f64], c: &[f64], i: usize) -> f64 {
@@ -230,30 +183,58 @@ pub(crate) fn ca_shadows(
     }
 }
 
-/// Generic cr/ca — still available for rare/complex patterns
+// ---- Scalar monomorphized cr/ca (streaming states) ----
+// Same arithmetic, operation for operation, as the slice variants above, so a
+// streaming state that maintains its sums with these produces bit-identical
+// thresholds to the batch loop.
+
 #[inline(always)]
-pub(crate) fn cr(
-    setting: CandleSetting,
-    o: &[f64],
-    h: &[f64],
-    l: &[f64],
-    c: &[f64],
-    i: usize,
-) -> f64 {
-    candle_range(setting, o[i], h[i], l[i], c[i])
+pub(crate) fn cr_realbody_scalar(o: f64, c: f64) -> f64 {
+    (c - o).abs()
 }
 
 #[inline(always)]
-pub(crate) fn ca(
+pub(crate) fn cr_highlow_scalar(h: f64, l: f64) -> f64 {
+    h - l
+}
+
+#[inline(always)]
+pub(crate) fn cr_shadows_scalar(o: f64, h: f64, l: f64, c: f64) -> f64 {
+    (h - l) - (c - o).abs()
+}
+
+#[inline(always)]
+pub(crate) fn ca_realbody_scalar(setting: CandleSetting, sum: f64, o: f64, c: f64) -> f64 {
+    if setting.avg_period > 0 {
+        setting.factor * (sum / setting.avg_period as f64)
+    } else {
+        setting.factor * (c - o).abs()
+    }
+}
+
+#[inline(always)]
+pub(crate) fn ca_highlow_scalar(setting: CandleSetting, sum: f64, h: f64, l: f64) -> f64 {
+    if setting.avg_period > 0 {
+        setting.factor * (sum / setting.avg_period as f64)
+    } else {
+        setting.factor * (h - l)
+    }
+}
+
+#[inline(always)]
+pub(crate) fn ca_shadows_scalar(
     setting: CandleSetting,
     sum: f64,
-    o: &[f64],
-    h: &[f64],
-    l: &[f64],
-    c: &[f64],
-    i: usize,
+    o: f64,
+    h: f64,
+    l: f64,
+    c: f64,
 ) -> f64 {
-    candle_average(setting, sum, o[i], h[i], l[i], c[i])
+    if setting.avg_period > 0 {
+        setting.factor * (sum / setting.avg_period as f64) / 2.0
+    } else {
+        setting.factor * ((h - l) - (c - o).abs()) / 2.0
+    }
 }
 
 /// Helper: real body gap up (min(o,c) of bar2 > max(o,c) of bar1)

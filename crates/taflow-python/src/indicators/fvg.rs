@@ -39,6 +39,7 @@ impl FairValueGapOperator {
 
     fn extend(
         &mut self,
+        py: Python<'_>,
         open: PyReadonlyArray1<f64>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
@@ -53,9 +54,11 @@ impl FairValueGapOperator {
         if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (((&open, &high), &low), &close) in open.iter().zip(high).zip(low).zip(close) {
-            self.append(open, high, low, close);
-        }
+        py.allow_threads(|| {
+            for (((&open, &high), &low), &close) in open.iter().zip(high).zip(low).zip(close) {
+                self.append(open, high, low, close);
+            }
+        });
         Ok(())
     }
 

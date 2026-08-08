@@ -61,7 +61,6 @@ class MovingAverageConvergenceDivergenceExtended:
             signal_period,
             signal_average_type,
         )
-        self._values: list[tuple[float, ...]] = []
         if _input is not None:
             self.extend(_input)
 
@@ -78,10 +77,7 @@ class MovingAverageConvergenceDivergenceExtended:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(_input)
-        self._values.append(
-            (np.nan, np.nan, np.nan) if result is None else tuple(result)
-        )
+        self._state.append(_input)
         return self
 
     def extend(self, _input: object) -> object:
@@ -97,9 +93,7 @@ class MovingAverageConvergenceDivergenceExtended:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(_input)
-        arrays = [np.asarray(item, dtype=np.float64) for item in result]
-        self._values.extend(zip(*arrays))
+        self._state.extend(_input)
         return self
 
     def compute(self) -> tuple[np.ndarray, ...]:
@@ -110,12 +104,7 @@ class MovingAverageConvergenceDivergenceExtended:
         object
             Updated state, converted values, or aligned output.
         """
-        if not self._values:
-            empty = np.empty(0, dtype=np.float64)
-            return tuple(empty.copy() for _ in range(3))
-        return tuple(
-            np.asarray(values, dtype=np.float64) for values in zip(*self._values)
-        )
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -137,5 +126,7 @@ class MovingAverageConvergenceDivergenceExtended:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

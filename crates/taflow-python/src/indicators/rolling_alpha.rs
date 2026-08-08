@@ -27,6 +27,7 @@ macro_rules! paired {
             }
             fn extend(
                 &mut self,
+                py: Python<'_>,
                 input: PyReadonlyArray1<f64>,
                 benchmark: PyReadonlyArray1<f64>,
             ) -> PyResult<()> {
@@ -34,9 +35,11 @@ macro_rules! paired {
                 if input.len() != benchmark.len() {
                     return Err(PyValueError::new_err("inputs must have equal lengths"));
                 }
-                for (&input, &benchmark) in input.iter().zip(benchmark) {
-                    self.append(input, benchmark);
-                }
+                py.allow_threads(|| {
+                    for (&input, &benchmark) in input.iter().zip(benchmark) {
+                        self.append(input, benchmark);
+                    }
+                });
                 Ok(())
             }
             fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

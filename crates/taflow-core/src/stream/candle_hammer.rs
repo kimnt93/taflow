@@ -9,14 +9,18 @@ use crate::error::TaResult;
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
+#[derive(Clone, Copy)]
+struct Candle {
+    o: f64,
+    h: f64,
+    l: f64,
+    c: f64,
+}
 pub struct CandleHammer {
-    bodies: VecDeque<f64>,
+    candles: VecDeque<Candle>,
     body_sum: f64,
-    ranges: VecDeque<f64>,
-    range_sum: f64,
-    near: VecDeque<f64>,
+    shadow_vs_sum: f64,
     near_sum: f64,
-    previous: Option<(f64, f64)>,
     value: Option<i32>,
 }
 impl Default for CandleHammer {
@@ -64,7 +68,7 @@ pub fn candle_hammer(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> 
     }
 
     let mut body_sum = 0.0;
-    let mut shadow_long_sum = 0.0;
+    let shadow_long_sum = 0.0;
     let mut shadow_vs_sum = 0.0;
     let mut near_sum = 0.0;
 
@@ -115,47 +119,105 @@ impl CandleHammer {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            bodies: VecDeque::with_capacity(10),
+            candles: VecDeque::with_capacity(11),
             body_sum: 0.0,
-            ranges: VecDeque::with_capacity(10),
-            range_sum: 0.0,
-            near: VecDeque::with_capacity(5),
+            shadow_vs_sum: 0.0,
             near_sum: 0.0,
-            previous: None,
             value: None,
         }
     }
-    fn push(window: &mut VecDeque<f64>, sum: &mut f64, capacity: usize, value: f64) {
-        if window.len() == capacity {
-            *sum -= window.pop_front().expect("window is full");
-        }
-        window.push_back(value);
-        *sum += value;
-    }
     /// Appends OHLC data and returns +100 for a hammer after warmup.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
-        let range = high - low;
+        let cur = Candle {
+            o: open,
+            h: high,
+            l: low,
+            c: close,
+        };
         let body = (close - open).abs();
-        let output = if self.bodies.len() == 10 && self.ranges.len() == 10 && self.near.len() == 5 {
-            let (previous_low, previous_range) = self.previous.expect("history exists");
-            let short_body = body < self.body_sum / 10.0;
+        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
+        let output = if self.candles.len() == 11 {
+            let prev = self.candles[10]; // bar i-1
+            let short_body = body < ca_realbody_scalar(BODY_SHORT, self.body_sum, open, close);
             let long_lower = open.min(close) - low > body;
-            let short_upper = high - open.max(close) < self.range_sum * 0.01;
-            let near_low = open.min(close) <= previous_low + self.near_sum * 0.04;
-            let _ = previous_range;
+            let short_upper = high - open.max(close)
+                < ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_vs_sum, high, low);
+            let near_low =
+                open.min(close) <= prev.l + ca_highlow_scalar(NEAR, self.near_sum, prev.h, prev.l);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - period).
+            self.body_sum += cr_realbody_scalar(open, close)
+                - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
+            self.shadow_vs_sum += cr_highlow_scalar(high, low)
+                - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            self.near_sum += cr_highlow_scalar(prev.h, prev.l)
+                - cr_highlow_scalar(self.candles[5].h, self.candles[5].l);
             Some((short_body && long_lower && short_upper && near_low) as i32 * 100)
         } else {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if (1..11).contains(&i) {
+                self.body_sum += cr_realbody_scalar(open, close);
+                self.shadow_vs_sum += cr_highlow_scalar(high, low);
+            }
+            if (5..10).contains(&i) {
+                self.near_sum += cr_highlow_scalar(high, low);
+            }
             None
         };
-        if let Some((_, previous_range)) = self.previous {
-            Self::push(&mut self.near, &mut self.near_sum, 5, previous_range);
+        if self.candles.len() == 11 {
+            self.candles.pop_front();
         }
-        Self::push(&mut self.bodies, &mut self.body_sum, 10, body);
-        Self::push(&mut self.ranges, &mut self.range_sum, 10, range);
-        self.previous = Some((low, range));
+        self.candles.push_back(cur);
         self.value = output;
         output
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.candles.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_hammer(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -166,7 +228,11 @@ impl CandleHammer {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new();
+        self.candles.clear();
+        self.body_sum = 0.0;
+        self.shadow_vs_sum = 0.0;
+        self.near_sum = 0.0;
+        self.value = None;
     }
 }
 #[cfg(test)]

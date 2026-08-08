@@ -34,6 +34,7 @@ impl KeltnerChannelsOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
@@ -42,9 +43,11 @@ impl KeltnerChannelsOperator {
         if h.len() != l.len() || h.len() != c.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for ((&h, &l), &c) in h.iter().zip(l).zip(c) {
-            self.append(h, l, c);
-        }
+        py.allow_threads(|| {
+            for ((&h, &l), &c) in h.iter().zip(l).zip(c) {
+                self.append(h, l, c);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(
@@ -92,14 +95,21 @@ impl ChaikinVolatilityOperator {
         self.outputs.push(v.unwrap_or(f64::NAN));
         v
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (h, l) = (high.as_slice()?, low.as_slice()?);
         if h.len() != l.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&h, &l) in h.iter().zip(l) {
-            self.append(h, l);
-        }
+        py.allow_threads(|| {
+            for (&h, &l) in h.iter().zip(l) {
+                self.append(h, l);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

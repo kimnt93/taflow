@@ -36,16 +36,22 @@ impl CommodityChannelIndex {
 
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let values = self
-            .inner
-            .extend_slice(high.as_slice()?, low.as_slice()?, close.as_slice()?)
-            .map_err(|error| PyValueError::new_err(error.to_string()))?;
-        self.outputs
-            .extend(values.into_iter().map(|value| value.unwrap_or(f64::NAN)));
+        let high = high.as_slice()?;
+        let low = low.as_slice()?;
+        let close = close.as_slice()?;
+        let outputs = &mut self.outputs;
+        let inner = &mut self.inner;
+        py.allow_threads(|| {
+            let values = inner.extend_slice(high, low, close)?;
+            outputs.extend(values.into_iter().map(|value| value.unwrap_or(f64::NAN)));
+            Ok(())
+        })
+        .map_err(|error: taflow::error::TaError| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
 

@@ -27,10 +27,13 @@ impl CumulativeSumControlChartOperator {
         value
     }
 
-    fn extend(&mut self, change: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &change in change.as_slice()? {
-            self.append(change);
-        }
+    fn extend(&mut self, py: Python<'_>, change: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let change = change.as_slice()?;
+        py.allow_threads(|| {
+            for &change in change {
+                self.append(change);
+            }
+        });
         Ok(())
     }
 

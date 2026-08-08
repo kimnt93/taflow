@@ -119,6 +119,68 @@ impl MovingAverageConvergenceDivergence {
         self.value
     }
 
+    /// Bulk kernel: advances the fast, slow, and signal EMA recurrences in one
+    /// loop with the scalar states held in locals, writing NaN during warm-up.
+    /// Bit-identical to per-bar [`Self::append`] in outputs and post-run state.
+    pub fn extend_slices_into(
+        &mut self,
+        inputs: &[f64],
+        macd_out: &mut Vec<f64>,
+        signal_out: &mut Vec<f64>,
+        histogram_out: &mut Vec<f64>,
+    ) {
+        macd_out.reserve(inputs.len());
+        signal_out.reserve(inputs.len());
+        histogram_out.reserve(inputs.len());
+        let mut index = 0;
+        // Warm-up prologue: per-bar appends until the signal EMA is seeded.
+        while index < inputs.len() && self.signal_ema.is_none() {
+            match self.append(inputs[index]) {
+                Some(value) => {
+                    macd_out.push(value.macd);
+                    signal_out.push(value.signal);
+                    histogram_out.push(value.histogram);
+                }
+                None => {
+                    macd_out.push(f64::NAN);
+                    signal_out.push(f64::NAN);
+                    histogram_out.push(f64::NAN);
+                }
+            }
+            index += 1;
+        }
+        if index == inputs.len() {
+            return;
+        }
+
+        let (fast_k, slow_k, signal_k) = (self.fast_k, self.slow_k, self.signal_k);
+        let mut fast = self.fast_ema.expect("warm fast EMA");
+        let mut slow = self.slow_ema.expect("warm slow EMA");
+        let mut signal = self.signal_ema.expect("warm signal EMA");
+        let mut last = self.value;
+        for &input in &inputs[index..] {
+            fast = fast_k.mul_add(input - fast, fast);
+            slow = slow_k.mul_add(input - slow, slow);
+            let macd = fast - slow;
+            signal = signal_k.mul_add(macd - signal, signal);
+            let histogram = macd - signal;
+            macd_out.push(macd);
+            signal_out.push(signal);
+            histogram_out.push(histogram);
+            last = Some(MovingAverageConvergenceDivergenceValue {
+                macd,
+                signal,
+                histogram,
+            });
+        }
+
+        self.fast_ema = Some(fast);
+        self.slow_ema = Some(slow);
+        self.signal_ema = Some(signal);
+        self.signal_count += inputs.len() - index;
+        self.value = last;
+    }
+
     /// Returns the latest warmed output.
     pub fn value(&self) -> Option<MovingAverageConvergenceDivergenceValue> {
         self.value
@@ -139,6 +201,76 @@ impl MovingAverageConvergenceDivergence {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    fn per_bar_outputs(
+        state: &mut MovingAverageConvergenceDivergence,
+        input: &[f64],
+    ) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+        let mut macd = Vec::new();
+        let mut signal = Vec::new();
+        let mut histogram = Vec::new();
+        for &x in input {
+            match state.append(x) {
+                Some(v) => {
+                    macd.push(v.macd);
+                    signal.push(v.signal);
+                    histogram.push(v.histogram);
+                }
+                None => {
+                    macd.push(f64::NAN);
+                    signal.push(f64::NAN);
+                    histogram.push(f64::NAN);
+                }
+            }
+        }
+        (macd, signal, histogram)
+    }
+
+    #[test]
+    fn bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = lcg_series(5_000, 0x5EED_0A0D);
+        let tail = lcg_series(128, 0x7A11_0A0D);
+        for (fast, slow, signal) in [(12usize, 26usize, 9usize), (2, 2, 1), (3, 10, 1), (5, 5, 4)] {
+            let mut per_bar = MovingAverageConvergenceDivergence::new(fast, slow, signal).unwrap();
+            let reference = per_bar_outputs(&mut per_bar, &input);
+            let tail_reference = per_bar_outputs(&mut per_bar, &tail);
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state =
+                    MovingAverageConvergenceDivergence::new(fast, slow, signal).unwrap();
+                let (mut m, mut s, mut h) = (Vec::new(), Vec::new(), Vec::new());
+                for piece in input.chunks(chunk.min(input.len())) {
+                    state.extend_slices_into(piece, &mut m, &mut s, &mut h);
+                }
+                let label = format!("{fast}/{slow}/{signal} chunk {chunk}");
+                assert_same_bits(&m, &reference.0, &label);
+                assert_same_bits(&s, &reference.1, &label);
+                assert_same_bits(&h, &reference.2, &label);
+                let tail_out = per_bar_outputs(&mut state, &tail);
+                assert_same_bits(&tail_out.0, &tail_reference.0, &format!("{label} tail"));
+                assert_same_bits(&tail_out.1, &tail_reference.1, &format!("{label} tail"));
+                assert_same_bits(&tail_out.2, &tail_reference.2, &format!("{label} tail"));
+            }
+        }
+    }
 
     #[test]
     fn matches_batch_and_reset_replay() {

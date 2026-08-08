@@ -40,10 +40,13 @@ impl KnowSureThingOperator {
         (value.kst, value.signal)
     }
 
-    fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &close in close.as_slice()? {
-            self.append(close);
-        }
+    fn extend(&mut self, py: Python<'_>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let close = close.as_slice()?;
+        py.allow_threads(|| {
+            for &close in close {
+                self.append(close);
+            }
+        });
         Ok(())
     }
 

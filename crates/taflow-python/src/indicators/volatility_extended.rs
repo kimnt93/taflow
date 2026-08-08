@@ -34,14 +34,21 @@ impl DonchianOperator {
             None
         }
     }
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (h, l) = (high.as_slice()?, low.as_slice()?);
         if h.len() != l.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&h, &l) in h.iter().zip(l) {
-            self.append(h, l);
-        }
+        py.allow_threads(|| {
+            for (&h, &l) in h.iter().zip(l) {
+                self.append(h, l);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(
@@ -88,10 +95,13 @@ impl UlcerIndexOperator {
         self.outputs.push(v.unwrap_or(f64::NAN));
         v
     }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &v in input.as_slice()? {
-            self.append(v);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        py.allow_threads(|| {
+            for &v in input {
+                self.append(v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

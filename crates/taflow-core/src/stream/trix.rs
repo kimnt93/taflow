@@ -41,6 +41,51 @@ impl TripleExponentialRateOfChange {
 impl StreamingIndicator for TripleExponentialRateOfChange {
     type Output = f64;
 
+    /// Bulk kernel: advances the triple EMA cascade and the ROC step in one
+    /// loop with the scalar states held in locals. Bit-identical to per-bar
+    /// [`Self::append`] in outputs and post-run streaming state.
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        output.reserve(inputs.len());
+        let mut index = 0;
+        // Warm-up prologue: per-bar appends until EMA3 has produced a value
+        // and it has been latched as the previous ROC reference.
+        while index < inputs.len() && self.previous_ema3.is_none() {
+            output.push(self.append(inputs[index]).unwrap_or(f64::NAN));
+            index += 1;
+        }
+        if index == inputs.len() {
+            return;
+        }
+
+        let k1 = self.ema1.smoothing();
+        let k2 = self.ema2.smoothing();
+        let k3 = self.ema3.smoothing();
+        let mut e1 = self.ema1.current().expect("warm EMA1");
+        let mut e2 = self.ema2.current().expect("warm EMA2");
+        let mut e3 = self.ema3.current().expect("warm EMA3");
+        let mut last = self.value;
+        for &input in &inputs[index..] {
+            e1 = k1.mul_add(input - e1, e1);
+            e2 = k2.mul_add(e1 - e2, e2);
+            let previous = e3;
+            e3 = k3.mul_add(e2 - e3, e3);
+            let value = if previous != 0.0 {
+                (e3 - previous) / previous * 100.0
+            } else {
+                0.0
+            };
+            output.push(value);
+            last = Some(value);
+        }
+
+        let appended = inputs.len() - index;
+        self.ema1.store_bulk_state(e1, appended);
+        self.ema2.store_bulk_state(e2, appended);
+        self.ema3.store_bulk_state(e3, appended);
+        self.previous_ema3 = Some(e3);
+        self.value = last;
+    }
+
     fn append(&mut self, input: f64) -> Option<f64> {
         let e1 = self.ema1.append(input)?;
         let e2 = self.ema2.append(e1)?;
@@ -70,6 +115,59 @@ impl StreamingIndicator for TripleExponentialRateOfChange {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    #[test]
+    fn bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = lcg_series(5_000, 0x5EED_7212);
+        let tail = lcg_series(128, 0x7A11_7212);
+        for period in [2usize, 3, 14, 30] {
+            let mut per_bar = TripleExponentialRateOfChange::new(period).unwrap();
+            let reference: Vec<f64> = input
+                .iter()
+                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
+                .collect();
+            let tail_reference: Vec<f64> = tail
+                .iter()
+                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
+                .collect();
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state = TripleExponentialRateOfChange::new(period).unwrap();
+                let mut out = Vec::new();
+                for piece in input.chunks(chunk.min(input.len())) {
+                    state.extend_slice_into(piece, &mut out);
+                }
+                assert_same_bits(&out, &reference, &format!("p{period} chunk {chunk}"));
+                let tail_out: Vec<f64> = tail
+                    .iter()
+                    .map(|&x| state.append(x).unwrap_or(f64::NAN))
+                    .collect();
+                assert_same_bits(
+                    &tail_out,
+                    &tail_reference,
+                    &format!("p{period} chunk {chunk} tail"),
+                );
+            }
+        }
+    }
 
     #[test]
     fn matches_batch_for_chunked_extend() {

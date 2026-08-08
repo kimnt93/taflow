@@ -29,6 +29,7 @@ impl ChaikinMoneyFlowOperator {
 
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
@@ -43,9 +44,11 @@ impl ChaikinMoneyFlowOperator {
         if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (((&h, &l), &c), &v) in high.iter().zip(low).zip(close).zip(volume) {
-            self.append(h, l, c, v);
-        }
+        py.allow_threads(|| {
+            for (((&h, &l), &c), &v) in high.iter().zip(low).zip(close).zip(volume) {
+                self.append(h, l, c, v);
+            }
+        });
         Ok(())
     }
 

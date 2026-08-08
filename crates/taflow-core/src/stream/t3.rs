@@ -81,6 +81,57 @@ impl TripleExponentialAverage {
 impl StreamingIndicator for TripleExponentialAverage {
     type Output = f64;
 
+    /// Bulk kernel: advances all six EMA recurrences in one loop with the
+    /// scalar states held in locals. Bit-identical to per-bar [`Self::append`]
+    /// in both outputs and post-run streaming state.
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        output.reserve(inputs.len());
+        let mut index = 0;
+        // Warm-up prologue: per-bar appends until the last EMA in the cascade
+        // is seeded (each sub-EMA seeds from the SMA of its own input stream).
+        while index < inputs.len() && self.ema6.current().is_none() {
+            output.push(self.append(inputs[index]).unwrap_or(f64::NAN));
+            index += 1;
+        }
+        if index == inputs.len() {
+            return;
+        }
+
+        let k1 = self.ema1.smoothing();
+        let k2 = self.ema2.smoothing();
+        let k3 = self.ema3.smoothing();
+        let k4 = self.ema4.smoothing();
+        let k5 = self.ema5.smoothing();
+        let k6 = self.ema6.smoothing();
+        let mut e1 = self.ema1.current().expect("warm EMA1");
+        let mut e2 = self.ema2.current().expect("warm EMA2");
+        let mut e3 = self.ema3.current().expect("warm EMA3");
+        let mut e4 = self.ema4.current().expect("warm EMA4");
+        let mut e5 = self.ema5.current().expect("warm EMA5");
+        let mut e6 = self.ema6.current().expect("warm EMA6");
+        let (c1, c2, c3, c4) = (self.c1, self.c2, self.c3, self.c4);
+        let mut last = f64::NAN;
+        for &input in &inputs[index..] {
+            e1 = k1.mul_add(input - e1, e1);
+            e2 = k2.mul_add(e1 - e2, e2);
+            e3 = k3.mul_add(e2 - e3, e3);
+            e4 = k4.mul_add(e3 - e4, e4);
+            e5 = k5.mul_add(e4 - e5, e5);
+            e6 = k6.mul_add(e5 - e6, e6);
+            last = c1 * e6 + c2 * e5 + c3 * e4 + c4 * e3;
+            output.push(last);
+        }
+
+        let appended = inputs.len() - index;
+        self.ema1.store_bulk_state(e1, appended);
+        self.ema2.store_bulk_state(e2, appended);
+        self.ema3.store_bulk_state(e3, appended);
+        self.ema4.store_bulk_state(e4, appended);
+        self.ema5.store_bulk_state(e5, appended);
+        self.ema6.store_bulk_state(e6, appended);
+        self.value = Some(last);
+    }
+
     fn append(&mut self, input: f64) -> Option<f64> {
         let Some(e1) = self.ema1.append(input) else {
             return None;
@@ -122,6 +173,59 @@ impl StreamingIndicator for TripleExponentialAverage {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    #[test]
+    fn bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = lcg_series(5_000, 0x5EED_7301);
+        let tail = lcg_series(128, 0x7A11_7301);
+        for (period, v_factor) in [(2usize, 0.7), (3, 0.0), (5, 1.0), (14, 0.7), (30, 0.2)] {
+            let mut per_bar = TripleExponentialAverage::new(period, v_factor).unwrap();
+            let reference: Vec<f64> = input
+                .iter()
+                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
+                .collect();
+            let tail_reference: Vec<f64> = tail
+                .iter()
+                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
+                .collect();
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state = TripleExponentialAverage::new(period, v_factor).unwrap();
+                let mut out = Vec::new();
+                for piece in input.chunks(chunk.min(input.len())) {
+                    state.extend_slice_into(piece, &mut out);
+                }
+                assert_same_bits(&out, &reference, &format!("p{period} chunk {chunk}"));
+                let tail_out: Vec<f64> = tail
+                    .iter()
+                    .map(|&x| state.append(x).unwrap_or(f64::NAN))
+                    .collect();
+                assert_same_bits(
+                    &tail_out,
+                    &tail_reference,
+                    &format!("p{period} chunk {chunk} tail"),
+                );
+            }
+        }
+    }
 
     #[test]
     fn matches_batch_and_reset_replay() {

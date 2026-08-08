@@ -23,6 +23,7 @@ impl RollingCovOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         left: PyReadonlyArray1<f64>,
         right: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
@@ -30,9 +31,11 @@ impl RollingCovOperator {
         if left.len() != right.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&left, &right) in left.iter().zip(right) {
-            self.append(left, right);
-        }
+        py.allow_threads(|| {
+            for (&left, &right) in left.iter().zip(right) {
+                self.append(left, right);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

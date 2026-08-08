@@ -35,7 +35,6 @@ class OhlcStateAdapter:
             self._state = self._native_cls(timeperiod)
         else:
             self._state = self._native_cls()
-        self._values: list[float] = []
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
@@ -52,8 +51,7 @@ class OhlcStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        value = self._state.append(float(high), float(low), float(close))
-        self._values.append(np.nan if value is None else value)
+        self._state.append(float(high), float(low), float(close))
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> object:
@@ -69,10 +67,9 @@ class OhlcStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(
+        self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
         )
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
         return self
 
     def compute(self) -> np.ndarray:
@@ -83,7 +80,7 @@ class OhlcStateAdapter:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -105,5 +102,7 @@ class OhlcStateAdapter:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

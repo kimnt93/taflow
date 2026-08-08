@@ -22,10 +22,13 @@ impl EwmVarOperator {
         self.outputs.push(v);
         v
     }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &v in input.as_slice()? {
-            self.append(v);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        py.allow_threads(|| {
+            for &v in input {
+                self.append(v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

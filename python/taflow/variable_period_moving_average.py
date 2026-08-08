@@ -29,7 +29,6 @@ class VariablePeriodMovingAverage:
     ) -> None:
         """Create MAVP with optional values and per-bar periods."""
         self._state = StatefulMavp(min_period, max_period, average_type)
-        self._values: list[float] = []
         if _input is not None or periods is not None:
             self.extend(_input, periods)
 
@@ -48,8 +47,7 @@ class VariablePeriodMovingAverage:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(float(_input), int(period))
-        self._values.append(np.nan if result is None else float(result))
+        self._state.append(float(_input), int(period))
         return self
 
     def extend(self, _input: Any, periods: Any) -> "VariablePeriodMovingAverage":
@@ -67,11 +65,10 @@ class VariablePeriodMovingAverage:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(
+        self._state.extend(
             np.asarray(_input, dtype=np.float64),
             np.asarray(periods, dtype=np.float64),
         )
-        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
         return self
 
     def compute(self) -> np.ndarray:
@@ -82,7 +79,7 @@ class VariablePeriodMovingAverage:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -104,5 +101,7 @@ class VariablePeriodMovingAverage:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

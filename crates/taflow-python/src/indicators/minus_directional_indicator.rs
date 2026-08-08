@@ -26,6 +26,7 @@ impl MinusDirectionalIndicator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         h: PyReadonlyArray1<f64>,
         l: PyReadonlyArray1<f64>,
         c: PyReadonlyArray1<f64>,
@@ -36,12 +37,16 @@ impl MinusDirectionalIndicator {
         if h.len() != l.len() || h.len() != c.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        self.outputs.extend(
-            h.iter()
-                .zip(l)
-                .zip(c)
-                .map(|((&h, &l), &c)| self.inner.append(h, l, c).unwrap_or(f64::NAN)),
-        );
+        let outputs = &mut self.outputs;
+        let inner = &mut self.inner;
+        py.allow_threads(|| {
+            outputs.extend(
+                h.iter()
+                    .zip(l)
+                    .zip(c)
+                    .map(|((&h, &l), &c)| inner.append(h, l, c).unwrap_or(f64::NAN)),
+            );
+        });
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {

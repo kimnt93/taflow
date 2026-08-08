@@ -28,10 +28,13 @@ macro_rules! unary {
                 self.outputs.push(v.unwrap_or(f64::NAN));
                 v
             }
-            fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-                for &v in input.as_slice()? {
-                    self.append(v);
-                }
+            fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+                let input = input.as_slice()?;
+                py.allow_threads(|| {
+                    for &v in input {
+                        self.append(v);
+                    }
+                });
                 Ok(())
             }
             fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -73,6 +76,7 @@ impl VwmaOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         price: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
@@ -80,9 +84,11 @@ impl VwmaOperator {
         if p.len() != v.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&p, &v) in p.iter().zip(v) {
-            self.append(p, v);
-        }
+        py.allow_threads(|| {
+            for (&p, &v) in p.iter().zip(v) {
+                self.append(p, v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -118,10 +124,13 @@ impl AlmaOperator {
         self.outputs.push(v.unwrap_or(f64::NAN));
         v
     }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &v in input.as_slice()? {
-            self.append(v);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        py.allow_threads(|| {
+            for &v in input {
+                self.append(v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

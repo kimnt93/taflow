@@ -30,7 +30,6 @@ class AbsolutePriceOscillator:
     ) -> None:
         """Create native APO state and optionally process initial inputs."""
         self._state = StatefulApo(fastperiod, slowperiod, int(moving_average_type))
-        self._values: list[float] = []
         if _input is not None:
             self.extend(_input)
 
@@ -47,8 +46,7 @@ class AbsolutePriceOscillator:
         object
             Updated state, converted values, or aligned output.
         """
-        value = self._state.append(float(_input))
-        self._values.append(np.nan if value is None else value)
+        self._state.append(float(_input))
         return self
 
     def extend(self, _input: Any) -> object:
@@ -64,8 +62,7 @@ class AbsolutePriceOscillator:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(as_float64_series(_input))
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
+        self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
@@ -76,7 +73,7 @@ class AbsolutePriceOscillator:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -98,5 +95,7 @@ class AbsolutePriceOscillator:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

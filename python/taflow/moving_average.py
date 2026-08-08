@@ -24,7 +24,6 @@ class MovingAverage:
     ) -> None:
         """Create a selectable moving average with optional initial values."""
         self._state = StatefulMa(period, moving_average_type)
-        self._values: list[float] = []
         if values is not None:
             self.extend(values)
 
@@ -41,8 +40,7 @@ class MovingAverage:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(float(value))
-        self._values.append(np.nan if result is None else float(result))
+        self._state.append(float(value))
         return self
 
     def extend(self, values: Any) -> "MovingAverage":
@@ -58,8 +56,7 @@ class MovingAverage:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(values)
-        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        self._state.extend(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -70,7 +67,7 @@ class MovingAverage:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -92,5 +89,7 @@ class MovingAverage:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

@@ -28,17 +28,26 @@ impl MinusDirectionalMovement {
         value
     }
 
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         if high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        self.outputs.extend(
-            high.iter()
-                .zip(low)
-                .map(|(&high, &low)| self.inner.append(high, low).unwrap_or(f64::NAN)),
-        );
+        let outputs = &mut self.outputs;
+        let inner = &mut self.inner;
+        py.allow_threads(|| {
+            outputs.extend(
+                high.iter()
+                    .zip(low)
+                    .map(|(&high, &low)| inner.append(high, low).unwrap_or(f64::NAN)),
+            );
+        });
         Ok(())
     }
 

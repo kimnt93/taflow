@@ -32,13 +32,18 @@ impl TripleExponentialRateOfChange {
         self.outputs.push(value.unwrap_or(f64::NAN));
         value
     }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        self.outputs.extend(
-            self.inner
-                .extend(input.as_slice()?.iter().copied())
-                .into_iter()
-                .map(|v| v.unwrap_or(f64::NAN)),
-        );
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        let inner = &mut self.inner;
+        py.allow_threads(|| {
+            outputs.extend(
+                inner
+                    .extend(input.iter().copied())
+                    .into_iter()
+                    .map(|v| v.unwrap_or(f64::NAN)),
+            );
+        });
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {

@@ -28,7 +28,6 @@ class ParabolicSar:
     ) -> None:
         """Create Parabolic SAR with optional aligned high/low history."""
         self._state = StatefulSar(acceleration, maximum)
-        self._values: list[float] = []
         if high is not None or low is not None:
             self.extend(high, low)
 
@@ -47,8 +46,7 @@ class ParabolicSar:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(float(high), float(low))
-        self._values.append(np.nan if result is None else float(result))
+        self._state.append(float(high), float(low))
         return self
 
     def extend(self, high: Any, low: Any) -> "ParabolicSar":
@@ -66,8 +64,7 @@ class ParabolicSar:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(high, low)
-        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        self._state.extend(high, low)
         return self
 
     def compute(self) -> np.ndarray:
@@ -78,7 +75,7 @@ class ParabolicSar:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -100,5 +97,7 @@ class ParabolicSar:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

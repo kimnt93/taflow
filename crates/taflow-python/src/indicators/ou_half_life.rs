@@ -27,10 +27,13 @@ impl OrnsteinUhlenbeckHalfLifeOperator {
         value
     }
 
-    fn extend(&mut self, price: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &price in price.as_slice()? {
-            self.append(price);
-        }
+    fn extend(&mut self, py: Python<'_>, price: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let price = price.as_slice()?;
+        py.allow_threads(|| {
+            for &price in price {
+                self.append(price);
+            }
+        });
         Ok(())
     }
 

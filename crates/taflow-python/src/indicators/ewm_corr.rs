@@ -24,6 +24,7 @@ impl EwmCorrOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         left: PyReadonlyArray1<f64>,
         right: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
@@ -31,9 +32,11 @@ impl EwmCorrOperator {
         if a.len() != b.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&x, &y) in a.iter().zip(b) {
-            self.append(x, y);
-        }
+        py.allow_threads(|| {
+            for (&x, &y) in a.iter().zip(b) {
+                self.append(x, y);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

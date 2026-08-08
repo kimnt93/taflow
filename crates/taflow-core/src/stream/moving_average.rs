@@ -74,6 +74,21 @@ impl MovingAverageDispatcher {
         }
     }
 
+    /// Whether this dispatcher wraps a plain EMA state (fused bulk paths).
+    #[inline]
+    pub(super) fn is_ema(&self) -> bool {
+        matches!(self, Self::ExponentialMovingAverage(_))
+    }
+
+    /// Mutable access to the wrapped EMA state, if this is the EMA variant.
+    #[inline]
+    pub(super) fn as_ema_mut(&mut self) -> Option<&mut ExponentialMovingAverage> {
+        match self {
+            Self::ExponentialMovingAverage(state) => Some(state),
+            _ => None,
+        }
+    }
+
     pub(super) fn reset(&mut self) {
         match self {
             Self::SimpleMovingAverage(state) => state.reset(),

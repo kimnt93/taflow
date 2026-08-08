@@ -28,6 +28,5 @@ class PercentagePriceOscillator(AbsolutePriceOscillator):
     ) -> None:
         """Create native PPO state and optionally process initial inputs."""
         self._state = self._native_cls(fastperiod, slowperiod, int(moving_average_type))
-        self._values = []
         if _input is not None:
             self.extend(_input)

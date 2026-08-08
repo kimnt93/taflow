@@ -4,13 +4,12 @@
 //! transforms, dominant-cycle estimate, cycle-length price average, and final
 //! four-value weighted trendline without recomputing prior bars.
 
-use std::collections::VecDeque;
-
 use crate::error::{TaError, TaResult};
 use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 63;
+const PRICE_RING: usize = 50;
 
 /// Incremental HT_TRENDLINE state.
 /// Persistent Rust state or aligned output type for `HilbertTransformTrendline`.
@@ -19,8 +18,12 @@ const LOOKBACK: usize = 63;
 /// values, and exposes the current result through its public API.
 pub struct HilbertTransformTrendline {
     index: usize,
-    prices: VecDeque<f64>,
-    wma_prices: VecDeque<f64>,
+    /// Fixed ring of the last 50 raw prices; `price_head` is the next write slot.
+    prices: [f64; PRICE_RING],
+    price_head: usize,
+    price_count: usize,
+    /// Three-slot delay line feeding the running WMA(4) smoother.
+    wma_prices: [f64; 3],
     period_wma_sub: f64,
     period_wma_sum: f64,
     trailing_wma_value: f64,
@@ -56,8 +59,10 @@ impl HilbertTransformTrendline {
     pub fn new() -> Self {
         Self {
             index: 0,
-            prices: VecDeque::with_capacity(50),
-            wma_prices: VecDeque::with_capacity(4),
+            prices: [0.0; PRICE_RING],
+            price_head: 0,
+            price_count: 0,
+            wma_prices: [0.0; 3],
             period_wma_sub: 0.0,
             period_wma_sum: 0.0,
             trailing_wma_value: 0.0,
@@ -85,11 +90,11 @@ impl HilbertTransformTrendline {
 
     fn next_smoothed(&mut self, input: f64) -> Option<f64> {
         if self.index < 2 {
-            self.wma_prices.push_back(input);
+            self.wma_prices[self.index] = input;
             return None;
         }
         if self.index == 2 {
-            self.wma_prices.push_back(input);
+            self.wma_prices[2] = input;
             self.period_wma_sub = self.wma_prices[0];
             self.period_wma_sub += self.wma_prices[1];
             self.period_wma_sub += self.wma_prices[2];
@@ -102,11 +107,9 @@ impl HilbertTransformTrendline {
         self.period_wma_sub += input;
         self.period_wma_sub -= self.trailing_wma_value;
         self.period_wma_sum += input * 4.0;
-        self.trailing_wma_value = self
-            .wma_prices
-            .pop_front()
-            .expect("initialized WMA has a trailing price");
-        self.wma_prices.push_back(input);
+        let slot = self.index % 3;
+        self.trailing_wma_value = self.wma_prices[slot];
+        self.wma_prices[slot] = input;
         let smoothed = self.period_wma_sum * 0.1;
         self.period_wma_sum -= self.period_wma_sub;
         Some(smoothed)
@@ -117,10 +120,11 @@ impl HilbertTransformTrendline {
         let today = self.index;
         let smoothed = self.next_smoothed(input);
         self.index += 1;
-        if self.prices.len() == 50 {
-            self.prices.pop_front();
+        self.prices[self.price_head] = input;
+        self.price_head = (self.price_head + 1) % PRICE_RING;
+        if self.price_count < PRICE_RING {
+            self.price_count += 1;
         }
-        self.prices.push_back(input);
 
         // TA-Lib computes and discards 34 WMA values at bars 3 through 36.
         if today < 37 {
@@ -210,8 +214,12 @@ impl HilbertTransformTrendline {
 
         let dc_period = (self.smooth_period + 0.5) as usize;
         let mut average = 0.0;
-        for price in self.prices.iter().rev().take(dc_period) {
-            average += price;
+        // Newest-to-oldest scan, identical accumulation order to the previous
+        // `prices.iter().rev().take(dc_period)` fold.
+        let mut idx = self.price_head;
+        for _ in 0..dc_period.min(self.price_count) {
+            idx = if idx == 0 { PRICE_RING - 1 } else { idx - 1 };
+            average += self.prices[idx];
         }
         if dc_period > 0 {
             average /= dc_period as f64;
@@ -233,13 +241,75 @@ impl HilbertTransformTrendline {
 
     /// Restores the post-construction state.
     pub fn reset(&mut self) {
-        *self = Self::new();
+        self.index = 0;
+        self.prices = [0.0; PRICE_RING];
+        self.price_head = 0;
+        self.price_count = 0;
+        self.wma_prices = [0.0; 3];
+        self.period_wma_sub = 0.0;
+        self.period_wma_sum = 0.0;
+        self.trailing_wma_value = 0.0;
+        self.hilbert_idx = 0;
+        self.detrender_vars = HilbertVars::new();
+        self.q1_vars = HilbertVars::new();
+        self.ji_vars = HilbertVars::new();
+        self.jq_vars = HilbertVars::new();
+        self.period = 0.0;
+        self.smooth_period = 0.0;
+        self.prev_i2 = 0.0;
+        self.prev_q2 = 0.0;
+        self.re = 0.0;
+        self.im = 0.0;
+        self.i1_for_odd_prev2 = 0.0;
+        self.i1_for_odd_prev3 = 0.0;
+        self.i1_for_even_prev2 = 0.0;
+        self.i1_for_even_prev3 = 0.0;
+        self.trend1 = 0.0;
+        self.trend2 = 0.0;
+        self.trend3 = 0.0;
+        self.value = None;
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(len: usize, mut seed: u64) -> Vec<f64> {
+        (0..len)
+            .map(|_| {
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                100.0 + ((seed >> 11) as f64 / (1u64 << 53) as f64 - 0.5) * 20.0
+            })
+            .collect()
+    }
+
+    #[test]
+    fn bitwise_matches_batch_and_reset_replay_on_lcg_bars() {
+        let input = lcg_series(5_000, 0x0bad_c0de_dead_1234);
+        let expected = hilbert_transform_trendline(&input).unwrap();
+        let mut state = HilbertTransformTrendline::new();
+        let mut outputs = Vec::with_capacity(input.len());
+        for (index, (&bar, &want)) in input.iter().zip(&expected).enumerate() {
+            let actual = state.append(bar);
+            match actual {
+                Some(value) => assert_eq!(
+                    value.to_bits(),
+                    want.to_bits(),
+                    "streaming diverged from batch at bar {index}"
+                ),
+                None => assert!(want.is_nan()),
+            }
+            outputs.push(actual);
+        }
+        state.reset();
+        for (&bar, expected) in input.iter().zip(&outputs) {
+            let replay = state.append(bar);
+            assert_eq!(replay.map(f64::to_bits), expected.map(f64::to_bits));
+        }
+    }
 
     #[test]
     fn matches_batch_and_reset_replay() {

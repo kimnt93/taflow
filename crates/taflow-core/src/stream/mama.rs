@@ -4,8 +4,6 @@
 //! dominant-cycle estimate, and phase-controlled adaptive smoothing.  The
 //! paired FAMA output is advanced from the same per-bar state.
 
-use std::collections::VecDeque;
-
 use crate::error::{TaError, TaResult};
 use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars, WmaState};
 
@@ -34,7 +32,8 @@ pub struct MesaAdaptiveMovingAverage {
     fast_limit: f64,
     slow_limit: f64,
     index: usize,
-    wma_prices: VecDeque<f64>,
+    /// Three-slot delay line feeding the running WMA(4) smoother.
+    wma_prices: [f64; 3],
     period_wma_sub: f64,
     period_wma_sum: f64,
     trailing_wma_value: f64,
@@ -79,7 +78,7 @@ impl MesaAdaptiveMovingAverage {
             fast_limit,
             slow_limit,
             index: 0,
-            wma_prices: VecDeque::with_capacity(4),
+            wma_prices: [0.0; 3],
             period_wma_sub: 0.0,
             period_wma_sum: 0.0,
             trailing_wma_value: 0.0,
@@ -106,11 +105,11 @@ impl MesaAdaptiveMovingAverage {
 
     fn next_smoothed(&mut self, input: f64) -> Option<f64> {
         if self.index < 2 {
-            self.wma_prices.push_back(input);
+            self.wma_prices[self.index] = input;
             return None;
         }
         if self.index == 2 {
-            self.wma_prices.push_back(input);
+            self.wma_prices[2] = input;
             let p0 = self.wma_prices[0];
             let p1 = self.wma_prices[1];
             let p2 = self.wma_prices[2];
@@ -126,11 +125,9 @@ impl MesaAdaptiveMovingAverage {
         self.period_wma_sub += input;
         self.period_wma_sub -= self.trailing_wma_value;
         self.period_wma_sum += input * 4.0;
-        self.trailing_wma_value = self
-            .wma_prices
-            .pop_front()
-            .expect("initialized WMA has a trailing price");
-        self.wma_prices.push_back(input);
+        let slot = self.index % 3;
+        self.trailing_wma_value = self.wma_prices[slot];
+        self.wma_prices[slot] = input;
         let smoothed = self.period_wma_sum * 0.1;
         self.period_wma_sum -= self.period_wma_sub;
         Some(smoothed)
@@ -257,15 +254,87 @@ impl StreamingIndicator for MesaAdaptiveMovingAverage {
     }
 
     fn reset(&mut self) {
-        let fast_limit = self.fast_limit;
-        let slow_limit = self.slow_limit;
-        *self = Self::new(fast_limit, slow_limit).expect("validated MAMA limits remain valid");
+        self.index = 0;
+        self.wma_prices = [0.0; 3];
+        self.period_wma_sub = 0.0;
+        self.period_wma_sum = 0.0;
+        self.trailing_wma_value = 0.0;
+        self.hilbert_idx = 0;
+        self.detrender_vars = HilbertVars::new();
+        self.q1_vars = HilbertVars::new();
+        self.ji_vars = HilbertVars::new();
+        self.jq_vars = HilbertVars::new();
+        self.period = 0.0;
+        self.prev_i2 = 0.0;
+        self.prev_q2 = 0.0;
+        self.re = 0.0;
+        self.im = 0.0;
+        self.i1_for_odd_prev2 = 0.0;
+        self.i1_for_odd_prev3 = 0.0;
+        self.i1_for_even_prev2 = 0.0;
+        self.i1_for_even_prev3 = 0.0;
+        self.prev_phase = 0.0;
+        self.prev_mama = 0.0;
+        self.prev_fama = 0.0;
+        self.value = None;
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(len: usize, mut seed: u64) -> Vec<f64> {
+        (0..len)
+            .map(|_| {
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                100.0 + ((seed >> 11) as f64 / (1u64 << 53) as f64 - 0.5) * 20.0
+            })
+            .collect()
+    }
+
+    #[test]
+    fn bitwise_matches_batch_and_reset_replay_on_lcg_bars() {
+        let input = lcg_series(5_000, 0x3a3a_1111_2222_3333);
+        let (expected_mama, expected_fama) =
+            crate::stream::mesa_adaptive_moving_average(&input, 0.5, 0.05).unwrap();
+        let mut state = MesaAdaptiveMovingAverage::new(0.5, 0.05).unwrap();
+        let mut outputs = Vec::with_capacity(input.len());
+        for (index, ((&bar, &mama), &fama)) in input
+            .iter()
+            .zip(&expected_mama)
+            .zip(&expected_fama)
+            .enumerate()
+        {
+            let actual = state.append(bar);
+            match actual {
+                Some(value) => {
+                    assert_eq!(value.mama.to_bits(), mama.to_bits(), "mama @{index}");
+                    assert_eq!(value.fama.to_bits(), fama.to_bits(), "fama @{index}");
+                }
+                None => {
+                    assert!(mama.is_nan());
+                    assert!(fama.is_nan());
+                }
+            }
+            outputs.push(actual);
+        }
+        state.reset();
+        assert!(state.value().is_none());
+        for (&bar, expected) in input.iter().zip(&outputs) {
+            let replay = state.append(bar);
+            match (replay, expected) {
+                (Some(got), Some(want)) => {
+                    assert_eq!(got.mama.to_bits(), want.mama.to_bits());
+                    assert_eq!(got.fama.to_bits(), want.fama.to_bits());
+                }
+                (None, None) => {}
+                _ => panic!("warm-up boundary moved after reset"),
+            }
+        }
+    }
 
     #[test]
     fn matches_batch_and_reset_replay() {

@@ -58,6 +58,44 @@ impl StochasticRelativeStrengthIndex {
         self.value
     }
 
+    /// Bulk kernel: the Wilder RSI recurrence runs per bar (it is a two-FLOP
+    /// serial recurrence, not the bottleneck), the warmed RSI values are then
+    /// handed to [`FastStochasticOscillator::extend_slices_into`], whose vHGW
+    /// extrema pass removes the O(n * fastk_period) work. Outputs and post-run
+    /// state are bit-identical to per-bar [`Self::append`]; warm-up bars are
+    /// NaN.
+    pub fn extend_slices_into(
+        &mut self,
+        inputs: &[f64],
+        fastk_out: &mut Vec<f64>,
+        fastd_out: &mut Vec<f64>,
+    ) {
+        fastk_out.reserve(inputs.len());
+        fastd_out.reserve(inputs.len());
+        let mut warmed = Vec::with_capacity(inputs.len());
+        for &input in inputs {
+            if let Some(rsi) = self.rsi.append(input) {
+                warmed.push(rsi);
+            }
+        }
+        // RSI warm-up is a strict prefix, so the NaN bars are exactly the
+        // leading `inputs.len() - warmed.len()` positions.
+        for _ in 0..(inputs.len() - warmed.len()) {
+            fastk_out.push(f64::NAN);
+            fastd_out.push(f64::NAN);
+        }
+        self.stochastic
+            .extend_slices_into(&warmed, &warmed, &warmed, fastk_out, fastd_out)
+            .expect("identical slice lengths");
+        self.value = self
+            .stochastic
+            .value()
+            .map(|value| StochasticRelativeStrengthIndexValue {
+                fastk: value.fastk,
+                fastd: value.fastd,
+            });
+    }
+
     /// Returns the latest warmed output.
     pub fn value(&self) -> Option<StochasticRelativeStrengthIndexValue> {
         self.value
@@ -142,4 +180,74 @@ pub fn stochastic_relative_strength_index(
     fastk_out[timeperiod..].copy_from_slice(&stochastic_k);
     fastd_out[timeperiod..].copy_from_slice(&stochastic_d);
     Ok((fastk_out, fastd_out))
+}
+
+#[cfg(test)]
+mod stochrsi_bulk_tests {
+    use super::*;
+
+    fn lcg_series(len: usize, seed: u64) -> Vec<f64> {
+        let mut state = seed;
+        (0..len)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                ((state >> 33) % 100_003) as f64 / 101.0
+            })
+            .collect()
+    }
+
+    #[test]
+    fn stochrsi_bulk_matches_append_bitwise() {
+        let data = lcg_series(5_000, 0x4D59_5A5F_1122_3344);
+        for period in [2usize, 5, 14, 30, 200] {
+            for (fastk, fastd, ma) in [
+                (5usize, 3usize, MaType::SimpleMovingAverage),
+                (14, 4, MaType::ExponentialMovingAverage),
+            ] {
+                let mut reference =
+                    StochasticRelativeStrengthIndex::new(period, fastk, fastd, ma).unwrap();
+                let expected: Vec<(f64, f64)> = data
+                    .iter()
+                    .map(|&v| match reference.append(v) {
+                        Some(value) => (value.fastk, value.fastd),
+                        None => (f64::NAN, f64::NAN),
+                    })
+                    .collect();
+                for chunk in [1usize, 7, 97, data.len()] {
+                    let mut state =
+                        StochasticRelativeStrengthIndex::new(period, fastk, fastd, ma).unwrap();
+                    let (mut k_out, mut d_out) = (Vec::new(), Vec::new());
+                    for piece in data.chunks(chunk) {
+                        state.extend_slices_into(piece, &mut k_out, &mut d_out);
+                    }
+                    assert_eq!(k_out.len(), data.len());
+                    for (i, (ek, ed)) in expected.iter().enumerate() {
+                        assert_eq!(
+                            ek.to_bits(),
+                            k_out[i].to_bits(),
+                            "fastk p={period} c={chunk} i={i}"
+                        );
+                        assert_eq!(
+                            ed.to_bits(),
+                            d_out[i].to_bits(),
+                            "fastd p={period} c={chunk} i={i}"
+                        );
+                    }
+                    for &value in data.iter().take(256) {
+                        assert_eq!(
+                            reference.append(value),
+                            state.append(value),
+                            "continue p={period} c={chunk}"
+                        );
+                    }
+                    reference.reset();
+                    for &value in &data {
+                        reference.append(value);
+                    }
+                }
+            }
+        }
+    }
 }

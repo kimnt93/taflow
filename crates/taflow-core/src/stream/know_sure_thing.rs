@@ -21,10 +21,6 @@ pub fn know_sure_thing(
     let mut state = KnowSureThing::new(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, nsig)?;
     let mut kst_out = Vec::with_capacity(close.len());
     let mut signal = Vec::with_capacity(close.len());
-    for &close in close {
-        let value = state.append(close);
-        kst_out.push(value.kst);
-        signal.push(value.signal);
-    }
+    state.extend_slices_into(close, &mut kst_out, &mut signal);
     Ok((kst_out, signal))
 }

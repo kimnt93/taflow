@@ -41,10 +41,13 @@ impl CandleTwoCrows {
     }
     fn push_body(&mut self, value: f64) {
         if self.bodies.len() == 10 {
-            self.sum -= self.bodies.pop_front().expect("window full");
+            // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
+            let old = self.bodies.pop_front().expect("window full");
+            self.sum += value - old;
+        } else {
+            self.sum += value;
         }
         self.bodies.push_back(value);
-        self.sum += value;
     }
     /// Appends OHLC data and returns -100 for a two-crows pattern after warmup.
     pub fn append(&mut self, open: f64, _high: f64, _low: f64, close: f64) -> Option<i32> {
@@ -77,6 +80,53 @@ impl CandleTwoCrows {
         self.value = output;
         output
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.candles.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_two_crows(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -87,7 +137,10 @@ impl CandleTwoCrows {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new();
+        self.candles.clear();
+        self.bodies.clear();
+        self.sum = 0.0;
+        self.value = None;
     }
 }
 
@@ -128,13 +181,13 @@ pub fn candle_two_crows(
     let mut body_sum = 0.0;
     let start = lookback;
     for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
-        body_sum += cr(BODY_LONG, open, high, low, close, i);
+        body_sum += cr_realbody(open, high, low, close, i);
     }
 
     for i in start..len {
         // 1st: long white
         output[i] = (candle_color(open[i-2], close[i-2]) == 1
-            && real_body(open[i-2], close[i-2]) > ca(BODY_LONG, body_sum, open, high, low, close, i-2)
+            && real_body(open[i-2], close[i-2]) > ca_realbody(BODY_LONG, body_sum, open, high, low, close, i-2)
             // 2nd: black, gap up
             && candle_color(open[i-1], close[i-1]) == -1
             && real_body_gap_up(open, close, i-1, i-2)
@@ -143,15 +196,8 @@ pub fn candle_two_crows(
             && open[i] < open[i-1] && open[i] > close[i-1]
             && close[i] > open[i-2] && close[i] < close[i-2]) as i32
             * -100;
-        body_sum += cr(BODY_LONG, open, high, low, close, i - 2)
-            - cr(
-                BODY_LONG,
-                open,
-                high,
-                low,
-                close,
-                i - 2 - BODY_LONG.avg_period,
-            );
+        body_sum += cr_realbody(open, high, low, close, i - 2)
+            - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
     }
     Ok(output)
 }

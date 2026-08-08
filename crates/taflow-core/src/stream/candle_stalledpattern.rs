@@ -13,9 +13,6 @@ impl Candle {
     fn body(self) -> f64 {
         (self.c - self.o).abs()
     }
-    fn range(self) -> f64 {
-        self.h - self.l
-    }
     fn upper(self) -> f64 {
         self.h - self.o.max(self.c)
     }
@@ -31,6 +28,10 @@ impl Candle {
 /// Consumes causal OHLC bars and returns an aligned pattern score.
 pub struct CandleStalledPattern {
     candles: VecDeque<Candle>,
+    body_long_sum: [f64; 2],
+    body_short_sum: f64,
+    shadow_sum: f64,
+    near_sum: [f64; 2],
     value: Option<i32>,
 }
 impl Default for CandleStalledPattern {
@@ -47,6 +48,10 @@ impl CandleStalledPattern {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
+            body_long_sum: [0.0; 2],
+            body_short_sum: 0.0,
+            shadow_sum: 0.0,
+            near_sum: [0.0; 2],
             value: None,
         }
     }
@@ -57,43 +62,29 @@ impl CandleStalledPattern {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
+        // Deque holds bars i-12..=i-1; bar j maps to index 12 - (i - j).
         let value = if self.candles.len() == 12 {
-            let a = self.candles[10];
-            let b = self.candles[11];
-            let long0 = self.candles.iter().take(10).map(|x| x.body()).sum::<f64>() / 10.0;
-            let long1 = self
-                .candles
-                .iter()
-                .skip(1)
-                .take(10)
-                .map(|x| x.body())
-                .sum::<f64>()
-                / 10.0;
-            let short = self.candles.iter().skip(2).map(|x| x.body()).sum::<f64>() / 10.0;
-            let shadow = self
-                .candles
-                .iter()
-                .skip(1)
-                .take(10)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.01;
-            let near0 = self
-                .candles
-                .iter()
-                .skip(5)
-                .take(5)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.04;
-            let near1 = self
-                .candles
-                .iter()
-                .skip(6)
-                .take(5)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.04;
+            let a = self.candles[10]; // bar i-2
+            let b = self.candles[11]; // bar i-1
+            let long0 = ca_realbody_scalar(BODY_LONG, self.body_long_sum[0], a.o, a.c);
+            let long1 = ca_realbody_scalar(BODY_LONG, self.body_long_sum[1], b.o, b.c);
+            let short = ca_realbody_scalar(BODY_SHORT, self.body_short_sum, o, c);
+            let shadow = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum, b.h, b.l);
+            let near0 = ca_highlow_scalar(NEAR, self.near_sum[0], a.h, a.l);
+            let near1 = ca_highlow_scalar(NEAR, self.near_sum[1], b.h, b.l);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - period).
+            self.body_long_sum[0] += cr_realbody_scalar(a.o, a.c)
+                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
+            self.body_long_sum[1] += cr_realbody_scalar(b.o, b.c)
+                - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
+            self.body_short_sum +=
+                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[2].o, self.candles[2].c);
+            self.shadow_sum += cr_highlow_scalar(b.h, b.l)
+                - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            self.near_sum[0] += cr_highlow_scalar(a.h, a.l)
+                - cr_highlow_scalar(self.candles[5].h, self.candles[5].l);
+            self.near_sum[1] += cr_highlow_scalar(b.h, b.l)
+                - cr_highlow_scalar(self.candles[6].h, self.candles[6].l);
             Some(
                 (a.color() == 1
                     && b.color() == 1
@@ -110,6 +101,24 @@ impl CandleStalledPattern {
                     * -100,
             )
         } else {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if i < 10 {
+                self.body_long_sum[0] += cr_realbody_scalar(o, c);
+            }
+            if (1..11).contains(&i) {
+                self.body_long_sum[1] += cr_realbody_scalar(o, c);
+                self.shadow_sum += cr_highlow_scalar(h, l);
+            }
+            if (2..12).contains(&i) {
+                self.body_short_sum += cr_realbody_scalar(o, c);
+            }
+            if (5..10).contains(&i) {
+                self.near_sum[0] += cr_highlow_scalar(h, l);
+            }
+            if (6..11).contains(&i) {
+                self.near_sum[1] += cr_highlow_scalar(h, l);
+            }
             None
         };
         if self.candles.len() == 12 {
@@ -119,6 +128,53 @@ impl CandleStalledPattern {
         self.value = value;
         value
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.candles.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_stalled_pattern(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -129,7 +185,12 @@ impl CandleStalledPattern {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new();
+        self.candles.clear();
+        self.body_long_sum = [0.0; 2];
+        self.body_short_sum = 0.0;
+        self.shadow_sum = 0.0;
+        self.near_sum = [0.0; 2];
+        self.value = None;
     }
 }
 
@@ -183,22 +244,22 @@ pub fn candle_stalled_pattern(
     let start = lookback;
 
     for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
-        body_long_sum[0] += cr(BODY_LONG, open, high, low, close, i);
+        body_long_sum[0] += cr_realbody(open, high, low, close, i);
     }
     for i in (start - 1 - BODY_LONG.avg_period)..(start - 1) {
-        body_long_sum[1] += cr(BODY_LONG, open, high, low, close, i);
+        body_long_sum[1] += cr_realbody(open, high, low, close, i);
     }
     for i in (start - BODY_SHORT.avg_period)..start {
-        body_short_sum += cr(BODY_SHORT, open, high, low, close, i);
+        body_short_sum += cr_realbody(open, high, low, close, i);
     }
     for i in (start - 1 - SHADOW_VERY_SHORT.avg_period)..(start - 1) {
-        shadow_sum += cr(SHADOW_VERY_SHORT, open, high, low, close, i);
+        shadow_sum += cr_highlow(open, high, low, close, i);
     }
     for k in 0..3 {
         let bar = start - 2 + k;
         if NEAR.avg_period > 0 && bar >= NEAR.avg_period {
             for j in (bar - NEAR.avg_period)..bar {
-                near_sum[k] += cr(NEAR, open, high, low, close, j);
+                near_sum[k] += cr_highlow(open, high, low, close, j);
             }
         }
     }
@@ -210,62 +271,35 @@ pub fn candle_stalled_pattern(
             && close[i - 1] > close[i - 2]
             && close[i] > close[i - 1]
             && real_body(open[i - 2], close[i - 2])
-                > ca(BODY_LONG, body_long_sum[0], open, high, low, close, i - 2)
+                > ca_realbody(BODY_LONG, body_long_sum[0], open, high, low, close, i - 2)
             && real_body(open[i - 1], close[i - 1])
-                > ca(BODY_LONG, body_long_sum[1], open, high, low, close, i - 1)
+                > ca_realbody(BODY_LONG, body_long_sum[1], open, high, low, close, i - 1)
             && upper_shadow(open[i - 1], high[i - 1], close[i - 1])
-                < ca(SHADOW_VERY_SHORT, shadow_sum, open, high, low, close, i - 1)
+                < ca_highlow(SHADOW_VERY_SHORT, shadow_sum, open, high, low, close, i - 1)
             && open[i - 1] > open[i - 2]
-            && open[i - 1] <= close[i - 2] + ca(NEAR, near_sum[0], open, high, low, close, i - 2)
+            && open[i - 1]
+                <= close[i - 2] + ca_highlow(NEAR, near_sum[0], open, high, low, close, i - 2)
             && real_body(open[i], close[i])
-                < ca(BODY_SHORT, body_short_sum, open, high, low, close, i)
+                < ca_realbody(BODY_SHORT, body_short_sum, open, high, low, close, i)
             && open[i]
                 >= close[i - 1]
                     - real_body(open[i], close[i])
-                    - ca(NEAR, near_sum[1], open, high, low, close, i - 1))
+                    - ca_highlow(NEAR, near_sum[1], open, high, low, close, i - 1))
             as i32
             * -100;
-        body_long_sum[0] += cr(BODY_LONG, open, high, low, close, i - 2)
-            - cr(
-                BODY_LONG,
-                open,
-                high,
-                low,
-                close,
-                i - 2 - BODY_LONG.avg_period,
-            );
-        body_long_sum[1] += cr(BODY_LONG, open, high, low, close, i - 1)
-            - cr(
-                BODY_LONG,
-                open,
-                high,
-                low,
-                close,
-                i - 1 - BODY_LONG.avg_period,
-            );
-        body_short_sum += cr(BODY_SHORT, open, high, low, close, i)
-            - cr(
-                BODY_SHORT,
-                open,
-                high,
-                low,
-                close,
-                i - BODY_SHORT.avg_period,
-            );
-        shadow_sum += cr(SHADOW_VERY_SHORT, open, high, low, close, i - 1)
-            - cr(
-                SHADOW_VERY_SHORT,
-                open,
-                high,
-                low,
-                close,
-                i - 1 - SHADOW_VERY_SHORT.avg_period,
-            );
+        body_long_sum[0] += cr_realbody(open, high, low, close, i - 2)
+            - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
+        body_long_sum[1] += cr_realbody(open, high, low, close, i - 1)
+            - cr_realbody(open, high, low, close, i - 1 - BODY_LONG.avg_period);
+        body_short_sum += cr_realbody(open, high, low, close, i)
+            - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
+        shadow_sum += cr_highlow(open, high, low, close, i - 1)
+            - cr_highlow(open, high, low, close, i - 1 - SHADOW_VERY_SHORT.avg_period);
         for k in 0..3 {
             let bar = i - 2 + k;
             if NEAR.avg_period > 0 && bar >= NEAR.avg_period {
-                near_sum[k] += cr(NEAR, open, high, low, close, bar)
-                    - cr(NEAR, open, high, low, close, bar - NEAR.avg_period);
+                near_sum[k] += cr_highlow(open, high, low, close, bar)
+                    - cr_highlow(open, high, low, close, bar - NEAR.avg_period);
             }
         }
     }

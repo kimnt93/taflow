@@ -10,9 +10,6 @@ struct Candle {
     close: f64,
 }
 impl Candle {
-    fn range(self) -> f64 {
-        self.high - self.low
-    }
     fn lower(self) -> f64 {
         self.open.min(self.close) - self.low
     }
@@ -27,6 +24,7 @@ impl Candle {
 /// values, and exposes the current result through its public API.
 pub struct CandleThreeBlackCrows {
     candles: VecDeque<Candle>,
+    shadow_sum: [f64; 3],
     value: Option<i32>,
 }
 impl Default for CandleThreeBlackCrows {
@@ -43,17 +41,9 @@ impl CandleThreeBlackCrows {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(13),
+            shadow_sum: [0.0; 3],
             value: None,
         }
-    }
-    fn average(&self, start: usize) -> f64 {
-        self.candles
-            .iter()
-            .skip(start)
-            .take(10)
-            .map(|c| c.range())
-            .sum::<f64>()
-            * 0.01
     }
     /// Appends OHLC data and returns -100 for three black crows after warmup.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
@@ -63,24 +53,43 @@ impl CandleThreeBlackCrows {
             low,
             close,
         };
+        // Deque holds bars i-13..=i-1; bar j maps to index 13 - (i - j).
         let output = if self.candles.len() == 13 {
-            let a = self.candles[10];
-            let b = self.candles[11];
+            let p3 = self.candles[10]; // bar i-3
+            let a = self.candles[11]; // bar i-2
+            let b = self.candles[12]; // bar i-1
             let pattern = a.black()
                 && b.black()
                 && current.black()
                 && b.close < a.close
                 && current.close < b.close
-                && a.open <= self.candles[9].open.max(self.candles[9].close)
+                && a.open <= p3.open.max(p3.close)
                 && b.open <= a.open
                 && b.open >= a.close
                 && current.open <= b.open
                 && current.open >= b.close
-                && a.lower() < self.average(1)
-                && b.lower() < self.average(2)
-                && current.lower() < self.average(3);
+                && a.lower()
+                    < ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[0], a.high, a.low)
+                && b.lower()
+                    < ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[1], b.high, b.low)
+                && current.lower()
+                    < ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[2], high, low);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
+            self.shadow_sum[0] += cr_highlow_scalar(a.high, a.low)
+                - cr_highlow_scalar(self.candles[1].high, self.candles[1].low);
+            self.shadow_sum[1] += cr_highlow_scalar(b.high, b.low)
+                - cr_highlow_scalar(self.candles[2].high, self.candles[2].low);
+            self.shadow_sum[2] += cr_highlow_scalar(high, low)
+                - cr_highlow_scalar(self.candles[3].high, self.candles[3].low);
             Some(-(pattern as i32) * 100)
         } else {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            for k in 0..3 {
+                if i >= k && i < 10 + k {
+                    self.shadow_sum[k] += cr_highlow_scalar(high, low);
+                }
+            }
             None
         };
         if self.candles.len() == 13 {
@@ -90,6 +99,41 @@ impl CandleThreeBlackCrows {
         self.value = output;
         output
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// No from-empty fast path here. The warm-up prologue seeds `shadow_sum`
+    /// one bar earlier than the steady-state slide evicts (`+= cr(i-2)` against
+    /// `-= cr(i-12)` on a window seeded at bars `0..=9`), which the batch
+    /// kernel mirrors exactly - the two agree with each other, but the sums
+    /// keep a `cr(bar 0) - cr(bar 10)` term forever. The state is therefore not
+    /// a function of a bounded window and a tail replay cannot reconstruct it,
+    /// so the bulk entry point is the per-bar `append` loop with the `Option`
+    /// unwrapped in place. Bit-identical to calling `append` once per bar.
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -100,7 +144,9 @@ impl CandleThreeBlackCrows {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new()
+        self.candles.clear();
+        self.shadow_sum = [0.0; 3];
+        self.value = None;
     }
 }
 
@@ -144,7 +190,7 @@ pub fn candle_three_black_crows(
         let bar_offset = start - 3 + k;
         if bar_offset >= SHADOW_VERY_SHORT.avg_period {
             for j in (bar_offset - SHADOW_VERY_SHORT.avg_period)..bar_offset {
-                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, j);
+                shadow_sum[k] += cr_highlow(open, high, low, close, j);
             }
         }
     }
@@ -161,7 +207,7 @@ pub fn candle_three_black_crows(
             && open[i] <= open[i - 1]
             && open[i] >= close[i - 1]
             && lower_shadow(open[i - 2], low[i - 2], close[i - 2])
-                < ca(
+                < ca_highlow(
                     SHADOW_VERY_SHORT,
                     shadow_sum[0],
                     open,
@@ -171,7 +217,7 @@ pub fn candle_three_black_crows(
                     i - 2,
                 )
             && lower_shadow(open[i - 1], low[i - 1], close[i - 1])
-                < ca(
+                < ca_highlow(
                     SHADOW_VERY_SHORT,
                     shadow_sum[1],
                     open,
@@ -181,21 +227,14 @@ pub fn candle_three_black_crows(
                     i - 1,
                 )
             && lower_shadow(open[i], low[i], close[i])
-                < ca(SHADOW_VERY_SHORT, shadow_sum[2], open, high, low, close, i))
+                < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[2], open, high, low, close, i))
             as i32
             * -100;
         for k in 0..3 {
             let bar = i - 2 + k;
             if bar >= SHADOW_VERY_SHORT.avg_period {
-                shadow_sum[k] += cr(SHADOW_VERY_SHORT, open, high, low, close, bar)
-                    - cr(
-                        SHADOW_VERY_SHORT,
-                        open,
-                        high,
-                        low,
-                        close,
-                        bar - SHADOW_VERY_SHORT.avg_period,
-                    );
+                shadow_sum[k] += cr_highlow(open, high, low, close, bar)
+                    - cr_highlow(open, high, low, close, bar - SHADOW_VERY_SHORT.avg_period);
             }
         }
     }

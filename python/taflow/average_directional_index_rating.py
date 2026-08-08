@@ -28,7 +28,6 @@ class AverageDirectionalIndexRating:
     ) -> None:
         """Create ADXR with an optional aligned high/low/close history."""
         self._state = StatefulAdxr(period)
-        self._values: list[float] = []
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
@@ -49,8 +48,7 @@ class AverageDirectionalIndexRating:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(high, low, close)
-        self._values.append(np.nan if result is None else float(result))
+        self._state.append(high, low, close)
         return self
 
     def extend(self, high: object, low: object, close: object) -> object:
@@ -70,8 +68,7 @@ class AverageDirectionalIndexRating:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(high, low, close)
-        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        self._state.extend(high, low, close)
         return self
 
     def compute(self) -> np.ndarray:
@@ -82,7 +79,7 @@ class AverageDirectionalIndexRating:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -104,5 +101,7 @@ class AverageDirectionalIndexRating:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

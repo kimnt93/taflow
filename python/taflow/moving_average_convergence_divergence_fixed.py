@@ -22,7 +22,6 @@ class MovingAverageConvergenceDivergenceFixed:
     def __init__(self, signal_period: int = 9, values: Any | None = None) -> None:
         """Create fixed MACD with an optional initial price series."""
         self._state = StatefulMacdFix(signal_period)
-        self._values: list[tuple[float, float, float]] = []
         if values is not None:
             self.extend(values)
 
@@ -39,10 +38,7 @@ class MovingAverageConvergenceDivergenceFixed:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(float(value))
-        self._values.append(
-            (np.nan, np.nan, np.nan) if result is None else tuple(result)
-        )
+        self._state.append(float(value))
         return self
 
     def extend(self, values: Any) -> "MovingAverageConvergenceDivergenceFixed":
@@ -58,9 +54,7 @@ class MovingAverageConvergenceDivergenceFixed:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(values)
-        arrays = [np.asarray(item, dtype=np.float64) for item in result]
-        self._values.extend(zip(*arrays))
+        self._state.extend(values)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -71,12 +65,7 @@ class MovingAverageConvergenceDivergenceFixed:
         object
             Updated state, converted values, or aligned output.
         """
-        if not self._values:
-            empty = np.empty(0, dtype=np.float64)
-            return empty.copy(), empty.copy(), empty.copy()
-        return tuple(
-            np.asarray(values, dtype=np.float64) for values in zip(*self._values)
-        )
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -98,5 +87,7 @@ class MovingAverageConvergenceDivergenceFixed:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

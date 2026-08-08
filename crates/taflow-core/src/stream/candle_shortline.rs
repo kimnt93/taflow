@@ -49,39 +49,26 @@ pub fn candle_short_line(
     let mut shadow_sum = 0.0;
     let start = lookback;
     for i in (start - BODY_SHORT.avg_period)..start {
-        body_sum += cr(BODY_SHORT, open, high, low, close, i);
+        body_sum += cr_realbody(open, high, low, close, i);
     }
     for i in (start - SHADOW_SHORT.avg_period)..start {
-        shadow_sum += cr(SHADOW_SHORT, open, high, low, close, i);
+        shadow_sum += cr_shadows(open, high, low, close, i);
     }
 
     for i in start..len {
-        output[i] =
-            (real_body(open[i], close[i]) < ca(BODY_SHORT, body_sum, open, high, low, close, i)
-                && upper_shadow(open[i], high[i], close[i])
-                    < ca(SHADOW_SHORT, shadow_sum, open, high, low, close, i)
-                && lower_shadow(open[i], low[i], close[i])
-                    < ca(SHADOW_SHORT, shadow_sum, open, high, low, close, i)) as i32
-                * candle_color(open[i], close[i])
-                * 100;
-        body_sum += cr(BODY_SHORT, open, high, low, close, i)
-            - cr(
-                BODY_SHORT,
-                open,
-                high,
-                low,
-                close,
-                i - BODY_SHORT.avg_period,
-            );
-        shadow_sum += cr(SHADOW_SHORT, open, high, low, close, i)
-            - cr(
-                SHADOW_SHORT,
-                open,
-                high,
-                low,
-                close,
-                i - SHADOW_SHORT.avg_period,
-            );
+        output[i] = (real_body(open[i], close[i])
+            < ca_realbody(BODY_SHORT, body_sum, open, high, low, close, i)
+            && upper_shadow(open[i], high[i], close[i])
+                < ca_shadows(SHADOW_SHORT, shadow_sum, open, high, low, close, i)
+            && lower_shadow(open[i], low[i], close[i])
+                < ca_shadows(SHADOW_SHORT, shadow_sum, open, high, low, close, i))
+            as i32
+            * candle_color(open[i], close[i])
+            * 100;
+        body_sum += cr_realbody(open, high, low, close, i)
+            - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
+        shadow_sum += cr_shadows(open, high, low, close, i)
+            - cr_shadows(open, high, low, close, i - SHADOW_SHORT.avg_period);
     }
     Ok(output)
 }
@@ -107,7 +94,8 @@ impl CandleShortLine {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let body = (c - o).abs();
-        let sh = (h - o.max(c)) + (o.min(c) - l);
+        // SHADOW_SHORT range value, computed exactly like the batch cr_shadows.
+        let sh = cr_shadows_scalar(o, h, l, c);
         let v = if self.b.len() == 10 {
             Some(
                 (body < self.bs / 10.
@@ -119,16 +107,67 @@ impl CandleShortLine {
             None
         };
         if self.b.len() == 10 {
-            self.bs -= self.b.pop_front().unwrap();
-            self.ss -= self.s.pop_front().unwrap();
+            // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
+            let old_b = self.b.pop_front().unwrap();
+            let old_s = self.s.pop_front().unwrap();
+            self.bs += body - old_b;
+            self.ss += sh - old_s;
+        } else {
+            self.bs += body;
+            self.ss += sh;
         }
         self.b.push_back(body);
         self.s.push_back(sh);
-        self.bs += body;
-        self.ss += sh;
         self.value = v;
         v
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.b.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_short_line(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -139,6 +178,10 @@ impl CandleShortLine {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new();
+        self.b.clear();
+        self.s.clear();
+        self.bs = 0.0;
+        self.ss = 0.0;
+        self.value = None;
     }
 }

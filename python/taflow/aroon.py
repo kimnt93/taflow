@@ -27,7 +27,6 @@ class Aroon:
     ) -> None:
         """Create an Aroon state and optionally process initial prices."""
         self._state = StatefulAroon(timeperiod)
-        self._values = ([], [])
         if high is not None or low is not None:
             self.extend(high, low)
 
@@ -44,9 +43,7 @@ class Aroon:
         object
             Updated state, converted values, or aligned output.
         """
-        value = self._state.append(float(high), float(low))
-        self._values[0].append(np.nan if value is None else value[0])
-        self._values[1].append(np.nan if value is None else value[1])
+        self._state.append(float(high), float(low))
         return self
 
     def extend(self, high: Any, low: Any) -> "Aroon":
@@ -62,9 +59,7 @@ class Aroon:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(as_float64_series(high), as_float64_series(low))
-        self._values[0].extend(np.asarray(values[0], dtype=np.float64).tolist())
-        self._values[1].extend(np.asarray(values[1], dtype=np.float64).tolist())
+        self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray]:
@@ -75,7 +70,7 @@ class Aroon:
         object
             Updated state, converted values, or aligned output.
         """
-        return tuple(np.asarray(values, dtype=np.float64) for values in self._values)
+        return self._state.compute()
 
     @property
     def value(self) -> tuple[float, float] | None:
@@ -97,6 +92,7 @@ class Aroon:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values[0].clear()
-        self._values[1].clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

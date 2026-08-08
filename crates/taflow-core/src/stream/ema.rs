@@ -57,6 +57,31 @@ impl ExponentialMovingAverage {
         })
     }
 
+    /// The smoothing constant `k = 2 / (period + 1)` used by the recurrence.
+    #[inline]
+    pub(crate) fn smoothing(&self) -> f64 {
+        self.k
+    }
+
+    /// The current EMA value, if the state is warm.
+    #[inline]
+    pub(crate) fn current(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Writes back the scalar recurrence state after a fused bulk loop.
+    ///
+    /// This mirrors exactly what `appended` warm calls of [`Self::append`]
+    /// would have left behind: `samples` advances by `appended` and the value
+    /// becomes `value`. Callers must only use this once the state is warm
+    /// (`current().is_some()`), so the SMA seed is untouched.
+    #[inline]
+    pub(crate) fn store_bulk_state(&mut self, value: f64, appended: usize) {
+        debug_assert!(self.value.is_some());
+        self.samples += appended;
+        self.value = Some(value);
+    }
+
     /// Extends an empty state through the optimized contiguous bulk path.
     ///
     /// Partial and continued chunks use `append` so chunk boundaries preserve

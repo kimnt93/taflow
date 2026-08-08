@@ -13,12 +13,6 @@ impl Candle {
     fn body(self) -> f64 {
         (self.c - self.o).abs()
     }
-    fn range(self) -> f64 {
-        self.h - self.l
-    }
-    fn shadow(self) -> f64 {
-        self.range() - self.body()
-    }
     fn upper(self) -> f64 {
         self.h - self.o.max(self.c)
     }
@@ -34,6 +28,10 @@ impl Candle {
 /// Consumes causal OHLC bars and returns an aligned pattern score.
 pub struct CandleAdvanceBlock {
     candles: VecDeque<Candle>,
+    body_long_sum: f64,
+    shadow_short_sum: f64,
+    near_sum: [f64; 2],
+    far_sum: [f64; 2],
     value: Option<i32>,
 }
 impl Default for CandleAdvanceBlock {
@@ -50,6 +48,10 @@ impl CandleAdvanceBlock {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(12),
+            body_long_sum: 0.0,
+            shadow_short_sum: 0.0,
+            near_sum: [0.0; 2],
+            far_sum: [0.0; 2],
             value: None,
         }
     }
@@ -60,49 +62,17 @@ impl CandleAdvanceBlock {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
+        // Deque holds bars i-12..=i-1; bar j maps to index 12 - (i - j).
         let value = if self.candles.len() == 12 {
-            let a = self.candles[10];
-            let b = self.candles[11];
-            let long = self.candles.iter().take(10).map(|x| x.body()).sum::<f64>() / 10.0;
-            let shadow_short = self
-                .candles
-                .iter()
-                .take(10)
-                .map(|x| x.shadow())
-                .sum::<f64>()
-                / 20.0;
-            let near1 = self
-                .candles
-                .iter()
-                .skip(6)
-                .take(5)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.04;
-            let near2 = self
-                .candles
-                .iter()
-                .skip(7)
-                .take(5)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.04;
-            let far1 = self
-                .candles
-                .iter()
-                .skip(6)
-                .take(5)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.12;
-            let far2 = self
-                .candles
-                .iter()
-                .skip(7)
-                .take(5)
-                .map(|x| x.range())
-                .sum::<f64>()
-                * 0.12;
+            let a = self.candles[10]; // bar i-2
+            let b = self.candles[11]; // bar i-1
+            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, a.o, a.c);
+            let shadow_short =
+                ca_shadows_scalar(SHADOW_SHORT, self.shadow_short_sum, a.o, a.h, a.l, a.c);
+            let near1 = ca_highlow_scalar(NEAR, self.near_sum[0], b.h, b.l);
+            let near2 = ca_highlow_scalar(NEAR, self.near_sum[1], h, l);
+            let far1 = ca_highlow_scalar(FAR, self.far_sum[0], b.h, b.l);
+            let far2 = ca_highlow_scalar(FAR, self.far_sum[1], h, l);
             let base = a.color() == 1
                 && b.color() == 1
                 && cur.color() == 1
@@ -120,8 +90,40 @@ impl CandleAdvanceBlock {
                         && b.body() < a.body()
                         && (cur.upper() > cur.body() || b.upper() > b.body()))
                     || cur.body() < b.body() - far2);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - period).
+            self.shadow_short_sum += cr_shadows_scalar(a.o, a.h, a.l, a.c)
+                - cr_shadows_scalar(
+                    self.candles[0].o,
+                    self.candles[0].h,
+                    self.candles[0].l,
+                    self.candles[0].c,
+                );
+            self.near_sum[0] += cr_highlow_scalar(b.h, b.l)
+                - cr_highlow_scalar(self.candles[6].h, self.candles[6].l);
+            self.near_sum[1] +=
+                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[7].h, self.candles[7].l);
+            self.far_sum[0] += cr_highlow_scalar(b.h, b.l)
+                - cr_highlow_scalar(self.candles[6].h, self.candles[6].l);
+            self.far_sum[1] +=
+                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[7].h, self.candles[7].l);
+            self.body_long_sum += cr_realbody_scalar(a.o, a.c)
+                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
             Some(weakness as i32 * -100)
         } else {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if i < 10 {
+                self.shadow_short_sum += cr_shadows_scalar(o, h, l, c);
+                self.body_long_sum += cr_realbody_scalar(o, c);
+            }
+            if (6..11).contains(&i) {
+                self.near_sum[0] += cr_highlow_scalar(h, l);
+                self.far_sum[0] += cr_highlow_scalar(h, l);
+            }
+            if (7..12).contains(&i) {
+                self.near_sum[1] += cr_highlow_scalar(h, l);
+                self.far_sum[1] += cr_highlow_scalar(h, l);
+            }
             None
         };
         if self.candles.len() == 12 {
@@ -131,6 +133,53 @@ impl CandleAdvanceBlock {
         self.value = value;
         value
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.candles.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_advance_block(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -141,7 +190,12 @@ impl CandleAdvanceBlock {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new();
+        self.candles.clear();
+        self.body_long_sum = 0.0;
+        self.shadow_short_sum = 0.0;
+        self.near_sum = [0.0; 2];
+        self.far_sum = [0.0; 2];
+        self.value = None;
     }
 }
 
@@ -190,7 +244,7 @@ pub fn candle_advance_block(
     }
 
     let mut shadow_short_sum = [0.0f64; 3];
-    let mut shadow_long_sum = [0.0f64; 3];
+    let shadow_long_sum = [0.0f64; 3];
     let mut near_sum = [0.0f64; 3];
     let mut far_sum = [0.0f64; 3];
     let mut body_long_sum = 0.0;
@@ -201,23 +255,23 @@ pub fn candle_advance_block(
         // SHADOW_LONG and SHADOW_SHORT init
         if SHADOW_SHORT.avg_period > 0 && bar >= SHADOW_SHORT.avg_period {
             for j in (bar - SHADOW_SHORT.avg_period)..bar {
-                shadow_short_sum[k] += cr(SHADOW_SHORT, open, high, low, close, j);
+                shadow_short_sum[k] += cr_shadows(open, high, low, close, j);
             }
         }
         // SHADOW_LONG avg_period=0
         if NEAR.avg_period > 0 && bar >= NEAR.avg_period {
             for j in (bar - NEAR.avg_period)..bar {
-                near_sum[k] += cr(NEAR, open, high, low, close, j);
+                near_sum[k] += cr_highlow(open, high, low, close, j);
             }
         }
         if FAR.avg_period > 0 && bar >= FAR.avg_period {
             for j in (bar - FAR.avg_period)..bar {
-                far_sum[k] += cr(FAR, open, high, low, close, j);
+                far_sum[k] += cr_highlow(open, high, low, close, j);
             }
         }
     }
     for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
-        body_long_sum += cr(BODY_LONG, open, high, low, close, i);
+        body_long_sum += cr_realbody(open, high, low, close, i);
     }
 
     for i in start..len {
@@ -226,26 +280,34 @@ pub fn candle_advance_block(
             && candle_color(open[i], close[i]) == 1
             && close[i-1] > close[i-2] && close[i] > close[i-1]
             // Opens within/near previous body
-            && open[i-1] > open[i-2] && open[i-1] <= close[i-2] + ca(NEAR, near_sum[1], open, high, low, close, i-1)
-            && open[i] > open[i-1] && open[i] <= close[i-1] + ca(NEAR, near_sum[2], open, high, low, close, i)
+            && open[i-1] > open[i-2] && open[i-1] <= close[i-2] + ca_highlow(NEAR, near_sum[1], open, high, low, close, i-1)
+            && open[i] > open[i-1] && open[i] <= close[i-1] + ca_highlow(NEAR, near_sum[2], open, high, low, close, i)
             // 1st: long body, short upper shadow
-            && real_body(open[i-2], close[i-2]) > ca(BODY_LONG, body_long_sum, open, high, low, close, i-2)
-            && upper_shadow(open[i-2], high[i-2], close[i-2]) < ca(SHADOW_SHORT, shadow_short_sum[0], open, high, low, close, i-2);
+            && real_body(open[i-2], close[i-2]) > ca_realbody(BODY_LONG, body_long_sum, open, high, low, close, i-2)
+            && upper_shadow(open[i-2], high[i-2], close[i-2]) < ca_shadows(SHADOW_SHORT, shadow_short_sum[0], open, high, low, close, i-2);
         // Weakness: bodies getting smaller and/or shadows getting longer
         let weakness = base
             && ((real_body(open[i - 1], close[i - 1])
                 < real_body(open[i - 2], close[i - 2])
-                    - ca(FAR, far_sum[1], open, high, low, close, i - 1)
+                    - ca_highlow(FAR, far_sum[1], open, high, low, close, i - 1)
                 && real_body(open[i], close[i])
                     < real_body(open[i - 1], close[i - 1])
-                        + ca(NEAR, near_sum[2], open, high, low, close, i))
+                        + ca_highlow(NEAR, near_sum[2], open, high, low, close, i))
                 || (real_body(open[i], close[i]) < real_body(open[i - 1], close[i - 1])
                     && real_body(open[i - 1], close[i - 1])
                         < real_body(open[i - 2], close[i - 2])
                     && (upper_shadow(open[i], high[i], close[i])
-                        > ca(SHADOW_LONG, shadow_long_sum[2], open, high, low, close, i)
+                        > ca_realbody(
+                            SHADOW_LONG,
+                            shadow_long_sum[2],
+                            open,
+                            high,
+                            low,
+                            close,
+                            i,
+                        )
                         || upper_shadow(open[i - 1], high[i - 1], close[i - 1])
-                            > ca(
+                            > ca_realbody(
                                 SHADOW_LONG,
                                 shadow_long_sum[1],
                                 open,
@@ -256,40 +318,26 @@ pub fn candle_advance_block(
                             )))
                 || (real_body(open[i], close[i])
                     < real_body(open[i - 1], close[i - 1])
-                        - ca(FAR, far_sum[2], open, high, low, close, i)));
+                        - ca_highlow(FAR, far_sum[2], open, high, low, close, i)));
         output[i] = weakness as i32 * -100;
         // Update sums
         for k in 0..3 {
             let bar = i - 2 + k;
             if SHADOW_SHORT.avg_period > 0 && bar >= SHADOW_SHORT.avg_period {
-                shadow_short_sum[k] += cr(SHADOW_SHORT, open, high, low, close, bar)
-                    - cr(
-                        SHADOW_SHORT,
-                        open,
-                        high,
-                        low,
-                        close,
-                        bar - SHADOW_SHORT.avg_period,
-                    );
+                shadow_short_sum[k] += cr_shadows(open, high, low, close, bar)
+                    - cr_shadows(open, high, low, close, bar - SHADOW_SHORT.avg_period);
             }
             if NEAR.avg_period > 0 && bar >= NEAR.avg_period {
-                near_sum[k] += cr(NEAR, open, high, low, close, bar)
-                    - cr(NEAR, open, high, low, close, bar - NEAR.avg_period);
+                near_sum[k] += cr_highlow(open, high, low, close, bar)
+                    - cr_highlow(open, high, low, close, bar - NEAR.avg_period);
             }
             if FAR.avg_period > 0 && bar >= FAR.avg_period {
-                far_sum[k] += cr(FAR, open, high, low, close, bar)
-                    - cr(FAR, open, high, low, close, bar - FAR.avg_period);
+                far_sum[k] += cr_highlow(open, high, low, close, bar)
+                    - cr_highlow(open, high, low, close, bar - FAR.avg_period);
             }
         }
-        body_long_sum += cr(BODY_LONG, open, high, low, close, i - 2)
-            - cr(
-                BODY_LONG,
-                open,
-                high,
-                low,
-                close,
-                i - 2 - BODY_LONG.avg_period,
-            );
+        body_long_sum += cr_realbody(open, high, low, close, i - 2)
+            - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
     }
     Ok(output)
 }

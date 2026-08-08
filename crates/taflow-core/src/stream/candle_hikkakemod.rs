@@ -8,11 +8,7 @@ struct Candle {
     low: f64,
     close: f64,
 }
-impl Candle {
-    fn range(self) -> f64 {
-        self.high - self.low
-    }
-}
+impl Candle {}
 /// Incremental CDLHIKKAKEMOD state.
 /// Persistent Rust state or aligned output type for `CandleHikkakeModified`.
 ///
@@ -22,6 +18,7 @@ pub struct CandleHikkakeModified {
     candles: VecDeque<Candle>,
     index: usize,
     pending: Option<(usize, i32, f64)>,
+    near_sum: f64,
     value: Option<i32>,
 }
 impl Default for CandleHikkakeModified {
@@ -40,17 +37,9 @@ impl CandleHikkakeModified {
             candles: VecDeque::with_capacity(8),
             index: 0,
             pending: None,
+            near_sum: 0.0,
             value: None,
         }
-    }
-    fn near(&self) -> f64 {
-        self.candles
-            .iter()
-            .skip(1)
-            .take(5)
-            .map(|c| c.range())
-            .sum::<f64>()
-            * 0.04
     }
     /// Computes or updates `append` through the native Rust kernel.
     ///
@@ -63,12 +52,13 @@ impl CandleHikkakeModified {
         self.index += 1;
         let mut result = 0;
         let mut new_pattern = false;
+        // Deque holds bars i-8..=i-1; bar j maps to index 8 - (i - j).
         if i >= 10 && self.candles.len() == 8 {
-            let a = self.candles[5];
-            let b = self.candles[6];
-            let c = self.candles[7];
+            let a = self.candles[5]; // bar i-3
+            let b = self.candles[6]; // bar i-2
+            let c = self.candles[7]; // bar i-1
             if c.high < b.high && c.low > b.low && b.high < a.high && b.low > a.low {
-                let near = self.near();
+                let near = ca_highlow_scalar(NEAR, self.near_sum, b.high, b.low);
                 if high < c.high && low < c.low && b.close <= b.low + near {
                     self.pending = Some((i, 100, c.high));
                     result = 100;
@@ -92,6 +82,12 @@ impl CandleHikkakeModified {
                     }
                 }
             }
+            // Slide the sum exactly like the batch loop: sum += cr(bar) - cr(bar - 5).
+            self.near_sum += cr_highlow_scalar(self.candles[6].high, self.candles[6].low)
+                - cr_highlow_scalar(self.candles[1].high, self.candles[1].low);
+        } else if (3..8).contains(&i) {
+            // Warm-up: seed the sum exactly like the batch prologue.
+            self.near_sum += cr_highlow_scalar(high, low);
         }
         if self.candles.len() == 8 {
             self.candles.pop_front();
@@ -100,6 +96,37 @@ impl CandleHikkakeModified {
         self.value = (i >= 10).then_some(result);
         self.value
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// This state carries a monotonic bar counter and a pending setup that can
+    /// outlive any fixed window, so no from-empty fast path is safe: the bulk
+    /// entry point is the per-bar `append` loop with the `Option` unwrapped in
+    /// place. Bit-identical to calling `append` once per bar.
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -110,7 +137,11 @@ impl CandleHikkakeModified {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new()
+        self.candles.clear();
+        self.index = 0;
+        self.pending = None;
+        self.near_sum = 0.0;
+        self.value = None;
     }
 }
 
@@ -156,7 +187,7 @@ pub fn candle_hikkake_modified(
     let near_bar = lookback - 2;
     if NEAR.avg_period > 0 && near_bar >= NEAR.avg_period {
         for j in (near_bar - NEAR.avg_period)..near_bar {
-            near_sum += cr(NEAR, open, high, low, close, j);
+            near_sum += cr_highlow(open, high, low, close, j);
         }
     }
 
@@ -172,7 +203,7 @@ pub fn candle_hikkake_modified(
             && high[i-2] < high[i-3] && low[i-2] > low[i-3]
         // bar[i-2] inside bar[i-3]
         {
-            let near_avg = ca(NEAR, near_sum, open, high, low, close, i - 2);
+            let near_avg = ca_highlow(NEAR, near_sum, open, high, low, close, i - 2);
             // Bullish: bar[i] breaks down (lower high AND lower low)
             if high[i] < high[i-1] && low[i] < low[i-1]
                 // 2nd bar close near the low
@@ -208,8 +239,8 @@ pub fn candle_hikkake_modified(
 
         // Update Near sum (for the "2nd bar" position, which is i-2)
         if NEAR.avg_period > 0 && (i - 2) >= NEAR.avg_period {
-            near_sum += cr(NEAR, open, high, low, close, i - 2)
-                - cr(NEAR, open, high, low, close, i - 2 - NEAR.avg_period);
+            near_sum += cr_highlow(open, high, low, close, i - 2)
+                - cr_highlow(open, high, low, close, i - 2 - NEAR.avg_period);
         }
     }
     Ok(output)

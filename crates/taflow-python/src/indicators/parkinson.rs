@@ -27,14 +27,21 @@ impl ParkinsonOperator {
         value
     }
 
-    fn extend(&mut self, high: PyReadonlyArray1<f64>, low: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (high, low) = (high.as_slice()?, low.as_slice()?);
         if high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&high, &low) in high.iter().zip(low) {
-            self.append(high, low);
-        }
+        py.allow_threads(|| {
+            for (&high, &low) in high.iter().zip(low) {
+                self.append(high, low);
+            }
+        });
         Ok(())
     }
 

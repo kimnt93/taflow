@@ -1,591 +1,123 @@
-//! SIMD-accelerated bulk operations.
+//! Bulk array kernels.
 //!
-//! Uses `wide::f64x4` for four-lane parallel computation. Functions fall back
-//! to scalar implementations when the `simd` feature is disabled.
+//! Plain, auto-vectorizable loops. Element-wise IEEE operations (+, -, *, /,
+//! sqrt, abs, max, min) round identically whether executed scalar or in SIMD
+//! lanes, so these kernels are compiled for multiple x86-64 feature levels via
+//! `multiversion` and dispatched at runtime without affecting results.
+//!
+//! Reductions (`sum_f64`, `sum_sq_diff`) are intentionally SERIAL: their
+//! summation order feeds indicator seeds (EMA/CORREL/TRIX) and must match the
+//! order the streaming `append` path accumulates in, or chunk invariance
+//! breaks. Do not reassociate them.
 
-#[cfg(feature = "simd")]
-use wide::f64x4;
+// The multiversion attribute expands cfg(target_feature) checks that rustc's
+// check-cfg lint does not know about; harmless.
+#![allow(unexpected_cfgs)]
 
-// ============================================================
-// Bulk sum (used by SMA seed windows, STDDEV, and related indicators).
-// ============================================================
+use multiversion::multiversion;
 
-/// SIMD-accelerated array sum.
-#[cfg(feature = "simd")]
+/// Serial array sum, in slice order.
+///
+/// Must stay serial: seeds computed here have to be bit-identical to the
+/// running `sum += value` accumulation the streaming paths perform.
 pub fn sum_f64(data: &[f64]) -> f64 {
-    let len = data.len();
-    let chunks = len / 4;
-
-    let mut acc = f64x4::ZERO;
-    for i in 0..chunks {
-        let offset = i * 4;
-        let v = f64x4::new([
-            data[offset],
-            data[offset + 1],
-            data[offset + 2],
-            data[offset + 3],
-        ]);
-        acc += v;
+    let mut total = 0.0;
+    for &value in data {
+        total += value;
     }
-
-    let mut total = acc.reduce_add();
-
-    // Process the remaining elements.
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        total += data[i];
-    }
-
     total
 }
 
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `sum_f64` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn sum_f64(data: &[f64]) -> f64 {
-    data.iter().sum()
-}
-
-// ============================================================
-// Bulk squared-difference sum (used by STDDEV and VAR).
-// ============================================================
-
-/// SIMD-accelerated squared-difference sum: Σ(x - mean)².
-#[cfg(feature = "simd")]
+/// Serial squared-difference sum: Σ(x - mean)², in slice order.
 pub fn sum_sq_diff(data: &[f64], mean: f64) -> f64 {
-    let len = data.len();
-    let chunks = len / 4;
-    let mean_v = f64x4::splat(mean);
-
-    let mut acc = f64x4::ZERO;
-    for i in 0..chunks {
-        let offset = i * 4;
-        let v = f64x4::new([
-            data[offset],
-            data[offset + 1],
-            data[offset + 2],
-            data[offset + 3],
-        ]);
-        let diff = v - mean_v;
-        acc = diff.mul_add(diff, acc); // acc += diff * diff (fused)
+    let mut total = 0.0;
+    for &value in data {
+        let d = value - mean;
+        total += d * d;
     }
-
-    let mut total = acc.reduce_add();
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        let diff = data[i] - mean;
-        total += diff * diff;
-    }
-
     total
 }
 
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `sum_sq_diff` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn sum_sq_diff(data: &[f64], mean: f64) -> f64 {
-    data.iter()
-        .map(|&x| {
-            let d = x - mean;
-            d * d
-        })
-        .sum()
-}
-
-// ============================================================
-// Bulk element-wise operations (used by math operators).
-// ============================================================
-
-/// SIMD-accelerated element-wise addition.
-#[cfg(feature = "simd")]
-pub fn add_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    debug_assert_eq!(a.len(), b.len());
-    let len = a.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-
-    for i in 0..chunks {
-        let offset = i * 4;
-        let va = f64x4::new([a[offset], a[offset + 1], a[offset + 2], a[offset + 3]]);
-        let vb = f64x4::new([b[offset], b[offset + 1], b[offset + 2], b[offset + 3]]);
-        let vr = va + vb;
-        let arr = vr.to_array();
-        result[offset] = arr[0];
-        result[offset + 1] = arr[1];
-        result[offset + 2] = arr[2];
-        result[offset + 3] = arr[3];
-    }
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        result[i] = a[i] + b[i];
-    }
-
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `add_arrays` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn add_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    a.iter().zip(b.iter()).map(|(x, y)| x + y).collect()
-}
-
-/// SIMD-accelerated element-wise subtraction.
-#[cfg(feature = "simd")]
-pub fn sub_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    debug_assert_eq!(a.len(), b.len());
-    let len = a.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-
-    for i in 0..chunks {
-        let offset = i * 4;
-        let va = f64x4::new([a[offset], a[offset + 1], a[offset + 2], a[offset + 3]]);
-        let vb = f64x4::new([b[offset], b[offset + 1], b[offset + 2], b[offset + 3]]);
-        let vr = va - vb;
-        let arr = vr.to_array();
-        result[offset] = arr[0];
-        result[offset + 1] = arr[1];
-        result[offset + 2] = arr[2];
-        result[offset + 3] = arr[3];
-    }
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        result[i] = a[i] - b[i];
-    }
-
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `sub_arrays` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn sub_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    a.iter().zip(b.iter()).map(|(x, y)| x - y).collect()
-}
-
-/// SIMD-accelerated element-wise multiplication.
-#[cfg(feature = "simd")]
-pub fn mult_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    debug_assert_eq!(a.len(), b.len());
-    let len = a.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-
-    for i in 0..chunks {
-        let offset = i * 4;
-        let va = f64x4::new([a[offset], a[offset + 1], a[offset + 2], a[offset + 3]]);
-        let vb = f64x4::new([b[offset], b[offset + 1], b[offset + 2], b[offset + 3]]);
-        let vr = va * vb;
-        let arr = vr.to_array();
-        result[offset] = arr[0];
-        result[offset + 1] = arr[1];
-        result[offset + 2] = arr[2];
-        result[offset + 3] = arr[3];
-    }
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        result[i] = a[i] * b[i];
-    }
-
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `mult_arrays` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn mult_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    a.iter().zip(b.iter()).map(|(x, y)| x * y).collect()
-}
-
-/// SIMD-accelerated element-wise division.
-#[cfg(feature = "simd")]
-pub fn div_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    debug_assert_eq!(a.len(), b.len());
-    let len = a.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-
-    for i in 0..chunks {
-        let offset = i * 4;
-        let va = f64x4::new([a[offset], a[offset + 1], a[offset + 2], a[offset + 3]]);
-        let vb = f64x4::new([b[offset], b[offset + 1], b[offset + 2], b[offset + 3]]);
-        let vr = va / vb;
-        let arr = vr.to_array();
-        result[offset] = arr[0];
-        result[offset + 1] = arr[1];
-        result[offset + 2] = arr[2];
-        result[offset + 3] = arr[3];
-    }
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        result[i] = a[i] / b[i];
-    }
-
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `div_arrays` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn div_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
-    a.iter().zip(b.iter()).map(|(x, y)| x / y).collect()
-}
-
-// ============================================================
-// Bulk unary element-wise operations (used by math transforms).
-// ============================================================
-
-/// SIMD-accelerated element-wise square root.
-#[cfg(feature = "simd")]
-pub fn sqrt_array(input: &[f64]) -> Vec<f64> {
-    let len = input.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-
-    for i in 0..chunks {
-        let offset = i * 4;
-        let v = f64x4::new([
-            input[offset],
-            input[offset + 1],
-            input[offset + 2],
-            input[offset + 3],
-        ]);
-        let vr = v.sqrt();
-        let arr = vr.to_array();
-        result[offset] = arr[0];
-        result[offset + 1] = arr[1];
-        result[offset + 2] = arr[2];
-        result[offset + 3] = arr[3];
-    }
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        result[i] = input[i].sqrt();
-    }
-
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `sqrt_array` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn sqrt_array(input: &[f64]) -> Vec<f64> {
-    input.iter().map(|&v| v.sqrt()).collect()
-}
-
-/// SIMD-accelerated element-wise absolute value.
-#[cfg(feature = "simd")]
-pub fn abs_array(input: &[f64]) -> Vec<f64> {
-    let len = input.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-
-    for i in 0..chunks {
-        let offset = i * 4;
-        let v = f64x4::new([
-            input[offset],
-            input[offset + 1],
-            input[offset + 2],
-            input[offset + 3],
-        ]);
-        let vr = v.abs();
-        let arr = vr.to_array();
-        result[offset] = arr[0];
-        result[offset + 1] = arr[1];
-        result[offset + 2] = arr[2];
-        result[offset + 3] = arr[3];
-    }
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        result[i] = input[i].abs();
-    }
-
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `abs_array` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn abs_array(input: &[f64]) -> Vec<f64> {
-    input.iter().map(|&v| v.abs()).collect()
-}
-
-/// General SIMD element-wise scalar-operation macro.
-/// Functions without direct SIMD support, such as sin/cos/exp/ln, use a
-/// four-way unrolled loop.
-macro_rules! simd_unary_scalar {
-    ($name:ident, $op:expr) => {
-        pub fn $name(input: &[f64]) -> Vec<f64> {
-            let len = input.len();
-            let mut result = vec![0.0; len];
-
-            // Four-way loop unrolling improves CPU pipelining and cache use,
-            // even when hardware SIMD is unavailable.
-            let chunks = len / 4;
-            for i in 0..chunks {
-                let offset = i * 4;
-                result[offset] = $op(input[offset]);
-                result[offset + 1] = $op(input[offset + 1]);
-                result[offset + 2] = $op(input[offset + 2]);
-                result[offset + 3] = $op(input[offset + 3]);
-            }
-
-            let tail_start = chunks * 4;
-            for i in tail_start..len {
-                result[i] = $op(input[i]);
-            }
-
-            result
+macro_rules! binary_arrays {
+    ($name:ident, $op:tt) => {
+        #[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+        pub fn $name(a: &[f64], b: &[f64]) -> Vec<f64> {
+            a.iter().zip(b).map(|(&x, &y)| x $op y).collect()
         }
     };
 }
 
-simd_unary_scalar!(sin_array, f64::sin);
-simd_unary_scalar!(cos_array, f64::cos);
-simd_unary_scalar!(tan_array, f64::tan);
-simd_unary_scalar!(asin_array, f64::asin);
-simd_unary_scalar!(acos_array, f64::acos);
-simd_unary_scalar!(atan_array, f64::atan);
-simd_unary_scalar!(sinh_array, f64::sinh);
-simd_unary_scalar!(cosh_array, f64::cosh);
-simd_unary_scalar!(tanh_array, f64::tanh);
-simd_unary_scalar!(exp_array, f64::exp);
-simd_unary_scalar!(ln_array, f64::ln);
-simd_unary_scalar!(log10_array, f64::log10);
-simd_unary_scalar!(ceil_array, f64::ceil);
-simd_unary_scalar!(floor_array, f64::floor);
+binary_arrays!(add_arrays, +);
+binary_arrays!(sub_arrays, -);
+binary_arrays!(mult_arrays, *);
+binary_arrays!(div_arrays, /);
 
-// ============================================================
-// SIMD window max/min scan (used by MAX, MIN, MINMAX, AROON, WILLR, MIDPOINT rescans)
-// ============================================================
-
-/// SIMD-accelerated max of a slice, returning (max_value, relative_index_of_max).
-/// `data` must not be empty.
-#[cfg(feature = "simd")]
-pub fn slice_max_with_index(data: &[f64]) -> (f64, usize) {
-    let len = data.len();
-    debug_assert!(len > 0);
-    let chunks = len / 4;
-
-    if chunks == 0 {
-        // Pure scalar for tiny slices
-        let mut best = data[0];
-        let mut best_idx = 0;
-        for i in 1..len {
-            if data[i] >= best {
-                best = data[i];
-                best_idx = i;
-            }
-        }
-        return (best, best_idx);
-    }
-
-    // Phase 1: SIMD scan to find the max value
-    let mut acc = f64x4::new([data[0], data[1], data[2], data[3]]);
-    for i in 1..chunks {
-        let offset = i * 4;
-        let v = f64x4::new([
-            data[offset],
-            data[offset + 1],
-            data[offset + 2],
-            data[offset + 3],
-        ]);
-        acc = acc.max(v);
-    }
-    let arr = acc.to_array();
-    let mut best = arr[0].max(arr[1]).max(arr[2]).max(arr[3]);
-
-    // Handle tail
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        if data[i] > best {
-            best = data[i];
-        }
-    }
-
-    // Phase 2: Find the LAST index with >= best (matching TA-Lib's >= semantics)
-    let mut best_idx = 0;
-    for i in 0..len {
-        if data[i] >= best {
-            best_idx = i;
-        }
-    }
-
-    (best, best_idx)
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+pub fn sqrt_array(input: &[f64]) -> Vec<f64> {
+    input.iter().map(|&x| x.sqrt()).collect()
 }
 
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `slice_max_with_index` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+pub fn abs_array(input: &[f64]) -> Vec<f64> {
+    input.iter().map(|&x| x.abs()).collect()
+}
+
+/// Element-wise transcendental kernels. These lower to scalar libm calls, so
+/// there is nothing to multiversion; a plain loop keeps codegen simple.
+macro_rules! unary_array {
+    ($name:ident, $op:expr) => {
+        pub fn $name(input: &[f64]) -> Vec<f64> {
+            input.iter().map(|&x| $op(x)).collect()
+        }
+    };
+}
+
+unary_array!(sin_array, f64::sin);
+unary_array!(cos_array, f64::cos);
+unary_array!(tan_array, f64::tan);
+unary_array!(asin_array, f64::asin);
+unary_array!(acos_array, f64::acos);
+unary_array!(atan_array, f64::atan);
+unary_array!(sinh_array, f64::sinh);
+unary_array!(cosh_array, f64::cosh);
+unary_array!(tanh_array, f64::tanh);
+unary_array!(exp_array, f64::exp);
+unary_array!(ln_array, f64::ln);
+unary_array!(log10_array, f64::log10);
+unary_array!(ceil_array, f64::ceil);
+unary_array!(floor_array, f64::floor);
+
+/// Max of a slice with its index; on ties the LAST occurrence wins
+/// (TA-Lib latest-wins semantics). `data` must not be empty.
 pub fn slice_max_with_index(data: &[f64]) -> (f64, usize) {
     let mut best = data[0];
     let mut best_idx = 0;
-    for i in 1..data.len() {
-        if data[i] >= best {
-            best = data[i];
+    for (i, &value) in data.iter().enumerate().skip(1) {
+        if value >= best {
+            best = value;
             best_idx = i;
         }
     }
     (best, best_idx)
 }
 
-/// SIMD-accelerated min of a slice, returning (min_value, relative_index_of_min).
+/// Min of a slice with its index; on ties the LAST occurrence wins.
 /// `data` must not be empty.
-#[cfg(feature = "simd")]
-pub fn slice_min_with_index(data: &[f64]) -> (f64, usize) {
-    let len = data.len();
-    debug_assert!(len > 0);
-    let chunks = len / 4;
-
-    if chunks == 0 {
-        let mut best = data[0];
-        let mut best_idx = 0;
-        for i in 1..len {
-            if data[i] <= best {
-                best = data[i];
-                best_idx = i;
-            }
-        }
-        return (best, best_idx);
-    }
-
-    // Phase 1: SIMD scan to find the min value
-    let mut acc = f64x4::new([data[0], data[1], data[2], data[3]]);
-    for i in 1..chunks {
-        let offset = i * 4;
-        let v = f64x4::new([
-            data[offset],
-            data[offset + 1],
-            data[offset + 2],
-            data[offset + 3],
-        ]);
-        acc = acc.min(v);
-    }
-    let arr = acc.to_array();
-    let mut best = arr[0].min(arr[1]).min(arr[2]).min(arr[3]);
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        if data[i] < best {
-            best = data[i];
-        }
-    }
-
-    // Phase 2: Find the LAST index with <= best
-    let mut best_idx = 0;
-    for i in 0..len {
-        if data[i] <= best {
-            best_idx = i;
-        }
-    }
-
-    (best, best_idx)
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `slice_min_with_index` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
 pub fn slice_min_with_index(data: &[f64]) -> (f64, usize) {
     let mut best = data[0];
     let mut best_idx = 0;
-    for i in 1..data.len() {
-        if data[i] <= best {
-            best = data[i];
+    for (i, &value) in data.iter().enumerate().skip(1) {
+        if value <= best {
+            best = value;
             best_idx = i;
         }
     }
     (best, best_idx)
 }
 
-// ============================================================
-// SIMD element-wise operations for TRANGE, BOP, price transforms
-// ============================================================
-
-/// SIMD True Range: output[i] = max(h[i]-l[i], |h[i]-prev_c[i-1]|, |l[i]-prev_c[i-1]|)
-/// Processes elements from index `start` to `len-1`, writing to `output`.
-#[cfg(feature = "simd")]
-pub fn true_range_simd(high: &[f64], low: &[f64], close: &[f64], output: &mut [f64], start: usize) {
-    let len = high.len();
-    let count = len - start;
-    let chunks = count / 4;
-    let tail_start = start + chunks * 4;
-
-    for i in 0..chunks {
-        let base = start + i * 4;
-        let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
-        let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vpc = f64x4::new([
-            close[base - 1],
-            close[base],
-            close[base + 1],
-            close[base + 2],
-        ]);
-
-        let hl = vh - vl;
-        let hc = (vh - vpc).abs();
-        let lc = (vl - vpc).abs();
-        let result = hl.max(hc).max(lc);
-        let arr = result.to_array();
-        output[base] = arr[0];
-        output[base + 1] = arr[1];
-        output[base + 2] = arr[2];
-        output[base + 3] = arr[3];
-    }
-
-    for i in tail_start..len {
-        let h = high[i];
-        let l = low[i];
-        let pc = close[i - 1];
-        let hl = h - l;
-        let hc = (h - pc).abs();
-        let lc = (l - pc).abs();
-        output[i] = hl.max(hc).max(lc);
-    }
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `true_range_simd` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+/// True Range: output[i] = max(h-l, |h-prev_close|, |l-prev_close|)
+/// for i in [start..len). `start` must be >= 1.
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn true_range_simd(high: &[f64], low: &[f64], close: &[f64], output: &mut [f64], start: usize) {
     let len = high.len();
     for i in start..len {
@@ -599,53 +131,8 @@ pub fn true_range_simd(high: &[f64], low: &[f64], close: &[f64], output: &mut [f
     }
 }
 
-/// SIMD BOP: output[i] = (close[i]-open[i]) / (high[i]-low[i]), 0 if range==0
-#[cfg(feature = "simd")]
-pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: &mut [f64]) {
-    let len = open.len();
-    let chunks = len / 4;
-
-    for i in 0..chunks {
-        let base = i * 4;
-        let vo = f64x4::new([open[base], open[base + 1], open[base + 2], open[base + 3]]);
-        let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
-        let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([
-            close[base],
-            close[base + 1],
-            close[base + 2],
-            close[base + 3],
-        ]);
-
-        let num = vc - vo;
-        let den = vh - vl;
-        // Do the division, then fix up zeros
-        let ratio = num / den;
-        let arr_den = den.to_array();
-        let arr = ratio.to_array();
-        output[base] = if arr_den[0] > 0.0 { arr[0] } else { 0.0 };
-        output[base + 1] = if arr_den[1] > 0.0 { arr[1] } else { 0.0 };
-        output[base + 2] = if arr_den[2] > 0.0 { arr[2] } else { 0.0 };
-        output[base + 3] = if arr_den[3] > 0.0 { arr[3] } else { 0.0 };
-    }
-
-    let tail_start = chunks * 4;
-    for i in tail_start..len {
-        let range = high[i] - low[i];
-        output[i] = if range > 0.0 {
-            (close[i] - open[i]) / range
-        } else {
-            0.0
-        };
-    }
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `bop_simd` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+/// Balance of Power: output[i] = (close-open)/(high-low), 0 when range <= 0.
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: &mut [f64]) {
     for i in 0..open.len() {
         let range = high[i] - low[i];
@@ -657,222 +144,35 @@ pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: 
     }
 }
 
-/// SIMD AVGPRICE: (O + H + L + C) / 4
-#[cfg(feature = "simd")]
-pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    let len = open.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-    let quarter = f64x4::splat(0.25);
-
-    for i in 0..chunks {
-        let base = i * 4;
-        let vo = f64x4::new([open[base], open[base + 1], open[base + 2], open[base + 3]]);
-        let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
-        let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([
-            close[base],
-            close[base + 1],
-            close[base + 2],
-            close[base + 3],
-        ]);
-        let vr = (vo + vh + vl + vc) * quarter;
-        let arr = vr.to_array();
-        result[base] = arr[0];
-        result[base + 1] = arr[1];
-        result[base + 2] = arr[2];
-        result[base + 3] = arr[3];
-    }
-
-    let tail = chunks * 4;
-    for i in tail..len {
-        result[i] = (open[i] + high[i] + low[i] + close[i]) * 0.25;
-    }
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `avgprice_simd` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
     (0..open.len())
         .map(|i| (open[i] + high[i] + low[i] + close[i]) / 4.0)
         .collect()
 }
 
-/// SIMD MEDPRICE: (H + L) / 2
-#[cfg(feature = "simd")]
-pub fn medprice_simd(high: &[f64], low: &[f64]) -> Vec<f64> {
-    let len = high.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-    let half = f64x4::splat(0.5);
-
-    for i in 0..chunks {
-        let base = i * 4;
-        let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
-        let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vr = (vh + vl) * half;
-        let arr = vr.to_array();
-        result[base] = arr[0];
-        result[base + 1] = arr[1];
-        result[base + 2] = arr[2];
-        result[base + 3] = arr[3];
-    }
-
-    let tail = chunks * 4;
-    for i in tail..len {
-        result[i] = (high[i] + low[i]) * 0.5;
-    }
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `medprice_simd` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn medprice_simd(high: &[f64], low: &[f64]) -> Vec<f64> {
     (0..high.len()).map(|i| (high[i] + low[i]) / 2.0).collect()
 }
 
-/// SIMD TYPPRICE: (H + L + C) / 3
-#[cfg(feature = "simd")]
-pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    let len = high.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-    let third = f64x4::splat(1.0 / 3.0);
-
-    for i in 0..chunks {
-        let base = i * 4;
-        let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
-        let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([
-            close[base],
-            close[base + 1],
-            close[base + 2],
-            close[base + 3],
-        ]);
-        let vr = (vh + vl + vc) * third;
-        let arr = vr.to_array();
-        result[base] = arr[0];
-        result[base + 1] = arr[1];
-        result[base + 2] = arr[2];
-        result[base + 3] = arr[3];
-    }
-
-    let tail = chunks * 4;
-    for i in tail..len {
-        result[i] = (high[i] + low[i] + close[i]) / 3.0;
-    }
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `typprice_simd` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
     (0..high.len())
         .map(|i| (high[i] + low[i] + close[i]) / 3.0)
         .collect()
 }
 
-/// SIMD WCLPRICE: (H + L + 2*C) / 4
-#[cfg(feature = "simd")]
-pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    let len = high.len();
-    let mut result = vec![0.0; len];
-    let chunks = len / 4;
-    let two = f64x4::splat(2.0);
-    let quarter = f64x4::splat(0.25);
-
-    for i in 0..chunks {
-        let base = i * 4;
-        let vh = f64x4::new([high[base], high[base + 1], high[base + 2], high[base + 3]]);
-        let vl = f64x4::new([low[base], low[base + 1], low[base + 2], low[base + 3]]);
-        let vc = f64x4::new([
-            close[base],
-            close[base + 1],
-            close[base + 2],
-            close[base + 3],
-        ]);
-        let vr = (vh + vl + two * vc) * quarter;
-        let arr = vr.to_array();
-        result[base] = arr[0];
-        result[base + 1] = arr[1];
-        result[base + 2] = arr[2];
-        result[base + 3] = arr[3];
-    }
-
-    let tail = chunks * 4;
-    for i in tail..len {
-        result[i] = (high[i] + low[i] + 2.0 * close[i]) * 0.25;
-    }
-    result
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `wclprice_simd` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
     (0..high.len())
         .map(|i| (high[i] + low[i] + 2.0 * close[i]) / 4.0)
         .collect()
 }
 
-/// SIMD offset subtraction: output[i] = a[i] - a[i-offset] for i in [offset..len)
-/// output[0..offset] is untouched by caller (set to NaN).
-#[cfg(feature = "simd")]
-pub fn sub_offset_simd(input: &[f64], output: &mut [f64], offset: usize) {
-    let len = input.len();
-    let count = len - offset;
-    let chunks = count / 4;
-
-    for i in 0..chunks {
-        let base = offset + i * 4;
-        let va = f64x4::new([
-            input[base],
-            input[base + 1],
-            input[base + 2],
-            input[base + 3],
-        ]);
-        let vb = f64x4::new([
-            input[base - offset],
-            input[base - offset + 1],
-            input[base - offset + 2],
-            input[base - offset + 3],
-        ]);
-        let vr = va - vb;
-        let arr = vr.to_array();
-        output[base] = arr[0];
-        output[base + 1] = arr[1];
-        output[base + 2] = arr[2];
-        output[base + 3] = arr[3];
-    }
-
-    let tail = offset + chunks * 4;
-    for i in tail..len {
-        output[i] = input[i] - input[i - offset];
-    }
-}
-
-#[cfg(not(feature = "simd"))]
-/// Computes or updates `sub_offset_simd` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
+/// Offset subtraction: output[i] = input[i] - input[i-offset] for i in
+/// [offset..len). output[0..offset] is left untouched (caller sets NaN).
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn sub_offset_simd(input: &[f64], output: &mut [f64], offset: usize) {
     for i in offset..input.len() {
         output[i] = input[i] - input[i - offset];
@@ -892,7 +192,7 @@ mod tests {
 
     #[test]
     fn test_sum_f64_non_aligned() {
-        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]; // Seven elements.
+        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
         let result = sum_f64(&data);
         assert!((result - 28.0).abs() < 1e-10);
     }
@@ -902,7 +202,6 @@ mod tests {
         let data = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         let mean = 3.0;
         let result = sum_sq_diff(&data, mean);
-        // (1-3)^2 + (2-3)^2 + (3-3)^2 + (4-3)^2 + (5-3)^2 = 4+1+0+1+4 = 10
         assert!((result - 10.0).abs() < 1e-10);
     }
 
@@ -934,5 +233,14 @@ mod tests {
         assert!((result[0] - 0.0).abs() < 1e-10);
         assert!((result[1] - 1.0).abs() < 1e-10);
         assert!(result[2].abs() < 1e-10);
+    }
+
+    #[test]
+    fn test_slice_max_ties_latest_wins() {
+        let data = vec![3.0, 5.0, 5.0, 2.0];
+        assert_eq!(slice_max_with_index(&data), (5.0, 2));
+        let data = vec![1.0, 1.0, 1.0];
+        assert_eq!(slice_max_with_index(&data), (1.0, 2));
+        assert_eq!(slice_min_with_index(&data), (1.0, 2));
     }
 }

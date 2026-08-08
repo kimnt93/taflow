@@ -3,7 +3,7 @@
 Date: 2026-08-08 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
 Environment: python 3.12.3, numpy 2.5.1, TA-Lib 0.7.1, taflow 0.1.2
 
-Summary: MATCH: 286, MISMATCH: 1
+Summary: MATCH: 287
 
 taflow is driven through its canonical classes (mapped from the
 TA-Lib name via the /CHECK.md master table). *Batch vs oracle*:
@@ -15,7 +15,6 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 
 | Function | taflow class | Oracle | Verdict | Batch vs oracle | Continue vs batch | Extend chunks | Continue vs oracle |
 |---|---|---|---|---|---|---|---|
-| CDLHIKKAKEMOD | CandleHikkakeModified | TA-Lib | MISMATCH | **FAIL** (err 1.0e+02, nan 0) | yes | yes | **FAIL** (err 1.0e+02, nan 0) |
 | ACCBANDS | AccelerationBands | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ACOS | MathAcos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | AD | AccumulationDistribution | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -32,7 +31,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | AVGDEV | RollingAverageDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | AVGPRICE | AveragePrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
 | BBANDS | BollingerBands | TA-Lib | MATCH | pass (err 7.9e-10, nan 0) | yes | yes | pass (err 7.9e-10, nan 0) |
-| BETA | RollingBeta | TA-Lib | MATCH | pass (err 5.7e-12, nan 0) | yes | yes | pass (err 5.7e-12, nan 0) |
+| BETA | RollingBeta | TA-Lib | MATCH | pass (err 3.9e-12, nan 0) | yes | yes | pass (err 3.9e-12, nan 0) |
 | BOP | BalanceOfPower | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CCI | CommodityChannelIndex | TA-Lib | MATCH | pass (err 2.6e-10, nan 0) | yes | yes | pass (err 2.6e-10, nan 0) |
 | CDL2CROWS | CandleTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -64,6 +63,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | CDLHARAMICROSS | CandleHaramiCross | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDLHIGHWAVE | CandleHighWave | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDLHIKKAKE | CandleHikkake | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| CDLHIKKAKEMOD | CandleHikkakeModified | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDLHOMINGPIGEON | CandleHomingPigeon | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDLIDENTICAL3CROWS | CandleIdenticalThreeCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDLINNECK | CandleInNeck | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -97,7 +97,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | CDLXSIDEGAP3METHODS | CandleUpDownSideGapThreeMethods | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CEIL | MathCeil | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CMO | ChandeMomentumOscillator | TA-Lib | MATCH | pass (err 6.8e-14, nan 0) | yes | yes | pass (err 6.8e-14, nan 0) |
-| CORREL | RollingCorrelation | TA-Lib | MATCH | pass (err 5.6e-11, nan 0) | yes | yes | pass (err 5.6e-11, nan 0) |
+| CORREL | RollingCorrelation | TA-Lib | MATCH | pass (err 3.1e-11, nan 0) | yes | yes | pass (err 3.1e-11, nan 0) |
 | COS | MathCos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | COSH | MathCosh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | DEMA | DoubleExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -305,6 +305,6 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 
 ## Follow-ups
 
-- Mismatches: CDLHIKKAKEMOD
+- Mismatches: none
 - Errors (class/mapping/runtime): none
 - Compared at TA-Lib defaults only (unmapped params): STDDEV, VAR, CDLABANDONEDBABY, CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD, CDLMORNINGDOJISTAR, CDLMORNINGSTAR

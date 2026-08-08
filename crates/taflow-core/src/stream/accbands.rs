@@ -32,20 +32,10 @@ pub fn acceleration_bands(
         });
     }
     let mut state = AccelerationBands::new(timeperiod)?;
-    let mut upper = Vec::with_capacity(high.len());
-    let mut middle = Vec::with_capacity(high.len());
-    let mut lower = Vec::with_capacity(high.len());
-    for ((high, low), close) in high.iter().zip(low).zip(close) {
-        if let Some(output) = state.append(*high, *low, *close) {
-            upper.push(output.upper);
-            middle.push(output.middle);
-            lower.push(output.lower);
-        } else {
-            upper.push(f64::NAN);
-            middle.push(f64::NAN);
-            lower.push(f64::NAN);
-        }
-    }
+    let mut upper = Vec::new();
+    let mut middle = Vec::new();
+    let mut lower = Vec::new();
+    state.extend_slices_into(high, low, close, &mut upper, &mut middle, &mut lower)?;
     Ok((upper, middle, lower))
 }
 
@@ -111,6 +101,60 @@ impl AccelerationBands {
         self.value
     }
 
+    /// Bulk kernel: materializes the deterministic high/low acceleration
+    /// transforms once, then advances each band through the SMA bulk path
+    /// (O(1) add/evict sliding sums over the transformed slices).
+    /// Bit-identical to per-bar [`Self::append`] in outputs and state.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        upper_out: &mut Vec<f64>,
+        middle_out: &mut Vec<f64>,
+        lower_out: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(crate::TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len().min(close.len()),
+            });
+        }
+        let n = high.len();
+        if n == 0 {
+            return Ok(());
+        }
+        let mut upper_inputs = Vec::with_capacity(n);
+        let mut lower_inputs = Vec::with_capacity(n);
+        for i in 0..n {
+            let high = high[i];
+            let low = low[i];
+            let denominator = high + low;
+            let (upper_input, lower_input) = if denominator == 0.0 {
+                (high, low)
+            } else {
+                let adjustment = 4.0 * (high - low) / denominator;
+                (high * (1.0 + adjustment), low * (1.0 - adjustment))
+            };
+            upper_inputs.push(upper_input);
+            lower_inputs.push(lower_input);
+        }
+        self.upper.extend_slice_into(&upper_inputs, upper_out);
+        self.middle.extend_slice_into(close, middle_out);
+        self.lower.extend_slice_into(&lower_inputs, lower_out);
+        self.value = self
+            .upper
+            .value()
+            .zip(self.middle.value())
+            .zip(self.lower.value())
+            .map(|((upper, middle), lower)| AccelerationBandsValue {
+                upper,
+                middle,
+                lower,
+            });
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -174,5 +218,107 @@ mod tests {
             state.append(high[index], low[index], close[index]);
         }
         assert_eq!(state.value(), expected_final);
+    }
+
+    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    fn hlc(n: usize, seed: u64) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+        let close = lcg_series(n, seed);
+        let spread_hi = lcg_series(n, seed ^ 0xDEAD_BEEF);
+        let spread_lo = lcg_series(n, seed ^ 0x1234_5678);
+        let high: Vec<f64> = close
+            .iter()
+            .zip(&spread_hi)
+            .map(|(c, s)| c + (s - 89.0).abs() * 0.1)
+            .collect();
+        let low: Vec<f64> = close
+            .iter()
+            .zip(&spread_lo)
+            .map(|(c, s)| c - (s - 89.0).abs() * 0.1)
+            .collect();
+        (high, low, close)
+    }
+
+    #[test]
+    fn accbands_bulk_is_bitwise_identical_to_per_bar_append() {
+        let (high, low, close) = hlc(5_000, 0x5EED_00AB);
+        let (th, tl, tc) = hlc(256, 0x7A11_00AB);
+        for period in [2usize, 5, 14, 30, 200] {
+            let mut per_bar = AccelerationBands::new(period).unwrap();
+            let mut ref_u = Vec::new();
+            let mut ref_m = Vec::new();
+            let mut ref_l = Vec::new();
+            for i in 0..close.len() {
+                match per_bar.append(high[i], low[i], close[i]) {
+                    Some(v) => {
+                        ref_u.push(v.upper);
+                        ref_m.push(v.middle);
+                        ref_l.push(v.lower);
+                    }
+                    None => {
+                        ref_u.push(f64::NAN);
+                        ref_m.push(f64::NAN);
+                        ref_l.push(f64::NAN);
+                    }
+                }
+            }
+            let tail_ref: Vec<Option<AccelerationBandsValue>> = (0..tc.len())
+                .map(|i| per_bar.append(th[i], tl[i], tc[i]))
+                .collect();
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state = AccelerationBands::new(period).unwrap();
+                let mut u = Vec::new();
+                let mut m = Vec::new();
+                let mut l = Vec::new();
+                let mut start = 0;
+                while start < close.len() {
+                    let end = (start + chunk.min(close.len())).min(close.len());
+                    state
+                        .extend_slices_into(
+                            &high[start..end],
+                            &low[start..end],
+                            &close[start..end],
+                            &mut u,
+                            &mut m,
+                            &mut l,
+                        )
+                        .unwrap();
+                    start = end;
+                }
+                let label = format!("ACCBANDS p{period} chunk {chunk}");
+                assert_same_bits(&u, &ref_u, &format!("{label} upper"));
+                assert_same_bits(&m, &ref_m, &format!("{label} middle"));
+                assert_same_bits(&l, &ref_l, &format!("{label} lower"));
+                for (i, expected) in tail_ref.iter().enumerate() {
+                    let actual = state.append(th[i], tl[i], tc[i]);
+                    match (actual, expected) {
+                        (Some(a), Some(e)) => {
+                            assert_eq!(a.upper.to_bits(), e.upper.to_bits(), "{label} tail {i}");
+                            assert_eq!(a.middle.to_bits(), e.middle.to_bits(), "{label} tail {i}");
+                            assert_eq!(a.lower.to_bits(), e.lower.to_bits(), "{label} tail {i}");
+                        }
+                        (None, None) => {}
+                        _ => panic!("{label} tail {i}: warm-up mismatch"),
+                    }
+                }
+            }
+        }
     }
 }

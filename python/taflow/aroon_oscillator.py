@@ -27,7 +27,6 @@ class AroonOscillator:
     ) -> None:
         """Create an oscillator state and optionally process initial prices."""
         self._state = StatefulAroonosc(timeperiod)
-        self._values: list[float] = []
         if high is not None or low is not None:
             self.extend(high, low)
 
@@ -44,8 +43,7 @@ class AroonOscillator:
         object
             Updated state, converted values, or aligned output.
         """
-        value = self._state.append(float(high), float(low))
-        self._values.append(np.nan if value is None else value)
+        self._state.append(float(high), float(low))
         return self
 
     def extend(self, high: Any, low: Any) -> "AroonOscillator":
@@ -61,8 +59,7 @@ class AroonOscillator:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(as_float64_series(high), as_float64_series(low))
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
+        self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
 
     def compute(self) -> np.ndarray:
@@ -73,7 +70,7 @@ class AroonOscillator:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> float | None:
@@ -95,5 +92,7 @@ class AroonOscillator:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

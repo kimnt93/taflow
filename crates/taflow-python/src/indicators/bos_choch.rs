@@ -37,6 +37,7 @@ impl BreakOfStructureChangeOfCharacterOperator {
 
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
@@ -45,9 +46,11 @@ impl BreakOfStructureChangeOfCharacterOperator {
         if high.len() != low.len() || low.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
-            self.append(high, low, close);
-        }
+        py.allow_threads(|| {
+            for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+                self.append(high, low, close);
+            }
+        });
         Ok(())
     }
 

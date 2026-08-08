@@ -29,6 +29,7 @@ impl UltimateOscillator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
@@ -36,15 +37,9 @@ impl UltimateOscillator {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
-        if high.len() != low.len() || high.len() != close.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        self.outputs.extend(
-            high.iter()
-                .zip(low)
-                .zip(close)
-                .map(|((&h, &l), &c)| self.inner.append(h, l, c).unwrap_or(f64::NAN)),
-        );
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slices_into(high, low, close, outputs))
+            .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {

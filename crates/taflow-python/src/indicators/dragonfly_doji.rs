@@ -25,6 +25,7 @@ impl CandleDragonflyDoji {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         open: PyReadonlyArray1<f64>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
@@ -37,9 +38,12 @@ impl CandleDragonflyDoji {
         if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for ((&open, &high), (&low, &close)) in open.iter().zip(high).zip(low.iter().zip(close)) {
-            self.append(open, high, low, close);
-        }
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(open, high, low, close, outputs)
+        })
+        .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<i32>> {

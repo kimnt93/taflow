@@ -29,6 +29,43 @@ const B: f64 = 0.5769;
 pub(crate) const SMOOTH_PRICE_SIZE: usize = 50;
 
 // ============================================================
+// Precomputed Fourier angles for the DC-phase component loop
+// ============================================================
+
+/// Flattened triangular table of `(sin, cos)` of `i * 2π / count` for
+/// `count` in `1..=SMOOTH_PRICE_SIZE` and `i` in `0..count`.
+///
+/// The DC-phase loop in HT_DCPHASE/HT_SINE/HT_TRENDMODE evaluates
+/// `sin(i * 2π / count)` and `cos(i * 2π / count)` up to 50 times per bar,
+/// which dominates the whole Hilbert pipeline.  The angles only depend on
+/// `(i, count)` with `count <= 50`, so they are computed once with the exact
+/// same expression the per-bar loop used (bit-identical values) and reused.
+const DC_SIN_COS_LEN: usize = SMOOTH_PRICE_SIZE * (SMOOTH_PRICE_SIZE + 1) / 2;
+static DC_SIN_COS: std::sync::OnceLock<[(f64, f64); DC_SIN_COS_LEN]> = std::sync::OnceLock::new();
+
+/// Returns the `(sin, cos)` pairs of `i * 2π / count` for `i` in `0..count`.
+///
+/// `count` must be at most [`SMOOTH_PRICE_SIZE`]; `count == 0` yields an
+/// empty slice, matching the degenerate loop in TA-Lib's warm-up bars.
+#[inline]
+pub(crate) fn dc_sin_cos(count: usize) -> &'static [(f64, f64)] {
+    debug_assert!(count <= SMOOTH_PRICE_SIZE);
+    let table = DC_SIN_COS.get_or_init(|| {
+        let mut table = [(0.0_f64, 0.0_f64); DC_SIN_COS_LEN];
+        for count in 1..=SMOOTH_PRICE_SIZE {
+            let base = count * (count - 1) / 2;
+            for (i, entry) in table[base..base + count].iter_mut().enumerate() {
+                let angle = (i as f64 * CONST_DEG2RAD_BY360) / count as f64;
+                *entry = (angle.sin(), angle.cos());
+            }
+        }
+        table
+    });
+    let base = count * count.saturating_sub(1) / 2;
+    &table[base..base + count]
+}
+
+// ============================================================
 // Hilbert Transform variables for one signal (even/odd buffers)
 // ============================================================
 
@@ -316,11 +353,10 @@ pub(crate) fn ht_dc_phase_core(input: &[f64]) -> DcPhaseResult {
         let mut imag_part = 0.0_f64;
 
         let mut idx = smooth_price_idx;
-        for i in 0..dc_period_int {
-            let angle = (i as f64 * CONST_DEG2RAD_BY360) / dc_period_int as f64;
+        for &(sin_angle, cos_angle) in dc_sin_cos(dc_period_int.max(0) as usize) {
             let price = smooth_price[idx];
-            real_part += angle.sin() * price;
-            imag_part += angle.cos() * price;
+            real_part += sin_angle * price;
+            imag_part += cos_angle * price;
             if idx == 0 {
                 idx = SMOOTH_PRICE_SIZE - 1;
             } else {
@@ -389,6 +425,20 @@ mod tests {
         (0..n)
             .map(|i| 50.0 + 10.0 * (i as f64 * 0.2).sin())
             .collect()
+    }
+
+    #[test]
+    fn dc_sin_cos_table_is_bitwise_identical_to_runtime_expression() {
+        assert!(dc_sin_cos(0).is_empty());
+        for count in 1..=SMOOTH_PRICE_SIZE {
+            let row = dc_sin_cos(count);
+            assert_eq!(row.len(), count);
+            for (i, &(sin_angle, cos_angle)) in row.iter().enumerate() {
+                let angle = (i as f64 * CONST_DEG2RAD_BY360) / count as f64;
+                assert_eq!(sin_angle.to_bits(), angle.sin().to_bits());
+                assert_eq!(cos_angle.to_bits(), angle.cos().to_bits());
+            }
+        }
     }
 
     #[test]

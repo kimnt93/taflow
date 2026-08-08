@@ -12,11 +12,13 @@ categories = ["science", "mathematics"]
 [dependencies]
 thiserror.workspace = true
 num-traits.workspace = true
-wide = { version = "0.7", optional = true }
+multiversion = "0.7"
 
 [features]
 default = ["simd"]
-simd = ["wide"]
+# Retained for backwards compatibility; kernels are now plain auto-vectorizable
+# loops with multiversion runtime dispatch, so the flag is a no-op.
+simd = []
 
 [dev-dependencies]
 approx = "0.5"

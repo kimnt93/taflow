@@ -27,14 +27,21 @@ impl KalmanHedgeRatioOperator {
         value
     }
 
-    fn extend(&mut self, x: PyReadonlyArray1<f64>, y: PyReadonlyArray1<f64>) -> PyResult<()> {
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        x: PyReadonlyArray1<f64>,
+        y: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
         let (x, y) = (x.as_slice()?, y.as_slice()?);
         if x.len() != y.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&x, &y) in x.iter().zip(y) {
-            self.append(x, y);
-        }
+        py.allow_threads(|| {
+            for (&x, &y) in x.iter().zip(y) {
+                self.append(x, y);
+            }
+        });
         Ok(())
     }
 

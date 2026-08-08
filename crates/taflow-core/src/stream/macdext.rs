@@ -87,6 +87,107 @@ impl MovingAverageConvergenceDivergenceExtended {
         self.value
     }
 
+    /// Bulk kernel. When all three moving averages are plain EMAs (the common
+    /// TA-Lib default), the warm steady state advances the three EMA
+    /// recurrences in one loop with the scalar states held in locals; other
+    /// MA types fall back to a per-bar loop with no per-bar allocation.
+    /// Bit-identical to per-bar [`Self::append`] in outputs and post-run state.
+    pub fn extend_slices_into(
+        &mut self,
+        inputs: &[f64],
+        macd_out: &mut Vec<f64>,
+        signal_out: &mut Vec<f64>,
+        histogram_out: &mut Vec<f64>,
+    ) {
+        macd_out.reserve(inputs.len());
+        signal_out.reserve(inputs.len());
+        histogram_out.reserve(inputs.len());
+        let fused = self.fast.is_ema() && self.slow.is_ema() && self.signal.is_ema();
+        let mut index = 0;
+        if fused {
+            // Warm-up prologue: per-bar appends until the signal EMA emits.
+            while index < inputs.len() && self.value.is_none() {
+                Self::push_outputs(
+                    self.append(inputs[index]),
+                    macd_out,
+                    signal_out,
+                    histogram_out,
+                );
+                index += 1;
+            }
+            if index < inputs.len() {
+                let (fast_k, mut fast) = {
+                    let state = self.fast.as_ema_mut().expect("EMA fast state");
+                    (state.smoothing(), state.current().expect("warm fast EMA"))
+                };
+                let (slow_k, mut slow) = {
+                    let state = self.slow.as_ema_mut().expect("EMA slow state");
+                    (state.smoothing(), state.current().expect("warm slow EMA"))
+                };
+                let (signal_k, mut signal) = {
+                    let state = self.signal.as_ema_mut().expect("EMA signal state");
+                    (state.smoothing(), state.current().expect("warm signal EMA"))
+                };
+                let mut last = self.value;
+                for &input in &inputs[index..] {
+                    fast = fast_k.mul_add(input - fast, fast);
+                    slow = slow_k.mul_add(input - slow, slow);
+                    let macd = fast - slow;
+                    signal = signal_k.mul_add(macd - signal, signal);
+                    let histogram = macd - signal;
+                    macd_out.push(macd);
+                    signal_out.push(signal);
+                    histogram_out.push(histogram);
+                    last = Some(MovingAverageConvergenceDivergenceValue {
+                        macd,
+                        signal,
+                        histogram,
+                    });
+                }
+                let appended = inputs.len() - index;
+                self.fast
+                    .as_ema_mut()
+                    .expect("EMA fast state")
+                    .store_bulk_state(fast, appended);
+                self.slow
+                    .as_ema_mut()
+                    .expect("EMA slow state")
+                    .store_bulk_state(slow, appended);
+                self.signal
+                    .as_ema_mut()
+                    .expect("EMA signal state")
+                    .store_bulk_state(signal, appended);
+                self.index += appended;
+                self.value = last;
+            }
+            return;
+        }
+        for &input in &inputs[index..] {
+            Self::push_outputs(self.append(input), macd_out, signal_out, histogram_out);
+        }
+    }
+
+    #[inline]
+    fn push_outputs(
+        value: Option<MovingAverageConvergenceDivergenceValue>,
+        macd_out: &mut Vec<f64>,
+        signal_out: &mut Vec<f64>,
+        histogram_out: &mut Vec<f64>,
+    ) {
+        match value {
+            Some(value) => {
+                macd_out.push(value.macd);
+                signal_out.push(value.signal);
+                histogram_out.push(value.histogram);
+            }
+            None => {
+                macd_out.push(f64::NAN);
+                signal_out.push(f64::NAN);
+                histogram_out.push(f64::NAN);
+            }
+        }
+    }
+
     /// Returns the latest warmed output.
     pub fn value(&self) -> Option<MovingAverageConvergenceDivergenceValue> {
         self.value
@@ -105,6 +206,94 @@ impl MovingAverageConvergenceDivergenceExtended {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
+        (0..n)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
+            })
+            .collect()
+    }
+
+    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label}: length");
+        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
+            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
+        }
+    }
+
+    fn per_bar_outputs(
+        state: &mut MovingAverageConvergenceDivergenceExtended,
+        input: &[f64],
+    ) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+        let mut macd = Vec::new();
+        let mut signal = Vec::new();
+        let mut histogram = Vec::new();
+        for &x in input {
+            match state.append(x) {
+                Some(v) => {
+                    macd.push(v.macd);
+                    signal.push(v.signal);
+                    histogram.push(v.histogram);
+                }
+                None => {
+                    macd.push(f64::NAN);
+                    signal.push(f64::NAN);
+                    histogram.push(f64::NAN);
+                }
+            }
+        }
+        (macd, signal, histogram)
+    }
+
+    #[test]
+    fn bulk_is_bitwise_identical_to_per_bar_append() {
+        let input = lcg_series(5_000, 0x5EED_E217);
+        let tail = lcg_series(128, 0x7A11_E217);
+        let ema = MaType::ExponentialMovingAverage;
+        let combos = [
+            (12usize, ema, 26usize, ema, 9usize, ema),
+            (2, ema, 2, ema, 1, ema),
+            (3, ema, 10, ema, 1, ema),
+            (5, ema, 5, ema, 4, ema),
+            // Non-EMA legs exercise the per-bar fallback path.
+            (
+                7,
+                MaType::SimpleMovingAverage,
+                13,
+                ema,
+                5,
+                MaType::WeightedMovingAverage,
+            ),
+        ];
+        for (fp, fmt, sp, smt, gp, gmt) in combos {
+            let mut per_bar =
+                MovingAverageConvergenceDivergenceExtended::new(fp, fmt, sp, smt, gp, gmt).unwrap();
+            let reference = per_bar_outputs(&mut per_bar, &input);
+            let tail_reference = per_bar_outputs(&mut per_bar, &tail);
+
+            for chunk in [usize::MAX, 1, 7, 97] {
+                let mut state =
+                    MovingAverageConvergenceDivergenceExtended::new(fp, fmt, sp, smt, gp, gmt)
+                        .unwrap();
+                let (mut m, mut s, mut h) = (Vec::new(), Vec::new(), Vec::new());
+                for piece in input.chunks(chunk.min(input.len())) {
+                    state.extend_slices_into(piece, &mut m, &mut s, &mut h);
+                }
+                let label = format!("{fp}/{sp}/{gp} chunk {chunk}");
+                assert_same_bits(&m, &reference.0, &label);
+                assert_same_bits(&s, &reference.1, &label);
+                assert_same_bits(&h, &reference.2, &label);
+                let tail_out = per_bar_outputs(&mut state, &tail);
+                assert_same_bits(&tail_out.0, &tail_reference.0, &format!("{label} tail"));
+                assert_same_bits(&tail_out.1, &tail_reference.1, &format!("{label} tail"));
+                assert_same_bits(&tail_out.2, &tail_reference.2, &format!("{label} tail"));
+            }
+        }
+    }
 
     #[test]
     fn matches_batch_for_every_moving_average_combination() {

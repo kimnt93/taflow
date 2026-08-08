@@ -10,9 +10,6 @@ struct Candle {
     close: f64,
 }
 impl Candle {
-    fn range(self) -> f64 {
-        self.high - self.low
-    }
     fn color(self) -> i32 {
         if self.close >= self.open {
             1
@@ -28,6 +25,7 @@ impl Candle {
 /// values, and exposes the current result through its public API.
 pub struct CandleStickSandwich {
     candles: VecDeque<Candle>,
+    equal_sum: f64,
     value: Option<i32>,
 }
 impl Default for CandleStickSandwich {
@@ -44,11 +42,9 @@ impl CandleStickSandwich {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(7),
+            equal_sum: 0.0,
             value: None,
         }
-    }
-    fn equal(&self) -> f64 {
-        self.candles.iter().take(5).map(|c| c.range()).sum::<f64>() * 0.01
     }
     /// Computes or updates `append` through the native Rust kernel.
     ///
@@ -62,18 +58,27 @@ impl CandleStickSandwich {
             low,
             close,
         };
+        // Deque holds bars i-7..=i-1; bar j maps to index 7 - (i - j).
         let output = if self.candles.len() == 7 {
-            let first = self.candles[5];
-            let second = self.candles[6];
+            let first = self.candles[5]; // bar i-2
+            let second = self.candles[6]; // bar i-1
+            let equal = ca_highlow_scalar(EQUAL, self.equal_sum, first.high, first.low);
+            // Slide the sum exactly like the batch loop: sum += cr(bar) - cr(bar - 5).
+            self.equal_sum += cr_highlow_scalar(first.high, first.low)
+                - cr_highlow_scalar(self.candles[0].high, self.candles[0].low);
             Some(
                 ((first.color() == -1
                     && second.color() == 1
                     && current.color() == -1
                     && second.low > first.close
-                    && (close - first.close).abs() <= self.equal()) as i32)
+                    && (close - first.close).abs() <= equal) as i32)
                     * 100,
             )
         } else {
+            // Warm-up: seed the sum exactly like the batch prologue.
+            if self.candles.len() < 5 {
+                self.equal_sum += cr_highlow_scalar(high, low);
+            }
             None
         };
         if self.candles.len() == 7 {
@@ -83,6 +88,53 @@ impl CandleStickSandwich {
         self.value = output;
         output
     }
+    /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
+    ///
+    /// From a pristine state this runs the incremental batch kernel over the
+    /// slices and then replays only the trailing bars through `append` to
+    /// rebuild the window-bounded streaming state; the replayed scores are
+    /// discarded because the batch pass already emitted them. A non-pristine
+    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
+    /// batch prologue).
+    ///
+    /// # Parameters
+    ///
+    /// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+    /// * `output` - Destination the aligned scores are appended to.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())`, or a validation error when the inputs are not aligned.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<i32>,
+    ) -> TaResult<()> {
+        let len = validate_ohlc(open, high, low, close)?;
+        output.reserve(len);
+        if !self.candles.is_empty() {
+            for i in 0..len {
+                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+            }
+            return Ok(());
+        }
+        let scores = candle_stick_sandwich(open, high, low, close)?;
+        output.extend_from_slice(&scores);
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
+        Ok(())
+    }
+
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -93,7 +145,9 @@ impl CandleStickSandwich {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        *self = Self::new()
+        self.candles.clear();
+        self.equal_sum = 0.0;
+        self.value = None;
     }
 }
 
@@ -134,7 +188,7 @@ pub fn candle_stick_sandwich(
     let mut equal_sum = 0.0;
     let start = lookback;
     for i in (start - 2 - EQUAL.avg_period)..(start - 2) {
-        equal_sum += cr(EQUAL, open, high, low, close, i);
+        equal_sum += cr_highlow(open, high, low, close, i);
     }
 
     for i in start..len {
@@ -143,10 +197,11 @@ pub fn candle_stick_sandwich(
             && candle_color(open[i], close[i]) == -1
             && low[i - 1] > close[i - 2]
             && (close[i] - close[i - 2]).abs()
-                <= ca(EQUAL, equal_sum, open, high, low, close, i - 2)) as i32
+                <= ca_highlow(EQUAL, equal_sum, open, high, low, close, i - 2))
+            as i32
             * 100;
-        equal_sum += cr(EQUAL, open, high, low, close, i - 2)
-            - cr(EQUAL, open, high, low, close, i - 2 - EQUAL.avg_period);
+        equal_sum += cr_highlow(open, high, low, close, i - 2)
+            - cr_highlow(open, high, low, close, i - 2 - EQUAL.avg_period);
     }
     Ok(output)
 }

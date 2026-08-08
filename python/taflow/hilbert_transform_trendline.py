@@ -22,7 +22,6 @@ class HilbertTransformTrendline:
     def __init__(self, _input: Any | None = None) -> None:
         """Create the trendline with an optional initial price series."""
         self._state = StatefulHtTrendline()
-        self._values: list[float] = []
         if _input is not None:
             self.extend(_input)
 
@@ -39,8 +38,7 @@ class HilbertTransformTrendline:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.append(_input)
-        self._values.append(np.nan if result is None else float(result))
+        self._state.append(_input)
         return self
 
     def extend(self, _input: object) -> object:
@@ -56,8 +54,7 @@ class HilbertTransformTrendline:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        result = self._state.extend(_input)
-        self._values.extend(np.asarray(result, dtype=np.float64).tolist())
+        self._state.extend(_input)
         return self
 
     def compute(self) -> np.ndarray:
@@ -68,7 +65,7 @@ class HilbertTransformTrendline:
         object
             Updated state, converted values, or aligned output.
         """
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -90,5 +87,7 @@ class HilbertTransformTrendline:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

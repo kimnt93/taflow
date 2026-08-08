@@ -28,14 +28,20 @@ fn py_value_error(error: impl ToString) -> PyErr {
     PyValueError::new_err(error.to_string())
 }
 
-fn values_from<I>(values: I) -> Vec<f64>
+/// Appends `Option<f64>` results straight into a Rust-side output cache,
+/// NaN-filling warm-up. One pass, no temporary `Vec`.
+fn extend_from_options<I>(cache: &mut Vec<f64>, values: I)
 where
     I: IntoIterator<Item = Option<f64>>,
 {
-    values
-        .into_iter()
-        .map(|value| value.unwrap_or(f64::NAN))
-        .collect()
+    let values = values.into_iter();
+    cache.reserve(values.size_hint().0);
+    cache.extend(values.map(|value| value.unwrap_or(f64::NAN)));
+}
+
+fn push_option(cache: &mut Vec<f64>, value: Option<f64>) -> Option<f64> {
+    cache.push(value.unwrap_or(f64::NAN));
+    value
 }
 
 macro_rules! scalar_state_class {
@@ -43,6 +49,7 @@ macro_rules! scalar_state_class {
         #[pyclass]
         pub struct $class {
             inner: $inner,
+            outputs: Vec<f64>,
         }
 
         #[pymethods]
@@ -52,25 +59,27 @@ macro_rules! scalar_state_class {
             fn new(timeperiod: usize) -> PyResult<Self> {
                 Ok(Self {
                     inner: <$inner>::new(timeperiod).map_err(py_value_error)?,
+                    outputs: Vec::new(),
                 })
             }
 
             fn append(&mut self, input: f64) -> Option<f64> {
-                self.inner.append(input)
+                push_option(&mut self.outputs, self.inner.append(input))
             }
 
-            fn extend(
-                &mut self,
-                py: Python<'_>,
-                input: PyReadonlyArray1<f64>,
-            ) -> PyResult<Py<PyArray1<f64>>> {
+            fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
                 let input = input.as_slice()?;
-                let values = py.allow_threads(|| {
-                    let mut values = Vec::with_capacity(input.len());
-                    self.inner.extend_slice_into(&input, &mut values);
-                    values
-                });
-                Ok(to_py_array(py, values))
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+                Ok(())
+            }
+
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
             }
 
             #[getter]
@@ -80,6 +89,7 @@ macro_rules! scalar_state_class {
 
             fn reset(&mut self) {
                 self.inner.reset();
+                self.outputs.clear();
             }
         }
     };
@@ -191,6 +201,10 @@ impl StatefulPremiumDiscount {
     fn value(&self) -> Option<(i32, f64)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.zones.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.zones.clear();
@@ -339,6 +353,10 @@ impl StatefulPivotPoints {
     fn value(&self) -> (f64, f64, f64, f64, f64) {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.levels[0].len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         for level in &mut self.levels {
@@ -420,6 +438,10 @@ impl StatefulAnchoredVolumeWeightedAveragePrice {
     fn value(&self) -> Option<(f64, f64, f64)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.means.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.means.clear();
@@ -463,6 +485,10 @@ impl StatefulTomDeMarkSequential {
     fn value(&self) -> Option<(i32, i32)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.buys.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.buys.clear();
@@ -515,6 +541,10 @@ impl StatefulParabolicMovingAverageStop {
     fn value(&self) -> Option<(f64, i32)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.stops.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.stops.clear();
@@ -573,6 +603,10 @@ impl StatefulKlingerVolumeOscillator {
     fn value(&self) -> Option<(f64, f64)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.oscillator.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.oscillator.clear();
@@ -653,6 +687,10 @@ impl StatefulSessionVolumeLevels {
     fn value(&self) -> Option<(f64, f64, f64)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.poc.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.poc.clear();
@@ -719,6 +757,10 @@ impl StatefulOpeningRange {
     fn value(&self) -> Option<(f64, f64, i32)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.highs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.highs.clear();
@@ -780,6 +822,10 @@ impl StatefulFibonacciRetracement {
             .value()
             .map(|v| (v[0], v[1], v[2], v[3], v[4], v[5], v[6]))
     }
+    fn __len__(&self) -> usize {
+        self.levels[0].len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         for level in &mut self.levels {
@@ -849,6 +895,10 @@ impl StatefulHeikinAshi {
     fn value(&self) -> Option<(f64, f64, f64, f64)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.open.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.open.clear();
@@ -906,6 +956,10 @@ impl StatefulSmoothedTrendChannel {
     fn value(&self) -> Option<(f64, f64)> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.lower.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.lower.clear();
@@ -941,6 +995,10 @@ impl StatefulJurikMovingAverage {
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.output.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.output.clear();
@@ -975,6 +1033,10 @@ impl StatefulEvenBetterSinewave {
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.output.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.output.clear();
@@ -1009,6 +1071,10 @@ impl StatefulLaguerreRelativeStrengthIndex {
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
+    fn __len__(&self) -> usize {
+        self.output.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.output.clear();
@@ -1049,6 +1115,10 @@ impl StatefulVariableIndexDynamicAverage {
         self.inner.value()
     }
 
+    fn __len__(&self) -> usize {
+        self.output.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.output.clear();
@@ -1072,15 +1142,16 @@ impl StatefulRelativeMomentumIndex {
         value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        for &value in input.as_slice()? {
-            self.append(value);
-        }
-        Ok(to_py_array(py, self.output.clone()))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let output = &mut self.output;
+        py.allow_threads(|| {
+            output.reserve(input.len());
+            for &value in input {
+                output.push(self.inner.append(value).unwrap_or(f64::NAN));
+            }
+        });
+        Ok(())
     }
 
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -1092,6 +1163,10 @@ impl StatefulRelativeMomentumIndex {
         self.inner.value()
     }
 
+    fn __len__(&self) -> usize {
+        self.output.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.output.clear();
@@ -1101,6 +1176,7 @@ impl StatefulRelativeMomentumIndex {
 #[pyclass]
 pub struct StatefulCci {
     inner: CommodityChannelIndex,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1110,11 +1186,12 @@ impl StatefulCci {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: CommodityChannelIndex::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -1123,12 +1200,18 @@ impl StatefulCci {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self
-            .inner
-            .extend_slice(high.as_slice()?, low.as_slice()?, close.as_slice()?)
-            .map_err(py_value_error)?;
-        Ok(to_py_array(py, values_from(values)))
+    ) -> PyResult<()> {
+        let high = high.as_slice()?;
+        let low = low.as_slice()?;
+        let close = close.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            self.inner
+                .extend_slice(high, low, close)
+                .map(|values| extend_from_options(outputs, values))
+        })
+        .map_err(py_value_error)?;
+        Ok(())
     }
 
     #[getter]
@@ -1136,14 +1219,24 @@ impl StatefulCci {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulImi {
     inner: IntradayMomentumIndex,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1153,11 +1246,12 @@ impl StatefulImi {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: IntradayMomentumIndex::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, open: f64, close: f64) -> Option<f64> {
-        self.inner.append(open, close)
+        push_option(&mut self.outputs, self.inner.append(open, close))
     }
 
     fn extend(
@@ -1165,7 +1259,7 @@ impl StatefulImi {
         py: Python<'_>,
         open: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let open = open.as_slice()?;
         let close = close.as_slice()?;
         if open.len() != close.len() {
@@ -1173,14 +1267,16 @@ impl StatefulImi {
                 "open and close must have equal lengths",
             ));
         }
-        Ok(to_py_array(
-            py,
-            values_from(
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            extend_from_options(
+                outputs,
                 open.iter()
                     .zip(close)
                     .map(|(&open, &close)| self.inner.append(open, close)),
-            ),
-        ))
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1188,14 +1284,24 @@ impl StatefulImi {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulT3 {
     inner: stream::TripleExponentialAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1206,20 +1312,19 @@ impl StatefulT3 {
         Ok(Self {
             inner: stream::TripleExponentialAverage::new(timeperiod, vfactor)
                 .map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -1227,8 +1332,17 @@ impl StatefulT3 {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
@@ -1237,6 +1351,7 @@ macro_rules! oscillator_state_class {
         #[pyclass]
         pub struct $class {
             inner: $inner,
+            outputs: Vec<f64>,
         }
 
         #[pymethods]
@@ -1251,20 +1366,19 @@ macro_rules! oscillator_state_class {
                         MaType::try_from(matype).map_err(py_value_error)?,
                     )
                     .map_err(py_value_error)?,
+                    outputs: Vec::new(),
                 })
             }
 
             fn append(&mut self, input: f64) -> Option<f64> {
-                self.inner.append(input)
+                push_option(&mut self.outputs, self.inner.append(input))
             }
 
-            fn extend(
-                &mut self,
-                py: Python<'_>,
-                input: PyReadonlyArray1<f64>,
-            ) -> PyResult<Py<PyArray1<f64>>> {
-                let values = self.inner.extend(input.as_slice()?.iter().copied());
-                Ok(to_py_array(py, values_from(values)))
+            fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+                let input = input.as_slice()?;
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+                Ok(())
             }
 
             #[getter]
@@ -1272,8 +1386,17 @@ macro_rules! oscillator_state_class {
                 self.inner.value()
             }
 
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
+            }
+
             fn reset(&mut self) {
                 self.inner.reset();
+                self.outputs.clear();
             }
         }
     };
@@ -1285,6 +1408,7 @@ oscillator_state_class!(StatefulPpo, stream::PercentagePriceOscillator);
 #[pyclass]
 pub struct StatefulMa {
     inner: stream::MovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1298,20 +1422,19 @@ impl StatefulMa {
                 MaType::try_from(matype).map_err(py_value_error)?,
             )
             .map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -1319,14 +1442,26 @@ impl StatefulMa {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulBbands {
     inner: stream::BollingerBands,
+    uppers: Vec<f64>,
+    middles: Vec<f64>,
+    lowers: Vec<f64>,
 }
 
 #[pymethods]
@@ -1342,39 +1477,44 @@ impl StatefulBbands {
                 MaType::try_from(matype).map_err(py_value_error)?,
             )
             .map_err(py_value_error)?,
+            uppers: Vec::new(),
+            middles: Vec::new(),
+            lowers: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(input)
-            .map(|value| (value.upper, value.middle, value.lower))
+            .map(|value| (value.upper, value.middle, value.lower));
+        let (upper, middle, lower) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
+        self.uppers.push(upper);
+        self.middles.push(middle);
+        self.lowers.push(lower);
+        value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut upper = Vec::with_capacity(input.len()?);
-        let mut middle = Vec::with_capacity(input.len()?);
-        let mut lower = Vec::with_capacity(input.len()?);
-        for input in input.as_slice()?.iter().copied() {
-            if let Some(value) = self.inner.append(input) {
-                upper.push(value.upper);
-                middle.push(value.middle);
-                lower.push(value.lower);
-            } else {
-                upper.push(f64::NAN);
-                middle.push(f64::NAN);
-                lower.push(f64::NAN);
-            }
-        }
-        Ok((
-            to_py_array(py, upper),
-            to_py_array(py, middle),
-            to_py_array(py, lower),
-        ))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (uppers, middles, lowers) = (&mut self.uppers, &mut self.middles, &mut self.lowers);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(input, uppers, middles, lowers)
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.uppers.clone()),
+            to_py_array(py, self.middles.clone()),
+            to_py_array(py, self.lowers.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.uppers.len()
     }
 
     #[getter]
@@ -1386,12 +1526,18 @@ impl StatefulBbands {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.uppers.clear();
+        self.middles.clear();
+        self.lowers.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulAccbands {
     inner: stream::AccelerationBands,
+    uppers: Vec<f64>,
+    middles: Vec<f64>,
+    lowers: Vec<f64>,
 }
 
 #[pymethods]
@@ -1401,13 +1547,22 @@ impl StatefulAccbands {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: stream::AccelerationBands::new(timeperiod).map_err(py_value_error)?,
+            uppers: Vec::new(),
+            middles: Vec::new(),
+            lowers: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<(f64, f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(high, low, close)
-            .map(|value| (value.upper, value.middle, value.lower))
+            .map(|value| (value.upper, value.middle, value.lower));
+        let (upper, middle, lower) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
+        self.uppers.push(upper);
+        self.middles.push(middle);
+        self.lowers.push(lower);
+        value
     }
 
     fn extend(
@@ -1416,32 +1571,32 @@ impl StatefulAccbands {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
         if high.len() != low.len() || high.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let mut upper = Vec::with_capacity(high.len());
-        let mut middle = Vec::with_capacity(high.len());
-        let mut lower = Vec::with_capacity(high.len());
-        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
-            if let Some(value) = self.inner.append(high, low, close) {
-                upper.push(value.upper);
-                middle.push(value.middle);
-                lower.push(value.lower);
-            } else {
-                upper.push(f64::NAN);
-                middle.push(f64::NAN);
-                lower.push(f64::NAN);
-            }
-        }
-        Ok((
-            to_py_array(py, upper),
-            to_py_array(py, middle),
-            to_py_array(py, lower),
-        ))
+        let (uppers, middles, lowers) = (&mut self.uppers, &mut self.middles, &mut self.lowers);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, close, uppers, middles, lowers)
+                .expect("lengths validated above")
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.uppers.clone()),
+            to_py_array(py, self.middles.clone()),
+            to_py_array(py, self.lowers.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.uppers.len()
     }
 
     #[getter]
@@ -1453,12 +1608,16 @@ impl StatefulAccbands {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.uppers.clear();
+        self.middles.clear();
+        self.lowers.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulSar {
     inner: stream::ParabolicSar,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1468,11 +1627,12 @@ impl StatefulSar {
     fn new(acceleration: f64, maximum: f64) -> Self {
         Self {
             inner: stream::ParabolicSar::new(acceleration, maximum),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, high: f64, low: f64) -> Option<f64> {
-        self.inner.append(high, low)
+        push_option(&mut self.outputs, self.inner.append(high, low))
     }
 
     fn extend(
@@ -1480,20 +1640,22 @@ impl StatefulSar {
         py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         if high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        Ok(to_py_array(
-            py,
-            values_from(
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            extend_from_options(
+                outputs,
                 high.iter()
                     .zip(low)
                     .map(|(&high, &low)| self.inner.append(high, low)),
-            ),
-        ))
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1501,14 +1663,24 @@ impl StatefulSar {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulSarext {
     inner: stream::ParabolicSarExtended,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1537,11 +1709,12 @@ impl StatefulSarext {
                 accelerationshort,
                 accelerationmaxshort,
             ),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, high: f64, low: f64) -> Option<f64> {
-        self.inner.append(high, low)
+        push_option(&mut self.outputs, self.inner.append(high, low))
     }
 
     fn extend(
@@ -1549,20 +1722,22 @@ impl StatefulSarext {
         py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         if high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        Ok(to_py_array(
-            py,
-            values_from(
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            extend_from_options(
+                outputs,
                 high.iter()
                     .zip(low)
                     .map(|(&high, &low)| self.inner.append(high, low)),
-            ),
-        ))
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1570,8 +1745,17 @@ impl StatefulSarext {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
@@ -1580,6 +1764,7 @@ macro_rules! deviation_state_class {
         #[pyclass]
         pub struct $class {
             inner: stream::$inner,
+            outputs: Vec<f64>,
         }
 
         #[pymethods]
@@ -1589,20 +1774,19 @@ macro_rules! deviation_state_class {
             fn new(timeperiod: usize, nbdev: f64) -> PyResult<Self> {
                 Ok(Self {
                     inner: stream::$inner::new(timeperiod, nbdev).map_err(py_value_error)?,
+                    outputs: Vec::new(),
                 })
             }
 
             fn append(&mut self, input: f64) -> Option<f64> {
-                self.inner.append(input)
+                push_option(&mut self.outputs, self.inner.append(input))
             }
 
-            fn extend(
-                &mut self,
-                py: Python<'_>,
-                input: PyReadonlyArray1<f64>,
-            ) -> PyResult<Py<PyArray1<f64>>> {
-                let values = self.inner.extend(input.as_slice()?.iter().copied());
-                Ok(to_py_array(py, values_from(values)))
+            fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+                let input = input.as_slice()?;
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+                Ok(())
             }
 
             #[getter]
@@ -1610,8 +1794,17 @@ macro_rules! deviation_state_class {
                 self.inner.value()
             }
 
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
+            }
+
             fn reset(&mut self) {
                 self.inner.reset();
+                self.outputs.clear();
             }
         }
     };
@@ -1625,6 +1818,7 @@ macro_rules! bivariate_statistic_class {
         #[pyclass]
         pub struct $class {
             inner: stream::$inner,
+            outputs: Vec<f64>,
         }
 
         #[pymethods]
@@ -1634,11 +1828,12 @@ macro_rules! bivariate_statistic_class {
             fn new(timeperiod: usize) -> PyResult<Self> {
                 Ok(Self {
                     inner: stream::$inner::new(timeperiod).map_err(py_value_error)?,
+                    outputs: Vec::new(),
                 })
             }
 
             fn append(&mut self, input0: f64, input1: f64) -> Option<f64> {
-                self.inner.append(input0, input1)
+                push_option(&mut self.outputs, self.inner.append(input0, input1))
             }
 
             fn extend(
@@ -1646,17 +1841,23 @@ macro_rules! bivariate_statistic_class {
                 py: Python<'_>,
                 input0: PyReadonlyArray1<f64>,
                 input1: PyReadonlyArray1<f64>,
-            ) -> PyResult<Py<PyArray1<f64>>> {
+            ) -> PyResult<()> {
                 let input0 = input0.as_slice()?;
                 let input1 = input1.as_slice()?;
                 if input0.len() != input1.len() {
                     return Err(PyValueError::new_err("inputs must have equal lengths"));
                 }
-                let values = input0
-                    .iter()
-                    .zip(input1)
-                    .map(|(&input0, &input1)| self.inner.append(input0, input1));
-                Ok(to_py_array(py, values_from(values)))
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| {
+                    extend_from_options(
+                        outputs,
+                        input0
+                            .iter()
+                            .zip(input1)
+                            .map(|(&input0, &input1)| self.inner.append(input0, input1)),
+                    )
+                });
+                Ok(())
             }
 
             #[getter]
@@ -1664,8 +1865,17 @@ macro_rules! bivariate_statistic_class {
                 self.inner.value()
             }
 
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
+            }
+
             fn reset(&mut self) {
                 self.inner.reset();
+                self.outputs.clear();
             }
         }
     };
@@ -1677,6 +1887,7 @@ bivariate_statistic_class!(StatefulCorrel, RollingCorrelation);
 #[pyclass]
 pub struct StatefulAd {
     inner: stream::AccumulationDistribution,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1685,11 +1896,14 @@ impl StatefulAd {
     fn new() -> Self {
         Self {
             inner: stream::AccumulationDistribution::new(),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> f64 {
-        self.inner.append(high, low, close, volume)
+        let value = self.inner.append(high, low, close, volume);
+        self.outputs.push(value);
+        value
     }
 
     fn extend(
@@ -1699,7 +1913,7 @@ impl StatefulAd {
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -1707,14 +1921,17 @@ impl StatefulAd {
         if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let values = high
-            .iter()
-            .zip(low)
-            .zip(close)
-            .zip(volume)
-            .map(|(((&h, &l), &c), &v)| self.inner.append(h, l, c, v))
-            .collect();
-        Ok(to_py_array(py, values))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            outputs.extend(
+                high.iter()
+                    .zip(low)
+                    .zip(close)
+                    .zip(volume)
+                    .map(|(((&h, &l), &c), &v)| self.inner.append(h, l, c, v)),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1722,14 +1939,24 @@ impl StatefulAd {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulAdosc {
     inner: stream::AccumulationDistributionOscillator,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1740,11 +1967,15 @@ impl StatefulAdosc {
         Ok(Self {
             inner: stream::AccumulationDistributionOscillator::new(fastperiod, slowperiod)
                 .map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
-        self.inner.append(high, low, close, volume)
+        push_option(
+            &mut self.outputs,
+            self.inner.append(high, low, close, volume),
+        )
     }
 
     fn extend(
@@ -1754,7 +1985,7 @@ impl StatefulAdosc {
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -1762,13 +1993,18 @@ impl StatefulAdosc {
         if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let values = high
-            .iter()
-            .zip(low)
-            .zip(close)
-            .zip(volume)
-            .map(|(((&h, &l), &c), &v)| self.inner.append(h, l, c, v));
-        Ok(to_py_array(py, values_from(values)))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            extend_from_options(
+                outputs,
+                high.iter()
+                    .zip(low)
+                    .zip(close)
+                    .zip(volume)
+                    .map(|(((&h, &l), &c), &v)| self.inner.append(h, l, c, v)),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1776,14 +2012,24 @@ impl StatefulAdosc {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulObv {
     inner: stream::OnBalanceVolume,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1792,11 +2038,14 @@ impl StatefulObv {
     fn new() -> Self {
         Self {
             inner: stream::OnBalanceVolume::new(),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, close: f64, volume: f64) -> f64 {
-        self.inner.append(close, volume)
+        let value = self.inner.append(close, volume);
+        self.outputs.push(value);
+        value
     }
 
     fn extend(
@@ -1804,18 +2053,22 @@ impl StatefulObv {
         py: Python<'_>,
         close: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let close = close.as_slice()?;
         let volume = volume.as_slice()?;
         if close.len() != volume.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let values = close
-            .iter()
-            .zip(volume)
-            .map(|(&close, &volume)| self.inner.append(close, volume))
-            .collect();
-        Ok(to_py_array(py, values))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            outputs.extend(
+                close
+                    .iter()
+                    .zip(volume)
+                    .map(|(&close, &volume)| self.inner.append(close, volume)),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1823,14 +2076,24 @@ impl StatefulObv {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulBop {
     inner: stream::BalanceOfPower,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1839,11 +2102,14 @@ impl StatefulBop {
     fn new() -> Self {
         Self {
             inner: stream::BalanceOfPower::new(),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> f64 {
-        self.inner.append(open, high, low, close)
+        let value = self.inner.append(open, high, low, close);
+        self.outputs.push(value);
+        value
     }
 
     fn extend(
@@ -1853,7 +2119,7 @@ impl StatefulBop {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let open = open.as_slice()?;
         let high = high.as_slice()?;
         let low = low.as_slice()?;
@@ -1861,14 +2127,17 @@ impl StatefulBop {
         if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let values = open
-            .iter()
-            .zip(high)
-            .zip(low)
-            .zip(close)
-            .map(|(((&o, &h), &l), &c)| self.inner.append(o, h, l, c))
-            .collect();
-        Ok(to_py_array(py, values))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            outputs.extend(
+                open.iter()
+                    .zip(high)
+                    .zip(low)
+                    .zip(close)
+                    .map(|(((&o, &h), &l), &c)| self.inner.append(o, h, l, c)),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1876,14 +2145,24 @@ impl StatefulBop {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulWillr {
     inner: stream::WilliamsPercentR,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1893,11 +2172,12 @@ impl StatefulWillr {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: stream::WilliamsPercentR::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -1906,19 +2186,20 @@ impl StatefulWillr {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
         if high.len() != low.len() || high.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let values = high
-            .iter()
-            .zip(low)
-            .zip(close)
-            .map(|((&h, &l), &c)| self.inner.append(h, l, c));
-        Ok(to_py_array(py, values_from(values)))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, close, outputs)
+                .expect("lengths validated above")
+        });
+        Ok(())
     }
 
     #[getter]
@@ -1926,14 +2207,25 @@ impl StatefulWillr {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulAroon {
     inner: stream::Aroon,
+    downs: Vec<f64>,
+    ups: Vec<f64>,
 }
 
 #[pymethods]
@@ -1943,13 +2235,20 @@ impl StatefulAroon {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: stream::Aroon::new(timeperiod).map_err(py_value_error)?,
+            downs: Vec::new(),
+            ups: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64) -> Option<(f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(high, low)
-            .map(|value| (value.down, value.up))
+            .map(|value| (value.down, value.up));
+        let (down, up) = value.unwrap_or((f64::NAN, f64::NAN));
+        self.downs.push(down);
+        self.ups.push(up);
+        value
     }
 
     fn extend(
@@ -1957,24 +2256,30 @@ impl StatefulAroon {
         py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         if high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let mut down = Vec::with_capacity(high.len());
-        let mut up = Vec::with_capacity(high.len());
-        for (&high, &low) in high.iter().zip(low) {
-            if let Some(value) = self.inner.append(high, low) {
-                down.push(value.down);
-                up.push(value.up);
-            } else {
-                down.push(f64::NAN);
-                up.push(f64::NAN);
-            }
-        }
-        Ok((to_py_array(py, down), to_py_array(py, up)))
+        let (downs, ups) = (&mut self.downs, &mut self.ups);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, downs, ups)
+                .expect("lengths validated above")
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.downs.clone()),
+            to_py_array(py, self.ups.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.downs.len()
     }
 
     #[getter]
@@ -1984,12 +2289,15 @@ impl StatefulAroon {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.downs.clear();
+        self.ups.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulAroonosc {
     inner: stream::AroonOscillator,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -1999,11 +2307,12 @@ impl StatefulAroonosc {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: stream::AroonOscillator::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64) -> Option<f64> {
-        self.inner.append(high, low)
+        push_option(&mut self.outputs, self.inner.append(high, low))
     }
 
     fn extend(
@@ -2011,14 +2320,19 @@ impl StatefulAroonosc {
         py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         if high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let values = high.iter().zip(low).map(|(&h, &l)| self.inner.append(h, l));
-        Ok(to_py_array(py, values_from(values)))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, outputs)
+                .expect("lengths validated above")
+        });
+        Ok(())
     }
 
     #[getter]
@@ -2026,14 +2340,25 @@ impl StatefulAroonosc {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulMinmax {
     inner: stream::RollingMinmax,
+    minimums: Vec<f64>,
+    maximums: Vec<f64>,
 }
 
 #[pymethods]
@@ -2043,32 +2368,38 @@ impl StatefulMinmax {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: stream::RollingMinmax::new(timeperiod).map_err(py_value_error)?,
+            minimums: Vec::new(),
+            maximums: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<(f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(input)
-            .map(|value| (value.minimum, value.maximum))
+            .map(|value| (value.minimum, value.maximum));
+        let (minimum, maximum) = value.unwrap_or((f64::NAN, f64::NAN));
+        self.minimums.push(minimum);
+        self.maximums.push(maximum);
+        value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut minimum = Vec::with_capacity(input.len()?);
-        let mut maximum = Vec::with_capacity(input.len()?);
-        for input in input.as_slice()? {
-            if let Some(value) = self.inner.append(*input) {
-                minimum.push(value.minimum);
-                maximum.push(value.maximum);
-            } else {
-                minimum.push(f64::NAN);
-                maximum.push(f64::NAN);
-            }
-        }
-        Ok((to_py_array(py, minimum), to_py_array(py, maximum)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (minimums, maximums) = (&mut self.minimums, &mut self.maximums);
+        py.allow_threads(|| self.inner.extend_slices_into(input, minimums, maximums));
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.minimums.clone()),
+            to_py_array(py, self.maximums.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.minimums.len()
     }
 
     #[getter]
@@ -2080,12 +2411,16 @@ impl StatefulMinmax {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.minimums.clear();
+        self.maximums.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulMinmaxindex {
     inner: stream::RollingMinmaxIndex,
+    minimums: Vec<f64>,
+    maximums: Vec<f64>,
 }
 
 #[pymethods]
@@ -2095,27 +2430,34 @@ impl StatefulMinmaxindex {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: stream::RollingMinmaxIndex::new(timeperiod).map_err(py_value_error)?,
+            minimums: Vec::new(),
+            maximums: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> (usize, usize) {
         let value = self.inner.append(input);
+        self.minimums.push(value.minimum as f64);
+        self.maximums.push(value.maximum as f64);
         (value.minimum, value.maximum)
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut minimum = Vec::with_capacity(input.len()?);
-        let mut maximum = Vec::with_capacity(input.len()?);
-        for input in input.as_slice()? {
-            let value = self.inner.append(*input);
-            minimum.push(value.minimum as f64);
-            maximum.push(value.maximum as f64);
-        }
-        Ok((to_py_array(py, minimum), to_py_array(py, maximum)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (minimums, maximums) = (&mut self.minimums, &mut self.maximums);
+        py.allow_threads(|| self.inner.extend_slices_into(input, minimums, maximums));
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.minimums.clone()),
+            to_py_array(py, self.maximums.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.minimums.len()
     }
 
     #[getter]
@@ -2127,6 +2469,8 @@ impl StatefulMinmaxindex {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.minimums.clear();
+        self.maximums.clear();
     }
 }
 
@@ -2135,6 +2479,7 @@ macro_rules! unary_state_class {
         #[pyclass]
         pub struct $class {
             inner: stream::$inner,
+            outputs: Vec<f64>,
         }
 
         #[pymethods]
@@ -2143,26 +2488,31 @@ macro_rules! unary_state_class {
             fn new() -> Self {
                 Self {
                     inner: stream::$inner::new(),
+                    outputs: Vec::new(),
                 }
             }
 
             fn append(&mut self, input: f64) -> f64 {
-                self.inner
+                let value = self
+                    .inner
                     .append(input)
-                    .expect("stateless transform is warm")
+                    .expect("stateless transform is warm");
+                self.outputs.push(value);
+                value
             }
 
-            fn extend(
-                &mut self,
-                py: Python<'_>,
-                input: PyReadonlyArray1<f64>,
-            ) -> PyResult<Py<PyArray1<f64>>> {
-                let values = self
-                    .inner
-                    .extend(input.as_slice()?.iter().copied())
-                    .into_iter()
-                    .map(|value| value.expect("stateless transform is warm"));
-                Ok(to_py_array(py, values.collect()))
+            fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+                let input = input.as_slice()?;
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| {
+                    outputs.extend(
+                        self.inner
+                            .extend(input.iter().copied())
+                            .into_iter()
+                            .map(|value| value.expect("stateless transform is warm")),
+                    )
+                });
+                Ok(())
             }
 
             #[getter]
@@ -2170,8 +2520,17 @@ macro_rules! unary_state_class {
                 self.inner.value()
             }
 
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
+            }
+
             fn reset(&mut self) {
                 self.inner.reset();
+                self.outputs.clear();
             }
         }
     };
@@ -2207,6 +2566,7 @@ macro_rules! binary_state_class {
         #[pyclass]
         pub struct $class {
             inner: stream::$inner,
+            outputs: Vec<f64>,
         }
 
         #[pymethods]
@@ -2215,11 +2575,14 @@ macro_rules! binary_state_class {
             fn new() -> Self {
                 Self {
                     inner: stream::$inner::new(),
+                    outputs: Vec::new(),
                 }
             }
 
             fn append(&mut self, left: f64, right: f64) -> f64 {
-                self.inner.append(left, right)
+                let value = self.inner.append(left, right);
+                self.outputs.push(value);
+                value
             }
 
             fn extend(
@@ -2227,17 +2590,21 @@ macro_rules! binary_state_class {
                 py: Python<'_>,
                 left: PyReadonlyArray1<f64>,
                 right: PyReadonlyArray1<f64>,
-            ) -> PyResult<Py<PyArray1<f64>>> {
+            ) -> PyResult<()> {
                 let left = left.as_slice()?;
                 let right = right.as_slice()?;
                 if left.len() != right.len() {
                     return Err(PyValueError::new_err("inputs must have equal lengths"));
                 }
-                let values = left
-                    .iter()
-                    .zip(right)
-                    .map(|(&left, &right)| self.inner.append(left, right));
-                Ok(to_py_array(py, values.collect()))
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| {
+                    outputs.extend(
+                        left.iter()
+                            .zip(right)
+                            .map(|(&left, &right)| self.inner.append(left, right)),
+                    )
+                });
+                Ok(())
             }
 
             #[getter]
@@ -2245,8 +2612,17 @@ macro_rules! binary_state_class {
                 self.inner.value()
             }
 
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
+            }
+
             fn reset(&mut self) {
                 self.inner.reset();
+                self.outputs.clear();
             }
         }
     };
@@ -2263,6 +2639,7 @@ macro_rules! price3_state_class {
         #[pyclass]
         pub struct $class {
             inner: stream::$inner,
+            outputs: Vec<f64>,
         }
 
         #[pymethods]
@@ -2271,11 +2648,14 @@ macro_rules! price3_state_class {
             fn new() -> Self {
                 Self {
                     inner: stream::$inner::new(),
+                    outputs: Vec::new(),
                 }
             }
 
             fn append(&mut self, high: f64, low: f64, close: f64) -> f64 {
-                self.inner.append(high, low, close)
+                let value = self.inner.append(high, low, close);
+                self.outputs.push(value);
+                value
             }
 
             fn extend(
@@ -2284,19 +2664,23 @@ macro_rules! price3_state_class {
                 high: PyReadonlyArray1<f64>,
                 low: PyReadonlyArray1<f64>,
                 close: PyReadonlyArray1<f64>,
-            ) -> PyResult<Py<PyArray1<f64>>> {
+            ) -> PyResult<()> {
                 let high = high.as_slice()?;
                 let low = low.as_slice()?;
                 let close = close.as_slice()?;
                 if high.len() != low.len() || high.len() != close.len() {
                     return Err(PyValueError::new_err("inputs must have equal lengths"));
                 }
-                let values = high
-                    .iter()
-                    .zip(low)
-                    .zip(close)
-                    .map(|((&high, &low), &close)| self.inner.append(high, low, close));
-                Ok(to_py_array(py, values.collect()))
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| {
+                    outputs.extend(
+                        high.iter()
+                            .zip(low)
+                            .zip(close)
+                            .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
+                    )
+                });
+                Ok(())
             }
 
             #[getter]
@@ -2304,8 +2688,17 @@ macro_rules! price3_state_class {
                 self.inner.value()
             }
 
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
+            }
+
             fn reset(&mut self) {
                 self.inner.reset();
+                self.outputs.clear();
             }
         }
     };
@@ -2317,6 +2710,7 @@ price3_state_class!(StatefulWclprice, WeightedClose);
 #[pyclass]
 pub struct StatefulAvgprice {
     inner: stream::AveragePrice,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2325,11 +2719,14 @@ impl StatefulAvgprice {
     fn new() -> Self {
         Self {
             inner: stream::AveragePrice::new(),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> f64 {
-        self.inner.append(open, high, low, close)
+        let value = self.inner.append(open, high, low, close);
+        self.outputs.push(value);
+        value
     }
 
     fn extend(
@@ -2339,7 +2736,7 @@ impl StatefulAvgprice {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let open = open.as_slice()?;
         let high = high.as_slice()?;
         let low = low.as_slice()?;
@@ -2347,13 +2744,15 @@ impl StatefulAvgprice {
         if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let values = open
-            .iter()
-            .zip(high)
-            .zip(low)
-            .zip(close)
-            .map(|(((&open, &high), &low), &close)| self.inner.append(open, high, low, close));
-        Ok(to_py_array(py, values.collect()))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            outputs.extend(
+                open.iter().zip(high).zip(low).zip(close).map(
+                    |(((&open, &high), &low), &close)| self.inner.append(open, high, low, close),
+                ),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -2361,14 +2760,24 @@ impl StatefulAvgprice {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulMidprice {
     inner: RollingMidprice,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2378,11 +2787,12 @@ impl StatefulMidprice {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: RollingMidprice::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64) -> Option<f64> {
-        self.inner.append(high, low)
+        push_option(&mut self.outputs, self.inner.append(high, low))
     }
 
     fn extend(
@@ -2390,7 +2800,7 @@ impl StatefulMidprice {
         py: Python<'_>,
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         if high.len() != low.len() {
@@ -2398,11 +2808,13 @@ impl StatefulMidprice {
                 "high and low must have equal lengths",
             ));
         }
-        let values = high
-            .iter()
-            .zip(low)
-            .map(|(&high, &low)| self.inner.append(high, low));
-        Ok(to_py_array(py, values_from(values)))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, outputs)
+                .expect("lengths validated above")
+        });
+        Ok(())
     }
 
     #[getter]
@@ -2410,14 +2822,24 @@ impl StatefulMidprice {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulSma {
     inner: SimpleMovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2427,20 +2849,19 @@ impl StatefulSma {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: SimpleMovingAverage::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -2448,14 +2869,24 @@ impl StatefulSma {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulEma {
     inner: ExponentialMovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2465,20 +2896,19 @@ impl StatefulEma {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: ExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -2486,14 +2916,24 @@ impl StatefulEma {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulWma {
     inner: WeightedMovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2503,20 +2943,19 @@ impl StatefulWma {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: WeightedMovingAverage::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -2524,14 +2963,24 @@ impl StatefulWma {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulDema {
     inner: DoubleExponentialMovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2541,20 +2990,19 @@ impl StatefulDema {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: DoubleExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -2562,14 +3010,24 @@ impl StatefulDema {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulTema {
     inner: TripleExponentialMovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2579,20 +3037,19 @@ impl StatefulTema {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: TripleExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -2600,14 +3057,24 @@ impl StatefulTema {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulTrima {
     inner: TriangularMovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2617,20 +3084,19 @@ impl StatefulTrima {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: TriangularMovingAverage::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -2638,14 +3104,24 @@ impl StatefulTrima {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulRsi {
     inner: RelativeStrengthIndex,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2655,20 +3131,19 @@ impl StatefulRsi {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: RelativeStrengthIndex::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        let values = self.inner.extend(input.as_slice()?.iter().copied());
-        Ok(to_py_array(py, values_from(values)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -2676,14 +3151,24 @@ impl StatefulRsi {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulAtr {
     inner: AverageTrueRange,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2693,11 +3178,12 @@ impl StatefulAtr {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: AverageTrueRange::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -2706,7 +3192,7 @@ impl StatefulAtr {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -2715,12 +3201,17 @@ impl StatefulAtr {
                 "high, low, and close must have equal lengths",
             ));
         }
-        let values = high
-            .iter()
-            .zip(low.iter())
-            .zip(close.iter())
-            .map(|((&high, &low), &close)| self.inner.append(high, low, close));
-        Ok(to_py_array(py, values_from(values)))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            extend_from_options(
+                outputs,
+                high.iter()
+                    .zip(low.iter())
+                    .zip(close.iter())
+                    .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -2728,14 +3219,24 @@ impl StatefulAtr {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulTrange {
     inner: TrueRange,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2744,11 +3245,12 @@ impl StatefulTrange {
     fn new() -> Self {
         Self {
             inner: TrueRange::new(),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -2757,7 +3259,7 @@ impl StatefulTrange {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -2766,29 +3268,41 @@ impl StatefulTrange {
                 "high, low, and close must have equal lengths",
             ));
         }
-        Ok(to_py_array(
-            py,
-            values_from(
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            extend_from_options(
+                outputs,
                 high.iter()
                     .zip(low)
                     .zip(close)
                     .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
-            ),
-        ))
+            )
+        });
+        Ok(())
     }
 
     #[getter]
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulNatr {
     inner: NormalizedAverageTrueRange,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2798,11 +3312,12 @@ impl StatefulNatr {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: NormalizedAverageTrueRange::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -2811,7 +3326,7 @@ impl StatefulNatr {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -2820,84 +3335,117 @@ impl StatefulNatr {
                 "high, low, and close must have equal lengths",
             ));
         }
-        Ok(to_py_array(
-            py,
-            values_from(
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            extend_from_options(
+                outputs,
                 high.iter()
                     .zip(low)
                     .zip(close)
                     .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
-            ),
-        ))
+            )
+        });
+        Ok(())
     }
 
     #[getter]
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
 #[pyclass]
 pub struct StatefulMacd {
     inner: MovingAverageConvergenceDivergence,
+    macds: Vec<f64>,
+    signals: Vec<f64>,
+    histograms: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulMacdFix {
     inner: MovingAverageConvergenceDivergenceFixed,
+    macds: Vec<f64>,
+    signals: Vec<f64>,
+    histograms: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulMacdExt {
     inner: MovingAverageConvergenceDivergenceExtended,
+    macds: Vec<f64>,
+    signals: Vec<f64>,
+    histograms: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulMavp {
     inner: VariablePeriodMovingAverage,
+    outputs: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulHtTrendline {
     inner: HilbertTransformTrendline,
+    outputs: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulAdx {
     inner: AverageDirectionalIndex,
+    outputs: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulAdxr {
     inner: AverageDirectionalIndexRating,
+    outputs: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulDx {
     inner: DirectionalMovementIndex,
+    outputs: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulStochf {
     inner: FastStochasticOscillator,
+    fastks: Vec<f64>,
+    fastds: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulStoch {
     inner: StochasticOscillator,
+    slowks: Vec<f64>,
+    slowds: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulStochrsi {
     inner: StochasticRelativeStrengthIndex,
+    fastks: Vec<f64>,
+    fastds: Vec<f64>,
 }
 
 #[pyclass]
 pub struct StatefulMama {
     inner: MesaAdaptiveMovingAverage,
+    mamas: Vec<f64>,
+    famas: Vec<f64>,
 }
 
 #[pymethods]
@@ -2907,32 +3455,50 @@ impl StatefulMama {
     fn new(fastlimit: f64, slowlimit: f64) -> PyResult<Self> {
         Ok(Self {
             inner: MesaAdaptiveMovingAverage::new(fastlimit, slowlimit).map_err(py_value_error)?,
+            mamas: Vec::new(),
+            famas: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<(f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(input)
-            .map(|value| (value.mama, value.fama))
+            .map(|value| (value.mama, value.fama));
+        let (mama, fama) = value.unwrap_or((f64::NAN, f64::NAN));
+        self.mamas.push(mama);
+        self.famas.push(fama);
+        value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut mama = Vec::with_capacity(input.len()?);
-        let mut fama = Vec::with_capacity(input.len()?);
-        for input in input.as_slice()?.iter().copied() {
-            if let Some(value) = self.inner.append(input) {
-                mama.push(value.mama);
-                fama.push(value.fama);
-            } else {
-                mama.push(f64::NAN);
-                fama.push(f64::NAN);
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (mamas, famas) = (&mut self.mamas, &mut self.famas);
+        py.allow_threads(|| {
+            mamas.reserve(input.len());
+            famas.reserve(input.len());
+            for input in input.iter().copied() {
+                if let Some(value) = self.inner.append(input) {
+                    mamas.push(value.mama);
+                    famas.push(value.fama);
+                } else {
+                    mamas.push(f64::NAN);
+                    famas.push(f64::NAN);
+                }
             }
-        }
-        Ok((to_py_array(py, mama), to_py_array(py, fama)))
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.mamas.clone()),
+            to_py_array(py, self.famas.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.mamas.len()
     }
 
     #[getter]
@@ -2942,6 +3508,8 @@ impl StatefulMama {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.mamas.clear();
+        self.famas.clear();
     }
 }
 
@@ -2953,42 +3521,45 @@ impl StatefulMacd {
         Ok(Self {
             inner: MovingAverageConvergenceDivergence::new(fastperiod, slowperiod, signalperiod)
                 .map_err(py_value_error)?,
+            macds: Vec::new(),
+            signals: Vec::new(),
+            histograms: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(input)
-            .map(|value| (value.macd, value.signal, value.histogram))
+            .map(|value| (value.macd, value.signal, value.histogram));
+        let (macd, signal, histogram) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
+        self.macds.push(macd);
+        self.signals.push(signal);
+        self.histograms.push(histogram);
+        value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut macd = Vec::with_capacity(input.len()?);
-        let mut signal = Vec::with_capacity(input.len()?);
-        let mut histogram = Vec::with_capacity(input.len()?);
-        for value in input.as_slice()?.iter().copied() {
-            match self.inner.append(value) {
-                Some(value) => {
-                    macd.push(value.macd);
-                    signal.push(value.signal);
-                    histogram.push(value.histogram);
-                }
-                None => {
-                    macd.push(f64::NAN);
-                    signal.push(f64::NAN);
-                    histogram.push(f64::NAN);
-                }
-            }
-        }
-        Ok((
-            to_py_array(py, macd),
-            to_py_array(py, signal),
-            to_py_array(py, histogram),
-        ))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (macds, signals, histograms) =
+            (&mut self.macds, &mut self.signals, &mut self.histograms);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(input, macds, signals, histograms)
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.macds.clone()),
+            to_py_array(py, self.signals.clone()),
+            to_py_array(py, self.histograms.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.macds.len()
     }
 
     #[getter]
@@ -3000,6 +3571,9 @@ impl StatefulMacd {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.macds.clear();
+        self.signals.clear();
+        self.histograms.clear();
     }
 }
 
@@ -3011,42 +3585,45 @@ impl StatefulMacdFix {
         Ok(Self {
             inner: MovingAverageConvergenceDivergenceFixed::new(signalperiod)
                 .map_err(py_value_error)?,
+            macds: Vec::new(),
+            signals: Vec::new(),
+            histograms: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(input)
-            .map(|value| (value.macd, value.signal, value.histogram))
+            .map(|value| (value.macd, value.signal, value.histogram));
+        let (macd, signal, histogram) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
+        self.macds.push(macd);
+        self.signals.push(signal);
+        self.histograms.push(histogram);
+        value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut macd = Vec::with_capacity(input.len()?);
-        let mut signal = Vec::with_capacity(input.len()?);
-        let mut histogram = Vec::with_capacity(input.len()?);
-        for value in input.as_slice()?.iter().copied() {
-            match self.inner.append(value) {
-                Some(value) => {
-                    macd.push(value.macd);
-                    signal.push(value.signal);
-                    histogram.push(value.histogram);
-                }
-                None => {
-                    macd.push(f64::NAN);
-                    signal.push(f64::NAN);
-                    histogram.push(f64::NAN);
-                }
-            }
-        }
-        Ok((
-            to_py_array(py, macd),
-            to_py_array(py, signal),
-            to_py_array(py, histogram),
-        ))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (macds, signals, histograms) =
+            (&mut self.macds, &mut self.signals, &mut self.histograms);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(input, macds, signals, histograms)
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.macds.clone()),
+            to_py_array(py, self.signals.clone()),
+            to_py_array(py, self.histograms.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.macds.len()
     }
 
     #[getter]
@@ -3058,6 +3635,9 @@ impl StatefulMacdFix {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.macds.clear();
+        self.signals.clear();
+        self.histograms.clear();
     }
 }
 
@@ -3070,13 +3650,20 @@ impl StatefulStochf {
         Ok(Self {
             inner: FastStochasticOscillator::new(fastk_period, fastd_period, ma_type)
                 .map_err(py_value_error)?,
+            fastks: Vec::new(),
+            fastds: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<(f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(high, low, close)
-            .map(|value| (value.fastk, value.fastd))
+            .map(|value| (value.fastk, value.fastd));
+        let (fastk, fastd) = value.unwrap_or((f64::NAN, f64::NAN));
+        self.fastks.push(fastk);
+        self.fastds.push(fastd);
+        value
     }
 
     fn extend(
@@ -3085,7 +3672,7 @@ impl StatefulStochf {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -3094,21 +3681,24 @@ impl StatefulStochf {
                 "high, low, and close must have equal lengths",
             ));
         }
-        let mut fastk = Vec::with_capacity(high.len());
-        let mut fastd = Vec::with_capacity(high.len());
-        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
-            match self.inner.append(high, low, close) {
-                Some(value) => {
-                    fastk.push(value.fastk);
-                    fastd.push(value.fastd);
-                }
-                None => {
-                    fastk.push(f64::NAN);
-                    fastd.push(f64::NAN);
-                }
-            }
-        }
-        Ok((to_py_array(py, fastk), to_py_array(py, fastd)))
+        let (fastks, fastds) = (&mut self.fastks, &mut self.fastds);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, close, fastks, fastds)
+                .expect("lengths validated above")
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.fastks.clone()),
+            to_py_array(py, self.fastds.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.fastks.len()
     }
 
     #[getter]
@@ -3118,6 +3708,8 @@ impl StatefulStochf {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.fastks.clear();
+        self.fastds.clear();
     }
 }
 
@@ -3143,13 +3735,20 @@ impl StatefulStoch {
                 slowd_type,
             )
             .map_err(py_value_error)?,
+            slowks: Vec::new(),
+            slowds: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<(f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(high, low, close)
-            .map(|value| (value.slowk, value.slowd))
+            .map(|value| (value.slowk, value.slowd));
+        let (slowk, slowd) = value.unwrap_or((f64::NAN, f64::NAN));
+        self.slowks.push(slowk);
+        self.slowds.push(slowd);
+        value
     }
 
     fn extend(
@@ -3158,7 +3757,7 @@ impl StatefulStoch {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -3167,21 +3766,24 @@ impl StatefulStoch {
                 "high, low, and close must have equal lengths",
             ));
         }
-        let mut slowk = Vec::with_capacity(high.len());
-        let mut slowd = Vec::with_capacity(high.len());
-        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
-            match self.inner.append(high, low, close) {
-                Some(value) => {
-                    slowk.push(value.slowk);
-                    slowd.push(value.slowd);
-                }
-                None => {
-                    slowk.push(f64::NAN);
-                    slowd.push(f64::NAN);
-                }
-            }
-        }
-        Ok((to_py_array(py, slowk), to_py_array(py, slowd)))
+        let (slowks, slowds) = (&mut self.slowks, &mut self.slowds);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, close, slowks, slowds)
+                .expect("lengths validated above")
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.slowks.clone()),
+            to_py_array(py, self.slowds.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.slowks.len()
     }
 
     #[getter]
@@ -3191,6 +3793,8 @@ impl StatefulStoch {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.slowks.clear();
+        self.slowds.clear();
     }
 }
 
@@ -3213,35 +3817,38 @@ impl StatefulStochrsi {
                 ma_type,
             )
             .map_err(py_value_error)?,
+            fastks: Vec::new(),
+            fastds: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<(f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(input)
-            .map(|value| (value.fastk, value.fastd))
+            .map(|value| (value.fastk, value.fastd));
+        let (fastk, fastd) = value.unwrap_or((f64::NAN, f64::NAN));
+        self.fastks.push(fastk);
+        self.fastds.push(fastd);
+        value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut fastk = Vec::with_capacity(input.len()?);
-        let mut fastd = Vec::with_capacity(input.len()?);
-        for input in input.as_slice()?.iter().copied() {
-            match self.inner.append(input) {
-                Some(value) => {
-                    fastk.push(value.fastk);
-                    fastd.push(value.fastd);
-                }
-                None => {
-                    fastk.push(f64::NAN);
-                    fastd.push(f64::NAN);
-                }
-            }
-        }
-        Ok((to_py_array(py, fastk), to_py_array(py, fastd)))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (fastks, fastds) = (&mut self.fastks, &mut self.fastds);
+        py.allow_threads(|| self.inner.extend_slices_into(input, fastks, fastds));
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.fastks.clone()),
+            to_py_array(py, self.fastds.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.fastks.len()
     }
 
     #[getter]
@@ -3251,6 +3858,8 @@ impl StatefulStochrsi {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.fastks.clear();
+        self.fastds.clear();
     }
 }
 
@@ -3279,42 +3888,45 @@ impl StatefulMacdExt {
                 signal_type,
             )
             .map_err(py_value_error)?,
+            macds: Vec::new(),
+            signals: Vec::new(),
+            histograms: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
-        self.inner
+        let value = self
+            .inner
             .append(input)
-            .map(|value| (value.macd, value.signal, value.histogram))
+            .map(|value| (value.macd, value.signal, value.histogram));
+        let (macd, signal, histogram) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
+        self.macds.push(macd);
+        self.signals.push(signal);
+        self.histograms.push(histogram);
+        value
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<(Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>)> {
-        let mut macd = Vec::with_capacity(input.len()?);
-        let mut signal = Vec::with_capacity(input.len()?);
-        let mut histogram = Vec::with_capacity(input.len()?);
-        for input in input.as_slice()?.iter().copied() {
-            match self.inner.append(input) {
-                Some(value) => {
-                    macd.push(value.macd);
-                    signal.push(value.signal);
-                    histogram.push(value.histogram);
-                }
-                None => {
-                    macd.push(f64::NAN);
-                    signal.push(f64::NAN);
-                    histogram.push(f64::NAN);
-                }
-            }
-        }
-        Ok((
-            to_py_array(py, macd),
-            to_py_array(py, signal),
-            to_py_array(py, histogram),
-        ))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (macds, signals, histograms) =
+            (&mut self.macds, &mut self.signals, &mut self.histograms);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(input, macds, signals, histograms)
+        });
+        Ok(())
+    }
+
+    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
+        (
+            to_py_array(py, self.macds.clone()),
+            to_py_array(py, self.signals.clone()),
+            to_py_array(py, self.histograms.clone()),
+        )
+    }
+
+    fn __len__(&self) -> usize {
+        self.macds.len()
     }
 
     #[getter]
@@ -3326,6 +3938,9 @@ impl StatefulMacdExt {
 
     fn reset(&mut self) {
         self.inner.reset();
+        self.macds.clear();
+        self.signals.clear();
+        self.histograms.clear();
     }
 }
 
@@ -3338,11 +3953,12 @@ impl StatefulMavp {
         Ok(Self {
             inner: VariablePeriodMovingAverage::new(minperiod, maxperiod, ma_type)
                 .map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, input: f64, period: f64) -> Option<f64> {
-        self.inner.append(input, period)
+        push_option(&mut self.outputs, self.inner.append(input, period))
     }
 
     fn extend(
@@ -3350,7 +3966,7 @@ impl StatefulMavp {
         py: Python<'_>,
         input: PyReadonlyArray1<f64>,
         periods: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let input = input.as_slice()?;
         let periods = periods.as_slice()?;
         if input.len() != periods.len() {
@@ -3358,14 +3974,16 @@ impl StatefulMavp {
                 "input and periods must have equal lengths",
             ));
         }
-        Ok(to_py_array(
-            py,
-            input
-                .iter()
-                .zip(periods)
-                .map(|(&input, &period)| self.inner.append(input, period).unwrap_or(f64::NAN))
-                .collect(),
-        ))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            outputs.extend(
+                input
+                    .iter()
+                    .zip(periods)
+                    .map(|(&input, &period)| self.inner.append(input, period).unwrap_or(f64::NAN)),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -3373,8 +3991,17 @@ impl StatefulMavp {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
@@ -3384,26 +4011,25 @@ impl StatefulHtTrendline {
     fn new() -> Self {
         Self {
             inner: HilbertTransformTrendline::new(),
+            outputs: Vec::new(),
         }
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.inner.append(input)
+        push_option(&mut self.outputs, self.inner.append(input))
     }
 
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        input: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
-        Ok(to_py_array(
-            py,
-            input
-                .as_slice()?
-                .iter()
-                .map(|&input| self.inner.append(input).unwrap_or(f64::NAN))
-                .collect(),
-        ))
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            outputs.extend(
+                input
+                    .iter()
+                    .map(|&input| self.inner.append(input).unwrap_or(f64::NAN)),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -3411,8 +4037,17 @@ impl StatefulHtTrendline {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
@@ -3423,11 +4058,12 @@ impl StatefulAdx {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: AverageDirectionalIndex::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -3436,7 +4072,7 @@ impl StatefulAdx {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -3445,16 +4081,9 @@ impl StatefulAdx {
                 "high, low, and close must have equal lengths",
             ));
         }
-        Ok(to_py_array(
-            py,
-            high.iter()
-                .zip(low)
-                .zip(close)
-                .map(|((&high, &low), &close)| {
-                    self.inner.append(high, low, close).unwrap_or(f64::NAN)
-                })
-                .collect(),
-        ))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slices_into(high, low, close, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -3462,8 +4091,17 @@ impl StatefulAdx {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
@@ -3474,11 +4112,12 @@ impl StatefulAdxr {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: AverageDirectionalIndexRating::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -3487,7 +4126,7 @@ impl StatefulAdxr {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -3496,16 +4135,9 @@ impl StatefulAdxr {
                 "high, low, and close must have equal lengths",
             ));
         }
-        Ok(to_py_array(
-            py,
-            high.iter()
-                .zip(low)
-                .zip(close)
-                .map(|((&high, &low), &close)| {
-                    self.inner.append(high, low, close).unwrap_or(f64::NAN)
-                })
-                .collect(),
-        ))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slices_into(high, low, close, outputs));
+        Ok(())
     }
 
     #[getter]
@@ -3513,8 +4145,17 @@ impl StatefulAdxr {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }
 
@@ -3525,11 +4166,12 @@ impl StatefulDx {
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
             inner: DirectionalMovementIndex::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.inner.append(high, low, close)
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
 
     fn extend(
@@ -3538,7 +4180,7 @@ impl StatefulDx {
         high: PyReadonlyArray1<f64>,
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
-    ) -> PyResult<Py<PyArray1<f64>>> {
+    ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
@@ -3547,16 +4189,18 @@ impl StatefulDx {
                 "high, low, and close must have equal lengths",
             ));
         }
-        Ok(to_py_array(
-            py,
-            high.iter()
-                .zip(low)
-                .zip(close)
-                .map(|((&high, &low), &close)| {
-                    self.inner.append(high, low, close).unwrap_or(f64::NAN)
-                })
-                .collect(),
-        ))
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| {
+            outputs.extend(
+                high.iter()
+                    .zip(low)
+                    .zip(close)
+                    .map(|((&high, &low), &close)| {
+                        self.inner.append(high, low, close).unwrap_or(f64::NAN)
+                    }),
+            )
+        });
+        Ok(())
     }
 
     #[getter]
@@ -3564,7 +4208,16 @@ impl StatefulDx {
         self.inner.value()
     }
 
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
+        self.outputs.clear();
     }
 }

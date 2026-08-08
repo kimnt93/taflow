@@ -3,6 +3,41 @@
 //! Each TA implementation lives in its own module and retains only the bounded
 //! recurrence state required to process newly appended bars.
 
+#[cfg(test)]
+pub(crate) mod tests_extrema_support {
+    //! Shared adversarial datasets for the extrema-family bit-exactness tests.
+
+    /// Random, monotonic increasing/decreasing, constant, and quantized
+    /// (repeated equal extremes) series of the requested length.
+    pub(crate) fn datasets(len: usize) -> Vec<Vec<f64>> {
+        let mut state = 0x9E3779B97F4A7C15_u64;
+        let random: Vec<f64> = (0..len)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                ((state >> 33) % 997) as f64 / 7.0
+            })
+            .collect();
+        let increasing: Vec<f64> = (0..len).map(|i| i as f64 * 0.5).collect();
+        let decreasing: Vec<f64> = (0..len).map(|i| (len as f64) - i as f64 * 0.5).collect();
+        let constant = vec![13.25_f64; len];
+        let quantized: Vec<f64> = (0..len).map(|i| ((i * 7) % 5) as f64).collect();
+        vec![random, increasing, decreasing, constant, quantized]
+    }
+
+    /// Periods 2/5/30/200 crossed with lengths 0, 1, p-1, p, p+1, 10_000.
+    pub(crate) fn periods_and_lengths() -> Vec<(usize, usize)> {
+        let mut cases = Vec::new();
+        for &period in &[2usize, 5, 30, 200] {
+            for &len in &[0usize, 1, period - 1, period, period + 1, 10_000] {
+                cases.push((period, len));
+            }
+        }
+        cases
+    }
+}
+
 mod accbands;
 mod adx;
 mod adxr;
@@ -115,7 +150,9 @@ mod rolling_statistics;
 mod rolling_sum;
 mod rsi;
 mod session_flags;
+pub(crate) mod sorted_ring;
 mod statistic;
+mod vhgw;
 mod volume_states;
 pub use session_flags::session_flags;
 mod cumulative_count;
@@ -325,7 +362,7 @@ pub use ppo::{percentage_price_oscillator, PercentagePriceOscillator};
 pub use premium_discount::PremiumDiscount;
 pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlope, Tsf};
 pub use rmi::RelativeMomentumIndex;
-pub(crate) use rolling_extrema::RollingExtrema;
+pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 pub use rolling_extrema::{
     RollingArgmax, RollingArgmin, RollingMax, RollingMin, RollingMinmax, RollingMinmaxIndex,
     RollingMinmaxIndexValue, RollingMinmaxValue,

@@ -28,7 +28,6 @@ class BalanceOfPower:
     ) -> None:
         """Create native state and optionally process initial OHLC data."""
         self._state = StatefulBop()
-        self._values: list[float] = []
         if any(value is not None for value in (_open, high, low, close)):
             self.extend(_open, high, low, close)
 
@@ -45,8 +44,7 @@ class BalanceOfPower:
         object
             Updated state, converted values, or aligned output.
         """
-        value = self._state.append(_open, high, low, close)
-        self._values.append(value)
+        self._state.append(_open, high, low, close)
         return self
 
     def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
@@ -62,13 +60,12 @@ class BalanceOfPower:
         object
             Updated state, converted values, or aligned output.
         """
-        values = self._state.extend(
+        self._state.extend(
             as_float64_series(_open),
             as_float64_series(high),
             as_float64_series(low),
             as_float64_series(close),
         )
-        self._values.extend(values.tolist())
         return self
 
     def compute(self) -> object:
@@ -81,7 +78,7 @@ class BalanceOfPower:
         """
         import numpy as np
 
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self) -> object:
@@ -103,5 +100,7 @@ class BalanceOfPower:
             Updated state, converted values, or aligned output.
         """
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)

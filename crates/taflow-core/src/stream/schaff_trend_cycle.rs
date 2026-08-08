@@ -17,11 +17,6 @@ pub fn schaff_trend_cycle(
     let mut stc_out = Vec::with_capacity(close.len());
     let mut macd = Vec::with_capacity(close.len());
     let mut stoch = Vec::with_capacity(close.len());
-    for &close in close {
-        let value = state.append(close);
-        stc_out.push(value.stc);
-        macd.push(value.macd);
-        stoch.push(value.stoch);
-    }
+    state.extend_slices_into(close, &mut stc_out, &mut macd, &mut stoch);
     Ok((stc_out, macd, stoch))
 }

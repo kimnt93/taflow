@@ -23,10 +23,13 @@ impl McGinleyDynamicOperator {
         self.values.push(v);
         v
     }
-    fn extend(&mut self, close: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &v in close.as_slice()? {
-            self.append(v);
-        }
+    fn extend(&mut self, py: Python<'_>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let close = close.as_slice()?;
+        py.allow_threads(|| {
+            for &v in close {
+                self.append(v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

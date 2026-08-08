@@ -22,6 +22,7 @@ impl NegativeVolumeIndexOperator {
     }
     fn extend(
         &mut self,
+        py: Python<'_>,
         close: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
@@ -31,9 +32,11 @@ impl NegativeVolumeIndexOperator {
                 "inputs must have equal lengths",
             ));
         }
-        for (&c, &v) in close.iter().zip(volume) {
-            self.append(c, v);
-        }
+        py.allow_threads(|| {
+            for (&c, &v) in close.iter().zip(volume) {
+                self.append(c, v);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

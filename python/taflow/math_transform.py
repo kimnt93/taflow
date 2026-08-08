@@ -24,22 +24,19 @@ class _MathUnary:
 
     def __init__(self, _input: Any | None = None) -> None:
         self._state = self._native_cls()
-        self._values: list[float] = []
         if _input is not None:
             self.extend(_input)
 
     def append(self, _input: float):
-        value = self._state.append(float(_input))
-        self._values.append(np.nan if value is None else float(value))
+        self._state.append(float(_input))
         return self
 
     def extend(self, _input: Any):
-        values = self._state.extend(as_float64_series(_input))
-        self._values.extend(np.asarray(values, dtype=np.float64).tolist())
+        self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self):
@@ -47,8 +44,10 @@ class _MathUnary:
 
     def reset(self):
         self._state.reset()
-        self._values.clear()
         return self
+
+    def __len__(self) -> int:
+        return len(self._state)
 
 
 class _MathBinary:
@@ -56,31 +55,31 @@ class _MathBinary:
 
     def __init__(self, left: Any | None = None, right: Any | None = None) -> None:
         self._state = self._native_cls()
-        self._values: list[float] = []
         if left is not None and right is not None:
             self.extend(left, right)
 
     def append(self, left: float, right: float):
-        value = self._state.append(float(left), float(right))
-        self._values.append(float(value))
+        self._state.append(float(left), float(right))
         return self
 
     def extend(self, left: Any, right: Any):
         a, b = as_float64_series(left), as_float64_series(right)
         if len(a) != len(b):
             raise ValueError("inputs must have equal lengths")
-        for x, y in zip(a, b):
-            self.append(x, y)
+        self._state.extend(a, b)
         return self
 
     def compute(self) -> np.ndarray:
-        return np.asarray(self._values, dtype=np.float64)
+        return self._state.compute()
 
     @property
     def value(self): return self._state.value
 
+    def __len__(self) -> int:
+        return len(self._state)
+
     def reset(self):
-        self._state.reset(); self._values.clear(); return self
+        self._state.reset(); return self
 
 
 class MathAbs(_MathUnary): _native_cls = StatefulMathAbs

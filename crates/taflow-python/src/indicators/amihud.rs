@@ -29,6 +29,7 @@ impl AmihudOperator {
 
     fn extend(
         &mut self,
+        py: Python<'_>,
         close: PyReadonlyArray1<f64>,
         volume: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
@@ -36,9 +37,11 @@ impl AmihudOperator {
         if close.len() != volume.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        for (&close, &volume) in close.iter().zip(volume) {
-            self.append(close, volume);
-        }
+        py.allow_threads(|| {
+            for (&close, &volume) in close.iter().zip(volume) {
+                self.append(close, volume);
+            }
+        });
         Ok(())
     }
 

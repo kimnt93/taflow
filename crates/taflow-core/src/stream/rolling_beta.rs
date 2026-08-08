@@ -74,7 +74,12 @@ pub fn rolling_beta(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
         0.0
     };
 
-    // Slide the window.
+    // Slide the window, reseeding the sums on the same absolute-append
+    // cadence as the streaming state (returns are appended from bar 1, so
+    // the streaming count at bar `i` is `i`) to bound drift. See
+    // `PAIR_MOMENTS_RESEED_INTERVAL` — streaming and batch stay bitwise
+    // equal. `syy` is not tracked here; its streaming reseed is independent.
+    let reseed_interval = super::rolling_statistics::PAIR_MOMENTS_RESEED_INTERVAL as usize;
     for i in (timeperiod + 1)..len {
         // Remove rx[i - timeperiod - 1] and add rx[i - 1].
         let old_idx = i - timeperiod - 1;
@@ -87,6 +92,23 @@ pub fn rolling_beta(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
         sy += ny - oy;
         sxx += nx * nx - ox * ox;
         sxy += nx * ny - ox * oy;
+
+        if i % reseed_interval == 0 {
+            // Serial oldest-to-newest recomputation over the current window,
+            // identical to `RollingPairMoments::reseed_serial`.
+            sx = 0.0;
+            sy = 0.0;
+            sxx = 0.0;
+            sxy = 0.0;
+            for j in i - timeperiod..i {
+                let x = rx[j];
+                let y = ry[j];
+                sx += x;
+                sy += y;
+                sxx += x * x;
+                sxy += x * y;
+            }
+        }
 
         let denom = n * sxx - sx * sx;
         output[i] = if denom > 0.0 {

@@ -21,10 +21,13 @@ impl HilbertTransformTrendMode {
         self.outputs.push(value.unwrap_or(0));
         value
     }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &input in input.as_slice()? {
-            self.append(input);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        py.allow_threads(|| {
+            for &input in input {
+                self.append(input);
+            }
+        });
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<i32>> {
