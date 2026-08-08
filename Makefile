@@ -16,7 +16,7 @@ NATIVE_FLAGS  := -C target-cpu=native
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build build-native wheel check test test-rust \
-        test-python verify bench fmt lint clean
+        test-python verify bench docs fmt lint clean
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -45,7 +45,7 @@ wheel: ## Produce a distributable wheel in dist/
 
 # ------------------------------------------------------------ correctness ----
 
-check: ## Verify the Python implementation: unit tests + oracle parity for all 287 functions
+check: ## Verify the Python implementation: unit tests (incl. doc examples) + oracle parity
 	$(PYTHON) -m pytest -q
 	cd verify && uv sync && uv run python verify.py $(ARGS)
 
@@ -66,6 +66,9 @@ bench: ## Benchmark against TA-Lib; narrow with ARGS="SMA MAX"
 	cd verify && uv sync && uv run python benchmark.py $(ARGS)
 
 # ------------------------------------------------------------- housekeeping ----
+
+docs: ## Regenerate docs/INDICATORS.md from the installed package
+	$(PYTHON) scripts/gen_indicators_doc.py
 
 fmt: ## Format Rust sources
 	cargo fmt --all

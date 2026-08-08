@@ -1,6 +1,6 @@
 # TAFlow verification benchmark
 
-Generated 2026-08-08 from 287 functions.
+Generated 2026-08-09 from 287 functions.
 
 | Canonical class | TA-Lib | Correctness | Largest vector bars/s | Speedup | Append µs | 4T vector scaling |
 |---|---|---|---:|---:|---:|---:|
@@ -22,7 +22,7 @@ Generated 2026-08-08 from 287 functions.
 | BollingerBands | BBANDS | MATCH | 96.80M | 0.96× | 0.271 | 3.71× |
 | RollingBeta | BETA | MATCH | 94.44M | 0.59× | 0.216 | 3.10× |
 | BalanceOfPower | BOP | MATCH | 680.41M | 1.17× | 0.253 | 3.61× |
-| CommodityChannelIndex | CCI | MISMATCH | 53.62M | 1.18× | 0.224 | 3.00× |
+| CommodityChannelIndex | CCI | MATCH | 49.80M | 1.06× | 0.247 | 3.33× |
 | CandleTwoCrows | CDL2CROWS | MATCH | 110.92M | 0.95× | 0.312 | 3.48× |
 | CandleThreeBlackCrows | CDL3BLACKCROWS | MATCH | 68.24M | 0.43× | 0.284 | 1.57× |
 | CandleThreeInside | CDL3INSIDE | MATCH | 88.87M | 0.97× | 0.297 | 3.55× |
@@ -86,7 +86,7 @@ Generated 2026-08-08 from 287 functions.
 | CandleUpDownSideGapThreeMethods | CDLXSIDEGAP3METHODS | MATCH | 189.10M | 1.19× | 0.304 | 4.23× |
 | MathCeil | CEIL | MATCH | 445.86M | 0.68× | 0.156 | 2.02× |
 | ChandeMomentumOscillator | CMO | MATCH | 189.49M | 1.11× | 0.145 | 3.36× |
-| RollingCorrelation | CORREL | MISMATCH | 48.19M | 0.27× | 0.189 | 3.38× |
+| RollingCorrelation | CORREL | MISMATCH | 48.71M | 0.28× | 0.207 | 3.73× |
 | MathCos | COS | MATCH | 60.32M | 0.91× | 0.174 | 3.87× |
 | MathCosh | COSH | MATCH | 144.26M | 0.83× | 0.169 | 3.26× |
 | DoubleExponentialMovingAverage | DEMA | MATCH | 289.42M | 1.97× | 0.157 | 3.22× |
@@ -145,7 +145,7 @@ Generated 2026-08-08 from 287 functions.
 | MathSinh | SINH | MATCH | 130.98M | 0.85× | 0.163 | 3.68× |
 | SimpleMovingAverage | SMA | MATCH | 502.04M | 0.99× | 0.145 | 3.07× |
 | MathSqrt | SQRT | MATCH | 403.08M | 0.66× | 0.156 | 2.27× |
-| RollingStandardDeviation | STDDEV | MISMATCH | 312.35M | 0.94× | 0.150 | 3.04× |
+| RollingStandardDeviation | STDDEV | MATCH | 264.28M | 0.79× | 0.143 | 3.14× |
 | StochasticOscillator | STOCH | MATCH | 43.81M | 0.58× | 0.397 | 3.40× |
 | FastStochasticOscillator | STOCHF | MATCH | 75.02M | 0.82× | 0.360 | 3.04× |
 | StochasticRelativeStrengthIndex | STOCHRSI | MATCH | 36.24M | 0.63× | 0.322 | 2.77× |
@@ -161,7 +161,7 @@ Generated 2026-08-08 from 287 functions.
 | RollingTimeSeriesForecast | TSF | MATCH | 74.88M | 1.00× | 0.162 | 3.53× |
 | TypicalPrice | TYPPRICE | MATCH | 817.32M | 1.08× | 0.250 | 1.30× |
 | UltimateOscillator | ULTOSC | MATCH | 85.25M | 1.33× | 0.242 | 3.83× |
-| RollingVariance | VAR | MISMATCH | 399.33M | 0.86× | 0.146 | 2.63× |
+| RollingVariance | VAR | MATCH | 289.46M | 0.64× | 0.146 | 3.68× |
 | WeightedClose | WCLPRICE | MATCH | 818.86M | 1.16× | 0.238 | 2.73× |
 | WilliamsPercentR | WILLR | MATCH | 155.94M | 1.35× | 0.272 | 3.06× |
 | WeightedMovingAverage | WMA | MATCH | 272.92M | 0.56× | 0.163 | 3.47× |
@@ -268,7 +268,7 @@ Generated 2026-08-08 from 287 functions.
 | RollingSortino | — | MATCH | 61.89M | — | 0.179 | 1.68× |
 | RollingVolumeWeightedAveragePrice | — | MATCH | 43.66M | — | 0.287 | 3.37× |
 | RollingWinsorize | — | MATCH | 21.95M | — | 0.206 | 3.82× |
-| RollingZScore | — | MISMATCH | 53.60M | — | 0.186 | 3.28× |
+| RollingZScore | — | MATCH | 52.94M | — | 0.183 | 3.01× |
 | SchaffTrendCycle | — | MATCH | 14.12M | — | 0.277 | 2.75× |
 | SessionVolumeLevels | — | MATCH | 18.62M | — | 0.513 | 0.91× |
 | Sessions | — | MATCH | 117.96M | — | 0.372 | 1.70× |

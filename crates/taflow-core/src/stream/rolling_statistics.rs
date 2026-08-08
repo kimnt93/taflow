@@ -6,10 +6,54 @@ use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator, Window};
 
+/// TA-Lib's `TA_STDDEV` collapses a variance below this threshold to zero
+/// instead of taking its square root; replicated verbatim.
+pub(super) const STDDEV_VARIANCE_EPSILON: f64 = 0.00000000000001;
+
+/// TA-Lib's `TA_STDDEV` post-processing of a `TA_INT_VAR` output.
+///
+/// Bit-identical to the C reference: the `nbdev == 1.0` branch there skips the
+/// multiply, and multiplying by exactly `1.0` is the identity in IEEE-754, so a
+/// single form covers both.
+#[inline]
+pub(super) fn stddev_from_variance(variance: f64, nbdev: f64) -> f64 {
+    if !(variance < STDDEV_VARIANCE_EPSILON) {
+        variance.sqrt() * nbdev
+    } else {
+        0.0
+    }
+}
+
+/// Sliding population moments in **TA-Lib's exact accumulation order**.
+///
+/// `TA_INT_VAR` adds the incoming bar to `periodTotal1`/`periodTotal2`, emits
+/// `mean2 - mean1²` (both means obtained by *division* by the period), and only
+/// then subtracts the trailing bar. Reproducing that order — rather than the
+/// algebraically equivalent fused `sum += new - old` / `(new-old)(new+old)`
+/// recurrence with a precomputed reciprocal — makes VAR and STDDEV **bitwise**
+/// equal to TA-Lib over a 100k-bar AR(1) price series at every period measured
+/// (5/14/30), instead of merely close to it.
+///
+/// This matters because TA-Lib's own sliding sums drift away from a fresh
+/// per-window recomputation (measured: 1.8e-9 for VAR, 3.7e-9 for STDDEV at
+/// p=5 over 100k bars — enough to break the `rtol=1e-8, atol=1e-10` oracle
+/// gate on low-variance windows). A periodic reseed of our sums would push
+/// *our* result towards the true value and therefore **away** from the oracle,
+/// making the mismatch worse; matching the oracle's arithmetic removes it
+/// entirely. Same reasoning as the verbatim `TA_CORREL` formula below.
+///
+/// Because the trailing value is subtracted after the emit, the resting
+/// invariant is "`sum`/`sum_squares` cover the `period - 1` most recent
+/// inputs", so the retained ring only needs `period - 1` slots and its
+/// eviction *is* the trailing value TA-Lib reads through `trailingIdx`.
+///
+/// Note: no `mul_add` here — TA-Lib uses a plain multiply followed by a
+/// separate add, and fusing them changes the low bits.
 #[derive(Debug, Clone)]
 struct RollingMoments {
     period: usize,
-    inverse_period: f64,
+    period_f: f64,
+    /// The `period - 1` most recent inputs; a push evicts TA-Lib's trailing bar.
     window: Window,
     sum: f64,
     sum_squares: f64,
@@ -22,27 +66,26 @@ impl RollingMoments {
         }
         Ok(Self {
             period,
-            inverse_period: 1.0 / period as f64,
-            window: Window::new(period)?,
+            period_f: period as f64,
+            window: Window::new(period - 1)?,
             sum: 0.0,
             sum_squares: 0.0,
         })
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        if self.window.is_full() {
-            let old = self.window.push(input).expect("full moments window evicts");
-            self.sum += input - old;
-            self.sum_squares += (input - old).mul_add(input + old, 0.0);
-        } else {
-            self.window.push(input);
-            self.sum += input;
-            self.sum_squares = input.mul_add(input, self.sum_squares);
+        self.sum += input;
+        self.sum_squares += input * input;
+        let variance = self.window.is_full().then(|| {
+            let mean1 = self.sum / self.period_f;
+            let mean2 = self.sum_squares / self.period_f;
+            mean2 - mean1 * mean1
+        });
+        if let Some(old) = self.window.push(input) {
+            self.sum -= old;
+            self.sum_squares -= old * old;
         }
-        self.window.is_full().then(|| {
-            let mean = self.sum * self.inverse_period;
-            self.sum_squares * self.inverse_period - mean * mean
-        })
+        variance
     }
 
     fn reset(&mut self) {
@@ -51,53 +94,56 @@ impl RollingMoments {
         self.sum_squares = 0.0;
     }
 
-    /// Bulk kernel: O(1) add/evict sliding-moments recurrence indexing the
-    /// input slice directly, pushing `map(variance)` (NaN during warm-up).
+    /// Bulk kernel: the same add / emit / subtract-trailing recurrence indexing
+    /// the input slice directly, pushing `map(variance)` (NaN during warm-up).
     ///
-    /// Uses exactly the same accumulate/evict arithmetic as [`Self::append`],
-    /// so outputs and post-run state are bit-identical to per-bar appends.
-    /// Returns the last emitted value (`None` when the final bar is warm-up
-    /// or `inputs` is empty and the last append returned warm-up).
+    /// Uses exactly the same arithmetic in exactly the same order as
+    /// [`Self::append`], so outputs and post-run state are bit-identical to
+    /// per-bar appends for any chunking. Returns the last emitted value.
     fn extend_map_into(
         &mut self,
         inputs: &[f64],
         output: &mut Vec<f64>,
         mut map: impl FnMut(f64) -> f64,
     ) -> Option<f64> {
-        let period = self.period;
+        // Number of retained (not-yet-subtracted) inputs = ring capacity.
+        let trailing = self.period - 1;
         let n = inputs.len();
         output.reserve(n);
-        // Warm-up prologue: after `period` appends the ring holds exactly
-        // `inputs[..period]`, regardless of prior state.
-        let prologue = n.min(period);
+        // Warm-up prologue: after `period - 1` appends the ring holds exactly
+        // `inputs[..period - 1]`, regardless of prior state.
+        let prologue = n.min(trailing);
         let mut last = None;
         for &input in &inputs[..prologue] {
             last = self.append(input).map(&mut map);
             output.push(last.unwrap_or(f64::NAN));
         }
-        if n <= period {
+        if n <= trailing {
             return last;
         }
-        // Steady loop: identical arithmetic to the full-window branch of
-        // `append`, with the evicted element read from the input slice.
-        let inverse_period = self.inverse_period;
+        // Steady loop: identical arithmetic to `append`, with the trailing
+        // element read from the input slice instead of the ring.
+        let period_f = self.period_f;
         let mut sum = self.sum;
         let mut sum_squares = self.sum_squares;
-        for i in period..n {
+        for i in trailing..n {
             let input = inputs[i];
-            let old = inputs[i - period];
-            sum += input - old;
-            sum_squares += (input - old).mul_add(input + old, 0.0);
-            let mean = sum * inverse_period;
-            let mapped = map(sum_squares * inverse_period - mean * mean);
+            sum += input;
+            sum_squares += input * input;
+            let mean1 = sum / period_f;
+            let mean2 = sum_squares / period_f;
+            let mapped = map(mean2 - mean1 * mean1);
             output.push(mapped);
             last = Some(mapped);
+            let old = inputs[i - trailing];
+            sum -= old;
+            sum_squares -= old * old;
         }
         self.sum = sum;
         self.sum_squares = sum_squares;
         // Rebuild the ring so subsequent appends continue bit-identically.
         self.window.clear();
-        for &input in &inputs[n - period..] {
+        for &input in &inputs[n - trailing..] {
             self.window.push(input);
         }
         last
@@ -195,16 +241,17 @@ impl StreamingIndicator for RollingStandardDeviation {
             return;
         }
         let nbdev = self.nbdev;
-        self.value = self
-            .moments
-            .extend_map_into(inputs, output, |variance| variance.max(0.0).sqrt() * nbdev);
+        self.value = self.moments.extend_map_into(inputs, output, |variance| {
+            stddev_from_variance(variance, nbdev)
+        });
     }
 
     fn append(&mut self, input: f64) -> Option<f64> {
+        let nbdev = self.nbdev;
         self.value = self
             .moments
             .append(input)
-            .map(|variance| variance.max(0.0).sqrt() * self.nbdev);
+            .map(|variance| stddev_from_variance(variance, nbdev));
         self.value
     }
 
@@ -719,7 +766,10 @@ mod tests {
                 .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
                 .collect();
 
-            for chunk in [usize::MAX, 1, 7, 97] {
+            // 5,000 bars with chunk sizes that are mutually coprime with the
+            // periods, so the bulk prologue/steady split lands at many
+            // different offsets inside the window.
+            for chunk in [usize::MAX, 1, 7, 10, 97, 1000] {
                 let mut state = new_state(period);
                 let mut out = Vec::new();
                 for piece in input.chunks(chunk.min(input.len())) {
@@ -838,6 +888,141 @@ mod tests {
                 .map(|(&a, &b)| state.append(a, b).unwrap_or(f64::NAN))
                 .collect();
             assert_same_bits(&streaming, &batch, &format!("BETA batch parity p{period}"));
+        }
+    }
+
+    /// Literal transcription of TA-Lib's `TA_INT_VAR` accumulation loop.
+    ///
+    /// This is the contract `RollingMoments` must reproduce **bit for bit**:
+    /// add the incoming bar, emit `mean2 - mean1²` with both means obtained by
+    /// division, then subtract the trailing bar.
+    fn talib_var_reference(input: &[f64], period: usize) -> Vec<f64> {
+        let mut output = vec![f64::NAN; input.len()];
+        let period_f = period as f64;
+        let (mut total1, mut total2) = (0.0, 0.0);
+        for &value in &input[..period - 1] {
+            total1 += value;
+            total2 += value * value;
+        }
+        let mut trailing = 0;
+        for i in (period - 1)..input.len() {
+            let value = input[i];
+            total1 += value;
+            total2 += value * value;
+            let mean1 = total1 / period_f;
+            let mean2 = total2 / period_f;
+            output[i] = mean2 - mean1 * mean1;
+            let old = input[trailing];
+            trailing += 1;
+            total1 -= old;
+            total2 -= old * old;
+        }
+        output
+    }
+
+    /// Fresh two-pass population variance over `input[end + 1 - period..=end]`,
+    /// accumulating nothing across bars.
+    fn exact_variance(input: &[f64], end: usize, period: usize) -> f64 {
+        let window = &input[end + 1 - period..=end];
+        let period_f = period as f64;
+        let mut sum = 0.0;
+        for &value in window {
+            sum += value;
+        }
+        let mean = sum / period_f;
+        let mut squares = 0.0;
+        for &value in window {
+            squares += (value - mean) * (value - mean);
+        }
+        squares / period_f
+    }
+
+    #[test]
+    fn var_and_stddev_reproduce_the_talib_recurrence_bitwise() {
+        let input = lcg_series(5_000, 0x5EED_1234);
+        for period in [2usize, 5, 14, 30, 200] {
+            let reference = talib_var_reference(&input, period);
+            let mut var = RollingVariance::new(period, 1.0).unwrap();
+            let streamed: Vec<f64> = input
+                .iter()
+                .map(|&x| var.append(x).unwrap_or(f64::NAN))
+                .collect();
+            assert_same_bits(&streamed, &reference, &format!("VAR TA-order p{period}"));
+
+            let mut bulk_state = RollingVariance::new(period, 1.0).unwrap();
+            let mut bulk = Vec::new();
+            for piece in input.chunks(997) {
+                bulk_state.extend_slice_into(piece, &mut bulk);
+            }
+            assert_same_bits(&bulk, &reference, &format!("VAR TA-order bulk p{period}"));
+
+            let expected_std: Vec<f64> = reference
+                .iter()
+                .map(|&v| {
+                    if v.is_nan() {
+                        f64::NAN
+                    } else {
+                        stddev_from_variance(v, 1.0)
+                    }
+                })
+                .collect();
+            let mut std = RollingStandardDeviation::new(period, 1.0).unwrap();
+            let streamed: Vec<f64> = input
+                .iter()
+                .map(|&x| std.append(x).unwrap_or(f64::NAN))
+                .collect();
+            assert_same_bits(
+                &streamed,
+                &expected_std,
+                &format!("STDDEV TA-order p{period}"),
+            );
+
+            // The batch kernels must agree with the states bit for bit too.
+            let batch_var = crate::stream::rolling_var(&input, period, 1.0).unwrap();
+            assert_same_bits(&batch_var, &reference, &format!("VAR batch p{period}"));
+            let batch_std = crate::stream::rolling_std(&input, period, 1.0).unwrap();
+            assert_same_bits(
+                &batch_std,
+                &expected_std,
+                &format!("STDDEV batch p{period}"),
+            );
+        }
+    }
+
+    /// VAR/STDDEV deliberately reproduce TA-Lib's sliding accumulator rather
+    /// than a periodically reseeded (more accurate) one, because the oracle
+    /// gate compares against TA-Lib, not against the true value: reseeding
+    /// moves us towards truth and therefore *away* from the oracle. See
+    /// `RollingMoments`' docs.
+    ///
+    /// So the invariant worth testing at scale is that the state never diverges
+    /// from that recurrence — checked bitwise at every bar — while the residual
+    /// against a fresh per-window recomputation stays bounded (it is TA-Lib's
+    /// own drift, ~1e-9 on price-scale data; the loose bound here only has to
+    /// catch a genuinely broken accumulator, which lands orders of magnitude
+    /// higher).
+    #[test]
+    fn var_and_stddev_track_the_talib_recurrence_over_1m_bars() {
+        let input = lcg_series(1_000_000, 0x5EED_1E6A);
+        for period in [14usize, 30] {
+            let reference = talib_var_reference(&input, period);
+            let mut var = RollingVariance::new(period, 1.0).unwrap();
+            for i in 0..input.len() {
+                let value = var.append(input[i]).unwrap_or(f64::NAN);
+                assert_eq!(
+                    value.to_bits(),
+                    reference[i].to_bits(),
+                    "VAR p{period} bar {i}: diverged from the TA-Lib recurrence"
+                );
+                if (i + 1) % 50_000 == 0 {
+                    let exact = exact_variance(&input, i, period);
+                    let drift = (value - exact).abs();
+                    assert!(
+                        drift < 1e-9,
+                        "VAR p{period} bar {i}: drift {drift:e} vs a fresh window"
+                    );
+                }
+            }
         }
     }
 

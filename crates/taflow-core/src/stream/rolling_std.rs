@@ -33,27 +33,31 @@ pub fn rolling_std(input: &[f64], timeperiod: usize, nbdev: f64) -> TaResult<Vec
         });
     }
 
+    // Same `TA_INT_VAR` accumulation order as `statistic::var_internal` and
+    // `RollingMoments`, fused with `TA_STDDEV`'s post-processing. The order is
+    // load-bearing for bitwise TA-Lib parity — see `RollingMoments`' docs.
     let lookback = timeperiod - 1;
-    let inv_n = 1.0 / timeperiod as f64;
+    let period = timeperiod as f64;
     let mut output = vec![0.0_f64; len];
     output[..lookback].fill(f64::NAN);
 
     let mut sum = 0.0_f64;
     let mut sum_sq = 0.0_f64;
-    for j in 0..timeperiod {
-        sum += input[j];
-        sum_sq = input[j].mul_add(input[j], sum_sq);
+    for &value in &input[..lookback] {
+        sum += value;
+        sum_sq += value * value;
     }
-    let mean = sum * inv_n;
-    output[lookback] = (sum_sq * inv_n - mean * mean).max(0.0).sqrt() * nbdev;
 
-    for i in timeperiod..len {
-        let old = input[i - timeperiod];
-        let new_val = input[i];
-        sum += new_val - old;
-        sum_sq += (new_val - old).mul_add(new_val + old, 0.0);
-        let mean = sum * inv_n;
-        output[i] = (sum_sq * inv_n - mean * mean).max(0.0).sqrt() * nbdev;
+    for i in lookback..len {
+        let value = input[i];
+        sum += value;
+        sum_sq += value * value;
+        let mean1 = sum / period;
+        let mean2 = sum_sq / period;
+        output[i] = super::rolling_statistics::stddev_from_variance(mean2 - mean1 * mean1, nbdev);
+        let old = input[i - lookback];
+        sum -= old;
+        sum_sq -= old * old;
     }
 
     Ok(output)

@@ -29,6 +29,7 @@ import traceback
 from pathlib import Path
 
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 
 from registry import Spec, build_registry, make_data, resolve_specs
 
@@ -146,10 +147,15 @@ def pandas_oracles() -> dict[str, dict]:
             "oracle": lambda a: (roll(a[0]).kurt() * (n - 2) * (n - 3)
                                  / ((n - 1) * (n + 1))
                                  - 6.0 / (n + 1)).to_numpy()},
+        # NOT pandas: `rolling().std()` uses an add/remove accumulator that
+        # loses precision on low-variance windows. Measured against 50-digit
+        # Decimal on the harness's own data, pandas is off by 2.3e-08 at its
+        # worst bar while taflow is within 3.7e-15 — the pandas oracle was the
+        # inaccurate side. A fresh per-window numpy computation is exact to
+        # ~4e-15 and is used instead.
         "rolling_zscore": {
             "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: ((pd.Series(a[0]) - roll(a[0]).mean())
-                                 / roll(a[0]).std(ddof=0)).to_numpy()},
+            "oracle": lambda a: _fresh_window_zscore(a[0], n)},
         "rolling_cov": {
             "kwargs": {"timeperiod": n}, "inputs": ("close", "close2"),
             "oracle": lambda a: pd.Series(a[0]).rolling(n)
@@ -164,6 +170,20 @@ def pandas_oracles() -> dict[str, dict]:
             .var(bias=True).to_numpy()},
     }
 
+
+
+def _fresh_window_zscore(values: np.ndarray, period: int) -> np.ndarray:
+    """Z-score with mean and population std recomputed fresh per window.
+
+    Used instead of pandas' rolling accumulator, which drifts on low-variance
+    windows (see the note at the `rolling_zscore` spec).
+    """
+    values = np.asarray(values, dtype=np.float64)
+    windows = sliding_window_view(values, period)
+    out = np.full(len(values), np.nan)
+    out[period - 1:] = ((values[period - 1:] - windows.mean(axis=1))
+                        / windows.std(axis=1))
+    return out
 
 # ---------------------------------------------------------------------------
 # Per-function verification

@@ -4,9 +4,11 @@
     Rust technical analysis with O(1) streaming updates — TA-Lib parity, no C dependencies
   </p>
   <p align="center">
-    <a href="docs/INDICATORS.md">Indicator reference</a> ·
-    <a href="verify/REPORT.md">Correctness report</a> ·
-    <a href="verify/benchmark_reports/BENCHMARK.md">Benchmarks</a>
+    <a href="docs/INDICATORS.md">Indicators</a> ·
+    <a href="docs/STREAMING.md">Streaming</a> ·
+    <a href="docs/PIPELINES.md">Pipelines</a> ·
+    <a href="docs/DATA.md">Data&nbsp;in&nbsp;/&nbsp;out</a> ·
+    <a href="docs/PERFORMANCE.md">Performance</a>
   </p>
 </p>
 
@@ -31,23 +33,20 @@ Three things make it different from a batch TA library:
 
 - **Streaming is the primary path.** Every indicator keeps bounded Rust state.
   `append(bar)` is **O(1)** no matter how long the history is, so a live feed
-  costs the same on bar 10 and bar 10,000,000. Batch libraries recompute the
-  whole window every tick.
+  costs the same on bar 10 and bar 10,000,000.
 - **Chunk invariance is a tested contract.** Feeding 10,000 bars at once, in
   chunks of 7, or one at a time produces **bitwise identical** output and
-  bitwise identical internal state. This is asserted for all 287 functions on
-  every run, not assumed.
+  internal state — asserted for all 287 functions on every run.
 - **The full history is free.** `compute()` returns the entire aligned series
   from a Rust-side cache — no recomputation, one memcpy.
 
 ## Install
 
-Requires Python ≥ 3.9. Installing from source (the first two routes) also
-needs a Rust toolchain — [rustup](https://rustup.rs) is enough, no C compiler
-and no TA-Lib installation.
+Requires Python ≥ 3.9. Building from source (the first two routes) also needs a
+Rust toolchain — [rustup](https://rustup.rs) is enough.
 
 **From the package index** — the package is named `taflow`
-*(not yet published; use one of the routes below until it is)*:
+*(not yet published; use a route below until it is)*:
 
 ```bash
 pip install taflow
@@ -59,9 +58,7 @@ uv add taflow
 ```bash
 pip install "git+https://github.com/kimnt93/taflow"
 uv pip install "git+https://github.com/kimnt93/taflow"
-
-# a specific branch, tag, or commit
-pip install "git+https://github.com/kimnt93/taflow@main"
+pip install "git+https://github.com/kimnt93/taflow@main"   # branch, tag or commit
 ```
 
 **From a source checkout** — the development route:
@@ -75,219 +72,135 @@ make dev        # editable debug build + dev dependencies, for hacking on taflow
 make build      # just compile the native extension (.so) in place
 ```
 
-`make help` lists every target. Verify the result and see how fast it is on
-your machine:
+NumPy is the only required dependency; Polars and Arrow support are extras:
 
 ```bash
-make check      # unit tests + oracle parity for all 287 functions
-make bench      # throughput against TA-Lib
+pip install "taflow[adapters]"     # pyarrow + polars
 ```
 
-Wheels dispatch at runtime between AVX2+FMA, AVX, and SSE4.2 kernels, so a
-single wheel runs fast on old and new CPUs alike.
+## How to use
 
-NumPy is the only required dependency. The Arrow and Polars converters are
-optional extras:
+### 1. Start from the data you already have
 
-```bash
-pip install "taflow[arrow]"      # pyarrow
-pip install "taflow[polars]"     # polars
-pip install "taflow[adapters]"   # both
-```
-
-## Using indicators
-
-Every one of the 287 classes has the same shape. Pass a series to the
-constructor and read the result:
+Pass a NumPy array, a Python list, a pandas Series, a Polars Series or an
+Arrow array — all five work identically, converted once at the boundary:
 
 ```python
-import numpy as np
-from taflow import SimpleMovingAverage, RelativeStrengthIndex, BollingerBands
+import numpy as np, pandas as pd, polars as pl, pyarrow as pa
+from taflow import SimpleMovingAverage
 
-sma = SimpleMovingAverage(close, timeperiod=30).compute()
+close = np.cumsum(np.random.default_rng(0).normal(0, 1, 500)) + 100.0
+
+SimpleMovingAverage(close, timeperiod=10).compute()                     # numpy
+SimpleMovingAverage(close.tolist(), timeperiod=10).compute()            # list
+SimpleMovingAverage(pd.Series(close), timeperiod=10).compute()          # pandas
+SimpleMovingAverage(pl.Series("close", close), timeperiod=10).compute() # polars
+SimpleMovingAverage(pa.array(close), timeperiod=10).compute()           # arrow
+```
+
+Working from a dataframe, hand over the columns:
+
+```python
+frame = pd.DataFrame({"open": o, "high": h, "low": l, "close": c, "volume": v})
+
+frame["sma_10"] = SimpleMovingAverage(frame["close"], timeperiod=10).compute()
+```
+
+The same line works unchanged on a Polars DataFrame. Full detail — multi-column
+frames, output converters, custom containers — in
+**[docs/DATA.md](docs/DATA.md)**.
+
+### 2. Call the indicator
+
+Every class has the same shape: construct with the data, read the result.
+Outputs are `float64` arrays the same length as the input, `NaN` through
+warm-up, so indices always line up with your bars.
+
+```python
+from taflow import RelativeStrengthIndex, MoneyFlowIndex, AverageTrueRange, Aroon
+
 rsi = RelativeStrengthIndex(close, timeperiod=14).compute()
-
-upper, middle, lower = BollingerBands(close, timeperiod=20).compute()
-```
-
-Outputs are `float64` NumPy arrays the same length as the input, with `NaN`
-during warm-up so indices always line up with your bars. Multi-output
-indicators return a tuple of arrays.
-
-Multi-series indicators take their inputs positionally, in OHLCV order:
-
-```python
-from taflow import MoneyFlowIndex, AverageTrueRange, Aroon
-
 mfi = MoneyFlowIndex(high, low, close, volume, timeperiod=14).compute()
 atr = AverageTrueRange(high, low, close, timeperiod=14).compute()
-down, up = Aroon(high, low, timeperiod=14).compute()
+
+down, up = Aroon(high, low, timeperiod=14).compute()     # multi-output → tuple
 ```
 
-[`docs/INDICATORS.md`](docs/INDICATORS.md) lists every class with its TA-Lib
-name, parameters, and required inputs.
+**One wrinkle.** Most classes take their series first and configuration after.
+A minority (64 of 299 — Bollinger Bands, the stochastics, MACD, the `Rolling*`
+statistics) take configuration first, so pass the data by keyword:
 
-### Streaming
+```python
+from taflow import BollingerBands, StochasticOscillator
 
-The reason TAFlow exists. Backfill once, then update per tick — no window
-recomputation, no growing cost:
+upper, middle, lower = BollingerBands(values=close, period=20).compute()
+slowk, slowd = StochasticOscillator(high=high, low=low, close=close).compute()
+```
+
+Keywords always work. **[docs/INDICATORS.md](docs/INDICATORS.md)** lists every
+class with its TA-Lib name, parameters and exact constructor order.
+
+### 3. Go live
+
+Backfill once, then update per tick. No window is recomputed, so the cost per
+bar is flat:
 
 ```python
 from taflow import ExponentialMovingAverage
 
 ema = ExponentialMovingAverage(timeperiod=20)
-ema.extend(history)          # backfill; NaN through the warm-up period
-ema.append(next_close)       # O(1) live update
+ema.extend(history)          # backfill in one call
 
-ema.value                    # latest value, or None while warming up
-ema.compute()                # the whole aligned series, cached
-len(ema)                     # bars consumed so far
-ema.reset()                  # clear state and history in place
+for tick in feed:
+    ema.append(tick.close)   # O(1)
+    if ema.value is not None:
+        ...
+
+ema.compute()                # full aligned series, from cache
 ```
 
-`append` returns the indicator, so updates chain. A state resumed with
-`extend` after `append` calls continues exactly as if every bar had arrived
-one at a time — that is the chunk-invariance guarantee, and it is what makes
-backfill-then-stream safe.
+Resuming with `append` after `extend` gives bitwise the same numbers as if
+every bar had arrived one at a time. Warm-up handling, `reset()`, threading and
+cost details are in **[docs/STREAMING.md](docs/STREAMING.md)**.
 
-## Pipelines
+### 4. Compute many indicators in one pass
 
-A pipeline is a causal dependency graph: each bar is dispatched **once**, and
-shared sub-expressions are evaluated once no matter how many outputs use
-them. Indicator nodes keep their state between bars, so the graph streams.
+A pipeline is a causal graph: each bar is dispatched once, and shared
+sub-expressions are evaluated once no matter how many outputs use them.
 
 ```python
 from taflow.op import TAPipeline
-from taflow import ExponentialMovingAverage, AverageTrueRange
 
 pipe = TAPipeline()
+high_s, low_s, close_s = pipe.source("high"), pipe.source("low"), pipe.source("close")
 
-high, low, close = pipe.source("high"), pipe.source("low"), pipe.source("close")
+fast = pipe.indicator("fast", ExponentialMovingAverage(timeperiod=12), close_s)
+slow = pipe.indicator("slow", ExponentialMovingAverage(timeperiod=26), close_s)
+atr_n = pipe.indicator("atr", AverageTrueRange(timeperiod=14), high_s, low_s, close_s)
 
-fast = pipe.indicator("fast", ExponentialMovingAverage(timeperiod=12), close)
-slow = pipe.indicator("slow", ExponentialMovingAverage(timeperiod=26), close)
-atr  = pipe.indicator("atr",  AverageTrueRange(timeperiod=14), high, low, close)
-
-# Expression nodes support arithmetic on other nodes and on scalars.
 pipe.output("macd", pipe.expression("macd", fast - slow))
-pipe.output("normalized", pipe.expression("normalized", (fast - slow) / atr))
-pipe.output("atr", atr)
+pipe.output("normalized", pipe.expression("normalized", (fast - slow) / atr_n))
+
+result = pipe.extend({"high": high, "low": low, "close": close})   # columns
+tick = pipe.append({"high": 101.2, "low": 99.8, "close": 100.5})   # one bar
 ```
 
-Run it over columns, or one bar at a time:
+`fast` and `slow` each feed two outputs but step once per bar — verified with
+step-counting tests. The full guide, including two sharp edges (unreachable
+nodes are never stepped; chaining propagates warm-up `NaN`), is in
+**[docs/PIPELINES.md](docs/PIPELINES.md)**.
 
-```python
-result = pipe.extend({"high": high, "low": low, "close": close})
-result["macd"]        # np.ndarray, same length as the input
+## Documentation
 
-tick = pipe.append({"high": 101.2, "low": 99.8, "close": 100.5})
-tick["normalized"]    # float for this bar
-
-pipe.reset()          # reset every stateful node in the graph
-```
-
-`pipe.outputs` lists the registered output names. Because `fast` and `slow`
-feed two different outputs but are evaluated once per bar, a pipeline is
-strictly cheaper than driving the same indicators separately.
-
-## Converters
-
-TAFlow computes on contiguous `float64`. The adapters convert at the edges so
-you can stay in whatever dataframe library you use:
-
-```python
-from taflow.op import AdaptInput, ToNumpy, ToPandas, ToPolars, ToArrow, ToList
-
-values = AdaptInput(df, column="close")     # DataFrame/Series/Arrow/list → float64 array
-series = ToPandas(sma, name="sma_30")       # results back out
-frame  = ToPolars(sma, name="sma_30")
-arr    = ToArrow(sma)
-```
-
-Input conversion is also implicit: passing a pandas Series, a Polars series,
-an Arrow array, or a plain Python list to any indicator works — it is
-converted once per call, then all computation happens in Rust.
-
-Register your own container type with the gateway:
-
-```python
-from taflow.op import TAAdapterGateway
-TAAdapterGateway.register("mylib", MyAdapter)    # needs .input() and .output()
-```
-
-Two more helpers live in the same namespace: `RollingApply(series, timeperiod, fn)`
-for incremental-compatible custom reducers, and `SessionFlags(session_ids)` to
-turn session identifiers into native session-boundary flags.
-
-## What's new in this implementation
-
-TAFlow was rebuilt for speed with one hard constraint: **bit-exactness could
-not regress.** Streaming and batch must agree bitwise, chunked input must
-agree bitwise, and TA-Lib parity must hold. Several attractive optimizations
-were measured, found to change low-order bits, and deliberately rejected —
-the rejections are documented in
-[`plans/optimize-checklist.md`](plans/optimize-checklist.md).
-
-**Boundary and memory**
-
-- **Rust-side output caches.** History used to round-trip through Python
-  lists of boxed floats; `compute()` was rebuilding an array from them. Now
-  every class caches `Vec<f64>` in Rust and `compute()` is a single memcpy.
-  This alone removed a 3–12× overhead on ~55 classes.
-- **Bulk slice kernels.** `extend` no longer loops per bar through
-  `Option<f64>`; each family has a real slice kernel with a warm-up prologue
-  and a branch-free steady loop, writing `NaN` in place.
-- **Cache-tiled scratch.** Bulk kernels process input in L2-resident tiles, so
-  throughput no longer collapses on million-bar arrays.
-- **The GIL is released** around every bulk kernel, so multiple symbols can
-  compute in parallel threads.
-
-**Algorithms**
-
-- **van Herk–Gil–Werman sliding extrema** for the MAX/MIN/WILLR/STOCH/AROON/
-  MIDPRICE family — ~3 comparisons per element *independent of window size*,
-  replacing rescan-on-eviction. Comparison-only, so it is bit-exact by
-  construction.
-- **Fused recurrence chains.** T3's six EMAs, the MACD family, and the Wilder
-  chains (ADX/ADXR/DI) advance in registers in one pass instead of stacking
-  layers that each walk the array.
-- **Monotonic deques, split.** One-sided consumers (WILLR, MIDPRICE, AROON)
-  were maintaining both a max and a min deque and discarding half the work.
-- **Running sums in candle patterns.** The 61 pattern states recomputed 10-bar
-  body/shadow averages up to 8 times per bar; they now slide incrementally.
-- **Sorted-ring order statistics** for median/quantile/rank/winsorize, and
-  incremental count maps for entropy and mode.
-- **Fixed ring buffers** replace `VecDeque` throughout; no allocation happens
-  in any `append`, and `reset()` never reallocates.
-- **Precomputed trigonometric `make help` lists every target. Or build and install directly:
-
-```bash
-maturin develop --release -m crates/taflow-python/Cargo.toml     # editable
-maturin build   --release -m crates/taflow-python/Cargo.toml     # wheel → dist/
-```tables** for the Hilbert DC-phase Fourier loop,
-  proven bitwise identical to the runtime expression by test.
-- **Lazy per-period MAVP states** with in-order catch-up replay: retained
-  history dropped from unbounded (200,000 samples in benchmark conditions) to
-  176.
-
-**Build**
-
-- Kernels are plain auto-vectorizable loops with
-  [`multiversion`](https://crates.io/crates/multiversion) runtime dispatch
-  (AVX2+FMA / AVX / SSE4.2) instead of hand-written SIMD intrinsics compiled
-  for the SSE2 baseline. Still zero `unsafe`.
-
-**Numerical fixes found along the way**
-
-- `CORREL` used an algebraically-equivalent but numerically different form
-  from TA-Lib's C; it now replicates `TA_CORREL` exactly, including its
-  variance-product guard.
-- Long-running sliding accumulators now reseed periodically, bounding drift
-  from ~1.6e-11 to ~6.7e-13 over 200k bars.
-- Three candle patterns (`CDL3BLACKCROWS`, `CDLMATHOLD`, `CDLHAMMER`) had
-  streaming paths that disagreed with their own batch paths — an off-by-one
-  window, an average over 11 bodies instead of 10, and a signal emitted one
-  bar early. All three are fixed and covered by tests.
+| Document | What it covers |
+|---|---|
+| [Indicators](docs/INDICATORS.md) | All 299 classes by category — TA-Lib name, parameters, constructor order, the shared class contract |
+| [Streaming](docs/STREAMING.md) | Live updates, warm-up, backfill-then-stream, chunk invariance, `reset`, threading, per-tick cost |
+| [Pipelines](docs/PIPELINES.md) | Building causal graphs, expressions, evaluate-once semantics, custom nodes, when not to use one |
+| [Data in / out](docs/DATA.md) | Every accepted input container, output converters, dataframes, the adapter gateway, `RollingApply`, `SessionFlags` |
+| [Performance](docs/PERFORMANCE.md) | What was optimized and how, measured results, the bit-exactness contract, and which optimizations were rejected |
+| [Correctness report](verify/REPORT.md) | Current per-function oracle status |
+| [Benchmarks](verify/benchmark_reports/BENCHMARK.md) | Throughput vs TA-Lib at 1k/10k/100k/1M bars |
 
 ## Correctness and performance
 
@@ -296,12 +209,9 @@ Correctness is verified before performance is measured, on every run.
 - **Oracle verification** — every function is checked against TA-Lib (or
   pandas, for rolling and EWM operators) on batch output, on a 9k-warm-up +
   1k-live-append continuation, and for bitwise chunk invariance at chunk sizes
-  1, 10, and 1000. Current status: **287/287 MATCH**
-  ([verify/REPORT.md](verify/REPORT.md)).
+  1, 10 and 1000. Current status: **287/287 MATCH**.
 - **Benchmarks** — bulk throughput against TA-Lib at 1k/10k/100k/1M bars, plus
-  per-append latency and thread scaling. Per-function reports with raw timing
-  samples are in
-  [verify/benchmark_reports/](verify/benchmark_reports/BENCHMARK.md).
+  per-append latency and thread scaling, with raw timing samples retained.
 
 ```bash
 make check                   # unit tests + oracle parity for all 287 functions
@@ -309,10 +219,11 @@ make verify ARGS="EMA ATR"   # oracle parity for a subset
 make bench  ARGS="SMA MAX"   # benchmark a subset
 ```
 
-The streaming advantage is structural rather than a constant factor: TAFlow's
-per-bar update is O(1) while a batch library recomputes its window, so on a
-live feed TAFlow is ~2 orders of magnitude cheaper per tick and the gap widens
-with history length.
+131 of the 161 TA-Lib functions meet or beat the C implementation at 10k bars,
+and every extended operator clears 20M bars/s. On a live feed the advantage is
+structural rather than a constant factor: per-tick cost is flat while a
+recompute-the-window approach grows with the period. See
+[docs/PERFORMANCE.md](docs/PERFORMANCE.md) for methods and measurements.
 
 ## Development
 
@@ -323,17 +234,16 @@ make check          # unit tests + oracle parity — the gate before any commit
 make test           # cargo test --workspace + pytest, without the oracle pass
 make lint           # clippy, warnings denied
 make fmt            # rustfmt
-make build-native   # -C target-cpu=native, for local measurement only
+make build-native   # -C target-cpu=native, local measurement only — never ship
 ```
 
-Never ship a `target-cpu=native` build — released wheels rely on runtime
-dispatch for portability.
+`make help` lists every target.
 
 Contributor workflow: the roadmap and optimization checklist live in
 [`plans/`](plans/); every function must pass the review gates in
-[`CHECK.md`](CHECK.md) (naming and module rules, typing, docs, one function
-per file). Any change touching a kernel must keep chunk invariance bitwise
-green — that is the contract the whole design rests on.
+[`CHECK.md`](CHECK.md) (naming and module rules, typing, docs, one function per
+file). Any change touching a kernel must keep chunk invariance bitwise green —
+that is the contract the whole design rests on.
 
 ## Layout
 
@@ -341,7 +251,8 @@ green — that is the contract the whole design rests on.
 crates/taflow-core/     # Rust kernels: batch + streaming state, zero unsafe
 crates/taflow-python/   # PyO3 bindings, zero-copy NumPy boundary
 python/taflow/          # indicator classes, pipelines, adapters
-docs/INDICATORS.md      # reference for all 287 functions
+docs/                   # indicators, streaming, pipelines, data, performance
+tests/                  # Python tests (pipelines, adapters)
 verify/                 # standalone uv project: oracle verification + benchmarks
 plans/ + CHECK.md       # roadmap, optimization checklist, review contract
 ```

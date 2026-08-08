@@ -597,7 +597,7 @@
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 3.9633842041642e-10
+   "max_abs_error": 0.0
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -608,7 +608,7 @@
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 3.9633842041642e-10
+   "max_abs_error": 0.0
   }
  },
  {
@@ -642,7 +642,7 @@
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 3.055902197957039e-10
+   "max_abs_error": 0.0
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -653,7 +653,7 @@
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 3.055902197957039e-10
+   "max_abs_error": 0.0
   }
  },
  {
@@ -789,7 +789,7 @@
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 2.609965576994e-10
+   "max_abs_error": 1.3869794202037156e-11
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -800,7 +800,7 @@
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 2.609965576994e-10
+   "max_abs_error": 1.3869794202037156e-11
   }
  },
  {
@@ -3522,7 +3522,7 @@
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 6.426930099223682e-10
+   "max_abs_error": 4.77118344832661e-14
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -3533,7 +3533,7 @@
   "continue_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
-   "max_abs_error": 6.426930099223682e-10
+   "max_abs_error": 4.77118344832661e-14
   }
  },
  {

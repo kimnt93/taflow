@@ -241,3 +241,32 @@ def test_unreachable_node_is_not_stepped(bars):
     pipe.extend({"close": close})
     assert used.steps == len(close)
     assert unused.steps == 0
+
+
+def test_chained_indicator_propagates_warmup_nan(bars):
+    """Documents a real defect: upstream warm-up NaN poisons a summing state.
+
+    A downstream running-sum indicator does ``sum += new - old``; once ``sum``
+    is NaN it stays NaN forever, so chaining onto SMA/VAR/STDDEV yields an
+    all-NaN series rather than a warm-up prefix. Chain only onto states that
+    tolerate NaN, or strip the upstream warm-up first. Change this test when
+    the behaviour is fixed.
+    """
+    _, _, close = bars
+    pipe = TAPipeline()
+    ema = pipe.indicator("ema", ExponentialMovingAverage(timeperiod=5),
+                         pipe.source("close"))
+    chained = pipe.indicator("chained", SimpleMovingAverage(timeperiod=7), ema)
+    pipe.output("chained", chained)
+
+    result = pipe.extend({"close": close})["chained"]
+    assert np.all(np.isnan(result)), "expected the documented all-NaN poisoning"
+
+    # The workaround: feed only the warmed upstream values.
+    upstream = ExponentialMovingAverage(timeperiod=5)
+    upstream.extend(close)
+    warm = upstream.compute()
+    warm = warm[~np.isnan(warm)]
+    downstream = SimpleMovingAverage(timeperiod=7)
+    downstream.extend(warm)
+    assert not np.isnan(downstream.compute()[-1])

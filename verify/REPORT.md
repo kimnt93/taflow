@@ -1,6 +1,6 @@
 # taflow correctness verification
 
-Date: 2026-08-08 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
+Date: 2026-08-09 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
 Environment: python 3.12.3, numpy 2.5.1, TA-Lib 0.7.1, taflow 0.1.2
 
 Summary: MATCH: 287
@@ -33,7 +33,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | BBANDS | BollingerBands | TA-Lib | MATCH | pass (err 7.9e-10, nan 0) | yes | yes | pass (err 7.9e-10, nan 0) |
 | BETA | RollingBeta | TA-Lib | MATCH | pass (err 3.9e-12, nan 0) | yes | yes | pass (err 3.9e-12, nan 0) |
 | BOP | BalanceOfPower | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CCI | CommodityChannelIndex | TA-Lib | MATCH | pass (err 2.6e-10, nan 0) | yes | yes | pass (err 2.6e-10, nan 0) |
+| CCI | CommodityChannelIndex | TA-Lib | MATCH | pass (err 1.4e-11, nan 0) | yes | yes | pass (err 1.4e-11, nan 0) |
 | CDL2CROWS | CandleTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDL3BLACKCROWS | CandleThreeBlackCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDL3INSIDE | CandleThreeInside | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -156,7 +156,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | SINH | MathSinh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | SMA | SimpleMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | SQRT | MathSqrt | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| STDDEV | RollingStandardDeviation | TA-Lib | MATCH | pass (err 4.0e-10, nan 0) | yes | yes | pass (err 4.0e-10, nan 0) |
+| STDDEV | RollingStandardDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | STOCH | StochasticOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | STOCHF | FastStochasticOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | STOCHRSI | StochasticRelativeStrengthIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -172,7 +172,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | TSF | RollingTimeSeriesForecast | TA-Lib | MATCH | pass (err 6.8e-13, nan 0) | yes | yes | pass (err 6.8e-13, nan 0) |
 | TYPPRICE | TypicalPrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
 | ULTOSC | UltimateOscillator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| VAR | RollingVariance | TA-Lib | MATCH | pass (err 3.1e-10, nan 0) | yes | yes | pass (err 3.1e-10, nan 0) |
+| VAR | RollingVariance | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | WCLPRICE | WeightedClose | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
 | WILLR | WilliamsPercentR | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
 | WMA | WeightedMovingAverage | TA-Lib | MATCH | pass (err 1.9e-10, nan 0) | yes | yes | pass (err 1.9e-10, nan 0) |
@@ -279,7 +279,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | rolling_sortino | RollingSortino | self | MATCH | — | yes | yes | — |
 | rolling_vwap | RollingVolumeWeightedAveragePrice | self | MATCH | — | yes | yes | — |
 | rolling_winsorize | RollingWinsorize | self | MATCH | — | yes | yes | — |
-| rolling_zscore | RollingZScore | pandas | MATCH | pass (err 6.4e-10, nan 0) | yes | yes | pass (err 6.4e-10, nan 0) |
+| rolling_zscore | RollingZScore | pandas | MATCH | pass (err 4.8e-14, nan 0) | yes | yes | pass (err 4.8e-14, nan 0) |
 | schaff_trend_cycle | SchaffTrendCycle | self | MATCH | — | yes | yes | — |
 | session_volume_levels | SessionVolumeLevels | self | MATCH | — | yes | yes | — |
 | sessions | Sessions | self | MATCH | — | yes | yes | — |

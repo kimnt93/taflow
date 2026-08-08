@@ -1,6 +1,13 @@
 use crate::error::{TaError, TaResult};
 
 /// Internal O(n) variance calculation using rolling sum and sum-of-squares.
+///
+/// Mirrors `TA_INT_VAR` exactly: add the incoming bar, emit
+/// `mean2 - mean1 * mean1` with both means obtained by *division* by the
+/// period, then subtract the trailing bar. The order is load-bearing — it is
+/// what makes VAR/STDDEV bitwise equal to TA-Lib rather than 1e-9-close, and
+/// it must stay identical to `RollingMoments` in `rolling_statistics.rs` so
+/// batch and streaming agree bit for bit.
 pub(crate) fn var_internal(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {
@@ -20,27 +27,27 @@ pub(crate) fn var_internal(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64
     let lookback = timeperiod - 1;
     let mut output = vec![0.0_f64; len];
     output[..lookback].fill(f64::NAN);
-    let inv_n = 1.0 / timeperiod as f64; // precompute: replace 2 div/iter → 2 mul/iter
+    let period = timeperiod as f64;
 
-    // Sum and sum-of-squares for the initial window.
+    // Seed with the first `timeperiod - 1` bars, exactly like TA-Lib's
+    // pre-`startIdx` loop.
     let mut sum = 0.0_f64;
     let mut sum_sq = 0.0_f64;
-    for j in 0..timeperiod {
-        sum += input[j];
-        sum_sq = input[j].mul_add(input[j], sum_sq);
+    for &value in &input[..lookback] {
+        sum += value;
+        sum_sq += value * value;
     }
-    // RollingVariance = E(X²) - E(X)² = sum_sq*inv_n - (sum*inv_n)²
-    let mean = sum * inv_n;
-    output[lookback] = sum_sq * inv_n - mean * mean;
 
-    // O(1) sliding update: multiplications only, no divisions.
-    for i in timeperiod..len {
-        let old = input[i - timeperiod];
-        let new_val = input[i];
-        sum += new_val - old;
-        sum_sq += (new_val - old).mul_add(new_val + old, 0.0); // (new²-old²) = (new-old)(new+old)
-        let mean = sum * inv_n;
-        output[i] = sum_sq * inv_n - mean * mean;
+    for i in lookback..len {
+        let value = input[i];
+        sum += value;
+        sum_sq += value * value;
+        let mean1 = sum / period;
+        let mean2 = sum_sq / period;
+        output[i] = mean2 - mean1 * mean1;
+        let old = input[i - lookback];
+        sum -= old;
+        sum_sq -= old * old;
     }
 
     Ok(output)
