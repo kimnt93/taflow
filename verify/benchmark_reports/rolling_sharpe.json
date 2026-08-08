@@ -21,7 +21,7 @@
     "native_vector_note": "taflow class.extend over contiguous NumPy arrays; this exercises the compiled Rust bulk/SIMD-capable path. SIMD availability and target features depend on the installed wheel/build flags."
   },
   "protocol": {
-    "repeats": 3,
+    "repeats": 1,
     "sizes": [
       1000,
       10000
@@ -53,55 +53,169 @@
     {
       "bars": 1000,
       "taflow_canonical_vector": {
-        "mean_ms": 0.02078639124909223,
-        "min_ms": 0.020539031045751634,
-        "p50_ms": 0.02081780991285403,
-        "p99_ms": 0.020998642331154685,
+        "mean_ms": 0.020789348,
+        "min_ms": 0.020789348,
+        "p50_ms": 0.020789348,
+        "p99_ms": 0.020789348,
         "samples_s": [
-          2.081780991285403e-05,
-          2.0539031045751633e-05,
-          2.1002332788671023e-05
+          2.0789348e-05
         ],
-        "bars_per_second": 48108398.80845942
+        "bars_per_second": 48101556.624094225
       },
       "taflow_native_kernel": {
-        "mean_ms": 0.019672676979374585,
-        "min_ms": 0.01933277245508982,
-        "p50_ms": 0.019335895209580834,
-        "p99_ms": 0.02032909391217565,
+        "mean_ms": 0.019728367346938776,
+        "min_ms": 0.019728367346938776,
+        "p50_ms": 0.019728367346938776,
+        "p99_ms": 0.019728367346938776,
         "samples_s": [
-          2.0349363273453095e-05,
-          1.9332772455089822e-05,
-          1.9335895209580836e-05
+          1.9728367346938775e-05
         ],
-        "bars_per_second": 50831922.92784706
+        "bars_per_second": 50688431.65854617
       }
     },
     {
       "bars": 10000,
       "taflow_canonical_vector": {
-        "mean_ms": 0.1832844523809524,
-        "min_ms": 0.17835461607142858,
-        "p50_ms": 0.18132322321428573,
-        "p99_ms": 0.1899984719642857,
+        "mean_ms": 0.18449939473684213,
+        "min_ms": 0.18449939473684213,
+        "p50_ms": 0.18449939473684213,
+        "p99_ms": 0.18449939473684213,
         "samples_s": [
-          0.00019017551785714286,
-          0.00018132322321428573,
-          0.00017835461607142858
+          0.00018449939473684211
         ],
-        "bars_per_second": 54560001.51728766
+        "bars_per_second": 54200719.81408583
       },
       "taflow_native_kernel": {
-        "mean_ms": 0.18193289275362318,
-        "min_ms": 0.17889121739130434,
-        "p50_ms": 0.18332460869565215,
-        "p99_ms": 0.18357768730434787,
+        "mean_ms": 0.18414205932203392,
+        "min_ms": 0.18414205932203392,
+        "p50_ms": 0.18414205932203392,
+        "p99_ms": 0.18414205932203392,
         "samples_s": [
-          0.00018358285217391306,
-          0.00018332460869565216,
-          0.00017889121739130434
+          0.00018414205932203392
         ],
-        "bars_per_second": 54965321.820844024
+        "bars_per_second": 54305898.59165015
+      }
+    }
+  ],
+  "warmup": {
+    "bars": 1500,
+    "taflow_canonical_warmup": {
+      "mean_ms": 0.030175362351190477,
+      "min_ms": 0.030175362351190477,
+      "p50_ms": 0.030175362351190477,
+      "p99_ms": 0.030175362351190477,
+      "samples_s": [
+        3.0175362351190477e-05
+      ]
+    },
+    "taflow_native_warmup": {
+      "mean_ms": 0.028902190934065937,
+      "min_ms": 0.028902190934065937,
+      "p50_ms": 0.028902190934065937,
+      "p99_ms": 0.028902190934065937,
+      "samples_s": [
+        2.8902190934065937e-05
+      ]
+    }
+  },
+  "continuation": [
+    {
+      "base_bars": 1500,
+      "update_bars": 100,
+      "chunk": 1,
+      "taflow_canonical_continue": {
+        "mean_ms": 0.09310399999999999,
+        "min_ms": 0.09310399999999999,
+        "p50_ms": 0.09310399999999999,
+        "p99_ms": 0.09310399999999999,
+        "samples_s": [
+          9.3104e-05
+        ],
+        "calls": 100,
+        "bars": 100,
+        "mean_call_us": 0.9310399999999999,
+        "mean_bar_us": 0.9310399999999999,
+        "bars_per_second": 1074067.70922839
+      },
+      "taflow_native_continue": {
+        "mean_ms": 0.020942,
+        "min_ms": 0.020942,
+        "p50_ms": 0.020942,
+        "p99_ms": 0.020942,
+        "samples_s": [
+          2.0942e-05
+        ],
+        "calls": 100,
+        "bars": 100,
+        "mean_call_us": 0.20942,
+        "mean_bar_us": 0.20942,
+        "bars_per_second": 4775093.114315729
+      }
+    },
+    {
+      "base_bars": 1500,
+      "update_bars": 100,
+      "chunk": 10,
+      "taflow_canonical_continue": {
+        "mean_ms": 0.011666,
+        "min_ms": 0.011666,
+        "p50_ms": 0.011666,
+        "p99_ms": 0.011666,
+        "samples_s": [
+          1.1666e-05
+        ],
+        "calls": 10,
+        "bars": 100,
+        "mean_call_us": 1.1666,
+        "mean_bar_us": 0.11666,
+        "bars_per_second": 8571918.395336876
+      },
+      "taflow_native_continue": {
+        "mean_ms": 0.006525,
+        "min_ms": 0.006525,
+        "p50_ms": 0.006525,
+        "p99_ms": 0.006525,
+        "samples_s": [
+          6.525e-06
+        ],
+        "calls": 10,
+        "bars": 100,
+        "mean_call_us": 0.6525,
+        "mean_bar_us": 0.06525,
+        "bars_per_second": 15325670.49808429
+      }
+    },
+    {
+      "base_bars": 1500,
+      "update_bars": 100,
+      "chunk": 100,
+      "taflow_canonical_continue": {
+        "mean_ms": 0.003875,
+        "min_ms": 0.003875,
+        "p50_ms": 0.003875,
+        "p99_ms": 0.003875,
+        "samples_s": [
+          3.875e-06
+        ],
+        "calls": 1,
+        "bars": 100,
+        "mean_call_us": 3.875,
+        "mean_bar_us": 0.03875,
+        "bars_per_second": 25806451.612903226
+      },
+      "taflow_native_continue": {
+        "mean_ms": 0.0030800000000000003,
+        "min_ms": 0.0030800000000000003,
+        "p50_ms": 0.0030800000000000003,
+        "p99_ms": 0.0030800000000000003,
+        "samples_s": [
+          3.08e-06
+        ],
+        "calls": 1,
+        "bars": 100,
+        "mean_call_us": 3.08,
+        "mean_bar_us": 0.030800000000000004,
+        "bars_per_second": 32467532.467532467
       }
     }
   ]
