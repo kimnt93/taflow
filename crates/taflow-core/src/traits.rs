@@ -1,4 +1,4 @@
-/// 参数默认值类型
+/// Supported parameter default values.
 #[derive(Debug, Clone)]
 pub enum ParamDefault {
     Integer(i32),
@@ -6,7 +6,7 @@ pub enum ParamDefault {
     MaType(i32),
 }
 
-/// 参数定义
+/// Definition of an indicator parameter.
 #[derive(Debug, Clone)]
 pub struct ParamDef {
     pub name: &'static str,
@@ -15,27 +15,29 @@ pub struct ParamDef {
     pub max: Option<f64>,
 }
 
-/// 指标标志位
+/// Flags describing indicator behavior.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct IndicatorFlags {
-    /// 是否有不稳定期
+    /// Whether the indicator has an unstable warm-up period.
     pub has_unstable_period: bool,
-    /// 是否为 K 线形态识别
+    /// Whether the indicator recognizes candlestick patterns.
     pub is_candlestick: bool,
 }
 
-/// 指标元数据 trait — 用于 Abstract API 和函数自省
+/// Indicator metadata used by the abstract API and introspection.
 pub trait IndicatorInfo {
-    /// 指标名称，如 "SMA"
+    /// Indicator name, for example `"SMA"`.
     fn name() -> &'static str;
-    /// 所属分组，如 "Overlap Studies"
+    /// Indicator group, for example `"Overlap Studies"`.
     fn group() -> &'static str;
-    /// 所需输入名称，如 ["close"] 或 ["high", "low", "close"]
+    /// Required input names, for example `["close"]` or
+    /// `["high", "low", "close"]`.
     fn input_names() -> &'static [&'static str];
-    /// 输出名称，如 ["real"] 或 ["upperband", "middleband", "lowerband"]
+    /// Output names, for example `["real"]` or
+    /// `["upperband", "middleband", "lowerband"]`.
     fn output_names() -> &'static [&'static str];
-    /// 参数定义列表
+    /// Parameter definitions.
     fn parameters() -> Vec<ParamDef>;
-    /// 标志位
+    /// Indicator flags.
     fn flags() -> IndicatorFlags;
 }

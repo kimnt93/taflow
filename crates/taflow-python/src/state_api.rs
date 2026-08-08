@@ -64,8 +64,8 @@ macro_rules! scalar_state_class {
                 py: Python<'_>,
                 input: PyReadonlyArray1<f64>,
             ) -> PyResult<Py<PyArray1<f64>>> {
-                let values = self.inner.extend(input.as_slice()?.iter().copied());
-                Ok(to_py_array(py, values_from(values)))
+                let values = self.inner.extend_into(input.as_slice()?.iter().copied());
+                Ok(to_py_array(py, values))
             }
 
             #[getter]

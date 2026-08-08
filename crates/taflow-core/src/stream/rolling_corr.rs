@@ -3,9 +3,10 @@
 use super::statistic::*;
 use crate::error::{TaError, TaResult};
 
-/// Pearson's Correlation Coefficient (CORREL) — O(n) 滑动窗口算法
+/// Pearson correlation coefficient (CORREL) — O(n) sliding-window algorithm.
 ///
-/// 使用恒等式: correl = (n*sxy - sx*sy) / sqrt((n*sxx - sx²) * (n*syy - sy²))
+/// Uses the identity: correl = (n*sxy - sx*sy) /
+/// sqrt((n*sxx - sx²) * (n*syy - sy²)).
 /// Compute the rolling corr result for the supplied aligned series.
 ///
 /// # Parameters
@@ -36,7 +37,7 @@ pub fn rolling_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
     output[..lookback].fill(f64::NAN);
     let n = timeperiod as f64;
 
-    // 初始化第一个窗口 [0..timeperiod] 的滑动求和
+    // Initialize rolling sums for the first [0..timeperiod] window.
     let init_x = &input0[0..timeperiod];
     let init_y = &input1[0..timeperiod];
     let mut sx = crate::simd::sum_f64(init_x);
@@ -49,7 +50,7 @@ pub fn rolling_corr(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
     let denom = ((n * sxx - sx * sx) * (n * syy - sy * sy)).sqrt();
     output[lookback] = if denom > 0.0 { num / denom } else { 0.0 };
 
-    // 滑动窗口
+    // Slide the window.
     for i in timeperiod..len {
         let old_x = input0[i - timeperiod];
         let old_y = input1[i - timeperiod];

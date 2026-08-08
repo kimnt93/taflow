@@ -125,7 +125,7 @@ impl UltimateOscillator {
 /// Ultimate Oscillator (ULTOSC)
 ///
 /// ULTOSC = 100 * (4*avg7 + 2*avg14 + avg28) / 7
-/// 其中 avg_n = sum(BP, n) / sum(TR, n)
+/// Here `avg_n = sum(BP, n) / sum(TR, n)`.
 /// BP (Buying Pressure) = close - min(low, prev_close)
 /// TR (True Range) = max(high, prev_close) - min(low, prev_close)
 pub fn ultimate_oscillator(
@@ -151,7 +151,7 @@ pub fn ultimate_oscillator(
         });
     }
 
-    // 计算 BP 和 TR
+    // Compute buying pressure (BP) and true range (TR).
     let mut bp = vec![0.0; len];
     let mut tr = vec![0.0; len];
     for i in 1..len {

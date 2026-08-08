@@ -4,7 +4,7 @@ use taflow as core;
 
 use crate::conversion::to_py_array;
 
-// 辅助宏: 将 TaError 转为 PyValueError
+// Helper macro: convert `TaError` into `PyValueError`.
 macro_rules! ta_err {
     ($expr:expr) => {
         $expr.map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
@@ -1896,7 +1896,7 @@ macro_rules! cdl_pyfunction_penetration {
     };
 }
 
-// 所有 K 线形态绑定
+// Bindings for all candlestick patterns.
 cdl_pyfunction!(CDLDOJI, core::stream::candle_doji);
 cdl_pyfunction!(CDLHAMMER, core::stream::candle_hammer);
 cdl_pyfunction!(CDLENGULFING, core::stream::candle_engulfing);

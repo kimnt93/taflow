@@ -1,4 +1,4 @@
-/// 将输出数组的前 `lookback` 个元素填充为 NaN，匹配 TA-Lib 行为
+/// Fills the first `lookback` output elements with NaN, matching TA-Lib.
 #[inline]
 pub fn fill_nan_prefix(output: &mut [f64], lookback: usize) {
     for v in output.iter_mut().take(lookback) {
@@ -6,13 +6,14 @@ pub fn fill_nan_prefix(output: &mut [f64], lookback: usize) {
     }
 }
 
-/// 验证输入数组长度是否满足 lookback 要求
+/// Validates that an input array is long enough for the requested lookback.
 #[inline]
 pub fn validate_length(len: usize, lookback: usize) -> bool {
     len > lookback
 }
 
-/// 用于 OHLCV 输入的统一容器，所有切片均为借用（零拷贝）
+/// Borrowed OHLCV inputs. All fields are slices, so constructing this view is
+/// zero-copy.
 #[derive(Debug, Clone, Copy)]
 pub struct OhlcvInputs<'a> {
     pub open: Option<&'a [f64]>,
@@ -23,7 +24,7 @@ pub struct OhlcvInputs<'a> {
 }
 
 impl<'a> OhlcvInputs<'a> {
-    /// 创建仅包含 close 数据的输入
+    /// Creates an input view containing only close prices.
     pub fn close_only(close: &'a [f64]) -> Self {
         Self {
             open: None,
@@ -34,7 +35,7 @@ impl<'a> OhlcvInputs<'a> {
         }
     }
 
-    /// 创建包含 HLC 数据的输入
+    /// Creates an input view containing high, low, and close prices.
     pub fn hlc(high: &'a [f64], low: &'a [f64], close: &'a [f64]) -> Self {
         Self {
             open: None,
@@ -45,7 +46,7 @@ impl<'a> OhlcvInputs<'a> {
         }
     }
 
-    /// 创建包含完整 OHLCV 数据的输入
+    /// Creates an input view containing the complete OHLCV set.
     pub fn full(
         open: &'a [f64],
         high: &'a [f64],

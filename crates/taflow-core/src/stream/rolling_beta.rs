@@ -3,15 +3,15 @@
 use super::statistic::*;
 use crate::error::{TaError, TaResult};
 
-/// RollingBeta — O(n) 滑动窗口算法
+/// RollingBeta — O(n) sliding-window algorithm.
 ///
-/// C TA-Lib BETA 使用百分比收益率:
-///   x[i] = (input0[i] - input0[i-1]) / input0[i-1]  (input0 的百分比收益)
-///   y[i] = (input1[i] - input1[i-1]) / input1[i-1]  (input1 的百分比收益)
+/// C TA-Lib BETA uses percentage returns:
+///   x[i] = (input0[i] - input0[i-1]) / input0[i-1]  (input0 return)
+///   y[i] = (input1[i] - input1[i-1]) / input1[i-1]  (input1 return)
 ///   beta = (n*sxy - sx*sy) / (n*sxx - sx*sx)
 ///
-/// 其中 input0 为基准 (market)，input1 为标的 (stock)，
-/// 分母是 rolling_var(x)=rolling_var(input0 的收益率)。
+/// `input0` is the market benchmark and `input1` is the stock;
+/// the denominator is `rolling_var(x)`, the variance of benchmark returns.
 /// Compute the rolling beta result for the supplied aligned series.
 ///
 /// # Parameters
@@ -41,9 +41,8 @@ pub fn rolling_beta(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
     output[..timeperiod].fill(f64::NAN);
     let n = timeperiod as f64;
 
-    // 预计算百分比收益率（一次分配，避免每个窗口重复除法）
-    // rx[i] 对应原始 index i+1 的收益率 (即 rx[i] = (input0[i+1]-input0[i])/input0[i])
-    // 收益率序列长度 = len - 1
+    // Precompute percentage returns once to avoid repeated division per window.
+    // rx[i] corresponds to original index i+1; the return series has length len - 1.
     let ret_len = len - 1;
     let mut rx = vec![0.0_f64; ret_len];
     let mut ry = vec![0.0_f64; ret_len];
@@ -52,14 +51,13 @@ pub fn rolling_beta(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
         ry[j] = (input1[j + 1] - input1[j]) / input1[j];
     }
 
-    // 滑动窗口: 对于输出 index i (i >= timeperiod)，
-    // 使用收益率 rx[i-timeperiod..i] (即原始 indices (i-timeperiod+1)..=i 的收益率)
+    // For output index i (i >= timeperiod), use rx[i-timeperiod..i].
     let mut sx = 0.0_f64;
     let mut sy = 0.0_f64;
     let mut sxx = 0.0_f64;
     let mut sxy = 0.0_f64;
 
-    // 初始化第一个窗口: rx[0..timeperiod] 对应原始 output[timeperiod]
+    // Initialize the first window: rx[0..timeperiod] produces output[timeperiod].
     for j in 0..timeperiod {
         let x = rx[j];
         let y = ry[j];
@@ -76,9 +74,9 @@ pub fn rolling_beta(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
         0.0
     };
 
-    // 滑动
+    // Slide the window.
     for i in (timeperiod + 1)..len {
-        // 移除 rx[i - timeperiod - 1]，加入 rx[i - 1]
+        // Remove rx[i - timeperiod - 1] and add rx[i - 1].
         let old_idx = i - timeperiod - 1;
         let new_idx = i - 1;
         let ox = rx[old_idx];

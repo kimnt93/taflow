@@ -195,7 +195,7 @@ pub fn moving_average_convergence_divergence(
         });
     }
 
-    // 确保 slow > fast
+    // Ensure slow is greater than fast.
     let (fp, sp) = if fastperiod < slowperiod {
         (fastperiod, slowperiod)
     } else {
@@ -215,13 +215,13 @@ pub fn moving_average_convergence_divergence(
     let k_slow = 2.0 / (sp as f64 + 1.0);
     let k_signal = 2.0 / (signalperiod as f64 + 1.0);
 
-    // C TA-Lib MACD 内部 EMA 计算：
+    // C TA-Lib MACD internal EMA calculation:
     // slow seed = SMA(close[0..sp]), fast seed = SMA(close[sp-fp..sp])
     let slow_seed: f64 = input[..sp].iter().sum::<f64>() / sp as f64;
     let fast_seed: f64 = input[sp - fp..sp].iter().sum::<f64>() / fp as f64;
 
-    // MACD line: 第一个值 (对应 bar sp-1) = fast_seed - slow_seed
-    // 后续从 bar sp 开始递推
+    // MACD line: first value (bar sp-1) = fast_seed - slow_seed.
+    // Recurrence starts at bar sp.
     let mut macd_values = Vec::with_capacity(len - sp + 1);
     macd_values.push(fast_seed - slow_seed);
 
@@ -237,7 +237,7 @@ pub fn moving_average_convergence_divergence(
     // seed = SMA(macd_values[0..signalperiod])
     let signal_seed: f64 = macd_values[..signalperiod].iter().sum::<f64>() / signalperiod as f64;
 
-    // 构建输出
+    // Build the output.
     let out_start = sp - 1 + signalperiod - 1; // = lookback
     let mut macd_line = vec![0.0_f64; len];
     macd_line[..out_start].fill(f64::NAN);
@@ -246,7 +246,7 @@ pub fn moving_average_convergence_divergence(
     let mut histogram = vec![0.0_f64; len];
     histogram[..out_start].fill(f64::NAN);
 
-    // signal 第一个值对应 macd_values[signalperiod-1]，即 bar out_start
+    // The first signal value corresponds to macd_values[signalperiod-1], bar out_start.
     let mut signal_ema = signal_seed;
     let macd_at_out_start = macd_values[signalperiod - 1];
     macd_line[out_start] = macd_at_out_start;

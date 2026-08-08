@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 use std::collections::HashMap;
 
-/// 返回所有已实现的函数名列表
+/// Returns the names of all implemented functions.
 #[pyfunction]
 pub fn get_functions() -> Vec<String> {
     let mut funcs = Vec::new();
@@ -177,7 +177,7 @@ pub fn get_functions() -> Vec<String> {
     funcs
 }
 
-/// 返回按组分类的函数映射
+/// Returns the implemented functions grouped by category.
 #[pyfunction]
 pub fn get_function_groups() -> HashMap<String, Vec<String>> {
     let mut groups = HashMap::new();

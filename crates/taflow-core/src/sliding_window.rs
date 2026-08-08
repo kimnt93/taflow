@@ -1,21 +1,23 @@
-//! 单调队列 (Monotonic Deque) 实现的滑动窗口极值
+//! Monotonic-queue implementations for sliding-window extrema.
 //!
-//! 用于 O(n) 计算固定窗口的最大/最小值及其索引。
-//! 替代 O(n*period) 的朴素扫描，对 AROON/WILLR/MAX/MIN 等指标提速显著。
+//! These helpers compute fixed-width maxima/minima and their indices in O(n),
+//! replacing the O(n * period) rescan used by naive rolling implementations.
 
 use std::collections::VecDeque;
 
-/// 滑动窗口最大值 + 索引 (单调递减队列)
+/// Sliding-window maximum and its index (monotonically decreasing queue).
 ///
-/// 返回每个窗口的 (max_value, max_index)。
-/// 总复杂度 O(n)，每个元素最多入队出队各一次。
+/// Returns `(max_value, max_index)` for each complete window.
 pub fn sliding_max(data: &[f64], window: usize) -> Vec<(f64, usize)> {
+    if window == 0 || data.is_empty() {
+        return Vec::new();
+    }
     let len = data.len();
     let mut result = Vec::with_capacity(len.saturating_sub(window - 1));
     let mut deque: VecDeque<usize> = VecDeque::with_capacity(window);
 
     for i in 0..len {
-        // 移除超出窗口的元素
+        // Remove indices that have fallen out of the window.
         while let Some(&front) = deque.front() {
             if front + window <= i {
                 deque.pop_front();
@@ -23,7 +25,7 @@ pub fn sliding_max(data: &[f64], window: usize) -> Vec<(f64, usize)> {
                 break;
             }
         }
-        // 保持单调递减：移除所有小于当前值的队尾
+        // Keep the queue decreasing; newest equal values win ties.
         while let Some(&back) = deque.back() {
             if data[back] <= data[i] {
                 deque.pop_back();
@@ -42,8 +44,11 @@ pub fn sliding_max(data: &[f64], window: usize) -> Vec<(f64, usize)> {
     result
 }
 
-/// 滑动窗口最小值 + 索引 (单调递增队列)
+/// Sliding-window minimum and its index (monotonically increasing queue).
 pub fn sliding_min(data: &[f64], window: usize) -> Vec<(f64, usize)> {
+    if window == 0 || data.is_empty() {
+        return Vec::new();
+    }
     let len = data.len();
     let mut result = Vec::with_capacity(len.saturating_sub(window - 1));
     let mut deque: VecDeque<usize> = VecDeque::with_capacity(window);
@@ -98,5 +103,13 @@ mod tests {
         assert_eq!(result[1], (1.0, 3)); // [3,4,1] -> min=1 at 3
         assert_eq!(result[2], (1.0, 3)); // [4,1,2] -> min=1 at 3
         assert_eq!(result[3], (1.0, 3)); // [1,2,6] -> min=1 at 3
+    }
+
+    #[test]
+    fn empty_or_zero_width_windows_are_empty() {
+        assert!(sliding_max(&[1.0, 2.0], 0).is_empty());
+        assert!(sliding_min(&[1.0, 2.0], 0).is_empty());
+        assert!(sliding_max(&[], 3).is_empty());
+        assert!(sliding_min(&[], 3).is_empty());
     }
 }

@@ -9,7 +9,7 @@ mod state_api;
 /// Python module entry point for `taflow._native`.
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    // 元数据 API
+    // Metadata API.
 
     // Unified indicator objects. Each TA binding lives in its own module and
     // owns its accumulated outputs so compute() never replays prior input.

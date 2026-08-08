@@ -91,12 +91,13 @@ mod tests {
 use crate::error::TaError;
 use crate::simd::sum_f64;
 
-/// TRIX — 三重指数平滑的 ROC
+/// TRIX — rate of change of a triple-exponentially smoothed series.
 ///
 /// TRIX = ROC(EMA(EMA(EMA(input))))
 /// lookback = 3*(timeperiod-1) + 1
 ///
-/// 优化版本：3 层 EMA 标量级联 + ROC，仅 1 个输出 Vec，无中间分配。
+/// Optimized version: three scalar EMA stages plus ROC, with one output Vec
+/// and no intermediate allocation.
 /// Compute the triple exponential rate of change result for the supplied aligned series.
 ///
 /// # Parameters

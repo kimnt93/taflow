@@ -3,11 +3,11 @@ use thiserror::Error;
 /// Core error type for TAFlow.
 #[derive(Debug, Error, Clone, PartialEq)]
 pub enum TaError {
-    /// 输入数据长度不足以计算指标
+    /// Input data is too short to compute the indicator.
     #[error("input data too short: need at least {need} elements, got {got}")]
     InsufficientData { need: usize, got: usize },
 
-    /// 参数值无效
+    /// A parameter value is invalid.
     #[error("invalid parameter: {name} = {value} ({reason})")]
     InvalidParameter {
         name: &'static str,
@@ -15,14 +15,14 @@ pub enum TaError {
         reason: &'static str,
     },
 
-    /// 缺少必要的输入数组
+    /// A required input array is missing.
     #[error("missing required input: {0}")]
     MissingInput(&'static str),
 
-    /// 输入数组长度不一致
+    /// Input arrays have different lengths.
     #[error("input length mismatch: expected {expected}, got {got}")]
     LengthMismatch { expected: usize, got: usize },
 }
 
-/// 便捷结果类型
+/// Convenient result type for indicator operations.
 pub type TaResult<T> = Result<T, TaError>;

@@ -1,6 +1,6 @@
 use crate::error::{TaError, TaResult};
 
-/// 移动平均类型枚举，与 TA-Lib 的 MA_Type 完全兼容
+/// Moving-average types compatible with TA-Lib `MA_Type`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(i32)]
 pub enum MaType {
@@ -64,7 +64,7 @@ impl MaType {
     }
 }
 
-/// 根据 MaType 调度到对应的移动平均计算函数
+/// Dispatches a `MaType` to its corresponding moving-average function.
 pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec<f64>> {
     if period == 1 {
         return Ok(input.to_vec());
@@ -85,9 +85,10 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
         MaType::KaufmanAdaptiveMovingAverage => {
             crate::stream::kaufman_adaptive_moving_average(input, period)
         }
-        // MAMA/TripleExponentialAverage 通过 MA 调度器调用时使用固定默认值，与 C TA-Lib ta_MA.c 完全一致:
-        //   MAMA: fastlimit=0.5, slowlimit=0.05 (忽略 period)
-        //   TripleExponentialAverage:   vfactor=0.7 (period 正常传递)
+        // MAMA and TripleExponentialAverage use fixed defaults through the
+        // MA dispatcher, matching C TA-Lib ta_MA.c:
+        //   MAMA: fastlimit=0.5, slowlimit=0.05 (period is ignored)
+        //   TripleExponentialAverage: vfactor=0.7 (period is forwarded)
         MaType::MesaAdaptiveMovingAverage => {
             let (mama, _fama) = crate::stream::mesa_adaptive_moving_average(input, 0.5, 0.05)?;
             Ok(mama)

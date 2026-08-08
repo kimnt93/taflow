@@ -3,7 +3,7 @@
 use super::math_operator::*;
 use crate::error::{TaError, TaResult};
 
-/// 滑动窗口最大值的索引 -- C TA-Lib compatible: ties keep FIRST occurrence
+/// Index of the rolling maximum; ties keep the first occurrence, matching C TA-Lib.
 ///
 /// Compute the rolling argmax result for the supplied aligned series.
 ///

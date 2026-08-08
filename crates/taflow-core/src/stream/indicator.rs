@@ -23,4 +23,22 @@ pub trait StreamingIndicator {
     {
         inputs.into_iter().map(|input| self.append(input)).collect()
     }
+
+    /// Extends the state without exposing `Option` values at the bulk boundary.
+    ///
+    /// Warm-up samples are represented as `NaN`, which is the representation
+    /// used by the batch and Python APIs.  Keeping that conversion in the core
+    /// loop avoids allocating an intermediate `Vec<Option<_>>` and a second
+    /// mapped vector for every bulk call.
+    fn extend_into<I>(&mut self, inputs: I) -> Vec<f64>
+    where
+        I: IntoIterator<Item = f64>,
+        Self::Output: Into<f64>,
+    {
+        let iter = inputs.into_iter();
+        let (lower, upper) = iter.size_hint();
+        let mut output = Vec::with_capacity(upper.unwrap_or(lower));
+        output.extend(iter.map(|input| self.append(input).map(Into::into).unwrap_or(f64::NAN)));
+        output
+    }
 }

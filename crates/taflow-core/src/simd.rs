@@ -1,21 +1,20 @@
-//! SIMD 加速的批量运算函数
+//! SIMD-accelerated bulk operations.
 //!
-//! 使用 `wide` crate 的 `f64x4` 类型实现 4 路并行计算。
-//! 所有函数在 `simd` feature 关闭时会退化为标量实现。
+//! Uses `wide::f64x4` for four-lane parallel computation. Functions fall back
+//! to scalar implementations when the `simd` feature is disabled.
 
 #[cfg(feature = "simd")]
 use wide::f64x4;
 
 // ============================================================
-// 批量求和 (用于 SMA 初始窗口、STDDEV 等)
+// Bulk sum (used by SMA seed windows, STDDEV, and related indicators).
 // ============================================================
 
-/// SIMD 加速的数组求和
+/// SIMD-accelerated array sum.
 #[cfg(feature = "simd")]
 pub fn sum_f64(data: &[f64]) -> f64 {
     let len = data.len();
     let chunks = len / 4;
-    let remainder = len % 4;
 
     let mut acc = f64x4::ZERO;
     for i in 0..chunks {
@@ -31,7 +30,7 @@ pub fn sum_f64(data: &[f64]) -> f64 {
 
     let mut total = acc.reduce_add();
 
-    // 处理剩余元素
+    // Process the remaining elements.
     let tail_start = chunks * 4;
     for i in tail_start..len {
         total += data[i];
@@ -51,10 +50,10 @@ pub fn sum_f64(data: &[f64]) -> f64 {
 }
 
 // ============================================================
-// 批量平方和 (用于 STDDEV, VAR)
+// Bulk squared-difference sum (used by STDDEV and VAR).
 // ============================================================
 
-/// SIMD 加速的平方和: Σ(x - mean)²
+/// SIMD-accelerated squared-difference sum: Σ(x - mean)².
 #[cfg(feature = "simd")]
 pub fn sum_sq_diff(data: &[f64], mean: f64) -> f64 {
     let len = data.len();
@@ -101,10 +100,10 @@ pub fn sum_sq_diff(data: &[f64], mean: f64) -> f64 {
 }
 
 // ============================================================
-// 批量逐元素运算 (用于 Math Operators)
+// Bulk element-wise operations (used by math operators).
 // ============================================================
 
-/// SIMD 加速的逐元素加法
+/// SIMD-accelerated element-wise addition.
 #[cfg(feature = "simd")]
 pub fn add_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     debug_assert_eq!(a.len(), b.len());
@@ -142,7 +141,7 @@ pub fn add_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     a.iter().zip(b.iter()).map(|(x, y)| x + y).collect()
 }
 
-/// SIMD 加速的逐元素减法
+/// SIMD-accelerated element-wise subtraction.
 #[cfg(feature = "simd")]
 pub fn sub_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     debug_assert_eq!(a.len(), b.len());
@@ -180,7 +179,7 @@ pub fn sub_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     a.iter().zip(b.iter()).map(|(x, y)| x - y).collect()
 }
 
-/// SIMD 加速的逐元素乘法
+/// SIMD-accelerated element-wise multiplication.
 #[cfg(feature = "simd")]
 pub fn mult_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     debug_assert_eq!(a.len(), b.len());
@@ -218,7 +217,7 @@ pub fn mult_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     a.iter().zip(b.iter()).map(|(x, y)| x * y).collect()
 }
 
-/// SIMD 加速的逐元素除法
+/// SIMD-accelerated element-wise division.
 #[cfg(feature = "simd")]
 pub fn div_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
     debug_assert_eq!(a.len(), b.len());
@@ -257,10 +256,10 @@ pub fn div_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
 }
 
 // ============================================================
-// 批量逐元素一元运算 (用于 Math Transform)
+// Bulk unary element-wise operations (used by math transforms).
 // ============================================================
 
-/// SIMD 加速的逐元素 sqrt
+/// SIMD-accelerated element-wise square root.
 #[cfg(feature = "simd")]
 pub fn sqrt_array(input: &[f64]) -> Vec<f64> {
     let len = input.len();
@@ -301,7 +300,7 @@ pub fn sqrt_array(input: &[f64]) -> Vec<f64> {
     input.iter().map(|&v| v.sqrt()).collect()
 }
 
-/// SIMD 加速的逐元素 abs
+/// SIMD-accelerated element-wise absolute value.
 #[cfg(feature = "simd")]
 pub fn abs_array(input: &[f64]) -> Vec<f64> {
     let len = input.len();
@@ -342,15 +341,17 @@ pub fn abs_array(input: &[f64]) -> Vec<f64> {
     input.iter().map(|&v| v.abs()).collect()
 }
 
-/// 通用的 SIMD 逐元素标量运算宏
-/// 对 sin/cos/exp/ln 等无法直接 SIMD 的函数，使用 4 路并行展开
+/// General SIMD element-wise scalar-operation macro.
+/// Functions without direct SIMD support, such as sin/cos/exp/ln, use a
+/// four-way unrolled loop.
 macro_rules! simd_unary_scalar {
     ($name:ident, $op:expr) => {
         pub fn $name(input: &[f64]) -> Vec<f64> {
             let len = input.len();
             let mut result = vec![0.0; len];
 
-            // 4 路循环展开 (即使不是真 SIMD，也利于 CPU 流水线和缓存)
+            // Four-way loop unrolling improves CPU pipelining and cache use,
+            // even when hardware SIMD is unavailable.
             let chunks = len / 4;
             for i in 0..chunks {
                 let offset = i * 4;
@@ -891,7 +892,7 @@ mod tests {
 
     #[test]
     fn test_sum_f64_non_aligned() {
-        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]; // 7 元素
+        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]; // Seven elements.
         let result = sum_f64(&data);
         assert!((result - 28.0).abs() < 1e-10);
     }
