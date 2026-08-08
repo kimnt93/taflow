@@ -1,7 +1,5 @@
 //! Rolling variance, deviation, correlation, and beta states.
 
-use std::collections::VecDeque;
-
 use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator, Window};
@@ -369,6 +367,93 @@ impl StreamingIndicator for RollingAverageDeviation {
     }
 }
 
+/// TA-Lib rejects a correlation window when the variance product falls below
+/// this threshold (`TA_CORREL`); replicated verbatim.
+pub(super) const CORREL_DENOMINATOR_EPSILON: f64 = 0.00000000000001;
+
+/// TA-Lib's `TA_IS_ZERO` macro, used verbatim by `TA_BETA` for both the
+/// previous-price divisor and the regression denominator.
+#[inline]
+pub(super) fn ta_is_zero(value: f64) -> bool {
+    (-0.00000001 < value) && (value < 0.00000001)
+}
+
+/// TA-Lib's `TA_BETA` percentage return, including its zero-price guard.
+#[inline]
+pub(super) fn beta_return(current: f64, previous: f64) -> f64 {
+    if !ta_is_zero(previous) {
+        (current - previous) / previous
+    } else {
+        0.0
+    }
+}
+
+/// Fixed ring of `(x, y)` pairs stored **interleaved** in one allocation.
+///
+/// Both halves of a bar are always read and written together, so one
+/// interleaved buffer costs one cache line and one index computation per bar
+/// where two parallel [`Window`]s cost two of each.
+#[derive(Debug, Clone)]
+struct PairRing {
+    /// `2 * capacity` slots, laid out `x0, y0, x1, y1, …`.
+    buf: Box<[f64]>,
+    /// Slot index (always even) of the oldest pair.
+    head: usize,
+    /// Number of pairs currently held.
+    len: usize,
+    capacity: usize,
+}
+
+impl PairRing {
+    fn new(capacity: usize) -> TaResult<Self> {
+        if capacity == 0 {
+            return Err(invalid_period("capacity", capacity, 1));
+        }
+        Ok(Self {
+            buf: vec![0.0; capacity * 2].into_boxed_slice(),
+            head: 0,
+            len: 0,
+            capacity,
+        })
+    }
+
+    /// Appends `(x, y)`, returning the pair evicted from a full ring.
+    #[inline]
+    fn push(&mut self, x: f64, y: f64) -> Option<(f64, f64)> {
+        let slots = self.buf.len();
+        if self.len == self.capacity {
+            let head = self.head;
+            let evicted = (self.buf[head], self.buf[head + 1]);
+            self.buf[head] = x;
+            self.buf[head + 1] = y;
+            let next = head + 2;
+            self.head = if next == slots { 0 } else { next };
+            Some(evicted)
+        } else {
+            let mut tail = self.head + self.len * 2;
+            if tail >= slots {
+                tail -= slots;
+            }
+            self.buf[tail] = x;
+            self.buf[tail + 1] = y;
+            self.len += 1;
+            None
+        }
+    }
+
+    #[inline]
+    fn is_full(&self) -> bool {
+        self.len == self.capacity
+    }
+
+    #[inline]
+    fn clear(&mut self) {
+        self.head = 0;
+        self.len = 0;
+    }
+}
+
+/// The five sliding sums `TA_CORREL` maintains.
 #[derive(Debug, Clone, Copy)]
 struct PairMoments {
     sx: f64,
@@ -378,31 +463,64 @@ struct PairMoments {
     sxy: f64,
 }
 
-/// Reseed cadence for sliding pair moments, in absolute appends.
+impl PairMoments {
+    const ZERO: Self = Self {
+        sx: 0.0,
+        sy: 0.0,
+        sxx: 0.0,
+        syy: 0.0,
+        sxy: 0.0,
+    };
+}
+
+/// TA-Lib's `TA_CORREL` emit expression.
 ///
-/// Every `PAIR_MOMENTS_RESEED_INTERVAL`-th append (counted from
-/// construction/reset, so the reseed bars are the same regardless of how the
-/// input is chunked) the five sums are recomputed from the retained window
-/// in serial oldest-to-newest order. This bounds subtractive-cancellation
-/// drift to at most 63 slide steps instead of letting it grow with the
-/// series length: measured over 200k LCG bars the worst deviation from a
-/// fresh per-window recomputation falls from 1.6e-11 to 6.7e-13.
-/// Amortized cost is `period / 64` extra element accumulations per bar.
-/// The batch kernels (`rolling_corr`, `rolling_beta`) apply the identical
-/// cadence so streaming stays bitwise equal to batch.
-/// TA-Lib rejects a correlation window when the variance product falls below
-/// this threshold (`TA_CORREL`); replicated verbatim.
-pub(super) const CORREL_DENOMINATOR_EPSILON: f64 = 0.00000000000001;
+/// The period divides *inside* each term rather than scaling numerator and
+/// denominator; the forms are algebraically equal but not numerically, and
+/// matching C exactly is what keeps near-zero correlations bit-identical.
+#[inline]
+fn correl_of(sx: f64, sy: f64, sxx: f64, syy: f64, sxy: f64, period: f64) -> f64 {
+    let numerator = sxy - ((sx * sy) / period);
+    let denominator = (sxx - ((sx * sx) / period)) * (syy - ((sy * sy) / period));
+    if !(denominator < CORREL_DENOMINATOR_EPSILON) {
+        numerator / denominator.sqrt()
+    } else {
+        0.0
+    }
+}
 
-pub(super) const PAIR_MOMENTS_RESEED_INTERVAL: u64 = 64;
-
+/// Sliding pair moments in **`TA_CORREL`'s exact accumulation order**.
+///
+/// The C steady-state loop removes the trailing bar's five contributions
+/// *first*, then adds the incoming bar's, then emits — the mirror image of
+/// `TA_INT_VAR` (add / emit / remove), which is why `RollingBeta` cannot share
+/// this struct: `TA_BETA` follows the `TA_INT_VAR` ordering over its return
+/// series and has its own [`RollingReturnMoments`].
+///
+/// Reproducing the order verbatim — instead of the algebraically equivalent
+/// fused `sum += new - old` recurrence, and instead of periodically reseeding
+/// the sums from the retained window — makes CORREL **bitwise** equal to
+/// `talib.CORREL` on the harness's AR(1) series at every period and length
+/// measured (p=5/14/30 at 100k and 1M bars) rather than 4.8e-10-close.
+///
+/// Reseeding was measured and removed: it pushes our sums towards the true
+/// per-window value and therefore *away* from TA-Lib's own drifting
+/// accumulator, which is what the oracle gate compares against. Same
+/// reasoning as [`RollingMoments`], and dropping it also removes a
+/// `period / 64` per-bar tax.
+///
+/// Because the trailing pair is removed before the incoming one is added, the
+/// resting invariant is "the sums cover the `period` most recent pairs", so
+/// the rings hold `period` entries and their eviction *is* TA-Lib's
+/// `trailingIdx` read.
+///
+/// Note: no `mul_add` anywhere — TA-Lib multiplies then adds separately, and
+/// contracting the pair changes the low bits.
 #[derive(Debug, Clone)]
 struct RollingPairMoments {
     period: usize,
-    window: VecDeque<(f64, f64)>,
+    window: PairRing,
     moments: PairMoments,
-    /// Total appends since construction/reset.
-    count: u64,
 }
 
 impl RollingPairMoments {
@@ -412,79 +530,120 @@ impl RollingPairMoments {
         }
         Ok(Self {
             period,
-            window: VecDeque::with_capacity(period),
-            moments: PairMoments {
-                sx: 0.0,
-                sy: 0.0,
-                sxx: 0.0,
-                syy: 0.0,
-                sxy: 0.0,
-            },
-            count: 0,
+            window: PairRing::new(period)?,
+            moments: PairMoments::ZERO,
         })
     }
 
+    #[inline]
     fn append(&mut self, x: f64, y: f64) -> Option<PairMoments> {
-        if self.window.len() == self.period {
-            let (old_x, old_y) = self.window.pop_front().expect("pair window is full");
-            self.moments.sx += x - old_x;
-            self.moments.sy += y - old_y;
-            self.moments.sxx += x * x - old_x * old_x;
-            self.moments.syy += y * y - old_y * old_y;
-            self.moments.sxy += x * y - old_x * old_y;
-        } else {
-            self.moments.sx += x;
-            self.moments.sy += y;
-            self.moments.sxx += x * x;
-            self.moments.syy += y * y;
-            self.moments.sxy += x * y;
+        let m = &mut self.moments;
+        if let Some((trailing_x, trailing_y)) = self.window.push(x, y) {
+            // "Remove trailing values", in TA_CORREL's statement order.
+            m.sx -= trailing_x;
+            m.sxx -= trailing_x * trailing_x;
+            m.sxy -= trailing_x * trailing_y;
+            m.sy -= trailing_y;
+            m.syy -= trailing_y * trailing_y;
         }
-        self.window.push_back((x, y));
-        self.count += 1;
-        if self.window.len() == self.period && self.count % PAIR_MOMENTS_RESEED_INTERVAL == 0 {
-            self.reseed_serial();
-        }
-        (self.window.len() == self.period).then_some(self.moments)
-    }
-
-    /// Recomputes all five sums from the window, oldest to newest, with the
-    /// same per-element accumulation the warm-up path uses.
-    fn reseed_serial(&mut self) {
-        let mut moments = PairMoments {
-            sx: 0.0,
-            sy: 0.0,
-            sxx: 0.0,
-            syy: 0.0,
-            sxy: 0.0,
-        };
-        for &(x, y) in &self.window {
-            moments.sx += x;
-            moments.sy += y;
-            moments.sxx += x * x;
-            moments.syy += y * y;
-            moments.sxy += x * y;
-        }
-        self.moments = moments;
+        // "Add new values", likewise.
+        m.sx += x;
+        m.sxx += x * x;
+        m.sxy += x * y;
+        m.sy += y;
+        m.syy += y * y;
+        self.window.is_full().then_some(self.moments)
     }
 
     fn reset(&mut self) {
         self.window.clear();
-        self.moments = PairMoments {
-            sx: 0.0,
-            sy: 0.0,
-            sxx: 0.0,
-            syy: 0.0,
-            sxy: 0.0,
-        };
-        self.count = 0;
+        self.moments = PairMoments::ZERO;
+    }
+}
+
+/// The four sliding sums `TA_BETA` maintains over the two return series.
+#[derive(Debug, Clone, Copy)]
+struct ReturnMoments {
+    sx: f64,
+    sy: f64,
+    sxx: f64,
+    sxy: f64,
+}
+
+impl ReturnMoments {
+    const ZERO: Self = Self {
+        sx: 0.0,
+        sy: 0.0,
+        sxx: 0.0,
+        sxy: 0.0,
+    };
+}
+
+/// TA-Lib's `TA_BETA` emit expression.
+#[inline]
+fn beta_of(sx: f64, sy: f64, sxx: f64, sxy: f64, period: f64) -> f64 {
+    let denominator = (period * sxx) - (sx * sx);
+    if !ta_is_zero(denominator) {
+        ((period * sxy) - (sx * sy)) / denominator
+    } else {
+        0.0
+    }
+}
+
+/// Sliding pair moments in **`TA_BETA`'s exact accumulation order**.
+///
+/// `TA_BETA` seeds `period - 1` returns, then per bar adds the incoming
+/// return, emits, and *only then* removes the trailing one — the opposite
+/// nesting from [`RollingPairMoments`] (`TA_CORREL`), which is why the two
+/// cannot share a struct. Reproducing it makes BETA **bitwise** equal to
+/// `talib.BETA` at p=5/30 over 100k and 1M bars.
+///
+/// The resting invariant is therefore "the sums cover the `period - 1` most
+/// recent returns", so the rings only need `period - 1` slots and their
+/// eviction is TA-Lib's `trailingIdx` return.
+#[derive(Debug, Clone)]
+struct RollingReturnMoments {
+    period: usize,
+    window: PairRing,
+    moments: ReturnMoments,
+}
+
+impl RollingReturnMoments {
+    fn new(period: usize) -> TaResult<Self> {
+        if period < 2 {
+            return Err(invalid_period("timeperiod", period, 2));
+        }
+        Ok(Self {
+            period,
+            window: PairRing::new(period - 1)?,
+            moments: ReturnMoments::ZERO,
+        })
     }
 
-    fn reseed_linear_sums_with_batch_order(&mut self) -> PairMoments {
-        let x: Vec<f64> = self.window.iter().map(|value| value.0).collect();
-        let y: Vec<f64> = self.window.iter().map(|value| value.1).collect();
-        self.moments.sx = crate::simd::sum_f64(&x);
-        self.moments.sy = crate::simd::sum_f64(&y);
-        self.moments
+    #[inline]
+    fn append(&mut self, x: f64, y: f64) -> Option<ReturnMoments> {
+        let m = &mut self.moments;
+        // "Add new values", in TA_BETA's statement order.
+        m.sxx += x * x;
+        m.sxy += x * y;
+        m.sx += x;
+        m.sy += y;
+        // A full retained ring means the sums now cover `period` returns.
+        let emitted = self.window.is_full().then_some(self.moments);
+        if let Some((trailing_x, trailing_y)) = self.window.push(x, y) {
+            // "Remove the trailing", after the output is written.
+            let m = &mut self.moments;
+            m.sxx -= trailing_x * trailing_x;
+            m.sxy -= trailing_x * trailing_y;
+            m.sx -= trailing_x;
+            m.sy -= trailing_y;
+        }
+        emitted
+    }
+
+    fn reset(&mut self) {
+        self.window.clear();
+        self.moments = ReturnMoments::ZERO;
     }
 }
 
@@ -497,7 +656,6 @@ impl RollingPairMoments {
 pub struct RollingCorrelation {
     period: f64,
     moments: RollingPairMoments,
-    seeded: bool,
     value: Option<f64>,
 }
 
@@ -511,7 +669,6 @@ impl RollingCorrelation {
         Ok(Self {
             period: period as f64,
             moments: RollingPairMoments::new(period)?,
-            seeded: false,
             value: None,
         })
     }
@@ -522,35 +679,17 @@ impl RollingCorrelation {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
-        let moments = self.moments.append(x, y).map(|moments| {
-            if self.seeded {
-                moments
-            } else {
-                self.seeded = true;
-                self.moments.reseed_linear_sums_with_batch_order()
-            }
-        });
-        self.value = moments.map(|m| {
-            // TA-Lib's TA_CORREL divides by the period inside each term rather
-            // than scaling the numerator and denominator by it. The forms are
-            // algebraically equal but not numerically; matching C exactly keeps
-            // near-zero correlations inside the oracle's tolerance.
-            let numerator = m.sxy - ((m.sx * m.sy) / self.period);
-            let denominator =
-                (m.sxx - ((m.sx * m.sx) / self.period)) * (m.syy - ((m.sy * m.sy) / self.period));
-            if !(denominator < CORREL_DENOMINATOR_EPSILON) {
-                numerator / denominator.sqrt()
-            } else {
-                0.0
-            }
-        });
+        let period = self.period;
+        self.value = self
+            .moments
+            .append(x, y)
+            .map(|m| correl_of(m.sx, m.sy, m.sxx, m.syy, m.sxy, period));
         self.value
     }
 
-    /// Bulk kernel: O(1) add/evict sliding pair-moments indexing the input
-    /// slices directly. Bit-identical to per-bar [`Self::append`] in outputs
-    /// and post-run state (including the one-time batch-order reseed of the
-    /// linear sums, which happens inside the prologue appends).
+    /// Bulk kernel: `TA_CORREL`'s remove-trailing / add-new / emit recurrence
+    /// indexing the input slices directly. Bit-identical to per-bar
+    /// [`Self::append`] in outputs and post-run state.
     pub fn extend_slices_into(
         &mut self,
         input0: &[f64],
@@ -566,9 +705,8 @@ impl RollingCorrelation {
         let period = self.moments.period;
         let n = input0.len();
         output.reserve(n);
-        // Warm-up prologue: after `period` appends the pair window holds
-        // exactly the first `period` slice pairs, regardless of prior state,
-        // and the reseed (if due) has been applied by `append`.
+        // Warm-up prologue: after `period` appends the pair ring holds exactly
+        // the first `period` slice pairs, regardless of prior state.
         let prologue = n.min(period);
         for i in 0..prologue {
             output.push(self.append(input0[i], input1[i]).unwrap_or(f64::NAN));
@@ -576,60 +714,42 @@ impl RollingCorrelation {
         if n <= period {
             return Ok(());
         }
-        // Steady loop: identical arithmetic to the full-window branch of
-        // `RollingPairMoments::append`, evicted pair read from the slices.
+        // Branch-free steady loop: identical arithmetic in identical order to
+        // `RollingPairMoments::append`, but every access is a zipped slice
+        // iterator, so there is no ring traffic and no bounds check. The
+        // `TrustedLen` `extend` writes each result straight into the output's
+        // spare capacity — a `resize` prologue would cost a second full pass
+        // over the buffer just to pre-fill it.
         let period_f = self.period;
         let mut m = self.moments.moments;
-        let mut count = self.moments.count;
-        let mut last = f64::NAN;
-        for i in period..n {
-            let x = input0[i];
-            let y = input1[i];
-            let old_x = input0[i - period];
-            let old_y = input1[i - period];
-            m.sx += x - old_x;
-            m.sy += y - old_y;
-            m.sxx += x * x - old_x * old_x;
-            m.syy += y * y - old_y * old_y;
-            m.sxy += x * y - old_x * old_y;
-            count += 1;
-            if count % PAIR_MOMENTS_RESEED_INTERVAL == 0 {
-                // Same absolute-append cadence and serial oldest-to-newest
-                // order as `RollingPairMoments::reseed_serial`.
-                m = PairMoments {
-                    sx: 0.0,
-                    sy: 0.0,
-                    sxx: 0.0,
-                    syy: 0.0,
-                    sxy: 0.0,
-                };
-                for j in i + 1 - period..=i {
-                    let x = input0[j];
-                    let y = input1[j];
+        let steady = n - period;
+        output.extend(
+            input0[period..]
+                .iter()
+                .zip(&input1[period..])
+                .zip(&input0[..steady])
+                .zip(&input1[..steady])
+                .map(|(((&x, &y), &tx), &ty)| {
+                    // "Remove trailing values", "add new values", then emit.
+                    m.sx -= tx;
+                    m.sxx -= tx * tx;
+                    m.sxy -= tx * ty;
+                    m.sy -= ty;
+                    m.syy -= ty * ty;
                     m.sx += x;
-                    m.sy += y;
                     m.sxx += x * x;
-                    m.syy += y * y;
                     m.sxy += x * y;
-                }
-            }
-            let numerator = m.sxy - ((m.sx * m.sy) / period_f);
-            let denominator =
-                (m.sxx - ((m.sx * m.sx) / period_f)) * (m.syy - ((m.sy * m.sy) / period_f));
-            last = if !(denominator < CORREL_DENOMINATOR_EPSILON) {
-                numerator / denominator.sqrt()
-            } else {
-                0.0
-            };
-            output.push(last);
-        }
+                    m.sy += y;
+                    m.syy += y * y;
+                    correl_of(m.sx, m.sy, m.sxx, m.syy, m.sxy, period_f)
+                }),
+        );
         self.moments.moments = m;
-        self.moments.count = count;
-        self.value = Some(last);
-        // Rebuild the pair window so subsequent appends continue bit-identically.
+        self.value = output.last().copied();
+        // Rebuild the pair ring so subsequent appends continue bit-identically.
         self.moments.window.clear();
         for i in n - period..n {
-            self.moments.window.push_back((input0[i], input1[i]));
+            self.moments.window.push(input0[i], input1[i]);
         }
         Ok(())
     }
@@ -650,7 +770,6 @@ impl RollingCorrelation {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn reset(&mut self) {
         self.moments.reset();
-        self.seeded = false;
         self.value = None;
     }
 }
@@ -664,7 +783,7 @@ impl RollingCorrelation {
 pub struct RollingBeta {
     period: f64,
     previous: Option<(f64, f64)>,
-    returns: RollingPairMoments,
+    returns: RollingReturnMoments,
     value: Option<f64>,
 }
 
@@ -678,7 +797,7 @@ impl RollingBeta {
         Ok(Self {
             period: period as f64,
             previous: None,
-            returns: RollingPairMoments::new(period)?,
+            returns: RollingReturnMoments::new(period)?,
             value: None,
         })
     }
@@ -692,17 +811,102 @@ impl RollingBeta {
         let Some((previous0, previous1)) = self.previous.replace((input0, input1)) else {
             return None;
         };
-        let x = (input0 - previous0) / previous0;
-        let y = (input1 - previous1) / previous1;
-        self.value = self.returns.append(x, y).map(|m| {
-            let denominator = self.period * m.sxx - m.sx * m.sx;
-            if denominator > 0.0 {
-                (self.period * m.sxy - m.sx * m.sy) / denominator
-            } else {
-                0.0
-            }
-        });
+        let x = beta_return(input0, previous0);
+        let y = beta_return(input1, previous1);
+        let period = self.period;
+        self.value = self
+            .returns
+            .append(x, y)
+            .map(|m| beta_of(m.sx, m.sy, m.sxx, m.sxy, period));
         self.value
+    }
+
+    /// Bulk kernel: `TA_BETA`'s add-new / emit / remove-trailing recurrence
+    /// over returns recomputed straight from the input slices — exactly what
+    /// the C loop does through its `trailingLastPrice` cursors, so no return
+    /// series is materialized and no ring is touched inside the loop.
+    /// Bit-identical to per-bar [`Self::append`] in outputs and post-run state.
+    pub fn extend_slices_into(
+        &mut self,
+        input0: &[f64],
+        input1: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if input0.len() != input1.len() {
+            return Err(crate::TaError::LengthMismatch {
+                expected: input0.len(),
+                got: input1.len(),
+            });
+        }
+        let period = self.returns.period;
+        let n = input0.len();
+        output.reserve(n);
+        // Warm-up prologue: after `period` appends the retained ring holds
+        // exactly the `period - 1` returns of `inputs[..period]`, and
+        // `previous` is `inputs[period - 1]` — regardless of prior state.
+        let prologue = n.min(period);
+        for i in 0..prologue {
+            output.push(self.append(input0[i], input1[i]).unwrap_or(f64::NAN));
+        }
+        if n <= period {
+            return Ok(());
+        }
+        // Branch-free steady loop over eight zipped slices: per series, the
+        // incoming bar and its predecessor (the new return) and the trailing
+        // bar and its predecessor (the return leaving the window). Output slot
+        // `k` is bar `i = k + period`. The `TrustedLen` `extend` writes into
+        // the output's spare capacity without a pre-fill pass.
+        let period_f = self.period;
+        let mut m = self.returns.moments;
+        let steady = n - period;
+        let series0 = input0[period..]
+            .iter()
+            .zip(&input0[period - 1..n - 1])
+            .zip(&input0[1..steady + 1])
+            .zip(&input0[..steady]);
+        let series1 = input1[period..]
+            .iter()
+            .zip(&input1[period - 1..n - 1])
+            .zip(&input1[1..steady + 1])
+            .zip(&input1[..steady]);
+        output.extend(series0.zip(series1).map(
+            |(
+                (((&new0, &previous0), &trailing0), &trailing_previous0),
+                (((&new1, &previous1), &trailing1), &trailing_previous1),
+            )| {
+                let x = beta_return(new0, previous0);
+                let y = beta_return(new1, previous1);
+                m.sxx += x * x;
+                m.sxy += x * y;
+                m.sx += x;
+                m.sy += y;
+
+                // TA-Lib reads the trailing return before writing the output.
+                let tx = beta_return(trailing0, trailing_previous0);
+                let ty = beta_return(trailing1, trailing_previous1);
+
+                let out = beta_of(m.sx, m.sy, m.sxx, m.sxy, period_f);
+
+                m.sxx -= tx * tx;
+                m.sxy -= tx * ty;
+                m.sx -= tx;
+                m.sy -= ty;
+                out
+            },
+        ));
+        self.returns.moments = m;
+        self.value = output.last().copied();
+        // Rebuild the retained ring (the `period - 1` most recent returns) and
+        // `previous`, so subsequent appends continue bit-identically.
+        self.returns.window.clear();
+        for i in n - period + 1..n {
+            self.returns.window.push(
+                beta_return(input0[i], input0[i - 1]),
+                beta_return(input1[i], input1[i - 1]),
+            );
+        }
+        self.previous = Some((input0[n - 1], input1[n - 1]));
+        Ok(())
     }
 
     /// Computes or updates `value` through the native Rust kernel.
@@ -827,8 +1031,10 @@ mod tests {
                 .map(|(&a, &b)| per_bar.append(a, b).unwrap_or(f64::NAN))
                 .collect();
 
-            // 5,000 bars cross the 256-append reseed cadence ~19 times, so
-            // every chunking (and the tail) crosses reseed boundaries.
+            // 5,000 bars with chunk sizes mutually coprime with the periods,
+            // so the bulk prologue/steady split lands at many different
+            // offsets inside the window; each run is followed by a 256-bar
+            // continue-after-bulk tail of per-bar appends.
             for chunk in [usize::MAX, 1, 7, 10, 97, 1000] {
                 let mut state = RollingCorrelation::new(period).unwrap();
                 let mut out = Vec::new();
@@ -856,7 +1062,55 @@ mod tests {
     }
 
     #[test]
-    fn correl_streaming_matches_batch_bitwise_across_reseeds() {
+    fn beta_bulk_is_bitwise_identical_to_per_bar_append() {
+        let x = lcg_series(5_000, 0x5EED_B0B0);
+        let y = lcg_series(5_000, 0xC0FF_B0B0);
+        let tail_x = lcg_series(256, 0x7A11_B0B0);
+        let tail_y = lcg_series(256, 0x7A11_B0B1);
+        for period in [2usize, 5, 14, 30, 200] {
+            let mut per_bar = RollingBeta::new(period).unwrap();
+            let reference: Vec<f64> = x
+                .iter()
+                .zip(&y)
+                .map(|(&a, &b)| per_bar.append(a, b).unwrap_or(f64::NAN))
+                .collect();
+            let tail_reference: Vec<f64> = tail_x
+                .iter()
+                .zip(&tail_y)
+                .map(|(&a, &b)| per_bar.append(a, b).unwrap_or(f64::NAN))
+                .collect();
+
+            // Chunk sizes mutually coprime with the periods, so the bulk
+            // prologue/steady split lands at many different offsets inside the
+            // window; each run ends with a continue-after-bulk tail.
+            for chunk in [usize::MAX, 1, 7, 10, 97, 1000] {
+                let mut state = RollingBeta::new(period).unwrap();
+                let mut out = Vec::new();
+                let mut start = 0;
+                while start < x.len() {
+                    let end = (start + chunk.min(x.len())).min(x.len());
+                    state
+                        .extend_slices_into(&x[start..end], &y[start..end], &mut out)
+                        .unwrap();
+                    start = end;
+                }
+                assert_same_bits(&out, &reference, &format!("BETA p{period} chunk {chunk}"));
+                let tail_out: Vec<f64> = tail_x
+                    .iter()
+                    .zip(&tail_y)
+                    .map(|(&a, &b)| state.append(a, b).unwrap_or(f64::NAN))
+                    .collect();
+                assert_same_bits(
+                    &tail_out,
+                    &tail_reference,
+                    &format!("BETA p{period} chunk {chunk} tail"),
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn correl_streaming_matches_batch_bitwise() {
         let x = lcg_series(5_000, 0x5EED_CBAF);
         let y = lcg_series(5_000, 0xC0FF_CBAF);
         for period in [2usize, 14, 30, 200, 256] {
@@ -876,7 +1130,7 @@ mod tests {
     }
 
     #[test]
-    fn beta_streaming_matches_batch_bitwise_across_reseeds() {
+    fn beta_streaming_matches_batch_bitwise() {
         let x = lcg_series(5_000, 0x5EED_BE7A);
         let y = lcg_series(5_000, 0xC0FF_BE7A);
         for period in [2usize, 14, 30, 200, 256] {
@@ -1047,23 +1301,235 @@ mod tests {
         }
     }
 
+    /// Literal transcription of TA-Lib's `TA_CORREL` accumulation loop.
+    ///
+    /// Seed the five sums over the first window, then per bar: remove the
+    /// trailing pair's contributions, add the incoming pair's, emit. Note the
+    /// per-statement order inside each phase (x, x², xy, y, y²) and that the
+    /// period divides inside each term of the emit.
+    fn talib_correl_reference(x: &[f64], y: &[f64], period: usize) -> Vec<f64> {
+        let n = x.len();
+        let mut output = vec![f64::NAN; n];
+        let period_f = period as f64;
+        let (mut sx, mut sy, mut sxx, mut syy, mut sxy) = (0.0, 0.0, 0.0, 0.0, 0.0);
+        let mut trailing = 0usize;
+        for today in 0..period {
+            let a = x[today];
+            sx += a;
+            sxx += a * a;
+            let b = y[today];
+            sxy += a * b;
+            sy += b;
+            syy += b * b;
+        }
+        let mut trailing_x = x[trailing];
+        let mut trailing_y = y[trailing];
+        trailing += 1;
+        let temp = (sxx - ((sx * sx) / period_f)) * (syy - ((sy * sy) / period_f));
+        output[period - 1] = if !(temp < 0.00000000000001) {
+            (sxy - ((sx * sy) / period_f)) / temp.sqrt()
+        } else {
+            0.0
+        };
+        for today in period..n {
+            // Remove trailing values.
+            sx -= trailing_x;
+            sxx -= trailing_x * trailing_x;
+            sxy -= trailing_x * trailing_y;
+            sy -= trailing_y;
+            syy -= trailing_y * trailing_y;
+            // Add new values.
+            let a = x[today];
+            sx += a;
+            sxx += a * a;
+            let b = y[today];
+            sxy += a * b;
+            sy += b;
+            syy += b * b;
+            trailing_x = x[trailing];
+            trailing_y = y[trailing];
+            trailing += 1;
+            let temp = (sxx - ((sx * sx) / period_f)) * (syy - ((sy * sy) / period_f));
+            output[today] = if !(temp < 0.00000000000001) {
+                (sxy - ((sx * sy) / period_f)) / temp.sqrt()
+            } else {
+                0.0
+            };
+        }
+        output
+    }
+
+    /// Literal transcription of TA-Lib's `TA_BETA` accumulation loop:
+    /// seed `period - 1` returns, then per bar add the incoming return, read
+    /// the trailing one, emit, and only then remove the trailing one.
+    fn talib_beta_reference(x: &[f64], y: &[f64], period: usize) -> Vec<f64> {
+        let n = x.len();
+        let mut output = vec![f64::NAN; n];
+        let period_f = period as f64;
+        let (mut sx, mut sy, mut sxx, mut sxy) = (0.0, 0.0, 0.0, 0.0);
+        let mut last_x = x[0];
+        let mut last_y = y[0];
+        let mut trailing_last_x = x[0];
+        let mut trailing_last_y = y[0];
+        let mut trailing = 1usize;
+        for i in 1..period {
+            let a = beta_return(x[i], last_x);
+            last_x = x[i];
+            let b = beta_return(y[i], last_y);
+            last_y = y[i];
+            sxx += a * a;
+            sxy += a * b;
+            sx += a;
+            sy += b;
+        }
+        for i in period..n {
+            let a = beta_return(x[i], last_x);
+            last_x = x[i];
+            let b = beta_return(y[i], last_y);
+            last_y = y[i];
+            sxx += a * a;
+            sxy += a * b;
+            sx += a;
+            sy += b;
+
+            let trailing_x = beta_return(x[trailing], trailing_last_x);
+            trailing_last_x = x[trailing];
+            let trailing_y = beta_return(y[trailing], trailing_last_y);
+            trailing_last_y = y[trailing];
+            trailing += 1;
+
+            let temp = (period_f * sxx) - (sx * sx);
+            output[i] = if !ta_is_zero(temp) {
+                ((period_f * sxy) - (sx * sy)) / temp
+            } else {
+                0.0
+            };
+
+            sxx -= trailing_x * trailing_x;
+            sxy -= trailing_x * trailing_y;
+            sx -= trailing_x;
+            sy -= trailing_y;
+        }
+        output
+    }
+
     #[test]
-    fn correl_streaming_drift_stays_bounded_over_200k_bars() {
-        let x = lcg_series(200_000, 0x5EED_D21F);
-        let y = lcg_series(200_000, 0xC0FF_D21F);
-        for period in [14usize, 30] {
+    fn correl_reproduces_the_talib_recurrence_bitwise() {
+        let x = lcg_series(5_000, 0x5EED_C0C0);
+        let y = lcg_series(5_000, 0xC0FF_C0C0);
+        for period in [2usize, 5, 14, 30, 200] {
+            let reference = talib_correl_reference(&x, &y, period);
+
             let mut state = RollingCorrelation::new(period).unwrap();
+            let streamed: Vec<f64> = x
+                .iter()
+                .zip(&y)
+                .map(|(&a, &b)| state.append(a, b).unwrap_or(f64::NAN))
+                .collect();
+            assert_same_bits(&streamed, &reference, &format!("CORREL TA-order p{period}"));
+
+            let mut bulk_state = RollingCorrelation::new(period).unwrap();
+            let mut bulk = Vec::new();
+            let mut start = 0;
+            while start < x.len() {
+                let end = (start + 997).min(x.len());
+                bulk_state
+                    .extend_slices_into(&x[start..end], &y[start..end], &mut bulk)
+                    .unwrap();
+                start = end;
+            }
+            assert_same_bits(
+                &bulk,
+                &reference,
+                &format!("CORREL TA-order bulk p{period}"),
+            );
+
+            let batch = crate::stream::rolling_corr(&x, &y, period).unwrap();
+            assert_same_bits(
+                &batch,
+                &reference,
+                &format!("CORREL TA-order batch p{period}"),
+            );
+        }
+    }
+
+    #[test]
+    fn beta_reproduces_the_talib_recurrence_bitwise() {
+        let x = lcg_series(5_000, 0x5EED_BEEF);
+        let y = lcg_series(5_000, 0xC0FF_BEEF);
+        for period in [2usize, 5, 14, 30, 200] {
+            let reference = talib_beta_reference(&x, &y, period);
+
+            let mut state = RollingBeta::new(period).unwrap();
+            let streamed: Vec<f64> = x
+                .iter()
+                .zip(&y)
+                .map(|(&a, &b)| state.append(a, b).unwrap_or(f64::NAN))
+                .collect();
+            assert_same_bits(&streamed, &reference, &format!("BETA TA-order p{period}"));
+
+            let mut bulk_state = RollingBeta::new(period).unwrap();
+            let mut bulk = Vec::new();
+            let mut start = 0;
+            while start < x.len() {
+                let end = (start + 997).min(x.len());
+                bulk_state
+                    .extend_slices_into(&x[start..end], &y[start..end], &mut bulk)
+                    .unwrap();
+                start = end;
+            }
+            assert_same_bits(&bulk, &reference, &format!("BETA TA-order bulk p{period}"));
+
+            let batch = crate::stream::rolling_beta(&x, &y, period).unwrap();
+            assert_same_bits(
+                &batch,
+                &reference,
+                &format!("BETA TA-order batch p{period}"),
+            );
+        }
+    }
+
+    /// CORREL and BETA deliberately reproduce TA-Lib's sliding accumulators
+    /// rather than periodically reseeded (more accurate) ones: the oracle gate
+    /// compares against TA-Lib, whose own sums drift, so reseeding moves us
+    /// towards truth and therefore *away* from the oracle. Measured against
+    /// `talib.CORREL`/`talib.BETA` on the harness's AR(1) series, the verbatim
+    /// order is bitwise identical at 100k and 1M bars where the reseeded
+    /// version was 1.5e-9 / 2.7e-9 off.
+    ///
+    /// So the invariant tested at scale is that the state never diverges from
+    /// that recurrence — checked bitwise at every bar — while the residual
+    /// against a fresh per-window recomputation stays bounded (that residual
+    /// is TA-Lib's own drift; the loose bound only has to catch a genuinely
+    /// broken accumulator, which lands orders of magnitude higher).
+    #[test]
+    fn correl_and_beta_track_the_talib_recurrence_over_1m_bars() {
+        let x = lcg_series(1_000_000, 0x5EED_1E6B);
+        let y = lcg_series(1_000_000, 0xC0FF_1E6B);
+        for period in [14usize, 30] {
+            let correl_reference = talib_correl_reference(&x, &y, period);
+            let mut correl = RollingCorrelation::new(period).unwrap();
+            let beta_reference = talib_beta_reference(&x, &y, period);
+            let mut beta = RollingBeta::new(period).unwrap();
             for i in 0..x.len() {
-                let Some(value) = state.append(x[i], y[i]) else {
-                    continue;
-                };
-                let probe = (i + 1) % 5_000 == 0 || i + 1 == x.len();
-                if probe {
+                let value = correl.append(x[i], y[i]).unwrap_or(f64::NAN);
+                assert_eq!(
+                    value.to_bits(),
+                    correl_reference[i].to_bits(),
+                    "CORREL p{period} bar {i}: diverged from the TA-Lib recurrence"
+                );
+                let beta_value = beta.append(x[i], y[i]).unwrap_or(f64::NAN);
+                assert_eq!(
+                    beta_value.to_bits(),
+                    beta_reference[i].to_bits(),
+                    "BETA p{period} bar {i}: diverged from the TA-Lib recurrence"
+                );
+                if (i + 1) % 50_000 == 0 {
                     let exact = exact_correl(&x, &y, i, period);
                     let drift = (value - exact).abs();
                     assert!(
-                        drift < 1e-12,
-                        "CORREL p{period} bar {i}: drift {drift:e} vs exact"
+                        drift < 1e-9,
+                        "CORREL p{period} bar {i}: drift {drift:e} vs a fresh window"
                     );
                 }
             }

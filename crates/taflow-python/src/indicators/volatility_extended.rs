@@ -44,11 +44,12 @@ impl DonchianOperator {
         if h.len() != l.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        py.allow_threads(|| {
-            for (&h, &l) in h.iter().zip(l) {
-                self.append(h, l);
-            }
-        });
+        let inner = &mut self.inner;
+        let upper = &mut self.upper;
+        let lower = &mut self.lower;
+        let middle = &mut self.middle;
+        py.allow_threads(|| inner.extend_slices_into(h, l, upper, lower, middle))
+            .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute<'py>(

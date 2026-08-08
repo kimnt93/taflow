@@ -35,11 +35,11 @@ impl SchaffTrendCycleOperator {
 
     fn extend(&mut self, py: Python<'_>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
         let close = close.as_slice()?;
-        py.allow_threads(|| {
-            for &close in close {
-                self.append(close);
-            }
-        });
+        let inner = &mut self.inner;
+        let stc = &mut self.stc;
+        let macd = &mut self.macd;
+        let stoch = &mut self.stoch;
+        py.allow_threads(|| inner.extend_slices_into(close, stc, macd, stoch));
         Ok(())
     }
 

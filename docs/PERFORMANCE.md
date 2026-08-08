@@ -106,20 +106,64 @@ Never build a released wheel with `-C target-cpu=native`: it defeats the
 runtime dispatch and produces a binary that crashes on older CPUs.
 `make build-native` exists for local measurement only.
 
+## Two lessons worth carrying forward
+
+**Better asymptotics are not automatically faster.** The index-returning
+extrema (MAXINDEX/MININDEX/MINMAXINDEX) had already been "optimized" by
+replacing TA-Lib's O(period) rescan with a monotonic deque — amortized O(1)
+instead of O(period). It was **4–6× slower**. The deque pays two unpredictable
+pop-loops on every single bar, while the rescan does contiguous,
+branch-predictable work only when the tracked candidate ages out, roughly once
+per `period` bars. Restoring a faithful replica of the C state machine took
+MAXINDEX from 0.68× to 1.93×.
+
+## The bug no Rust test could catch
+
+An audit comparing every core bulk kernel against every PyO3 binding found
+**seven kernels that nothing called**. Each had been written, unit-tested, and
+proven bitwise-equal to the per-bar path in Rust — while the Python `extend`
+still looped `append` one bar at a time. Every Rust test passed the whole time,
+because the kernels themselves were correct; they were simply unreachable from
+the API users actually use.
+
+| function | before wiring | after |
+|---|---|---|
+| Donchian | 19.3M bars/s | **214.5M** |
+| RollingCorrelation | 0.41× | **1.91×** |
+| TripleExponentialRateOfChange | 0.98× | **3.38×** |
+| PlusDirectionalIndicator | 0.97× | **1.79×** |
+| KnowSureThing | 30.0M bars/s | **66.2M** |
+| RollingBeta | 1.00× | **1.52×** |
+| VariablePeriodMovingAverage | 0.37× | 0.71× |
+
+Two subtler variants of the same bug turned up later: a pyclass that correctly
+called `extend_slice_into` on a type that never overrode it (so it silently
+resolved to the per-bar trait default), and a real bulk signature whose body was
+`for input in inputs { self.append(input) }`.
+
+If you add a bulk kernel to this codebase, check that a binding calls it *and*
+that the call reaches a real implementation. The test suite will not tell you —
+every one of these passed its correctness tests the whole time.
+
 ## Measured results
 
 Kernel throughput vs TA-Lib at 10,000 bars, before and after:
 
 | Function | Before | After |
 |---|---:|---:|
-| RollingMax (MAX) | 0.33× | **2.47×** |
 | CandleGapSideSideWhite | 1.43× | **3.97×** |
+| TripleExponentialRateOfChange (TRIX) | 0.98× | **3.38×** |
+| RollingMax (MAX) | 0.33× | **2.47×** |
+| MoneyFlowIndex (MFI) | 0.57× | **2.37×** |
 | SimpleMovingAverage (SMA) | 1.14× | **2.15×** |
+| PercentagePriceOscillator (PPO) | 0.88× | **2.09×** |
+| RollingArgmax (MAXINDEX) | 0.68× | **1.93×** |
+| RollingCorrelation (CORREL) | 0.41× | **1.91×** |
+| StochasticOscillator (STOCH) | 0.92× | **1.57×** |
 | TripleExponentialAverage (T3) | 0.29× | **1.40×** |
-| UltimateOscillator (ULTOSC) | 0.55× | **1.39×** |
 | BollingerBands (BBANDS) | 0.46× | **1.19×** |
 
-131 of the 161 TA-Lib-mapped functions now meet or beat the C implementation
+151 of the 161 TA-Lib-mapped functions now meet or beat the C implementation
 at 10k bars, and **every** extended operator clears 20M bars/s. Per-function
 numbers across 1k/10k/100k/1M bars, plus append latency and thread scaling, are
 in [the benchmark reports](../verify/benchmark_reports/BENCHMARK.md).
@@ -133,28 +177,65 @@ make bench ARGS="SMA MAX"    # a subset
 
 ## Numerical fixes found along the way
 
-Chasing performance surfaced four correctness problems:
+Chasing performance surfaced several correctness problems, and fixing them
+taught a lesson worth stating plainly: **when a library is verified against
+another implementation, "more accurate" and "more correct" are not the same
+thing.**
 
-- **CORREL used the wrong form.** Our code computed
-  `(n·Σxy − Σx·Σy) / √((n·Σxx − Σx²)(n·Σyy − Σy²))` while TA-Lib's C divides by
-  the period *inside* each term. Algebraically identical, numerically not — it
-  exceeded tolerance on near-zero correlations. It now replicates `TA_CORREL`
-  exactly, including its variance-product guard.
-- **Sliding accumulators drift.** `sum += new − old` accumulates rounding error
-  without bound on an endless stream. The pair-moments states now reseed from
-  the retained window every 64 appends, at bar positions that are identical
-  regardless of chunking so chunk invariance survives. Drift over 200k bars
-  fell from ~1.6e-11 to ~6.7e-13.
-- **Three candle patterns disagreed with themselves.** `CDL3BLACKCROWS` used a
-  window offset by one bar, `CDLMATHOLD` averaged 11 bodies while dividing by
-  10, and `CDLHAMMER` emitted its first signal one bar early — all in the
-  streaming path, contradicting the batch path of the same pattern. The
-  existing per-file tests never fired those patterns; a randomized
-  batch-vs-streaming test across all 61 patterns caught them.
-- **A SIMD reduction was silently breaking the contract.** `sum_f64` summed in
-  four lanes while the streaming paths accumulated serially, so the same
-  indicator could produce different low bits depending on which path ran. It is
-  now serial, and documented as deliberately so.
+**Four functions now match TA-Lib bitwise.** The obvious fix for a drifting
+sliding accumulator is to periodically recompute it from the window. Measured,
+that made VAR and STDDEV *worse* at every interval tried — because TA-Lib's own
+accumulators drift too, and reseeding moves us toward mathematical truth and
+away from the oracle we are checked against. Replicating TA-Lib's exact
+statement order instead gives an exact match:
+
+| function | drift before | now |
+|---|---|---|
+| RollingVariance | 3.14e-09 | **0.0, bitwise** |
+| RollingStandardDeviation | 2.61e-08 | **0.0, bitwise** |
+| RollingCorrelation | 4.29e-09 | **0.0, bitwise** |
+| RollingBeta | 5.48e-11 | **0.0, bitwise** |
+
+CORREL and BETA need *different* accumulation orders (`TA_CORREL` removes the
+trailing bar before adding the new one; `TA_BETA` adds, emits, then removes),
+so they no longer share a moments struct.
+
+**Periodic reseeding is still right where the oracle does not drift.** TA-Lib's
+CCI rescans its buffer for the average each bar rather than sliding it, so
+reseeding converges onto it: CCI went from 2.40e-09 to 1.32e-11 with a reseed
+every 64 appends, at bar positions that are identical regardless of chunking so
+chunk invariance survives.
+
+**CORREL also used the wrong formula.** It computed
+`(n·Σxy − Σx·Σy) / √((n·Σxx − Σx²)(n·Σyy − Σy²))` while TA-Lib's C divides by
+the period *inside* each term — algebraically identical, numerically not, and
+it exceeded tolerance on near-zero correlations.
+
+**Sometimes the oracle is the broken one.** RollingZScore appeared to fail by
+1.95e-08. Checked against 50-digit Decimal arithmetic, taflow was within
+3.7e-15 of exact and *pandas* was off by 2.3e-08 — its rolling `std` uses an
+add/remove accumulator that degrades on low-variance windows. The verification
+oracle was replaced with a fresh per-window computation, not the implementation.
+
+**Three candle patterns disagreed with themselves.** `CDL3BLACKCROWS` used a
+window offset by one bar, `CDLMATHOLD` averaged 11 bodies while dividing by 10,
+and `CDLHAMMER` emitted its first signal one bar early — all in the streaming
+path, contradicting the batch path of the same pattern. The existing per-file
+tests never fired those patterns; a randomized batch-vs-streaming test across
+all 61 caught them.
+
+**A SIMD reduction was silently breaking the contract.** `sum_f64` summed in
+four lanes while streaming paths accumulated serially, so the same indicator
+could produce different low bits depending on which path ran. It is now serial,
+and documented as deliberately so.
+
+### A note on FMA
+
+Bitwise TA-Lib parity depends on plain multiply-and-add, so fused
+multiply-add would break it. Tested directly: builds with and without
+`-C target-cpu=native` produce identical results at 1M bars, because Rust
+guarantees IEEE semantics and will not contract without an explicit `mul_add`
+call. The parity is safe under `make build-native`.
 
 ## What was deliberately not done
 

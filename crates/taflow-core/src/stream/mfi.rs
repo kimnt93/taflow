@@ -54,6 +54,10 @@ pub struct MoneyFlowIndex {
     positive_sum: f64,
     negative_sum: f64,
     value: Option<f64>,
+    /// Reusable signed-money-flow scratch for [`Self::extend_slices_into`].
+    /// Held on the state so repeated bulk calls allocate at most once; never
+    /// touched by [`Self::append`].
+    flow_scratch: Vec<f64>,
 }
 
 impl MoneyFlowIndex {
@@ -73,6 +77,7 @@ impl MoneyFlowIndex {
             positive_sum: 0.0,
             negative_sum: 0.0,
             value: None,
+            flow_scratch: Vec::new(),
         })
     }
 
@@ -104,6 +109,30 @@ impl MoneyFlowIndex {
         } else if flow < 0.0 {
             *negative_sum -= flow;
         }
+    }
+
+    /// Branchless form of [`Self::apply_flow`] for the bulk steady loop.
+    ///
+    /// The sign of a money flow is essentially a coin flip bar to bar, so the
+    /// four data-dependent branches above mispredict roughly half the time.
+    /// Splitting each signed flow into the directional component it would have
+    /// contributed - and `0.0` otherwise - turns them into selects. This is
+    /// bit-exact, not an approximation: `x - 0.0` and `x + 0.0` are identity on
+    /// every f64 except `-0.0`, and neither sum can ever be `-0.0` (both start
+    /// at `+0.0`, and IEEE round-to-nearest gives `a - a == +0.0`).
+    #[inline]
+    fn apply_flow_branchless(
+        positive_sum: &mut f64,
+        negative_sum: &mut f64,
+        evicted: f64,
+        flow: f64,
+    ) {
+        let positive_evicted = if evicted > 0.0 { evicted } else { 0.0 };
+        let negative_evicted = if evicted < 0.0 { evicted } else { 0.0 };
+        let positive_flow = if flow > 0.0 { flow } else { 0.0 };
+        let negative_flow = if flow < 0.0 { flow } else { 0.0 };
+        *positive_sum = (*positive_sum - positive_evicted) + positive_flow;
+        *negative_sum = (*negative_sum + negative_evicted) - negative_flow;
     }
 
     #[inline]
@@ -139,10 +168,20 @@ impl MoneyFlowIndex {
     }
 
     /// Bulk kernel: O(1) add/evict recurrence on the directional sums with
-    /// both the new and the evicted signed flow recomputed directly from the
-    /// input slices (the recomputation is deterministic, so the evicted value
-    /// is bit-identical to what the ring held). Outputs and post-run state
-    /// are bit-identical to per-bar [`Self::append`].
+    /// both the new and the evicted signed flow derived directly from the
+    /// input slices (the derivation is deterministic, so the evicted value is
+    /// bit-identical to what the ring held). Outputs and post-run state are
+    /// bit-identical to per-bar [`Self::append`].
+    ///
+    /// Two things keep the steady loop off the divider and off the branch
+    /// predictor. The signed money flows are produced up front in one flat,
+    /// branch-free, autovectorizable pass - each element is the same
+    /// `(h + l + c) / 3.0` typical price and the same three-way sign test that
+    /// `append` evaluates, so it is bit-identical element for element - and the
+    /// loop then only slides two sums over that array, splitting each flow with
+    /// [`Self::apply_flow_branchless`] rather than four coin-flip branches. The
+    /// flow logic was measured at roughly half this kernel's cost before it was
+    /// hoisted.
     pub fn extend_slices_into(
         &mut self,
         high: &[f64],
@@ -174,37 +213,48 @@ impl MoneyFlowIndex {
         if n <= period + 1 {
             return Ok(());
         }
-        let typical = |i: usize| (high[i] + low[i] + close[i]) / 3.0;
+        // Flat prepass: `flows[i]` is the signed money flow of the transition
+        // `i-1 -> i`, element for element what `Self::signed_flow` would return.
+        // Element 0 has no predecessor and is never read.
+        let mut flows = std::mem::take(&mut self.flow_scratch);
+        flows.clear();
+        flows.reserve(n);
+        flows.push(0.0);
+        flows.extend((1..n).map(|i| {
+            let typical_price = (high[i] + low[i] + close[i]) / 3.0;
+            let previous = (high[i - 1] + low[i - 1] + close[i - 1]) / 3.0;
+            Self::signed_flow(typical_price, previous, volume[i])
+        }));
+
         let mut positive_sum = self.positive_sum;
         let mut negative_sum = self.negative_sum;
         let mut last = f64::NAN;
-        let mut previous = typical(period);
-        let mut old_previous = typical(0);
-        for i in (period + 1)..n {
-            let typical_price = typical(i);
-            let flow = Self::signed_flow(typical_price, previous, volume[i]);
-            previous = typical_price;
+        // Write through a pre-sized slice: `push`'s length write-back would sit
+        // on the critical path of every iteration.
+        let base = output.len();
+        output.resize(base + n - period - 1, f64::NAN);
+        let results = &mut output[base..];
+        for (slot, i) in results.iter_mut().zip((period + 1)..n) {
             // Evicted element: the signed flow generated `period` steps ago.
-            let old_typical = typical(i - period);
-            let old = Self::signed_flow(old_typical, old_previous, volume[i - period]);
-            old_previous = old_typical;
-            Self::apply_flow(&mut positive_sum, &mut negative_sum, Some(old), flow);
+            Self::apply_flow_branchless(
+                &mut positive_sum,
+                &mut negative_sum,
+                flows[i - period],
+                flows[i],
+            );
             last = Self::output(positive_sum, negative_sum);
-            output.push(last);
+            *slot = last;
         }
         self.positive_sum = positive_sum;
         self.negative_sum = negative_sum;
-        self.previous_typical_price = Some(previous);
+        self.previous_typical_price = Some((high[n - 1] + low[n - 1] + close[n - 1]) / 3.0);
         self.value = Some(last);
         // Rebuild the flow ring so subsequent appends continue bit-identically.
         self.flow.clear();
-        let mut prev = typical(n - period - 1);
-        for i in (n - period)..n {
-            let typical_price = typical(i);
-            self.flow
-                .push(Self::signed_flow(typical_price, prev, volume[i]));
-            prev = typical_price;
+        for &flow in &flows[n - period..] {
+            self.flow.push(flow);
         }
+        self.flow_scratch = flows;
         Ok(())
     }
 
@@ -350,7 +400,7 @@ mod tests {
                 })
                 .collect();
 
-            for chunk in [usize::MAX, 1, 7, 97] {
+            for chunk in [usize::MAX, 1, 7, 10, 97, 1_000] {
                 let mut state = MoneyFlowIndex::new(period).unwrap();
                 let mut out = Vec::new();
                 let mut start = 0;

@@ -7,7 +7,10 @@
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverageDispatcher, MovingAverageConvergenceDivergenceValue};
+use super::{
+    moving_average::MovingAverageDispatcher, MovingAverageConvergenceDivergenceValue,
+    StreamingIndicator,
+};
 
 /// Incremental MACDEXT with aligned fast/slow seeds.
 /// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergenceExtended`.
@@ -102,6 +105,10 @@ impl MovingAverageConvergenceDivergenceExtended {
         macd_out.reserve(inputs.len());
         signal_out.reserve(inputs.len());
         histogram_out.reserve(inputs.len());
+        if self.fast.is_sma() && self.slow.is_sma() && self.signal.is_sma() {
+            self.extend_slices_fused_sma(inputs, macd_out, signal_out, histogram_out);
+            return;
+        }
         let fused = self.fast.is_ema() && self.slow.is_ema() && self.signal.is_ema();
         let mut index = 0;
         if fused {
@@ -165,6 +172,73 @@ impl MovingAverageConvergenceDivergenceExtended {
         for &input in &inputs[index..] {
             Self::push_outputs(self.append(input), macd_out, signal_out, histogram_out);
         }
+    }
+
+    /// Fused bulk kernel for the all-SMA configuration - TA-Lib's `MACDEXT`
+    /// default, and therefore the path the benchmark actually exercises.
+    ///
+    /// The fast and slow legs become sliding sums indexed straight off the
+    /// input slice, with the same `sum -= old; sum += input` statement order
+    /// `SimpleMovingAverage::append` uses. The signal leg keeps its own ring,
+    /// because its input is the MACD line rather than the price slice. Outputs
+    /// and post-run state are bit-identical to per-bar [`Self::append`].
+    fn extend_slices_fused_sma(
+        &mut self,
+        inputs: &[f64],
+        macd_out: &mut Vec<f64>,
+        signal_out: &mut Vec<f64>,
+        histogram_out: &mut Vec<f64>,
+    ) {
+        let fast_period = self.fast.as_sma_mut().expect("SMA fast state").period();
+        let slow_period = self.slow.as_sma_mut().expect("SMA slow state").period();
+        // `new` normalizes the periods, so `fast_period <= slow_period`. After
+        // `slow_period` per-bar appends both price rings hold nothing but bars
+        // of this slice (the fast leg's `fast_start` delay is at most
+        // `slow_period - fast_period`, so it too is fully seeded from here),
+        // and the evicted element of each is just `inputs[i - period]`.
+        let n = inputs.len();
+        let prologue = n.min(slow_period);
+        for &input in &inputs[..prologue] {
+            Self::push_outputs(self.append(input), macd_out, signal_out, histogram_out);
+        }
+        if n <= slow_period {
+            return;
+        }
+        let mut fast_sum = self.fast.as_sma_mut().expect("SMA fast state").raw_sum();
+        let mut slow_sum = self.slow.as_sma_mut().expect("SMA slow state").raw_sum();
+        let fast_len = fast_period as f64;
+        let slow_len = slow_period as f64;
+        let mut last = self.value;
+        {
+            let signal = self.signal.as_sma_mut().expect("SMA signal state");
+            for i in slow_period..n {
+                fast_sum -= inputs[i - fast_period];
+                fast_sum += inputs[i];
+                slow_sum -= inputs[i - slow_period];
+                slow_sum += inputs[i];
+                let macd = fast_sum / fast_len - slow_sum / slow_len;
+                last = signal
+                    .append(macd)
+                    .map(|signal| MovingAverageConvergenceDivergenceValue {
+                        macd,
+                        signal,
+                        histogram: macd - signal,
+                    });
+                Self::push_outputs(last, macd_out, signal_out, histogram_out);
+            }
+        }
+        MovingAverageDispatcher::restore_sma_leg(
+            self.fast.as_sma_mut().expect("SMA fast state"),
+            inputs,
+            fast_sum,
+        );
+        MovingAverageDispatcher::restore_sma_leg(
+            self.slow.as_sma_mut().expect("SMA slow state"),
+            inputs,
+            slow_sum,
+        );
+        self.index += n - slow_period;
+        self.value = last;
     }
 
     #[inline]
@@ -252,14 +326,47 @@ mod tests {
     #[test]
     fn bulk_is_bitwise_identical_to_per_bar_append() {
         let input = lcg_series(5_000, 0x5EED_E217);
-        let tail = lcg_series(128, 0x7A11_E217);
+        let tail = lcg_series(256, 0x7A11_E217);
         let ema = MaType::ExponentialMovingAverage;
         let combos = [
             (12usize, ema, 26usize, ema, 9usize, ema),
             (2, ema, 2, ema, 1, ema),
             (3, ema, 10, ema, 1, ema),
             (5, ema, 5, ema, 4, ema),
-            // Non-EMA legs exercise the per-bar fallback path.
+            // All-SMA legs exercise the fused SMA path (TA-Lib's default).
+            (
+                12,
+                MaType::SimpleMovingAverage,
+                26,
+                MaType::SimpleMovingAverage,
+                9,
+                MaType::SimpleMovingAverage,
+            ),
+            (
+                5,
+                MaType::SimpleMovingAverage,
+                5,
+                MaType::SimpleMovingAverage,
+                1,
+                MaType::SimpleMovingAverage,
+            ),
+            (
+                2,
+                MaType::SimpleMovingAverage,
+                7,
+                MaType::SimpleMovingAverage,
+                1,
+                MaType::SimpleMovingAverage,
+            ),
+            (
+                26,
+                MaType::SimpleMovingAverage,
+                12,
+                MaType::SimpleMovingAverage,
+                9,
+                MaType::SimpleMovingAverage,
+            ),
+            // Mixed / non-EMA legs exercise the per-bar fallback path.
             (
                 7,
                 MaType::SimpleMovingAverage,
@@ -275,7 +382,7 @@ mod tests {
             let reference = per_bar_outputs(&mut per_bar, &input);
             let tail_reference = per_bar_outputs(&mut per_bar, &tail);
 
-            for chunk in [usize::MAX, 1, 7, 97] {
+            for chunk in [usize::MAX, 1, 7, 10, 97, 1_000] {
                 let mut state =
                     MovingAverageConvergenceDivergenceExtended::new(fp, fmt, sp, smt, gp, gmt)
                         .unwrap();

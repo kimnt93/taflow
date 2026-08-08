@@ -31,7 +31,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | AVGDEV | RollingAverageDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | AVGPRICE | AveragePrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
 | BBANDS | BollingerBands | TA-Lib | MATCH | pass (err 7.9e-10, nan 0) | yes | yes | pass (err 7.9e-10, nan 0) |
-| BETA | RollingBeta | TA-Lib | MATCH | pass (err 3.9e-12, nan 0) | yes | yes | pass (err 3.9e-12, nan 0) |
+| BETA | RollingBeta | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | BOP | BalanceOfPower | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CCI | CommodityChannelIndex | TA-Lib | MATCH | pass (err 1.4e-11, nan 0) | yes | yes | pass (err 1.4e-11, nan 0) |
 | CDL2CROWS | CandleTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -97,7 +97,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | CDLXSIDEGAP3METHODS | CandleUpDownSideGapThreeMethods | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CEIL | MathCeil | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CMO | ChandeMomentumOscillator | TA-Lib | MATCH | pass (err 6.8e-14, nan 0) | yes | yes | pass (err 6.8e-14, nan 0) |
-| CORREL | RollingCorrelation | TA-Lib | MATCH | pass (err 3.1e-11, nan 0) | yes | yes | pass (err 3.1e-11, nan 0) |
+| CORREL | RollingCorrelation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | COS | MathCos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | COSH | MathCosh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | DEMA | DoubleExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |

@@ -83,10 +83,13 @@ impl CandleHikkake {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// This state carries a monotonic bar counter and a pending setup that can
-    /// outlive any fixed window, so no from-empty fast path is safe: the bulk
-    /// entry point is the per-bar `append` loop with the `Option` unwrapped in
-    /// place. Bit-identical to calling `append` once per bar.
+    /// The monotonic bar counter and the pending setup are *carried* through
+    /// the steady loop in locals rather than reconstructed, so this needs no
+    /// from-empty precondition: only the two-bar candle ring is window bounded,
+    /// and it is rebuilt from the slice tail afterwards. A `PROLOGUE`-bar
+    /// per-bar prefix guarantees the ring holds nothing but bars of this slice,
+    /// after which the steady loop reads `high[i-1]`/`high[i-2]` straight out
+    /// of the inputs. Bit-identical to calling `append` once per bar.
     ///
     /// # Parameters
     ///
@@ -104,10 +107,66 @@ impl CandleHikkake {
         close: &[f64],
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
+        /// Bars the ring spans; after this many appends it holds only slice bars.
+        const PROLOGUE: usize = 2;
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        for i in 0..len {
+        let prologue = len.min(PROLOGUE);
+        for i in 0..prologue {
             output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        }
+        if len <= PROLOGUE {
+            return Ok(());
+        }
+        let mut index = self.index;
+        let mut pending = self.pending;
+        let mut value = self.value;
+        // Write through a pre-sized slice rather than `push`: the length
+        // write-back of `push` sits on the critical path of every iteration.
+        let base = output.len();
+        output.resize(base + len - PROLOGUE, 0);
+        let scores = &mut output[base..];
+        for (slot, i) in scores.iter_mut().zip(PROLOGUE..len) {
+            let bar = index;
+            index += 1;
+            let (first_high, first_low) = (high[i - 2], low[i - 2]);
+            let (second_high, second_low) = (high[i - 1], low[i - 1]);
+            let (this_high, this_low) = (high[i], low[i]);
+            let inside = second_high < first_high && second_low > first_low;
+            let mut result = 0;
+            if inside && this_high < second_high && this_low < second_low {
+                pending = Some((bar, 100, second_high));
+                result = 100;
+            } else if inside && this_high > second_high && this_low > second_low {
+                pending = Some((bar, -100, second_low));
+                result = -100;
+            } else if bar >= 5 {
+                if let Some((setup, direction, threshold)) = pending {
+                    if bar - setup <= 3
+                        && ((direction > 0 && close[i] > threshold)
+                            || (direction < 0 && close[i] < threshold))
+                    {
+                        result = direction + direction.signum() * 100;
+                        pending = None;
+                    } else if bar - setup > 3 {
+                        pending = None;
+                    }
+                }
+            }
+            value = (bar >= 5).then_some(result);
+            *slot = value.unwrap_or(0);
+        }
+        self.index = index;
+        self.pending = pending;
+        self.value = value;
+        // Rebuild the window-bounded ring so subsequent appends continue
+        // bit-identically.
+        self.candles.clear();
+        for i in (len - PROLOGUE)..len {
+            self.candles.push_back(Candle {
+                high: high[i],
+                low: low[i],
+            });
         }
         Ok(())
     }

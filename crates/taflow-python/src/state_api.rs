@@ -1099,10 +1099,11 @@ impl StatefulVariableIndexDynamicAverage {
         value
     }
 
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? {
-            self.append(value);
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let inner = &mut self.inner;
+        let output = &mut self.output;
+        py.allow_threads(|| inner.extend_slice_into(input, output));
         Ok(())
     }
 
@@ -1848,16 +1849,9 @@ macro_rules! bivariate_statistic_class {
                     return Err(PyValueError::new_err("inputs must have equal lengths"));
                 }
                 let outputs = &mut self.outputs;
-                py.allow_threads(|| {
-                    extend_from_options(
-                        outputs,
-                        input0
-                            .iter()
-                            .zip(input1)
-                            .map(|(&input0, &input1)| self.inner.append(input0, input1)),
-                    )
-                });
-                Ok(())
+                let inner = &mut self.inner;
+                py.allow_threads(|| inner.extend_slices_into(input0, input1, outputs))
+                    .map_err(py_value_error)
             }
 
             #[getter]
@@ -3974,15 +3968,9 @@ impl StatefulMavp {
                 "input and periods must have equal lengths",
             ));
         }
+        let inner = &mut self.inner;
         let outputs = &mut self.outputs;
-        py.allow_threads(|| {
-            outputs.extend(
-                input
-                    .iter()
-                    .zip(periods)
-                    .map(|(&input, &period)| self.inner.append(input, period).unwrap_or(f64::NAN)),
-            )
-        });
+        py.allow_threads(|| inner.extend_slices_into(input, periods, outputs));
         Ok(())
     }
 

@@ -2,7 +2,85 @@
 
 use crate::error::{TaError, TaResult};
 
-use super::{invalid_period, vhgw, MonotonicMax, MonotonicMin};
+use super::{invalid_period, MonotonicMax, MonotonicMin};
+
+/// TA-Lib-exact AROON kernel over a whole slice.
+///
+/// `TA_AROON` tracks a `(index, value)` candidate per side and rescans the
+/// live window when it ages past the trailing edge. Unlike MAXINDEX/MININDEX
+/// this family is NOT path dependent: the warm-up seed, the fast path and the
+/// rescan all use `>=`/`<=`, so the tracked index is always the LATEST window
+/// extremum however it was reached. The rescan is amortized O(1) on
+/// non-degenerate data and beats carrying indexed sliding-window state per
+/// bar.
+///
+/// `emit(today, down, up)` is called once per warmed bar, `today` in
+/// `period..len`; warm-up bars are the caller's business.
+#[inline]
+fn aroon_rescan<F>(high: &[f64], low: &[f64], period: usize, inverse_period: f64, mut emit: F)
+where
+    F: FnMut(usize, f64, f64),
+{
+    debug_assert_eq!(high.len(), low.len());
+    debug_assert!(high.len() > period);
+    let len = high.len();
+    let mut highest = high[0];
+    let mut highest_index = 0usize;
+    let mut lowest = low[0];
+    let mut lowest_index = 0usize;
+    for index in 1..=period {
+        // Latest wins on every path, warm-up included.
+        if high[index] >= highest {
+            highest = high[index];
+            highest_index = index;
+        }
+        if low[index] <= lowest {
+            lowest = low[index];
+            lowest_index = index;
+        }
+    }
+    emit(
+        period,
+        (period - (period - lowest_index)) as f64 * inverse_period,
+        (period - (period - highest_index)) as f64 * inverse_period,
+    );
+
+    let mut trailing = 1usize;
+    for today in period + 1..len {
+        if highest_index < trailing {
+            highest = high[trailing];
+            highest_index = trailing;
+            for (offset, &value) in high[trailing + 1..=today].iter().enumerate() {
+                if value >= highest {
+                    highest = value;
+                    highest_index = trailing + 1 + offset;
+                }
+            }
+        } else if high[today] >= highest {
+            highest = high[today];
+            highest_index = today;
+        }
+        if lowest_index < trailing {
+            lowest = low[trailing];
+            lowest_index = trailing;
+            for (offset, &value) in low[trailing + 1..=today].iter().enumerate() {
+                if value <= lowest {
+                    lowest = value;
+                    lowest_index = trailing + 1 + offset;
+                }
+            }
+        } else if low[today] <= lowest {
+            lowest = low[today];
+            lowest_index = today;
+        }
+        emit(
+            today,
+            (period - (today - lowest_index)) as f64 * inverse_period,
+            (period - (today - highest_index)) as f64 * inverse_period,
+        );
+        trailing += 1;
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Persistent Rust state or aligned output type for `AroonValue`.
@@ -66,13 +144,10 @@ impl Aroon {
         self.value
     }
 
-    /// Bulk kernel: two indexed vHGW passes over the `period + 1` window.
-    ///
-    /// Aroon is the one index-based family that is NOT path dependent: TA-Lib
-    /// uses `>=`/`<=` in the warm-up, fast, and rescan branches alike, so the
-    /// tracked index is always the latest window extremum — exactly the tie
-    /// rule of [`vhgw::sliding_argmax_latest_into`]. Outputs and post-run state
-    /// are bit-identical to per-bar [`Self::append`]; warm-up bars are NaN.
+    /// Bulk kernel: one fused [`aroon_rescan`] pass writing both aligned
+    /// series straight into their output caches — no index scratch buffers, no
+    /// second combining pass. Outputs and post-run state are bit-identical to
+    /// per-bar [`Self::append`]; warm-up bars are NaN.
     pub fn extend_slices_into(
         &mut self,
         high: &[f64],
@@ -80,16 +155,8 @@ impl Aroon {
         down_out: &mut Vec<f64>,
         up_out: &mut Vec<f64>,
     ) -> TaResult<()> {
-        if high.len() != low.len() {
-            return Err(TaError::LengthMismatch {
-                expected: high.len(),
-                got: low.len(),
-            });
-        }
-        let n = high.len();
-        let period = self.period;
-        let window = period + 1;
-        if self.index != 0 || n < window {
+        let n = self.check_bulk_lengths(high, low)?;
+        if self.index != 0 || n < self.period + 1 {
             down_out.reserve(n);
             up_out.reserve(n);
             for index in 0..n {
@@ -111,25 +178,82 @@ impl Aroon {
         let up_start = up_out.len();
         down_out.resize(down_start + n, f64::NAN);
         up_out.resize(up_start + n, f64::NAN);
-        let mut highest = vec![0usize; n - period];
-        let mut lowest = vec![0usize; n - period];
-        vhgw::sliding_argmax_latest_into(high, window, &mut highest);
-        vhgw::sliding_argmin_latest_into(low, window, &mut lowest);
-        let inverse_period = self.inverse_period;
-        for offset in 0..(n - period) {
-            let today = period + offset;
-            down_out[down_start + today] =
-                (period - (today - lowest[offset])) as f64 * inverse_period;
-            up_out[up_start + today] = (period - (today - highest[offset])) as f64 * inverse_period;
-        }
-        self.highs.rebuild_from_full_run(high);
-        self.lows.rebuild_from_full_run(low);
-        self.index = n;
+        let downs = &mut down_out[down_start..];
+        let ups = &mut up_out[up_start..];
+        aroon_rescan(
+            high,
+            low,
+            self.period,
+            self.inverse_period,
+            |today, down, up| {
+                downs[today] = down;
+                ups[today] = up;
+            },
+        );
+        self.finish_bulk_run(high, low);
         self.value = Some(AroonValue {
             down: *down_out.last().expect("at least one warmed bar"),
             up: *up_out.last().expect("at least one warmed bar"),
         });
         Ok(())
+    }
+
+    /// Bulk kernel for [`AroonOscillator`]: the same single rescan pass, with
+    /// `up - down` formed in registers so the oscillator never materializes
+    /// the two component series.
+    fn extend_oscillator_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let n = self.check_bulk_lengths(high, low)?;
+        if self.index != 0 || n < self.period + 1 {
+            output.reserve(n);
+            for index in 0..n {
+                output.push(
+                    self.append(high[index], low[index])
+                        .map_or(f64::NAN, |value| value.up - value.down),
+                );
+            }
+            return Ok(());
+        }
+
+        let start = output.len();
+        output.resize(start + n, f64::NAN);
+        let slots = &mut output[start..];
+        let mut last = AroonValue { down: 0.0, up: 0.0 };
+        aroon_rescan(
+            high,
+            low,
+            self.period,
+            self.inverse_period,
+            |today, down, up| {
+                slots[today] = up - down;
+                last = AroonValue { down, up };
+            },
+        );
+        self.finish_bulk_run(high, low);
+        self.value = Some(last);
+        Ok(())
+    }
+
+    fn check_bulk_lengths(&self, high: &[f64], low: &[f64]) -> TaResult<usize> {
+        if high.len() != low.len() {
+            return Err(TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len(),
+            });
+        }
+        Ok(high.len())
+    }
+
+    /// Restores the monotonic deques and bar counter a full from-empty
+    /// `append` run would have left.
+    fn finish_bulk_run(&mut self, high: &[f64], low: &[f64]) {
+        self.highs.rebuild_from_full_run(high);
+        self.lows.rebuild_from_full_run(low);
+        self.index = high.len();
     }
 
     /// Returns the computed value, aligned history, or a validation error.
@@ -186,22 +310,16 @@ impl AroonOscillator {
         self.value
     }
 
-    /// Bulk kernel: delegates to [`Aroon::extend_slices_into`] and subtracts
-    /// the two aligned series. Bit-identical to per-bar [`Self::append`].
+    /// Bulk kernel: one fused Aroon rescan pass that forms `up - down` in
+    /// registers — no intermediate down/up buffers, no second pass.
+    /// Bit-identical to per-bar [`Self::append`].
     pub fn extend_slices_into(
         &mut self,
         high: &[f64],
         low: &[f64],
         output: &mut Vec<f64>,
     ) -> TaResult<()> {
-        let mut down = Vec::with_capacity(high.len());
-        let mut up = Vec::with_capacity(high.len());
-        self.aroon
-            .extend_slices_into(high, low, &mut down, &mut up)?;
-        output.reserve(down.len());
-        for (up, down) in up.iter().zip(&down) {
-            output.push(up - down);
-        }
+        self.aroon.extend_oscillator_into(high, low, output)?;
         self.value = self.aroon.value().map(|value| value.up - value.down);
         Ok(())
     }
@@ -457,12 +575,30 @@ mod aroon_bulk_tests {
         (high, low)
     }
 
+    /// Random, quantized (dense ties), constant (every bar a tie), monotone up
+    /// (never rescans) and monotone down (rescans every bar) — one dataset per
+    /// branch of the rescan machine.
+    fn bulk_datasets() -> Vec<(Vec<f64>, Vec<f64>)> {
+        const LEN: usize = 5_000;
+        let (high, low) = series();
+        let quantized: Vec<f64> = (0..LEN).map(|i| ((i * 7) % 5) as f64).collect();
+        let constant = vec![13.25_f64; LEN];
+        let increasing: Vec<f64> = (0..LEN).map(|i| i as f64 * 0.5).collect();
+        let decreasing: Vec<f64> = (0..LEN).map(|i| LEN as f64 - i as f64 * 0.5).collect();
+        vec![
+            (high, low),
+            (quantized.clone(), quantized),
+            (constant.clone(), constant),
+            (increasing.clone(), increasing),
+            (decreasing.clone(), decreasing),
+        ]
+    }
+
+    const BULK_CHUNKS: [usize; 5] = [1, 7, 10, 97, 1000];
+
     #[test]
     fn aroon_bulk_matches_append_bitwise() {
-        let (high, low) = series();
-        // Quantized duplicates stress the latest-wins tie rule.
-        let quantized: Vec<f64> = (0..high.len()).map(|i| ((i * 7) % 5) as f64).collect();
-        for (high, low) in [(high, low), (quantized.clone(), quantized.clone())] {
+        for (high, low) in bulk_datasets() {
             for period in [2usize, 5, 14, 30, 200] {
                 let mut reference = Aroon::new(period).unwrap();
                 let expected: Vec<AroonValue> = (0..high.len())
@@ -473,7 +609,7 @@ mod aroon_bulk_tests {
                         })
                     })
                     .collect();
-                for chunk in [1usize, 7, 97, high.len()] {
+                for chunk in BULK_CHUNKS.iter().copied().chain([high.len()]) {
                     let mut state = Aroon::new(period).unwrap();
                     let (mut down, mut up) = (Vec::new(), Vec::new());
                     let mut offset = 0;
@@ -517,37 +653,38 @@ mod aroon_bulk_tests {
 
     #[test]
     fn aroon_oscillator_bulk_matches_append_bitwise() {
-        let (high, low) = series();
-        for period in [2usize, 5, 14, 30, 200] {
-            let mut reference = AroonOscillator::new(period).unwrap();
-            let expected: Vec<f64> = (0..high.len())
-                .map(|i| reference.append(high[i], low[i]).unwrap_or(f64::NAN))
-                .collect();
-            for chunk in [1usize, 7, 97, high.len()] {
-                let mut state = AroonOscillator::new(period).unwrap();
-                let mut out = Vec::new();
-                let mut offset = 0;
-                while offset < high.len() {
-                    let end = (offset + chunk).min(high.len());
-                    state
-                        .extend_slices_into(&high[offset..end], &low[offset..end], &mut out)
-                        .unwrap();
-                    offset = end;
-                }
-                for (i, e) in expected.iter().enumerate() {
-                    assert_eq!(
-                        e.to_bits(),
-                        out[i].to_bits(),
-                        "p={period} chunk={chunk} i={i}"
-                    );
-                }
-                let mut follow = reference.clone();
-                for i in 0..256 {
-                    assert_eq!(
-                        follow.append(high[i], low[i]),
-                        state.append(high[i], low[i]),
-                        "continue p={period} chunk={chunk}"
-                    );
+        for (high, low) in bulk_datasets() {
+            for period in [2usize, 5, 14, 30, 200] {
+                let mut reference = AroonOscillator::new(period).unwrap();
+                let expected: Vec<f64> = (0..high.len())
+                    .map(|i| reference.append(high[i], low[i]).unwrap_or(f64::NAN))
+                    .collect();
+                for chunk in BULK_CHUNKS.iter().copied().chain([high.len()]) {
+                    let mut state = AroonOscillator::new(period).unwrap();
+                    let mut out = Vec::new();
+                    let mut offset = 0;
+                    while offset < high.len() {
+                        let end = (offset + chunk).min(high.len());
+                        state
+                            .extend_slices_into(&high[offset..end], &low[offset..end], &mut out)
+                            .unwrap();
+                        offset = end;
+                    }
+                    for (i, e) in expected.iter().enumerate() {
+                        assert_eq!(
+                            e.to_bits(),
+                            out[i].to_bits(),
+                            "p={period} chunk={chunk} i={i}"
+                        );
+                    }
+                    let mut follow = reference.clone();
+                    for i in 0..256 {
+                        assert_eq!(
+                            follow.append(high[i], low[i]),
+                            state.append(high[i], low[i]),
+                            "continue p={period} chunk={chunk}"
+                        );
+                    }
                 }
             }
         }

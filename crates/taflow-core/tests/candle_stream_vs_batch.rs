@@ -170,7 +170,7 @@ const TAIL: usize = 64;
 /// Bulk chunk sizes. `BARS` is the single-shot (from-empty) fast path; the rest
 /// force the "state already warm" fallback from the second chunk onward, and 1
 /// makes every call after the first a single-bar fallback.
-const CHUNKS: [usize; 6] = [BARS, 1, 7, 97, 251, 1013];
+const CHUNKS: [usize; 8] = [BARS, 1, 7, 10, 97, 251, 1000, 1013];
 /// Mirrors `pattern::BULK_REPLAY_BARS`, the tail a route (a) bulk pass
 /// replays to rebuild its state. Not public, so it is restated here.
 const REPLAY: usize = 64;

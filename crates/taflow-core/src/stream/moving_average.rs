@@ -74,6 +74,51 @@ impl MovingAverageDispatcher {
         }
     }
 
+    /// Whether the wrapped state has produced at least one warmed value.
+    #[inline]
+    pub(super) fn is_warm(&self) -> bool {
+        match self {
+            Self::SimpleMovingAverage(state) => state.value().is_some(),
+            Self::ExponentialMovingAverage(state) => state.value().is_some(),
+            Self::WeightedMovingAverage(state) => state.value().is_some(),
+            Self::DoubleExponentialMovingAverage(state) => state.value().is_some(),
+            Self::TripleExponentialMovingAverage(state) => state.value().is_some(),
+            Self::TriangularMovingAverage(state) => state.value().is_some(),
+            Self::KaufmanAdaptiveMovingAverage(state) => state.value().is_some(),
+            Self::MesaAdaptiveMovingAverage(state) => state.value().is_some(),
+            Self::TripleExponentialAverage(state) => state.value().is_some(),
+        }
+    }
+
+    /// Bulk-appends `inputs`, pushing one `f64` per bar (NaN while warming).
+    ///
+    /// Dispatch happens once for the whole slice instead of once per bar, and
+    /// each variant's own bulk kernel runs underneath — those kernels are
+    /// contractually bit-identical to their per-bar `append`, so the emitted
+    /// series and the exit state match a per-bar drive exactly. MAMA has no
+    /// `f64` bulk kernel and keeps the per-bar loop.
+    pub(super) fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        match self {
+            Self::SimpleMovingAverage(state) => state.extend_slice_into(inputs, output),
+            Self::ExponentialMovingAverage(state) => state.extend_slice_into(inputs, output),
+            Self::WeightedMovingAverage(state) => state.extend_slice_into(inputs, output),
+            Self::DoubleExponentialMovingAverage(state) => state.extend_slice_into(inputs, output),
+            Self::TripleExponentialMovingAverage(state) => state.extend_slice_into(inputs, output),
+            Self::TriangularMovingAverage(state) => state.extend_slice_into(inputs, output),
+            Self::KaufmanAdaptiveMovingAverage(state) => state.extend_slice_into(inputs, output),
+            Self::MesaAdaptiveMovingAverage(state) => {
+                output.reserve(inputs.len());
+                output.extend(
+                    inputs
+                        .iter()
+                        .copied()
+                        .map(|input| state.append(input).map_or(f64::NAN, |value| value.mama)),
+                );
+            }
+            Self::TripleExponentialAverage(state) => state.extend_slice_into(inputs, output),
+        }
+    }
+
     /// Whether this dispatcher wraps a plain EMA state (fused bulk paths).
     #[inline]
     pub(super) fn is_ema(&self) -> bool {
@@ -87,6 +132,41 @@ impl MovingAverageDispatcher {
             Self::ExponentialMovingAverage(state) => Some(state),
             _ => None,
         }
+    }
+
+    /// Whether this dispatcher wraps a plain SMA state (fused bulk paths).
+    ///
+    /// Note that a `period == 1` dispatcher is an SMA whatever `MaType` it was
+    /// built from, which is exactly the state the fused paths can drive.
+    #[inline]
+    pub(super) fn is_sma(&self) -> bool {
+        matches!(self, Self::SimpleMovingAverage(_))
+    }
+
+    /// Mutable access to the wrapped SMA state, if this is the SMA variant.
+    #[inline]
+    pub(super) fn as_sma_mut(&mut self) -> Option<&mut SimpleMovingAverage> {
+        match self {
+            Self::SimpleMovingAverage(state) => Some(state),
+            _ => None,
+        }
+    }
+
+    /// Restores one SMA leg after a fused bulk loop carried its running sum in
+    /// a local: rebuilds the ring from the slice tail and stores the scalar
+    /// state, leaving exactly what `period` per-bar appends would have left.
+    ///
+    /// `inputs` must be at least `period` long and end at the bar the leg was
+    /// advanced to.
+    #[inline]
+    pub(super) fn restore_sma_leg(state: &mut SimpleMovingAverage, inputs: &[f64], sum: f64) {
+        let period = state.period();
+        let window = state.window_mut();
+        window.clear();
+        for &input in &inputs[inputs.len() - period..] {
+            window.push(input);
+        }
+        state.store_bulk_state(sum, Some(sum / period as f64));
     }
 
     pub(super) fn reset(&mut self) {

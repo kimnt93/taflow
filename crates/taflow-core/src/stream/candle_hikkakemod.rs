@@ -98,10 +98,14 @@ impl CandleHikkakeModified {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// This state carries a monotonic bar counter and a pending setup that can
-    /// outlive any fixed window, so no from-empty fast path is safe: the bulk
-    /// entry point is the per-bar `append` loop with the `Option` unwrapped in
-    /// place. Bit-identical to calling `append` once per bar.
+    /// The monotonic bar counter, the pending setup and `near_sum` are
+    /// *carried* through the steady loop in locals rather than reconstructed,
+    /// so this needs no from-empty precondition (`near_sum`'s prologue seeds it
+    /// one bar off the steady-state eviction, which a tail replay could not
+    /// reproduce). Only the eight-bar candle ring is window bounded, and it is
+    /// rebuilt from the slice tail afterwards; a `PROLOGUE`-bar per-bar prefix
+    /// guarantees the steady loop's `i-7 .. i` reads land inside this slice.
+    /// Bit-identical to calling `append` once per bar.
     ///
     /// # Parameters
     ///
@@ -119,10 +123,91 @@ impl CandleHikkakeModified {
         close: &[f64],
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
+        /// Bars the ring spans; after this many appends it holds only slice bars.
+        const PROLOGUE: usize = 8;
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        for i in 0..len {
+        let prologue = len.min(PROLOGUE);
+        for i in 0..prologue {
             output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        }
+        if len <= PROLOGUE {
+            return Ok(());
+        }
+        let mut index = self.index;
+        let mut pending = self.pending;
+        let mut near_sum = self.near_sum;
+        let mut value = self.value;
+        // Write through a pre-sized slice rather than `push`: the length
+        // write-back of `push` sits on the critical path of every iteration.
+        let base = output.len();
+        output.resize(base + len - PROLOGUE, 0);
+        let scores = &mut output[base..];
+        for (slot, i) in scores.iter_mut().zip(PROLOGUE..len) {
+            let bar = index;
+            index += 1;
+            // `bar >= PROLOGUE` here, so the `(3..8)` warm-up seeding branch of
+            // `append` is unreachable: bars 8 and 9 simply do nothing.
+            if bar < 10 {
+                value = None;
+                continue;
+            }
+            let (first_high, first_low) = (high[i - 3], low[i - 3]);
+            let (second_high, second_low, second_close) = (high[i - 2], low[i - 2], close[i - 2]);
+            let (third_high, third_low) = (high[i - 1], low[i - 1]);
+            let mut result = 0;
+            let mut new_pattern = false;
+            if third_high < second_high
+                && third_low > second_low
+                && second_high < first_high
+                && second_low > first_low
+            {
+                let near = ca_highlow_scalar(NEAR, near_sum, second_high, second_low);
+                if high[i] < third_high && low[i] < third_low && second_close <= second_low + near {
+                    pending = Some((bar, 100, third_high));
+                    result = 100;
+                    new_pattern = true;
+                } else if high[i] > third_high
+                    && low[i] > third_low
+                    && second_close >= second_high - near
+                {
+                    pending = Some((bar, -100, third_low));
+                    result = -100;
+                    new_pattern = true;
+                }
+            }
+            if !new_pattern {
+                if let Some((setup, direction, threshold)) = pending {
+                    if bar <= setup + 3
+                        && ((direction > 0 && close[i] > threshold)
+                            || (direction < 0 && close[i] < threshold))
+                    {
+                        result = direction + direction.signum() * 100;
+                        pending = None;
+                    } else if bar > setup + 3 {
+                        pending = None;
+                    }
+                }
+            }
+            // Slide the sum exactly like `append`: `+= cr(i-2) - cr(i-7)`.
+            near_sum += cr_highlow_scalar(second_high, second_low)
+                - cr_highlow_scalar(high[i - 7], low[i - 7]);
+            value = Some(result);
+            *slot = result;
+        }
+        self.index = index;
+        self.pending = pending;
+        self.near_sum = near_sum;
+        self.value = value;
+        // Rebuild the window-bounded ring so subsequent appends continue
+        // bit-identically.
+        self.candles.clear();
+        for i in (len - PROLOGUE)..len {
+            self.candles.push_back(Candle {
+                high: high[i],
+                low: low[i],
+                close: close[i],
+            });
         }
         Ok(())
     }

@@ -102,13 +102,13 @@ impl CandleBreakaway {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
-    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
-    /// batch prologue).
+    /// `body_long_sum` is *carried* through the steady loop in a local rather
+    /// than reconstructed, so this needs no from-empty precondition and no
+    /// intermediate score buffer. Only the 14-bar candle ring is window
+    /// bounded, and it is rebuilt from the slice tail afterwards; a
+    /// `PROLOGUE`-bar per-bar prefix guarantees the steady loop's `i-14 .. i`
+    /// reads land inside this slice. Bit-identical to calling `append` once per
+    /// bar (warm-up `None` becomes `0`, matching the batch prologue).
     ///
     /// # Parameters
     ///
@@ -126,23 +126,109 @@ impl CandleBreakaway {
         close: &[f64],
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
+        /// Bars the ring spans; after this many appends it holds only slice bars.
+        const PROLOGUE: usize = 14;
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
-            for i in 0..len {
-                output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
-            }
+        let prologue = len.min(PROLOGUE);
+        for i in 0..prologue {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        }
+        if len <= PROLOGUE {
             return Ok(());
         }
-        let scores = candle_breakaway(open, high, low, close)?;
-        output.extend_from_slice(&scores);
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
+        let mut body_long_sum = self.body_long_sum;
+        let mut last = 0;
+        // Write through a pre-sized slice rather than `push`: the length
+        // write-back of `push` sits on the critical path of every iteration.
+        let base = output.len();
+        output.resize(base + len - PROLOGUE, 0);
+        let scores = &mut output[base..];
+        // Lag-aligned subslices, all exactly `len - PROLOGUE` long, so the
+        // steady loop's reads carry no bounds checks.
+        let a_open_s = &open[PROLOGUE - 4..len - 4];
+        let a_close_s = &close[PROLOGUE - 4..len - 4];
+        let b_open_s = &open[PROLOGUE - 3..len - 3];
+        let b_close_s = &close[PROLOGUE - 3..len - 3];
+        let d_open_s = &open[PROLOGUE - 1..len - 1];
+        let d_close_s = &close[PROLOGUE - 1..len - 1];
+        let cur_open_s = &open[PROLOGUE..];
+        let cur_close_s = &close[PROLOGUE..];
+        let old_open_s = &open[..len - PROLOGUE];
+        let old_close_s = &close[..len - PROLOGUE];
+        for k in 0..scores.len() {
+            let i = k + PROLOGUE;
+            // Bars i-4 (`a`), i-3 (`b`), i-2 (`c`), i-1 (`d`) and i (current).
+            // The high/low reads of bars i-3..i-1 are loaded lazily: `base`
+            // almost never holds, so they stay off the hot path exactly as in
+            // the batch loop's short-circuit chain.
+            let (a_open, a_close) = (a_open_s[k], a_close_s[k]);
+            let (cur_open, cur_close) = (cur_open_s[k], cur_close_s[k]);
+            let a_white = a_close >= a_open;
+            let cur_white = cur_close >= cur_open;
+            // Colour agreement first, branchlessly (`&`: every operand is an
+            // already-loaded compare, so short-circuiting here would only add
+            // unpredictable branches), and only then the long-body test. That
+            // ordering keeps `ca_realbody_scalar`'s `sum / avg_period` division
+            // - measured at ~40% of this kernel's cost - off the hot path, since
+            // it is now needed on the one bar in eight where the colours line
+            // up. Pure predicate reordering: every operand is a total function
+            // of already-computed values, so the result is unchanged bit for
+            // bit.
+            let b_white = b_close_s[k] >= b_open_s[k];
+            let d_white = d_close_s[k] >= d_open_s[k];
+            let base = ((a_white == b_white) & (b_white == d_white) & (a_white != cur_white))
+                && (a_close - a_open).abs()
+                    > ca_realbody_scalar(BODY_LONG, body_long_sum, a_open, a_close);
+            let hit = base && {
+                let (b_open, b_high, b_low, b_close) =
+                    (open[i - 3], high[i - 3], low[i - 3], close[i - 3]);
+                let (c_high, c_low) = (high[i - 2], low[i - 2]);
+                let (d_high, d_low) = (high[i - 1], low[i - 1]);
+                if a_white {
+                    b_open.min(b_close) > a_open.max(a_close)
+                        && c_high > b_high
+                        && c_low > b_low
+                        && d_high > c_high
+                        && d_low > c_low
+                        && cur_close < b_open
+                        && cur_close > a_close
+                } else {
+                    b_open.max(b_close) < a_open.min(a_close)
+                        && c_high < b_high
+                        && c_low < b_low
+                        && d_high < c_high
+                        && d_low < c_low
+                        && cur_close > b_open
+                        && cur_close < a_close
+                }
+            };
+            // Slide the sum exactly like `append`: `+= cr(i-4) - cr(i-14)`.
+            body_long_sum += cr_realbody_scalar(a_open, a_close)
+                - cr_realbody_scalar(old_open_s[k], old_close_s[k]);
+            last = if hit {
+                if cur_white {
+                    100
+                } else {
+                    -100
+                }
+            } else {
+                0
+            };
+            scores[k] = last;
+        }
+        self.body_long_sum = body_long_sum;
+        self.value = Some(last);
+        // Rebuild the window-bounded ring so subsequent appends continue
+        // bit-identically.
+        self.candles.clear();
+        for i in (len - PROLOGUE)..len {
+            self.candles.push_back(Candle {
+                o: open[i],
+                h: high[i],
+                l: low[i],
+                c: close[i],
+            });
         }
         Ok(())
     }

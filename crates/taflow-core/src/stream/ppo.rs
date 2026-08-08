@@ -63,13 +63,59 @@ impl PercentagePriceOscillator {
 impl StreamingIndicator for PercentagePriceOscillator {
     type Output = f64;
 
-    /// Bulk kernel. For the EMA MA type the warm steady state advances both
-    /// EMA recurrences in one loop with the scalar states held in locals;
-    /// other MA types fall back to a per-bar loop with no per-bar allocation.
-    /// Bit-identical to per-bar [`Self::append`] in outputs and post-run state.
+    /// Bulk kernel. For the EMA and SMA MA types (SMA is TA-Lib's `PPO`
+    /// default) the warm steady state advances both recurrences in one loop
+    /// with the scalar states held in locals; other MA types fall back to a
+    /// per-bar loop with no per-bar allocation. Bit-identical to per-bar
+    /// [`Self::append`] in outputs and post-run state.
     fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
         output.reserve(inputs.len());
         let mut index = 0;
+        if self.fast.is_sma() && self.slow.is_sma() {
+            let fast_period = self.fast.as_sma_mut().expect("SMA fast state").period();
+            let slow_period = self.slow.as_sma_mut().expect("SMA slow state").period();
+            // `new` normalizes the periods, so `fast_period <= slow_period` and
+            // `slow_period` per-bar appends leave both rings holding nothing
+            // but bars of this slice - after which the evicted element of each
+            // is just `inputs[i - period]`.
+            let n = inputs.len();
+            let prologue = n.min(slow_period);
+            for &input in &inputs[..prologue] {
+                output.push(self.append(input).unwrap_or(f64::NAN));
+            }
+            if n <= slow_period {
+                return;
+            }
+            let mut fast_sum = self.fast.as_sma_mut().expect("SMA fast state").raw_sum();
+            let mut slow_sum = self.slow.as_sma_mut().expect("SMA slow state").raw_sum();
+            let fast_len = fast_period as f64;
+            let slow_len = slow_period as f64;
+            let mut last = None;
+            for i in slow_period..n {
+                // Same statement order as `SimpleMovingAverage::append`
+                // (`sum -= old` then `sum += input`) on both legs.
+                fast_sum -= inputs[i - fast_period];
+                fast_sum += inputs[i];
+                slow_sum -= inputs[i - slow_period];
+                slow_sum += inputs[i];
+                let fast = fast_sum / fast_len;
+                let slow = slow_sum / slow_len;
+                last = (slow != 0.0).then_some((fast - slow) / slow * 100.0);
+                output.push(last.unwrap_or(f64::NAN));
+            }
+            MovingAverageDispatcher::restore_sma_leg(
+                self.fast.as_sma_mut().expect("SMA fast state"),
+                inputs,
+                fast_sum,
+            );
+            MovingAverageDispatcher::restore_sma_leg(
+                self.slow.as_sma_mut().expect("SMA slow state"),
+                inputs,
+                slow_sum,
+            );
+            self.value = last;
+            return;
+        }
         if self.fast.is_ema() && self.slow.is_ema() {
             // Warm-up prologue: per-bar appends until the slow EMA is seeded.
             // (`self.value` is not a warm gate here: it stays `None` whenever
@@ -164,13 +210,20 @@ mod tests {
     #[test]
     fn bulk_is_bitwise_identical_to_per_bar_append() {
         let input = lcg_series(5_000, 0x5EED_9905);
-        let tail = lcg_series(128, 0x7A11_9905);
+        let tail = lcg_series(256, 0x7A11_9905);
         let combos = [
             (12usize, 26usize, MaType::ExponentialMovingAverage),
             (2, 2, MaType::ExponentialMovingAverage),
             (1, 5, MaType::ExponentialMovingAverage),
             (3, 10, MaType::ExponentialMovingAverage),
+            // SMA legs exercise the fused SMA path (TA-Lib's PPO default).
             (7, 13, MaType::SimpleMovingAverage),
+            (12, 26, MaType::SimpleMovingAverage),
+            (5, 5, MaType::SimpleMovingAverage),
+            (1, 9, MaType::SimpleMovingAverage),
+            (26, 12, MaType::SimpleMovingAverage),
+            // A non-fusable type still has to round-trip through the fallback.
+            (7, 13, MaType::WeightedMovingAverage),
         ];
         for (fast, slow, ma_type) in combos {
             let mut per_bar = PercentagePriceOscillator::new(fast, slow, ma_type).unwrap();
@@ -183,7 +236,7 @@ mod tests {
                 .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
                 .collect();
 
-            for chunk in [usize::MAX, 1, 7, 97] {
+            for chunk in [usize::MAX, 1, 7, 10, 97, 1_000] {
                 let mut state = PercentagePriceOscillator::new(fast, slow, ma_type).unwrap();
                 let mut out = Vec::new();
                 for piece in input.chunks(chunk.min(input.len())) {

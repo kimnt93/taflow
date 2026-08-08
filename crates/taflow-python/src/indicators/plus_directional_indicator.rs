@@ -39,14 +39,7 @@ impl PlusDirectionalIndicator {
         }
         let outputs = &mut self.outputs;
         let inner = &mut self.inner;
-        py.allow_threads(|| {
-            outputs.extend(
-                h.iter()
-                    .zip(l)
-                    .zip(c)
-                    .map(|((&h, &l), &c)| inner.append(h, l, c).unwrap_or(f64::NAN)),
-            );
-        });
+        py.allow_threads(|| inner.extend_slices_into(h, l, c, outputs));
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {

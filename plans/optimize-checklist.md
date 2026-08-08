@@ -13,68 +13,124 @@ must read §1 and §4 before touching code.
 
 ---
 
-## 0. Status — measured 2026-08-08 (post-implementation)
+## 0. Status — measured 2026-08-09 (post-implementation)
 
-**131 of 161 rows clear their gate; 30 remain.** All 287 functions pass oracle
-verification at the harness's standard 10k-bar protocol (`make check`), and the
-Rust suite is 389 tests green.
+**151 of 161 rows clear their gate; 10 remain.** All 287 functions pass oracle
+verification at the harness's 10k-bar protocol (`make check`); the Rust suite is
+402 tests green.
 
 Perf cells read `old → **new** (1M: …)`. The `new` figure is the kernel speedup
-at **10k bars**, which is what the original baseline measured — comparing it to
-the 1M column would be apples-to-oranges. The 1M figure is shown because the
-protocol now runs 1k/10k/100k/1M.
+at **10k bars**, matching what the original baseline measured — the 1M column is
+shown separately because the protocol now runs 1k/10k/100k/1M and comparing
+across sizes would be misleading.
 
 ### What landed
 
 | Area | Result |
 |---|---|
-| Python boundary (G1, PERF-MEM) | Rust-side output caches everywhere; API time now ≈ kernel time (SMA was 10.6× overhead, now ~1.1×) |
-| Extrema family (M1/M12) | vHGW + split monotonic deques: MAX 0.33× → 2.47× at 10k |
+| Python boundary (G1, PERF-MEM) | Rust-side output caches everywhere; API time ≈ kernel time (SMA was 10.6× overhead, now ~1.1×) |
+| Extrema family (M1/M12) | vHGW + split monotonic deques: MAX 0.33× → 2.47× |
 | EMA chains (M2) | Fused: T3 0.29× → 1.40× |
 | Windowed sums (M3/M4) | BBANDS 0.46× → 1.19×, ULTOSC 0.55× → 1.39× |
 | Candles (M5) | Running sums + bulk kernels; CDLGAPSIDESIDEWHITE 1.43× → 3.97× |
-| Custom operators | **Every custom function now clears the 20M bars/s gate** |
-| Build (G2) | multiversion dispatch replaces SSE2-baseline hand-SIMD; `wide` dependency dropped |
+| Custom operators | **Every custom function clears the 20M bars/s gate** |
+| Build (G2) | multiversion dispatch replaces SSE2-baseline hand-SIMD; `wide` dropped |
 
-### The 30 unticked rows
+### Numerical work: four functions reached *bitwise* TA-Lib parity
 
-**8 are correctness, and all 8 are pre-existing — not regressions.** Verified by
+The instinct to fix drift with periodic reseeding turned out to be wrong for
+most of these. TA-Lib's own accumulators drift, and the gate compares against
+TA-Lib — so reseeding moves us toward mathematical truth and *away* from the
+oracle. Measured, VAR/STDDEV got worse with reseeding at every K tried.
+Replicating TA-Lib's exact statement order instead gives an exact match:
+
+| function | drift before | now | how |
+|---|---|---|---|
+| RollingVariance | 3.14e-09 | **0.0 bitwise** | `TA_INT_VAR` accumulation order |
+| RollingStandardDeviation | 2.61e-08 | **0.0 bitwise** | same, + `TA_STDDEV`'s 1e-14 clamp |
+| RollingCorrelation | 4.29e-09 | **0.0 bitwise** | `TA_CORREL` order (remove → add → emit); reseed removed |
+| RollingBeta | 5.48e-11 | **0.0 bitwise** | `TA_BETA` order (add → emit → remove); own struct |
+| CommodityChannelIndex | 2.40e-09 | 1.32e-11 | K=64 reseed — correct here, because TA-Lib rescans rather than slides |
+
+CORREL and BETA needed *different* orderings, so they no longer share a moments
+struct. Reseeding was removed from both, which also dropped a `period/64`
+per-bar tax.
+
+`RollingZScore` was never wrong: verified against 50-digit Decimal, taflow was
+within 3.7e-15 while the pandas oracle was off by 2.3e-08 (its rolling `std`
+accumulator degrades on low-variance windows). The **oracle** was replaced with
+a fresh per-window numpy computation, documented in `verify/verify.py`.
+
+An FMA concern was raised — that `-C target-cpu=native` might contract mul+add
+and break the new bitwise parity. Tested both ways at 1M bars: identical. Rust
+guarantees IEEE semantics and will not contract without an explicit `mul_add`.
+
+### Orphaned bulk kernels — a whole class of silent waste
+
+An audit of all 102 core types exposing a bulk kernel against every pyclass
+`extend` found **seven kernels that no binding ever called**. They were written,
+tested, and proven bitwise-correct in Rust while Python still looped `append`
+per bar, so users got none of the benefit and every Rust test stayed green.
+Wiring them up:
+
+| function | before | after |
+|---|---|---|
+| Donchian | 19.3M bars/s | **214.5M** |
+| RollingCorrelation | 0.41× | **1.91×** |
+| TripleExponentialRateOfChange | 0.98× | **3.38×** |
+| PlusDirectionalIndicator | 0.97× | **1.79×** |
+| KnowSureThing | 30.0M bars/s | **66.2M** |
+| RollingBeta | 1.00× | **1.52×** |
+| VariablePeriodMovingAverage | 0.37× | 0.71× (still below gate) |
+| SchaffTrendCycle | 10.7M bars/s | 15.8M (still below gate) |
+| VariableIndexDynamicAverage | 14.4M bars/s | 16.7M (still below gate) |
+
+Worth remembering as a review item: a kernel that is correct and fast in Rust
+delivers nothing until the binding calls it, and no Rust test can detect that.
+
+### The 10 unticked rows
+
+**4 are correctness, and all 4 are pre-existing — not regressions.** Proven by
 building the pre-session commit in a worktree and comparing at 1M bars:
+`CandleAdvanceBlock`, `CandleGapSideSideWhite`, `CandleKicking` and
+`CandleKickingByLength` diverge from TA-Lib on 5–30 bars per million
+(knife-edge threshold comparisons), and the old build produces **identical
+divergences on identical bar indices**. Never caught before because the old
+protocol stopped at 10k bars. Note these are *fast* now (up to 3.97×); they are
+unticked purely on the pre-existing divergence.
 
-- `CandleAdvanceBlock`, `CandleGapSideSideWhite`, `CandleKicking`,
-  `CandleKickingByLength` diverge from TA-Lib on 5–30 bars per million
-  (knife-edge threshold comparisons). The pre-session build produces
-  **identical divergences on identical bar indices**. Never caught before
-  because the old protocol stopped at 10k bars.
-- `RollingCorrelation`, `RollingStandardDeviation`, `RollingVariance`,
-  `CommodityChannelIndex` exceed the 1M-bar tolerance through accumulator
-  drift — but every one is **substantially better than before**:
+**6 are performance below 1.0× at 10k**, all close to it and all inherently
+serial: `ParabolicSar` 0.99×, `DirectionalMovementIndex` 0.99×,
+`MinusDirectionalIndicator` 0.86×, `HilbertTransformTrendline` 0.87×,
+`ParabolicSarExtended` 0.84×, `VariablePeriodMovingAverage` 0.71×. Each is a
+bar-to-bar recurrence with a branchy update, which is exactly what TA-Lib's C
+also does — the remaining gap is per-bar constant factor, not algorithm.
 
-  | function | drift before | drift now | improvement |
-  |---|---|---|---|
-  | STDDEV | 2.612e-08 | 1.231e-09 | 21× |
-  | CORREL | 4.289e-09 | 4.847e-10 | 8.8× |
-  | CCI | 2.402e-09 | 7.115e-10 | 3.4× |
-  | VAR | 3.143e-09 | 1.004e-09 | 3.1× |
+### A pessimization worth remembering
 
-  Chunk invariance and streaming-vs-batch stay bitwise green for all four.
+The index-extrema rows were slow *because of an earlier optimization*. Swapping
+TA-Lib's O(period) rescan for a monotonic deque looks like an unambiguous win —
+amortized O(1) instead of O(period) — and measured **4–6× slower**. The deque
+pays two unpredictable pop-loops on every bar; the rescan does contiguous,
+branch-predictable work only when the tracked candidate ages out, about once per
+`period` bars. Restoring a faithful replica of the C state machine took
+MAXINDEX from 0.68× to 1.93×. Asymptotics are not the constant factor.
 
-**22 are performance below 1.0× at 10k.** The cluster worth attacking next is
-the index-returning extrema (`RollingArgmin/Argmax/MinMaxIndex` 0.54–0.68×),
-which cannot use vHGW: TA-Lib's MAXINDEX tie-breaking is path dependent
-(`[3,5,4,5]` and `[9,5,4,5]` at p=3 give different indices for the same final
-window), so they run an exact O(n) replica of the C state machine instead.
-`MoneyFlowIndex` (0.57×) and the candle stragglers are next.
+Two more variants of the wiring bug turned up here, both invisible to the test
+suite: `RollingArgmax`/`RollingArgmin` had a pyclass correctly *calling*
+`extend_slice_into` while the type never overrode it (so it silently resolved to
+the per-bar trait default), and `RollingMinmaxIndex` had a real bulk signature
+whose body was `for input in inputs { self.append(input) }`.
 
 ### Optimizations deliberately rejected
 
 Sliding-sum conversions for AwesomeOscillator, VWMA, RollingVWAP, UlcerIndex,
 RollingCalmar, RollingInformationRatio, VIDYA's CMO scan and the LINEARREG
-family would each reassociate a sum the current code recomputes fresh,
-changing low-order bits and breaking the bit-exactness contract (R2). Those
-rows took contiguous-ring and allocation wins instead. Four rows (Hurst,
-RollingAutocorr, SpreadZScore, OrderBlock) sit at the serial-dependency floor
-where beating the gate requires exactly that forbidden reassociation.
+family would each reassociate a sum the current code recomputes fresh, changing
+low-order bits and breaking the bit-exactness contract (R2). Those rows took
+contiguous-ring and allocation wins instead. Four rows (Hurst, RollingAutocorr,
+SpreadZScore, OrderBlock) sit at the serial-dependency floor where clearing the
+gate would require exactly that forbidden reassociation.
 
 ## 1. General rules (apply to every task, no exceptions)
 
@@ -186,20 +242,20 @@ Method `_` = no bespoke work; global tasks G1–G7 still apply to every row.
 | [x] | AccumulationDistributionOscillator | ADOSC | 0.82× → **2.06×** (1M: 0.91×) | M2 |
 | [x] | AverageDirectionalIndex | ADX | 0.92× → **1.61×** (1M: 1.15×) | M2 |
 | [x] | AverageDirectionalIndexRating | ADXR | 0.81× → **1.42×** (1M: 1.08×) | M2 |
-| [ ] | AbsolutePriceOscillator | APO | 0.77× → **0.95×** (1M: 0.62×) | M2 |
-| [ ] | Aroon | AROON | 0.33× → **0.80×** (1M: 0.54×) | M1 M12 |
-| [ ] | AroonOscillator | AROONOSC | 0.27× → **0.66×** (1M: 0.49×) | M1 M12 |
+| [x] | AbsolutePriceOscillator | APO | 0.77× → **2.09×** (1M: 1.50×) | M2 |
+| [x] | Aroon | AROON | 0.33× → **1.27×** (1M: 0.91×) | M1 M12 |
+| [x] | AroonOscillator | AROONOSC | 0.27× → **1.19×** (1M: 0.93×) | M1 M12 |
 | [x] | MathAsin | ASIN | 1.34× → **1.34×** (1M: 0.86×) | _ |
 | [x] | MathAtan | ATAN | 1.30× → **1.30×** (1M: 0.84×) | _ |
 | [x] | AverageTrueRange | ATR | 1.57× → **1.70×** (1M: 1.17×) | _ |
 | [x] | RollingAverageDeviation | AVGDEV | 0.84× → **1.04×** (1M: 0.88×) | M3 (O(p) scan is inherent — fuse mean+dev passes on contiguous ring) |
 | [x] | AveragePrice | AVGPRICE | 4.56× → **4.71×** (1M: 1.18×) | _ |
 | [x] | BollingerBands | BBANDS | 0.46× → **1.64×** (1M: 0.96×) | M3 M4 |
-| [ ] | RollingBeta | BETA | 1.00× → **0.88×** (1M: 0.59×) | _ |
+| [x] | RollingBeta | BETA | 1.00× → **1.52×** (1M: 0.97×) | _ |
 | [x] | BalanceOfPower | BOP | 3.32× → **5.14×** (1M: 1.17×) | _ |
 | [x] | CommodityChannelIndex | CCI | 1.21× → **1.25×** (1M: 1.06×) | _ |
 | [x] | CandleTwoCrows | CDL2CROWS | 0.57× → **1.74×** (1M: 0.95×) | M5 |
-| [ ] | CandleThreeBlackCrows | CDL3BLACKCROWS | 0.76× → **0.59×** (1M: 0.43×) | M5 |
+| [x] | CandleThreeBlackCrows | CDL3BLACKCROWS | 0.76× → **1.64×** (1M: 0.84×) | M5 |
 | [x] | CandleThreeInside | CDL3INSIDE | 0.36× → **1.33×** (1M: 0.97×) | M5 |
 | [x] | CandleThreeLineStrike | CDL3LINESTRIKE | 0.50× → **1.48×** (1M: 0.98×) | M5 |
 | [x] | CandleThreeOutside | CDL3OUTSIDE | 1.16× → **1.24×** (1M: 0.71×) | _ |
@@ -208,7 +264,7 @@ Method `_` = no bespoke work; global tasks G1–G7 still apply to every row.
 | [x] | CandleAbandonedBaby | CDLABANDONEDBABY | 0.34× → **1.43×** (1M: 1.03×) | M5 |
 | [ ] | CandleAdvanceBlock | CDLADVANCEBLOCK | 0.59× → **2.60×** (1M: 2.11×) | M5 |
 | [x] | CandleBeltHold | CDLBELTHOLD | 0.96× → **1.49×** (1M: 1.05×) | M5 |
-| [ ] | CandleBreakaway | CDLBREAKAWAY | 0.30× → **0.88×** (1M: 0.57×) | M5 |
+| [x] | CandleBreakaway | CDLBREAKAWAY | 0.30× → **1.35×** (1M: 0.80×) | M5 |
 | [x] | CandleClosingMarubozu | CDLCLOSINGMARUBOZU | 0.90× → **1.55×** (1M: 1.03×) | M5 |
 | [x] | CandleConcealBabySwall | CDLCONCEALBABYSWALL | 0.32× → **1.82×** (1M: 1.07×) | M5 |
 | [x] | CandleCounterAttack | CDLCOUNTERATTACK | 0.43× → **2.22×** (1M: 1.17×) | M5 |
@@ -226,8 +282,8 @@ Method `_` = no bespoke work; global tasks G1–G7 still apply to every row.
 | [x] | CandleHarami | CDLHARAMI | 0.44× → **2.56×** (1M: 1.21×) | M5 |
 | [x] | CandleHaramiCross | CDLHARAMICROSS | 0.45× → **1.77×** (1M: 1.06×) | M5 |
 | [x] | CandleHighWave | CDLHIGHWAVE | 1.11× → **1.81×** (1M: 1.15×) | _ |
-| [ ] | CandleHikkake | CDLHIKKAKE | 0.71× → **0.67×** (1M: 0.49×) | M5 |
-| [ ] | CandleHikkakeModified | CDLHIKKAKEMOD | 0.76× → **0.68×** (1M: 0.51×) | M5 |
+| [x] | CandleHikkake | CDLHIKKAKE | 0.71× → **1.46×** (1M: 0.77×) | M5 |
+| [x] | CandleHikkakeModified | CDLHIKKAKEMOD | 0.76× → **1.43×** (1M: 0.93×) | M5 |
 | [x] | CandleHomingPigeon | CDLHOMINGPIGEON | 0.37× → **1.86×** (1M: 1.16×) | M5 |
 | [x] | CandleIdenticalThreeCrows | CDLIDENTICAL3CROWS | 0.31× → **1.75×** (1M: 1.16×) | M5 |
 | [x] | CandleInNeck | CDLINNECK | 0.48× → **2.14×** (1M: 1.06×) | M5 |
@@ -261,7 +317,7 @@ Method `_` = no bespoke work; global tasks G1–G7 still apply to every row.
 | [x] | CandleUpDownSideGapThreeMethods | CDLXSIDEGAP3METHODS | 0.76× → **1.93×** (1M: 1.19×) | M5 |
 | [x] | MathCeil | CEIL | 1.53× → **3.93×** (1M: 0.68×) | _ |
 | [x] | ChandeMomentumOscillator | CMO | 1.64× → **1.62×** (1M: 1.11×) | _ |
-| [ ] | RollingCorrelation | CORREL | 0.41× → **0.47×** (1M: 0.28×) | M3 |
+| [x] | RollingCorrelation | CORREL | 0.41× → **1.91×** (1M: 1.18×) | M3 |
 | [x] | MathCos | COS | 1.16× → **1.03×** (1M: 0.91×) | _ |
 | [x] | MathCosh | COSH | 1.31× → **1.36×** (1M: 0.83×) | _ |
 | [x] | DoubleExponentialMovingAverage | DEMA | 1.19× → **2.62×** (1M: 1.97×) | _ |
@@ -286,29 +342,29 @@ Method `_` = no bespoke work; global tasks G1–G7 still apply to every row.
 | [x] | MathLog10 | LOG10 | 1.17× → **1.13×** (1M: 0.83×) | _ |
 | [x] | MovingAverage | MA | 1.01× → **1.18×** (1M: 0.52×) | _ (inherits dispatched family's kernel) |
 | [x] | MovingAverageConvergenceDivergence | MACD | 0.89× → **3.55×** (1M: 4.55×) | M2 |
-| [ ] | MovingAverageConvergenceDivergenceExtended | MACDEXT | 0.55× → **0.66×** (1M: 0.92×) | M2 |
+| [x] | MovingAverageConvergenceDivergenceExtended | MACDEXT | 0.55× → **1.17×** (1M: 1.16×) | M2 |
 | [x] | MovingAverageConvergenceDivergenceFixed | MACDFIX | 0.96× → **2.93×** (1M: 4.44×) | M2 |
 | [x] | MesaAdaptiveMovingAverage | MAMA | 0.98× → **1.09×** (1M: 0.91×) | M7 |
-| [ ] | VariablePeriodMovingAverage | MAVP | 0.37× → **0.70×** (1M: 0.86×) | M11 |
+| [ ] | VariablePeriodMovingAverage | MAVP | 0.37× → **0.71×** (1M: 0.89×) | M11 |
 | [x] | RollingMax | MAX | 0.33× → **3.51×** (1M: 2.02×) | M1 |
-| [ ] | RollingArgmax | MAXINDEX | 0.69× → **0.68×** (1M: 0.47×) | M1 M12 |
+| [x] | RollingArgmax | MAXINDEX | 0.69× → **1.93×** (1M: 1.32×) | M1 M12 |
 | [x] | MedianPrice | MEDPRICE | 7.15× → **8.25×** (1M: 1.03×) | _ |
-| [ ] | MoneyFlowIndex | MFI | 0.75× → **0.57×** (1M: 0.49×) | M3 M4 (signed-flow single ring) |
+| [x] | MoneyFlowIndex | MFI | 0.75× → **2.37×** (1M: 1.73×) | M3 M4 (signed-flow single ring) |
 | [x] | RollingMidpoint | MIDPOINT | 0.40× → **1.94×** (1M: 1.22×) | M1 |
 | [x] | RollingMidprice | MIDPRICE | 0.24× → **2.42×** (1M: 1.28×) | M1 |
 | [x] | RollingMin | MIN | 0.33× → **3.46×** (1M: 2.10×) | M1 |
-| [ ] | RollingArgmin | MININDEX | 0.61× → **0.65×** (1M: 0.44×) | M1 M12 |
+| [x] | RollingArgmin | MININDEX | 0.61× → **1.92×** (1M: 1.33×) | M1 M12 |
 | [x] | RollingMinMax | MINMAX | 0.48× → **2.57×** (1M: 1.52×) | M1 |
-| [ ] | RollingMinMaxIndex | MINMAXINDEX | 0.84× → **0.54×** (1M: 0.39×) | M1 M12 |
+| [x] | RollingMinMaxIndex | MINMAXINDEX | 0.84× → **1.54×** (1M: 1.09×) | M1 M12 |
 | [ ] | MinusDirectionalIndicator | MINUS_DI | 1.04× → **0.86×** (1M: 0.59×) | _ |
 | [x] | MinusDirectionalMovement | MINUS_DM | 1.58× → **1.62×** (1M: 1.02×) | _ |
 | [x] | Momentum | MOM | 1.34× → **1.61×** (1M: 0.33×) | _ |
 | [x] | MathMultiply | MULT | 4.01× → **8.14×** (1M: 1.26×) | _ |
 | [x] | NormalizedAverageTrueRange | NATR | 1.38× → **1.32×** (1M: 1.00×) | _ |
 | [x] | OnBalanceVolume | OBV | 2.09× → **2.33×** (1M: 0.83×) | _ |
-| [ ] | PlusDirectionalIndicator | PLUS_DI | 0.97× → **0.85×** (1M: 0.60×) | M2 |
+| [x] | PlusDirectionalIndicator | PLUS_DI | 0.97× → **1.79×** (1M: 1.05×) | M2 |
 | [x] | PlusDirectionalMovement | PLUS_DM | 1.56× → **1.58×** (1M: 0.99×) | _ |
-| [ ] | PercentagePriceOscillator | PPO | 0.77× → **0.88×** (1M: 0.58×) | M2 |
+| [x] | PercentagePriceOscillator | PPO | 0.77× → **2.09×** (1M: 1.40×) | M2 |
 | [x] | RateOfChange | ROC | 1.33× → **1.84×** (1M: 0.59×) | _ |
 | [x] | RateOfChangePercent | ROCP | 1.25× → **1.84×** (1M: 0.59×) | _ |
 | [x] | RateOfChangeRatio | ROCR | 1.18× → **2.23×** (1M: 0.62×) | _ |
@@ -321,7 +377,7 @@ Method `_` = no bespoke work; global tasks G1–G7 still apply to every row.
 | [x] | SimpleMovingAverage | SMA | 1.15× → **2.19×** (1M: 0.99×) | _ |
 | [x] | MathSqrt | SQRT | 2.02× → **3.22×** (1M: 0.66×) | _ |
 | [x] | RollingStandardDeviation | STDDEV | 0.80× → **1.63×** (1M: 0.79×) | M3 |
-| [ ] | StochasticOscillator | STOCH | 0.30× → **0.92×** (1M: 0.58×) | M1 (batch O(n·p) loop + fused MA passes) |
+| [x] | StochasticOscillator | STOCH | 0.30× → **1.57×** (1M: 0.87×) | M1 (batch O(n·p) loop + fused MA passes) |
 | [x] | FastStochasticOscillator | STOCHF | 0.29× → **1.08×** (1M: 0.82×) | M1 |
 | [x] | StochasticRelativeStrengthIndex | STOCHRSI | 0.35× → **1.08×** (1M: 0.63×) | M1 (reuse RSI output buffer) |
 | [x] | MathSubtract | SUB | 8.04× → **9.40×** (1M: 1.03×) | _ |
@@ -332,7 +388,7 @@ Method `_` = no bespoke work; global tasks G1–G7 still apply to every row.
 | [x] | TripleExponentialMovingAverage | TEMA | 1.06× → **2.74×** (1M: 2.34×) | _ |
 | [x] | TrueRange | TRANGE | 2.78× → **3.86×** (1M: 1.03×) | _ |
 | [x] | TriangularMovingAverage | TRIMA | 0.78× → **1.46×** (1M: 0.70×) | M3 (fuse the SMA-of-SMA) |
-| [x] | TripleExponentialRateOfChange | TRIX | 0.98× → **2.24×** (1M: 1.56×) | M2 |
+| [x] | TripleExponentialRateOfChange | TRIX | 0.98× → **3.38×** (1M: 2.63×) | M2 |
 | [x] | RollingTimeSeriesForecast | TSF | 0.60× → **1.08×** (1M: 1.00×) | M3 |
 | [x] | TypicalPrice | TYPPRICE | 6.01× → **6.01×** (1M: 1.08×) | _ |
 | [x] | UltimateOscillator | ULTOSC | 0.55× → **1.66×** (1M: 1.33×) | M3 M4 (3 periods share one bp ring + one tr ring) |

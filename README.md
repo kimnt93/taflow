@@ -219,7 +219,7 @@ make verify ARGS="EMA ATR"   # oracle parity for a subset
 make bench  ARGS="SMA MAX"   # benchmark a subset
 ```
 
-131 of the 161 TA-Lib functions meet or beat the C implementation at 10k bars,
+151 of the 161 TA-Lib functions meet or beat the C implementation at 10k bars,
 and every extended operator clears 20M bars/s. On a live feed the advantage is
 structural rather than a constant factor: per-tick cost is flat while a
 recompute-the-window approach grows with the period. See

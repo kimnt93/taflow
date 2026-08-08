@@ -1,6 +1,6 @@
 //! Batch implementation for `rolling_beta`.
 
-use super::statistic::*;
+use super::rolling_statistics::{beta_return, ta_is_zero};
 use crate::error::{TaError, TaResult};
 
 /// RollingBeta — O(n) sliding-window algorithm.
@@ -31,6 +31,13 @@ pub fn rolling_beta(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
             got: input1.len(),
         });
     }
+    if timeperiod < 2 {
+        return Err(TaError::InvalidParameter {
+            name: "timeperiod",
+            value: timeperiod.to_string(),
+            reason: "must be >= 2",
+        });
+    }
     if len <= timeperiod {
         return Err(TaError::InsufficientData {
             need: timeperiod + 1,
@@ -41,81 +48,66 @@ pub fn rolling_beta(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResu
     output[..timeperiod].fill(f64::NAN);
     let n = timeperiod as f64;
 
-    // Precompute percentage returns once to avoid repeated division per window.
-    // rx[i] corresponds to original index i+1; the return series has length len - 1.
-    let ret_len = len - 1;
-    let mut rx = vec![0.0_f64; ret_len];
-    let mut ry = vec![0.0_f64; ret_len];
-    for j in 0..ret_len {
-        rx[j] = (input0[j + 1] - input0[j]) / input0[j];
-        ry[j] = (input1[j + 1] - input1[j]) / input1[j];
-    }
-
-    // For output index i (i >= timeperiod), use rx[i-timeperiod..i].
+    // Returns are recomputed straight from the price slices — exactly what
+    // the C loop does through its `lastPrice`/`trailingLastPrice` cursors —
+    // so no `len`-sized return series is materialized. `rx[j]` below denotes
+    // the return between bars `j` and `j + 1`.
     let mut sx = 0.0_f64;
     let mut sy = 0.0_f64;
     let mut sxx = 0.0_f64;
     let mut sxy = 0.0_f64;
 
-    // Initialize the first window: rx[0..timeperiod] produces output[timeperiod].
-    for j in 0..timeperiod {
-        let x = rx[j];
-        let y = ry[j];
-        sx += x;
-        sy += y;
+    // TA_BETA seeds `timeperiod - 1` returns before the emit loop, then per
+    // bar adds the incoming return, emits, and only then removes the trailing
+    // one. That order — the mirror of TA_CORREL's — is load-bearing: it makes
+    // BETA bitwise equal to TA-Lib. See `RollingReturnMoments`. No reseed.
+    for j in 0..(timeperiod - 1) {
+        let x = beta_return(input0[j + 1], input0[j]);
+        let y = beta_return(input1[j + 1], input1[j]);
         sxx += x * x;
         sxy += x * y;
+        sx += x;
+        sy += y;
     }
 
-    let denom = n * sxx - sx * sx;
-    output[timeperiod] = if denom > 0.0 {
-        (n * sxy - sx * sy) / denom
-    } else {
-        0.0
-    };
+    // Branch-free steady loop over zipped slices; output slot `k` is bar
+    // `k + timeperiod`, whose incoming return spans bars `k + timeperiod - 1`
+    // and `k + timeperiod`, and whose trailing return spans `k` and `k + 1`.
+    let steady = len - timeperiod;
+    let out = &mut output[timeperiod..];
+    let new0 = &input0[timeperiod..];
+    let new1 = &input1[timeperiod..];
+    let previous0 = &input0[timeperiod - 1..len - 1];
+    let previous1 = &input1[timeperiod - 1..len - 1];
+    let trailing0 = &input0[1..steady + 1];
+    let trailing1 = &input1[1..steady + 1];
+    let trailing_previous0 = &input0[..steady];
+    let trailing_previous1 = &input1[..steady];
 
-    // Slide the window, reseeding the sums on the same absolute-append
-    // cadence as the streaming state (returns are appended from bar 1, so
-    // the streaming count at bar `i` is `i`) to bound drift. See
-    // `PAIR_MOMENTS_RESEED_INTERVAL` — streaming and batch stay bitwise
-    // equal. `syy` is not tracked here; its streaming reseed is independent.
-    let reseed_interval = super::rolling_statistics::PAIR_MOMENTS_RESEED_INTERVAL as usize;
-    for i in (timeperiod + 1)..len {
-        // Remove rx[i - timeperiod - 1] and add rx[i - 1].
-        let old_idx = i - timeperiod - 1;
-        let new_idx = i - 1;
-        let ox = rx[old_idx];
-        let oy = ry[old_idx];
-        let nx = rx[new_idx];
-        let ny = ry[new_idx];
-        sx += nx - ox;
-        sy += ny - oy;
-        sxx += nx * nx - ox * ox;
-        sxy += nx * ny - ox * oy;
+    for (k, slot) in out.iter_mut().enumerate() {
+        let x = beta_return(new0[k], previous0[k]);
+        let y = beta_return(new1[k], previous1[k]);
+        sxx += x * x;
+        sxy += x * y;
+        sx += x;
+        sy += y;
 
-        if i % reseed_interval == 0 {
-            // Serial oldest-to-newest recomputation over the current window,
-            // identical to `RollingPairMoments::reseed_serial`.
-            sx = 0.0;
-            sy = 0.0;
-            sxx = 0.0;
-            sxy = 0.0;
-            for j in i - timeperiod..i {
-                let x = rx[j];
-                let y = ry[j];
-                sx += x;
-                sy += y;
-                sxx += x * x;
-                sxy += x * y;
-            }
-        }
+        // TA-Lib reads the trailing return before writing the output.
+        let trailing_x = beta_return(trailing0[k], trailing_previous0[k]);
+        let trailing_y = beta_return(trailing1[k], trailing_previous1[k]);
 
-        let denom = n * sxx - sx * sx;
-        output[i] = if denom > 0.0 {
-            (n * sxy - sx * sy) / denom
+        let denom = (n * sxx) - (sx * sx);
+        *slot = if !ta_is_zero(denom) {
+            ((n * sxy) - (sx * sy)) / denom
         } else {
             0.0
         };
+
+        // Remove the trailing return, after the emit.
+        sxx -= trailing_x * trailing_x;
+        sxy -= trailing_x * trailing_y;
+        sx -= trailing_x;
+        sy -= trailing_y;
     }
     Ok(output)
 }

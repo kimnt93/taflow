@@ -418,6 +418,36 @@ impl MonotonicArgmax {
         })
     }
 
+    pub(crate) fn period(&self) -> usize {
+        self.period
+    }
+
+    /// Observations consumed since construction/reset.
+    pub(crate) fn count(&self) -> usize {
+        self.index
+    }
+
+    /// Restores the exact post-run state a full from-empty `append` run would
+    /// have left, given the tracked index the bulk kernel finished on.
+    ///
+    /// The strict-pop deque contents depend only on the last `period`
+    /// observations (an entry survives iff no later in-window value is
+    /// strictly greater), so replaying that tail reproduces them bit for bit.
+    pub(crate) fn rebuild_from_full_run(&mut self, inputs: &[f64], tracked_index: usize) {
+        debug_assert_eq!(self.index, 0);
+        debug_assert!(self.deque.is_empty());
+        let start = inputs.len().saturating_sub(self.period);
+        for (offset, &value) in inputs[start..].iter().enumerate() {
+            let index = start + offset;
+            while self.deque.back().is_some_and(|&(_, v)| v < value) {
+                self.deque.pop_back();
+            }
+            self.deque.push_back((index, value));
+        }
+        self.index = inputs.len();
+        self.tracked = Some((tracked_index, inputs[tracked_index]));
+    }
+
     /// Appends one value; `Some(index)` once the window is full.
     pub(crate) fn append(&mut self, input: f64) -> Option<usize> {
         let index = self.index;
@@ -481,6 +511,31 @@ impl MonotonicArgmin {
         })
     }
 
+    pub(crate) fn period(&self) -> usize {
+        self.period
+    }
+
+    /// Observations consumed since construction/reset.
+    pub(crate) fn count(&self) -> usize {
+        self.index
+    }
+
+    /// See [`MonotonicArgmax::rebuild_from_full_run`].
+    pub(crate) fn rebuild_from_full_run(&mut self, inputs: &[f64], tracked_index: usize) {
+        debug_assert_eq!(self.index, 0);
+        debug_assert!(self.deque.is_empty());
+        let start = inputs.len().saturating_sub(self.period);
+        for (offset, &value) in inputs[start..].iter().enumerate() {
+            let index = start + offset;
+            while self.deque.back().is_some_and(|&(_, v)| v > value) {
+                self.deque.pop_back();
+            }
+            self.deque.push_back((index, value));
+        }
+        self.index = inputs.len();
+        self.tracked = Some((tracked_index, inputs[tracked_index]));
+    }
+
     /// Appends one value; `Some(index)` once the window is full.
     pub(crate) fn append(&mut self, input: f64) -> Option<usize> {
         let index = self.index;
@@ -518,8 +573,86 @@ impl MonotonicArgmin {
     }
 }
 
+/// TA-Lib-exact rolling extremum-index kernel over a whole slice.
+///
+/// Replicates `TA_MAXINDEX`/`TA_MININDEX` statement for statement: a tracked
+/// `(index, value)` candidate advanced by the newest-wins (`>=`/`<=`) fast
+/// path, plus an earliest-wins (`>`/`<`) rescan of the live window whenever
+/// the candidate ages past the trailing edge. That path dependence is the
+/// whole reason no window-determined algorithm (vHGW included) can be used
+/// here — `[3,5,4,5]` and `[9,5,4,5]` at `period=3` share a final window but
+/// emit different indices.
+///
+/// The rescan is amortized O(1) on non-degenerate data (the candidate ages out
+/// roughly once per `period` bars, and each rescan is one contiguous forward
+/// pass), and measures several times faster than carrying a monotonic deque
+/// through every bar.
+///
+/// `out` must be the full-length output slice; warm-up entries are left
+/// untouched, so callers pre-fill them with TA-Lib's `0.0`. Returns the final
+/// tracked index, which seeds the streaming state's candidate.
+#[inline]
+fn tracked_index_rescan_into<const MAXIMUM: bool>(
+    input: &[f64],
+    period: usize,
+    out: &mut [f64],
+) -> usize {
+    debug_assert!(period >= 1);
+    debug_assert!(input.len() >= period);
+    debug_assert_eq!(out.len(), input.len());
+    // Strict form drives the rescan (earliest extremum wins); the non-strict
+    // form drives the fast path (newest wins the tie).
+    let replaces = |candidate: f64, best: f64| {
+        if MAXIMUM {
+            candidate > best
+        } else {
+            candidate < best
+        }
+    };
+    let wins = |candidate: f64, best: f64| {
+        if MAXIMUM {
+            candidate >= best
+        } else {
+            candidate <= best
+        }
+    };
+
+    let len = input.len();
+    let lookback = period - 1;
+    let mut best = input[0];
+    let mut best_index = 0usize;
+    for (offset, &value) in input[1..period].iter().enumerate() {
+        if replaces(value, best) {
+            best = value;
+            best_index = offset + 1;
+        }
+    }
+    out[lookback] = best_index as f64;
+
+    let mut trailing = 1usize;
+    for today in period..len {
+        let value = input[today];
+        if best_index < trailing {
+            best = input[trailing];
+            best_index = trailing;
+            for (offset, &candidate) in input[trailing + 1..=today].iter().enumerate() {
+                if replaces(candidate, best) {
+                    best = candidate;
+                    best_index = trailing + 1 + offset;
+                }
+            }
+        } else if wins(value, best) {
+            best = value;
+            best_index = today;
+        }
+        out[today] = best_index as f64;
+        trailing += 1;
+    }
+    best_index
+}
+
 macro_rules! rolling_index_indicator {
-    ($name:ident, $inner:ident) => {
+    ($name:ident, $inner:ident, $maximum:literal) => {
         #[derive(Debug, Clone)]
         pub struct $name {
             extrema: $inner,
@@ -558,12 +691,38 @@ macro_rules! rolling_index_indicator {
                 self.extrema.reset();
                 self.value = None;
             }
+
+            /// Bulk kernel: from an empty state, the TA-Lib tracked-candidate
+            /// rescan machine over the whole slice; otherwise per-bar
+            /// continuation. Outputs and post-run state are bit-identical to
+            /// per-bar [`Self::append`]; warm-up bars are `0.0`, not NaN.
+            fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+                let period = self.extrema.period();
+                if self.extrema.count() != 0 || inputs.len() < period {
+                    output.reserve(inputs.len());
+                    output.extend(
+                        inputs
+                            .iter()
+                            .copied()
+                            .map(|input| self.append(input).unwrap_or(f64::NAN)),
+                    );
+                    return;
+                }
+                let start = output.len();
+                // TA-Lib fills the lookback with 0, not NaN; the kernel writes
+                // only the warmed tail.
+                output.resize(start + inputs.len(), 0.0);
+                let tracked =
+                    tracked_index_rescan_into::<$maximum>(inputs, period, &mut output[start..]);
+                self.extrema.rebuild_from_full_run(inputs, tracked);
+                self.value = output.last().copied();
+            }
         }
     };
 }
 
-rolling_index_indicator!(RollingArgmax, MonotonicArgmax);
-rolling_index_indicator!(RollingArgmin, MonotonicArgmin);
+rolling_index_indicator!(RollingArgmax, MonotonicArgmax, true);
+rolling_index_indicator!(RollingArgmin, MonotonicArgmin, false);
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `RollingMinmaxIndex`.
@@ -609,19 +768,36 @@ impl RollingMinmaxIndex {
     /// No vHGW shortcut here: TA-Lib's index tie rule is path dependent (a
     /// newest-wins fast path plus an earliest-wins rescan on eviction), so the
     /// only bit-exact route is the state machine itself. Warm-up emits `0.0`.
+    ///
+    /// From an empty state each side runs one [`tracked_index_rescan_into`]
+    /// pass straight into its output cache — no per-bar deque traffic, no
+    /// `Option`, no intermediate value struct.
     pub fn extend_slices_into(
         &mut self,
         inputs: &[f64],
         min_out: &mut Vec<f64>,
         max_out: &mut Vec<f64>,
     ) {
-        min_out.reserve(inputs.len());
-        max_out.reserve(inputs.len());
-        for &input in inputs {
-            let value = self.append(input);
-            min_out.push(value.minimum as f64);
-            max_out.push(value.maximum as f64);
+        let period = self.maximum.period();
+        if self.maximum.count() != 0 || inputs.len() < period {
+            min_out.reserve(inputs.len());
+            max_out.reserve(inputs.len());
+            for &input in inputs {
+                let value = self.append(input);
+                min_out.push(value.minimum as f64);
+                max_out.push(value.maximum as f64);
+            }
+            return;
         }
+        let min_start = min_out.len();
+        let max_start = max_out.len();
+        min_out.resize(min_start + inputs.len(), 0.0);
+        max_out.resize(max_start + inputs.len(), 0.0);
+        let maximum = tracked_index_rescan_into::<true>(inputs, period, &mut max_out[max_start..]);
+        let minimum = tracked_index_rescan_into::<false>(inputs, period, &mut min_out[min_start..]);
+        self.maximum.rebuild_from_full_run(inputs, maximum);
+        self.minimum.rebuild_from_full_run(inputs, minimum);
+        self.value = Some(RollingMinmaxIndexValue { minimum, maximum });
     }
 
     /// Returns the computed value, aligned history, or a validation error.
@@ -950,6 +1126,144 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// Inputs that exercise every branch of the path-dependent index machine:
+    /// random (rescans and fast-path ties interleaved), constant (every bar a
+    /// tie), monotone up/down (one side never rescans, the other rescans every
+    /// bar) and a coarse quantized series (dense ties).
+    fn index_bulk_datasets(len: usize) -> Vec<Vec<f64>> {
+        vec![
+            lcg_series(len, 0x51ED_2701_C0FF_EE11),
+            vec![13.25_f64; len],
+            (0..len).map(|i| i as f64 * 0.5).collect(),
+            (0..len).map(|i| (len as f64) - i as f64 * 0.5).collect(),
+            (0..len).map(|i| ((i * 7) % 5) as f64).collect(),
+        ]
+    }
+
+    const INDEX_BULK_CHUNKS: [usize; 5] = [1, 7, 10, 97, 1000];
+    /// `BULK_PERIODS` plus the degenerate single-bar window.
+    const INDEX_BULK_PERIODS: [usize; 6] = [1, 2, 5, 14, 30, 200];
+
+    #[test]
+    fn rolling_argmax_argmin_bulk_matches_append_bitwise() {
+        for data in index_bulk_datasets(5_000) {
+            for period in INDEX_BULK_PERIODS {
+                let mut reference_max = RollingArgmax::new(period).unwrap();
+                let mut reference_min = RollingArgmin::new(period).unwrap();
+                let expected_max: Vec<f64> = data
+                    .iter()
+                    .map(|&v| reference_max.append(v).unwrap_or(f64::NAN))
+                    .collect();
+                let expected_min: Vec<f64> = data
+                    .iter()
+                    .map(|&v| reference_min.append(v).unwrap_or(f64::NAN))
+                    .collect();
+                for chunk in INDEX_BULK_CHUNKS.iter().copied().chain([data.len()]) {
+                    let mut max_state = RollingArgmax::new(period).unwrap();
+                    let mut min_state = RollingArgmin::new(period).unwrap();
+                    let (mut max_out, mut min_out) = (Vec::new(), Vec::new());
+                    for piece in data.chunks(chunk) {
+                        max_state.extend_slice_into(piece, &mut max_out);
+                        min_state.extend_slice_into(piece, &mut min_out);
+                    }
+                    assert_eq!(max_out.len(), data.len());
+                    for i in 0..data.len() {
+                        assert_eq!(
+                            expected_max[i].to_bits(),
+                            max_out[i].to_bits(),
+                            "maxindex p={period} c={chunk} i={i}"
+                        );
+                        assert_eq!(
+                            expected_min[i].to_bits(),
+                            min_out[i].to_bits(),
+                            "minindex p={period} c={chunk} i={i}"
+                        );
+                    }
+                    // The state left behind must continue identically.
+                    let mut follow_max = reference_max.clone();
+                    let mut follow_min = reference_min.clone();
+                    for &value in data.iter().take(256) {
+                        assert_eq!(
+                            follow_max.append(value),
+                            max_state.append(value),
+                            "continue maxindex p={period} c={chunk}"
+                        );
+                        assert_eq!(
+                            follow_min.append(value),
+                            min_state.append(value),
+                            "continue minindex p={period} c={chunk}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn rolling_minmax_index_bulk_covers_tie_paths() {
+        for data in index_bulk_datasets(5_000) {
+            for period in INDEX_BULK_PERIODS {
+                let mut reference = RollingMinmaxIndex::new(period).unwrap();
+                let expected: Vec<RollingMinmaxIndexValue> =
+                    data.iter().map(|&v| reference.append(v)).collect();
+                for chunk in INDEX_BULK_CHUNKS.iter().copied().chain([data.len()]) {
+                    let mut state = RollingMinmaxIndex::new(period).unwrap();
+                    let (mut min_out, mut max_out) = (Vec::new(), Vec::new());
+                    for piece in data.chunks(chunk) {
+                        state.extend_slices_into(piece, &mut min_out, &mut max_out);
+                    }
+                    for (i, expected) in expected.iter().enumerate() {
+                        assert_eq!(
+                            expected.minimum as f64, min_out[i],
+                            "minidx p={period} c={chunk} i={i}"
+                        );
+                        assert_eq!(
+                            expected.maximum as f64, max_out[i],
+                            "maxidx p={period} c={chunk} i={i}"
+                        );
+                    }
+                    let mut follow = reference.clone();
+                    for &value in data.iter().take(256) {
+                        assert_eq!(
+                            follow.append(value),
+                            state.append(value),
+                            "continue p={period} c={chunk}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /// The bulk kernel must reproduce TA-Lib's path dependence, not just the
+    /// window-determined answer: the same final window emits a different index
+    /// depending on whether the fast path or the rescan produced it.
+    #[test]
+    fn bulk_index_kernel_is_path_dependent_like_c() {
+        let fast_path = [3.0, 5.0, 4.0, 5.0];
+        let rescan = [9.0, 5.0, 4.0, 5.0];
+        let mut out = Vec::new();
+        RollingArgmax::new(3)
+            .unwrap()
+            .extend_slice_into(&fast_path, &mut out);
+        assert_eq!(out, vec![0.0, 0.0, 1.0, 3.0]);
+        out.clear();
+        RollingArgmax::new(3)
+            .unwrap()
+            .extend_slice_into(&rescan, &mut out);
+        assert_eq!(out, vec![0.0, 0.0, 0.0, 1.0]);
+        out.clear();
+        RollingArgmin::new(3)
+            .unwrap()
+            .extend_slice_into(&[9.0, 2.0, 4.0, 2.0], &mut out);
+        assert_eq!(out[3], 3.0);
+        out.clear();
+        RollingArgmin::new(3)
+            .unwrap()
+            .extend_slice_into(&[1.0, 2.0, 4.0, 2.0], &mut out);
+        assert_eq!(out[3], 1.0);
     }
 
     #[test]

@@ -101,14 +101,16 @@ impl CandleThreeBlackCrows {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// No from-empty fast path here. The warm-up prologue seeds `shadow_sum`
-    /// one bar earlier than the steady-state slide evicts (`+= cr(i-2)` against
-    /// `-= cr(i-12)` on a window seeded at bars `0..=9`), which the batch
-    /// kernel mirrors exactly - the two agree with each other, but the sums
-    /// keep a `cr(bar 0) - cr(bar 10)` term forever. The state is therefore not
-    /// a function of a bounded window and a tail replay cannot reconstruct it,
-    /// so the bulk entry point is the per-bar `append` loop with the `Option`
-    /// unwrapped in place. Bit-identical to calling `append` once per bar.
+    /// There is no batch-kernel-plus-tail-replay route here: the warm-up
+    /// prologue seeds `shadow_sum` one bar earlier than the steady-state slide
+    /// evicts (`+= cr(i-2)` against `-= cr(i-12)` on a window seeded at bars
+    /// `0..=9`), so the sums keep a `cr(bar 0) - cr(bar 10)` term forever and
+    /// are not a function of a bounded window. They do not have to be: the
+    /// steady loop *carries* all three sums in locals, and only the 13-bar
+    /// candle ring - which is window bounded - is rebuilt from the slice tail.
+    /// A `PROLOGUE`-bar per-bar prefix guarantees the steady loop's `i-12 .. i`
+    /// reads land inside this slice. Bit-identical to calling `append` once per
+    /// bar.
     ///
     /// # Parameters
     ///
@@ -126,10 +128,67 @@ impl CandleThreeBlackCrows {
         close: &[f64],
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
+        /// Bars the ring spans; after this many appends it holds only slice bars.
+        const PROLOGUE: usize = 13;
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        for i in 0..len {
+        let prologue = len.min(PROLOGUE);
+        for i in 0..prologue {
             output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        }
+        if len <= PROLOGUE {
+            return Ok(());
+        }
+        let [mut sum0, mut sum1, mut sum2] = self.shadow_sum;
+        let mut last = 0;
+        // Write through a pre-sized slice rather than `push`: the length
+        // write-back of `push` sits on the critical path of every iteration.
+        let base = output.len();
+        output.resize(base + len - PROLOGUE, 0);
+        let scores = &mut output[base..];
+        for (slot, i) in scores.iter_mut().zip(PROLOGUE..len) {
+            // Bars i-3 (`p3`), i-2 (`a`), i-1 (`b`) and i (`current`).
+            let (p3_open, p3_close) = (open[i - 3], close[i - 3]);
+            let (a_open, a_high, a_low, a_close) =
+                (open[i - 2], high[i - 2], low[i - 2], close[i - 2]);
+            let (b_open, b_high, b_low, b_close) =
+                (open[i - 1], high[i - 1], low[i - 1], close[i - 1]);
+            let (c_open, c_high, c_low, c_close) = (open[i], high[i], low[i], close[i]);
+            let pattern = a_close < a_open
+                && b_close < b_open
+                && c_close < c_open
+                && b_close < a_close
+                && c_close < b_close
+                && a_open <= p3_open.max(p3_close)
+                && b_open <= a_open
+                && b_open >= a_close
+                && c_open <= b_open
+                && c_open >= b_close
+                && a_open.min(a_close) - a_low
+                    < ca_highlow_scalar(SHADOW_VERY_SHORT, sum0, a_high, a_low)
+                && b_open.min(b_close) - b_low
+                    < ca_highlow_scalar(SHADOW_VERY_SHORT, sum1, b_high, b_low)
+                && c_open.min(c_close) - c_low
+                    < ca_highlow_scalar(SHADOW_VERY_SHORT, sum2, c_high, c_low);
+            // Slide the sums exactly like `append`: `+= cr(bar) - cr(bar - 10)`.
+            sum0 += cr_highlow_scalar(a_high, a_low) - cr_highlow_scalar(high[i - 12], low[i - 12]);
+            sum1 += cr_highlow_scalar(b_high, b_low) - cr_highlow_scalar(high[i - 11], low[i - 11]);
+            sum2 += cr_highlow_scalar(c_high, c_low) - cr_highlow_scalar(high[i - 10], low[i - 10]);
+            last = -(pattern as i32) * 100;
+            *slot = last;
+        }
+        self.shadow_sum = [sum0, sum1, sum2];
+        self.value = Some(last);
+        // Rebuild the window-bounded ring so subsequent appends continue
+        // bit-identically.
+        self.candles.clear();
+        for i in (len - PROLOGUE)..len {
+            self.candles.push_back(Candle {
+                open: open[i],
+                high: high[i],
+                low: low[i],
+                close: close[i],
+            });
         }
         Ok(())
     }
