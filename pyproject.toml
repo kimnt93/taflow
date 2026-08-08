@@ -7,7 +7,7 @@ name = "taflow"
 version = "0.1.2"
 description = "Rust-powered batch and streaming technical analysis library"
 requires-python = ">=3.9"
-license = { text = "BSD-3-Clause" }
+license = { text = "MIT" }
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",

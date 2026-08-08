@@ -5,7 +5,7 @@ members = ["crates/taflow-core", "crates/taflow-python"]
 [workspace.package]
 version = "0.1.2"
 edition = "2021"
-license = "BSD-3-Clause"
+license = "MIT"
 repository = "https://github.com/kimnt93/taflow"
 
 [workspace.dependencies]

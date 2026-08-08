@@ -8,20 +8,30 @@ taflow class.extend over contiguous NumPy arrays; this exercises the compiled Ru
 
 | Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | TA-Lib ms | API speedup | Kernel speedup |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1,000 | 0.009 | 105.56M | 0.009 | 114.09M | nan | — | — |
-| 10,000 | 0.079 | 126.94M | 0.112 | 88.94M | nan | — | — |
+| 1,000 | 0.009 | 115.20M | 0.008 | 126.59M | nan | — | — |
+| 10,000 | 0.075 | 133.62M | 0.071 | 141.24M | nan | — | — |
+| 100,000 | 0.749 | 133.43M | 0.715 | 139.84M | nan | — | — |
+| 1,000,000 | 7.775 | 128.62M | 6.834 | 146.33M | nan | — | — |
 
 ## Warm-up
 
-Construct + canonical extend over 1,500 bars: **0.013 ms**; native kernel **0.013 ms**.
+Construct + canonical extend over 100,000 bars: **0.708 ms**; native kernel **0.691 ms**.
 
 ## Warmed continuation
 
 | Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | TA-Lib full µs | vs full | vs tail |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1,500 | 1 | 0.302 | 0.187 | 5.33M | nan | — | — |
-| 1,500 | 10 | 1.354 | 0.990 | 10.11M | nan | — | — |
-| 1,500 | 100 | 3.240 | 2.713 | 36.86M | nan | — | — |
+| 100,000 | 1 | 0.230 | 0.173 | 5.79M | nan | — | — |
+| 100,000 | 10 | 0.836 | 0.573 | 17.47M | nan | — | — |
+| 100,000 | 1,000 | 8.633 | 8.595 | 116.35M | nan | — | — |
+
+## Independent-stream threads
+
+| Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | TA-Lib vector/s |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 115.87M | 128.20M | 1.00× | 2.87M | 3.04M | 1.00× | — |
+| 2 | 224.27M | 247.26M | 1.93× | 2.88M | 3.69M | 1.21× | — |
+| 4 | 248.40M | 223.83M | 1.75× | 2.91M | 3.21M | 1.05× | — |
 
 ---
 Times include Python conversion/binding overhead. Raw samples are retained in JSON.
