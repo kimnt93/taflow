@@ -64,7 +64,12 @@ macro_rules! scalar_state_class {
                 py: Python<'_>,
                 input: PyReadonlyArray1<f64>,
             ) -> PyResult<Py<PyArray1<f64>>> {
-                let values = self.inner.extend_into(input.as_slice()?.iter().copied());
+                let input = input.as_slice()?;
+                let values = py.allow_threads(|| {
+                    let mut values = Vec::with_capacity(input.len());
+                    self.inner.extend_slice_into(&input, &mut values);
+                    values
+                });
                 Ok(to_py_array(py, values))
             }
 

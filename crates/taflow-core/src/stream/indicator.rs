@@ -41,4 +41,20 @@ pub trait StreamingIndicator {
         output.extend(iter.map(|input| self.append(input).map(Into::into).unwrap_or(f64::NAN)));
         output
     }
+
+    /// Extends from a borrowed slice directly into a caller-owned output.
+    /// Implementations may override this with a specialized bulk kernel; the
+    /// default preserves streaming semantics and chunk invariance.
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>)
+    where
+        Self::Output: Into<f64>,
+    {
+        output.reserve(inputs.len());
+        output.extend(
+            inputs
+                .iter()
+                .copied()
+                .map(|input| self.append(input).map(Into::into).unwrap_or(f64::NAN)),
+        );
+    }
 }

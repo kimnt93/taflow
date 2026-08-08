@@ -71,9 +71,11 @@ impl CandleHikkakeModified {
                 let near = self.near();
                 if high < c.high && low < c.low && b.close <= b.low + near {
                     self.pending = Some((i, 100, c.high));
+                    result = 100;
                     new_pattern = true;
                 } else if high > c.high && low > c.low && b.close >= b.high - near {
                     self.pending = Some((i, -100, c.low));
+                    result = -100;
                     new_pattern = true;
                 }
             }
