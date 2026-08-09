@@ -1,106 +1,130 @@
-"""Descriptive stateful interface for a variable-period moving average."""
+"""Native adapter for a variable-period moving average."""
 
-from taflow._native import StatefulMavp
+from __future__ import annotations
+
 from typing import Any
 
 import numpy as np
 
+from ._native import VariablePeriodMovingAverage as _NativeVariablePeriodMovingAverage
+from ._series import as_float64_series
+
 
 class VariablePeriodMovingAverage:
-    """Incrementally compute MAVP from values and per-bar periods
+    """Compute a moving average whose trailing period changes on each bar.
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    values : array-like
+        Initial chronological input values. Pass an empty aligned series to
+        create a fresh streaming state.
+    periods : array-like
+        Per-bar periods aligned with ``values``. Values are truncated to an
+        integer and clamped to ``[min_period, max_period]`` like TA-Lib MAVP.
+    min_period : int, default 2
+        Smallest permitted moving-average period.
+    max_period : int, default 30
+        Largest permitted period and the basis of global warm-up.
+    average_type : int, default 0
+        TA-Lib moving-average type code from 0 through 8.
 
-    Returns
-    -------
-    VariablePeriodMovingAverage
-        A persistent native-backed indicator adapter.
+    Notes
+    -----
+    The independent oracle is TA-Lib ``MAVP``. Rust owns period coercion,
+    warm-up, rolling state, and aligned NaN output. ``append``, ``extend``, and
+    ``reset`` mutate this adapter and return it for fluent use.
     """
 
     def __init__(
         self,
-        _input: Any,
+        values: Any,
         periods: Any,
         min_period: int = 2,
         max_period: int = 30,
         average_type: int = 0,
     ) -> None:
-        """Create MAVP with optional values and per-bar periods."""
-        self._state = StatefulMavp(min_period, max_period, average_type)
-        if _input is not None or periods is not None:
-            self.extend(_input, periods)
+        """Create the native state and process the required aligned inputs."""
+        self._state = _NativeVariablePeriodMovingAverage(
+            min_period, max_period, average_type
+        )
+        self.extend(values, periods)
 
-    def append(self, _input: float, period: int) -> "VariablePeriodMovingAverage":
-        """Append one observation or aligned bar to the native Rust state.
+    def append(self, value: float, period: float) -> "VariablePeriodMovingAverage":
+        """Append one value and its period to the native Rust state.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
-        period : object
-            Trailing window length in bars.
+        value : float
+            Next chronological input value.
+        period : float
+            Period for this bar; Rust truncates and clamps it to the configured
+            range.
 
         Returns
         -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
+        VariablePeriodMovingAverage
+            This updated adapter.
         """
-        self._state.append(float(_input), int(period))
+        self._state.append(float(value), float(period))
         return self
 
-    def extend(self, _input: Any, periods: Any) -> "VariablePeriodMovingAverage":
-        """Append aligned input series to the native Rust state.
+    def extend(self, values: Any, periods: Any) -> "VariablePeriodMovingAverage":
+        """Append aligned chronological value and period series.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
-        periods : object
-            Lookback periods used by the estimator.
+        values : array-like
+            Values to process.
+        periods : array-like
+            One requested period per value. Misaligned inputs are rejected by
+            Rust before state mutation.
 
         Returns
         -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
+        VariablePeriodMovingAverage
+            This updated adapter.
         """
         self._state.extend(
-            np.asarray(_input, dtype=np.float64),
-            np.asarray(periods, dtype=np.float64),
+            as_float64_series(values),
+            as_float64_series(periods),
         )
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the complete aligned history produced by Rust.
+        """Return the complete aligned native history.
 
         Returns
         -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
+        numpy.ndarray
+            One value per processed bar, with NaN in warm-up positions.
+        """
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
+    def value(self) -> float | None:
+        """Return the latest warmed native result.
 
         Returns
         -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
+        float or None
+            Latest moving average, or ``None`` during global warm-up.
         """
         return self._state.value
 
     def reset(self) -> "VariablePeriodMovingAverage":
-        """Execute the reset operation through the native Rust implementation.
+        """Reset native state and aligned history without changing configuration.
 
         Returns
         -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
+        VariablePeriodMovingAverage
+            This reset adapter.
         """
         self._state.reset()
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed bars."""
         return len(self._state)
+
+
+__all__ = ["VariablePeriodMovingAverage"]

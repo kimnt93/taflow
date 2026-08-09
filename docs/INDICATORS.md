@@ -78,7 +78,7 @@ Correctness uses the highest-priority available external oracle in [../verify/SO
 | `TripleExponentialAverage` | T3 | timeperiod=5, volume_factor=0.7 | `(_input, timeperiod, volume_factor)` |
 | `TripleExponentialMovingAverage` | TEMA | timeperiod=14 | `(_input, timeperiod)` |
 | `TripleExponentialRateOfChange` | TRIX | timeperiod=30 | `(_input, timeperiod)` |
-| `VariablePeriodMovingAverage` | MAVP | min_period=2, max_period=30, average_type=0 | `(_input, periods, min_period, max_period, average_type)` |
+| `VariablePeriodMovingAverage` | MAVP | min_period=2, max_period=30, average_type=0 | `(values, periods, min_period, max_period, average_type)` |
 | `VolumeWeightedMovingAverage` | — | timeperiod=10 | `(price, volume, timeperiod)` |
 | `WeightedMovingAverage` | WMA | timeperiod=14 | `(_input, timeperiod)` |
 | `ZeroLagExponentialMovingAverage` | — | timeperiod=10 | `(_input, timeperiod)` |

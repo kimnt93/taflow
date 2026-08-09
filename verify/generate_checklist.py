@@ -14,6 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PYROOT = ROOT / "python" / "taflow"
 OUT_JSON = Path(__file__).parent / "function_inventory.json"
 OUT_MD = Path(__file__).parent / "FUNCTION_CHECKLIST.md"
+CORE = ROOT / "crates" / "taflow-core" / "src" / "stream"
+TESTS = ROOT / "tests"
 
 
 def public_defs(path: Path) -> list[dict[str, str]]:
@@ -116,6 +118,108 @@ def references() -> tuple[list[str], list[str], list[str]]:
     return ta, pandas_ta, smc_functions
 
 
+def camel_to_snake(name: str) -> str:
+    """Derive the required module name from a canonical class name."""
+    words = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", words).lower()
+
+
+def load_correctness() -> dict[str, str]:
+    """Summarize independent-oracle verdicts by canonical class."""
+    path = Path(__file__).parent / "SOURCE_COMPARISON.json"
+    if not path.exists():
+        return {}
+    grouped: dict[str, list[dict[str, object]]] = {}
+    for row in json.loads(path.read_text()):
+        grouped.setdefault(str(row["class"]), []).append(row)
+    result: dict[str, str] = {}
+    for name, rows in grouped.items():
+        verdicts = {str(row["verdict"]) for row in rows}
+        independent = any(str(row.get("source", "")).lower() != "self" for row in rows)
+        if "FAIL" in verdicts:
+            result[name] = "FAIL"
+        elif "VARIANT" in verdicts:
+            result[name] = "VARIANT"
+        elif verdicts == {"MATCH"} and independent:
+            result[name] = "MATCH"
+        else:
+            result[name] = "NO ORACLE"
+    return result
+
+
+def load_benchmarks() -> set[str]:
+    """Return classes with a correctness-gated, full-size benchmark report."""
+    result: set[str] = set()
+    for path in (Path(__file__).parent / "benchmark_reports").glob("*.json"):
+        try:
+            report = json.loads(path.read_text())
+            correctness = report["correctness"]
+            sizes = set(report["protocol"]["sizes"])
+            if (
+                correctness["batch_vs_oracle"]["passed"]
+                and correctness["continue_vs_batch_bitwise"]
+                and {1_000, 10_000, 100_000, 1_000_000}.issubset(sizes)
+            ):
+                result.add(str(report["canonical_class"]))
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+            continue
+    return result
+
+
+def implementation_checklist(rows: list[dict[str, object]]) -> tuple[list[str], dict[str, int]]:
+    """Build the strict all-indicator TODO checklist required by AGENTS.md."""
+    correctness = load_correctness()
+    benchmarks = load_benchmarks()
+    indicators = [row for row in rows if row["kind"] == "class"]
+    lines = [
+        "## Canonical implementation TODO",
+        "",
+        "A row is checked only when the canonical full-name Rust and Python files exist,",
+        "both implementation files are test-free and expose no same-named free function,",
+        "separate same-named Rust and Python tests exist, an independent source reports",
+        "`MATCH`, and a correctness-gated 1K/10K/100K/1M benchmark report exists.",
+        "",
+        "| Done | Canonical class | Module | Rust | Python | Rust test | Python test | Correctness | Benchmark |",
+        "|---|---|---|---|---|---|---|---|---|",
+    ]
+    counts = {"indicators": len(indicators), "complete": 0, "structure": 0, "correctness": 0, "benchmark": 0}
+    for row in indicators:
+        name = str(row["name"])
+        module = camel_to_snake(name)
+        rust_path = CORE / f"{module}.rs"
+        python_path = PYROOT / f"{module}.py"
+        rust_text = rust_path.read_text() if rust_path.exists() else ""
+        python_defs = public_defs(python_path) if python_path.exists() else []
+        python_classes = [item["name"] for item in python_defs if item["kind"] == "class"]
+        python_functions = [item["name"] for item in python_defs if item["kind"] == "function"]
+        rust_ok = bool(
+            rust_text
+            and re.search(rf"\b(?:pub\s+)?struct\s+{re.escape(name)}\b", rust_text)
+            and "#[cfg(test)]" not in rust_text
+            and not re.search(rf"(?m)^pub(?:\(crate\))?\s+fn\s+{re.escape(module)}\b", rust_text)
+        )
+        python_ok = python_classes == [name] and module not in python_functions
+        rust_test = (CORE / f"{module}_test.rs").exists()
+        python_test = (TESTS / f"{module}_test.py").exists()
+        structure = rust_ok and python_ok and rust_test and python_test
+        verdict = correctness.get(name, "MISSING")
+        benchmark = name in benchmarks
+        done = structure and verdict == "MATCH" and benchmark
+        counts["structure"] += int(structure)
+        counts["correctness"] += int(verdict == "MATCH")
+        counts["benchmark"] += int(benchmark)
+        counts["complete"] += int(done)
+        mark = "x" if done else " "
+        yes = "yes"
+        no = "TODO"
+        lines.append(
+            f"| [{mark}] | `{name}` | `{module}` | {yes if rust_ok else no} | "
+            f"{yes if python_ok else no} | {yes if rust_test else no} | "
+            f"{yes if python_test else no} | {verdict} | {yes if benchmark else no} |"
+        )
+    return lines, counts
+
+
 def main() -> None:
     exported = exported_names()
     export_module_map = export_modules()
@@ -147,9 +251,12 @@ def main() -> None:
             "pandas_ta_reference": name.lower() in {x.lower() for x in pandas_ta},
             "smc_reference": name.lower() in {x.lower() for x in smc_functions},
         })
-    inventory = {"counts": {"python_exports": len(rows), "native_functions": len(native), "native_state_classes": len(native_state), "rust_exports": len(rust), "talib_functions": len(ta), "pandas_ta_symbols": len(pandas_ta), "smc_functions": len(smc_functions)}, "rows": rows, "talib_functions": ta, "smc_functions": smc_functions}
+    todo_lines, todo_counts = implementation_checklist(rows)
+    inventory = {"counts": {"python_exports": len(rows), "native_functions": len(native), "native_state_classes": len(native_state), "rust_exports": len(rust), "talib_functions": len(ta), "pandas_ta_symbols": len(pandas_ta), "smc_functions": len(smc_functions), **todo_counts}, "rows": rows, "talib_functions": ta, "smc_functions": smc_functions}
     OUT_JSON.write_text(json.dumps(inventory, indent=2, sort_keys=True) + "\n")
-    lines = ["# taflow public function checklist", "", "Generated by `python generate_checklist.py`; rerun after API changes.", "", f"- Python exports: **{len(rows)}**", f"- Native PyO3 functions: **{len(native)}**", f"- Native state/indicator classes: **{len(native_state)}**", f"- Rust stream exports: **{len(rust)}**", f"- TA-Lib registry: **{len(ta)}**", f"- pandas-ta-classic symbols: **{len(pandas_ta)}**", f"- SmartMoneyConcepts functions: **{len(smc_functions)}**", "", "## Python exports", "", "| Status | Python export | Kind | Module | Native symbol(s) | Rust/native | TA-Lib alias | pandas-ta reference | SMC reference |", "|---|---|---|---|---|---|---|---|---|"]
+    lines = ["# taflow public function checklist", "", "Generated by `python generate_checklist.py`; rerun after API changes.", "", f"- Python exports: **{len(rows)}**", f"- Indicator classes: **{todo_counts['indicators']}**", f"- Fully complete indicators: **{todo_counts['complete']}**", f"- Canonical structure plus separate tests: **{todo_counts['structure']}**", f"- Independent correctness matches: **{todo_counts['correctness']}**", f"- Full-protocol benchmark reports: **{todo_counts['benchmark']}**", f"- Native PyO3 functions: **{len(native)}**", f"- Native state/indicator classes: **{len(native_state)}**", f"- Rust stream exports: **{len(rust)}**", f"- TA-Lib registry: **{len(ta)}**", f"- pandas-ta-classic symbols: **{len(pandas_ta)}**", f"- SmartMoneyConcepts functions: **{len(smc_functions)}**", ""]
+    lines.extend(todo_lines)
+    lines.extend(["", "## Python exports", "", "| Status | Python export | Kind | Module | Native symbol(s) | Rust/native | TA-Lib alias | pandas-ta reference | SMC reference |", "|---|---|---|---|---|---|---|---|---|"])
     for r in rows:
         status = "implemented" if (r["native_binding"] or r["rust_export"]) else "python-only"
         refs = "yes" if r["pandas_ta_reference"] else "—"

@@ -293,7 +293,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulNatr>()?;
     m.add_class::<state_api::StatefulMacd>()?;
     m.add_class::<state_api::StatefulMacdExt>()?;
-    m.add_class::<state_api::StatefulMavp>()?;
+    m.add_class::<state_api::VariablePeriodMovingAverage>()?;
     m.add_class::<state_api::StatefulHtTrendline>()?;
     m.add_class::<state_api::StatefulAdx>()?;
     m.add_class::<state_api::StatefulAdxr>()?;

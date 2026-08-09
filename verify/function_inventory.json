@@ -1,12 +1,17 @@
 {
   "counts": {
+    "benchmark": 169,
+    "complete": 1,
+    "correctness": 269,
+    "indicators": 299,
     "native_functions": 0,
-    "native_state_classes": 283,
-    "pandas_ta_symbols": 0,
-    "python_exports": 285,
-    "rust_exports": 493,
-    "smc_functions": 0,
-    "talib_functions": 0
+    "native_state_classes": 295,
+    "pandas_ta_symbols": 427,
+    "python_exports": 301,
+    "rust_exports": 539,
+    "smc_functions": 8,
+    "structure": 1,
+    "talib_functions": 161
   },
   "rows": [
     {
@@ -134,7 +139,21 @@
         "StatefulMacdFix"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "moving_average_convergence_divergence",
+      "name": "MovingAverageConvergenceDivergence",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMacd"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -148,7 +167,7 @@
         "StatefulMacdExt"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -191,7 +210,7 @@
         "StatefulStochf"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -353,7 +372,7 @@
         "StatefulStochrsi"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -499,7 +518,8 @@
       "name": "VariablePeriodMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMavp"
+        "VariablePeriodMovingAverage",
+        "_NativeVariablePeriodMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -797,7 +817,7 @@
         "StatefulAtr"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -853,7 +873,7 @@
         "StatefulNatr"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -867,7 +887,7 @@
         "StatefulTrange"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -902,6 +922,20 @@
     {
       "exported": true,
       "kind": "class",
+      "module": "triple_exponential_average",
+      "name": "TripleExponentialAverage",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulT3"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
       "module": "weighted_moving_average",
       "name": "WeightedMovingAverage",
       "native_binding": true,
@@ -922,10 +956,10 @@
       "native_symbols": [
         "StatefulAroon"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
-      "talib_alias": ""
+      "talib_alias": "AROON"
     },
     {
       "exported": true,
@@ -937,7 +971,7 @@
         "StatefulAroonosc"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -951,7 +985,7 @@
         "StatefulAd"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -965,7 +999,7 @@
         "StatefulAdosc"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -979,7 +1013,7 @@
         "StatefulBop"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -993,7 +1027,7 @@
         "StatefulObv"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -1048,7 +1082,7 @@
       "native_symbols": [
         "StatefulMom"
       ],
-      "pandas_ta_reference": false,
+      "pandas_ta_reference": true,
       "rust_export": false,
       "smc_reference": false,
       "talib_alias": ""
@@ -1119,7 +1153,7 @@
         "StatefulWillr"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -1998,7 +2032,7 @@
         "LagOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
+      "pandas_ta_reference": true,
       "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
@@ -2051,6 +2085,21 @@
     {
       "exported": true,
       "kind": "class",
+      "module": "cumulative_count",
+      "name": "CumulativeCount",
+      "native_binding": true,
+      "native_symbols": [
+        "CumulativeCountOperator",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
       "module": "rolling_median",
       "name": "RollingMedian",
       "native_binding": true,
@@ -2073,7 +2122,7 @@
         "StatefulMin"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2087,7 +2136,7 @@
         "StatefulMax"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2115,7 +2164,7 @@
         "StatefulMinindex"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2129,7 +2178,7 @@
         "StatefulMaxindex"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2159,7 +2208,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2189,7 +2238,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2204,7 +2253,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2219,7 +2268,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2234,7 +2283,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2249,7 +2298,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2264,7 +2313,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2279,88 +2328,46 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_standard_deviation",
       "name": "RollingStandardDeviation",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulStddev"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_average_deviation",
       "name": "RollingAverageDeviation",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulAvgdev"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_midpoint",
       "name": "RollingMidpoint",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulMidpoint"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2370,25 +2377,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_midprice",
       "name": "RollingMidprice",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulMidprice"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2398,53 +2391,25 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_variance",
       "name": "RollingVariance",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulVar"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_linear_regression",
       "name": "RollingLinearRegression",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulLinearreg"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2454,25 +2419,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_linear_regression_angle",
       "name": "RollingLinearRegressionAngle",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulLinearregAngle"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2482,25 +2433,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_linear_regression_intercept",
       "name": "RollingLinearRegressionIntercept",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulLinearregIntercept"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2510,25 +2447,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_linear_regression_slope",
       "name": "RollingLinearRegressionSlope",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulLinearregSlope"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2538,25 +2461,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_time_series_forecast",
       "name": "RollingTimeSeriesForecast",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulTsf"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2566,109 +2475,53 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_beta",
       "name": "RollingBeta",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulBeta"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_correlation",
       "name": "RollingCorrelation",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulCorrel"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "mesa_adaptive_moving_average",
       "name": "MesaAdaptiveMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulMama"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_min_max",
       "name": "RollingMinMax",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
-        "StatefulMinmaxindex"
+        "StatefulMinmax"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2678,24 +2531,10 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "statistics",
+      "module": "rolling_min_max_index",
       "name": "RollingMinMaxIndex",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev",
-        "StatefulBeta",
-        "StatefulCorrel",
-        "StatefulLinearreg",
-        "StatefulLinearregAngle",
-        "StatefulLinearregIntercept",
-        "StatefulLinearregSlope",
-        "StatefulMidpoint",
-        "StatefulMidprice",
-        "StatefulStddev",
-        "StatefulTsf",
-        "StatefulVar",
-        "StatefulMama",
-        "StatefulMinmax",
         "StatefulMinmaxindex"
       ],
       "pandas_ta_reference": false,
@@ -2706,29 +2545,25 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_abs",
+      "name": "MathAbs",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathAbs"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_acos",
       "name": "MathAcos",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathAcos"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2738,29 +2573,25 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_acosh",
+      "name": "MathAcosh",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathAcosh"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_asin",
       "name": "MathAsin",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathAsin"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2770,29 +2601,25 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_asinh",
+      "name": "MathAsinh",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathAsinh"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_atan",
       "name": "MathAtan",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathAtan"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2802,29 +2629,39 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_atanh",
+      "name": "MathAtanh",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathAtanh"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_cbrt",
+      "name": "MathCbrt",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathCbrt"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_ceil",
       "name": "MathCeil",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathCeil"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2834,29 +2671,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_cos",
       "name": "MathCos",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathCos"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2866,29 +2685,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_cosh",
       "name": "MathCosh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathCosh"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2898,29 +2699,39 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_cot",
+      "name": "MathCot",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathCot"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_degrees",
+      "name": "MathDegrees",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathDegrees"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_exp",
       "name": "MathExp",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathExp"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2930,29 +2741,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_floor",
       "name": "MathFloor",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathFloor"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2962,29 +2755,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_ln",
       "name": "MathLn",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathLn"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -2994,29 +2769,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_log10",
       "name": "MathLog10",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathLog10"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3026,29 +2783,39 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_log1p",
+      "name": "MathLog1p",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathLog1p"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_radians",
+      "name": "MathRadians",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulMathRadians"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": false,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "math_sin",
       "name": "MathSin",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathSin"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3058,29 +2825,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_sinh",
       "name": "MathSinh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathSinh"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3090,29 +2839,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_sqrt",
       "name": "MathSqrt",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathSqrt"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3122,29 +2853,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_tan",
       "name": "MathTan",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathTan"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3154,29 +2867,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_tanh",
       "name": "MathTanh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathTanh"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3186,29 +2881,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_add",
       "name": "MathAdd",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathAdd"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3218,29 +2895,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_subtract",
       "name": "MathSubtract",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathSubtract"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3250,29 +2909,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_multiply",
       "name": "MathMultiply",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathMultiply"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3282,29 +2923,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "math_transform",
+      "module": "math_divide",
       "name": "MathDivide",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAcos",
-        "StatefulAsin",
-        "StatefulAtan",
-        "StatefulCeil",
-        "StatefulCos",
-        "StatefulCosh",
-        "StatefulExp",
-        "StatefulFloor",
-        "StatefulLn",
-        "StatefulLog10",
-        "StatefulSin",
-        "StatefulSinh",
-        "StatefulSqrt",
-        "StatefulTan",
-        "StatefulTanh",
-        "StatefulAdd",
-        "StatefulSub",
-        "StatefulMult",
-        "StatefulDiv"
+        "StatefulMathDivide"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -3322,7 +2945,22 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "ewm_sum",
+      "name": "ExponentiallyWeightedSum",
+      "native_binding": true,
+      "native_symbols": [
+        "EwmSumOperator",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3337,7 +2975,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3352,7 +2990,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3367,7 +3005,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3411,8 +3049,8 @@
         "DrawdownOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3427,7 +3065,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3442,7 +3080,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3457,7 +3095,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3472,7 +3110,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3487,7 +3125,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3502,7 +3140,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3517,7 +3155,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3532,7 +3170,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3547,7 +3185,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3562,7 +3200,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3576,8 +3214,8 @@
         "DonchianOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3592,7 +3230,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3607,7 +3245,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3622,7 +3260,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3636,8 +3274,8 @@
         "CrossoverOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3652,7 +3290,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3666,8 +3304,8 @@
         "CrossOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3682,7 +3320,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3697,7 +3335,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3712,7 +3350,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3727,7 +3365,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3742,121 +3380,91 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "bar_helpers",
+      "kind": "class",
+      "module": "higher_high",
       "name": "HigherHigh",
       "native_binding": true,
       "native_symbols": [
-        "GapDownOperator",
-        "GapUpOperator",
-        "HigherHighOperator",
-        "InsideBarOperator",
-        "LowerLowOperator",
-        "OutsideBarOperator"
+        "HigherHighOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "bar_helpers",
+      "kind": "class",
+      "module": "lower_low",
       "name": "LowerLow",
       "native_binding": true,
       "native_symbols": [
-        "GapDownOperator",
-        "GapUpOperator",
-        "HigherHighOperator",
-        "InsideBarOperator",
-        "LowerLowOperator",
-        "OutsideBarOperator"
+        "LowerLowOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "bar_helpers",
+      "kind": "class",
+      "module": "inside_bar",
       "name": "InsideBar",
       "native_binding": true,
       "native_symbols": [
-        "GapDownOperator",
-        "GapUpOperator",
-        "HigherHighOperator",
-        "InsideBarOperator",
-        "LowerLowOperator",
-        "OutsideBarOperator"
+        "InsideBarOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "bar_helpers",
+      "kind": "class",
+      "module": "outside_bar",
       "name": "OutsideBar",
       "native_binding": true,
       "native_symbols": [
-        "GapDownOperator",
-        "GapUpOperator",
-        "HigherHighOperator",
-        "InsideBarOperator",
-        "LowerLowOperator",
         "OutsideBarOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "bar_helpers",
+      "kind": "class",
+      "module": "gap_up",
       "name": "GapUp",
       "native_binding": true,
       "native_symbols": [
-        "GapDownOperator",
-        "GapUpOperator",
-        "HigherHighOperator",
-        "InsideBarOperator",
-        "LowerLowOperator",
-        "OutsideBarOperator"
+        "GapUpOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "bar_helpers",
+      "kind": "class",
+      "module": "gap_down",
       "name": "GapDown",
       "native_binding": true,
       "native_symbols": [
-        "GapDownOperator",
-        "GapUpOperator",
-        "HigherHighOperator",
-        "InsideBarOperator",
-        "LowerLowOperator",
-        "OutsideBarOperator"
+        "GapDownOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3870,67 +3478,49 @@
         "BarsSinceOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "state_helpers",
+      "kind": "class",
+      "module": "value_when",
       "name": "ValueWhen",
       "native_binding": true,
       "native_symbols": [
-        "BarsSinceOperator",
-        "EntryExitOperator",
-        "HighestSinceOperator",
-        "LowestSinceOperator",
-        "PositionHoldOperator",
-        "SignalDelayOperator",
         "ValueWhenOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "state_helpers",
+      "kind": "class",
+      "module": "highest_since",
       "name": "HighestSince",
       "native_binding": true,
       "native_symbols": [
-        "BarsSinceOperator",
-        "EntryExitOperator",
-        "HighestSinceOperator",
-        "LowestSinceOperator",
-        "PositionHoldOperator",
-        "SignalDelayOperator",
-        "ValueWhenOperator"
+        "HighestSinceOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "state_helpers",
+      "kind": "class",
+      "module": "lowest_since",
       "name": "LowestSince",
       "native_binding": true,
       "native_symbols": [
-        "BarsSinceOperator",
-        "EntryExitOperator",
-        "HighestSinceOperator",
-        "LowestSinceOperator",
-        "PositionHoldOperator",
-        "SignalDelayOperator",
-        "ValueWhenOperator"
+        "LowestSinceOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3944,7 +3534,7 @@
         "SignalDelayOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3958,7 +3548,7 @@
         "PositionHoldOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3972,7 +3562,7 @@
         "EntryExitOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3987,14 +3577,14 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "swing",
+      "kind": "class",
+      "module": "swing_high",
       "name": "SwingHigh",
       "native_binding": true,
       "native_symbols": [
@@ -4007,8 +3597,8 @@
     },
     {
       "exported": true,
-      "kind": "export",
-      "module": "swing",
+      "kind": "class",
+      "module": "swing_low",
       "name": "SwingLow",
       "native_binding": true,
       "native_symbols": [
@@ -4030,8 +3620,8 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
-      "smc_reference": false,
+      "rust_export": true,
+      "smc_reference": true,
       "talib_alias": ""
     },
     {
@@ -4047,7 +3637,7 @@
         "_native_session_flags"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4062,7 +3652,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4077,8 +3667,8 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
-      "smc_reference": false,
+      "rust_export": true,
+      "smc_reference": true,
       "talib_alias": ""
     },
     {
@@ -4092,7 +3682,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4107,13 +3697,13 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
+      "kind": "class",
       "module": "donchian_channels",
       "name": "DonchianChannels",
       "native_binding": true,
@@ -4136,13 +3726,13 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
-      "kind": "export",
+      "kind": "class",
       "module": "swing_highs_lows",
       "name": "SwingHighsLows",
       "native_binding": true,
@@ -4180,7 +3770,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4195,8 +3785,8 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
-      "smc_reference": false,
+      "rust_export": true,
+      "smc_reference": true,
       "talib_alias": ""
     },
     {
@@ -4210,7 +3800,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4225,7 +3815,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4240,7 +3830,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4255,7 +3845,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4270,7 +3860,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4299,7 +3889,7 @@
         "RollingAlphaOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4314,7 +3904,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4329,7 +3919,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4344,7 +3934,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4359,7 +3949,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4374,7 +3964,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4389,7 +3979,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4404,7 +3994,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4419,7 +4009,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4434,7 +4024,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4449,7 +4039,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4464,7 +4054,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4479,7 +4069,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4494,7 +4084,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4509,7 +4099,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4524,7 +4114,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4538,8 +4128,8 @@
         "SupertrendOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4553,8 +4143,8 @@
         "IchimokuOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4568,8 +4158,8 @@
         "SqueezeOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4584,7 +4174,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4599,7 +4189,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4613,8 +4203,8 @@
         "VortexOperator",
         "_Native"
       ],
-      "pandas_ta_reference": false,
-      "rust_export": false,
+      "pandas_ta_reference": true,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4629,7 +4219,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4644,7 +4234,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4659,7 +4249,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4674,7 +4264,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4689,7 +4279,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4704,7 +4294,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4719,7 +4309,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4734,7 +4324,50 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "decay_linear",
+      "name": "DecayLinear",
+      "native_binding": true,
+      "native_symbols": [
+        "StatefulWma"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "signed_power",
+      "name": "SignedPower",
+      "native_binding": true,
+      "native_symbols": [
+        "SignedPowerOperator",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "time_series_rank",
+      "name": "TimeSeriesRank",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingRankOperator"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4820,6 +4453,7 @@
         "CrossOperator",
         "CrossoverOperator",
         "CrossunderOperator",
+        "CumulativeCountOperator",
         "CumulativeMaximumOperator",
         "CumulativeMinimumOperator",
         "CumulativeProductOperator",
@@ -4834,6 +4468,7 @@
         "EwmCorrOperator",
         "EwmCovOperator",
         "EwmStdOperator",
+        "EwmSumOperator",
         "EwmVarOperator",
         "ExponentialMovingAverage",
         "FairValueGapOperator",
@@ -4907,13 +4542,12 @@
         "SessionExtremaOperator",
         "SessionsOperator",
         "SignalDelayOperator",
+        "SignedPowerOperator",
         "SpreadZScoreOperator",
         "SqueezeOperator",
         "SqueezeProOperator",
         "StatefulAccbands",
-        "StatefulAcos",
         "StatefulAd",
-        "StatefulAdd",
         "StatefulAdosc",
         "StatefulAdx",
         "StatefulAdxr",
@@ -4921,26 +4555,18 @@
         "StatefulApo",
         "StatefulAroon",
         "StatefulAroonosc",
-        "StatefulAsin",
-        "StatefulAtan",
         "StatefulAtr",
         "StatefulAvgdev",
         "StatefulAvgprice",
         "StatefulBbands",
         "StatefulBeta",
         "StatefulBop",
-        "StatefulCeil",
         "StatefulCmo",
         "StatefulCorrel",
-        "StatefulCos",
-        "StatefulCosh",
         "StatefulDema",
-        "StatefulDiv",
         "StatefulDx",
         "StatefulEvenBetterSinewave",
-        "StatefulExp",
         "StatefulFibonacciRetracement",
-        "StatefulFloor",
         "StatefulHeikinAshi",
         "StatefulHtTrendline",
         "StatefulImi",
@@ -4952,13 +4578,39 @@
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
         "StatefulLinearregSlope",
-        "StatefulLn",
-        "StatefulLog10",
         "StatefulMa",
+        "StatefulMacd",
         "StatefulMacdExt",
         "StatefulMacdFix",
         "StatefulMama",
-        "StatefulMavp",
+        "StatefulMathAbs",
+        "StatefulMathAcos",
+        "StatefulMathAcosh",
+        "StatefulMathAdd",
+        "StatefulMathAsin",
+        "StatefulMathAsinh",
+        "StatefulMathAtan",
+        "StatefulMathAtanh",
+        "StatefulMathCbrt",
+        "StatefulMathCeil",
+        "StatefulMathCos",
+        "StatefulMathCosh",
+        "StatefulMathCot",
+        "StatefulMathDegrees",
+        "StatefulMathDivide",
+        "StatefulMathExp",
+        "StatefulMathFloor",
+        "StatefulMathLn",
+        "StatefulMathLog10",
+        "StatefulMathLog1p",
+        "StatefulMathMultiply",
+        "StatefulMathRadians",
+        "StatefulMathSin",
+        "StatefulMathSinh",
+        "StatefulMathSqrt",
+        "StatefulMathSubtract",
+        "StatefulMathTan",
+        "StatefulMathTanh",
         "StatefulMax",
         "StatefulMaxindex",
         "StatefulMedprice",
@@ -4969,7 +4621,6 @@
         "StatefulMinmax",
         "StatefulMinmaxindex",
         "StatefulMom",
-        "StatefulMult",
         "StatefulNatr",
         "StatefulObv",
         "StatefulOpeningRange",
@@ -4986,19 +4637,14 @@
         "StatefulSar",
         "StatefulSarext",
         "StatefulSessionVolumeLevels",
-        "StatefulSin",
-        "StatefulSinh",
         "StatefulSma",
         "StatefulSmoothedTrendChannel",
-        "StatefulSqrt",
         "StatefulStddev",
         "StatefulStoch",
         "StatefulStochf",
         "StatefulStochrsi",
-        "StatefulSub",
         "StatefulSum",
-        "StatefulTan",
-        "StatefulTanh",
+        "StatefulT3",
         "StatefulTema",
         "StatefulTomDeMarkSequential",
         "StatefulTrange",
@@ -5017,6 +4663,7 @@
         "UlcerIndexOperator",
         "UltimateOscillator",
         "ValueWhenOperator",
+        "VariablePeriodMovingAverage",
         "VolumePriceTrendOperator",
         "VortexOperator",
         "VwapOperator",
@@ -5112,6 +4759,7 @@
         "CrossOperator",
         "CrossoverOperator",
         "CrossunderOperator",
+        "CumulativeCountOperator",
         "CumulativeMaximumOperator",
         "CumulativeMinimumOperator",
         "CumulativeProductOperator",
@@ -5126,6 +4774,7 @@
         "EwmCorrOperator",
         "EwmCovOperator",
         "EwmStdOperator",
+        "EwmSumOperator",
         "EwmVarOperator",
         "ExponentialMovingAverage",
         "FairValueGapOperator",
@@ -5199,13 +4848,12 @@
         "SessionExtremaOperator",
         "SessionsOperator",
         "SignalDelayOperator",
+        "SignedPowerOperator",
         "SpreadZScoreOperator",
         "SqueezeOperator",
         "SqueezeProOperator",
         "StatefulAccbands",
-        "StatefulAcos",
         "StatefulAd",
-        "StatefulAdd",
         "StatefulAdosc",
         "StatefulAdx",
         "StatefulAdxr",
@@ -5213,26 +4861,18 @@
         "StatefulApo",
         "StatefulAroon",
         "StatefulAroonosc",
-        "StatefulAsin",
-        "StatefulAtan",
         "StatefulAtr",
         "StatefulAvgdev",
         "StatefulAvgprice",
         "StatefulBbands",
         "StatefulBeta",
         "StatefulBop",
-        "StatefulCeil",
         "StatefulCmo",
         "StatefulCorrel",
-        "StatefulCos",
-        "StatefulCosh",
         "StatefulDema",
-        "StatefulDiv",
         "StatefulDx",
         "StatefulEvenBetterSinewave",
-        "StatefulExp",
         "StatefulFibonacciRetracement",
-        "StatefulFloor",
         "StatefulHeikinAshi",
         "StatefulHtTrendline",
         "StatefulImi",
@@ -5244,13 +4884,39 @@
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
         "StatefulLinearregSlope",
-        "StatefulLn",
-        "StatefulLog10",
         "StatefulMa",
+        "StatefulMacd",
         "StatefulMacdExt",
         "StatefulMacdFix",
         "StatefulMama",
-        "StatefulMavp",
+        "StatefulMathAbs",
+        "StatefulMathAcos",
+        "StatefulMathAcosh",
+        "StatefulMathAdd",
+        "StatefulMathAsin",
+        "StatefulMathAsinh",
+        "StatefulMathAtan",
+        "StatefulMathAtanh",
+        "StatefulMathCbrt",
+        "StatefulMathCeil",
+        "StatefulMathCos",
+        "StatefulMathCosh",
+        "StatefulMathCot",
+        "StatefulMathDegrees",
+        "StatefulMathDivide",
+        "StatefulMathExp",
+        "StatefulMathFloor",
+        "StatefulMathLn",
+        "StatefulMathLog10",
+        "StatefulMathLog1p",
+        "StatefulMathMultiply",
+        "StatefulMathRadians",
+        "StatefulMathSin",
+        "StatefulMathSinh",
+        "StatefulMathSqrt",
+        "StatefulMathSubtract",
+        "StatefulMathTan",
+        "StatefulMathTanh",
         "StatefulMax",
         "StatefulMaxindex",
         "StatefulMedprice",
@@ -5261,7 +4927,6 @@
         "StatefulMinmax",
         "StatefulMinmaxindex",
         "StatefulMom",
-        "StatefulMult",
         "StatefulNatr",
         "StatefulObv",
         "StatefulOpeningRange",
@@ -5278,19 +4943,14 @@
         "StatefulSar",
         "StatefulSarext",
         "StatefulSessionVolumeLevels",
-        "StatefulSin",
-        "StatefulSinh",
         "StatefulSma",
         "StatefulSmoothedTrendChannel",
-        "StatefulSqrt",
         "StatefulStddev",
         "StatefulStoch",
         "StatefulStochf",
         "StatefulStochrsi",
-        "StatefulSub",
         "StatefulSum",
-        "StatefulTan",
-        "StatefulTanh",
+        "StatefulT3",
         "StatefulTema",
         "StatefulTomDeMarkSequential",
         "StatefulTrange",
@@ -5309,6 +4969,7 @@
         "UlcerIndexOperator",
         "UltimateOscillator",
         "ValueWhenOperator",
+        "VariablePeriodMovingAverage",
         "VolumePriceTrendOperator",
         "VortexOperator",
         "VwapOperator",
@@ -5323,6 +4984,177 @@
       "talib_alias": ""
     }
   ],
-  "smc_functions": [],
-  "talib_functions": []
+  "smc_functions": [
+    "bos_choch",
+    "fvg",
+    "liquidity",
+    "ob",
+    "previous_high_low",
+    "retracements",
+    "sessions",
+    "swing_highs_lows"
+  ],
+  "talib_functions": [
+    "HT_DCPERIOD",
+    "HT_DCPHASE",
+    "HT_PHASOR",
+    "HT_SINE",
+    "HT_TRENDMODE",
+    "ADD",
+    "DIV",
+    "MAX",
+    "MAXINDEX",
+    "MIN",
+    "MININDEX",
+    "MINMAX",
+    "MINMAXINDEX",
+    "MULT",
+    "SUB",
+    "SUM",
+    "ACOS",
+    "ASIN",
+    "ATAN",
+    "CEIL",
+    "COS",
+    "COSH",
+    "EXP",
+    "FLOOR",
+    "LN",
+    "LOG10",
+    "SIN",
+    "SINH",
+    "SQRT",
+    "TAN",
+    "TANH",
+    "ADX",
+    "ADXR",
+    "APO",
+    "AROON",
+    "AROONOSC",
+    "BOP",
+    "CCI",
+    "CMO",
+    "DX",
+    "IMI",
+    "MACD",
+    "MACDEXT",
+    "MACDFIX",
+    "MFI",
+    "MINUS_DI",
+    "MINUS_DM",
+    "MOM",
+    "PLUS_DI",
+    "PLUS_DM",
+    "PPO",
+    "ROC",
+    "ROCP",
+    "ROCR",
+    "ROCR100",
+    "RSI",
+    "STOCH",
+    "STOCHF",
+    "STOCHRSI",
+    "TRIX",
+    "ULTOSC",
+    "WILLR",
+    "ACCBANDS",
+    "BBANDS",
+    "DEMA",
+    "EMA",
+    "HT_TRENDLINE",
+    "KAMA",
+    "MA",
+    "MAMA",
+    "MAVP",
+    "MIDPOINT",
+    "MIDPRICE",
+    "SAR",
+    "SAREXT",
+    "SMA",
+    "T3",
+    "TEMA",
+    "TRIMA",
+    "WMA",
+    "CDL2CROWS",
+    "CDL3BLACKCROWS",
+    "CDL3INSIDE",
+    "CDL3LINESTRIKE",
+    "CDL3OUTSIDE",
+    "CDL3STARSINSOUTH",
+    "CDL3WHITESOLDIERS",
+    "CDLABANDONEDBABY",
+    "CDLADVANCEBLOCK",
+    "CDLBELTHOLD",
+    "CDLBREAKAWAY",
+    "CDLCLOSINGMARUBOZU",
+    "CDLCONCEALBABYSWALL",
+    "CDLCOUNTERATTACK",
+    "CDLDARKCLOUDCOVER",
+    "CDLDOJI",
+    "CDLDOJISTAR",
+    "CDLDRAGONFLYDOJI",
+    "CDLENGULFING",
+    "CDLEVENINGDOJISTAR",
+    "CDLEVENINGSTAR",
+    "CDLGAPSIDESIDEWHITE",
+    "CDLGRAVESTONEDOJI",
+    "CDLHAMMER",
+    "CDLHANGINGMAN",
+    "CDLHARAMI",
+    "CDLHARAMICROSS",
+    "CDLHIGHWAVE",
+    "CDLHIKKAKE",
+    "CDLHIKKAKEMOD",
+    "CDLHOMINGPIGEON",
+    "CDLIDENTICAL3CROWS",
+    "CDLINNECK",
+    "CDLINVERTEDHAMMER",
+    "CDLKICKING",
+    "CDLKICKINGBYLENGTH",
+    "CDLLADDERBOTTOM",
+    "CDLLONGLEGGEDDOJI",
+    "CDLLONGLINE",
+    "CDLMARUBOZU",
+    "CDLMATCHINGLOW",
+    "CDLMATHOLD",
+    "CDLMORNINGDOJISTAR",
+    "CDLMORNINGSTAR",
+    "CDLONNECK",
+    "CDLPIERCING",
+    "CDLRICKSHAWMAN",
+    "CDLRISEFALL3METHODS",
+    "CDLSEPARATINGLINES",
+    "CDLSHOOTINGSTAR",
+    "CDLSHORTLINE",
+    "CDLSPINNINGTOP",
+    "CDLSTALLEDPATTERN",
+    "CDLSTICKSANDWICH",
+    "CDLTAKURI",
+    "CDLTASUKIGAP",
+    "CDLTHRUSTING",
+    "CDLTRISTAR",
+    "CDLUNIQUE3RIVER",
+    "CDLUPSIDEGAP2CROWS",
+    "CDLXSIDEGAP3METHODS",
+    "AVGDEV",
+    "AVGPRICE",
+    "MEDPRICE",
+    "TYPPRICE",
+    "WCLPRICE",
+    "BETA",
+    "CORREL",
+    "LINEARREG",
+    "LINEARREG_ANGLE",
+    "LINEARREG_INTERCEPT",
+    "LINEARREG_SLOPE",
+    "STDDEV",
+    "TSF",
+    "VAR",
+    "ATR",
+    "NATR",
+    "TRANGE",
+    "AD",
+    "ADOSC",
+    "OBV"
+  ]
 }

@@ -90,8 +90,12 @@ depend only on `(i, count)` with `count ≤ 50`. A test asserts every table entr
 is bitwise equal to the runtime expression, so the substitution is provably an
 identity rather than an approximation.
 
-**Lazy per-period MAVP states** with in-order catch-up replay. Retained history
-dropped from unbounded (200,000 samples under benchmark conditions) to 176.
+**Preallocated per-period MAVP states** advance causally from their TA-Lib
+alignment offsets. This replaces lazy catch-up history, which could still grow
+without bound when a permitted period was never selected. The stricter state
+uses bounded memory and performs no allocation in `append`; its 1M-vector rate
+is 8.85M bars/s (0.79× TA-Lib), while warmed one-bar continuation remains over
+21,000× faster than recomputing the full oracle history.
 
 ## Build
 
@@ -156,7 +160,7 @@ the API users actually use.
 | PlusDirectionalIndicator | 0.97× | **1.79×** |
 | KnowSureThing | 30.0M bars/s | **66.2M** |
 | RollingBeta | 1.00× | **1.52×** |
-| VariablePeriodMovingAverage | 0.37× | 0.71× |
+| VariablePeriodMovingAverage | 0.37× | 0.79× |
 
 Two subtler variants of the same bug turned up later: a pyclass that correctly
 called `extend_slice_into` on a type that never overrode it (so it silently

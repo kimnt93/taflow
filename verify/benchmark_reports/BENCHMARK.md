@@ -410,7 +410,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.45× | 1.11× | 0.79× | 0.84× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.87× | 4.96× | 4.10× | 4.33× |
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.01× | 0.98× | 0.92× |
-| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.74× | 0.72× | 0.68× | 0.79× |
+| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.93× | 0.67× | 0.69× | 0.78× |
 | RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.20× | 2.43× | 1.55× | 1.29× |
 | RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.78× | 1.84× | 1.34× | 1.26× |
 | MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.55× | 4.17× | 1.57× | 0.85× |
@@ -874,7 +874,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.38× | 1.91× | 1.94× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.74× | 1.88× |
+| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.50× | 1.96× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1166,7 +1166,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 2.00× | 2.15× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.06× | 2.06× | 2.03× |
+| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.02× | 2.02× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1458,7 +1458,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 2.00× | 1.98× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.04× | 2.04× |
+| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.09× | 1.95× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1750,7 +1750,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.08× | 2.10× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.05× | 2.39× | 3.02× |
+| VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 2.48× | 2.82× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |

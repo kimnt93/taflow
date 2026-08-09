@@ -18,7 +18,7 @@ use taflow::stream::{
     SmoothedTrendChannel, StochasticOscillator, StochasticRelativeStrengthIndex,
     StreamingIndicator, TomDeMarkSequential, TriangularMovingAverage,
     TripleExponentialMovingAverage, TrueRange, VariableIndexDynamicAverage,
-    VariablePeriodMovingAverage, WeightedMovingAverage,
+    VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage, WeightedMovingAverage,
 };
 use taflow::MaType;
 
@@ -3385,8 +3385,8 @@ pub struct StatefulMacdExt {
 }
 
 #[pyclass]
-pub struct StatefulMavp {
-    inner: VariablePeriodMovingAverage,
+pub struct VariablePeriodMovingAverage {
+    inner: CoreVariablePeriodMovingAverage,
     outputs: Vec<f64>,
 }
 
@@ -3939,13 +3939,13 @@ impl StatefulMacdExt {
 }
 
 #[pymethods]
-impl StatefulMavp {
+impl VariablePeriodMovingAverage {
     #[new]
     #[pyo3(signature = (minperiod=2, maxperiod=30, matype=0))]
     fn new(minperiod: usize, maxperiod: usize, matype: i32) -> PyResult<Self> {
         let ma_type = MaType::try_from(matype).map_err(py_value_error)?;
         Ok(Self {
-            inner: VariablePeriodMovingAverage::new(minperiod, maxperiod, ma_type)
+            inner: CoreVariablePeriodMovingAverage::new(minperiod, maxperiod, ma_type)
                 .map_err(py_value_error)?,
             outputs: Vec::new(),
         })
@@ -3970,7 +3970,8 @@ impl StatefulMavp {
         }
         let inner = &mut self.inner;
         let outputs = &mut self.outputs;
-        py.allow_threads(|| inner.extend_slices_into(input, periods, outputs));
+        py.allow_threads(|| inner.extend_slices_into(input, periods, outputs))
+            .map_err(py_value_error)?;
         Ok(())
     }
 

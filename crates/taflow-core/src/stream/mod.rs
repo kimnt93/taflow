@@ -132,7 +132,6 @@ mod mama;
 mod math_operator;
 mod math_price;
 mod math_transform;
-mod mavp;
 mod mfi;
 mod minus_di;
 mod minus_dm;
@@ -153,6 +152,9 @@ mod rsi;
 mod session_flags;
 pub(crate) mod sorted_ring;
 mod statistic;
+mod variable_period_moving_average;
+#[cfg(test)]
+mod variable_period_moving_average_test;
 mod vhgw;
 mod volume_states;
 pub use session_flags::session_flags;
@@ -360,9 +362,6 @@ pub use math_price::{
     MathSubtract, MathTan, MathTanh, MedianPrice, TypicalPrice, WeightedClose,
 };
 #[allow(unused_imports)]
-pub(crate) use mavp::variable_period_moving_average;
-pub use mavp::VariablePeriodMovingAverage;
-#[allow(unused_imports)]
 pub(crate) use mfi::money_flow_index;
 pub use mfi::MoneyFlowIndex;
 #[allow(unused_imports)]
@@ -391,6 +390,7 @@ pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 pub use rolling_extrema::{RollingArgmax, RollingArgmin, RollingMax, RollingMin};
 pub use rolling_median::RollingMedian;
 pub use rolling_mode::RollingMode;
+pub use variable_period_moving_average::VariablePeriodMovingAverage;
 
 pub use rolling_sum::RollingSum;
 #[allow(unused_imports)]
