@@ -10,7 +10,7 @@
     "python_exports": 300,
     "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 264,
+    "structure": 266,
     "talib_functions": 161
   },
   "rows": [
@@ -4150,7 +4150,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "spread_zscore",
+      "module": "spread_z_score",
       "name": "SpreadZScore",
       "native_binding": true,
       "native_symbols": [
@@ -4255,7 +4255,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "stc",
+      "module": "schaff_trend_cycle",
       "name": "SchaffTrendCycle",
       "native_binding": true,
       "native_symbols": [

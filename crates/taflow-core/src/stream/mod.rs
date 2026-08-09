@@ -1348,8 +1348,8 @@ mod squeeze_pro;
 #[allow(unused_imports)]
 pub(crate) use squeeze_pro::squeeze_pro;
 mod schaff_trend_cycle;
-#[allow(unused_imports)]
-pub(crate) use schaff_trend_cycle::schaff_trend_cycle;
+#[cfg(test)]
+mod schaff_trend_cycle_test;
 mod vortex;
 #[allow(unused_imports)]
 pub(crate) use vortex::vortex;

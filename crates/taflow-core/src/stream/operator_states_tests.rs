@@ -660,7 +660,11 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.07).sin() * 8.0 + (i as f64 * 0.013) * 2.0)
             .collect();
 
-        let (stc, macd, stoch) = schaff_trend_cycle(&close, 10, 12, 26, 0.5).unwrap();
+        let mut batch_state = SchaffTrendCycle::new(10, 12, 26, 0.5).unwrap();
+        let values: Vec<SchaffTrendCycleValue> = close.iter().map(|&value| batch_state.append(value)).collect();
+        let stc: Vec<f64> = values.iter().map(|value| value.stc).collect();
+        let macd: Vec<f64> = values.iter().map(|value| value.macd).collect();
+        let stoch: Vec<f64> = values.iter().map(|value| value.stoch).collect();
         assert_eq!(stc[0], 0.0);
         assert_eq!(stoch[0], 0.0);
         assert!(macd[..24].iter().all(|&v| v.is_nan()));
@@ -683,8 +687,10 @@ mod tests {
     #[test]
     fn stc_swaps_fast_slow_and_rejects_bad_params() {
         let close: Vec<f64> = (0..200).map(|i| 100.0 + (i as f64 * 0.03).cos()).collect();
-        let (a, _, _) = schaff_trend_cycle(&close, 10, 12, 26, 0.5).unwrap();
-        let (b, _, _) = schaff_trend_cycle(&close, 10, 26, 12, 0.5).unwrap();
+        let mut state_a = SchaffTrendCycle::new(10, 12, 26, 0.5).unwrap();
+        let mut state_b = SchaffTrendCycle::new(10, 26, 12, 0.5).unwrap();
+        let a: Vec<f64> = close.iter().map(|&value| state_a.append(value).stc).collect();
+        let b: Vec<f64> = close.iter().map(|&value| state_b.append(value).stc).collect();
         assert_eq!(a, b);
 
         assert!(SchaffTrendCycle::new(0, 12, 26, 0.5).is_err());

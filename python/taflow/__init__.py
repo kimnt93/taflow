@@ -298,7 +298,7 @@ from .supertrend import Supertrend
 from .ichimoku import Ichimoku
 from .squeeze import Squeeze
 from .squeeze_pro import SqueezePro
-from .stc import SchaffTrendCycle
+from .schaff_trend_cycle import SchaffTrendCycle
 from .vortex import Vortex
 from .kst import KnowSureThing
 from .mass_index import MassIndex
