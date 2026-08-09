@@ -7,7 +7,7 @@ use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator};
 
 #[cfg(test)]
-use crate::stream::{RollingMinmax, RollingMinmaxIndex, RollingMinmaxIndexValue};
+use crate::stream::{RollingMinMax, RollingMinMaxIndex, RollingMinMaxIndexValue};
 
 /// Single-sided monotonic deque tracking the rolling maximum.
 ///
@@ -545,7 +545,7 @@ mod tests {
             }
         }
 
-        fn append(&mut self, input: f64) -> RollingMinmaxIndexValue {
+        fn append(&mut self, input: f64) -> RollingMinMaxIndexValue {
             let index = self.index;
             self.index += 1;
             if self.window.len() == self.period {
@@ -553,7 +553,7 @@ mod tests {
             }
             self.window.push_back((index, input));
             if self.window.len() < self.period {
-                return RollingMinmaxIndexValue {
+                return RollingMinMaxIndexValue {
                     minimum: 0,
                     maximum: 0,
                 };
@@ -582,7 +582,7 @@ mod tests {
             } else if self.minimum.is_some_and(|(_, value)| input <= value) {
                 self.minimum = Some((index, input));
             }
-            RollingMinmaxIndexValue {
+            RollingMinMaxIndexValue {
                 minimum: self.minimum.expect("full window has a minimum").0,
                 maximum: self.maximum.expect("full window has a maximum").0,
             }
@@ -652,7 +652,7 @@ mod tests {
                 let mut argmin = MonotonicArgmin::new(period).unwrap();
                 for &value in &data {
                     let expected = reference.append(value);
-                    let actual = RollingMinmaxIndexValue {
+                    let actual = RollingMinMaxIndexValue {
                         maximum: argmax.append(value).unwrap_or(0),
                         minimum: argmin.append(value).unwrap_or(0),
                     };
@@ -667,7 +667,7 @@ mod tests {
         for (period, len) in periods_and_lengths() {
             for data in datasets(len) {
                 let mut reference = ReferenceRollingIndexExtrema::new(period);
-                let mut state = RollingMinmaxIndex::new(period).unwrap();
+                let mut state = RollingMinMaxIndex::new(period).unwrap();
                 for &value in &data {
                     assert_eq!(reference.append(value), state.append(value));
                 }
@@ -700,7 +700,7 @@ mod tests {
     fn rolling_minmax_bulk_matches_append_bitwise() {
         let data = lcg_series(5_000, 0x1234_5678_9ABC_DEF0);
         for period in BULK_PERIODS {
-            let mut reference = RollingMinmax::new(period).unwrap();
+            let mut reference = RollingMinMax::new(period).unwrap();
             let expected: Vec<(f64, f64)> = data
                 .iter()
                 .map(|&v| match reference.append(v) {
@@ -709,7 +709,7 @@ mod tests {
                 })
                 .collect();
             for chunk in [BULK_CHUNKS[0], BULK_CHUNKS[1], BULK_CHUNKS[2], data.len()] {
-                let mut state = RollingMinmax::new(period).unwrap();
+                let mut state = RollingMinMax::new(period).unwrap();
                 let (mut min_out, mut max_out) = (Vec::new(), Vec::new());
                 for piece in data.chunks(chunk) {
                     state.extend_slices_into(piece, &mut min_out, &mut max_out);
@@ -744,11 +744,11 @@ mod tests {
     fn rolling_minmax_index_bulk_matches_append_bitwise() {
         let data = lcg_series(5_000, 0x0FED_CBA9_8765_4321);
         for period in BULK_PERIODS {
-            let mut reference = RollingMinmaxIndex::new(period).unwrap();
-            let expected: Vec<RollingMinmaxIndexValue> =
+            let mut reference = RollingMinMaxIndex::new(period).unwrap();
+            let expected: Vec<RollingMinMaxIndexValue> =
                 data.iter().map(|&v| reference.append(v)).collect();
             for chunk in [BULK_CHUNKS[0], BULK_CHUNKS[1], BULK_CHUNKS[2], data.len()] {
-                let mut state = RollingMinmaxIndex::new(period).unwrap();
+                let mut state = RollingMinMaxIndex::new(period).unwrap();
                 let (mut min_out, mut max_out) = (Vec::new(), Vec::new());
                 for piece in data.chunks(chunk) {
                     state.extend_slices_into(piece, &mut min_out, &mut max_out);
@@ -852,11 +852,11 @@ mod tests {
     fn rolling_minmax_index_bulk_covers_tie_paths() {
         for data in index_bulk_datasets(5_000) {
             for period in INDEX_BULK_PERIODS {
-                let mut reference = RollingMinmaxIndex::new(period).unwrap();
-                let expected: Vec<RollingMinmaxIndexValue> =
+                let mut reference = RollingMinMaxIndex::new(period).unwrap();
+                let expected: Vec<RollingMinMaxIndexValue> =
                     data.iter().map(|&v| reference.append(v)).collect();
                 for chunk in INDEX_BULK_CHUNKS.iter().copied().chain([data.len()]) {
-                    let mut state = RollingMinmaxIndex::new(period).unwrap();
+                    let mut state = RollingMinMaxIndex::new(period).unwrap();
                     let (mut min_out, mut max_out) = (Vec::new(), Vec::new());
                     for piece in data.chunks(chunk) {
                         state.extend_slices_into(piece, &mut min_out, &mut max_out);

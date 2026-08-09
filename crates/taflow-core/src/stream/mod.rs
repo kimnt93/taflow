@@ -276,9 +276,9 @@ mod intraday_momentum_index_test;
 mod kaufman_adaptive_moving_average;
 #[cfg(test)]
 mod kaufman_adaptive_moving_average_test;
-mod mama;
 mod math_abs;
 mod math_operator;
+mod mama;
 mod moving_average;
 mod moving_average_convergence_divergence;
 mod moving_average_convergence_divergence_extended;
@@ -662,7 +662,6 @@ pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscill
 pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
-#[allow(unused_imports)]
 pub(crate) use mama::mesa_adaptive_moving_average;
 pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
@@ -690,16 +689,20 @@ pub use rate_of_change::RateOfChange;
 pub use rate_of_change_percent::RateOfChangePercent;
 pub use rate_of_change_ratio::RateOfChangeRatio;
 pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
-pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlope, Tsf};
 pub use relative_momentum_index::RelativeMomentumIndex;
 pub use rolling_argmax::RollingArgmax;
 pub use rolling_argmin::RollingArgmin;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
+pub use rolling_linear_regression::RollingLinearRegression;
+pub use rolling_linear_regression_angle::RollingLinearRegressionAngle;
+pub use rolling_linear_regression_intercept::RollingLinearRegressionIntercept;
+pub use rolling_linear_regression_slope::RollingLinearRegressionSlope;
 pub use rolling_max::RollingMax;
 pub use rolling_median::RollingMedian;
 pub use rolling_min::RollingMin;
 pub use rolling_mode::RollingMode;
+pub use rolling_time_series_forecast::RollingTimeSeriesForecast;
 pub use variable_period_moving_average::VariablePeriodMovingAverage;
 
 #[allow(unused_imports)]
@@ -754,6 +757,7 @@ mod math_divide;
 #[cfg(test)]
 mod math_multiply_test;
 pub use math_divide::MathDivide;
+mod average_price;
 #[cfg(test)]
 mod math_divide_test;
 mod rolling_argmax;
@@ -766,15 +770,14 @@ mod rolling_max;
 #[cfg(test)]
 mod rolling_max_test;
 mod rolling_min;
+mod rolling_min_max;
+mod rolling_min_max_index;
+#[cfg(test)]
+mod rolling_min_max_index_test;
+#[cfg(test)]
+mod rolling_min_max_test;
 #[cfg(test)]
 mod rolling_min_test;
-mod rolling_minmax;
-#[allow(unused_imports)]
-pub(crate) use rolling_minmax::rolling_minmax;
-mod rolling_minmax_index;
-#[allow(unused_imports)]
-pub(crate) use rolling_minmax_index::rolling_minmax_index;
-mod average_price;
 pub use average_price::AveragePrice;
 #[cfg(test)]
 mod average_price_test;
@@ -788,40 +791,6 @@ pub use typical_price::TypicalPrice;
 mod typical_price_test;
 mod weighted_close;
 pub use weighted_close::WeightedClose;
-mod rolling_average_deviation;
-#[cfg(test)]
-mod rolling_average_deviation_test;
-mod rolling_beta;
-#[cfg(test)]
-mod rolling_beta_test;
-#[allow(unused_imports)]
-mod rolling_correlation;
-#[cfg(test)]
-mod rolling_correlation_test;
-#[allow(unused_imports)]
-mod rolling_linreg;
-mod rolling_standard_deviation;
-#[cfg(test)]
-mod rolling_standard_deviation_test;
-mod rolling_variance;
-#[cfg(test)]
-mod rolling_variance_test;
-#[cfg(test)]
-mod weighted_close_test;
-#[allow(unused_imports)]
-pub(crate) use rolling_linreg::rolling_linreg;
-mod rolling_linreg_slope;
-#[allow(unused_imports)]
-pub(crate) use rolling_linreg_slope::rolling_linreg_slope;
-mod rolling_linreg_intercept;
-#[allow(unused_imports)]
-pub(crate) use rolling_linreg_intercept::rolling_linreg_intercept;
-mod rolling_linreg_angle;
-#[allow(unused_imports)]
-pub(crate) use rolling_linreg_angle::rolling_linreg_angle;
-mod rolling_tsf;
-#[allow(unused_imports)]
-pub(crate) use rolling_tsf::rolling_tsf;
 #[cfg(test)]
 mod bars_since_test;
 #[cfg(test)]
@@ -844,18 +813,51 @@ mod lowest_since_test;
 mod outside_bar_test;
 #[cfg(test)]
 mod position_hold_test;
+mod rolling_average_deviation;
+#[cfg(test)]
+mod rolling_average_deviation_test;
+mod rolling_beta;
+#[cfg(test)]
+mod rolling_beta_test;
+#[allow(unused_imports)]
+mod rolling_correlation;
+#[cfg(test)]
+mod rolling_correlation_test;
+mod rolling_linear_regression;
+mod rolling_linear_regression_angle;
+#[cfg(test)]
+mod rolling_linear_regression_angle_test;
+mod rolling_linear_regression_intercept;
+#[cfg(test)]
+mod rolling_linear_regression_intercept_test;
+mod rolling_linear_regression_slope;
+#[cfg(test)]
+mod rolling_linear_regression_slope_test;
+#[cfg(test)]
+mod rolling_linear_regression_test;
 mod rolling_midpoint;
 #[cfg(test)]
 mod rolling_midpoint_test;
 mod rolling_midprice;
 #[cfg(test)]
 mod rolling_midprice_test;
+mod rolling_standard_deviation;
+#[cfg(test)]
+mod rolling_standard_deviation_test;
+mod rolling_time_series_forecast;
+#[cfg(test)]
+mod rolling_time_series_forecast_test;
+mod rolling_variance;
+#[cfg(test)]
+mod rolling_variance_test;
 #[cfg(test)]
 mod signal_delay_test;
 #[cfg(test)]
 mod smoothed_trend_channel_lifecycle_test;
 #[cfg(test)]
 mod value_when_test;
+#[cfg(test)]
+mod weighted_close_test;
 #[allow(unused_imports)]
 #[cfg(test)]
 mod tests {
@@ -981,15 +983,21 @@ mod tests {
         let mut minindex_expected_state = RollingArgmin::new(period).unwrap();
         let mut minindex_expected = Vec::new();
         minindex_expected_state.extend_slice_into(&input, &mut minindex_expected);
-        let (minmax_min, minmax_max) = crate::stream::rolling_minmax(&input, period).unwrap();
-        let (minidx, maxidx) = crate::stream::rolling_minmax_index(&input, period).unwrap();
+        let mut minmax_expected_state = RollingMinMax::new(period).unwrap();
+        let mut minmax_min = Vec::new();
+        let mut minmax_max = Vec::new();
+        minmax_expected_state.extend_slices_into(&input, &mut minmax_min, &mut minmax_max);
+        let mut minmaxindex_expected_state = RollingMinMaxIndex::new(period).unwrap();
+        let mut minidx = Vec::new();
+        let mut maxidx = Vec::new();
+        minmaxindex_expected_state.extend_slices_into(&input, &mut minidx, &mut maxidx);
         let mut max = RollingMax::new(period).unwrap();
         let mut min = RollingMin::new(period).unwrap();
         let mut sum = RollingSum::new(period).unwrap();
         let mut maxindex = RollingArgmax::new(period).unwrap();
         let mut minindex = RollingArgmin::new(period).unwrap();
-        let mut minmax = RollingMinmax::new(period).unwrap();
-        let mut minmaxindex = RollingMinmaxIndex::new(period).unwrap();
+        let mut minmax = RollingMinMax::new(period).unwrap();
+        let mut minmaxindex = RollingMinMaxIndex::new(period).unwrap();
 
         for index in 0..input.len() {
             assert_optional_eq(max.append(input[index]), max_expected[index]);
@@ -1104,16 +1112,31 @@ mod tests {
             .map(|index| 200.0 + index as f64 * 0.4 + (index as f64 * 0.19).sin() * 7.0)
             .collect();
         let period = 14;
-        let linearreg_expected = crate::stream::rolling_linreg(&input, period).unwrap();
-        let slope_expected = crate::stream::rolling_linreg_slope(&input, period).unwrap();
-        let intercept_expected = crate::stream::rolling_linreg_intercept(&input, period).unwrap();
-        let angle_expected = crate::stream::rolling_linreg_angle(&input, period).unwrap();
-        let tsf_expected = crate::stream::rolling_tsf(&input, period).unwrap();
-        let mut linearreg = Linearreg::new(period).unwrap();
-        let mut slope = LinearregSlope::new(period).unwrap();
-        let mut intercept = LinearregIntercept::new(period).unwrap();
-        let mut angle = LinearregAngle::new(period).unwrap();
-        let mut tsf = Tsf::new(period).unwrap();
+        let mut linearreg_expected = Vec::new();
+        RollingLinearRegression::new(period)
+            .unwrap()
+            .extend_slice_into(&input, &mut linearreg_expected);
+        let mut slope_expected = Vec::new();
+        RollingLinearRegressionSlope::new(period)
+            .unwrap()
+            .extend_slice_into(&input, &mut slope_expected);
+        let mut intercept_expected = Vec::new();
+        RollingLinearRegressionIntercept::new(period)
+            .unwrap()
+            .extend_slice_into(&input, &mut intercept_expected);
+        let mut angle_expected = Vec::new();
+        RollingLinearRegressionAngle::new(period)
+            .unwrap()
+            .extend_slice_into(&input, &mut angle_expected);
+        let mut tsf_expected = Vec::new();
+        RollingTimeSeriesForecast::new(period)
+            .unwrap()
+            .extend_slice_into(&input, &mut tsf_expected);
+        let mut linearreg = RollingLinearRegression::new(period).unwrap();
+        let mut slope = RollingLinearRegressionSlope::new(period).unwrap();
+        let mut intercept = RollingLinearRegressionIntercept::new(period).unwrap();
+        let mut angle = RollingLinearRegressionAngle::new(period).unwrap();
+        let mut tsf = RollingTimeSeriesForecast::new(period).unwrap();
         for index in 0..input.len() {
             assert_optional_eq(linearreg.append(input[index]), linearreg_expected[index]);
             assert_optional_eq(slope.append(input[index]), slope_expected[index]);
@@ -1523,8 +1546,8 @@ pub use rolling_calmar::RollingCalmar;
 pub use rolling_correlation::RollingCorrelation;
 pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;
-pub use rolling_minmax::{RollingMinmax, RollingMinmaxValue};
-pub use rolling_minmax_index::{RollingMinmaxIndex, RollingMinmaxIndexValue};
+pub use rolling_min_max::{RollingMinMax, RollingMinMaxValue};
+pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
 pub use rolling_standard_deviation::RollingStandardDeviation;
 pub use rolling_variance::RollingVariance;
 pub use true_range::TrueRange;

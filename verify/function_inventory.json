@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 190,
-    "complete": 180,
+    "complete": 187,
     "correctness": 272,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 293,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 618,
+    "rust_exports": 622,
     "smc_functions": 8,
-    "structure": 214,
+    "structure": 221,
     "talib_functions": 161
   },
   "rows": [
@@ -2475,7 +2475,7 @@
         "StatefulLinearreg"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2489,7 +2489,7 @@
         "StatefulLinearregAngle"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2503,7 +2503,7 @@
         "StatefulLinearregIntercept"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2517,7 +2517,7 @@
         "StatefulLinearregSlope"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2531,7 +2531,7 @@
         "StatefulTsf"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2587,7 +2587,7 @@
         "StatefulMinmax"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2601,7 +2601,7 @@
         "StatefulMinmaxindex"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },

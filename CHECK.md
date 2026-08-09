@@ -119,7 +119,7 @@ the un-prefixed name does NOT exist (it would shadow Python builtins).
 | `rolling_avgdev` | `AVGDEV` |
 | `rolling_correlation` | `CORREL` |
 | `rolling_beta` | `BETA` |
-| `rolling_linreg` (+ `_slope`, `_intercept`, `_angle`, `rolling_tsf`) | `LINEARREG` (+ variants, `TSF`) |
+| `rolling_linear_regression` (+ `_slope`, `_intercept`, `_angle`, `rolling_time_series_forecast`) | `LINEARREG` (+ variants, `TSF`) |
 | `rolling_median`, `rolling_quantile`, `rolling_rank`, `rolling_zscore`, `rolling_skew`, `rolling_kurtosis`, `rolling_covariance`, … | — (no TA-Lib counterpart) |
 
 Moving averages keep their indicator names (`sma`, not `rolling_mean`) —
@@ -184,12 +184,12 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_avgdev | rolling_avgdev | AVGDEV |
 | [x] | rolling_beta | rolling_beta | BETA |
 | [x] | rolling_correlation | rolling_correlation | CORREL |
-| [x] | rolling_linreg | rolling_linreg | LINEARREG |
-| [x] | rolling_linreg_angle | rolling_linreg_angle | LINEARREG_ANGLE |
-| [x] | rolling_linreg_intercept | rolling_linreg_intercept | LINEARREG_INTERCEPT |
-| [x] | rolling_linreg_slope | rolling_linreg_slope | LINEARREG_SLOPE |
+| [x] | rolling_linear_regression | rolling_linear_regression | LINEARREG |
+| [x] | rolling_linear_regression_angle | rolling_linear_regression_angle | LINEARREG_ANGLE |
+| [x] | rolling_linear_regression_intercept | rolling_linear_regression_intercept | LINEARREG_INTERCEPT |
+| [x] | rolling_linear_regression_slope | rolling_linear_regression_slope | LINEARREG_SLOPE |
 | [x] | rolling_std | rolling_std | STDDEV |
-| [x] | rolling_tsf | rolling_tsf | TSF |
+| [x] | rolling_time_series_forecast | rolling_time_series_forecast | TSF |
 | [x] | rolling_var | rolling_var | VAR |
 | [x] | average_directional_index | average_directional_index | ADX |
 | [x] | average_directional_index_rating | average_directional_index_rating | ADXR |
@@ -228,8 +228,8 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_argmax | rolling_argmax | MAXINDEX |
 | [x] | rolling_min | rolling_min | MIN |
 | [x] | rolling_argmin | rolling_argmin | MININDEX |
-| [x] | rolling_minmax | rolling_minmax | MINMAX |
-| [x] | rolling_minmax_index | rolling_minmax_index | MINMAXINDEX |
+| [x] | rolling_min_max | rolling_min_max | MINMAX |
+| [x] | rolling_min_max_index | rolling_min_max_index | MINMAXINDEX |
 | [x] | math_multiply | math_multiply | MULT |
 | [x] | math_subtract | math_subtract | SUB |
 | [x] | rolling_sum | rolling_sum | SUM |

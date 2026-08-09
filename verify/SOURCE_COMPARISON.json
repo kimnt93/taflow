@@ -313,7 +313,7 @@
   },
   {
     "class": "RollingLinearRegression",
-    "snake": "rolling_linreg",
+    "snake": "rolling_linear_regression",
     "oracle_api": "LINEARREG",
     "output": "all",
     "source": "TA-Lib",
@@ -326,7 +326,7 @@
   },
   {
     "class": "RollingLinearRegressionAngle",
-    "snake": "rolling_linreg_angle",
+    "snake": "rolling_linear_regression_angle",
     "oracle_api": "LINEARREG_ANGLE",
     "output": "all",
     "source": "TA-Lib",
@@ -339,7 +339,7 @@
   },
   {
     "class": "RollingLinearRegressionIntercept",
-    "snake": "rolling_linreg_intercept",
+    "snake": "rolling_linear_regression_intercept",
     "oracle_api": "LINEARREG_INTERCEPT",
     "output": "all",
     "source": "TA-Lib",
@@ -352,7 +352,7 @@
   },
   {
     "class": "RollingLinearRegressionSlope",
-    "snake": "rolling_linreg_slope",
+    "snake": "rolling_linear_regression_slope",
     "oracle_api": "LINEARREG_SLOPE",
     "output": "all",
     "source": "TA-Lib",
@@ -378,7 +378,7 @@
   },
   {
     "class": "RollingTimeSeriesForecast",
-    "snake": "rolling_tsf",
+    "snake": "rolling_time_series_forecast",
     "oracle_api": "TSF",
     "output": "all",
     "source": "TA-Lib",
@@ -885,7 +885,7 @@
   },
   {
     "class": "RollingMinMax",
-    "snake": "rolling_minmax",
+    "snake": "rolling_min_max",
     "oracle_api": "MINMAX",
     "output": "all",
     "source": "TA-Lib",
@@ -898,7 +898,7 @@
   },
   {
     "class": "RollingMinMaxIndex",
-    "snake": "rolling_minmax_index",
+    "snake": "rolling_min_max_index",
     "oracle_api": "MINMAXINDEX",
     "output": "all",
     "source": "TA-Lib",

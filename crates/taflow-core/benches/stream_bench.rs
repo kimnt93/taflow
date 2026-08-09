@@ -359,14 +359,14 @@ fn append_benchmark(criterion: &mut Criterion) {
         })
     });
     bench_periodic!("kama", KaufmanAdaptiveMovingAverage);
-    bench_periodic!("linearreg", Linearreg);
+    bench_periodic!("linearreg", RollingLinearRegression);
     bench_periodic!("linearreg_slope", LinearregSlope);
     bench_periodic!("linearreg_intercept", LinearregIntercept);
     bench_periodic!("linearreg_angle", LinearregAngle);
-    bench_periodic!("tsf", Tsf);
+    bench_periodic!("tsf", RollingTimeSeriesForecast);
     group.bench_function(BenchmarkId::new("minmax", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::RollingMinmax::new(20).unwrap();
+            let mut state = stream::RollingMinMax::new(20).unwrap();
             for value in warmup {
                 state.append(*value);
             }
@@ -377,7 +377,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("minmaxindex", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::RollingMinmaxIndex::new(20).unwrap();
+            let mut state = stream::RollingMinMaxIndex::new(20).unwrap();
             for value in warmup {
                 state.append(*value);
             }

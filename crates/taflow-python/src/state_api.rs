@@ -89,11 +89,23 @@ scalar_state_class!(StatefulMax, stream::RollingMax, 30);
 scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);
 scalar_state_class!(StatefulMin, stream::RollingMin, 30);
 scalar_state_class!(StatefulMinindex, stream::RollingArgmin, 30);
-scalar_state_class!(StatefulLinearreg, stream::Linearreg, 14);
-scalar_state_class!(StatefulLinearregSlope, stream::LinearregSlope, 14);
-scalar_state_class!(StatefulLinearregIntercept, stream::LinearregIntercept, 14);
-scalar_state_class!(StatefulLinearregAngle, stream::LinearregAngle, 14);
-scalar_state_class!(StatefulTsf, stream::Tsf, 14);
+scalar_state_class!(StatefulLinearreg, stream::RollingLinearRegression, 14);
+scalar_state_class!(
+    StatefulLinearregSlope,
+    stream::RollingLinearRegressionSlope,
+    14
+);
+scalar_state_class!(
+    StatefulLinearregIntercept,
+    stream::RollingLinearRegressionIntercept,
+    14
+);
+scalar_state_class!(
+    StatefulLinearregAngle,
+    stream::RollingLinearRegressionAngle,
+    14
+);
+scalar_state_class!(StatefulTsf, stream::RollingTimeSeriesForecast, 14);
 
 #[pyclass]
 pub struct StatefulAccbands {
@@ -853,7 +865,7 @@ impl AroonOscillator {
 
 #[pyclass]
 pub struct StatefulMinmax {
-    inner: stream::RollingMinmax,
+    inner: stream::RollingMinMax,
     minimums: Vec<f64>,
     maximums: Vec<f64>,
 }
@@ -864,7 +876,7 @@ impl StatefulMinmax {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::RollingMinmax::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::RollingMinMax::new(timeperiod).map_err(py_value_error)?,
             minimums: Vec::new(),
             maximums: Vec::new(),
         })
@@ -915,7 +927,7 @@ impl StatefulMinmax {
 
 #[pyclass]
 pub struct StatefulMinmaxindex {
-    inner: stream::RollingMinmaxIndex,
+    inner: stream::RollingMinMaxIndex,
     minimums: Vec<f64>,
     maximums: Vec<f64>,
 }
@@ -926,7 +938,7 @@ impl StatefulMinmaxindex {
     #[pyo3(signature = (timeperiod=30))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: stream::RollingMinmaxIndex::new(timeperiod).map_err(py_value_error)?,
+            inner: stream::RollingMinMaxIndex::new(timeperiod).map_err(py_value_error)?,
             minimums: Vec::new(),
             maximums: Vec::new(),
         })
