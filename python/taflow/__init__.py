@@ -5,13 +5,13 @@ __version__ = "0.1.2"
 from .ma_type import MaType
 from .indicators import AccelerationBands
 from .indicators import AverageTrueRange
-from .double_exponential_moving_average import DoubleExponentialMovingAverage
+from .indicators import DoubleExponentialMovingAverage
 from .indicators.kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
 from .indicators import Aroon, AroonOscillator
 from .indicators import AccumulationDistribution, AccumulationDistributionOscillator
 from .indicators import BalanceOfPower, OnBalanceVolume
 from .indicators.absolute_price_oscillator import AbsolutePriceOscillator
-from .percentage_price_oscillator import PercentagePriceOscillator
+from .indicators import PercentagePriceOscillator
 from .indicators.chande_momentum_oscillator import ChandeMomentumOscillator
 from .indicators import Momentum
 from .indicators import RateOfChange
@@ -38,9 +38,9 @@ from .indicators.candle_long_line import CandleLongLine
 from .indicators.candle_doji_star import CandleDojiStar
 from .indicators.candle_belt_hold import CandleBeltHold
 from .indicators.candle_engulfing import CandleEngulfing
-from .exponential_moving_average import ExponentialMovingAverage
+from .indicators import ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
-from .hilbert_transform_trendline import HilbertTransformTrendline
+from .indicators import HilbertTransformTrendline
 from .indicators.candle_hikkake import CandleHikkake
 from .indicators.candle_hikkake_modified import CandleHikkakeModified
 from .indicators.candle_hammer import CandleHammer
@@ -50,10 +50,10 @@ from .indicators.hilbert_transform_phasor import HilbertTransformPhasor
 from .indicators.hilbert_transform_sine_wave import HilbertTransformSineWave
 from .indicators.hilbert_transform_trend_mode import HilbertTransformTrendMode
 from .indicators.intraday_momentum_index import IntradayMomentumIndex
-from .moving_average import MovingAverage
+from .indicators import MovingAverage
 from .minus_directional_indicator import MinusDirectionalIndicator
 from .minus_directional_movement import MinusDirectionalMovement
-from .money_flow_index import MoneyFlowIndex
+from .indicators import MoneyFlowIndex
 from .indicators import AveragePrice
 from .indicators import MedianPrice, TypicalPrice, WeightedClose
 from .moving_average_convergence_divergence_fixed import (
@@ -94,7 +94,7 @@ from .triple_exponential_moving_average import TripleExponentialMovingAverage
 from .triple_exponential_average import TripleExponentialAverage
 from .weighted_moving_average import WeightedMovingAverage
 from .relative_strength_index import RelativeStrengthIndex
-from .relative_momentum_index import RelativeMomentumIndex
+from .indicators import RelativeMomentumIndex
 from .indicators import SmoothedTrendChannel
 from .indicators.jurik_moving_average import JurikMovingAverage
 from .indicators import ParabolicMovingAverageStop
@@ -253,7 +253,7 @@ from .indicators.fractal_dimension import FractalDimension
 from .indicators.rolling_alpha import RollingAlpha
 from .indicators.rolling_information_ratio import RollingInformationRatio
 from .indicators.close_to_close_sigma import CloseToCloseSigma
-from .parkinson import Parkinson
+from .indicators import Parkinson
 from .indicators.garman_klass import GarmanKlass
 from .rogers_satchell import RogersSatchell
 from .indicators.garman_klass_yang_zhang import GarmanKlassYangZhang
@@ -267,7 +267,7 @@ from .indicators.spread_z_score import SpreadZScore
 from .frac_diff import FracDiff
 from .indicators.kalman_hedge_ratio import KalmanHedgeRatio
 from .supertrend import Supertrend
-from .ichimoku import Ichimoku
+from .indicators import Ichimoku
 from .squeeze import Squeeze
 from .squeeze_pro import SqueezePro
 from .schaff_trend_cycle import SchaffTrendCycle
@@ -280,7 +280,7 @@ from .indicators.volume_price_trend import VolumePriceTrend
 from .indicators.negative_volume_index import NegativeVolumeIndex
 from .indicators.positive_volume_index import PositiveVolumeIndex
 from .indicators.mc_ginley_dynamic import McGinleyDynamic
-from .decay_linear import DecayLinear
+from .indicators import DecayLinear
 from .signed_power import SignedPower
 from .time_series_rank import TimeSeriesRank
 

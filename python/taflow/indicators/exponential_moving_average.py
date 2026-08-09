@@ -1,8 +1,8 @@
 """Canonical native-backed Exponential Moving Average adapter."""
 from typing import Any
 import numpy as np
-from ._native import ExponentialMovingAverage as _NativeExponentialMovingAverage
-from ._series import as_float64_series
+from .._native import ExponentialMovingAverage as _NativeExponentialMovingAverage
+from .._series import as_float64_series
 
 class ExponentialMovingAverage:
     """Compute EMA from required ``values``; Rust owns seed and warm-up."""

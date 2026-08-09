@@ -1,8 +1,8 @@
 """Canonical native-backed Ichimoku adapter."""
 from typing import Any
 import numpy as np
-from ._native import IchimokuOperator as _Native
-from ._series import as_float64_series
+from .._native import IchimokuOperator as _Native
+from .._series import as_float64_series
 
 
 class Ichimoku:

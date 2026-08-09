@@ -1,8 +1,8 @@
 """Canonical native-backed Double Exponential Moving Average adapter."""
 from typing import Any
 import numpy as np
-from ._native import DoubleExponentialMovingAverage as _NativeDoubleExponentialMovingAverage
-from ._series import as_float64_series
+from .._native import DoubleExponentialMovingAverage as _NativeDoubleExponentialMovingAverage
+from .._series import as_float64_series
 
 class DoubleExponentialMovingAverage:
     """Compute DEMA from required ``values``; Rust owns warm-up and recurrence."""

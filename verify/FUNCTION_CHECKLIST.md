@@ -106,6 +106,16 @@ without a duplicate counter. Focused Rust/Python tests, the full Python suite
 (588 passed, 2 skipped), and the interface audit passed at 300/300. Benchmark
 fields remain `TODO`; no benchmark command was run.
 
+The thirty-third structural batch moved the remaining root-level Python
+adapters for `DecayLinear`, `DoubleExponentialMovingAverage`,
+`ExponentialMovingAverage`, `HilbertTransformTrendline`, `Ichimoku`,
+`MoneyFlowIndex`, `MovingAverage`, `Parkinson`, `PercentagePriceOscillator`,
+and `RelativeMomentumIndex` into `python/taflow/indicators/`. The package and
+top-level import surfaces now re-export those canonical modules, with native
+state ownership unchanged. Their 132 focused Python tests and the 300/300
+interface audit passed. Benchmark fields remain `TODO`; no benchmark command
+was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

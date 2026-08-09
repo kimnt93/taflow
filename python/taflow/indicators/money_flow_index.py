@@ -1,21 +1,35 @@
-"""Rolling mean of ``ln(H/L)^2 / (4 ln 2)`` (Parkinson volatility)."""
+"""Persistent Money Flow Index indicator."""
+
+from __future__ import annotations
 
 from typing import Any
+
 import numpy as np
-from ._native import ParkinsonOperator as _Native
-from ._series import as_float64_series
+
+from .._native import MoneyFlowIndex as _NativeMoneyFlowIndex
+from .._series import as_float64_series
 
 
-class Parkinson:
-    """Rolling mean of ``ln(H/L)^2 / (4 ln 2)`` (Parkinson volatility).
+class MoneyFlowIndex:
+    """Compute MFI history once, then append HLCV bars in O(1)
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
+    Parameters
+    ----------
+    Input series and configuration values are accepted by the constructor.
+
+    Returns
+    -------
+    MoneyFlowIndex
+        A persistent native-backed indicator adapter.
+    """
 
     def __init__(
         self,
         high: Any,
         low: Any,
-        timeperiod: int = 20,
+        close: Any,
+        volume: Any,
+        timeperiod: int = 14,
     ) -> None:
         """Initialize this adapter and process the supplied input series.
 
@@ -25,6 +39,10 @@ class Parkinson:
             High-price series or the current bar high.
         low : object
             Low-price series or the current bar low.
+        close : object
+            Close-price series or the current bar close.
+        volume : object
+            Volume series or the current bar volume.
         timeperiod : object
             Trailing window length in bars.
 
@@ -33,11 +51,12 @@ class Parkinson:
         None
             The constructor initializes the adapter and returns no value.
         """
-        self._state = _Native(timeperiod)
-        self._length = 0
-        self.extend(high, low)
+        self._state = _NativeMoneyFlowIndex(timeperiod)
+        self.extend(high, low, close, volume)
 
-    def append(self, high: float, low: float) -> "Parkinson":
+    def append(
+        self, high: float, low: float, close: float, volume: float
+    ) -> "MoneyFlowIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -46,17 +65,26 @@ class Parkinson:
             High-price series or the current bar high.
         low : object
             Low-price series or the current bar low.
+        close : object
+            Close-price series or the current bar close.
+        volume : object
+            Volume series or the current bar volume.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(high), float(low))
-        self._length += 1
+        self._state.append(float(high), float(low), float(close), float(volume))
         return self
 
-    def extend(self, high: Any, low: Any) -> "Parkinson":
+    def extend(
+        self,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
+    ) -> "MoneyFlowIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -65,18 +93,22 @@ class Parkinson:
             High-price series or the current bar high.
         low : object
             Low-price series or the current bar low.
+        close : object
+            Close-price series or the current bar close.
+        volume : object
+            Volume series or the current bar volume.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        high_array = as_float64_series(high)
-        low_array = as_float64_series(low)
-        if high_array.shape != low_array.shape:
-            raise ValueError("high and low must have equal lengths")
-        self._state.extend(high_array, low_array)
-        self._length += len(high_array)
+        self._state.extend(
+            as_float64_series(high),
+            as_float64_series(low),
+            as_float64_series(close),
+            as_float64_series(volume),
+        )
         return self
 
     def compute(self) -> np.ndarray:
@@ -100,7 +132,18 @@ class Parkinson:
         """
         return self._state.value
 
-    def reset(self) -> "Parkinson":
+    @property
+    def timeperiod(self) -> int:
+        """Execute the timeperiod operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
+        return self._state.timeperiod
+
+    def reset(self) -> "MoneyFlowIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -109,9 +152,17 @@ class Parkinson:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
-        """Return the number of processed bars."""
-        return self._length
+        """Execute the __len__ operation through the native Rust implementation.
+
+        Returns
+        -------
+        object
+            The updated adapter, native value, aligned output array, or execution node.
+        """
+        return len(self._state)
+
+
+__all__ = ["MoneyFlowIndex"]

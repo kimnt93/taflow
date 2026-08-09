@@ -5,6 +5,16 @@ from .amihud import Amihud
 from .anchored_volume_weighted_average_price import AnchoredVolumeWeightedAveragePrice
 from .average_daily_dollar_value import AverageDailyDollarValue
 from .bollinger_bands import BollingerBands
+from .decay_linear import DecayLinear
+from .double_exponential_moving_average import DoubleExponentialMovingAverage
+from .exponential_moving_average import ExponentialMovingAverage
+from .hilbert_transform_trendline import HilbertTransformTrendline
+from .ichimoku import Ichimoku
+from .money_flow_index import MoneyFlowIndex
+from .moving_average import MovingAverage
+from .parkinson import Parkinson
+from .percentage_price_oscillator import PercentagePriceOscillator
+from .relative_momentum_index import RelativeMomentumIndex
 
 from .commodity_channel_index import CommodityChannelIndex
 from .cumulative_count import CumulativeCount
@@ -35,7 +45,6 @@ from .candle_engulfing import CandleEngulfing
 from .candle_hammer import CandleHammer
 from .candle_hikkake import CandleHikkake
 from .candle_hikkake_modified import CandleHikkakeModified
-from ..exponential_moving_average import ExponentialMovingAverage
 from .hilbert_transform_dominant_cycle_period import (
     HilbertTransformDominantCyclePeriod,
 )
@@ -43,7 +52,6 @@ from .hilbert_transform_dominant_cycle_phase import HilbertTransformDominantCycl
 from .hilbert_transform_phasor import HilbertTransformPhasor
 from .hilbert_transform_sine_wave import HilbertTransformSineWave
 from .hilbert_transform_trend_mode import HilbertTransformTrendMode
-from ..money_flow_index import MoneyFlowIndex
 from ..minus_directional_indicator import MinusDirectionalIndicator
 from ..minus_directional_movement import MinusDirectionalMovement
 from ..plus_directional_indicator import PlusDirectionalIndicator
@@ -208,7 +216,6 @@ from ..statistics import (
     RollingMidprice, RollingStandardDeviation, RollingVariance,
     RollingMinMax, RollingMinMaxIndex,
 )
-from ..decay_linear import DecayLinear
 from ..signed_power import SignedPower
 from ..time_series_rank import TimeSeriesRank
 from .rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
@@ -255,7 +262,6 @@ from .fractal_dimension import FractalDimension
 from .rolling_alpha import RollingAlpha
 from .rolling_information_ratio import RollingInformationRatio
 from .close_to_close_sigma import CloseToCloseSigma
-from ..parkinson import Parkinson
 from .garman_klass import GarmanKlass
 from ..rogers_satchell import RogersSatchell
 from .garman_klass_yang_zhang import GarmanKlassYangZhang
@@ -303,7 +309,11 @@ __all__ = [
     "RollingLinearRegressionIntercept",
     "RollingLinearRegressionSlope",
     "RollingTimeSeriesForecast",
+    "DecayLinear",
+    "DoubleExponentialMovingAverage",
     "ExponentialMovingAverage",
+    "HilbertTransformTrendline",
+    "Ichimoku",
     "CandleDoji",
     "CandleTakuri",
     "CandleMarubozu",
@@ -328,10 +338,13 @@ __all__ = [
     "HilbertTransformSineWave",
     "HilbertTransformTrendMode",
     "MoneyFlowIndex",
+    "MovingAverage",
     "MinusDirectionalIndicator",
     "MinusDirectionalMovement",
     "PlusDirectionalIndicator",
     "PlusDirectionalMovement",
+    "PercentagePriceOscillator",
+    "RelativeMomentumIndex",
     "TripleExponentialRateOfChange",
     "UltimateOscillator",
     "CandleUpDownSideGapThreeMethods",
