@@ -1,35 +1,32 @@
-"""Canonical average-price adapter."""
+"""Persistent average-price transform."""
 
-from ._native import StatefulAvgprice
+from typing import Any
+
+from ._native import AveragePrice as _NativeAveragePrice
 from ._price_state import OhlcPriceState
 
 
 class AveragePrice(OhlcPriceState):
-    """Compute average price through the native Rust kernel
+    """Compute ``(open + high + low + close) / 4`` in persistent Rust state.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    AveragePrice
-        A persistent native-backed indicator adapter.
+    The constructor requires the aligned chronological open, high, low, close
+    series. Pass empty aligned arrays for a fresh streaming state. Output has no
+    rolling warm-up and maps to TA-Lib ``AVGPRICE``.
     """
 
-    _native_cls = StatefulAvgprice
+    _native_cls = _NativeAveragePrice
 
-    def append(self, _open: object, high: object, low: object, close: object) -> "AveragePrice":
-        """Append one observation and return this indicator."""
-        super().append(_open, high, low, close)
+    def append(self, open: float, high: float, low: float, close: float) -> "AveragePrice":
+        """Append one aligned price tuple and return this indicator."""
+        super().append(open, high, low, close)
         return self
 
-    def extend(self, _open: object, high: object, low: object, close: object) -> "AveragePrice":
-        """Append aligned histories and return this indicator."""
-        super().extend(_open, high, low, close)
+    def extend(self, open: Any, high: Any, low: Any, close: Any) -> "AveragePrice":
+        """Append aligned price histories and return this indicator."""
+        super().extend(open, high, low, close)
         return self
 
     def reset(self) -> "AveragePrice":
-        """Reset native state and return this indicator."""
+        """Restore fresh native state and return this indicator."""
         super().reset()
         return self

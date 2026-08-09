@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 178,
-    "complete": 29,
+    "complete": 33,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 599,
+    "rust_exports": 602,
     "smc_functions": 8,
-    "structure": 29,
+    "structure": 33,
     "talib_functions": 161
   },
   "rows": [
@@ -80,7 +80,8 @@
       "name": "AveragePrice",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgprice"
+        "AveragePrice",
+        "_NativeAveragePrice"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -94,7 +95,8 @@
       "name": "MedianPrice",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMedprice"
+        "MedianPrice",
+        "_NativeMedianPrice"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -108,7 +110,8 @@
       "name": "TypicalPrice",
       "native_binding": true,
       "native_symbols": [
-        "StatefulTypprice"
+        "TypicalPrice",
+        "_NativeTypicalPrice"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -122,7 +125,8 @@
       "name": "WeightedClose",
       "native_binding": true,
       "native_symbols": [
-        "StatefulWclprice"
+        "WeightedClose",
+        "_NativeWeightedClose"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4410,6 +4414,7 @@
         "AlmaOperator",
         "AmihudOperator",
         "AverageDailyDollarValueOperator",
+        "AveragePrice",
         "AwesomeOscillatorOperator",
         "BarsSinceOperator",
         "BreakOfStructureChangeOfCharacterOperator",
@@ -4559,6 +4564,7 @@
         "MathTan",
         "MathTanh",
         "McGinleyDynamicOperator",
+        "MedianPrice",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
         "MoneyFlowIndex",
@@ -4613,7 +4619,6 @@
         "StatefulAroonosc",
         "StatefulAtr",
         "StatefulAvgdev",
-        "StatefulAvgprice",
         "StatefulBbands",
         "StatefulBeta",
         "StatefulBop",
@@ -4641,7 +4646,6 @@
         "StatefulMama",
         "StatefulMax",
         "StatefulMaxindex",
-        "StatefulMedprice",
         "StatefulMidpoint",
         "StatefulMidprice",
         "StatefulMin",
@@ -4678,16 +4682,15 @@
         "StatefulTrange",
         "StatefulTrima",
         "StatefulTsf",
-        "StatefulTypprice",
         "StatefulVar",
         "StatefulVariableIndexDynamicAverage",
-        "StatefulWclprice",
         "StatefulWillr",
         "StatefulWma",
         "SupertrendOperator",
         "SwingHighLowOperator",
         "TripleExponentialRateOfChange",
         "TrueStrengthIndexOperator",
+        "TypicalPrice",
         "UlcerIndexOperator",
         "UltimateOscillator",
         "ValueWhenOperator",
@@ -4696,6 +4699,7 @@
         "VortexOperator",
         "VwapOperator",
         "VwmaOperator",
+        "WeightedClose",
         "YangZhangOperator",
         "ZlemaOperator",
         "session_flags_array"
@@ -4716,6 +4720,7 @@
         "AlmaOperator",
         "AmihudOperator",
         "AverageDailyDollarValueOperator",
+        "AveragePrice",
         "AwesomeOscillatorOperator",
         "BarsSinceOperator",
         "BreakOfStructureChangeOfCharacterOperator",
@@ -4865,6 +4870,7 @@
         "MathTan",
         "MathTanh",
         "McGinleyDynamicOperator",
+        "MedianPrice",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
         "MoneyFlowIndex",
@@ -4919,7 +4925,6 @@
         "StatefulAroonosc",
         "StatefulAtr",
         "StatefulAvgdev",
-        "StatefulAvgprice",
         "StatefulBbands",
         "StatefulBeta",
         "StatefulBop",
@@ -4947,7 +4952,6 @@
         "StatefulMama",
         "StatefulMax",
         "StatefulMaxindex",
-        "StatefulMedprice",
         "StatefulMidpoint",
         "StatefulMidprice",
         "StatefulMin",
@@ -4984,16 +4988,15 @@
         "StatefulTrange",
         "StatefulTrima",
         "StatefulTsf",
-        "StatefulTypprice",
         "StatefulVar",
         "StatefulVariableIndexDynamicAverage",
-        "StatefulWclprice",
         "StatefulWillr",
         "StatefulWma",
         "SupertrendOperator",
         "SwingHighLowOperator",
         "TripleExponentialRateOfChange",
         "TrueStrengthIndexOperator",
+        "TypicalPrice",
         "UlcerIndexOperator",
         "UltimateOscillator",
         "ValueWhenOperator",
@@ -5002,6 +5005,7 @@
         "VortexOperator",
         "VwapOperator",
         "VwmaOperator",
+        "WeightedClose",
         "YangZhangOperator",
         "ZlemaOperator",
         "session_flags_array"

@@ -256,10 +256,10 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulWillr>()?;
     m.add_class::<state_api::StatefulAroon>()?;
     m.add_class::<state_api::StatefulAroonosc>()?;
-    m.add_class::<state_api::StatefulAvgprice>()?;
-    m.add_class::<state_api::StatefulMedprice>()?;
-    m.add_class::<state_api::StatefulTypprice>()?;
-    m.add_class::<state_api::StatefulWclprice>()?;
+    m.add_class::<state_api::AveragePrice>()?;
+    m.add_class::<state_api::MedianPrice>()?;
+    m.add_class::<state_api::TypicalPrice>()?;
+    m.add_class::<state_api::WeightedClose>()?;
     m.add_class::<state_api::MathAbs>()?;
     m.add_class::<state_api::MathAcos>()?;
     m.add_class::<state_api::MathAcosh>()?;

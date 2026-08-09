@@ -131,7 +131,6 @@ mod macdfix;
 mod mama;
 mod math_abs;
 mod math_operator;
-mod math_price;
 pub use math_abs::MathAbs;
 #[cfg(test)]
 mod math_abs_test;
@@ -450,7 +449,6 @@ pub(crate) use mama::mesa_adaptive_moving_average;
 pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
 pub(crate) use math_operator::rolling_sum;
-pub use math_price::{AveragePrice, MedianPrice, TypicalPrice, WeightedClose};
 #[allow(unused_imports)]
 pub(crate) use mfi::money_flow_index;
 pub use mfi::MoneyFlowIndex;
@@ -572,18 +570,22 @@ mod rolling_minmax_index;
 #[allow(unused_imports)]
 pub(crate) use rolling_minmax_index::rolling_minmax_index;
 mod average_price;
-#[allow(unused_imports)]
-pub(crate) use average_price::average_price;
+pub use average_price::AveragePrice;
+#[cfg(test)]
+mod average_price_test;
 mod median_price;
-#[allow(unused_imports)]
-pub(crate) use median_price::median_price;
+pub use median_price::MedianPrice;
+#[cfg(test)]
+mod median_price_test;
 mod typical_price;
-#[allow(unused_imports)]
-pub(crate) use typical_price::typical_price;
+pub use typical_price::TypicalPrice;
+#[cfg(test)]
+mod typical_price_test;
 mod weighted_close;
-#[allow(unused_imports)]
-pub(crate) use weighted_close::weighted_close;
+pub use weighted_close::WeightedClose;
 mod rolling_avgdev;
+#[cfg(test)]
+mod weighted_close_test;
 #[allow(unused_imports)]
 pub(crate) use rolling_avgdev::rolling_avgdev;
 mod rolling_std;
@@ -853,40 +855,6 @@ mod tests {
         let mut state = RollingMidprice::new(7).unwrap();
         for index in 0..close.len() {
             assert_optional_eq(state.append(high[index], low[index]), expected[index]);
-        }
-    }
-
-    #[test]
-    fn stateless_states_match_batch_for_every_bar() {
-        let input: Vec<f64> = (0..40).map(|i| 0.1 + i as f64 / 50.0).collect();
-        let other: Vec<f64> = (0..40).map(|i| 1.0 + i as f64 * 0.03).collect();
-
-        let open = &input;
-        let high: Vec<_> = input.iter().map(|value| value + 0.2).collect();
-        let low: Vec<_> = input.iter().map(|value| value - 0.1).collect();
-        let close = &other;
-        let avg = crate::stream::average_price(open, &high, &low, close).unwrap();
-        let med = crate::stream::median_price(&high, &low).unwrap();
-        let typ = crate::stream::typical_price(&high, &low, close).unwrap();
-        let wcl = crate::stream::weighted_close(&high, &low, close).unwrap();
-        let mut avg_state = AveragePrice::new();
-        let mut med_state = MedianPrice::new();
-        let mut typ_state = TypicalPrice::new();
-        let mut wcl_state = WeightedClose::new();
-        for index in 0..input.len() {
-            assert_eq!(
-                avg_state.append(open[index], high[index], low[index], close[index]),
-                avg[index]
-            );
-            assert_eq!(med_state.append(high[index], low[index]), med[index]);
-            assert_eq!(
-                typ_state.append(high[index], low[index], close[index]),
-                typ[index]
-            );
-            assert_eq!(
-                wcl_state.append(high[index], low[index], close[index]),
-                wcl[index]
-            );
         }
     }
 

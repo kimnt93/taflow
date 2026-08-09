@@ -1,27 +1,54 @@
-//! Batch implementation for `median_price`.
+//! Persistent pointwise `median price` transform.
 
-use super::price_transform::*;
 use crate::error::{TaError, TaResult};
 
-/// Compute the median price result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn median_price(high: &[f64], low: &[f64]) -> TaResult<Vec<f64>> {
-    let len = high.len();
-    if len != low.len() {
-        return Err(TaError::LengthMismatch {
-            expected: len,
-            got: low.len(),
-        });
+/// Compute median price for aligned chronological prices without warm-up.
+#[derive(Debug, Clone, Default)]
+pub struct MedianPrice {
+    value: Option<f64>,
+}
+
+impl MedianPrice {
+    /// Create a fresh price-transform state.
+    pub fn new() -> TaResult<Self> {
+        Ok(Self::default())
     }
-    let mut output = Vec::with_capacity(len);
-    output.extend(high.iter().zip(low.iter()).map(|(&h, &l)| (h + l) * 0.5));
-    Ok(output)
+
+    /// Transform one chronological price tuple.
+    pub fn append(&mut self, high: f64, low: f64) -> f64 {
+        let value = (high + low) * 0.5;
+        self.value = Some(value);
+        value
+    }
+
+    /// Transform aligned slices after validating every length before mutation.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let len = high.len();
+        if low.len() != len {
+            return Err(TaError::LengthMismatch {
+                expected: len,
+                got: low.len(),
+            });
+        }
+        output.reserve(len);
+        for index in 0..len {
+            output.push(self.append(high[index], low[index]));
+        }
+        Ok(())
+    }
+
+    /// Return the latest result, or `None` before the first price tuple.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Restore fresh-state behavior without reallocating.
+    pub fn reset(&mut self) {
+        self.value = None;
+    }
 }

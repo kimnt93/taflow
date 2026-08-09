@@ -2613,21 +2613,21 @@ binary_math_state_class!(MathMultiply);
 binary_math_state_class!(MathDivide);
 
 macro_rules! binary_state_class {
-    ($class:ident, $inner:ident) => {
+    ($class:ident) => {
         #[pyclass]
         pub struct $class {
-            inner: stream::$inner,
+            inner: stream::$class,
             outputs: Vec<f64>,
         }
 
         #[pymethods]
         impl $class {
             #[new]
-            fn new() -> Self {
-                Self {
-                    inner: stream::$inner::new(),
+            fn new() -> PyResult<Self> {
+                Ok(Self {
+                    inner: stream::$class::new().map_err(py_value_error)?,
                     outputs: Vec::new(),
-                }
+                })
             }
 
             fn append(&mut self, left: f64, right: f64) -> f64 {
@@ -2644,18 +2644,11 @@ macro_rules! binary_state_class {
             ) -> PyResult<()> {
                 let left = left.as_slice()?;
                 let right = right.as_slice()?;
-                if left.len() != right.len() {
-                    return Err(PyValueError::new_err("inputs must have equal lengths"));
-                }
-                let outputs = &mut self.outputs;
                 py.allow_threads(|| {
-                    outputs.extend(
-                        left.iter()
-                            .zip(right)
-                            .map(|(&left, &right)| self.inner.append(left, right)),
-                    )
-                });
-                Ok(())
+                    self.inner
+                        .extend_slices_into(left, right, &mut self.outputs)
+                })
+                .map_err(py_value_error)
             }
 
             #[getter]
@@ -2679,24 +2672,24 @@ macro_rules! binary_state_class {
     };
 }
 
-binary_state_class!(StatefulMedprice, MedianPrice);
+binary_state_class!(MedianPrice);
 
 macro_rules! price3_state_class {
-    ($class:ident, $inner:ident) => {
+    ($class:ident) => {
         #[pyclass]
         pub struct $class {
-            inner: stream::$inner,
+            inner: stream::$class,
             outputs: Vec<f64>,
         }
 
         #[pymethods]
         impl $class {
             #[new]
-            fn new() -> Self {
-                Self {
-                    inner: stream::$inner::new(),
+            fn new() -> PyResult<Self> {
+                Ok(Self {
+                    inner: stream::$class::new().map_err(py_value_error)?,
                     outputs: Vec::new(),
-                }
+                })
             }
 
             fn append(&mut self, high: f64, low: f64, close: f64) -> f64 {
@@ -2715,19 +2708,11 @@ macro_rules! price3_state_class {
                 let high = high.as_slice()?;
                 let low = low.as_slice()?;
                 let close = close.as_slice()?;
-                if high.len() != low.len() || high.len() != close.len() {
-                    return Err(PyValueError::new_err("inputs must have equal lengths"));
-                }
-                let outputs = &mut self.outputs;
                 py.allow_threads(|| {
-                    outputs.extend(
-                        high.iter()
-                            .zip(low)
-                            .zip(close)
-                            .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
-                    )
-                });
-                Ok(())
+                    self.inner
+                        .extend_slices_into(high, low, close, &mut self.outputs)
+                })
+                .map_err(py_value_error)
             }
 
             #[getter]
@@ -2751,23 +2736,23 @@ macro_rules! price3_state_class {
     };
 }
 
-price3_state_class!(StatefulTypprice, TypicalPrice);
-price3_state_class!(StatefulWclprice, WeightedClose);
+price3_state_class!(TypicalPrice);
+price3_state_class!(WeightedClose);
 
 #[pyclass]
-pub struct StatefulAvgprice {
+pub struct AveragePrice {
     inner: stream::AveragePrice,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulAvgprice {
+impl AveragePrice {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: stream::AveragePrice::new(),
+    fn new() -> PyResult<Self> {
+        Ok(Self {
+            inner: stream::AveragePrice::new().map_err(py_value_error)?,
             outputs: Vec::new(),
-        }
+        })
     }
 
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> f64 {
@@ -2788,18 +2773,11 @@ impl StatefulAvgprice {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
-        if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            outputs.extend(
-                open.iter().zip(high).zip(low).zip(close).map(
-                    |(((&open, &high), &low), &close)| self.inner.append(open, high, low, close),
-                ),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(open, high, low, close, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]

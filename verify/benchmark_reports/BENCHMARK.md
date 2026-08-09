@@ -314,7 +314,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.22× | 1.47× | 1.08× | 1.02× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.44× | 1.69× | 1.23× | 1.17× |
 | RollingAverageDeviation | [TA-Lib: `AVGDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.41× | 1.04× | 0.91× | 0.91× |
-| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.80× | 3.07× | 1.49× | 0.83× |
+| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.59× | 1.38× | 0.44× | 0.62× |
 | BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.00× | 2.57× | 1.40× | 1.01× |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.80× | 1.53× | 1.13× | 1.09× |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.91× | 2.54× | 1.19× | 1.11× |
@@ -413,7 +413,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.93× | 0.67× | 0.69× | 0.78× |
 | RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.20× | 2.43× | 1.55× | 1.29× |
 | RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.78× | 1.84× | 1.34× | 1.26× |
-| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.55× | 4.17× | 1.57× | 0.85× |
+| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 6.36× | 1.96× | 0.50× | 0.53× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.34× | 1.81× | 1.56× | 1.58× |
 | RollingMidpoint | [TA-Lib: `MIDPOINT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.07× | 1.33× | 0.88× | 0.79× |
 | RollingMidprice | [TA-Lib: `MIDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.73× | 1.38× | 0.97× | 0.81× |
@@ -455,10 +455,10 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | TriangularMovingAverage | [TA-Lib: `TRIMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.24× | 1.39× | 0.81× | 0.72× |
 | TripleExponentialRateOfChange | [TA-Lib: `TRIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.34× | 4.98× | 4.06× | 4.08× |
 | RollingTimeSeriesForecast | [TA-Lib: `TSF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.75× | 1.17× | 0.90× | 1.03× |
-| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 6.87× | 3.81× | 1.57× | 1.05× |
+| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.78× | 1.99× | 0.58× | 0.64× |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.05× | 1.45× | 1.21× | 1.10× |
 | RollingVariance | [TA-Lib: `VAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.74× | 1.59× | 0.69× | 0.64× |
-| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.15× | 4.02× | 1.42× | 1.05× |
+| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.63× | 1.98× | 0.65× | 0.62× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.53× | 1.55× | 0.98× | 0.84× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.24× | 1.43× | 0.68× | 0.61× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
@@ -608,7 +608,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.44× | 1.93× | 2.20× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.66× | 1.80× |
-| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.37× | 1.72× | 1.86× |
+| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.73× | 1.94× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.66× | 1.92× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.43× | 1.63× | 1.71× |
@@ -773,7 +773,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.44× | 1.98× | 1.82× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 1.69× | 1.98× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.19× | 1.53× | 1.93× |
+| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.69× | 1.92× |
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.20× | 2.14× | 2.27× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.72× | 1.95× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.24× | 1.57× | 1.88× |
@@ -869,7 +869,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TripleExponentialRateOfChange | [TA-Lib: `TRIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.51× | 1.57× | 1.93× |
 | TrueRange | [TA-Lib: `TRANGE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.90× | 1.91× |
 | TrueStrengthIndex | [pandas-ta-classic: `pandas-ta-classic.true_strength_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.58× | 1.90× |
+| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.90× | 1.91× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.38× | 1.91× | 1.94× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -878,7 +878,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 1.74× | 1.89× |
+| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 1.60× | 1.89× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.93× | 1.76× | 2.12× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.27× | 1.37× | 1.99× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -900,7 +900,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 2.15× | 1.96× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.09× | 1.98× |
-| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.66× | 1.76× |
+| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 1.83× | 1.89× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.97× | 1.87× | 1.92× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 1.84× | 1.78× |
@@ -1065,7 +1065,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.88× | 2.00× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.92× | 1.84× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.83× | 1.85× |
+| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.97× | 1.86× |
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.11× | 2.08× | 2.21× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.80× | 1.92× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.01× | 2.13× |
@@ -1161,7 +1161,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TripleExponentialRateOfChange | [TA-Lib: `TRIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 1.91× | 1.87× |
 | TrueRange | [TA-Lib: `TRANGE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.76× | 1.77× |
 | TrueStrengthIndex | [pandas-ta-classic: `pandas-ta-classic.true_strength_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.87× | 1.85× |
+| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.93× | 1.93× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 2.00× | 2.15× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1170,7 +1170,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.87× | 1.76× |
+| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.87× | 1.93× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.87× | 2.00× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.91× | 2.01× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1192,7 +1192,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.16× | 2.02× | 2.00× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.90× | 1.97× |
-| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.73× | 1.93× |
+| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.68× | 1.81× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.99× | 1.95× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.60× | 1.87× | 1.85× |
@@ -1357,7 +1357,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.87× | 1.81× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.69× | 1.92× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 2.05× | 1.88× |
+| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.89× | 1.86× |
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.98× | 2.07× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 1.87× | 2.07× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 2.00× | 2.15× |
@@ -1453,7 +1453,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TripleExponentialRateOfChange | [TA-Lib: `TRIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.56× | 1.96× | 2.13× |
 | TrueRange | [TA-Lib: `TRANGE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.85× | 1.90× |
 | TrueStrengthIndex | [pandas-ta-classic: `pandas-ta-classic.true_strength_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.95× | 1.86× | 1.84× |
+| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.88× | 1.78× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 2.00× | 1.98× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1462,7 +1462,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 1.95× | 1.80× |
+| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.85× | 1.96× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.07× | 2.03× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.84× | 1.93× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1484,7 +1484,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 2.04× | 1.98× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.91× | 2.06× |
-| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.14× | 1.64× | 1.85× |
+| AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.78× | 1.79× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.93× | 1.98× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.86× | 1.85× |
@@ -1649,7 +1649,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.49× | 2.17× | 2.07× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.83× | 1.89× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.90× | 1.90× |
+| MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.83× | 1.81× |
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.49× | 2.63× | 2.72× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.65× | 1.93× | 1.99× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.96× | 2.11× |
@@ -1745,7 +1745,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TripleExponentialRateOfChange | [TA-Lib: `TRIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.59× | 2.17× | 2.07× |
 | TrueRange | [TA-Lib: `TRANGE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.81× | 1.79× |
 | TrueStrengthIndex | [pandas-ta-classic: `pandas-ta-classic.true_strength_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.69× | 1.90× |
+| TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 1.72× | 1.85× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.08× | 2.10× |
 | ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1754,7 +1754,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 1.74× | 1.78× |
+| WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.91× | 1.89× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 2.04× | 1.82× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.86× | 2.00× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |

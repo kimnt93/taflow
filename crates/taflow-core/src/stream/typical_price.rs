@@ -1,34 +1,61 @@
-//! Batch implementation for `typical_price`.
+//! Persistent pointwise `typical price` transform.
 
-use super::price_transform::*;
 use crate::error::{TaError, TaResult};
 
-/// Compute the typical price result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn typical_price(high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<f64>> {
-    let len = high.len();
-    if len != low.len() || len != close.len() {
-        return Err(TaError::LengthMismatch {
-            expected: len,
-            got: low.len().min(close.len()),
-        });
+/// Compute typical price for aligned chronological prices without warm-up.
+#[derive(Debug, Clone, Default)]
+pub struct TypicalPrice {
+    value: Option<f64>,
+}
+
+impl TypicalPrice {
+    /// Create a fresh price-transform state.
+    pub fn new() -> TaResult<Self> {
+        Ok(Self::default())
     }
-    let one_third = 1.0 / 3.0;
-    let mut output = Vec::with_capacity(len);
-    output.extend(
-        high.iter()
-            .zip(low.iter())
-            .zip(close.iter())
-            .map(|((&h, &l), &c)| (h + l + c) * one_third),
-    );
-    Ok(output)
+
+    /// Transform one chronological price tuple.
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> f64 {
+        let value = (high + low + close) * (1.0 / 3.0);
+        self.value = Some(value);
+        value
+    }
+
+    /// Transform aligned slices after validating every length before mutation.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let len = high.len();
+        if low.len() != len {
+            return Err(TaError::LengthMismatch {
+                expected: len,
+                got: low.len(),
+            });
+        }
+        if close.len() != len {
+            return Err(TaError::LengthMismatch {
+                expected: len,
+                got: close.len(),
+            });
+        }
+        output.reserve(len);
+        for index in 0..len {
+            output.push(self.append(high[index], low[index], close[index]));
+        }
+        Ok(())
+    }
+
+    /// Return the latest result, or `None` before the first price tuple.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Restore fresh-state behavior without reallocating.
+    pub fn reset(&mut self) {
+        self.value = None;
+    }
 }

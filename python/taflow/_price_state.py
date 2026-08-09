@@ -25,16 +25,15 @@ class OhlcPriceState:
     def __init__(
         self,
         _open: Any,
-        high: object,
-        low: object,
-        close: object,
+        high: Any,
+        low: Any,
+        close: Any,
     ) -> None:
         """Create native state and process initial OHLC data."""
         self._state = self._native_cls()
-        if any(value is not None for value in (_open, high, low, close)):
-            self.extend(_open, high, low, close)
+        self.extend(_open, high, low, close)
 
-    def append(self, _open: object, high: object, low: object, close: object) -> "Self":
+    def append(self, _open: float, high: float, low: float, close: float) -> "Self":
         """Append one chronological observation to the native Rust state.
 
         Parameters
@@ -55,7 +54,7 @@ class OhlcPriceState:
         self._state.append(_open, high, low, close)
         return self
 
-    def extend(self, _open: object, high: object, low: object, close: object) -> "Self":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "Self":
         """Append aligned chronological histories to the native Rust state.
 
         Parameters
@@ -91,7 +90,7 @@ class OhlcPriceState:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest Rust result.
 
         Returns
@@ -132,15 +131,14 @@ class HlcPriceState:
     def __init__(
         self,
         high: Any,
-        low: object,
-        close: object,
+        low: Any,
+        close: Any,
     ) -> None:
         """Create native state and process initial HLC data."""
         self._state = self._native_cls()
-        if high is not None or low is not None or close is not None:
-            self.extend(high, low, close)
+        self.extend(high, low, close)
 
-    def append(self, high: object, low: object, close: object) -> "Self":
+    def append(self, high: float, low: float, close: float) -> "Self":
         """Append one chronological observation to the native Rust state.
 
         Parameters
@@ -159,7 +157,7 @@ class HlcPriceState:
         self._state.append(high, low, close)
         return self
 
-    def extend(self, high: object, low: object, close: object) -> "Self":
+    def extend(self, high: Any, low: Any, close: Any) -> "Self":
         """Append aligned chronological histories to the native Rust state.
 
         Parameters
@@ -190,7 +188,7 @@ class HlcPriceState:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest Rust result.
 
         Returns
@@ -231,14 +229,13 @@ class HlPriceState:
     def __init__(
         self,
         high: Any,
-        low: object,
+        low: Any,
     ) -> None:
         """Create native state and process initial high/low data."""
         self._state = self._native_cls()
-        if high is not None or low is not None:
-            self.extend(high, low)
+        self.extend(high, low)
 
-    def append(self, high: object, low: object) -> "Self":
+    def append(self, high: float, low: float) -> "Self":
         """Append one chronological observation to the native Rust state.
 
         Parameters
@@ -255,7 +252,7 @@ class HlPriceState:
         self._state.append(high, low)
         return self
 
-    def extend(self, high: object, low: object) -> "Self":
+    def extend(self, high: Any, low: Any) -> "Self":
         """Append aligned chronological histories to the native Rust state.
 
         Parameters
@@ -282,7 +279,7 @@ class HlPriceState:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest Rust result.
 
         Returns
