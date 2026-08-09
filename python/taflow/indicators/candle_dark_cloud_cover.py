@@ -1,13 +1,13 @@
-"""Persistent Counter Attack recognition (CDLCOUNTERATTACK)."""
+"""Persistent Dark Cloud Cover recognition (CDLDARKCLOUDCOVER)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleCounterAttack as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleDarkCloudCover as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleCounterAttack:
-    """Persistent Counter Attack recognition (CDLCOUNTERATTACK).
+class CandleDarkCloudCover:
+    """Persistent Dark Cloud Cover recognition (CDLDARKCLOUDCOVER).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleCounterAttack:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleCounterAttack":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleDarkCloudCover":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleCounterAttack:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleCounterAttack":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleDarkCloudCover":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleCounterAttack:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleCounterAttack":
+    def reset(self) -> "CandleDarkCloudCover":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

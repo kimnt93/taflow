@@ -2,8 +2,8 @@
 
 use std::collections::VecDeque;
 
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 /// Incremental CDLCLOSINGMARUBOZU state using TA-Lib's rolling body and range averages.
 /// Persistent Rust state or aligned output type for `CandleClosingMarubozu`.
 ///

@@ -1,25 +1,22 @@
-//! Incremental Dragonfly Doji candlestick recognition (CDLDRAGONFLYDOJI).
+//! Incremental Engulfing candlestick recognition (CDLENGULFING).
 
-use std::collections::VecDeque;
-
-use super::pattern::*;
 use crate::error::TaResult;
-/// Incremental CDLDRAGONFLYDOJI state using TA-Lib's two ten-bar range averages.
-/// Persistent Rust state or aligned output type for `CandleDragonflyDoji`.
+use crate::stream::pattern::*;
+/// Incremental CDLENGULFING state.
+/// Persistent Rust state or aligned output type for `CandleEngulfing`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct CandleDragonflyDoji {
-    ranges: VecDeque<f64>,
-    sum: f64,
+pub struct CandleEngulfing {
+    previous: Option<(f64, f64)>,
     value: Option<i32>,
 }
-impl Default for CandleDragonflyDoji {
+impl Default for CandleEngulfing {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleDragonflyDoji {
+impl CandleEngulfing {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -27,36 +24,22 @@ impl CandleDragonflyDoji {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            ranges: VecDeque::with_capacity(10),
-            sum: 0.0,
+            previous: None,
             value: None,
         }
     }
-    /// Appends OHLC data and returns +100 for a dragonfly doji after warmup.
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
-        let range = high - low;
-        let body = (close - open).abs();
-        let output = if self.ranges.len() == 10 {
-            let shadow_limit = ca_highlow_scalar(BODY_DOJI, self.sum, high, low);
-            Some(
-                (body <= shadow_limit
-                    && high - open.max(close) < shadow_limit
-                    && open.min(close) - low > shadow_limit) as i32
-                    * 100,
-            )
-        } else {
-            None
-        };
-        if self.ranges.len() == 10 {
-            // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
-            let old = self.ranges.pop_front().expect("window is full");
-            self.sum += range - old;
-        } else {
-            self.sum += range;
-        }
-        self.ranges.push_back(range);
-        self.value = output;
-        output
+    /// Appends OHLC data; high and low are accepted for a uniform pattern API.
+    pub fn append(&mut self, open: f64, _high: f64, _low: f64, close: f64) -> Option<i32> {
+        let previous = self.previous.replace((open, close));
+        let (previous_open, previous_close) = previous?;
+        let bullish =
+            previous_close < previous_open && close >= previous_open && open <= previous_close;
+        let bearish = previous_close >= previous_open
+            && close < open
+            && open >= previous_close
+            && close <= previous_open;
+        self.value = Some((bullish as i32) * 100 - (bearish as i32) * 100);
+        self.value
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
@@ -86,7 +69,7 @@ impl CandleDragonflyDoji {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.ranges.is_empty() {
+        if self.previous.is_some() {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
@@ -108,8 +91,7 @@ impl CandleDragonflyDoji {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.ranges.clear();
-        self.sum = 0.0;
+        self.previous = None;
         self.value = None;
     }
 }

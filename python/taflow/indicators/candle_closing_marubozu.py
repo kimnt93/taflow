@@ -1,13 +1,13 @@
-"""Persistent Dark Cloud Cover recognition (CDLDARKCLOUDCOVER)."""
+"""Persistent Closing CandleMarubozu candlestick recognition (CDLCLOSINGMARUBOZU)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleDarkCloudCover as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleClosingMarubozu as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleDarkCloudCover:
-    """Persistent Dark Cloud Cover recognition (CDLDARKCLOUDCOVER).
+class CandleClosingMarubozu:
+    """Persistent Closing CandleMarubozu candlestick recognition (CDLCLOSINGMARUBOZU).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,13 +37,9 @@ class CandleDarkCloudCover:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        (
-            self.extend(_open, high, low, close)
-            if any(x is not None for x in (_open, high, low, close))
-            else None
-        )
+        self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleDarkCloudCover":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleClosingMarubozu":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +61,7 @@ class CandleDarkCloudCover:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleDarkCloudCover":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleClosingMarubozu":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +108,7 @@ class CandleDarkCloudCover:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleDarkCloudCover":
+    def reset(self) -> "CandleClosingMarubozu":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

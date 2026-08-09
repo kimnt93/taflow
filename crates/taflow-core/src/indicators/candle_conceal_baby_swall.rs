@@ -1,6 +1,6 @@
-//! Incremental Evening Doji Star candlestick recognition (CDLEVENINGDOJISTAR).
-use super::pattern::*;
+//! Incremental Concealing Baby Swallow candlestick recognition (CDLCONCEALBABYSWALL).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -10,8 +10,11 @@ struct Candle {
     c: f64,
 }
 impl Candle {
-    fn body(self) -> f64 {
-        (self.c - self.o).abs()
+    fn upper(self) -> f64 {
+        self.h - self.o.max(self.c)
+    }
+    fn lower(self) -> f64 {
+        self.o.min(self.c) - self.l
     }
     fn color(self) -> i32 {
         if self.c >= self.o {
@@ -21,21 +24,19 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleEveningDojiStar candle recognizer.
+/// Stateful CandleConcealBabySwall candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleEveningDojiStar {
+pub struct CandleConcealBabySwall {
     candles: VecDeque<Candle>,
-    body_long_sum: f64,
-    body_doji_sum: f64,
-    body_short_sum: f64,
+    shadow_sum: [f64; 2],
     value: Option<i32>,
 }
-impl Default for CandleEveningDojiStar {
+impl Default for CandleConcealBabySwall {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleEveningDojiStar {
+impl CandleConcealBabySwall {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -43,10 +44,8 @@ impl CandleEveningDojiStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(12),
-            body_long_sum: 0.0,
-            body_doji_sum: 0.0,
-            body_short_sum: 0.0,
+            candles: VecDeque::with_capacity(13),
+            shadow_sum: [0.0; 2],
             value: None,
         }
     }
@@ -57,45 +56,45 @@ impl CandleEveningDojiStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
-        // Deque holds bars i-12..=i-1; bar j maps to index 12 - (i - j).
-        let value = if self.candles.len() == 12 {
-            let a = self.candles[10]; // bar i-2
-            let b = self.candles[11]; // bar i-1
-            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, a.o, a.c);
-            let doji = ca_highlow_scalar(BODY_DOJI, self.body_doji_sum, b.h, b.l);
-            let short = ca_realbody_scalar(BODY_SHORT, self.body_short_sum, o, c);
+        // Deque holds bars i-13..=i-1; bar j maps to index 13 - (i - j).
+        let value = if self.candles.len() == 13 {
+            let a = self.candles[10]; // bar i-3
+            let b = self.candles[11]; // bar i-2
+            let cnd = self.candles[12]; // bar i-1
+            let s0 = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[0], a.h, a.l);
+            let s1 = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[1], b.h, b.l);
             // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_long_sum += cr_realbody_scalar(a.o, a.c)
-                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_doji_sum += cr_highlow_scalar(b.h, b.l)
+            self.shadow_sum[0] += cr_highlow_scalar(a.h, a.l)
+                - cr_highlow_scalar(self.candles[0].h, self.candles[0].l);
+            self.shadow_sum[1] += cr_highlow_scalar(b.h, b.l)
                 - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
-            self.body_short_sum +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[2].o, self.candles[2].c);
             Some(
-                (a.color() == 1
-                    && a.body() > long
-                    && b.body() <= doji
-                    && b.o.min(b.c) > a.o.max(a.c)
+                (a.color() == -1
+                    && b.color() == -1
+                    && cnd.color() == -1
                     && cur.color() == -1
-                    && cur.body() > short
-                    && cur.c < a.c - a.body() * 0.3) as i32
-                    * -100,
+                    && a.upper() < s0
+                    && a.lower() < s0
+                    && b.upper() < s1
+                    && b.lower() < s1
+                    && cnd.o.max(cnd.c) < b.o.min(b.c)
+                    && cnd.h > b.c
+                    && cur.o >= cnd.h
+                    && cur.c <= cnd.l) as i32
+                    * 100,
             )
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
             let i = self.candles.len();
             if i < 10 {
-                self.body_long_sum += cr_realbody_scalar(o, c);
+                self.shadow_sum[0] += cr_highlow_scalar(h, l);
             }
             if (1..11).contains(&i) {
-                self.body_doji_sum += cr_highlow_scalar(h, l);
-            }
-            if (2..12).contains(&i) {
-                self.body_short_sum += cr_realbody_scalar(o, c);
+                self.shadow_sum[1] += cr_highlow_scalar(h, l);
             }
             None
         };
-        if self.candles.len() == 12 {
+        if self.candles.len() == 13 {
             self.candles.pop_front();
         }
         self.candles.push_back(cur);
@@ -153,9 +152,7 @@ impl CandleEveningDojiStar {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.body_long_sum = 0.0;
-        self.body_doji_sum = 0.0;
-        self.body_short_sum = 0.0;
+        self.shadow_sum = [0.0; 2];
         self.value = None;
     }
 }

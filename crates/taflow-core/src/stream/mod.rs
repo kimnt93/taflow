@@ -40,34 +40,6 @@ pub(crate) mod tests_extrema_support {
 
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
-mod candle_breakaway;
-#[cfg(test)]
-mod candle_breakaway_test;
-mod candle_closing_marubozu;
-#[cfg(test)]
-mod candle_closing_marubozu_test;
-mod candle_conceal_baby_swall;
-#[cfg(test)]
-mod candle_conceal_baby_swall_test;
-mod candle_counter_attack;
-#[cfg(test)]
-mod candle_counter_attack_test;
-mod candle_dark_cloud_cover;
-#[cfg(test)]
-mod candle_dark_cloud_cover_test;
-mod candle_doji;
-mod candle_doji_star;
-#[cfg(test)]
-mod candle_doji_star_test;
-#[cfg(test)]
-mod candle_doji_test;
-mod candle_dragonfly_doji;
-#[cfg(test)]
-mod candle_dragonfly_doji_test;
-mod candle_engulfing;
-mod candle_evening_doji_star;
-#[cfg(test)]
-mod candle_evening_doji_star_test;
 mod candle_evening_star;
 #[cfg(test)]
 mod candle_evening_star_test;
@@ -361,16 +333,6 @@ mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use candle_breakaway::CandleBreakaway;
-pub use candle_closing_marubozu::CandleClosingMarubozu;
-pub use candle_conceal_baby_swall::CandleConcealBabySwall;
-pub use candle_counter_attack::CandleCounterAttack;
-pub use candle_dark_cloud_cover::CandleDarkCloudCover;
-pub use candle_doji::CandleDoji;
-pub use candle_doji_star::CandleDojiStar;
-pub use candle_dragonfly_doji::CandleDragonflyDoji;
-pub use candle_engulfing::CandleEngulfing;
-pub use candle_evening_doji_star::CandleEveningDojiStar;
 pub use candle_evening_star::CandleEveningStar;
 pub use candle_gap_side_side_white::CandleGapSideSideWhite;
 pub use candle_gravestone_doji::CandleGravestoneDoji;

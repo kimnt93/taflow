@@ -462,6 +462,48 @@ pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 
+mod candle_breakaway;
+#[cfg(test)]
+mod candle_breakaway_test;
+mod candle_closing_marubozu;
+#[cfg(test)]
+mod candle_closing_marubozu_test;
+mod candle_conceal_baby_swall;
+#[cfg(test)]
+mod candle_conceal_baby_swall_test;
+mod candle_counter_attack;
+#[cfg(test)]
+mod candle_counter_attack_test;
+mod candle_dark_cloud_cover;
+#[cfg(test)]
+mod candle_dark_cloud_cover_test;
+mod candle_doji;
+mod candle_doji_star;
+#[cfg(test)]
+mod candle_doji_star_test;
+#[cfg(test)]
+mod candle_doji_test;
+mod candle_dragonfly_doji;
+#[cfg(test)]
+mod candle_dragonfly_doji_test;
+mod candle_engulfing;
+#[cfg(test)]
+mod candle_engulfing_test;
+mod candle_evening_doji_star;
+#[cfg(test)]
+mod candle_evening_doji_star_test;
+
+pub use candle_breakaway::CandleBreakaway;
+pub use candle_closing_marubozu::CandleClosingMarubozu;
+pub use candle_conceal_baby_swall::CandleConcealBabySwall;
+pub use candle_counter_attack::CandleCounterAttack;
+pub use candle_dark_cloud_cover::CandleDarkCloudCover;
+pub use candle_doji::CandleDoji;
+pub use candle_doji_star::CandleDojiStar;
+pub use candle_dragonfly_doji::CandleDragonflyDoji;
+pub use candle_engulfing::CandleEngulfing;
+pub use candle_evening_doji_star::CandleEveningDojiStar;
+
 mod absolute_price_oscillator;
 #[cfg(test)]
 mod absolute_price_oscillator_test;

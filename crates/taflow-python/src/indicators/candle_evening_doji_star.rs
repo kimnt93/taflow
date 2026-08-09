@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleEveningDojiStar as CandleEveningDojiStarState;
+use taflow::indicators::CandleEveningDojiStar as CandleEveningDojiStarState;
 #[pyclass]
 /// Stateful CandleEveningDojiStar candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.

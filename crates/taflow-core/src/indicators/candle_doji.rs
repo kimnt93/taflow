@@ -1,22 +1,25 @@
-//! Incremental Engulfing candlestick recognition (CDLENGULFING).
+//! Incremental Doji candlestick recognition (CDLDOJI).
 
-use super::pattern::*;
+use std::collections::VecDeque;
+
 use crate::error::TaResult;
-/// Incremental CDLENGULFING state.
-/// Persistent Rust state or aligned output type for `CandleEngulfing`.
+use crate::stream::pattern::*;
+/// Incremental CDLDOJI state using TA-Lib's ten-bar High-Low average.
+/// Persistent Rust state or aligned output type for `CandleDoji`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct CandleEngulfing {
-    previous: Option<(f64, f64)>,
+pub struct CandleDoji {
+    ranges: VecDeque<f64>,
+    sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleEngulfing {
+impl Default for CandleDoji {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleEngulfing {
+impl CandleDoji {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -24,21 +27,26 @@ impl CandleEngulfing {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            previous: None,
+            ranges: VecDeque::with_capacity(10),
+            sum: 0.0,
             value: None,
         }
     }
-    /// Appends OHLC data; high and low are accepted for a uniform pattern API.
-    pub fn append(&mut self, open: f64, _high: f64, _low: f64, close: f64) -> Option<i32> {
-        let previous = self.previous.replace((open, close));
-        let (previous_open, previous_close) = previous?;
-        let bullish =
-            previous_close < previous_open && close >= previous_open && open <= previous_close;
-        let bearish = previous_close >= previous_open
-            && close < open
-            && open >= previous_close
-            && close <= previous_open;
-        self.value = Some((bullish as i32) * 100 - (bearish as i32) * 100);
+    /// Appends OHLC data and returns +100 for a doji after the ten-bar warmup.
+    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
+        if self.ranges.len() < 10 {
+            self.ranges.push_back(high - low);
+            self.sum += high - low;
+            return None;
+        }
+        let threshold = ca_highlow_scalar(BODY_DOJI, self.sum, high, low);
+        self.value = Some(if (close - open).abs() <= threshold {
+            100
+        } else {
+            0
+        });
+        self.sum += high - low - self.ranges.pop_front().expect("window is full");
+        self.ranges.push_back(high - low);
         self.value
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
@@ -69,7 +77,7 @@ impl CandleEngulfing {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if self.previous.is_some() {
+        if !self.ranges.is_empty() {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
@@ -91,7 +99,8 @@ impl CandleEngulfing {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.previous = None;
+        self.ranges.clear();
+        self.sum = 0.0;
         self.value = None;
     }
 }

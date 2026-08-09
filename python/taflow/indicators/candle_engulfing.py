@@ -1,13 +1,13 @@
-"""Persistent CandleDoji candlestick recognition (CDLDOJI)."""
+"""Persistent CandleEngulfing candlestick recognition (CDLENGULFING)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleDoji as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleEngulfing as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleDoji:
-    """Persistent CandleDoji candlestick recognition (CDLDOJI).
+class CandleEngulfing:
+    """Persistent CandleEngulfing candlestick recognition (CDLENGULFING).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -39,7 +39,7 @@ class CandleDoji:
         self._state = _Native()
         self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleDoji":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleEngulfing":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -61,7 +61,7 @@ class CandleDoji:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleDoji":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleEngulfing":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -108,7 +108,7 @@ class CandleDoji:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleDoji":
+    def reset(self) -> "CandleEngulfing":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -1,13 +1,13 @@
-"""Persistent Dragonfly CandleDoji candlestick recognition (CDLDRAGONFLYDOJI)."""
+"""Persistent Conceal Baby Swall recognition (CDLCONCEALBABYSWALL)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleDragonflyDoji as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleConcealBabySwall as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleDragonflyDoji:
-    """Persistent Dragonfly CandleDoji candlestick recognition (CDLDRAGONFLYDOJI).
+class CandleConcealBabySwall:
+    """Persistent Conceal Baby Swall recognition (CDLCONCEALBABYSWALL).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -39,11 +39,11 @@ class CandleDragonflyDoji:
         self._state = _Native()
         (
             self.extend(_open, high, low, close)
-            if any(value is not None for value in (_open, high, low, close))
+            if any(x is not None for x in (_open, high, low, close))
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleDragonflyDoji":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleConcealBabySwall":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleDragonflyDoji:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleDragonflyDoji":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleConcealBabySwall":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleDragonflyDoji:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleDragonflyDoji":
+    def reset(self) -> "CandleConcealBabySwall":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

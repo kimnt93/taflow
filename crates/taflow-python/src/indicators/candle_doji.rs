@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleClosingMarubozu as CandleClosingMarubozuState;
+use taflow::indicators::CandleDoji as CandleDojiState;
 #[pyclass]
-/// Stateful CandleClosingMarubozu candlestick recognizer.
+/// Stateful CandleDoji candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleClosingMarubozu {
-    inner: CandleClosingMarubozuState,
+pub struct CandleDoji {
+    inner: CandleDojiState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleClosingMarubozu {
+impl CandleDoji {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleClosingMarubozuState::new(),
+            inner: CandleDojiState::new(),
             outputs: Vec::new(),
         }
     }

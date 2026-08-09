@@ -1,6 +1,6 @@
-//! Incremental Doji Star candlestick recognition (CDLDOJISTAR).
-use super::pattern::*;
+//! Incremental Counterattack candlestick recognition (CDLCOUNTERATTACK).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -13,21 +13,28 @@ impl Candle {
     fn body(self) -> f64 {
         (self.c - self.o).abs()
     }
+    fn color(self) -> i32 {
+        if self.c >= self.o {
+            1
+        } else {
+            -1
+        }
+    }
 }
-/// Stateful CandleDojiStar candle recognizer.
+/// Stateful CandleCounterAttack candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleDojiStar {
+pub struct CandleCounterAttack {
     candles: VecDeque<Candle>,
-    body_long_sum: f64,
-    body_doji_sum: f64,
+    equal_sum: f64,
+    body_sum: [f64; 2],
     value: Option<i32>,
 }
-impl Default for CandleDojiStar {
+impl Default for CandleCounterAttack {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleDojiStar {
+impl CandleCounterAttack {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -36,36 +43,49 @@ impl CandleDojiStar {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
-            body_long_sum: 0.0,
-            body_doji_sum: 0.0,
+            equal_sum: 0.0,
+            body_sum: [0.0; 2],
             value: None,
         }
     }
-    /// Appends OHLC data and returns a signed doji-star signal after the eleven-bar warmup.
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
         // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
         let value = if self.candles.len() == 11 {
             let prev = self.candles[10]; // bar i-1
-            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, prev.o, prev.c);
-            let doji = ca_highlow_scalar(BODY_DOJI, self.body_doji_sum, h, l);
-            let base = prev.body() > long && cur.body() <= doji;
-            let bear = base && prev.c >= prev.o && cur.o.min(cur.c) > prev.o.max(prev.c);
-            let bull = base && prev.c < prev.o && cur.o.max(cur.c) < prev.o.min(prev.c);
-            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_long_sum += cr_realbody_scalar(prev.o, prev.c)
+            let equal = ca_highlow_scalar(EQUAL, self.equal_sum, prev.h, prev.l);
+            let body_prev = ca_realbody_scalar(BODY_LONG, self.body_sum[1], prev.o, prev.c);
+            let body_cur = ca_realbody_scalar(BODY_LONG, self.body_sum[0], o, c);
+            let out = (prev.color() != cur.color()
+                && prev.body() > body_prev
+                && cur.body() > body_cur
+                && (cur.c - prev.c).abs() <= equal) as i32
+                * cur.color()
+                * 100;
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - period).
+            self.equal_sum += cr_highlow_scalar(prev.h, prev.l)
+                - cr_highlow_scalar(self.candles[5].h, self.candles[5].l);
+            self.body_sum[1] += cr_realbody_scalar(prev.o, prev.c)
                 - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_doji_sum +=
-                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
-            Some((bull as i32) * 100 - (bear as i32) * 100)
+            self.body_sum[0] +=
+                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
+            Some(out)
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
             let i = self.candles.len();
+            if (5..10).contains(&i) {
+                self.equal_sum += cr_highlow_scalar(h, l);
+            }
             if i < 10 {
-                self.body_long_sum += cr_realbody_scalar(o, c);
+                self.body_sum[1] += cr_realbody_scalar(o, c);
             }
             if (1..11).contains(&i) {
-                self.body_doji_sum += cr_highlow_scalar(h, l);
+                self.body_sum[0] += cr_realbody_scalar(o, c);
             }
             None
         };
@@ -127,8 +147,8 @@ impl CandleDojiStar {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.body_long_sum = 0.0;
-        self.body_doji_sum = 0.0;
+        self.equal_sum = 0.0;
+        self.body_sum = [0.0; 2];
         self.value = None;
     }
 }

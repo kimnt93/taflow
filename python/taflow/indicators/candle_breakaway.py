@@ -1,13 +1,13 @@
-"""Persistent Evening CandleDoji Star recognition (CDLEVENINGDOJISTAR)."""
+"""Persistent CandleBreakaway recognition (CDLBREAKAWAY)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleEveningDojiStar as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleBreakaway as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleEveningDojiStar:
-    """Persistent Evening CandleDoji Star recognition (CDLEVENINGDOJISTAR).
+class CandleBreakaway:
+    """Persistent CandleBreakaway recognition (CDLBREAKAWAY).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleEveningDojiStar:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleEveningDojiStar":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleBreakaway":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleEveningDojiStar:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleEveningDojiStar":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleBreakaway":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleEveningDojiStar:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleEveningDojiStar":
+    def reset(self) -> "CandleBreakaway":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

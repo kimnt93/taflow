@@ -1,13 +1,13 @@
-"""Persistent CandleDoji Star recognition (CDLDOJISTAR)."""
+"""Persistent Evening CandleDoji Star recognition (CDLEVENINGDOJISTAR)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleDojiStar as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleEveningDojiStar as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleDojiStar:
-    """Persistent CandleDoji Star recognition (CDLDOJISTAR).
+class CandleEveningDojiStar:
+    """Persistent Evening CandleDoji Star recognition (CDLEVENINGDOJISTAR).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleDojiStar:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleDojiStar":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleEveningDojiStar":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleDojiStar:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleDojiStar":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleEveningDojiStar":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleDojiStar:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleDojiStar":
+    def reset(self) -> "CandleEveningDojiStar":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

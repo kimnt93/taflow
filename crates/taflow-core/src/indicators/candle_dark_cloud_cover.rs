@@ -1,6 +1,6 @@
 //! Incremental Dark Cloud Cover candlestick recognition (CDLDARKCLOUDCOVER).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {

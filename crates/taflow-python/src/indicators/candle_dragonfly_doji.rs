@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleEngulfing as CandleEngulfingState;
+use taflow::indicators::CandleDragonflyDoji as CandleDragonflyDojiState;
 #[pyclass]
-/// Stateful CandleEngulfing candlestick recognizer.
+/// Stateful CandleDragonflyDoji candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleEngulfing {
-    inner: CandleEngulfingState,
+pub struct CandleDragonflyDoji {
+    inner: CandleDragonflyDojiState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleEngulfing {
+impl CandleDragonflyDoji {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleEngulfingState::new(),
+            inner: CandleDragonflyDojiState::new(),
             outputs: Vec::new(),
         }
     }

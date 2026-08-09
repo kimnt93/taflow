@@ -1,25 +1,25 @@
-//! Incremental Doji candlestick recognition (CDLDOJI).
+//! Incremental Dragonfly Doji candlestick recognition (CDLDRAGONFLYDOJI).
 
 use std::collections::VecDeque;
 
-use super::pattern::*;
 use crate::error::TaResult;
-/// Incremental CDLDOJI state using TA-Lib's ten-bar High-Low average.
-/// Persistent Rust state or aligned output type for `CandleDoji`.
+use crate::stream::pattern::*;
+/// Incremental CDLDRAGONFLYDOJI state using TA-Lib's two ten-bar range averages.
+/// Persistent Rust state or aligned output type for `CandleDragonflyDoji`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct CandleDoji {
+pub struct CandleDragonflyDoji {
     ranges: VecDeque<f64>,
     sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleDoji {
+impl Default for CandleDragonflyDoji {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleDoji {
+impl CandleDragonflyDoji {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -32,22 +32,31 @@ impl CandleDoji {
             value: None,
         }
     }
-    /// Appends OHLC data and returns +100 for a doji after the ten-bar warmup.
+    /// Appends OHLC data and returns +100 for a dragonfly doji after warmup.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
-        if self.ranges.len() < 10 {
-            self.ranges.push_back(high - low);
-            self.sum += high - low;
-            return None;
-        }
-        let threshold = ca_highlow_scalar(BODY_DOJI, self.sum, high, low);
-        self.value = Some(if (close - open).abs() <= threshold {
-            100
+        let range = high - low;
+        let body = (close - open).abs();
+        let output = if self.ranges.len() == 10 {
+            let shadow_limit = ca_highlow_scalar(BODY_DOJI, self.sum, high, low);
+            Some(
+                (body <= shadow_limit
+                    && high - open.max(close) < shadow_limit
+                    && open.min(close) - low > shadow_limit) as i32
+                    * 100,
+            )
         } else {
-            0
-        });
-        self.sum += high - low - self.ranges.pop_front().expect("window is full");
-        self.ranges.push_back(high - low);
-        self.value
+            None
+        };
+        if self.ranges.len() == 10 {
+            // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
+            let old = self.ranges.pop_front().expect("window is full");
+            self.sum += range - old;
+        } else {
+            self.sum += range;
+        }
+        self.ranges.push_back(range);
+        self.value = output;
+        output
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///

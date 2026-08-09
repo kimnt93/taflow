@@ -765,6 +765,17 @@ suite, interface audit, formatter, and diff checks passed. Generated rows may
 still lag; source scans are authoritative. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The thirteenth structural batch migrated `CandleBreakaway`,
+`CandleClosingMarubozu`, `CandleConcealBabySwall`, `CandleCounterAttack`,
+`CandleDarkCloudCover`, `CandleDoji`, `CandleDojiStar`,
+`CandleDragonflyDoji`, `CandleEngulfing`, and `CandleEveningDojiStar`.
+Rust implementations/tests, Python adapters, and PyO3 bindings now use
+matching canonical filenames and exports; no implementation was added to
+`state_api.rs`. The release extension, workspace Rust tests, ten focused
+Python tests, full Python suite, interface audit, formatter, and diff checks
+passed. Generated rows may still lag; source scans are authoritative.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 ## TA compatibility
 
 TA-Lib is an external oracle only. TAFlow exports native-backed CamelCase classes directly from `taflow`; no TA-Lib compatibility package is shipped.
