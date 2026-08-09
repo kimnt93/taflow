@@ -18,7 +18,7 @@
 6. [Performance](#performance)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/functions-301-blue" alt="301 public exports" />
+  <img src="https://img.shields.io/badge/functions-300-blue" alt="300 public exports" />
   <img src="https://img.shields.io/badge/TA--Lib_parity-161-blue" alt="161 TA-Lib functions" />
   <img src="https://img.shields.io/badge/correctness-287%2F287_checked-brightgreen" alt="287/287 externally checked" />
   <img src="https://img.shields.io/badge/vector_speedup-1.81%C3%97_mean-blue" alt="1.81x mean vector speedup at 10k bars" />
@@ -29,7 +29,7 @@
 
 ## What it is
 
-**299 indicator classes** (301 public exports) in one library: the complete 161-function TA-Lib surface
+**298 indicator classes** (300 public exports) in one library: the complete 161-function TA-Lib surface
 (overlap, momentum, volume, volatility, statistics, cycles, and all 61 candle
 patterns) plus 138 extended operators — rolling statistics, EWM operators,
 Smart Money Concepts, volatility estimators, and signal helpers. Pure Rust
@@ -204,7 +204,7 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 
 | Document | What it covers |
 |---|---|
-| [Indicators](docs/INDICATORS.md) | All 299 classes by category — TA-Lib name, parameters, constructor order, the shared class contract |
+| [Indicators](docs/INDICATORS.md) | All 298 classes by category — TA-Lib name, parameters, constructor order, the shared class contract |
 | [Streaming](docs/STREAMING.md) | Live updates, warm-up, backfill-then-stream, chunk invariance, `reset`, threading, per-tick cost |
 | [Pipelines](docs/PIPELINES.md) | Building causal graphs, expressions, evaluate-once semantics, custom nodes, when not to use one |
 | [Data in / out](docs/DATA.md) | Every accepted input container, output converters, dataframes, the adapter gateway, `RollingApply`, `SessionFlags` |
@@ -293,7 +293,7 @@ Correctness is verified before performance is measured, on every run.
   order.
 - Every public class is also checked for constructor backfill, empty-state
   startup, scalar append, chunked continuation, fluent identity, length, and
-  reset behavior. Current status: **305/305 lifecycle scenarios pass**.
+  reset behavior. Current status: **304/304 public interfaces pass**.
 
 ```bash
 make check                   # unit tests + oracle parity for all 287 functions
