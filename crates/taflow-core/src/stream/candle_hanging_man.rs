@@ -128,15 +128,8 @@ impl CandleHangingMan {
             }
             return Ok(());
         }
-        let scores = candle_hanging_man(open, high, low, close)?;
-        output.extend_from_slice(&scores);
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
         }
         Ok(())
     }
@@ -156,113 +149,5 @@ impl CandleHangingMan {
         self.shadow_vs_sum = 0.0;
         self.near_sum = 0.0;
         self.value = None;
-    }
-}
-
-/// Compute the candle pattern signal for aligned OHLC bars.
-///
-/// # Parameters
-///
-/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
-///
-/// # Returns
-///
-/// A same-length vector containing -100, 0, or 100 pattern signals; bars
-/// Compute the candle hanging man result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_hanging_man(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = *[
-        BODY_SHORT.avg_period,
-        SHADOW_LONG.avg_period,
-        SHADOW_VERY_SHORT.avg_period,
-        NEAR.avg_period,
-    ]
-    .iter()
-    .max()
-    .unwrap()
-        + 1;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut body_sum = 0.0;
-    let shadow_long_sum = 0.0;
-    let mut shadow_vs_sum = 0.0;
-    let mut near_sum = 0.0;
-    let start = lookback;
-    for i in (start - BODY_SHORT.avg_period)..start {
-        body_sum += cr_realbody(open, high, low, close, i);
-    }
-    for i in (start - SHADOW_VERY_SHORT.avg_period)..start {
-        shadow_vs_sum += cr_highlow(open, high, low, close, i);
-    }
-    for i in (start - 1 - NEAR.avg_period)..(start - 1) {
-        near_sum += cr_highlow(open, high, low, close, i);
-    }
-
-    for i in start..len {
-        output[i] = (real_body(open[i], close[i])
-            < ca_realbody(BODY_SHORT, body_sum, open, high, low, close, i)
-            && lower_shadow(open[i], low[i], close[i])
-                > ca_realbody(SHADOW_LONG, shadow_long_sum, open, high, low, close, i)
-            && upper_shadow(open[i], high[i], close[i])
-                < ca_highlow(SHADOW_VERY_SHORT, shadow_vs_sum, open, high, low, close, i)
-            && open[i].min(close[i])
-                >= high[i - 1] - ca_highlow(NEAR, near_sum, open, high, low, close, i - 1))
-            as i32
-            * -100;
-        if BODY_SHORT.avg_period > 0 {
-            body_sum += cr_realbody(open, high, low, close, i)
-                - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
-        }
-        if SHADOW_VERY_SHORT.avg_period > 0 {
-            shadow_vs_sum += cr_highlow(open, high, low, close, i)
-                - cr_highlow(open, high, low, close, i - SHADOW_VERY_SHORT.avg_period);
-        }
-        if NEAR.avg_period > 0 {
-            near_sum += cr_highlow(open, high, low, close, i - 1)
-                - cr_highlow(open, high, low, close, i - 1 - NEAR.avg_period);
-        }
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let o: Vec<f64> = (0..40).map(|i| 100.0 + i as f64 * 0.2).collect();
-        let h: Vec<f64> = o.iter().map(|x| x + 2.0).collect();
-        let l: Vec<f64> = o.iter().map(|x| x - 2.0).collect();
-        let c: Vec<f64> = o
-            .iter()
-            .enumerate()
-            .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
-            .collect();
-        let e = crate::stream::candle_hanging_man(&o, &h, &l, &c).unwrap();
-        let mut s = CandleHangingMan::new();
-        for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
-        }
     }
 }

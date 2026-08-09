@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 133,
+    "complete": 143,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 161,
+    "structure": 171,
     "talib_functions": 161
   },
   "rows": [
@@ -1409,7 +1409,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "spinning_top",
+      "module": "candle_spinning_top",
       "name": "CandleSpinningTop",
       "native_binding": true,
       "native_symbols": [
@@ -1572,7 +1572,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "abandoned_baby",
+      "module": "candle_abandoned_baby",
       "name": "CandleAbandonedBaby",
       "native_binding": true,
       "native_symbols": [
@@ -1587,7 +1587,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "advance_block",
+      "module": "candle_advance_block",
       "name": "CandleAdvanceBlock",
       "native_binding": true,
       "native_symbols": [
@@ -1617,7 +1617,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "conceal_baby_swall",
+      "module": "candle_conceal_baby_swall",
       "name": "CandleConcealBabySwall",
       "native_binding": true,
       "native_symbols": [
@@ -1632,7 +1632,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "counter_attack",
+      "module": "candle_counter_attack",
       "name": "CandleCounterAttack",
       "native_binding": true,
       "native_symbols": [
@@ -1647,7 +1647,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "dark_cloud_cover",
+      "module": "candle_dark_cloud_cover",
       "name": "CandleDarkCloudCover",
       "native_binding": true,
       "native_symbols": [
@@ -1662,7 +1662,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "evening_doji_star",
+      "module": "candle_evening_doji_star",
       "name": "CandleEveningDojiStar",
       "native_binding": true,
       "native_symbols": [
@@ -1677,7 +1677,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "evening_star",
+      "module": "candle_evening_star",
       "name": "CandleEveningStar",
       "native_binding": true,
       "native_symbols": [
@@ -1692,7 +1692,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "gap_side_side_white",
+      "module": "candle_gap_side_side_white",
       "name": "CandleGapSideSideWhite",
       "native_binding": true,
       "native_symbols": [
@@ -1707,7 +1707,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "hanging_man",
+      "module": "candle_hanging_man",
       "name": "CandleHangingMan",
       "native_binding": true,
       "native_symbols": [
