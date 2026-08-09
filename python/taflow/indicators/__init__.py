@@ -142,6 +142,7 @@ from .drawdown import Drawdown
 from .rolling_sharpe import RollingSharpe
 from .rolling_sortino import RollingSortino
 from .rolling_calmar import RollingCalmar
+from .rolling_maximum_drawdown import RollingMaximumDrawdown
 from .hull_moving_average import HullMovingAverage
 from .volume_weighted_moving_average import VolumeWeightedMovingAverage
 from .zero_lag_exponential_moving_average import ZeroLagExponentialMovingAverage
@@ -490,6 +491,7 @@ __all__ = [
     "RollingSharpe",
     "RollingSortino",
     "RollingCalmar",
+    "RollingMaximumDrawdown",
     "HullMovingAverage",
     "VolumeWeightedMovingAverage",
     "ZeroLagExponentialMovingAverage",

@@ -28,7 +28,7 @@ condition = (np.arange(N) % 11) == 0
 new_session = (np.arange(N) % 16) == 0
 ARRAYS = {
     "_input": close, "input": close, "values": close, "price": close,
-    "change": close, "value": close,
+    "change": close, "value": close, "equity": close,
     "left": close, "right": benchmark, "x": close, "y": benchmark,
     "benchmark": benchmark, "close": close, "high": high, "low": low,
     "h": high, "l": low,

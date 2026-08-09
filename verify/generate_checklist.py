@@ -12,9 +12,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYROOT = ROOT / "python" / "taflow"
+PYINDICATORS = PYROOT / "indicators"
 OUT_JSON = Path(__file__).parent / "function_inventory.json"
 OUT_MD = Path(__file__).parent / "FUNCTION_CHECKLIST.md"
-CORE = ROOT / "crates" / "taflow-core" / "src" / "stream"
+CORE = ROOT / "crates" / "taflow-core" / "src" / "indicators"
 TESTS = ROOT / "tests"
 
 
@@ -22,7 +23,10 @@ def public_defs(path: Path) -> list[dict[str, str]]:
     tree = ast.parse(path.read_text())
     native_names: list[str] = []
     for node in tree.body:
-        if isinstance(node, ast.ImportFrom) and ((node.level == 1 and node.module == "_native") or node.module == "taflow._native"):
+        if isinstance(node, ast.ImportFrom) and (
+            (node.level >= 1 and node.module == "_native")
+            or node.module == "taflow._native"
+        ):
             for alias in node.names:
                 native_names.append(alias.name)
                 if alias.asname:
@@ -39,7 +43,10 @@ def module_native_symbols(path: Path) -> list[str]:
     tree = ast.parse(path.read_text())
     result: list[str] = []
     for node in tree.body:
-        if isinstance(node, ast.ImportFrom) and ((node.level == 1 and node.module == "_native") or node.module == "taflow._native"):
+        if isinstance(node, ast.ImportFrom) and (
+            (node.level >= 1 and node.module == "_native")
+            or node.module == "taflow._native"
+        ):
             result.extend(alias.name for alias in node.names)
     return result
 
@@ -67,7 +74,16 @@ def export_modules() -> dict[str, str]:
             module = node.module.rsplit(".", 1)[-1]
             for alias in node.names:
                 result[alias.asname or alias.name] = module
-    return result
+    indicator_tree = ast.parse((PYINDICATORS / "__init__.py").read_text())
+    indicator_modules: dict[str, str] = {}
+    for node in indicator_tree.body:
+        if isinstance(node, ast.ImportFrom) and node.level > 0 and node.module:
+            for alias in node.names:
+                indicator_modules[alias.asname or alias.name] = node.module.rsplit(".", 1)[-1]
+    return {
+        name: indicator_modules.get(name, module) if module == "indicators" else module
+        for name, module in result.items()
+    }
 
 
 def native_functions() -> set[str]:
@@ -91,7 +107,7 @@ def native_classes() -> set[str]:
 
 
 def rust_exports() -> set[str]:
-    text = (ROOT / "crates" / "taflow-core" / "src" / "stream" / "mod.rs").read_text()
+    text = (CORE / "mod.rs").read_text()
     names = set()
     for line in text.splitlines():
         if line.strip().startswith("pub use "):
@@ -187,7 +203,7 @@ def implementation_checklist(rows: list[dict[str, object]]) -> tuple[list[str], 
         name = str(row["name"])
         module = camel_to_snake(name)
         rust_path = CORE / f"{module}.rs"
-        python_path = PYROOT / f"{module}.py"
+        python_path = PYINDICATORS / f"{module}.py"
         rust_text = rust_path.read_text() if rust_path.exists() else ""
         python_defs = public_defs(python_path) if python_path.exists() else []
         python_classes = [item["name"] for item in python_defs if item["kind"] == "class"]
@@ -223,9 +239,13 @@ def implementation_checklist(rows: list[dict[str, object]]) -> tuple[list[str], 
 def main() -> None:
     exported = exported_names()
     export_module_map = export_modules()
-    defs = {d["name"]: d for p in sorted(PYROOT.glob("*.py")) if p.name != "__init__.py" for d in public_defs(p)}
-    module_symbols = {p.stem: module_native_symbols(p) for p in PYROOT.glob("*.py")}
-    module_paths = {p.stem: p for p in PYROOT.glob("*.py")}
+    adapter_paths = [
+        path for path in sorted(PYROOT.rglob("*.py"))
+        if path.name != "__init__.py"
+    ]
+    defs = {d["name"]: d for path in adapter_paths for d in public_defs(path)}
+    module_symbols = {path.stem: module_native_symbols(path) for path in adapter_paths}
+    module_paths = {path.stem: path for path in adapter_paths}
     for _ in range(len(module_paths)):
         for module, path in module_paths.items():
             for imported in local_import_modules(path):

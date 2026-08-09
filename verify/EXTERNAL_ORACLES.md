@@ -1,6 +1,6 @@
 # External correctness oracles
 
-Bars: **2,000** | Matches: **206** | Documented variants: **38** | Failures: **0** | rtol=1e-08, atol=1e-10
+Bars: **2,000** | Matches: **207** | Documented variants: **38** | Failures: **1** | rtol=1e-08, atol=1e-10
 
 Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27, wickra 0.9.9
 
@@ -9,6 +9,7 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas-ta-classic | `arnaud_legoux_moving_average` | `alma` | VARIANT | `5.611e+00` | 0 | independently compared; documented initialization/formula convention differs |
 | pandas-ta-classic | `chaikin_volatility` | `chaikin_volatility` | VARIANT | `2.563e+00` | 9 | independently compared; documented initialization/formula convention differs |
 | pandas-ta-classic | `ease_of_movement` | `ease_of_movement` | VARIANT | `4.531e+03` | 0 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `fisher_transform` | `fisher[length=21]` | **FAIL** | `1.490e+00` | 0 |  |
 | pandas-ta-classic | `keltner_channels` | `lower` | VARIANT | `3.751e+00` | 20 | independently compared; documented initialization/formula convention differs |
 | pandas-ta-classic | `keltner_channels` | `middle` | VARIANT | `4.587e-01` | 19 | independently compared; documented initialization/formula convention differs |
 | pandas-ta-classic | `keltner_channels` | `upper` | VARIANT | `3.846e+00` | 20 | independently compared; documented initialization/formula convention differs |
@@ -87,6 +88,10 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | Wickra | `relative_momentum_index` | `period=14,momentum=5` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
 | Wickra | `relative_momentum_index` | `period=3,momentum=2` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
 | Wickra | `relative_momentum_index` | `period=30,momentum=12` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
+| Wickra | `rolling_maximum_drawdown` | `period=1` | MATCH | `0.000e+00` | 0 | taflow RollingMaximumDrawdown ↔ wickra.MaxDrawdown 0.9.9 |
+| Wickra | `rolling_maximum_drawdown` | `period=14` | MATCH | `0.000e+00` | 0 | taflow RollingMaximumDrawdown ↔ wickra.MaxDrawdown 0.9.9 |
+| Wickra | `rolling_maximum_drawdown` | `period=2` | MATCH | `0.000e+00` | 0 | taflow RollingMaximumDrawdown ↔ wickra.MaxDrawdown 0.9.9 |
+| Wickra | `rolling_maximum_drawdown` | `period=31` | MATCH | `0.000e+00` | 0 | taflow RollingMaximumDrawdown ↔ wickra.MaxDrawdown 0.9.9 |
 | pandas | `amihud` | `all` | MATCH | `2.895e-24` | 0 | Series.pct_change/rolling.mean |
 | pandas | `anchored_vwap` | `lower` | MATCH | `1.062e-11` | 0 | pandas grouped cumulative weighted moments |
 | pandas | `anchored_vwap` | `upper` | MATCH | `1.062e-11` | 0 | pandas grouped cumulative weighted moments |
@@ -145,6 +150,7 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas | `rolling_calmar` | `all` | MATCH | `1.819e-12` | 0 | Series.rolling.apply |
 | pandas | `rolling_entropy` | `all` | MATCH | `4.441e-16` | 0 | Series.rolling.apply/value_counts |
 | pandas | `rolling_information_ratio` | `all` | MATCH | `2.886e-11` | 0 | Rolling.mean/Rolling.std(ddof=0) |
+| pandas | `rolling_maximum_drawdown` | `all` | MATCH | `0.000e+00` | 0 | Series.rolling.apply peak-to-trough drawdown; TA-Lib N/A |
 | pandas | `rolling_mode` | `all` | MATCH | `0.000e+00` | 0 | Series.rolling.apply/value_counts |
 | pandas | `rolling_rank` | `all` | MATCH | `0.000e+00` | 0 | Series.rolling.apply |
 | pandas | `rolling_sharpe` | `all` | MATCH | `6.300e-09` | 0 | Rolling.mean/Rolling.std(ddof=0) |
@@ -170,14 +176,10 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas-ta-classic | `donchian` | `lower` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `donchian` | `mid` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `donchian` | `upper` | MATCH | `0.000e+00` | 0 |  |
-| pandas-ta-classic | `donchian_channels` | `lower` | MATCH | `0.000e+00` | 0 |  |
-| pandas-ta-classic | `donchian_channels` | `mid` | MATCH | `0.000e+00` | 0 |  |
-| pandas-ta-classic | `donchian_channels` | `upper` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `even_better_sinewave` | `ebsw` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `even_better_sinewave` | `ebsw[length=60]` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `fisher_transform` | `fisher` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `fisher_transform` | `fisher[length=11]` | MATCH | `0.000e+00` | 0 |  |
-| pandas-ta-classic | `fisher_transform` | `fisher[length=21]` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `force_index` | `force_index` | MATCH | `0.000e+00` | 0 | taflow exposes the unsmoothed one-bar force; pandas-ta EFI length=1 |
 | pandas-ta-classic | `heikin_ashi` | `close` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `heikin_ashi` | `high` | MATCH | `0.000e+00` | 0 |  |

@@ -104,7 +104,7 @@ SERIES_PARAM_NAMES = {
     "volume", "left", "right", "periods", "period", "real", "price", "column",
     "x", "y", "benchmark", "condition", "new_session", "anchor", "entry",
     "_exit", "input0", "input1", "_input0", "_input1", "h", "l", "change",
-    "value",
+    "value", "equity",
 }
 
 
@@ -265,7 +265,7 @@ class Spec:
         out = []
         for role in self.input_roles:
             if role in ("_input", "input", "values", "price", "real",
-                        "close", "change", "value"):
+                        "close", "change", "value", "equity"):
                 key = "unit" if self.domain == "unit" else "close"
             elif role in ("price0", "left", "x", "input0", "_input0"):
                 key = "close"

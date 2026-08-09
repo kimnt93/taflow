@@ -1,6 +1,6 @@
 # Correctness and performance
 
-Generated 2026-08-09 from 287 indicator implementations.
+Generated 2026-08-10 from 288 indicator implementations.
 
 Every correctness row uses an external implementation. `VARIANT` means the external calculation was executed and the documented causal or initialization difference was observed; it is not a failed comparison. Speedups are `reference time / TAFlow native-kernel time`, so values above 1× favor TAFlow. A dash means that reference is correctness-only in the timing harness.
 
@@ -12,21 +12,21 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.490e-08` |
-| Amihud | [self: `self.amihud`]() | MATCH | `0.000e+00` |
-| AnchoredVolumeWeightedAveragePrice | [self: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | MATCH | `0.000e+00` |
+| Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.895e-24` |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | MATCH | `1.062e-11` |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `5.611e+00` |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.421e-14` |
-| AverageDailyDollarValue | [self: `self.average_daily_dollar_value`]() | MATCH | `0.000e+00` |
+| AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `9.686e-08` |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `2.842e-14` |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `2.132e-14` |
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `5.684e-14` |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `8.527e-14` |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| BarsSince | [self: `self.bars_since`]() | MATCH | `0.000e+00` |
+| BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `7.927e-10` |
-| BreakOfStructureChangeOfCharacter | [self: `self.break_of_structure_change_of_character`]() | MATCH | `0.000e+00` |
+| BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `0.000e+00` |
 | CandleAbandonedBaby | [TA-Lib: `CDLABANDONEDBABY`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | CandleAdvanceBlock | [TA-Lib: `CDLADVANCEBLOCK`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | CandleBeltHold | [TA-Lib: `CDLBELTHOLD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
@@ -91,47 +91,47 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | ChaikinMoneyFlow | [pandas-ta-classic: `pandas_ta_classic.cmf`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `3.993e-14` |
 | ChaikinVolatility | [pandas-ta-classic: `pandas-ta-classic.chaikin_volatility`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `2.563e+00` |
 | ChandeMomentumOscillator | [TA-Lib: `CMO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `6.817e-14` |
-| CloseToCloseSigma | [self: `self.close_to_close_sigma`]() | MATCH | `0.000e+00` |
+| CloseToCloseSigma | [pandas: `pandas.close_to_close_sigma`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `4.857e-17` |
 | CommodityChannelIndex | [TA-Lib: `CCI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.387e-11` |
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
-| CumulativeCount | [self: `self.cumulative_count`]() | MATCH | `0.000e+00` |
-| CumulativeMaximum | [self: `self.cumulative_maximum`]() | MATCH | `0.000e+00` |
-| CumulativeMinimum | [self: `self.cumulative_minimum`]() | MATCH | `0.000e+00` |
-| CumulativeProduct | [self: `self.cumulative_product`]() | MATCH | `0.000e+00` |
-| CumulativeSum | [self: `self.cumulative_sum`]() | MATCH | `0.000e+00` |
-| CumulativeSumControlChart | [self: `self.cumulative_sum_control_chart`]() | MATCH | `0.000e+00` |
-| DecayLinear | [self: `self.decay_linear`]() | MATCH | `0.000e+00` |
+| CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `0.000e+00` |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `0.000e+00` |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `7.105e-15` |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `0.000e+00` |
+| CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.103e-12` |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `1.137e-13` |
 | DirectionalMovementIndex | [TA-Lib: `DX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `2.842e-14` |
-| DonchianChannels | [pandas-ta-classic: `pandas_ta_classic.donchian`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
+| Donchian | [pandas-ta-classic: `pandas_ta_classic.donchian`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
 | DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| Drawdown | [self: `self.drawdown`]() | MATCH | `0.000e+00` |
+| Drawdown | [pandas: `pandas.drawdown`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | EaseOfMovement | [pandas-ta-classic: `pandas-ta-classic.ease_of_movement`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `4.531e+03` |
-| EqualHighsLows | [self: `self.equal_highs_lows`]() | MATCH | `0.000e+00` |
+| EqualHighsLows | [smartmoneyconcepts: `smartmoneyconcepts.equal_highs_lows`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `0.000e+00` |
 | EvenBetterSinewave | [pandas-ta-classic: `pandas_ta_classic.ebsw`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
 | ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| ExponentiallyWeightedCorrelation | [self: `self.ewm_corr`]() | MATCH | `0.000e+00` |
-| ExponentiallyWeightedCovariance | [self: `self.ewm_cov`]() | MATCH | `0.000e+00` |
+| ExponentiallyWeightedCorrelation | [pandas: `pandas.ewm_corr`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.265e-14` |
+| ExponentiallyWeightedCovariance | [pandas: `pandas.ewm_cov`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.558e-13` |
 | ExponentiallyWeightedStandardDeviation | [pandas: `pandas.ewm_std`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `7.816e-14` |
-| ExponentiallyWeightedSum | [self: `self.exponentially_weighted_sum`]() | MATCH | `0.000e+00` |
-| ExponentiallyWeightedVariance | [pandas: `pandas.ewm_var`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.904e-12` |
-| FairValueGap | [self: `self.fair_value_gap`]() | MATCH | `0.000e+00` |
-| Falling | [self: `self.falling`]() | MATCH | `0.000e+00` |
+| ExponentiallyWeightedSum | [pandas: `pandas.exponentially_weighted_sum`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| ExponentiallyWeightedVariance | [Polars: `Polars.ewm_var`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `1.066e-14` |
+| FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | MATCH | `0.000e+00` |
+| Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| FibonacciRetracement | [self: `self.fib_retracement`]() | MATCH | `0.000e+00` |
-| FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | FAIL | `1.490e+00` |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
-| FracDiff | [self: `self.frac_diff`]() | MATCH | `0.000e+00` |
-| FractalDimension | [self: `self.fractal_dimension`]() | MATCH | `0.000e+00` |
-| GapDown | [self: `self.gap_down`]() | MATCH | `0.000e+00` |
-| GapUp | [self: `self.gap_up`]() | MATCH | `0.000e+00` |
-| GarmanKlass | [self: `self.garman_klass`]() | MATCH | `0.000e+00` |
-| GarmanKlassYangZhang | [self: `self.garman_klass_yang_zhang`]() | MATCH | `0.000e+00` |
-| HedgeRatio | [self: `self.hedge_ratio`]() | MATCH | `0.000e+00` |
+| FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.155e-13` |
+| FractalDimension | [pandas: `pandas.fractal_dimension`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.399e-14` |
+| GapDown | [pandas: `pandas.gap_down`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| GapUp | [pandas: `pandas.gap_up`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.995e-17` |
+| GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.429e-17` |
+| HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.353e-09` |
 | HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
-| HigherHigh | [self: `self.higher_high`]() | MATCH | `0.000e+00` |
-| HighestSince | [self: `self.highest_since`]() | MATCH | `0.000e+00` |
+| HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | HilbertTransformDominantCyclePhase | [TA-Lib: `HT_DCPHASE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | HilbertTransformPhasor | [TA-Lib: `HT_PHASOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
@@ -139,45 +139,45 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | HilbertTransformTrendMode | [TA-Lib: `HT_TRENDMODE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | HullMovingAverage | [pandas-ta-classic: `pandas_ta_classic.hma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
-| Hurst | [self: `self.hurst`]() | MATCH | `0.000e+00` |
+| Hurst | [pandas: `pandas.hurst`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.388e-14` |
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
-| InsideBar | [self: `self.inside_bar`]() | MATCH | `0.000e+00` |
+| InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.421e-14` |
 | JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `4.263e-14` |
-| KalmanHedgeRatio | [self: `self.kalman_hedge_ratio`]() | MATCH | `0.000e+00` |
+| KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `2.842e-14` |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `3.846e+00` |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `2.910e-10` |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `1.824e+04` |
-| Lag | [self: `self.lag`]() | MATCH | `0.000e+00` |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | MATCH | `0.000e+00` |
-| Liquidity | [self: `self.liquidity`]() | MATCH | `0.000e+00` |
+| Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `2.000e+00` |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
-| LowerLow | [self: `self.lower_low`]() | MATCH | `0.000e+00` |
-| LowestSince | [self: `self.lowest_since`]() | MATCH | `0.000e+00` |
+| LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `4.737e-02` |
-| MathAbs | [self: `self.math_abs`]() | MATCH | `0.000e+00` |
+| MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| MathAcosh | [self: `self.math_acosh`]() | MATCH | `0.000e+00` |
+| MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
 | MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| MathAsinh | [self: `self.math_asinh`]() | MATCH | `0.000e+00` |
+| MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| MathAtanh | [self: `self.math_atanh`]() | MATCH | `0.000e+00` |
-| MathCbrt | [self: `self.math_cbrt`]() | MATCH | `0.000e+00` |
+| MathAtanh | [NumPy: `numpy.arctanh`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `1.110e-16` |
+| MathCbrt | [NumPy: `numpy.cbrt`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `6.661e-16` |
 | MathCeil | [TA-Lib: `CEIL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | MathCos | [TA-Lib: `COS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| MathCot | [self: `self.math_cot`]() | MATCH | `0.000e+00` |
-| MathDegrees | [self: `self.math_degrees`]() | MATCH | `0.000e+00` |
+| MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
+| MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
 | MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
+| MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `4.441e-16` |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| MathLog1p | [self: `self.math_log1p`]() | MATCH | `0.000e+00` |
+| MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
 | MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| MathRadians | [self: `self.math_radians`]() | MATCH | `0.000e+00` |
+| MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
@@ -198,82 +198,85 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `5.278e+02` |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| OpeningRange | [self: `self.opening_range`]() | MATCH | `0.000e+00` |
-| OrderBlock | [self: `self.order_block`]() | MATCH | `0.000e+00` |
-| OrnsteinUhlenbeckHalfLife | [self: `self.ornstein_uhlenbeck_half_life`]() | MATCH | `0.000e+00` |
-| OutsideBar | [self: `self.outside_bar`]() | MATCH | `0.000e+00` |
+| OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `0.000e+00` |
+| OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `3.547e-09` |
+| OutsideBar | [pandas: `pandas.outside_bar`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | ParabolicMovingAverageStop | [pandas-ta-classic: `pandas-ta-classic.pmax`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `5.684e-14` |
 | ParabolicSar | [TA-Lib: `SAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | ParabolicSarExtended | [TA-Lib: `SAREXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| Parkinson | [self: `self.parkinson`]() | MATCH | `0.000e+00` |
+| Parkinson | [pandas: `pandas.parkinson`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.602e-17` |
 | PercentagePriceOscillator | [TA-Lib: `PPO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| PivotPoints | [self: `self.pivot_points`]() | MATCH | `0.000e+00` |
+| PivotPoints | [pandas: `pandas.pivot_points`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.421e-14` |
 | PlusDirectionalMovement | [TA-Lib: `PLUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `4.481e+02` |
-| PremiumDiscount | [self: `self.premium_discount`]() | MATCH | `0.000e+00` |
-| PreviousHighLow | [self: `self.previous_high_low`]() | MATCH | `0.000e+00` |
+| PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `4.564e+01` |
 | RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.421e-14` |
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RelativeMomentumIndex | [self: `wickra.RMI`]() | MATCH | `0.000e+00` |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | MATCH | `1.421e-14` |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| Retracements | [self: `self.retracements`]() | MATCH | `0.000e+00` |
-| Rising | [self: `self.rising`]() | MATCH | `0.000e+00` |
-| RogersSatchell | [self: `self.rogers_satchell`]() | MATCH | `0.000e+00` |
-| RollSpread | [self: `self.roll_spread`]() | MATCH | `0.000e+00` |
-| RollingAlpha | [self: `self.rolling_alpha`]() | MATCH | `0.000e+00` |
-| RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RollingArgmin | [TA-Lib: `MININDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RollingAutocorr | [self: `self.rolling_autocorr`]() | MATCH | `0.000e+00` |
+| Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `6.093e+02` |
+| Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.821e-17` |
+| RollSpread | [pandas: `pandas.roll_spread`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.623e-14` |
+| RollingAlpha | [pandas: `pandas.rolling_alpha`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `8.285e-10` |
+| RollingAutocorr | [pandas: `pandas.rolling_autocorr`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `6.661e-16` |
 | RollingAverageDeviation | [TA-Lib: `AVGDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RollingCalmar | [self: `self.rolling_calmar`]() | MATCH | `0.000e+00` |
+| RollingCalmar | [pandas: `pandas.rolling_calmar`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.819e-12` |
 | RollingCorrelation | [TA-Lib: `CORREL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RollingCov | [pandas: `pandas.rolling_cov`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.282e-11` |
-| RollingEntropy | [self: `self.rolling_entropy`]() | MATCH | `0.000e+00` |
-| RollingInformationRatio | [self: `self.rolling_information_ratio`]() | MATCH | `0.000e+00` |
+| RollingCovariance | [pandas: `pandas.rolling_covariance`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.282e-11` |
+| RollingEntropy | [pandas: `pandas.rolling_entropy`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `4.441e-16` |
+| RollingInformationRatio | [pandas: `pandas.rolling_information_ratio`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.886e-11` |
+| RollingInterquartileRange | [Polars: `Polars.rolling_interquartile_range`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `0.000e+00` |
 | RollingKurtosis | [pandas: `pandas.rolling_kurtosis`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.332e-15` |
 | RollingLinearRegression | [TA-Lib: `LINEARREG`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `5.969e-13` |
 | RollingLinearRegressionAngle | [TA-Lib: `LINEARREG_ANGLE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `4.924e-12` |
 | RollingLinearRegressionIntercept | [TA-Lib: `LINEARREG_INTERCEPT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `5.969e-13` |
 | RollingLinearRegressionSlope | [TA-Lib: `LINEARREG_SLOPE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `9.137e-14` |
-| RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
+| RollingMaximum | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
+| RollingMaximumDrawdown | [pandas: `pandas.rolling_maximum_drawdown`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| RollingMaximumIndex | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RollingMedian | [pandas: `pandas.rolling_median`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | RollingMidpoint | [TA-Lib: `MIDPOINT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RollingMidprice | [TA-Lib: `MIDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RollingMin | [TA-Lib: `MIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RollingMinMax | [TA-Lib: `MINMAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RollingMinMaxIndex | [TA-Lib: `MINMAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RollingMode | [self: `self.rolling_mode`]() | MATCH | `0.000e+00` |
-| RollingQuantile | [pandas: `pandas.rolling_quantile`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
-| RollingRank | [self: `self.rolling_rank`]() | MATCH | `0.000e+00` |
-| RollingSharpe | [self: `self.rolling_sharpe`]() | MATCH | `0.000e+00` |
+| RollingMinimum | [TA-Lib: `MIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
+| RollingMinimumIndex | [TA-Lib: `MININDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
+| RollingMode | [pandas: `pandas.rolling_mode`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| RollingPercentile | [Polars: `Polars.rolling_percentile`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `0.000e+00` |
+| RollingQuantile | [Polars: `Polars.rolling_quantile`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | MATCH | `0.000e+00` |
+| RollingRank | [pandas: `pandas.rolling_rank`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| RollingSharpe | [pandas: `pandas.rolling_sharpe`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `6.300e-09` |
 | RollingSkew | [pandas: `pandas.rolling_skew`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `8.882e-16` |
-| RollingSortino | [self: `self.rolling_sortino`]() | MATCH | `0.000e+00` |
+| RollingSortino | [pandas: `pandas.rolling_sortino`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | RollingStandardDeviation | [TA-Lib: `STDDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RollingSum | [TA-Lib: `SUM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RollingTimeSeriesForecast | [TA-Lib: `TSF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `6.821e-13` |
 | RollingVariance | [TA-Lib: `VAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RollingVolumeWeightedAveragePrice | [self: `self.rolling_vwap`]() | MATCH | `0.000e+00` |
-| RollingWinsorize | [self: `self.rolling_winsorize`]() | MATCH | `0.000e+00` |
+| RollingVolumeWeightedAveragePrice | [pandas: `pandas.rolling_vwap`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `5.684e-14` |
+| RollingWinsorize | [pandas: `pandas.rolling_winsorize`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.421e-14` |
 | RollingZScore | [pandas: `pandas.rolling_zscore`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `4.771e-14` |
 | SchaffTrendCycle | [pandas-ta-classic: `pandas_ta_classic.stc`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `1.000e-08` |
-| SessionVolumeLevels | [self: `self.session_volume_levels`]() | MATCH | `0.000e+00` |
-| Sessions | [self: `self.sessions`]() | MATCH | `0.000e+00` |
-| SignalDelay | [self: `self.signal_delay`]() | MATCH | `0.000e+00` |
-| SignedPower | [self: `self.signed_power`]() | MATCH | `0.000e+00` |
+| SessionVolumeLevels | [pandas: `pandas.session_volume_levels`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| Sessions | [smartmoneyconcepts: `smartmoneyconcepts.sessions`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | MATCH | `3.808e-06` |
+| SignalDelay | [pandas: `pandas.signal_delay`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| SignedPower | [NumPy: `numpy.sign/numpy.abs/numpy.power`](https://numpy.org/doc/stable/reference/ufuncs.html) | MATCH | `0.000e+00` |
 | SimpleMovingAverage | [TA-Lib: `SMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| SmoothedTrendChannel | [self: `self.ssl_channel`]() | MATCH | `0.000e+00` |
-| SpreadZScore | [self: `self.spread_zscore`]() | MATCH | `0.000e+00` |
+| SmoothedTrendChannel | [pandas: `pandas.ssl_channel`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `1.279e-13` |
+| SpreadZScore | [pandas: `pandas.spread_zscore`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `4.680e-14` |
 | Squeeze | [pandas-ta-classic: `pandas-ta-classic.squeeze`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `3.553e-15` |
 | SqueezePro | [pandas-ta-classic: `pandas-ta-classic.squeeze_pro`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `3.553e-15` |
 | StochasticOscillator | [TA-Lib: `STOCH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | StochasticRelativeStrengthIndex | [TA-Lib: `STOCHRSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | Supertrend | [pandas-ta-classic: `pandas-ta-classic.supertrend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `1.421e-14` |
-| SwingHighsLows | [self: `self.swing_highs_lows`]() | MATCH | `0.000e+00` |
-| TimeSeriesRank | [self: `self.time_series_rank`]() | MATCH | `0.000e+00` |
+| SwingHighLow | [self: `self.swing_high_low`]() | MATCH | `0.000e+00` |
+| TimeSeriesRank | [pandas: `pandas.time_series_rank`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | TomDeMarkSequential | [pandas-ta-classic: `pandas-ta-classic.td_sequential`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
 | TriangularMovingAverage | [TA-Lib: `TRIMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `6.821e-13` |
 | TripleExponentialAverage | [TA-Lib: `T3`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `5.684e-13` |
@@ -284,7 +287,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `5.684e-14` |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `1.169e+01` |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.421e-14` |
-| ValueWhen | [self: `self.value_when`]() | MATCH | `0.000e+00` |
+| ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `1.421e-14` |
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `6.091e+07` |
@@ -293,14 +296,14 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `5.684e-14` |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.857e-10` |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `2.842e-14` |
-| YangZhang | [self: `self.yang_zhang`]() | MATCH | `0.000e+00` |
+| YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.776e-17` |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `7.105e-14` |
 
 ## 2. Performance on vector
 
 | Class | Reference | 1k bars | 10k bars | 100k bars | 1m bars |
 |---|---|---:|---:|---:|---:|
-| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.74× | 1.31× | 0.87× | 0.79× |
+| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.99× | 1.34× | 0.94× | 0.79× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.39× | 1.28× | 1.03× | 1.00× |
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.96× | 1.19× | 0.52× | 0.56× |
 | MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.50× | 4.81× | 1.64× | 1.04× |
@@ -315,7 +318,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.56× | 1.61× | 1.19× | 1.22× |
 | RollingAverageDeviation | [TA-Lib: `AVGDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.41× | 1.04× | 0.91× | 0.91× |
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.59× | 1.38× | 0.44× | 0.62× |
-| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.00× | 2.57× | 1.40× | 1.01× |
+| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.50× | 2.39× | 1.73× | 1.01× |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.80× | 1.53× | 1.13× | 1.09× |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.19× | 1.36× | 0.54× | 0.63× |
 | CommodityChannelIndex | [TA-Lib: `CCI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.20× | 1.17× | 0.95× | 1.10× |
@@ -385,40 +388,40 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | RollingCorrelation | [TA-Lib: `CORREL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.80× | 1.85× | 1.13× | 1.19× |
 | MathCos | [TA-Lib: `COS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.31× | 1.22× | 1.17× | 1.02× |
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.39× | 1.53× | 1.08× | 1.13× |
-| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.87× | 1.55× | 1.17× | 1.99× |
+| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.49× | 1.64× | 1.04× | 1.83× |
 | MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.30× | 4.08× | 1.50× | 0.86× |
 | DirectionalMovementIndex | [TA-Lib: `DX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.17× | 1.19× | 0.88× | 0.84× |
-| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.95× | 2.19× | 1.24× | 1.01× |
+| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.64× | 2.22× | 1.25× | 0.72× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.62× | 1.45× | 1.02× | 0.96× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.14× | 1.92× | 0.76× | 0.72× |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 1.08× | 1.04× | 0.94× |
 | HilbertTransformDominantCyclePhase | [TA-Lib: `HT_DCPHASE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.43× | 4.32× | 4.29× | 3.80× |
 | HilbertTransformPhasor | [TA-Lib: `HT_PHASOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.61× | 1.11× | 0.97× | 1.04× |
 | HilbertTransformSineWave | [TA-Lib: `HT_SINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.39× | 3.26× | 3.23× | 3.38× |
-| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.14× | 0.93× | 0.79× | 0.80× |
+| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.16× | 0.85× | 0.82× | 0.82× |
 | HilbertTransformTrendMode | [TA-Lib: `HT_TRENDMODE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.83× | 2.85× | 2.69× | 2.88× |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.93× | 5.11× | 4.95× | 4.61× |
-| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 6.55× | 1.58× | 1.13× | 0.98× |
+| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 6.52× | 1.86× | 1.08× | 0.92× |
 | RollingLinearRegression | [TA-Lib: `LINEARREG`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.62× | 1.21× | 1.00× | 0.95× |
 | RollingLinearRegressionAngle | [TA-Lib: `LINEARREG_ANGLE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.48× | 1.17× | 0.94× | 0.96× |
 | RollingLinearRegressionIntercept | [TA-Lib: `LINEARREG_INTERCEPT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.11× | 1.23× | 1.11× | 0.96× |
 | RollingLinearRegressionSlope | [TA-Lib: `LINEARREG_SLOPE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.13× | 1.22× | 1.00× | 0.97× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.97× | 1.57× | 1.00× | 1.06× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.49× | 1.32× | 1.02× | 0.88× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.18× | 2.43× | 1.11× | 0.95× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.22× | 2.48× | 1.14× | 0.96× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 11.09× | 5.41× | 4.10× | 5.84× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.29× | 1.20× | 0.76× | 1.26× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 10.01× | 5.33× | 4.48× | 6.10× |
-| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.01× | 0.98× | 0.92× |
+| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 0.95× | 0.87× | 0.96× |
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.93× | 0.67× | 0.69× | 0.78× |
-| RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.20× | 2.43× | 1.55× | 1.29× |
-| RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.78× | 1.84× | 1.34× | 1.26× |
+| RollingMax | — | 7.20× | 2.43× | 1.55× | 1.29× |
+| RollingArgmax | — | 4.78× | 1.84× | 1.34× | 1.26× |
 | MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 6.36× | 1.96× | 0.50× | 0.53× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.34× | 1.81× | 1.56× | 1.58× |
 | RollingMidpoint | [TA-Lib: `MIDPOINT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.07× | 1.33× | 0.88× | 0.79× |
 | RollingMidprice | [TA-Lib: `MIDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.73× | 1.38× | 0.97× | 0.81× |
-| RollingMin | [TA-Lib: `MIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.75× | 2.42× | 1.66× | 1.35× |
-| RollingArgmin | [TA-Lib: `MININDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.84× | 1.94× | 1.35× | 1.30× |
+| RollingMin | — | 9.75× | 2.42× | 1.66× | 1.35× |
+| RollingArgmin | — | 5.84× | 1.94× | 1.35× | 1.30× |
 | RollingMinMax | [TA-Lib: `MINMAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.72× | 1.76× | 1.24× | 1.02× |
 | RollingMinMaxIndex | [TA-Lib: `MINMAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.20× | 1.56× | 1.26× | 1.15× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.10× | 0.95× | 0.71× | 0.81× |
@@ -461,131 +464,132 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.63× | 1.98× | 0.65× | 0.62× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.73× | 1.26× | 0.99× | 0.86× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.24× | 1.43× | 0.68× | 0.61× |
-| Amihud | [self: `self.amihud`]() | — | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [self: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 110.09× | 23.96× | 8.15× | 9.20× |
+| Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 110.09× | 23.96× | 8.15× | 9.20× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| AverageDailyDollarValue | [self: `self.average_daily_dollar_value`]() | — | — | — | — |
+| AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| BarsSince | [self: `self.bars_since`]() | — | — | — | — |
-| BreakOfStructureChangeOfCharacter | [self: `self.break_of_structure_change_of_character`]() | — | — | — | — |
+| BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
 | ChaikinMoneyFlow | [pandas-ta-classic: `pandas_ta_classic.cmf`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | ChaikinVolatility | [pandas-ta-classic: `pandas-ta-classic.chaikin_volatility`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| CloseToCloseSigma | [self: `self.close_to_close_sigma`]() | — | — | — | — |
+| CloseToCloseSigma | [pandas: `pandas.close_to_close_sigma`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| CumulativeCount | [self: `self.cumulative_count`]() | — | — | — | — |
-| CumulativeMaximum | [self: `self.cumulative_maximum`]() | 10.42× | 3.14× | 1.74× | 1.63× |
-| CumulativeMinimum | [self: `self.cumulative_minimum`]() | 10.89× | 2.95× | 1.73× | 1.60× |
-| CumulativeProduct | [self: `self.cumulative_product`]() | 18.28× | 7.45× | 4.60× | 3.94× |
-| CumulativeSum | [self: `self.cumulative_sum`]() | 18.30× | 7.19× | 4.62× | 3.96× |
-| CumulativeSumControlChart | [self: `self.cumulative_sum_control_chart`]() | — | — | — | — |
-| DecayLinear | [self: `self.decay_linear`]() | — | — | — | — |
+| CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 10.42× | 3.14× | 1.74× | 1.63× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 10.89× | 2.95× | 1.73× | 1.60× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 18.28× | 7.45× | 4.60× | 3.94× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 18.30× | 7.19× | 4.62× | 3.96× |
+| CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| DonchianChannels | [pandas-ta-classic: `pandas_ta_classic.donchian`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| Drawdown | [self: `self.drawdown`]() | — | — | — | — |
+| DonchianChannels | — | — | — | — | — |
+| Drawdown | [pandas: `pandas.drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | EaseOfMovement | [pandas-ta-classic: `pandas-ta-classic.ease_of_movement`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| EqualHighsLows | [self: `self.equal_highs_lows`]() | — | — | — | — |
+| EqualHighsLows | [smartmoneyconcepts: `smartmoneyconcepts.equal_highs_lows`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
 | EvenBetterSinewave | [pandas-ta-classic: `pandas_ta_classic.ebsw`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| ExponentiallyWeightedCorrelation | [self: `self.ewm_corr`]() | — | — | — | — |
-| ExponentiallyWeightedCovariance | [self: `self.ewm_cov`]() | — | — | — | — |
+| ExponentiallyWeightedCorrelation | [pandas: `pandas.ewm_corr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| ExponentiallyWeightedCovariance | [pandas: `pandas.ewm_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | ExponentiallyWeightedStandardDeviation | [pandas: `pandas.ewm_std`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| ExponentiallyWeightedVariance | [pandas: `pandas.ewm_var`](https://pandas.pydata.org/docs/reference/window.html) | 9.29× | 4.18× | 3.35× | 2.96× |
-| ExponentiallyWeightedSum | [self: `self.exponentially_weighted_sum`]() | — | — | — | — |
-| FairValueGap | [self: `self.fair_value_gap`]() | — | — | — | — |
-| Falling | [self: `self.falling`]() | — | — | — | — |
-| FibonacciRetracement | [self: `self.fib_retracement`]() | 30.17× | 4.14× | 1.81× | 1.66× |
+| ExponentiallyWeightedVariance | [Polars: `Polars.ewm_var`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 9.29× | 4.18× | 3.35× | 2.96× |
+| ExponentiallyWeightedSum | [pandas: `pandas.exponentially_weighted_sum`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
+| Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 30.17× | 4.14× | 1.81× | 1.66× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| FracDiff | [self: `self.frac_diff`]() | — | — | — | — |
-| FractalDimension | [self: `self.fractal_dimension`]() | — | — | — | — |
-| GapDown | [self: `self.gap_down`]() | — | — | — | — |
-| GapUp | [self: `self.gap_up`]() | — | — | — | — |
-| GarmanKlass | [self: `self.garman_klass`]() | — | — | — | — |
-| GarmanKlassYangZhang | [self: `self.garman_klass_yang_zhang`]() | — | — | — | — |
-| HedgeRatio | [self: `self.hedge_ratio`]() | — | — | — | — |
+| FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| FractalDimension | [pandas: `pandas.fractal_dimension`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| GapDown | [pandas: `pandas.gap_down`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| GapUp | [pandas: `pandas.gap_up`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4097.09× | 7673.35× | 7945.52× | 3638.04× |
-| HigherHigh | [self: `self.higher_high`]() | — | — | — | — |
-| HighestSince | [self: `self.highest_since`]() | — | — | — | — |
+| HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | HullMovingAverage | [pandas-ta-classic: `pandas_ta_classic.hma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| Hurst | [self: `self.hurst`]() | — | — | — | — |
+| Hurst | [pandas: `pandas.hurst`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| InsideBar | [self: `self.inside_bar`]() | — | — | — | — |
+| InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 228.41× | 257.67× | 220.98× | 271.22× |
-| KalmanHedgeRatio | [self: `self.kalman_hedge_ratio`]() | — | — | — | — |
+| KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| Lag | [self: `self.lag`]() | 11.76× | 2.61× | 0.48× | 0.38× |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 11.76× | 2.61× | 0.48× | 0.38× |
 | LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 10.30× | 2.74× | 1.99× | 5.85× |
-| Liquidity | [self: `self.liquidity`]() | — | — | — | — |
+| Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 21.32× | 3.07× | 0.95× | 1.22× |
-| LowerLow | [self: `self.lower_low`]() | — | — | — | — |
-| LowestSince | [self: `self.lowest_since`]() | — | — | — | — |
+| LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| MathAbs | [self: `self.math_abs`]() | 0.78× | 0.76× | 0.96× | 0.92× |
-| MathAcosh | [self: `self.math_acosh`]() | 0.94× | 1.00× | 1.01× | 0.98× |
-| MathAsinh | [self: `self.math_asinh`]() | 0.82× | 0.98× | 0.97× | 1.01× |
-| MathAtanh | [self: `self.math_atanh`]() | 1.10× | 0.99× | 1.15× | 1.16× |
-| MathCbrt | [self: `self.math_cbrt`]() | 0.80× | 0.87× | 0.84× | 1.03× |
-| MathCot | [self: `self.math_cot`]() | 0.96× | 1.04× | 1.04× | 1.04× |
-| MathDegrees | [self: `self.math_degrees`]() | 1.15× | 2.78× | 3.75× | 2.49× |
-| MathLog1p | [self: `self.math_log1p`]() | 0.91× | 1.02× | 1.07× | 1.00× |
-| MathRadians | [self: `self.math_radians`]() | 1.21× | 2.78× | 4.01× | 2.41× |
+| MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.78× | 0.76× | 0.96× | 0.92× |
+| MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.94× | 1.00× | 1.01× | 0.98× |
+| MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.82× | 0.98× | 0.97× | 1.01× |
+| MathAtanh | [NumPy: `numpy.arctanh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.10× | 0.99× | 1.15× | 1.16× |
+| MathCbrt | [NumPy: `numpy.cbrt`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.80× | 0.87× | 0.84× | 1.03× |
+| MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.96× | 1.04× | 1.04× | 1.04× |
+| MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.15× | 2.78× | 3.75× | 2.49× |
+| MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.91× | 1.02× | 1.07× | 1.00× |
+| MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.21× | 2.78× | 4.01× | 2.41× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| OpeningRange | [self: `self.opening_range`]() | — | — | — | — |
-| OrderBlock | [self: `self.order_block`]() | — | — | — | — |
-| OrnsteinUhlenbeckHalfLife | [self: `self.ornstein_uhlenbeck_half_life`]() | — | — | — | — |
-| OutsideBar | [self: `self.outside_bar`]() | — | — | — | — |
-| Parkinson | [self: `self.parkinson`]() | — | — | — | — |
-| PivotPoints | [self: `self.pivot_points`]() | — | — | — | — |
+| OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
+| OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| OutsideBar | [pandas: `pandas.outside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| Parkinson | [pandas: `pandas.parkinson`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| PivotPoints | [pandas: `pandas.pivot_points`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | ParabolicMovingAverageStop | [pandas-ta-classic: `pandas-ta-classic.pmax`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 133.16× | 86.84× | — | — |
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| PremiumDiscount | [self: `self.premium_discount`]() | — | — | — | — |
-| PreviousHighLow | [self: `self.previous_high_low`]() | — | — | — | — |
-| Retracements | [self: `self.retracements`]() | — | — | — | — |
-| Rising | [self: `self.rising`]() | — | — | — | — |
-| RelativeMomentumIndex | [self: `wickra.RMI`]() | 3.44× | 4.32× | 4.08× | 6.84× |
-| RogersSatchell | [self: `self.rogers_satchell`]() | — | — | — | — |
-| RollSpread | [self: `self.roll_spread`]() | — | — | — | — |
-| RollingAlpha | [self: `self.rolling_alpha`]() | — | — | — | — |
-| RollingAutocorr | [self: `self.rolling_autocorr`]() | — | — | — | — |
-| RollingCalmar | [self: `self.rolling_calmar`]() | — | — | — | — |
-| RollingCov | [pandas: `pandas.rolling_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| RollingEntropy | [self: `self.rolling_entropy`]() | — | — | — | — |
-| RollingInformationRatio | [self: `self.rolling_information_ratio`]() | — | — | — | — |
+| PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
+| Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
+| Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 3.44× | 4.32× | 4.08× | 6.84× |
+| RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollSpread | [pandas: `pandas.roll_spread`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingAlpha | [pandas: `pandas.rolling_alpha`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingAutocorr | [pandas: `pandas.rolling_autocorr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingCalmar | [pandas: `pandas.rolling_calmar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingCov | — | — | — | — | — |
+| RollingEntropy | [pandas: `pandas.rolling_entropy`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingInformationRatio | [pandas: `pandas.rolling_information_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | RollingKurtosis | [pandas: `pandas.rolling_kurtosis`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingMaximumDrawdown | [pandas: `pandas.rolling_maximum_drawdown`](https://pandas.pydata.org/docs/reference/window.html) | 172.57× | 187.68× | 198.60× | 191.29× |
 | RollingMedian | [pandas: `pandas.rolling_median`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| RollingMode | [self: `self.rolling_mode`]() | — | — | — | — |
-| RollingQuantile | [pandas: `pandas.rolling_quantile`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| RollingRank | [self: `self.rolling_rank`]() | — | — | — | — |
-| RollingSharpe | [self: `self.rolling_sharpe`]() | — | — | — | — |
+| RollingMode | [pandas: `pandas.rolling_mode`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingQuantile | [Polars: `Polars.rolling_quantile`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | — | — | — | — |
+| RollingRank | [pandas: `pandas.rolling_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingSharpe | [pandas: `pandas.rolling_sharpe`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | RollingSkew | [pandas: `pandas.rolling_skew`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| RollingSortino | [self: `self.rolling_sortino`]() | — | — | — | — |
-| RollingVolumeWeightedAveragePrice | [self: `self.rolling_vwap`]() | — | — | — | — |
-| RollingWinsorize | [self: `self.rolling_winsorize`]() | — | — | — | — |
+| RollingSortino | [pandas: `pandas.rolling_sortino`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingVolumeWeightedAveragePrice | [pandas: `pandas.rolling_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RollingWinsorize | [pandas: `pandas.rolling_winsorize`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | RollingZScore | [pandas: `pandas.rolling_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | SchaffTrendCycle | [pandas-ta-classic: `pandas_ta_classic.stc`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| SessionVolumeLevels | [self: `self.session_volume_levels`]() | — | — | — | — |
-| Sessions | [self: `self.sessions`]() | — | — | — | — |
-| SignalDelay | [self: `self.signal_delay`]() | — | — | — | — |
-| SignedPower | [self: `self.signed_power`]() | 1.19× | 1.07× | 0.97× | 1.51× |
-| SpreadZScore | [self: `self.spread_zscore`]() | — | — | — | — |
+| SessionVolumeLevels | [pandas: `pandas.session_volume_levels`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| Sessions | [smartmoneyconcepts: `smartmoneyconcepts.sessions`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
+| SignalDelay | [pandas: `pandas.signal_delay`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| SignedPower | [NumPy: `numpy.sign/numpy.abs/numpy.power`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.19× | 1.07× | 0.97× | 1.51× |
+| SpreadZScore | [pandas: `pandas.spread_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | Squeeze | [pandas-ta-classic: `pandas-ta-classic.squeeze`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | SqueezePro | [pandas-ta-classic: `pandas-ta-classic.squeeze_pro`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| SmoothedTrendChannel | [self: `self.ssl_channel`]() | — | — | — | — |
+| SmoothedTrendChannel | [pandas: `pandas.ssl_channel`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | Supertrend | [pandas-ta-classic: `pandas-ta-classic.supertrend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| SwingHighsLows | [self: `self.swing_highs_lows`]() | — | — | — | — |
+| SwingHighsLows | — | — | — | — | — |
 | TomDeMarkSequential | [pandas-ta-classic: `pandas-ta-classic.td_sequential`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| TimeSeriesRank | [self: `self.time_series_rank`]() | — | — | — | — |
+| TimeSeriesRank | [pandas: `pandas.time_series_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | TrueStrengthIndex | [pandas-ta-classic: `pandas-ta-classic.true_strength_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| ValueWhen | [self: `self.value_when`]() | — | — | — | — |
+| ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 137.18× | 62.79× | 52.66× | 50.85× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | VolumeWeightedMovingAverage | [pandas-ta-classic: `pandas_ta_classic.vwma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| YangZhang | [self: `self.yang_zhang`]() | — | — | — | — |
+| YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 
 ## 3. Warm up
@@ -597,24 +601,24 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Class | Reference | 1 thread | 5 threads | 10 threads |
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.55× | 1.91× |
-| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.53× | 2.09× | 2.18× |
+| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.94× | 1.68× | 2.12× |
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.75× | 1.84× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 1.58× | 2.04× |
-| Amihud | [self: `self.amihud`]() | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [self: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 19.96× | 27.84× | 29.07× |
+| Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 19.96× | 27.84× | 29.07× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.99× | 2.06× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.80× | 1.99× |
-| AverageDailyDollarValue | [self: `self.average_daily_dollar_value`]() | — | — | — |
+| AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.44× | 1.93× | 2.20× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.66× | 1.80× |
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.73× | 1.94× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.44× | 1.73× | 1.90× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.06× | 1.53× | 1.83× |
-| BarsSince | [self: `self.bars_since`]() | — | — | — |
-| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 2.07× | 2.52× |
-| BreakOfStructureChangeOfCharacter | [self: `self.break_of_structure_change_of_character`]() | — | — | — |
+| BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.00× | 2.43× | 2.55× |
+| BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | CandleAbandonedBaby | [TA-Lib: `CDLABANDONEDBABY`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.02× | 1.55× | 1.96× |
 | CandleAdvanceBlock | [TA-Lib: `CDLADVANCEBLOCK`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.97× | 1.41× | 1.74× |
 | CandleBeltHold | [TA-Lib: `CDLBELTHOLD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.12× | 1.85× | 1.86× |
@@ -679,93 +683,93 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | ChaikinMoneyFlow | [pandas-ta-classic: `pandas_ta_classic.cmf`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChaikinVolatility | [pandas-ta-classic: `pandas-ta-classic.chaikin_volatility`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChandeMomentumOscillator | [TA-Lib: `CMO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.43× | 1.83× | 2.19× |
-| CloseToCloseSigma | [self: `self.close_to_close_sigma`]() | — | — | — |
+| CloseToCloseSigma | [pandas: `pandas.close_to_close_sigma`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | CommodityChannelIndex | [TA-Lib: `CCI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.95× | 1.92× |
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| CumulativeCount | [self: `self.cumulative_count`]() | — | — | — |
-| CumulativeMaximum | [self: `self.cumulative_maximum`]() | 4.43× | 2.59× | 2.60× |
-| CumulativeMinimum | [self: `self.cumulative_minimum`]() | 3.22× | 2.70× | 2.80× |
-| CumulativeProduct | [self: `self.cumulative_product`]() | 1.17× | 2.16× | 2.71× |
-| CumulativeSum | [self: `self.cumulative_sum`]() | 1.91× | 2.89× | 2.91× |
-| CumulativeSumControlChart | [self: `self.cumulative_sum_control_chart`]() | — | — | — |
-| DecayLinear | [self: `self.decay_linear`]() | — | — | — |
+| CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 4.43× | 2.59× | 2.60× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.22× | 2.70× | 2.80× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 1.17× | 2.16× | 2.71× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 1.91× | 2.89× | 2.91× |
+| CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | DirectionalMovementIndex | [TA-Lib: `DX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.94× | 1.73× | 1.99× |
-| DonchianChannels | [pandas-ta-classic: `pandas_ta_classic.donchian`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.66× | 1.81× |
-| Drawdown | [self: `self.drawdown`]() | — | — | — |
+| DonchianChannels | — | — | — | — |
+| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 2.10× | 2.00× |
+| Drawdown | [pandas: `pandas.drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | EaseOfMovement | [pandas-ta-classic: `pandas-ta-classic.ease_of_movement`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| EqualHighsLows | [self: `self.equal_highs_lows`]() | — | — | — |
+| EqualHighsLows | [smartmoneyconcepts: `smartmoneyconcepts.equal_highs_lows`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | EvenBetterSinewave | [pandas-ta-classic: `pandas_ta_classic.ebsw`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.34× | 1.48× | 1.86× |
-| ExponentiallyWeightedCorrelation | [self: `self.ewm_corr`]() | — | — | — |
-| ExponentiallyWeightedCovariance | [self: `self.ewm_cov`]() | — | — | — |
+| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.78× | 2.03× |
+| ExponentiallyWeightedCorrelation | [pandas: `pandas.ewm_corr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedCovariance | [pandas: `pandas.ewm_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ExponentiallyWeightedStandardDeviation | [pandas: `pandas.ewm_std`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| ExponentiallyWeightedSum | [self: `self.exponentially_weighted_sum`]() | — | — | — |
-| ExponentiallyWeightedVariance | [pandas: `pandas.ewm_var`](https://pandas.pydata.org/docs/reference/window.html) | 2.55× | 2.64× | 2.73× |
-| FairValueGap | [self: `self.fair_value_gap`]() | — | — | — |
-| Falling | [self: `self.falling`]() | — | — | — |
+| ExponentiallyWeightedSum | [pandas: `pandas.exponentially_weighted_sum`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedVariance | [Polars: `Polars.ewm_var`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.55× | 2.64× | 2.73× |
+| FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.33× | 0.91× | 0.94× |
-| FibonacciRetracement | [self: `self.fib_retracement`]() | 7.47× | 11.13× | 16.03× |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 7.47× | 11.13× | 16.03× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| FracDiff | [self: `self.frac_diff`]() | — | — | — |
-| FractalDimension | [self: `self.fractal_dimension`]() | — | — | — |
-| GapDown | [self: `self.gap_down`]() | — | — | — |
-| GapUp | [self: `self.gap_up`]() | — | — | — |
-| GarmanKlass | [self: `self.garman_klass`]() | — | — | — |
-| GarmanKlassYangZhang | [self: `self.garman_klass_yang_zhang`]() | — | — | — |
-| HedgeRatio | [self: `self.hedge_ratio`]() | — | — | — |
+| FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FractalDimension | [pandas: `pandas.fractal_dimension`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapDown | [pandas: `pandas.gap_down`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapUp | [pandas: `pandas.gap_up`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 30.13× | 38.75× | 48.14× |
-| HigherHigh | [self: `self.higher_high`]() | — | — | — |
-| HighestSince | [self: `self.highest_since`]() | — | — | — |
+| HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.36× | 1.74× | 2.07× |
 | HilbertTransformDominantCyclePhase | [TA-Lib: `HT_DCPHASE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.03× | 1.62× | 2.01× |
 | HilbertTransformPhasor | [TA-Lib: `HT_PHASOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.19× | 1.90× | 1.94× |
 | HilbertTransformSineWave | [TA-Lib: `HT_SINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.93× | 2.14× |
 | HilbertTransformTrendMode | [TA-Lib: `HT_TRENDMODE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.18× | 1.81× | 1.96× |
-| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.13× | 1.62× | 2.03× |
+| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 1.68× | 1.91× |
 | HullMovingAverage | [pandas-ta-classic: `pandas_ta_classic.hma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Hurst | [self: `self.hurst`]() | — | — | — |
+| Hurst | [pandas: `pandas.hurst`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| InsideBar | [self: `self.inside_bar`]() | — | — | — |
+| InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.17× | 2.09× | 2.12× |
 | JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 1.79× | 1.93× | 1.72× |
-| KalmanHedgeRatio | [self: `self.kalman_hedge_ratio`]() | — | — | — |
-| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.61× | 2.04× |
+| KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.19× | 1.87× | 1.98× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [self: `self.lag`]() | 1.45× | 2.64× | 2.92× |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 1.45× | 2.64× | 2.92× |
 | LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.28× | 3.71× | 3.26× |
-| Liquidity | [self: `self.liquidity`]() | — | — | — |
+| Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 3.53× | 3.71× | 5.20× |
-| LowerLow | [self: `self.lower_low`]() | — | — | — |
-| LowestSince | [self: `self.lowest_since`]() | — | — | — |
+| LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MathAbs | [self: `self.math_abs`]() | 0.74× | 0.83× | 0.80× |
+| MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.74× | 0.83× | 0.80× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.98× | 1.51× | 1.96× |
-| MathAcosh | [self: `self.math_acosh`]() | 0.55× | 0.93× | 0.86× |
+| MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.55× | 0.93× | 0.86× |
 | MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.88× | 1.69× | 1.90× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.47× | 1.92× | 1.90× |
-| MathAsinh | [self: `self.math_asinh`]() | 0.81× | 0.76× | 0.89× |
+| MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.81× | 0.76× | 0.89× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.34× | 1.97× | 2.04× |
-| MathAtanh | [self: `self.math_atanh`]() | 0.66× | 0.74× | 0.88× |
-| MathCbrt | [self: `self.math_cbrt`]() | 0.43× | 0.63× | 0.84× |
+| MathAtanh | [NumPy: `numpy.arctanh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.66× | 0.74× | 0.88× |
+| MathCbrt | [NumPy: `numpy.cbrt`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.43× | 0.63× | 0.84× |
 | MathCeil | [TA-Lib: `CEIL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.15× | 1.73× | 1.87× |
 | MathCos | [TA-Lib: `COS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.08× | 1.76× | 1.99× |
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.80× | 1.97× | 2.07× |
-| MathCot | [self: `self.math_cot`]() | 0.78× | 0.83× | 0.88× |
-| MathDegrees | [self: `self.math_degrees`]() | 0.69× | 1.03× | 1.22× |
+| MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.78× | 0.83× | 0.88× |
+| MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.69× | 1.03× | 1.22× |
 | MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.03× | 1.53× | 1.81× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.24× | 1.36× | 2.12× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.92× | 1.32× | 1.97× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.15× | 2.01× | 1.93× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.51× | 1.91× | 1.96× |
-| MathLog1p | [self: `self.math_log1p`]() | 0.59× | 0.84× | 0.82× |
+| MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.59× | 0.84× | 0.82× |
 | MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.46× | 1.12× | 1.89× |
-| MathRadians | [self: `self.math_radians`]() | 0.79× | 0.68× | 0.82× |
+| MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.79× | 0.68× | 0.82× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.05× | 1.64× | 1.90× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.47× | 1.50× | 1.97× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.37× | 1.48× | 2.06× |
@@ -774,94 +778,95 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 1.69× | 1.98× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.69× | 1.92× |
-| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.20× | 2.14× | 2.27× |
+| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.30× | 2.01× | 2.14× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.72× | 1.95× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.24× | 1.57× | 1.88× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.02× | 1.44× | 2.01× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.56× | 1.84× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.82× | 2.08× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.20× | 1.85× | 2.10× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.18× | 2.05× | 2.13× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.38× | 2.27× | 2.21× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 2.05× | 2.09× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.99× | 1.62× | 1.98× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.12× | 1.19× | 1.96× |
-| OpeningRange | [self: `self.opening_range`]() | — | — | — |
-| OrderBlock | [self: `self.order_block`]() | — | — | — |
-| OrnsteinUhlenbeckHalfLife | [self: `self.ornstein_uhlenbeck_half_life`]() | — | — | — |
-| OutsideBar | [self: `self.outside_bar`]() | — | — | — |
+| OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OutsideBar | [pandas: `pandas.outside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ParabolicMovingAverageStop | [pandas-ta-classic: `pandas-ta-classic.pmax`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 1.19× | 2.69× | 2.44× |
 | ParabolicSar | [TA-Lib: `SAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.40× | 2.04× | 2.14× |
 | ParabolicSarExtended | [TA-Lib: `SAREXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.18× | 2.64× |
-| Parkinson | [self: `self.parkinson`]() | — | — | — |
+| Parkinson | [pandas: `pandas.parkinson`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PercentagePriceOscillator | [TA-Lib: `PPO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.13× | 2.00× | 1.91× |
-| PivotPoints | [self: `self.pivot_points`]() | — | — | — |
+| PivotPoints | [pandas: `pandas.pivot_points`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.45× | 1.75× | 1.97× |
 | PlusDirectionalMovement | [TA-Lib: `PLUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.11× | 1.82× | 2.18× |
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| PremiumDiscount | [self: `self.premium_discount`]() | — | — | — |
-| PreviousHighLow | [self: `self.previous_high_low`]() | — | — | — |
+| PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.59× | 1.93× | 2.02× |
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 2.13× | 1.93× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.27× | 1.55× | 2.08× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.97× | 1.88× | 2.09× |
-| RelativeMomentumIndex | [self: `wickra.RMI`]() | 0.85× | 0.83× | 0.98× |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 0.85× | 0.83× | 0.98× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.10× | 2.01× |
-| Retracements | [self: `self.retracements`]() | — | — | — |
-| Rising | [self: `self.rising`]() | — | — | — |
-| RogersSatchell | [self: `self.rogers_satchell`]() | — | — | — |
-| RollSpread | [self: `self.roll_spread`]() | — | — | — |
-| RollingAlpha | [self: `self.rolling_alpha`]() | — | — | — |
-| RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.96× | 2.02× | 1.96× |
-| RollingArgmin | [TA-Lib: `MININDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.22× | 1.94× | 1.99× |
-| RollingAutocorr | [self: `self.rolling_autocorr`]() | — | — | — |
+| Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollSpread | [pandas: `pandas.roll_spread`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingAlpha | [pandas: `pandas.rolling_alpha`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingArgmax | — | 0.96× | 2.02× | 1.96× |
+| RollingArgmin | — | 1.22× | 1.94× | 1.99× |
+| RollingAutocorr | [pandas: `pandas.rolling_autocorr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingAverageDeviation | [TA-Lib: `AVGDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.41× | 1.63× | 2.03× |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.59× | 1.62× | 1.79× |
-| RollingCalmar | [self: `self.rolling_calmar`]() | — | — | — |
+| RollingCalmar | [pandas: `pandas.rolling_calmar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingCorrelation | [TA-Lib: `CORREL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.10× | 2.02× | 1.98× |
-| RollingCov | [pandas: `pandas.rolling_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingEntropy | [self: `self.rolling_entropy`]() | — | — | — |
-| RollingInformationRatio | [self: `self.rolling_information_ratio`]() | — | — | — |
+| RollingCov | — | — | — | — |
+| RollingEntropy | [pandas: `pandas.rolling_entropy`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingInformationRatio | [pandas: `pandas.rolling_information_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingKurtosis | [pandas: `pandas.rolling_kurtosis`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingLinearRegression | [TA-Lib: `LINEARREG`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.43× | 1.45× | 2.00× |
 | RollingLinearRegressionAngle | [TA-Lib: `LINEARREG_ANGLE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 1.89× | 1.86× |
 | RollingLinearRegressionIntercept | [TA-Lib: `LINEARREG_INTERCEPT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.50× | 1.80× | 2.02× |
 | RollingLinearRegressionSlope | [TA-Lib: `LINEARREG_SLOPE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.65× | 1.83× |
-| RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.81× | 2.19× |
+| RollingMax | — | 1.83× | 1.81× | 2.19× |
+| RollingMaximumDrawdown | [pandas: `pandas.rolling_maximum_drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMedian | [pandas: `pandas.rolling_median`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMidpoint | [TA-Lib: `MIDPOINT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.56× | 1.99× | 2.15× |
 | RollingMidprice | [TA-Lib: `MIDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.82× | 1.88× |
-| RollingMin | [TA-Lib: `MIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.94× | 1.93× | 2.07× |
+| RollingMin | — | 0.94× | 1.93× | 2.07× |
 | RollingMinMax | [TA-Lib: `MINMAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.31× | 1.79× | 2.11× |
 | RollingMinMaxIndex | [TA-Lib: `MINMAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.94× | 2.20× |
-| RollingMode | [self: `self.rolling_mode`]() | — | — | — |
-| RollingQuantile | [pandas: `pandas.rolling_quantile`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingRank | [self: `self.rolling_rank`]() | — | — | — |
-| RollingSharpe | [self: `self.rolling_sharpe`]() | — | — | — |
+| RollingMode | [pandas: `pandas.rolling_mode`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingQuantile | [Polars: `Polars.rolling_quantile`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | — | — | — |
+| RollingRank | [pandas: `pandas.rolling_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingSharpe | [pandas: `pandas.rolling_sharpe`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingSkew | [pandas: `pandas.rolling_skew`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingSortino | [self: `self.rolling_sortino`]() | — | — | — |
+| RollingSortino | [pandas: `pandas.rolling_sortino`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingStandardDeviation | [TA-Lib: `STDDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.00× | 1.84× | 1.90× |
 | RollingSum | [TA-Lib: `SUM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.93× | 1.92× |
 | RollingTimeSeriesForecast | [TA-Lib: `TSF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.29× | 1.62× | 2.01× |
 | RollingVariance | [TA-Lib: `VAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.08× | 1.74× | 2.15× |
-| RollingVolumeWeightedAveragePrice | [self: `self.rolling_vwap`]() | — | — | — |
-| RollingWinsorize | [self: `self.rolling_winsorize`]() | — | — | — |
+| RollingVolumeWeightedAveragePrice | [pandas: `pandas.rolling_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingWinsorize | [pandas: `pandas.rolling_winsorize`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingZScore | [pandas: `pandas.rolling_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | SchaffTrendCycle | [pandas-ta-classic: `pandas_ta_classic.stc`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SessionVolumeLevels | [self: `self.session_volume_levels`]() | — | — | — |
-| Sessions | [self: `self.sessions`]() | — | — | — |
-| SignalDelay | [self: `self.signal_delay`]() | — | — | — |
-| SignedPower | [self: `self.signed_power`]() | 0.75× | 0.87× | 0.92× |
+| SessionVolumeLevels | [pandas: `pandas.session_volume_levels`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Sessions | [smartmoneyconcepts: `smartmoneyconcepts.sessions`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| SignalDelay | [pandas: `pandas.signal_delay`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SignedPower | [NumPy: `numpy.sign/numpy.abs/numpy.power`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.75× | 0.87× | 0.92× |
 | SimpleMovingAverage | [TA-Lib: `SMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.36× | 1.71× | 1.96× |
-| SmoothedTrendChannel | [self: `self.ssl_channel`]() | — | — | — |
-| SpreadZScore | [self: `self.spread_zscore`]() | — | — | — |
+| SmoothedTrendChannel | [pandas: `pandas.ssl_channel`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SpreadZScore | [pandas: `pandas.spread_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Squeeze | [pandas-ta-classic: `pandas-ta-classic.squeeze`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | SqueezePro | [pandas-ta-classic: `pandas-ta-classic.squeeze_pro`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | StochasticOscillator | [TA-Lib: `STOCH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.46× | 1.81× | 2.29× |
 | StochasticRelativeStrengthIndex | [TA-Lib: `STOCHRSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 1.94× | 2.29× |
 | Supertrend | [pandas-ta-classic: `pandas-ta-classic.supertrend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SwingHighsLows | [self: `self.swing_highs_lows`]() | — | — | — |
-| TimeSeriesRank | [self: `self.time_series_rank`]() | — | — | — |
+| SwingHighsLows | — | — | — | — |
+| TimeSeriesRank | [pandas: `pandas.time_series_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | TomDeMarkSequential | [pandas-ta-classic: `pandas-ta-classic.td_sequential`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | TriangularMovingAverage | [TA-Lib: `TRIMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.40× | 1.91× | 2.00× |
 | TripleExponentialAverage | [TA-Lib: `T3`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.69× | 2.11× |
@@ -872,7 +877,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.90× | 1.91× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.38× | 1.91× | 1.94× |
-| ValueWhen | [self: `self.value_when`]() | — | — | — |
+| ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 1.74× | 1.56× | 1.83× |
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.50× | 1.96× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -881,7 +886,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 1.60× | 1.89× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.93× | 1.76× | 2.12× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.98× | 1.60× | 2.02× |
-| YangZhang | [self: `self.yang_zhang`]() | — | — | — |
+| YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 
 ### 10 bars
@@ -889,24 +894,24 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Class | Reference | 1 thread | 5 threads | 10 threads |
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 2.02× | 1.95× |
-| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.09× | 2.26× | 2.30× |
+| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.14× | 2.36× |
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.74× | 1.97× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.00× | 1.94× |
-| Amihud | [self: `self.amihud`]() | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [self: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 26.54× | 27.61× | 28.56× |
+| Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 26.54× | 27.61× | 28.56× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.04× | 2.11× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.95× | 1.99× |
-| AverageDailyDollarValue | [self: `self.average_daily_dollar_value`]() | — | — | — |
+| AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 2.15× | 1.96× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.09× | 1.98× |
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 1.83× | 1.89× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 2.03× | 1.99× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.94× | 1.77× |
-| BarsSince | [self: `self.bars_since`]() | — | — | — |
-| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.24× | 2.38× | 2.52× |
-| BreakOfStructureChangeOfCharacter | [self: `self.break_of_structure_change_of_character`]() | — | — | — |
+| BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.05× | 2.33× | 2.49× |
+| BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | CandleAbandonedBaby | [TA-Lib: `CDLABANDONEDBABY`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.90× | 1.88× |
 | CandleAdvanceBlock | [TA-Lib: `CDLADVANCEBLOCK`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.82× | 1.80× |
 | CandleBeltHold | [TA-Lib: `CDLBELTHOLD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.72× | 1.85× |
@@ -971,93 +976,93 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | ChaikinMoneyFlow | [pandas-ta-classic: `pandas_ta_classic.cmf`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChaikinVolatility | [pandas-ta-classic: `pandas-ta-classic.chaikin_volatility`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChandeMomentumOscillator | [TA-Lib: `CMO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.54× | 2.03× | 2.09× |
-| CloseToCloseSigma | [self: `self.close_to_close_sigma`]() | — | — | — |
+| CloseToCloseSigma | [pandas: `pandas.close_to_close_sigma`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | CommodityChannelIndex | [TA-Lib: `CCI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.93× | 1.78× |
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| CumulativeCount | [self: `self.cumulative_count`]() | — | — | — |
-| CumulativeMaximum | [self: `self.cumulative_maximum`]() | 3.15× | 2.46× | 2.70× |
-| CumulativeMinimum | [self: `self.cumulative_minimum`]() | 3.15× | 2.65× | 2.67× |
-| CumulativeProduct | [self: `self.cumulative_product`]() | 3.03× | 2.49× | 3.19× |
-| CumulativeSum | [self: `self.cumulative_sum`]() | 3.02× | 2.47× | 2.67× |
-| CumulativeSumControlChart | [self: `self.cumulative_sum_control_chart`]() | — | — | — |
-| DecayLinear | [self: `self.decay_linear`]() | — | — | — |
+| CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.15× | 2.46× | 2.70× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.15× | 2.65× | 2.67× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.03× | 2.49× | 3.19× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.02× | 2.47× | 2.67× |
+| CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | DirectionalMovementIndex | [TA-Lib: `DX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 2.04× | 1.89× |
-| DonchianChannels | [pandas-ta-classic: `pandas_ta_classic.donchian`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.88× | 1.99× |
-| Drawdown | [self: `self.drawdown`]() | — | — | — |
+| DonchianChannels | — | — | — | — |
+| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.03× | 2.06× |
+| Drawdown | [pandas: `pandas.drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | EaseOfMovement | [pandas-ta-classic: `pandas-ta-classic.ease_of_movement`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| EqualHighsLows | [self: `self.equal_highs_lows`]() | — | — | — |
+| EqualHighsLows | [smartmoneyconcepts: `smartmoneyconcepts.equal_highs_lows`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | EvenBetterSinewave | [pandas-ta-classic: `pandas_ta_classic.ebsw`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.08× | 2.00× |
-| ExponentiallyWeightedCorrelation | [self: `self.ewm_corr`]() | — | — | — |
-| ExponentiallyWeightedCovariance | [self: `self.ewm_cov`]() | — | — | — |
+| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.96× | 1.92× |
+| ExponentiallyWeightedCorrelation | [pandas: `pandas.ewm_corr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedCovariance | [pandas: `pandas.ewm_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ExponentiallyWeightedStandardDeviation | [pandas: `pandas.ewm_std`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| ExponentiallyWeightedSum | [self: `self.exponentially_weighted_sum`]() | — | — | — |
-| ExponentiallyWeightedVariance | [pandas: `pandas.ewm_var`](https://pandas.pydata.org/docs/reference/window.html) | 3.16× | 2.47× | 2.77× |
-| FairValueGap | [self: `self.fair_value_gap`]() | — | — | — |
-| Falling | [self: `self.falling`]() | — | — | — |
+| ExponentiallyWeightedSum | [pandas: `pandas.exponentially_weighted_sum`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedVariance | [Polars: `Polars.ewm_var`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.16× | 2.47× | 2.77× |
+| FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.17× | 4.66× | 1.75× |
-| FibonacciRetracement | [self: `self.fib_retracement`]() | 12.77× | 16.42× | 15.77× |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 12.77× | 16.42× | 15.77× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| FracDiff | [self: `self.frac_diff`]() | — | — | — |
-| FractalDimension | [self: `self.fractal_dimension`]() | — | — | — |
-| GapDown | [self: `self.gap_down`]() | — | — | — |
-| GapUp | [self: `self.gap_up`]() | — | — | — |
-| GarmanKlass | [self: `self.garman_klass`]() | — | — | — |
-| GarmanKlassYangZhang | [self: `self.garman_klass_yang_zhang`]() | — | — | — |
-| HedgeRatio | [self: `self.hedge_ratio`]() | — | — | — |
+| FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FractalDimension | [pandas: `pandas.fractal_dimension`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapDown | [pandas: `pandas.gap_down`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapUp | [pandas: `pandas.gap_up`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 49.60× | 55.08× | 57.69× |
-| HigherHigh | [self: `self.higher_high`]() | — | — | — |
-| HighestSince | [self: `self.highest_since`]() | — | — | — |
+| HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.87× | 1.98× |
 | HilbertTransformDominantCyclePhase | [TA-Lib: `HT_DCPHASE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.87× | 1.97× |
 | HilbertTransformPhasor | [TA-Lib: `HT_PHASOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.53× | 1.93× | 2.10× |
 | HilbertTransformSineWave | [TA-Lib: `HT_SINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 2.18× | 1.91× |
 | HilbertTransformTrendMode | [TA-Lib: `HT_TRENDMODE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.91× | 2.01× |
-| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.03× | 1.96× |
+| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.87× | 1.87× |
 | HullMovingAverage | [pandas-ta-classic: `pandas_ta_classic.hma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Hurst | [self: `self.hurst`]() | — | — | — |
+| Hurst | [pandas: `pandas.hurst`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| InsideBar | [self: `self.inside_bar`]() | — | — | — |
+| InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.05× | 2.16× | 2.02× |
 | JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 7.66× | 8.34× | 8.09× |
-| KalmanHedgeRatio | [self: `self.kalman_hedge_ratio`]() | — | — | — |
-| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.90× | 1.87× |
+| KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.03× | 1.92× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [self: `self.lag`]() | 2.63× | 2.84× | 2.95× |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.63× | 2.84× | 2.95× |
 | LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.13× | 3.48× | 3.28× |
-| Liquidity | [self: `self.liquidity`]() | — | — | — |
+| Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.52× | 5.31× | 5.06× |
-| LowerLow | [self: `self.lower_low`]() | — | — | — |
-| LowestSince | [self: `self.lowest_since`]() | — | — | — |
+| LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MathAbs | [self: `self.math_abs`]() | 0.89× | 0.98× | 0.84× |
+| MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.89× | 0.98× | 0.84× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 1.78× | 2.08× |
-| MathAcosh | [self: `self.math_acosh`]() | 0.87× | 0.90× | 0.82× |
+| MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.87× | 0.90× | 0.82× |
 | MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.93× | 1.84× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 1.91× | 1.96× |
-| MathAsinh | [self: `self.math_asinh`]() | 0.81× | 0.77× | 0.83× |
+| MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.81× | 0.77× | 0.83× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.92× | 2.04× |
-| MathAtanh | [self: `self.math_atanh`]() | 1.02× | 0.81× | 0.88× |
-| MathCbrt | [self: `self.math_cbrt`]() | 0.87× | 0.80× | 0.82× |
+| MathAtanh | [NumPy: `numpy.arctanh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.02× | 0.81× | 0.88× |
+| MathCbrt | [NumPy: `numpy.cbrt`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.87× | 0.80× | 0.82× |
 | MathCeil | [TA-Lib: `CEIL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 1.90× | 1.94× |
 | MathCos | [TA-Lib: `COS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 2.14× | 1.98× |
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.22× | 1.99× | 2.03× |
-| MathCot | [self: `self.math_cot`]() | 0.96× | 1.07× | 0.90× |
-| MathDegrees | [self: `self.math_degrees`]() | 0.83× | 0.90× | 0.89× |
+| MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.96× | 1.07× | 0.90× |
+| MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.83× | 0.90× | 0.89× |
 | MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.96× | 1.91× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 2.03× | 1.95× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.29× | 1.79× | 1.92× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.97× | 1.91× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.81× | 1.82× |
-| MathLog1p | [self: `self.math_log1p`]() | 0.84× | 0.82× | 0.82× |
+| MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.84× | 0.82× | 0.82× |
 | MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.91× | 1.83× |
-| MathRadians | [self: `self.math_radians`]() | 0.88× | 0.87× | 0.84× |
+| MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.88× | 0.87× | 0.84× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.99× | 1.89× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 1.91× | 1.90× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.76× | 1.96× |
@@ -1066,94 +1071,95 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.92× | 1.84× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.97× | 1.86× |
-| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.11× | 2.08× | 2.21× |
+| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 2.11× | 2.14× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.80× | 1.92× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.01× | 2.13× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.05× | 2.11× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.05× | 1.95× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.01× | 2.11× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.03× | 2.05× | 2.08× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.00× | 2.41× | 2.27× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.17× | 2.13× | 2.11× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.09× | 2.11× | 2.12× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.22× | 1.99× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.89× | 2.01× |
-| OpeningRange | [self: `self.opening_range`]() | — | — | — |
-| OrderBlock | [self: `self.order_block`]() | — | — | — |
-| OrnsteinUhlenbeckHalfLife | [self: `self.ornstein_uhlenbeck_half_life`]() | — | — | — |
-| OutsideBar | [self: `self.outside_bar`]() | — | — | — |
+| OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OutsideBar | [pandas: `pandas.outside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ParabolicMovingAverageStop | [pandas-ta-classic: `pandas-ta-classic.pmax`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 31.71× | 31.98× | 29.25× |
 | ParabolicSar | [TA-Lib: `SAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.33× | 2.19× |
 | ParabolicSarExtended | [TA-Lib: `SAREXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.52× | 2.67× | 2.57× |
-| Parkinson | [self: `self.parkinson`]() | — | — | — |
+| Parkinson | [pandas: `pandas.parkinson`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PercentagePriceOscillator | [TA-Lib: `PPO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.00× | 2.05× | 2.04× |
-| PivotPoints | [self: `self.pivot_points`]() | — | — | — |
+| PivotPoints | [pandas: `pandas.pivot_points`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.83× | 1.98× |
 | PlusDirectionalMovement | [TA-Lib: `PLUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.09× | 1.96× |
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| PremiumDiscount | [self: `self.premium_discount`]() | — | — | — |
-| PreviousHighLow | [self: `self.previous_high_low`]() | — | — | — |
+| PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 2.02× | 1.97× |
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.17× | 2.14× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.92× | 2.04× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.05× | 1.99× |
-| RelativeMomentumIndex | [self: `wickra.RMI`]() | 0.96× | 0.95× | 0.98× |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 0.96× | 0.95× | 0.98× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.91× | 1.99× |
-| Retracements | [self: `self.retracements`]() | — | — | — |
-| Rising | [self: `self.rising`]() | — | — | — |
-| RogersSatchell | [self: `self.rogers_satchell`]() | — | — | — |
-| RollSpread | [self: `self.roll_spread`]() | — | — | — |
-| RollingAlpha | [self: `self.rolling_alpha`]() | — | — | — |
-| RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 2.00× | 2.07× |
-| RollingArgmin | [TA-Lib: `MININDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.97× | 1.80× |
-| RollingAutocorr | [self: `self.rolling_autocorr`]() | — | — | — |
+| Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollSpread | [pandas: `pandas.roll_spread`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingAlpha | [pandas: `pandas.rolling_alpha`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingArgmax | — | 1.80× | 2.00× | 2.07× |
+| RollingArgmin | — | 1.89× | 1.97× | 1.80× |
+| RollingAutocorr | [pandas: `pandas.rolling_autocorr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingAverageDeviation | [TA-Lib: `AVGDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.08× | 2.04× |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.91× | 2.01× |
-| RollingCalmar | [self: `self.rolling_calmar`]() | — | — | — |
+| RollingCalmar | [pandas: `pandas.rolling_calmar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingCorrelation | [TA-Lib: `CORREL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.98× | 2.09× |
-| RollingCov | [pandas: `pandas.rolling_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingEntropy | [self: `self.rolling_entropy`]() | — | — | — |
-| RollingInformationRatio | [self: `self.rolling_information_ratio`]() | — | — | — |
+| RollingCov | — | — | — | — |
+| RollingEntropy | [pandas: `pandas.rolling_entropy`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingInformationRatio | [pandas: `pandas.rolling_information_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingKurtosis | [pandas: `pandas.rolling_kurtosis`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingLinearRegression | [TA-Lib: `LINEARREG`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 2.00× | 1.92× |
 | RollingLinearRegressionAngle | [TA-Lib: `LINEARREG_ANGLE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.88× | 1.93× |
 | RollingLinearRegressionIntercept | [TA-Lib: `LINEARREG_INTERCEPT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.95× | 1.94× | 2.10× |
 | RollingLinearRegressionSlope | [TA-Lib: `LINEARREG_SLOPE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 2.03× | 1.89× |
-| RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.94× | 2.08× |
+| RollingMax | — | 1.89× | 1.94× | 2.08× |
+| RollingMaximumDrawdown | [pandas: `pandas.rolling_maximum_drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMedian | [pandas: `pandas.rolling_median`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMidpoint | [TA-Lib: `MIDPOINT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.88× | 2.10× |
 | RollingMidprice | [TA-Lib: `MIDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 1.96× | 1.81× |
-| RollingMin | [TA-Lib: `MIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.97× | 2.08× |
+| RollingMin | — | 1.71× | 1.97× | 2.08× |
 | RollingMinMax | [TA-Lib: `MINMAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.02× | 2.16× | 1.96× |
 | RollingMinMaxIndex | [TA-Lib: `MINMAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.04× | 2.23× |
-| RollingMode | [self: `self.rolling_mode`]() | — | — | — |
-| RollingQuantile | [pandas: `pandas.rolling_quantile`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingRank | [self: `self.rolling_rank`]() | — | — | — |
-| RollingSharpe | [self: `self.rolling_sharpe`]() | — | — | — |
+| RollingMode | [pandas: `pandas.rolling_mode`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingQuantile | [Polars: `Polars.rolling_quantile`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | — | — | — |
+| RollingRank | [pandas: `pandas.rolling_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingSharpe | [pandas: `pandas.rolling_sharpe`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingSkew | [pandas: `pandas.rolling_skew`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingSortino | [self: `self.rolling_sortino`]() | — | — | — |
+| RollingSortino | [pandas: `pandas.rolling_sortino`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingStandardDeviation | [TA-Lib: `STDDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.96× | 1.95× | 1.96× |
 | RollingSum | [TA-Lib: `SUM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.01× | 1.96× |
 | RollingTimeSeriesForecast | [TA-Lib: `TSF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 2.17× | 2.00× |
 | RollingVariance | [TA-Lib: `VAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.04× | 1.98× |
-| RollingVolumeWeightedAveragePrice | [self: `self.rolling_vwap`]() | — | — | — |
-| RollingWinsorize | [self: `self.rolling_winsorize`]() | — | — | — |
+| RollingVolumeWeightedAveragePrice | [pandas: `pandas.rolling_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingWinsorize | [pandas: `pandas.rolling_winsorize`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingZScore | [pandas: `pandas.rolling_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | SchaffTrendCycle | [pandas-ta-classic: `pandas_ta_classic.stc`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SessionVolumeLevels | [self: `self.session_volume_levels`]() | — | — | — |
-| Sessions | [self: `self.sessions`]() | — | — | — |
-| SignalDelay | [self: `self.signal_delay`]() | — | — | — |
-| SignedPower | [self: `self.signed_power`]() | 0.96× | 0.89× | 0.88× |
+| SessionVolumeLevels | [pandas: `pandas.session_volume_levels`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Sessions | [smartmoneyconcepts: `smartmoneyconcepts.sessions`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| SignalDelay | [pandas: `pandas.signal_delay`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SignedPower | [NumPy: `numpy.sign/numpy.abs/numpy.power`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.96× | 0.89× | 0.88× |
 | SimpleMovingAverage | [TA-Lib: `SMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 1.98× | 1.84× |
-| SmoothedTrendChannel | [self: `self.ssl_channel`]() | — | — | — |
-| SpreadZScore | [self: `self.spread_zscore`]() | — | — | — |
+| SmoothedTrendChannel | [pandas: `pandas.ssl_channel`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SpreadZScore | [pandas: `pandas.spread_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Squeeze | [pandas-ta-classic: `pandas-ta-classic.squeeze`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | SqueezePro | [pandas-ta-classic: `pandas-ta-classic.squeeze_pro`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | StochasticOscillator | [TA-Lib: `STOCH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.95× | 2.16× | 1.98× |
 | StochasticRelativeStrengthIndex | [TA-Lib: `STOCHRSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.29× | 2.16× | 2.22× |
 | Supertrend | [pandas-ta-classic: `pandas-ta-classic.supertrend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SwingHighsLows | [self: `self.swing_highs_lows`]() | — | — | — |
-| TimeSeriesRank | [self: `self.time_series_rank`]() | — | — | — |
+| SwingHighsLows | — | — | — | — |
+| TimeSeriesRank | [pandas: `pandas.time_series_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | TomDeMarkSequential | [pandas-ta-classic: `pandas-ta-classic.td_sequential`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | TriangularMovingAverage | [TA-Lib: `TRIMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 2.07× | 2.09× |
 | TripleExponentialAverage | [TA-Lib: `T3`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.09× | 2.08× |
@@ -1164,7 +1170,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.93× | 1.93× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 2.00× | 2.15× |
-| ValueWhen | [self: `self.value_when`]() | — | — | — |
+| ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 1.85× | 1.99× | 1.87× |
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.02× | 2.02× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1173,7 +1179,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.87× | 1.93× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.87× | 2.00× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.96× | 1.85× |
-| YangZhang | [self: `self.yang_zhang`]() | — | — | — |
+| YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 
 ### 100 bars
@@ -1181,24 +1187,24 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Class | Reference | 1 thread | 5 threads | 10 threads |
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.07× | 2.01× | 1.85× |
-| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 2.20× | 2.18× |
+| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 2.26× | 2.18× |
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.80× | 1.76× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.98× | 1.89× |
-| Amihud | [self: `self.amihud`]() | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [self: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 25.40× | 24.35× | 25.94× |
+| Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 25.40× | 24.35× | 25.94× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 2.03× | 2.00× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.95× | 1.82× |
-| AverageDailyDollarValue | [self: `self.average_daily_dollar_value`]() | — | — | — |
+| AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.16× | 2.02× | 2.00× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.90× | 1.97× |
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.68× | 1.81× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.09× | 2.13× | 1.96× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.83× | 1.87× |
-| BarsSince | [self: `self.bars_since`]() | — | — | — |
-| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.41× | 2.42× | 2.44× |
-| BreakOfStructureChangeOfCharacter | [self: `self.break_of_structure_change_of_character`]() | — | — | — |
+| BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.57× | 2.11× | 2.50× |
+| BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | CandleAbandonedBaby | [TA-Lib: `CDLABANDONEDBABY`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.80× | 1.95× |
 | CandleAdvanceBlock | [TA-Lib: `CDLADVANCEBLOCK`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 1.73× | 1.90× |
 | CandleBeltHold | [TA-Lib: `CDLBELTHOLD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.74× | 1.73× |
@@ -1263,93 +1269,93 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | ChaikinMoneyFlow | [pandas-ta-classic: `pandas_ta_classic.cmf`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChaikinVolatility | [pandas-ta-classic: `pandas-ta-classic.chaikin_volatility`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChandeMomentumOscillator | [TA-Lib: `CMO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.11× | 2.00× |
-| CloseToCloseSigma | [self: `self.close_to_close_sigma`]() | — | — | — |
+| CloseToCloseSigma | [pandas: `pandas.close_to_close_sigma`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | CommodityChannelIndex | [TA-Lib: `CCI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 1.89× | 1.89× |
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| CumulativeCount | [self: `self.cumulative_count`]() | — | — | — |
-| CumulativeMaximum | [self: `self.cumulative_maximum`]() | 3.21× | 2.56× | 2.71× |
-| CumulativeMinimum | [self: `self.cumulative_minimum`]() | 2.59× | 2.63× | 2.54× |
-| CumulativeProduct | [self: `self.cumulative_product`]() | 3.17× | 2.55× | 2.49× |
-| CumulativeSum | [self: `self.cumulative_sum`]() | 3.18× | 2.65× | 2.59× |
-| CumulativeSumControlChart | [self: `self.cumulative_sum_control_chart`]() | — | — | — |
-| DecayLinear | [self: `self.decay_linear`]() | — | — | — |
+| CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.21× | 2.56× | 2.71× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.59× | 2.63× | 2.54× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.17× | 2.55× | 2.49× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.18× | 2.65× | 2.59× |
+| CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | DirectionalMovementIndex | [TA-Lib: `DX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.00× | 2.03× |
-| DonchianChannels | [pandas-ta-classic: `pandas_ta_classic.donchian`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.91× | 2.03× |
-| Drawdown | [self: `self.drawdown`]() | — | — | — |
+| DonchianChannels | — | — | — | — |
+| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.90× | 2.21× |
+| Drawdown | [pandas: `pandas.drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | EaseOfMovement | [pandas-ta-classic: `pandas-ta-classic.ease_of_movement`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| EqualHighsLows | [self: `self.equal_highs_lows`]() | — | — | — |
+| EqualHighsLows | [smartmoneyconcepts: `smartmoneyconcepts.equal_highs_lows`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | EvenBetterSinewave | [pandas-ta-classic: `pandas_ta_classic.ebsw`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.30× | 1.97× | 2.09× |
-| ExponentiallyWeightedCorrelation | [self: `self.ewm_corr`]() | — | — | — |
-| ExponentiallyWeightedCovariance | [self: `self.ewm_cov`]() | — | — | — |
+| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 1.90× | 2.06× |
+| ExponentiallyWeightedCorrelation | [pandas: `pandas.ewm_corr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedCovariance | [pandas: `pandas.ewm_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ExponentiallyWeightedStandardDeviation | [pandas: `pandas.ewm_std`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| ExponentiallyWeightedSum | [self: `self.exponentially_weighted_sum`]() | — | — | — |
-| ExponentiallyWeightedVariance | [pandas: `pandas.ewm_var`](https://pandas.pydata.org/docs/reference/window.html) | 3.08× | 2.73× | 2.79× |
-| FairValueGap | [self: `self.fair_value_gap`]() | — | — | — |
-| Falling | [self: `self.falling`]() | — | — | — |
+| ExponentiallyWeightedSum | [pandas: `pandas.exponentially_weighted_sum`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedVariance | [Polars: `Polars.ewm_var`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.08× | 2.73× | 2.79× |
+| FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 1.65× | 1.99× |
-| FibonacciRetracement | [self: `self.fib_retracement`]() | 14.20× | 16.16× | 15.94× |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 14.20× | 16.16× | 15.94× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| FracDiff | [self: `self.frac_diff`]() | — | — | — |
-| FractalDimension | [self: `self.fractal_dimension`]() | — | — | — |
-| GapDown | [self: `self.gap_down`]() | — | — | — |
-| GapUp | [self: `self.gap_up`]() | — | — | — |
-| GarmanKlass | [self: `self.garman_klass`]() | — | — | — |
-| GarmanKlassYangZhang | [self: `self.garman_klass_yang_zhang`]() | — | — | — |
-| HedgeRatio | [self: `self.hedge_ratio`]() | — | — | — |
+| FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FractalDimension | [pandas: `pandas.fractal_dimension`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapDown | [pandas: `pandas.gap_down`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapUp | [pandas: `pandas.gap_up`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 120.41× | 99.08× | 137.72× |
-| HigherHigh | [self: `self.higher_high`]() | — | — | — |
-| HighestSince | [self: `self.highest_since`]() | — | — | — |
+| HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.92× | 1.76× |
 | HilbertTransformDominantCyclePhase | [TA-Lib: `HT_DCPHASE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.10× | 2.46× | 2.41× |
 | HilbertTransformPhasor | [TA-Lib: `HT_PHASOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.89× | 2.06× |
 | HilbertTransformSineWave | [TA-Lib: `HT_SINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 2.41× | 2.49× |
 | HilbertTransformTrendMode | [TA-Lib: `HT_TRENDMODE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 2.62× | 2.40× |
-| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.87× | 2.00× |
+| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 2.14× | 1.97× |
 | HullMovingAverage | [pandas-ta-classic: `pandas_ta_classic.hma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Hurst | [self: `self.hurst`]() | — | — | — |
+| Hurst | [pandas: `pandas.hurst`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| InsideBar | [self: `self.inside_bar`]() | — | — | — |
+| InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 2.05× | 1.93× |
 | JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 33.90× | 38.32× | 38.43× |
-| KalmanHedgeRatio | [self: `self.kalman_hedge_ratio`]() | — | — | — |
-| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.01× | 1.84× | 1.97× |
+| KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.02× | 1.88× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [self: `self.lag`]() | 2.68× | 2.91× | 2.85× |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.68× | 2.91× | 2.85× |
 | LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.29× | 3.42× | 3.07× |
-| Liquidity | [self: `self.liquidity`]() | — | — | — |
+| Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.51× | 5.32× | 5.10× |
-| LowerLow | [self: `self.lower_low`]() | — | — | — |
-| LowestSince | [self: `self.lowest_since`]() | — | — | — |
+| LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MathAbs | [self: `self.math_abs`]() | 0.84× | 0.85× | 0.89× |
+| MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.84× | 0.85× | 0.89× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.83× | 1.79× |
-| MathAcosh | [self: `self.math_acosh`]() | 0.87× | 0.86× | 0.86× |
+| MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.87× | 0.86× | 0.86× |
 | MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.93× | 1.89× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.82× | 1.80× |
-| MathAsinh | [self: `self.math_asinh`]() | 0.92× | 0.88× | 0.88× |
+| MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.92× | 0.88× | 0.88× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.89× | 1.92× |
-| MathAtanh | [self: `self.math_atanh`]() | 0.90× | 0.82× | 0.86× |
-| MathCbrt | [self: `self.math_cbrt`]() | 0.90× | 0.98× | 0.83× |
+| MathAtanh | [NumPy: `numpy.arctanh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.90× | 0.82× | 0.86× |
+| MathCbrt | [NumPy: `numpy.cbrt`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.90× | 0.98× | 0.83× |
 | MathCeil | [TA-Lib: `CEIL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.96× | 2.02× | 1.93× |
 | MathCos | [TA-Lib: `COS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.98× | 1.90× |
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.80× | 1.93× |
-| MathCot | [self: `self.math_cot`]() | 0.92× | 0.85× | 0.88× |
-| MathDegrees | [self: `self.math_degrees`]() | 0.89× | 0.85× | 0.84× |
+| MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.92× | 0.85× | 0.88× |
+| MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.89× | 0.85× | 0.84× |
 | MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.85× | 1.96× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 1.72× | 1.87× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 1.93× | 1.97× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.78× | 1.79× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.63× | 1.84× |
-| MathLog1p | [self: `self.math_log1p`]() | 0.94× | 0.83× | 0.80× |
+| MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.94× | 0.83× | 0.80× |
 | MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.84× | 1.88× |
-| MathRadians | [self: `self.math_radians`]() | 1.24× | 0.80× | 0.83× |
+| MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.24× | 0.80× | 0.83× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.84× | 1.88× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.88× | 1.85× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.79× | 1.91× |
@@ -1358,94 +1364,95 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.69× | 1.92× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.89× | 1.86× |
-| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.98× | 2.07× |
+| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.15× | 2.13× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 1.87× | 2.07× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 2.00× | 2.15× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.96× | 1.96× | 2.02× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.87× | 1.90× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.92× | 2.04× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 2.00× | 2.01× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.28× | 2.28× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.25× | 2.18× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.06× | 2.09× | 2.22× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.93× | 2.01× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.89× | 1.89× |
-| OpeningRange | [self: `self.opening_range`]() | — | — | — |
-| OrderBlock | [self: `self.order_block`]() | — | — | — |
-| OrnsteinUhlenbeckHalfLife | [self: `self.ornstein_uhlenbeck_half_life`]() | — | — | — |
-| OutsideBar | [self: `self.outside_bar`]() | — | — | — |
+| OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OutsideBar | [pandas: `pandas.outside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ParabolicMovingAverageStop | [pandas-ta-classic: `pandas-ta-classic.pmax`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 25.69× | 31.40× | 28.71× |
 | ParabolicSar | [TA-Lib: `SAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 1.99× | 2.14× |
 | ParabolicSarExtended | [TA-Lib: `SAREXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.13× | 2.27× | 2.32× |
-| Parkinson | [self: `self.parkinson`]() | — | — | — |
+| Parkinson | [pandas: `pandas.parkinson`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PercentagePriceOscillator | [TA-Lib: `PPO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.60× | 1.99× | 1.93× |
-| PivotPoints | [self: `self.pivot_points`]() | — | — | — |
+| PivotPoints | [pandas: `pandas.pivot_points`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 2.01× | 1.83× |
 | PlusDirectionalMovement | [TA-Lib: `PLUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 2.06× | 1.93× |
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| PremiumDiscount | [self: `self.premium_discount`]() | — | — | — |
-| PreviousHighLow | [self: `self.previous_high_low`]() | — | — | — |
+| PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.03× | 2.01× |
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.96× | 1.96× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.03× | 2.03× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 2.07× |
-| RelativeMomentumIndex | [self: `wickra.RMI`]() | 1.06× | 1.01× | 1.08× |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 1.06× | 1.01× | 1.08× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.04× | 1.89× |
-| Retracements | [self: `self.retracements`]() | — | — | — |
-| Rising | [self: `self.rising`]() | — | — | — |
-| RogersSatchell | [self: `self.rogers_satchell`]() | — | — | — |
-| RollSpread | [self: `self.roll_spread`]() | — | — | — |
-| RollingAlpha | [self: `self.rolling_alpha`]() | — | — | — |
-| RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 2.01× | 1.97× |
-| RollingArgmin | [TA-Lib: `MININDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.96× | 1.84× |
-| RollingAutocorr | [self: `self.rolling_autocorr`]() | — | — | — |
+| Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollSpread | [pandas: `pandas.roll_spread`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingAlpha | [pandas: `pandas.rolling_alpha`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingArgmax | — | 1.82× | 2.01× | 1.97× |
+| RollingArgmin | — | 1.82× | 1.96× | 1.84× |
+| RollingAutocorr | [pandas: `pandas.rolling_autocorr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingAverageDeviation | [TA-Lib: `AVGDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.95× | 1.96× |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.93× | 2.02× |
-| RollingCalmar | [self: `self.rolling_calmar`]() | — | — | — |
+| RollingCalmar | [pandas: `pandas.rolling_calmar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingCorrelation | [TA-Lib: `CORREL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 2.23× | 1.98× |
-| RollingCov | [pandas: `pandas.rolling_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingEntropy | [self: `self.rolling_entropy`]() | — | — | — |
-| RollingInformationRatio | [self: `self.rolling_information_ratio`]() | — | — | — |
+| RollingCov | — | — | — | — |
+| RollingEntropy | [pandas: `pandas.rolling_entropy`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingInformationRatio | [pandas: `pandas.rolling_information_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingKurtosis | [pandas: `pandas.rolling_kurtosis`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingLinearRegression | [TA-Lib: `LINEARREG`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.87× | 1.99× |
 | RollingLinearRegressionAngle | [TA-Lib: `LINEARREG_ANGLE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 2.04× | 2.06× |
 | RollingLinearRegressionIntercept | [TA-Lib: `LINEARREG_INTERCEPT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.91× | 2.06× |
 | RollingLinearRegressionSlope | [TA-Lib: `LINEARREG_SLOPE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.00× | 2.05× |
-| RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 2.03× | 1.95× |
+| RollingMax | — | 1.58× | 2.03× | 1.95× |
+| RollingMaximumDrawdown | [pandas: `pandas.rolling_maximum_drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMedian | [pandas: `pandas.rolling_median`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMidpoint | [TA-Lib: `MIDPOINT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.88× | 1.98× |
 | RollingMidprice | [TA-Lib: `MIDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.89× | 1.87× |
-| RollingMin | [TA-Lib: `MIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.82× | 2.15× |
+| RollingMin | — | 1.57× | 1.82× | 2.15× |
 | RollingMinMax | [TA-Lib: `MINMAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.98× | 2.14× |
 | RollingMinMaxIndex | [TA-Lib: `MINMAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.60× | 2.12× | 1.98× |
-| RollingMode | [self: `self.rolling_mode`]() | — | — | — |
-| RollingQuantile | [pandas: `pandas.rolling_quantile`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingRank | [self: `self.rolling_rank`]() | — | — | — |
-| RollingSharpe | [self: `self.rolling_sharpe`]() | — | — | — |
+| RollingMode | [pandas: `pandas.rolling_mode`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingQuantile | [Polars: `Polars.rolling_quantile`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | — | — | — |
+| RollingRank | [pandas: `pandas.rolling_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingSharpe | [pandas: `pandas.rolling_sharpe`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingSkew | [pandas: `pandas.rolling_skew`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingSortino | [self: `self.rolling_sortino`]() | — | — | — |
+| RollingSortino | [pandas: `pandas.rolling_sortino`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingStandardDeviation | [TA-Lib: `STDDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 1.97× | 1.79× |
 | RollingSum | [TA-Lib: `SUM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.04× | 1.79× |
 | RollingTimeSeriesForecast | [TA-Lib: `TSF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 2.06× | 1.94× |
 | RollingVariance | [TA-Lib: `VAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.98× | 1.97× |
-| RollingVolumeWeightedAveragePrice | [self: `self.rolling_vwap`]() | — | — | — |
-| RollingWinsorize | [self: `self.rolling_winsorize`]() | — | — | — |
+| RollingVolumeWeightedAveragePrice | [pandas: `pandas.rolling_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingWinsorize | [pandas: `pandas.rolling_winsorize`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingZScore | [pandas: `pandas.rolling_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | SchaffTrendCycle | [pandas-ta-classic: `pandas_ta_classic.stc`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SessionVolumeLevels | [self: `self.session_volume_levels`]() | — | — | — |
-| Sessions | [self: `self.sessions`]() | — | — | — |
-| SignalDelay | [self: `self.signal_delay`]() | — | — | — |
-| SignedPower | [self: `self.signed_power`]() | 0.98× | 0.87× | 0.94× |
+| SessionVolumeLevels | [pandas: `pandas.session_volume_levels`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Sessions | [smartmoneyconcepts: `smartmoneyconcepts.sessions`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| SignalDelay | [pandas: `pandas.signal_delay`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SignedPower | [NumPy: `numpy.sign/numpy.abs/numpy.power`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.98× | 0.87× | 0.94× |
 | SimpleMovingAverage | [TA-Lib: `SMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.94× | 1.96× | 2.06× |
-| SmoothedTrendChannel | [self: `self.ssl_channel`]() | — | — | — |
-| SpreadZScore | [self: `self.spread_zscore`]() | — | — | — |
+| SmoothedTrendChannel | [pandas: `pandas.ssl_channel`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SpreadZScore | [pandas: `pandas.spread_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Squeeze | [pandas-ta-classic: `pandas-ta-classic.squeeze`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | SqueezePro | [pandas-ta-classic: `pandas-ta-classic.squeeze_pro`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | StochasticOscillator | [TA-Lib: `STOCH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.06× | 1.93× |
 | StochasticRelativeStrengthIndex | [TA-Lib: `STOCHRSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.96× | 2.20× | 2.16× |
 | Supertrend | [pandas-ta-classic: `pandas-ta-classic.supertrend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SwingHighsLows | [self: `self.swing_highs_lows`]() | — | — | — |
-| TimeSeriesRank | [self: `self.time_series_rank`]() | — | — | — |
+| SwingHighsLows | — | — | — | — |
+| TimeSeriesRank | [pandas: `pandas.time_series_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | TomDeMarkSequential | [pandas-ta-classic: `pandas-ta-classic.td_sequential`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | TriangularMovingAverage | [TA-Lib: `TRIMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.86× | 1.61× |
 | TripleExponentialAverage | [TA-Lib: `T3`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.95× | 1.98× | 2.00× |
@@ -1456,7 +1463,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.88× | 1.78× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 2.00× | 1.98× |
-| ValueWhen | [self: `self.value_when`]() | — | — | — |
+| ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 24.61× | 24.69× | 24.46× |
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.09× | 1.95× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1465,7 +1472,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.85× | 1.96× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.07× | 2.03× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.94× | 1.78× |
-| YangZhang | [self: `self.yang_zhang`]() | — | — | — |
+| YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 
 ### 1,000 bars
@@ -1473,24 +1480,24 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Class | Reference | 1 thread | 5 threads | 10 threads |
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.31× | 1.88× |
-| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 2.04× | 2.18× |
+| AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 2.09× | 2.15× |
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.80× | 1.67× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.91× | 1.90× |
-| Amihud | [self: `self.amihud`]() | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [self: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 23.72× | 27.41× | 30.30× |
+| Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 23.72× | 27.41× | 30.30× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 2.24× | 2.20× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 2.09× | 2.05× |
-| AverageDailyDollarValue | [self: `self.average_daily_dollar_value`]() | — | — | — |
+| AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 2.04× | 1.98× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.91× | 2.06× |
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.78× | 1.79× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 1.97× | 2.02× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.78× | 1.76× |
-| BarsSince | [self: `self.bars_since`]() | — | — | — |
-| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.20× | 2.40× | 2.40× |
-| BreakOfStructureChangeOfCharacter | [self: `self.break_of_structure_change_of_character`]() | — | — | — |
+| BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.22× | 2.36× | 2.31× |
+| BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | CandleAbandonedBaby | [TA-Lib: `CDLABANDONEDBABY`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 1.86× | 2.05× |
 | CandleAdvanceBlock | [TA-Lib: `CDLADVANCEBLOCK`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 2.05× | 2.10× |
 | CandleBeltHold | [TA-Lib: `CDLBELTHOLD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.53× | 1.99× | 1.98× |
@@ -1555,93 +1562,93 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | ChaikinMoneyFlow | [pandas-ta-classic: `pandas_ta_classic.cmf`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChaikinVolatility | [pandas-ta-classic: `pandas-ta-classic.chaikin_volatility`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ChandeMomentumOscillator | [TA-Lib: `CMO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 2.06× | 2.10× |
-| CloseToCloseSigma | [self: `self.close_to_close_sigma`]() | — | — | — |
+| CloseToCloseSigma | [pandas: `pandas.close_to_close_sigma`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | CommodityChannelIndex | [TA-Lib: `CCI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.60× | 2.23× | 2.17× |
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| CumulativeCount | [self: `self.cumulative_count`]() | — | — | — |
-| CumulativeMaximum | [self: `self.cumulative_maximum`]() | 3.21× | 2.33× | 2.29× |
-| CumulativeMinimum | [self: `self.cumulative_minimum`]() | 3.03× | 2.39× | 2.32× |
-| CumulativeProduct | [self: `self.cumulative_product`]() | 3.13× | 2.48× | 2.45× |
-| CumulativeSum | [self: `self.cumulative_sum`]() | 3.09× | 2.44× | 2.46× |
-| CumulativeSumControlChart | [self: `self.cumulative_sum_control_chart`]() | — | — | — |
-| DecayLinear | [self: `self.decay_linear`]() | — | — | — |
+| CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.21× | 2.33× | 2.29× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.03× | 2.39× | 2.32× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.13× | 2.48× | 2.45× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.09× | 2.44× | 2.46× |
+| CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | DirectionalMovementIndex | [TA-Lib: `DX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.17× | 1.93× |
-| DonchianChannels | [pandas-ta-classic: `pandas_ta_classic.donchian`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 2.03× | 2.17× |
-| Drawdown | [self: `self.drawdown`]() | — | — | — |
+| DonchianChannels | — | — | — | — |
+| DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 2.13× | 2.01× |
+| Drawdown | [pandas: `pandas.drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | EaseOfMovement | [pandas-ta-classic: `pandas-ta-classic.ease_of_movement`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| EqualHighsLows | [self: `self.equal_highs_lows`]() | — | — | — |
+| EqualHighsLows | [smartmoneyconcepts: `smartmoneyconcepts.equal_highs_lows`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | EvenBetterSinewave | [pandas-ta-classic: `pandas_ta_classic.ebsw`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.86× | 1.94× |
-| ExponentiallyWeightedCorrelation | [self: `self.ewm_corr`]() | — | — | — |
-| ExponentiallyWeightedCovariance | [self: `self.ewm_cov`]() | — | — | — |
+| ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 2.04× | 2.09× |
+| ExponentiallyWeightedCorrelation | [pandas: `pandas.ewm_corr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedCovariance | [pandas: `pandas.ewm_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ExponentiallyWeightedStandardDeviation | [pandas: `pandas.ewm_std`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| ExponentiallyWeightedSum | [self: `self.exponentially_weighted_sum`]() | — | — | — |
-| ExponentiallyWeightedVariance | [pandas: `pandas.ewm_var`](https://pandas.pydata.org/docs/reference/window.html) | 3.20× | 2.53× | 2.50× |
-| FairValueGap | [self: `self.fair_value_gap`]() | — | — | — |
-| Falling | [self: `self.falling`]() | — | — | — |
+| ExponentiallyWeightedSum | [pandas: `pandas.exponentially_weighted_sum`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| ExponentiallyWeightedVariance | [Polars: `Polars.ewm_var`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.20× | 2.53× | 2.50× |
+| FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 2.16× | 2.08× |
-| FibonacciRetracement | [self: `self.fib_retracement`]() | 10.00× | 16.92× | 16.06× |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 10.00× | 16.92× | 16.06× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| FracDiff | [self: `self.frac_diff`]() | — | — | — |
-| FractalDimension | [self: `self.fractal_dimension`]() | — | — | — |
-| GapDown | [self: `self.gap_down`]() | — | — | — |
-| GapUp | [self: `self.gap_up`]() | — | — | — |
-| GarmanKlass | [self: `self.garman_klass`]() | — | — | — |
-| GarmanKlassYangZhang | [self: `self.garman_klass_yang_zhang`]() | — | — | — |
-| HedgeRatio | [self: `self.hedge_ratio`]() | — | — | — |
+| FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FractalDimension | [pandas: `pandas.fractal_dimension`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapDown | [pandas: `pandas.gap_down`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GapUp | [pandas: `pandas.gap_up`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 517.02× | 528.89× | 838.87× |
-| HigherHigh | [self: `self.higher_high`]() | — | — | — |
-| HighestSince | [self: `self.highest_since`]() | — | — | — |
+| HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.15× | 2.77× | 2.67× |
 | HilbertTransformDominantCyclePhase | [TA-Lib: `HT_DCPHASE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.31× | 8.85× | 9.27× |
 | HilbertTransformPhasor | [TA-Lib: `HT_PHASOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.46× | 2.90× | 2.67× |
 | HilbertTransformSineWave | [TA-Lib: `HT_SINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.06× | 7.57× | 9.34× |
 | HilbertTransformTrendMode | [TA-Lib: `HT_TRENDMODE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.48× | 7.56× | 8.77× |
-| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.25× | 2.87× | 3.07× |
+| HilbertTransformTrendline | [TA-Lib: `HT_TRENDLINE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.19× | 2.60× | 2.64× |
 | HullMovingAverage | [pandas-ta-classic: `pandas_ta_classic.hma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Hurst | [self: `self.hurst`]() | — | — | — |
+| Hurst | [pandas: `pandas.hurst`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| InsideBar | [self: `self.inside_bar`]() | — | — | — |
+| InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.67× | 3.23× | 3.22× |
 | JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 120.78× | 292.04× | 326.19× |
-| KalmanHedgeRatio | [self: `self.kalman_hedge_ratio`]() | — | — | — |
-| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 2.02× | 1.86× |
+| KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.93× | 2.03× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [self: `self.lag`]() | 2.60× | 2.83× | 2.99× |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.60× | 2.83× | 2.99× |
 | LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.12× | 4.81× | 5.54× |
-| Liquidity | [self: `self.liquidity`]() | — | — | — |
+| Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.47× | 5.48× | 5.42× |
-| LowerLow | [self: `self.lower_low`]() | — | — | — |
-| LowestSince | [self: `self.lowest_since`]() | — | — | — |
+| LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| MathAbs | [self: `self.math_abs`]() | 0.97× | 0.88× | 0.77× |
+| MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.97× | 0.88× | 0.77× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.94× | 1.78× |
-| MathAcosh | [self: `self.math_acosh`]() | 0.92× | 0.91× | 0.91× |
+| MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.92× | 0.91× | 0.91× |
 | MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.94× | 2.02× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 2.16× | 2.01× |
-| MathAsinh | [self: `self.math_asinh`]() | 0.93× | 0.92× | 0.96× |
+| MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.93× | 0.92× | 0.96× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.91× | 1.90× |
-| MathAtanh | [self: `self.math_atanh`]() | 0.95× | 0.87× | 0.91× |
-| MathCbrt | [self: `self.math_cbrt`]() | 1.06× | 0.96× | 0.88× |
+| MathAtanh | [NumPy: `numpy.arctanh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.95× | 0.87× | 0.91× |
+| MathCbrt | [NumPy: `numpy.cbrt`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.06× | 0.96× | 0.88× |
 | MathCeil | [TA-Lib: `CEIL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 2.03× | 1.91× |
 | MathCos | [TA-Lib: `COS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 2.07× | 2.11× |
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.06× | 2.02× | 2.01× |
-| MathCot | [self: `self.math_cot`]() | 1.01× | 0.92× | 0.94× |
-| MathDegrees | [self: `self.math_degrees`]() | 0.84× | 0.89× | 0.95× |
+| MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.01× | 0.92× | 0.94× |
+| MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.84× | 0.89× | 0.95× |
 | MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.69× | 1.78× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 1.82× | 1.85× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.74× | 1.89× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.01× | 1.87× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.54× | 1.99× | 2.02× |
-| MathLog1p | [self: `self.math_log1p`]() | 0.91× | 0.93× | 0.87× |
+| MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.91× | 0.93× | 0.87× |
 | MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.08× | 1.88× | 1.94× |
-| MathRadians | [self: `self.math_radians`]() | 0.90× | 0.85× | 0.89× |
+| MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.90× | 0.85× | 0.89× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 2.09× | 2.13× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 1.88× | 1.96× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.87× | 2.00× |
@@ -1650,94 +1657,95 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.83× | 1.89× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | MedianPrice | [TA-Lib: `MEDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.83× | 1.81× |
-| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.49× | 2.63× | 2.72× |
+| MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.44× | 2.95× | 3.08× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.65× | 1.93× | 1.99× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.96× | 2.11× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.94× | 2.03× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 1.99× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.04× | 1.97× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.90× | 2.12× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.12× | 1.95× | 2.33× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 2.31× | 2.30× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.18× | 2.34× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.89× | 1.82× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.95× | 1.89× |
-| OpeningRange | [self: `self.opening_range`]() | — | — | — |
-| OrderBlock | [self: `self.order_block`]() | — | — | — |
-| OrnsteinUhlenbeckHalfLife | [self: `self.ornstein_uhlenbeck_half_life`]() | — | — | — |
-| OutsideBar | [self: `self.outside_bar`]() | — | — | — |
+| OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| OutsideBar | [pandas: `pandas.outside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ParabolicMovingAverageStop | [pandas-ta-classic: `pandas-ta-classic.pmax`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 34.73× | 60.73× | 42.88× |
 | ParabolicSar | [TA-Lib: `SAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.12× | 2.13× |
 | ParabolicSarExtended | [TA-Lib: `SAREXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 2.37× | 2.42× |
-| Parkinson | [self: `self.parkinson`]() | — | — | — |
+| Parkinson | [pandas: `pandas.parkinson`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PercentagePriceOscillator | [TA-Lib: `PPO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 2.04× | 1.82× |
-| PivotPoints | [self: `self.pivot_points`]() | — | — | — |
+| PivotPoints | [pandas: `pandas.pivot_points`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 2.02× | 1.99× |
 | PlusDirectionalMovement | [TA-Lib: `PLUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 2.02× | 2.07× |
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| PremiumDiscount | [self: `self.premium_discount`]() | — | — | — |
-| PreviousHighLow | [self: `self.previous_high_low`]() | — | — | — |
+| PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.91× | 2.05× |
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.00× | 1.95× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.89× | 1.93× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.75× | 1.89× |
-| RelativeMomentumIndex | [self: `wickra.RMI`]() | 1.41× | 1.66× | 1.57× |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 1.41× | 1.66× | 1.57× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.04× | 2.07× |
-| Retracements | [self: `self.retracements`]() | — | — | — |
-| Rising | [self: `self.rising`]() | — | — | — |
-| RogersSatchell | [self: `self.rogers_satchell`]() | — | — | — |
-| RollSpread | [self: `self.roll_spread`]() | — | — | — |
-| RollingAlpha | [self: `self.rolling_alpha`]() | — | — | — |
-| RollingArgmax | [TA-Lib: `MAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.99× | 2.10× |
-| RollingArgmin | [TA-Lib: `MININDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 2.11× | 1.76× |
-| RollingAutocorr | [self: `self.rolling_autocorr`]() | — | — | — |
+| Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollSpread | [pandas: `pandas.roll_spread`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingAlpha | [pandas: `pandas.rolling_alpha`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingArgmax | — | 1.70× | 1.99× | 2.10× |
+| RollingArgmin | — | 1.88× | 2.11× | 1.76× |
+| RollingAutocorr | [pandas: `pandas.rolling_autocorr`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingAverageDeviation | [TA-Lib: `AVGDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.05× | 2.10× | 2.27× |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.03× | 2.02× |
-| RollingCalmar | [self: `self.rolling_calmar`]() | — | — | — |
+| RollingCalmar | [pandas: `pandas.rolling_calmar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingCorrelation | [TA-Lib: `CORREL`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.94× | 2.00× | 1.95× |
-| RollingCov | [pandas: `pandas.rolling_cov`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingEntropy | [self: `self.rolling_entropy`]() | — | — | — |
-| RollingInformationRatio | [self: `self.rolling_information_ratio`]() | — | — | — |
+| RollingCov | — | — | — | — |
+| RollingEntropy | [pandas: `pandas.rolling_entropy`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingInformationRatio | [pandas: `pandas.rolling_information_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingKurtosis | [pandas: `pandas.rolling_kurtosis`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingLinearRegression | [TA-Lib: `LINEARREG`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 2.07× | 2.22× |
 | RollingLinearRegressionAngle | [TA-Lib: `LINEARREG_ANGLE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 2.50× | 2.12× |
 | RollingLinearRegressionIntercept | [TA-Lib: `LINEARREG_INTERCEPT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 2.05× | 2.01× |
 | RollingLinearRegressionSlope | [TA-Lib: `LINEARREG_SLOPE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 2.08× | 2.16× |
-| RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.91× | 2.00× |
+| RollingMax | — | 1.89× | 1.91× | 2.00× |
+| RollingMaximumDrawdown | [pandas: `pandas.rolling_maximum_drawdown`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMedian | [pandas: `pandas.rolling_median`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingMidpoint | [TA-Lib: `MIDPOINT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 2.20× | 1.88× |
 | RollingMidprice | [TA-Lib: `MIDPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 2.01× | 2.11× |
-| RollingMin | [TA-Lib: `MIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 2.17× | 1.86× |
+| RollingMin | — | 1.88× | 2.17× | 1.86× |
 | RollingMinMax | [TA-Lib: `MINMAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.03× | 2.18× |
 | RollingMinMaxIndex | [TA-Lib: `MINMAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.02× | 2.12× | 2.24× |
-| RollingMode | [self: `self.rolling_mode`]() | — | — | — |
-| RollingQuantile | [pandas: `pandas.rolling_quantile`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingRank | [self: `self.rolling_rank`]() | — | — | — |
-| RollingSharpe | [self: `self.rolling_sharpe`]() | — | — | — |
+| RollingMode | [pandas: `pandas.rolling_mode`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingQuantile | [Polars: `Polars.rolling_quantile`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | — | — | — |
+| RollingRank | [pandas: `pandas.rolling_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingSharpe | [pandas: `pandas.rolling_sharpe`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingSkew | [pandas: `pandas.rolling_skew`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RollingSortino | [self: `self.rolling_sortino`]() | — | — | — |
+| RollingSortino | [pandas: `pandas.rolling_sortino`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingStandardDeviation | [TA-Lib: `STDDEV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.03× | 1.88× | 1.96× |
 | RollingSum | [TA-Lib: `SUM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.96× | 1.93× |
 | RollingTimeSeriesForecast | [TA-Lib: `TSF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.61× | 2.08× | 2.27× |
 | RollingVariance | [TA-Lib: `VAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.86× | 1.98× |
-| RollingVolumeWeightedAveragePrice | [self: `self.rolling_vwap`]() | — | — | — |
-| RollingWinsorize | [self: `self.rolling_winsorize`]() | — | — | — |
+| RollingVolumeWeightedAveragePrice | [pandas: `pandas.rolling_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RollingWinsorize | [pandas: `pandas.rolling_winsorize`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RollingZScore | [pandas: `pandas.rolling_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | SchaffTrendCycle | [pandas-ta-classic: `pandas_ta_classic.stc`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SessionVolumeLevels | [self: `self.session_volume_levels`]() | — | — | — |
-| Sessions | [self: `self.sessions`]() | — | — | — |
-| SignalDelay | [self: `self.signal_delay`]() | — | — | — |
-| SignedPower | [self: `self.signed_power`]() | 0.96× | 1.10× | 1.05× |
+| SessionVolumeLevels | [pandas: `pandas.session_volume_levels`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Sessions | [smartmoneyconcepts: `smartmoneyconcepts.sessions`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
+| SignalDelay | [pandas: `pandas.signal_delay`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SignedPower | [NumPy: `numpy.sign/numpy.abs/numpy.power`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.96× | 1.10× | 1.05× |
 | SimpleMovingAverage | [TA-Lib: `SMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.91× | 1.97× |
-| SmoothedTrendChannel | [self: `self.ssl_channel`]() | — | — | — |
-| SpreadZScore | [self: `self.spread_zscore`]() | — | — | — |
+| SmoothedTrendChannel | [pandas: `pandas.ssl_channel`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| SpreadZScore | [pandas: `pandas.spread_zscore`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Squeeze | [pandas-ta-classic: `pandas-ta-classic.squeeze`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | SqueezePro | [pandas-ta-classic: `pandas-ta-classic.squeeze_pro`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | StochasticOscillator | [TA-Lib: `STOCH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.16× | 2.18× |
 | StochasticRelativeStrengthIndex | [TA-Lib: `STOCHRSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 2.32× | 2.31× |
 | Supertrend | [pandas-ta-classic: `pandas-ta-classic.supertrend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| SwingHighsLows | [self: `self.swing_highs_lows`]() | — | — | — |
-| TimeSeriesRank | [self: `self.time_series_rank`]() | — | — | — |
+| SwingHighsLows | — | — | — | — |
+| TimeSeriesRank | [pandas: `pandas.time_series_rank`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | TomDeMarkSequential | [pandas-ta-classic: `pandas-ta-classic.td_sequential`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | TriangularMovingAverage | [TA-Lib: `TRIMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.96× | 1.90× |
 | TripleExponentialAverage | [TA-Lib: `T3`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 1.91× | 1.99× |
@@ -1748,7 +1756,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | TypicalPrice | [TA-Lib: `TYPPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 1.72× | 1.85× |
 | UlcerIndex | [pandas-ta-classic: `pandas-ta-classic.ulcer_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.08× | 2.10× |
-| ValueWhen | [self: `self.value_when`]() | — | — | — |
+| ValueWhen | [pandas: `pandas.value_when`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | VariableIndexDynamicAverage | [pandas-ta-classic: `pandas-ta-classic.vidya`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 26.33× | 39.09× | 36.27× |
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 2.48× | 2.82× |
 | VolumePriceTrend | [pandas-ta-classic: `pandas-ta-classic.volume_price_trend`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1757,5 +1765,5 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.91× | 1.89× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 2.04× | 1.82× |
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 2.01× | 2.09× |
-| YangZhang | [self: `self.yang_zhang`]() | — | — | — |
+| YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |

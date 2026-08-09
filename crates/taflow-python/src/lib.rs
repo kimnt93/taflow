@@ -129,6 +129,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingSharpe>()?;
     m.add_class::<indicators::RollingSortino>()?;
     m.add_class::<indicators::RollingCalmar>()?;
+    m.add_class::<indicators::RollingMaximumDrawdown>()?;
     m.add_class::<indicators::HullMovingAverage>()?;
     m.add_class::<indicators::VolumeWeightedMovingAverage>()?;
     m.add_class::<indicators::ZeroLagExponentialMovingAverage>()?;

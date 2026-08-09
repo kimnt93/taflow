@@ -60,7 +60,7 @@ benchmark.
 
 | Done | Priority | Proposed TAFlow class | Wickra function | Family | Why it belongs on the roadmap |
 |:---:|:---:|---|---|---|---|
-| [ ] | High | `RollingMaximumDrawdown` | `MaxDrawdown` | Risk | Essential per-bar strategy risk series; `Drawdown` is running-prefix drawdown, while `RollingCalmar` only exposes rolling MDD indirectly through a ratio. |
+| [x] | High | `RollingMaximumDrawdown` | `MaxDrawdown` | Risk | MATCH against pandas rolling apply and Wickra 0.9.9; TA-Lib has no equivalent. Focused 1K/10K/100K/1M benchmarks are recorded under `verify/benchmark_reports/`. |
 | [ ] | High | `RollingOmegaRatio` | `OmegaRatio` | Risk | Threshold-based return/risk series absent from TAFlow. |
 | [ ] | High | `RollingValueAtRisk` | `ValueAtRisk` | Risk | Per-bar rolling loss-quantile series for portfolio and strategy analysis. |
 | [ ] | High | `RollingConditionalValueAtRisk` | `ConditionalValueAtRisk` | Risk | Per-bar rolling expected-tail-loss series. |

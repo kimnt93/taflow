@@ -198,6 +198,7 @@ from .indicators import Drawdown
 from .indicators import RollingSharpe
 from .indicators import RollingSortino
 from .indicators import RollingCalmar
+from .indicators import RollingMaximumDrawdown
 from .indicators import HullMovingAverage
 from .indicators import VolumeWeightedMovingAverage
 from .indicators import ZeroLagExponentialMovingAverage
@@ -462,6 +463,7 @@ __all__ = [
     "RollingSharpe",
     "RollingSortino",
     "RollingCalmar",
+    "RollingMaximumDrawdown",
     "HullMovingAverage",
     "VolumeWeightedMovingAverage",
     "ZeroLagExponentialMovingAverage",

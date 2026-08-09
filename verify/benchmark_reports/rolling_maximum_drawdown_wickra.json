@@ -1,0 +1,57 @@
+{
+  "date": "2026-08-10",
+  "class": "RollingMaximumDrawdown",
+  "wickra_name": "MaxDrawdown",
+  "period": 14,
+  "repeats": 3,
+  "correctness": {
+    "pandas": "MATCH",
+    "wickra": "MATCH",
+    "talib": "N/A"
+  },
+  "versions": {
+    "taflow": "0.1.2",
+    "pandas": "3.0.5",
+    "wickra": "0.9.9",
+    "TA-Lib": "0.7.1"
+  },
+  "environment": {
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3"
+  },
+  "talib_has_maximum_drawdown": false,
+  "rows": [
+    {
+      "bars": 1000,
+      "taflow_ms": 0.046859,
+      "pandas_ms": 7.95825,
+      "wickra_ms": 0.112381,
+      "speedup_vs_pandas": 169.83396999509165,
+      "speedup_vs_wickra": 2.3982799462216438
+    },
+    {
+      "bars": 10000,
+      "taflow_ms": 0.422177,
+      "pandas_ms": 77.131553,
+      "wickra_ms": 1.10114,
+      "speedup_vs_pandas": 182.69956203203867,
+      "speedup_vs_wickra": 2.6082425143956205
+    },
+    {
+      "bars": 100000,
+      "taflow_ms": 4.631647,
+      "pandas_ms": 756.900677,
+      "wickra_ms": 12.039311,
+      "speedup_vs_pandas": 163.41933592953004,
+      "speedup_vs_wickra": 2.599358500334762
+    },
+    {
+      "bars": 1000000,
+      "taflow_ms": 45.755491,
+      "pandas_ms": 7771.535822,
+      "wickra_ms": 123.823769,
+      "speedup_vs_pandas": 169.84924983102027,
+      "speedup_vs_wickra": 2.706205666113385
+    }
+  ]
+}

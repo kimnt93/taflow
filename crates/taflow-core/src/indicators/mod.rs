@@ -455,6 +455,9 @@ mod rolling_linear_regression_slope_test;
 #[cfg(test)]
 mod rolling_linear_regression_test;
 mod rolling_maximum;
+mod rolling_maximum_drawdown;
+#[cfg(test)]
+mod rolling_maximum_drawdown_test;
 mod rolling_maximum_index;
 #[cfg(test)]
 mod rolling_maximum_index_test;
@@ -647,6 +650,7 @@ pub use rolling_linear_regression_angle::RollingLinearRegressionAngle;
 pub use rolling_linear_regression_intercept::RollingLinearRegressionIntercept;
 pub use rolling_linear_regression_slope::RollingLinearRegressionSlope;
 pub use rolling_maximum::RollingMaximum;
+pub use rolling_maximum_drawdown::RollingMaximumDrawdown;
 pub use rolling_maximum_index::RollingMaximumIndex;
 pub use rolling_median::RollingMedian;
 pub use rolling_midpoint::RollingMidpoint;

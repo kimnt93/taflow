@@ -50,6 +50,7 @@ API_NAMES = {
     "klinger_volume_oscillator": "pandas_ta_classic.kvo",
     "tom_de_mark_sequential": "pandas_ta_classic.td_seq",
     "rmi": "wickra.RMI",
+    "rolling_maximum_drawdown": "pandas.core.window.rolling.Rolling.apply",
 }
 API_URLS = {
     "anchored_vwap": (
@@ -59,6 +60,10 @@ API_URLS = {
     "laguerre_rsi": (
         "https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/"
         "pandas_ta_classic/momentum/lrsi.py"
+    ),
+    "rolling_maximum_drawdown": (
+        "https://pandas.pydata.org/docs/reference/api/"
+        "pandas.core.window.rolling.Rolling.apply.html"
     ),
 }
 

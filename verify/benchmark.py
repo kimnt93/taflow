@@ -123,6 +123,18 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
         return pd.Series(arrays[0]).shift(
             spec.ctor_kwargs.get("timeperiod", 1)
         ).to_numpy()
+    if source == "pandas" and spec.snake == "rolling_maximum_drawdown":
+        import pandas as pd
+        period = spec.ctor_kwargs.get("timeperiod", 14)
+        return pd.Series(arrays[0]).rolling(period).apply(
+            lambda window: np.max(np.divide(
+                np.maximum.accumulate(window) - window,
+                np.maximum.accumulate(window),
+                out=np.zeros_like(window),
+                where=np.maximum.accumulate(window) > 0.0,
+            )),
+            raw=True,
+        ).to_numpy()
     if source == "pandas-ta-classic" and spec.snake == "log_return":
         import pandas as pd
         import pandas_ta_classic as pta

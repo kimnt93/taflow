@@ -144,7 +144,7 @@ def run_numpy(data: dict[str, np.ndarray], rows: list[Result]) -> None:
 
 
 def run_wickra(data: dict[str, np.ndarray], rows: list[Result]) -> None:
-    """Compare RMI with Wickra's independently compiled Wilder state."""
+    """Compare canonical classes with matching Wickra streaming states."""
     import wickra
 
     close = data["close"]
@@ -162,6 +162,20 @@ def run_wickra(data: dict[str, np.ndarray], rows: list[Result]) -> None:
             rtol=0.0,
             atol=2e-12,
             note="wickra.RMI Wilder-seeded state; version 0.9.9",
+        )
+    for period in (1, 2, 14, 31):
+        actual = taflow.RollingMaximumDrawdown(close, period).compute()
+        expected = np.asarray(wickra.MaxDrawdown(period).batch(close.tolist()))
+        compare(
+            rows,
+            "Wickra",
+            "rolling_maximum_drawdown",
+            f"period={period}",
+            actual,
+            expected,
+            rtol=0.0,
+            atol=2e-14,
+            note="taflow RollingMaximumDrawdown ↔ wickra.MaxDrawdown 0.9.9",
         )
 
 
@@ -223,6 +237,21 @@ def run_pandas(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         raw=True)
     check("rolling_calmar", taflow.RollingCalmar(close, n).compute(), calmar,
           "Series.rolling.apply")
+    maximum_drawdown = close.rolling(n).apply(
+        lambda window: np.max(np.divide(
+            np.maximum.accumulate(window) - window,
+            np.maximum.accumulate(window),
+            out=np.zeros_like(window),
+            where=np.maximum.accumulate(window) > 0.0,
+        )),
+        raw=True,
+    )
+    check(
+        "rolling_maximum_drawdown",
+        taflow.RollingMaximumDrawdown(close, n).compute(),
+        maximum_drawdown,
+        "Series.rolling.apply peak-to-trough drawdown; TA-Lib N/A",
+    )
 
     check("rising", taflow.Rising(close, n).compute(),
           (close > close.shift(n)).astype(float).where(close.shift(n).notna()),

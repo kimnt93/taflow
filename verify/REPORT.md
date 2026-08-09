@@ -1,9 +1,9 @@
 # taflow correctness verification
 
 Date: 2026-08-10 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
-Environment: python 3.12.3, numpy 2.5.1, TA-Lib 0.7.1, taflow 0.1.2
+Environment: python 3.12.3, numpy 2.4.6, TA-Lib 0.7.1, taflow 0.1.2
 
-Summary: MATCH: 287
+Summary: MATCH: 288
 
 taflow is driven through its canonical classes (mapped from the
 TA-Lib name via the /CHECK.md master table). *Batch vs oracle*:
@@ -270,6 +270,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | rolling_entropy | RollingEntropy | self | MATCH | — | yes | yes | — |
 | rolling_information_ratio | RollingInformationRatio | self | MATCH | — | yes | yes | — |
 | rolling_kurtosis | RollingKurtosis | pandas | MATCH | pass (err 1.3e-15, nan 0) | yes | yes | pass (err 1.3e-15, nan 0) |
+| rolling_maximum_drawdown | RollingMaximumDrawdown | pandas | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_median | RollingMedian | pandas | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_mode | RollingMode | self | MATCH | — | yes | yes | — |
 | rolling_quantile | RollingQuantile | pandas | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |

@@ -349,6 +349,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_sharpe | rolling_sharpe | _ |
 | [x] | rolling_sortino | rolling_sortino | _ |
 | [x] | rolling_calmar | rolling_calmar | _ |
+| [x] | rolling_maximum_drawdown | rolling_maximum_drawdown | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

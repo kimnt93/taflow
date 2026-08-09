@@ -153,6 +153,17 @@ def pandas_oracles() -> dict[str, dict]:
             "kwargs": {"timeperiod": n}, "inputs": ("close",),
             "oracle": lambda a: (roll(a[0]).quantile(0.75)
                                   - roll(a[0]).quantile(0.25)).to_numpy()},
+        "rolling_maximum_drawdown": {
+            "kwargs": {"timeperiod": n}, "inputs": ("close",),
+            "oracle": lambda a: pd.Series(a[0]).rolling(n).apply(
+                lambda window: np.max(np.divide(
+                    np.maximum.accumulate(window) - window,
+                    np.maximum.accumulate(window),
+                    out=np.zeros_like(window),
+                    where=np.maximum.accumulate(window) > 0.0,
+                )),
+                raw=True,
+            ).to_numpy()},
         "rolling_skew": {
             "kwargs": {"timeperiod": n}, "inputs": ("close",),
             "oracle": lambda a: (roll(a[0]).skew() * (n - 2)
