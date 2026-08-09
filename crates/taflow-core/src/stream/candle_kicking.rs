@@ -143,15 +143,8 @@ impl CandleKicking {
             }
             return Ok(());
         }
-        let scores = candle_kicking(open, high, low, close)?;
-        output.extend_from_slice(&scores);
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
         }
         Ok(())
     }
@@ -170,128 +163,5 @@ impl CandleKicking {
         self.shadow_sum = [0.0; 2];
         self.body_sum = [0.0; 2];
         self.value = None;
-    }
-}
-
-/// Compute the candle pattern signal for aligned OHLC bars.
-///
-/// # Parameters
-///
-/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
-///
-/// # Returns
-///
-/// A same-length vector containing -100, 0, or 100 pattern signals; bars
-/// Compute the candle kicking result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_kicking(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = SHADOW_VERY_SHORT.avg_period.max(BODY_LONG.avg_period) + 1;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut shadow_sum = [0.0f64; 2];
-    let mut body_sum = [0.0f64; 2];
-    let start = lookback;
-    for i in (start - 1 - SHADOW_VERY_SHORT.avg_period)..(start - 1) {
-        shadow_sum[1] += cr_highlow(open, high, low, close, i);
-    }
-    for i in (start - SHADOW_VERY_SHORT.avg_period)..start {
-        shadow_sum[0] += cr_highlow(open, high, low, close, i);
-    }
-    for i in (start - 1 - BODY_LONG.avg_period)..(start - 1) {
-        body_sum[1] += cr_realbody(open, high, low, close, i);
-    }
-    for i in (start - BODY_LONG.avg_period)..start {
-        body_sum[0] += cr_realbody(open, high, low, close, i);
-    }
-
-    for i in start..len {
-        let color_prev = candle_color(open[i - 1], close[i - 1]);
-        let color_curr = candle_color(open[i], close[i]);
-        if color_prev != color_curr
-            && real_body(open[i - 1], close[i - 1])
-                > ca_realbody(BODY_LONG, body_sum[1], open, high, low, close, i - 1)
-            && upper_shadow(open[i - 1], high[i - 1], close[i - 1])
-                < ca_highlow(
-                    SHADOW_VERY_SHORT,
-                    shadow_sum[1],
-                    open,
-                    high,
-                    low,
-                    close,
-                    i - 1,
-                )
-            && lower_shadow(open[i - 1], low[i - 1], close[i - 1])
-                < ca_highlow(
-                    SHADOW_VERY_SHORT,
-                    shadow_sum[1],
-                    open,
-                    high,
-                    low,
-                    close,
-                    i - 1,
-                )
-            && real_body(open[i], close[i])
-                > ca_realbody(BODY_LONG, body_sum[0], open, high, low, close, i)
-            && upper_shadow(open[i], high[i], close[i])
-                < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i)
-            && lower_shadow(open[i], low[i], close[i])
-                < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i)
-        {
-            // Gap: black then white = bullish, white then black = bearish
-            let bull = color_prev == -1 && color_curr == 1 && low[i] > high[i - 1];
-            let bear = color_prev == 1 && color_curr == -1 && high[i] < low[i - 1];
-            output[i] = (bull as i32) * 100 - (bear as i32) * 100;
-        }
-        shadow_sum[1] += cr_highlow(open, high, low, close, i - 1)
-            - cr_highlow(open, high, low, close, i - 1 - SHADOW_VERY_SHORT.avg_period);
-        shadow_sum[0] += cr_highlow(open, high, low, close, i)
-            - cr_highlow(open, high, low, close, i - SHADOW_VERY_SHORT.avg_period);
-        body_sum[1] += cr_realbody(open, high, low, close, i - 1)
-            - cr_realbody(open, high, low, close, i - 1 - BODY_LONG.avg_period);
-        body_sum[0] += cr_realbody(open, high, low, close, i)
-            - cr_realbody(open, high, low, close, i - BODY_LONG.avg_period);
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let o: Vec<f64> = (0..40).map(|i| 100.0 + i as f64 * 0.2).collect();
-        let h: Vec<f64> = o.iter().map(|x| x + 2.0).collect();
-        let l: Vec<f64> = o.iter().map(|x| x - 2.0).collect();
-        let c: Vec<f64> = o
-            .iter()
-            .enumerate()
-            .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
-            .collect();
-        let e = crate::stream::candle_kicking(&o, &h, &l, &c).unwrap();
-        let mut s = CandleKicking::new();
-        for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
-        }
     }
 }

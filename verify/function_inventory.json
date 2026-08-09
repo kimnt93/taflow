@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 123,
+    "complete": 133,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 151,
+    "structure": 161,
     "talib_functions": 161
   },
   "rows": [
@@ -1424,7 +1424,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "long_line",
+      "module": "candle_long_line",
       "name": "CandleLongLine",
       "native_binding": true,
       "native_symbols": [
@@ -1439,7 +1439,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "doji_star",
+      "module": "candle_doji_star",
       "name": "CandleDojiStar",
       "native_binding": true,
       "native_symbols": [
@@ -1454,7 +1454,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "belt_hold",
+      "module": "candle_belt_hold",
       "name": "CandleBeltHold",
       "native_binding": true,
       "native_symbols": [
@@ -1469,7 +1469,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "engulfing",
+      "module": "candle_engulfing",
       "name": "CandleEngulfing",
       "native_binding": true,
       "native_symbols": [
@@ -1557,7 +1557,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "three_white_soldiers",
+      "module": "candle_three_white_soldiers",
       "name": "CandleThreeWhiteSoldiers",
       "native_binding": true,
       "native_symbols": [
@@ -1782,7 +1782,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "in_neck",
+      "module": "candle_in_neck",
       "name": "CandleInNeck",
       "native_binding": true,
       "native_symbols": [
@@ -1797,7 +1797,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "inverted_hammer",
+      "module": "candle_inverted_hammer",
       "name": "CandleInvertedHammer",
       "native_binding": true,
       "native_symbols": [
@@ -1812,7 +1812,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "kicking",
+      "module": "candle_kicking",
       "name": "CandleKicking",
       "native_binding": true,
       "native_symbols": [
@@ -1827,7 +1827,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "kicking_by_length",
+      "module": "candle_kicking_by_length",
       "name": "CandleKickingByLength",
       "native_binding": true,
       "native_symbols": [
@@ -1842,7 +1842,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ladder_bottom",
+      "module": "candle_ladder_bottom",
       "name": "CandleLadderBottom",
       "native_binding": true,
       "native_symbols": [
