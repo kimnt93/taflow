@@ -61,6 +61,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RelativeStrengthIndex>()?;
     m.add_class::<indicators::RelativeMomentumIndex>()?;
     m.add_class::<indicators::MovingAverage>()?;
+    m.add_class::<indicators::HilbertTransformTrendline>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergence>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergenceExtended>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergenceFixed>()?;
@@ -295,7 +296,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::TrueRange>()?;
     m.add_class::<state_api::NormalizedAverageTrueRange>()?;
     m.add_class::<state_api::VariablePeriodMovingAverage>()?;
-    m.add_class::<state_api::StatefulHtTrendline>()?;
     m.add_class::<state_api::StatefulAdx>()?;
     m.add_class::<state_api::StatefulAdxr>()?;
     m.add_class::<state_api::StatefulDx>()?;

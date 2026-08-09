@@ -1,95 +1,48 @@
-"""Descriptive stateful interface for the Hilbert Transform trendline."""
+"""Canonical native-backed Hilbert Transform Trendline adapter."""
 
-from taflow._native import StatefulHtTrendline
 from typing import Any
 
 import numpy as np
 
+from ._native import HilbertTransformTrendline as _NativeHilbertTransformTrendline
+from ._series import as_float64_series
+
 
 class HilbertTransformTrendline:
-    """Incrementally compute the instantaneous Hilbert Transform trendline
+    """Compute TA-Lib ``HT_TRENDLINE`` from a chronological price series.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    HilbertTransformTrendline
-        A persistent native-backed indicator adapter.
+    ``values`` is required and may be empty for a fresh stream. The Rust state
+    handles Hilbert warm-up; aligned ``compute`` output contains NaN values
+    before the first trendline, while scalar ``value`` is ``None``. Lifecycle
+    mutators are fluent. Oracle mapping: ``HilbertTransformTrendline`` ⇔
+    TA-Lib ``HT_TRENDLINE``.
     """
 
-    def __init__(
-        self,
-        _input: Any,
-    ) -> None:
-        """Create the trendline with an initial price series."""
-        self._state = StatefulHtTrendline()
-        if _input is not None:
-            self.extend(_input)
+    def __init__(self, values: Any) -> None:
+        self._state = _NativeHilbertTransformTrendline()
+        self.extend(values)
 
-    def append(self, _input: object) -> "HilbertTransformTrendline":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(_input)
+    def append(self, value: float) -> "HilbertTransformTrendline":
+        self._state.append(float(value))
         return self
 
-    def extend(self, _input: object) -> "HilbertTransformTrendline":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(_input)
+    def extend(self, values: Any) -> "HilbertTransformTrendline":
+        self._state.extend(as_float64_series(values))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> float | None:
         return self._state.value
 
     def reset(self) -> "HilbertTransformTrendline":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
         self._state.reset()
         return self
 
     def __len__(self) -> int:
         return len(self._state)
+
+
+__all__ = ["HilbertTransformTrendline"]

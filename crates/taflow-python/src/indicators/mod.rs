@@ -60,6 +60,7 @@ mod hilbert_transform_dominant_cycle_phase;
 mod hilbert_transform_phasor;
 mod hilbert_transform_sine_wave;
 mod hilbert_transform_trend_mode;
+mod hilbert_transform_trendline;
 mod homing_pigeon;
 mod hurst;
 mod ichimoku;
@@ -232,6 +233,7 @@ pub use hilbert_transform_dominant_cycle_phase::HilbertTransformDominantCyclePha
 pub use hilbert_transform_phasor::HilbertTransformPhasor;
 pub use hilbert_transform_sine_wave::HilbertTransformSineWave;
 pub use hilbert_transform_trend_mode::HilbertTransformTrendMode;
+pub use hilbert_transform_trendline::HilbertTransformTrendline;
 pub use homing_pigeon::CandleHomingPigeon;
 pub use hurst::{FractalDimensionOperator, HurstOperator};
 pub use ichimoku::IchimokuOperator;

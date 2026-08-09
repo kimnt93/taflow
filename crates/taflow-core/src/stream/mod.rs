@@ -117,11 +117,13 @@ mod dema;
 mod directional;
 mod dx;
 mod ema;
+mod hilbert_transform_trendline;
+#[cfg(test)]
+mod hilbert_transform_trendline_test;
 mod ht_dcperiod;
 mod ht_dcphase;
 mod ht_phasor;
 mod ht_sine;
-mod ht_trendline;
 mod ht_trendmode;
 mod imi;
 mod indicator;
@@ -456,13 +458,11 @@ pub use ema::ExponentialMovingAverage;
 pub use even_better_sinewave::EvenBetterSinewave;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
 pub use heikin_ashi::{HeikinAshi, HeikinAshiValue};
+pub use hilbert_transform_trendline::HilbertTransformTrendline;
 pub use ht_dcperiod::HilbertTransformDominantCyclePeriod;
 pub use ht_dcphase::HilbertTransformDominantCyclePhase;
 pub use ht_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
 pub use ht_sine::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
-#[allow(unused_imports)]
-pub(crate) use ht_trendline::hilbert_transform_trendline;
-pub use ht_trendline::HilbertTransformTrendline;
 pub use ht_trendmode::HilbertTransformTrendMode;
 #[allow(unused_imports)]
 pub(crate) use imi::intraday_momentum_index;

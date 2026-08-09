@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 190,
-    "complete": 69,
+    "complete": 70,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 610,
     "smc_functions": 8,
-    "structure": 69,
+    "structure": 70,
     "talib_functions": 161
   },
   "rows": [
@@ -229,7 +229,8 @@
       "name": "HilbertTransformTrendline",
       "native_binding": true,
       "native_symbols": [
-        "StatefulHtTrendline"
+        "HilbertTransformTrendline",
+        "_NativeHilbertTransformTrendline"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4557,6 +4558,7 @@
         "HilbertTransformPhasor",
         "HilbertTransformSineWave",
         "HilbertTransformTrendMode",
+        "HilbertTransformTrendline",
         "HmaOperator",
         "HurstOperator",
         "IchimokuOperator",
@@ -4669,7 +4671,6 @@
         "StatefulDema",
         "StatefulDx",
         "StatefulEvenBetterSinewave",
-        "StatefulHtTrendline",
         "StatefulImi",
         "StatefulJurikMovingAverage",
         "StatefulKama",
@@ -4863,6 +4864,7 @@
         "HilbertTransformPhasor",
         "HilbertTransformSineWave",
         "HilbertTransformTrendMode",
+        "HilbertTransformTrendline",
         "HmaOperator",
         "HurstOperator",
         "IchimokuOperator",
@@ -4975,7 +4977,6 @@
         "StatefulDema",
         "StatefulDx",
         "StatefulEvenBetterSinewave",
-        "StatefulHtTrendline",
         "StatefulImi",
         "StatefulJurikMovingAverage",
         "StatefulKama",

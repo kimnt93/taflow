@@ -7,8 +7,8 @@ use taflow::stream::{
     self, AverageDirectionalIndex, AverageDirectionalIndexRating,
     AverageTrueRange as CoreAverageTrueRange, DirectionalMovementIndex,
     DoubleExponentialMovingAverage, EvenBetterSinewave, ExponentialMovingAverage,
-    FastStochasticOscillator, HilbertTransformTrendline, IntradayMomentumIndex, JurikMovingAverage,
-    KlingerVolumeOscillator, MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
+    FastStochasticOscillator, IntradayMomentumIndex, JurikMovingAverage, KlingerVolumeOscillator,
+    MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
     NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange,
     ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange as CoreRateOfChange,
     RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
@@ -768,6 +768,12 @@ impl StatefulEvenBetterSinewave {
         self.inner.reset();
         self.output.clear();
     }
+}
+
+#[pyclass]
+pub struct StatefulImi {
+    inner: IntradayMomentumIndex,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
@@ -2741,12 +2747,6 @@ pub struct VariablePeriodMovingAverage {
 }
 
 #[pyclass]
-pub struct StatefulHtTrendline {
-    inner: HilbertTransformTrendline,
-    outputs: Vec<f64>,
-}
-
-#[pyclass]
 pub struct StatefulAdx {
     inner: AverageDirectionalIndex,
     outputs: Vec<f64>,
@@ -3113,52 +3113,6 @@ impl VariablePeriodMovingAverage {
         let outputs = &mut self.outputs;
         py.allow_threads(|| inner.extend_slices_into(input, periods, outputs))
             .map_err(py_value_error)?;
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulHtTrendline {
-    #[new]
-    fn new() -> Self {
-        Self {
-            inner: HilbertTransformTrendline::new(),
-            outputs: Vec::new(),
-        }
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| {
-            outputs.extend(
-                input
-                    .iter()
-                    .map(|&input| self.inner.append(input).unwrap_or(f64::NAN)),
-            )
-        });
         Ok(())
     }
 
