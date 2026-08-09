@@ -126,6 +126,8 @@ mod ht_phasor;
 mod ht_sine;
 mod ht_trendmode;
 mod imi;
+#[cfg(test)]
+mod imi_test;
 mod indicator;
 mod kama;
 mod mama;
@@ -483,7 +485,6 @@ pub use ht_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
 pub use ht_sine::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
 pub use ht_trendmode::HilbertTransformTrendMode;
 #[allow(unused_imports)]
-pub(crate) use imi::intraday_momentum_index;
 pub use imi::IntradayMomentumIndex;
 pub use indicator::StreamingIndicator;
 pub use jurik_moving_average::JurikMovingAverage;

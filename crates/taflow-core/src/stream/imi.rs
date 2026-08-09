@@ -1,18 +1,10 @@
-//! Stateful Intraday Momentum Index.
-//!
-//! IMI separates each candle body into an intraday gain or loss and maintains
-//! rolling sums for the most recent `timeperiod` bars in constant time.
-
-use crate::error::TaResult;
+//! Persistent Intraday Momentum Index state.
 
 use super::{invalid_period, Window};
+use crate::error::TaResult;
 
 /// Incremental Intraday Momentum Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `IntradayMomentumIndex`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct IntradayMomentumIndex {
     gains: Window,
     losses: Window,
@@ -22,7 +14,6 @@ pub struct IntradayMomentumIndex {
 }
 
 impl IntradayMomentumIndex {
-    /// Creates an IMI state with a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -36,7 +27,6 @@ impl IntradayMomentumIndex {
         })
     }
 
-    /// Appends one candle's open and close.
     pub fn append(&mut self, open: f64, close: f64) -> Option<f64> {
         let movement = close - open;
         let (gain, loss) = if movement > 0.0 {
@@ -63,12 +53,27 @@ impl IntradayMomentumIndex {
         self.value
     }
 
-    /// Returns the latest warm value.
+    pub fn extend_slice_into(
+        &mut self,
+        open: &[f64],
+        close: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if open.len() != close.len() {
+            return Err(crate::error::TaError::LengthMismatch {
+                expected: open.len(),
+                got: close.len(),
+            });
+        }
+        for (&open, &close) in open.iter().zip(close) {
+            output.push(self.append(open, close).unwrap_or(f64::NAN));
+        }
+        Ok(())
+    }
+
     pub fn value(&self) -> Option<f64> {
         self.value
     }
-
-    /// Restores the post-construction state while retaining window capacity.
     pub fn reset(&mut self) {
         self.gains.clear();
         self.losses.clear();
@@ -76,102 +81,4 @@ impl IntradayMomentumIndex {
         self.loss_sum = 0.0;
         self.value = None;
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn matches_batch_and_reset_replay() {
-        let open: Vec<f64> = (0..300)
-            .map(|index| 100.0 + (index as f64 * 0.17).sin() * 8.0)
-            .collect();
-        let close: Vec<f64> = open
-            .iter()
-            .enumerate()
-            .map(|(index, open)| open + (index as f64 * 0.31).cos() * 1.7)
-            .collect();
-        let expected = crate::stream::intraday_momentum_index(&open, &close, 14).unwrap();
-        let mut state = IntradayMomentumIndex::new(14).unwrap();
-        for index in 0..open.len() {
-            match state.append(open[index], close[index]) {
-                Some(actual) => assert!((actual - expected[index]).abs() < 1e-10),
-                None => assert!(expected[index].is_nan()),
-            }
-        }
-        let expected_final = state.value();
-        state.reset();
-        for index in 0..open.len() {
-            state.append(open[index], close[index]);
-        }
-        assert_eq!(state.value(), expected_final);
-    }
-
-    #[test]
-    fn flat_candles_return_neutral_value() {
-        let mut state = IntradayMomentumIndex::new(2).unwrap();
-        assert_eq!(state.append(10.0, 10.0), None);
-        assert_eq!(state.append(10.0, 10.0), Some(50.0));
-    }
-}
-use crate::error::TaError;
-
-/// Compute the intraday momentum index result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn intraday_momentum_index(
-    open: &[f64],
-    close: &[f64],
-    timeperiod: usize,
-) -> TaResult<Vec<f64>> {
-    let len = open.len();
-    if len != close.len() {
-        return Err(TaError::LengthMismatch {
-            expected: len,
-            got: close.len(),
-        });
-    }
-    if timeperiod < 2 {
-        return Err(TaError::InvalidParameter {
-            name: "timeperiod",
-            value: timeperiod.to_string(),
-            reason: "must be >= 2",
-        });
-    }
-    if len < timeperiod {
-        return Err(TaError::InsufficientData {
-            need: timeperiod,
-            got: len,
-        });
-    }
-
-    let lookback = timeperiod - 1;
-    let mut output = vec![f64::NAN; len];
-    for today in lookback..len {
-        let mut gains = 0.0;
-        let mut losses = 0.0;
-        for index in (today + 1 - timeperiod)..=today {
-            let movement = close[index] - open[index];
-            if movement > 0.0 {
-                gains += movement;
-            } else {
-                losses -= movement;
-            }
-        }
-        output[today] = if gains + losses == 0.0 {
-            50.0
-        } else {
-            100.0 * gains / (gains + losses)
-        };
-    }
-    Ok(output)
 }

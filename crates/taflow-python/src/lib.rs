@@ -70,6 +70,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::OpeningRange>()?;
     m.add_class::<indicators::SessionVolumeLevels>()?;
     m.add_class::<indicators::PivotPoints>()?;
+    m.add_class::<indicators::IntradayMomentumIndex>()?;
     m.add_class::<indicators::ParabolicMovingAverageStop>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergence>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergenceExtended>()?;
@@ -227,7 +228,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulTrima>()?;
     m.add_class::<state_api::StatefulMidpoint>()?;
     m.add_class::<state_api::StatefulMidprice>()?;
-    m.add_class::<state_api::StatefulImi>()?;
     m.add_class::<state_api::Momentum>()?;
     m.add_class::<state_api::RateOfChange>()?;
     m.add_class::<state_api::RateOfChangePercent>()?;
