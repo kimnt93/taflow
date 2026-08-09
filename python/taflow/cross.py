@@ -1,55 +1,62 @@
+"""Native-backed any-direction crossing signal adapter."""
+
 from typing import Any
+
 import numpy as np
+
 from ._native import CrossOperator as _Native
 from ._series import as_float64_series
 
 
 class Cross:
-    """Detect either a causal upward or downward crossing.
+    """Emit one on either causal upward or downward crossing.
 
-    ``left`` and ``right`` are required aligned numeric histories. Each output
-    is 1.0 on a crossing and 0.0 otherwise; the first bar is 0.0 because no
-    prior pair exists. ``append``, ``extend``, and ``reset`` are fluent,
-    ``value`` returns the latest scalar or ``None``, and ``compute`` returns a
-    NumPy array.
+    ``left`` and ``right`` are required equal-length chronological numeric
+    histories and may both be empty for a fresh stream. The first output is
+    zero because no prior pair exists. ``compute`` returns one aligned float
+    array, ``value`` is the latest scalar or ``None`` for an empty stream, and
+    lifecycle mutators return ``self``. Input mismatches are rejected before
+    native mutation.
     """
 
-    def __init__(
-        self,
-        left: Any,
-        right: Any,
-    ) -> None:
-        """Create the native state and replay aligned input histories."""
+    def __init__(self, left: Any, right: Any) -> None:
         self._state = _Native()
+        self._length = 0
         self.extend(left, right)
 
     def append(self, left: float, right: float) -> "Cross":
         """Append one pair and return this adapter."""
         self._state.append(float(left), float(right))
+        self._length += 1
         return self
 
     def extend(self, left: Any, right: Any) -> "Cross":
-        """Append aligned left/right histories and return this adapter."""
-        arrays = tuple(as_float64_series(series) for series in (left, right))
-        if arrays[0].shape != arrays[1].shape:
+        """Append equal-length left/right histories."""
+        arrays = as_float64_series(left), as_float64_series(right)
+        if len(arrays[0]) != len(arrays[1]):
             raise ValueError("left and right must have equal lengths")
         self._state.extend(*arrays)
+        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned 0.0/1.0 crossing history."""
+        """Return the aligned any-direction crossing flags."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest crossing flag or ``None`` for an empty stream."""
+        """Return the latest flag, or ``None`` for an empty stream."""
         return self._state.value
 
     def reset(self) -> "Cross":
-        """Reset native state and output history, returning this adapter."""
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
+        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed pairs."""
-        return len(self._state.compute())
+        return self._length
+
+
+__all__ = ["Cross"]

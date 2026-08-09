@@ -1,100 +1,61 @@
+"""Native-backed downward-crossing signal adapter."""
+
 from typing import Any
+
 import numpy as np
+
 from ._native import CrossunderOperator as _Native
 from ._series import as_float64_series
 
 
 class Crossunder:
-    """Crossunder
+    """Emit one when ``left`` crosses causally below ``right``.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `left`, `right`. Warm-up positions are represented by `NaN` in history."""
+    ``left`` and ``right`` are required equal-length chronological series and
+    may both be empty for a fresh stream. The first output is zero because no
+    prior pair exists. ``compute`` returns one aligned float array, ``value`` is
+    the latest scalar or ``None`` for an empty stream, and lifecycle mutators
+    return ``self``. Input length mismatches are rejected before mutation.
+    """
 
-    def __init__(
-        self,
-        left: Any,
-        right: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        left : object
-            Left-hand aligned input series or scalar value.
-        right : object
-            Right-hand aligned input series or scalar value.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
+    def __init__(self, left: Any, right: Any) -> None:
         self._state = _Native()
-        self.extend(left, right) if left is not None or right is not None else None
+        self._length = 0
+        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "Crossunder":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        left : object
-            Left-hand aligned input series or scalar value.
-        right : object
-            Right-hand aligned input series or scalar value.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(left, right)
+        """Append one pair and return this adapter."""
+        self._state.append(float(left), float(right))
+        self._length += 1
         return self
 
     def extend(self, left: Any, right: Any) -> "Crossunder":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        left : object
-            Left-hand aligned input series or scalar value.
-        right : object
-            Right-hand aligned input series or scalar value.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(left), as_float64_series(right))
+        """Append equal-length left/right histories."""
+        arrays = as_float64_series(left), as_float64_series(right)
+        if len(arrays[0]) != len(arrays[1]):
+            raise ValueError("left and right must have equal lengths")
+        self._state.extend(*arrays)
+        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned downward-crossing flags."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> float | None:
+        """Return the latest flag, or ``None`` for an empty stream."""
         return self._state.value
 
     def reset(self) -> "Crossunder":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed pairs."""
+        return self._length
+
+
+__all__ = ["Crossunder"]
