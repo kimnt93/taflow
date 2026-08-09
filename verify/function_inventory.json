@@ -10,7 +10,7 @@
     "python_exports": 300,
     "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 287,
+    "structure": 294,
     "talib_functions": 161
   },
   "rows": [
@@ -4409,7 +4409,8 @@
       "name": "DecayLinear",
       "native_binding": true,
       "native_symbols": [
-        "WeightedMovingAverage"
+        "WeightedMovingAverage",
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4438,7 +4439,8 @@
       "name": "TimeSeriesRank",
       "native_binding": true,
       "native_symbols": [
-        "RollingRankOperator"
+        "RollingRankOperator",
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,

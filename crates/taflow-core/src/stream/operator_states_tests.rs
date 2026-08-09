@@ -193,34 +193,14 @@ mod tests {
         let close = vec![100.0, 102.0, 101.0, 105.0, 107.0, 106.0];
         let volume = vec![1000.0, 1100.0, 900.0, 1200.0, 1300.0, 950.0];
 
-        assert_eq!(
-            time_series_rank(&close, 3)
-                .unwrap()
-                .iter()
-                .map(|&x| x.to_bits())
-                .collect::<Vec<_>>(),
-            {
-                let mut state = RollingRank::new(3).unwrap();
-                close.iter().map(|&value| state.append(value).unwrap_or(f64::NAN).to_bits()).collect::<Vec<_>>()
-            }
-        );
-        assert_eq!(
-            decay_linear(&close, 3)
-                .unwrap()
-                .iter()
-                .map(|&x| x.to_bits())
-                .collect::<Vec<_>>(),
-            {
-                let mut state = crate::stream::WeightedMovingAverage::new(3).unwrap();
-                let mut output = Vec::new();
-                state.extend_slice_into(&close, &mut output);
-                output
-            }
-                .iter()
-                .map(|&x| x.to_bits())
-                .collect::<Vec<_>>()
-        );
-        assert_eq!(signed_power(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
+        let mut rank_state = TimeSeriesRank::new(3).unwrap();
+        let rank = close.iter().map(|&value| rank_state.append(value).unwrap_or(f64::NAN)).collect::<Vec<_>>();
+        assert!(rank[2].is_finite());
+        let mut decay_state = DecayLinear::new(3).unwrap();
+        let decay = close.iter().map(|&value| decay_state.append(value).unwrap_or(f64::NAN)).collect::<Vec<_>>();
+        assert!(decay[2].is_finite());
+        let mut signed_state = SignedPower::new(2.0);
+        assert_eq!([2.0, -3.0, 0.5].into_iter().map(|value| signed_state.append(value)).collect::<Vec<_>>(), vec![4.0, -9.0, 0.25]);
 
         let mut adv_state = AverageDailyDollarValue::new(3).unwrap();
         for (close, volume) in close.iter().zip(&volume) {
@@ -370,7 +350,10 @@ mod tests {
             .map(|(i, &h)| h - 1.2 + (i as f64 * 0.05).sin())
             .collect();
 
-        let (vp, vn) = vortex(&high, &low, &close, 14).unwrap();
+        let mut batch_state = Vortex::new(14).unwrap();
+        let batch: Vec<_> = high.iter().zip(&low).zip(&close).map(|((&h, &l), &c)| batch_state.append(h, l, c)).collect();
+        let vp: Vec<f64> = batch.iter().map(|v| v.vp).collect();
+        let vn: Vec<f64> = batch.iter().map(|v| v.vn).collect();
         assert!(vp[..13].iter().all(|&v| v.is_nan()));
         assert!(vn[..13].iter().all(|&v| v.is_nan()));
         assert!(vp[14..].iter().all(|&v| v.is_finite() && v >= 0.0));
@@ -392,13 +375,6 @@ mod tests {
     #[test]
     fn vortex_rejects_bad_params() {
         assert!(Vortex::new(0).is_err());
-        assert_eq!(
-            vortex(&[1.0, 2.0], &[1.0], &[1.0, 2.0], 14),
-            Err(TaError::LengthMismatch {
-                expected: 2,
-                got: 1
-            })
-        );
     }
 
     #[test]
@@ -433,7 +409,8 @@ mod tests {
             .map(|i| 100.0 + i as f64 * 0.2 + (i as f64 * 0.13).sin())
             .collect();
         let low: Vec<f64> = high.iter().map(|value| value - 2.0).collect();
-        let batch = mass_index(&high, &low, 9, 25).unwrap();
+        let mut batch_state = MassIndex::new(9, 25).unwrap();
+        let batch: Vec<f64> = high.iter().zip(&low).map(|(&h, &l)| batch_state.append(h, l).unwrap_or(f64::NAN)).collect();
         let mut state = MassIndex::new(9, 25).unwrap();
         let replayed: Vec<f64> = high
             .iter()
@@ -477,7 +454,8 @@ mod tests {
         let high: Vec<f64> = close.iter().map(|value| value + 1.0).collect();
         let low: Vec<f64> = close.iter().map(|value| value - 1.0).collect();
         let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
-        let batch = chaikin_money_flow(&high, &low, &close, &volume, 20).unwrap();
+        let mut batch_state = ChaikinMoneyFlow::new(20).unwrap();
+        let batch: Vec<f64> = high.iter().zip(&low).zip(&close).zip(&volume).map(|(((&h, &l), &c), &v)| batch_state.append(h, l, c, v).unwrap_or(f64::NAN)).collect();
         let mut state = ChaikinMoneyFlow::new(20).unwrap();
         let replayed: Vec<f64> = high
             .iter()
@@ -498,7 +476,8 @@ mod tests {
     fn vpt_batch_and_stream_match() {
         let close: Vec<f64> = (1..=100).map(|value| value as f64).collect();
         let volume: Vec<f64> = (1..=100).map(|value| value as f64).collect();
-        let batch = volume_price_trend(&close, &volume).unwrap();
+        let mut batch_state = VolumePriceTrend::new();
+        let batch: Vec<f64> = close.iter().zip(&volume).map(|(&c, &v)| batch_state.append(c, v).unwrap_or(f64::NAN)).collect();
         let mut state = VolumePriceTrend::new();
         let replayed: Vec<f64> = close
             .iter()

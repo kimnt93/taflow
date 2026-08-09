@@ -1,27 +1,20 @@
-"""Linearly decayed moving average."""
+"""Canonical native-backed linear-decay adapter."""
 from typing import Any
+import numpy as np
+from ._native import WeightedMovingAverage as _Native
+from ._series import as_float64_series
 
-from .weighted_moving_average import WeightedMovingAverage
 
-
-class DecayLinear(WeightedMovingAverage):
-    """WorldQuant linear decay, exactly equivalent to weighted moving average.
-
-    The class reuses the native ``WeightedMovingAverage`` state and preserves
-    its constructor, append, extend, compute, value, and reset lifecycle.
-    """
-
-    def append(self, _input: float) -> "DecayLinear":
-        """Append one observation and return this indicator."""
-        super().append(_input)
-        return self
-
-    def extend(self, _input: Any) -> "DecayLinear":
-        """Append aligned histories and return this indicator."""
-        super().extend(_input)
-        return self
-
-    def reset(self) -> "DecayLinear":
-        """Reset native state and return this indicator."""
-        super().reset()
-        return self
+class DecayLinear:
+    """WorldQuant linear-decay weighted moving average."""
+    def __init__(self, input: Any, timeperiod: int = 30) -> None:
+        self._state = _Native(int(timeperiod)); self._length = 0; self.extend(input)
+    def append(self, input: float) -> "DecayLinear":
+        self._state.append(float(input)); self._length += 1; return self
+    def extend(self, input: Any) -> "DecayLinear":
+        values = as_float64_series(input); self._state.extend(values); self._length += len(values); return self
+    def compute(self) -> np.ndarray: return self._state.compute()
+    @property
+    def value(self) -> float | None: return self._state.value
+    def reset(self) -> "DecayLinear": self._state.reset(); self._length = 0; return self
+    def __len__(self) -> int: return self._length

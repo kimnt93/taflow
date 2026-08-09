@@ -1297,22 +1297,22 @@ mod sessions;
 #[cfg(test)]
 mod sessions_test;
 mod time_series_rank;
+#[cfg(test)]
+mod time_series_rank_test;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
 mod yang_zhang;
 #[cfg(test)]
 mod yang_zhang_test;
-#[allow(unused_imports)]
-pub(crate) use time_series_rank::time_series_rank;
 pub use time_series_rank::TimeSeriesRank;
 mod signed_power;
-#[allow(unused_imports)]
-pub(crate) use signed_power::signed_power;
+#[cfg(test)]
+mod signed_power_test;
 pub use signed_power::SignedPower;
 mod decay_linear;
-#[allow(unused_imports)]
-pub(crate) use decay_linear::decay_linear;
+#[cfg(test)]
+mod decay_linear_test;
 pub use decay_linear::DecayLinear;
 mod amihud;
 #[cfg(test)]
@@ -1332,6 +1332,7 @@ mod ichimoku_test;
 mod kalman_hedge_ratio;
 #[cfg(test)]
 mod kalman_hedge_ratio_test;
+mod know_sure_thing;
 mod ornstein_uhlenbeck_half_life;
 #[cfg(test)]
 mod ornstein_uhlenbeck_half_life_test;
@@ -1354,9 +1355,8 @@ mod supertrend;
 #[cfg(test)]
 mod supertrend_test;
 mod vortex;
-#[allow(unused_imports)]
-pub(crate) use vortex::vortex;
-mod know_sure_thing;
+#[cfg(test)]
+mod vortex_test;
 #[allow(unused_imports)]
 pub(crate) use know_sure_thing::know_sure_thing;
 mod swing_high_low;
@@ -1398,12 +1398,27 @@ mod rolling_kurtosis;
 #[cfg(test)]
 mod rolling_kurtosis_test;
 pub use rolling_kurtosis::RollingKurtosis;
+mod chaikin_money_flow;
+#[cfg(test)]
+mod chaikin_money_flow_test;
+mod detrended_price_oscillator;
+#[cfg(test)]
+mod detrended_price_oscillator_test;
 mod exponentially_weighted_correlation;
 mod exponentially_weighted_covariance;
 mod exponentially_weighted_standard_deviation;
 mod exponentially_weighted_sum;
 mod exponentially_weighted_variance;
 mod mass_index;
+#[cfg(test)]
+mod mass_index_test;
+mod mcginley_dynamic;
+mod negative_volume_index;
+#[cfg(test)]
+mod negative_volume_index_test;
+mod positive_volume_index;
+#[cfg(test)]
+mod positive_volume_index_test;
 mod rolling_covariance;
 #[cfg(test)]
 mod rolling_covariance_test;
@@ -1414,24 +1429,9 @@ mod rolling_interquartile_range_test;
 mod rolling_winsorize;
 #[cfg(test)]
 mod rolling_winsorize_test;
-#[allow(unused_imports)]
-pub(crate) use mass_index::mass_index;
-mod chaikin_money_flow;
-mod detrended_price_oscillator;
-#[cfg(test)]
-mod detrended_price_oscillator_test;
-#[allow(unused_imports)]
-pub(crate) use chaikin_money_flow::chaikin_money_flow;
 mod volume_price_trend;
-#[allow(unused_imports)]
-pub(crate) use volume_price_trend::volume_price_trend;
-mod negative_volume_index;
-#[allow(unused_imports)]
-pub(crate) use negative_volume_index::negative_volume_index;
-mod positive_volume_index;
-#[allow(unused_imports)]
-pub(crate) use positive_volume_index::positive_volume_index;
-mod mcginley_dynamic;
+#[cfg(test)]
+mod volume_price_trend_test;
 #[allow(unused_imports)]
 pub(crate) use mcginley_dynamic::mcginley_dynamic;
 mod aroon_oscillator;

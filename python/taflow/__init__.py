@@ -303,10 +303,10 @@ from .vortex import Vortex
 from .kst import KnowSureThing
 from .mass_index import MassIndex
 from .detrended_price_oscillator import DetrendedPriceOscillator
-from .cmf import ChaikinMoneyFlow
-from .vpt import VolumePriceTrend
-from .nvi import NegativeVolumeIndex
-from .pvi import PositiveVolumeIndex
+from .chaikin_money_flow import ChaikinMoneyFlow
+from .volume_price_trend import VolumePriceTrend
+from .negative_volume_index import NegativeVolumeIndex
+from .positive_volume_index import PositiveVolumeIndex
 from .mcginley_dynamic import McGinleyDynamic
 from .decay_linear import DecayLinear
 from .signed_power import SignedPower

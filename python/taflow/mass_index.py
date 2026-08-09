@@ -1,110 +1,23 @@
-"""Persistent Mass Index (Dorsey EMA-ratio alignment)."""
-
+"""Canonical native-backed Mass Index adapter."""
 from typing import Any
-
 import numpy as np
-
 from ._native import MassIndexOperator as _Native
 from ._series import as_float64_series
 
 
 class MassIndex:
-    """Persistent Mass Index (Dorsey EMA-ratio alignment).
-
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
-
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        ema_period: object = 9,
-        sum_period: object = 25,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        ema_period : object
-            EMA smoothing period in bars.
-        sum_period : object
-            Cumulative sum lookback in bars.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = _Native(ema_period, sum_period)
-        self.extend(high, low) if high is not None or low is not None else None
-
+    """Mass Index from EMA-smoothed high-low ranges."""
+    def __init__(self, high: Any, low: Any, ema_period: int = 9, sum_period: int = 25) -> None:
+        self._state = _Native(int(ema_period), int(sum_period)); self._length = 0
+        self.extend(high, low)
     def append(self, high: float, low: float) -> "MassIndex":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(high, low)
-        return self
-
+        self._state.append(float(high), float(low)); self._length += 1; return self
     def extend(self, high: Any, low: Any) -> "MassIndex":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(high), as_float64_series(low))
-        return self
-
-    def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.compute()
-
+        high_values = as_float64_series(high); low_values = as_float64_series(low)
+        if high_values.shape != low_values.shape: raise ValueError("high and low must have equal lengths")
+        self._state.extend(high_values, low_values); self._length += len(high_values); return self
+    def compute(self) -> np.ndarray: return self._state.compute()
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> "MassIndex":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
+    def value(self) -> float | None: return self._state.value
+    def reset(self) -> "MassIndex": self._state.reset(); self._length = 0; return self
+    def __len__(self) -> int: return self._length

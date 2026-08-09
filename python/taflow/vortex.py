@@ -1,5 +1,4 @@
-"""Persistent Vortex indicator (bukosabino `ta` alignment)."""
-
+"""Canonical native-backed Vortex adapter."""
 from typing import Any
 import numpy as np
 from ._native import VortexOperator as _Native
@@ -7,112 +6,18 @@ from ._series import as_float64_series
 
 
 class Vortex:
-    """Persistent Vortex indicator (bukosabino `ta` alignment).
-
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
-
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        close: Any,
-        window: int = 14,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-        window : object
-            Trailing window length in bars.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = _Native(window)
-        (
-            self.extend(high, low, close)
-            if any(value is not None for value in (high, low, close))
-            else None
-        )
-
+    """Vortex positive and negative directional ratios over OHLC series."""
+    def __init__(self, high: Any, low: Any, close: Any, window: int = 14) -> None:
+        self._state = _Native(int(window)); self._length = 0
+        self.extend(high, low, close)
     def append(self, high: float, low: float, close: float) -> "Vortex":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(high, low, close)
-        return self
-
+        self._state.append(float(high), float(low), float(close)); self._length += 1; return self
     def extend(self, high: Any, low: Any, close: Any) -> "Vortex":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(
-            as_float64_series(high), as_float64_series(low), as_float64_series(close)
-        )
-        return self
-
-    def compute(self) -> tuple[np.ndarray, np.ndarray]:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.compute()
-
+        arrays = [as_float64_series(v) for v in (high, low, close)]
+        if not (arrays[0].shape == arrays[1].shape == arrays[2].shape): raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(*arrays); self._length += len(arrays[0]); return self
+    def compute(self) -> tuple[np.ndarray, np.ndarray]: return self._state.compute()
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> "Vortex":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
+    def value(self) -> tuple[float, float] | None: return self._state.value
+    def reset(self) -> "Vortex": self._state.reset(); self._length = 0; return self
+    def __len__(self) -> int: return self._length

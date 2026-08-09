@@ -1,26 +1,20 @@
-"""Causal WorldQuant time-series rank."""
+"""Canonical native-backed time-series-rank adapter."""
 from typing import Any
+import numpy as np
+from ._native import RollingRankOperator as _Native
+from ._series import as_float64_series
 
-from .rolling_rank import RollingRank
 
-
-class TimeSeriesRank(RollingRank):
-    """Rank the current value within its trailing window as a fraction.
-
-    This is the WorldQuant name for the native causal ``RollingRank`` kernel.
-    """
-
-    def append(self, _input: float) -> "TimeSeriesRank":
-        """Append one observation and return this indicator."""
-        super().append(_input)
-        return self
-
-    def extend(self, _input: Any) -> "TimeSeriesRank":
-        """Append aligned histories and return this indicator."""
-        super().extend(_input)
-        return self
-
-    def reset(self) -> "TimeSeriesRank":
-        """Reset native state and return this indicator."""
-        super().reset()
-        return self
+class TimeSeriesRank:
+    """WorldQuant rank of each value within a trailing window."""
+    def __init__(self, input: Any, timeperiod: int = 14) -> None:
+        self._state = _Native(int(timeperiod)); self._length = 0; self.extend(input)
+    def append(self, input: float) -> "TimeSeriesRank":
+        self._state.append(float(input)); self._length += 1; return self
+    def extend(self, input: Any) -> "TimeSeriesRank":
+        values = as_float64_series(input); self._state.extend(values); self._length += len(values); return self
+    def compute(self) -> np.ndarray: return self._state.compute()
+    @property
+    def value(self) -> float | None: return self._state.value
+    def reset(self) -> "TimeSeriesRank": self._state.reset(); self._length = 0; return self
+    def __len__(self) -> int: return self._length

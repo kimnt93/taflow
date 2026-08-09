@@ -1,45 +1,20 @@
-"""Persistent pointwise signed power."""
-
+"""Canonical native-backed signed-power adapter."""
 from typing import Any
-
 import numpy as np
-
 from ._native import SignedPowerOperator as _Native
 from ._series import as_float64_series
 
 
 class SignedPower:
-    """Compute ``sign(x) * abs(x) ** exponent`` for an aligned series."""
-
-    def __init__(
-        self,
-        _input: Any,
-        exponent: float = 2.0,
-    ) -> None:
-        self._state = _Native(float(exponent))
-        if _input is not None:
-            self.extend(_input)
-
-    def append(self, _input: float) -> "SignedPower":
-        """Append one scalar observation to the persistent native state."""
-        self._state.append(float(_input))
-        return self
-
-    def extend(self, _input: Any) -> "SignedPower":
-        """Append an aligned input series to the persistent native state."""
-        self._state.extend(as_float64_series(_input))
-        return self
-
-    def compute(self) -> np.ndarray:
-        """Return the complete aligned output history."""
-        return self._state.compute()
-
+    """Pointwise sign(x) times abs(x) raised to exponent."""
+    def __init__(self, input: Any, exponent: float = 2.0) -> None:
+        self._state = _Native(float(exponent)); self._length = 0; self.extend(input)
+    def append(self, input: float) -> "SignedPower":
+        self._state.append(float(input)); self._length += 1; return self
+    def extend(self, input: Any) -> "SignedPower":
+        values = as_float64_series(input); self._state.extend(values); self._length += len(values); return self
+    def compute(self) -> np.ndarray: return self._state.compute()
     @property
-    def value(self) -> float | None:
-        """Return the latest computed value."""
-        return self._state.value
-
-    def reset(self) -> "SignedPower":
-        """Clear output history while retaining the configured exponent."""
-        self._state.reset()
-        return self
+    def value(self) -> float | None: return self._state.value
+    def reset(self) -> "SignedPower": self._state.reset(); self._length = 0; return self
+    def __len__(self) -> int: return self._length
