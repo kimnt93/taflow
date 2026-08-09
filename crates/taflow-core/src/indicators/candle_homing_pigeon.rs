@@ -1,17 +1,15 @@
-//! Incremental Ladder Bottom candlestick recognition (CDLLADDERBOTTOM).
-use super::pattern::*;
+//! Incremental Homing Pigeon candlestick recognition (CDLHOMINGPIGEON).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
     o: f64,
-    h: f64,
-    l: f64,
     c: f64,
 }
 impl Candle {
-    fn upper(self) -> f64 {
-        self.h - self.o.max(self.c)
+    fn body(self) -> f64 {
+        (self.c - self.o).abs()
     }
     fn color(self) -> i32 {
         if self.c >= self.o {
@@ -21,19 +19,20 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleLadderBottom candle recognizer.
+/// Stateful CandleHomingPigeon candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleLadderBottom {
+pub struct CandleHomingPigeon {
     candles: VecDeque<Candle>,
-    shadow_sum: f64,
+    body_long_sum: f64,
+    body_short_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleLadderBottom {
+impl Default for CandleHomingPigeon {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleLadderBottom {
+impl CandleHomingPigeon {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -41,8 +40,9 @@ impl CandleLadderBottom {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(14),
-            shadow_sum: 0.0,
+            candles: VecDeque::with_capacity(11),
+            body_long_sum: 0.0,
+            body_short_sum: 0.0,
             value: None,
         }
     }
@@ -51,42 +51,39 @@ impl CandleLadderBottom {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
-        let cur = Candle { o, h, l, c };
-        // Deque holds bars i-14..=i-1; bar j maps to index 14 - (i - j).
-        let value = if self.candles.len() == 14 {
-            let a = self.candles[10]; // bar i-4
-            let b = self.candles[11];
-            let cnd = self.candles[12];
-            let d = self.candles[13];
-            let shadow = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum, d.h, d.l);
-            // Slide the sum exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.shadow_sum += cr_highlow_scalar(d.h, d.l)
-                - cr_highlow_scalar(self.candles[3].h, self.candles[3].l);
+    pub fn append(&mut self, o: f64, _h: f64, _l: f64, c: f64) -> Option<i32> {
+        let cur = Candle { o, c };
+        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
+        let value = if self.candles.len() == 11 {
+            let prev = self.candles[10]; // bar i-1
+            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, prev.o, prev.c);
+            let short = ca_realbody_scalar(BODY_SHORT, self.body_short_sum, o, c);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
+            self.body_long_sum += cr_realbody_scalar(prev.o, prev.c)
+                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
+            self.body_short_sum +=
+                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
             Some(
-                (a.color() == -1
-                    && b.color() == -1
-                    && cnd.color() == -1
-                    && d.color() == -1
-                    && a.o > b.o
-                    && b.o > cnd.o
-                    && a.c > b.c
-                    && b.c > cnd.c
-                    && d.color() == -1
-                    && d.upper() > shadow
-                    && cur.color() == 1
-                    && cur.o > d.o
-                    && cur.c > d.h) as i32
+                (prev.color() == -1
+                    && cur.color() == -1
+                    && prev.body() > long
+                    && cur.body() <= short
+                    && cur.o < prev.o
+                    && cur.c > prev.c) as i32
                     * 100,
             )
         } else {
-            // Warm-up: seed the sum exactly like the batch prologue.
-            if (3..13).contains(&self.candles.len()) {
-                self.shadow_sum += cr_highlow_scalar(h, l);
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if i < 10 {
+                self.body_long_sum += cr_realbody_scalar(o, c);
+            }
+            if (1..11).contains(&i) {
+                self.body_short_sum += cr_realbody_scalar(o, c);
             }
             None
         };
-        if self.candles.len() == 14 {
+        if self.candles.len() == 11 {
             self.candles.pop_front();
         }
         self.candles.push_back(cur);
@@ -144,7 +141,8 @@ impl CandleLadderBottom {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.shadow_sum = 0.0;
+        self.body_long_sum = 0.0;
+        self.body_short_sum = 0.0;
         self.value = None;
     }
 }

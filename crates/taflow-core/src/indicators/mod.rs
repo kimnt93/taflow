@@ -462,6 +462,48 @@ pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 
+mod candle_homing_pigeon;
+#[cfg(test)]
+mod candle_homing_pigeon_test;
+mod candle_identical_three_crows;
+#[cfg(test)]
+mod candle_identical_three_crows_test;
+mod candle_in_neck;
+#[cfg(test)]
+mod candle_in_neck_test;
+mod candle_inverted_hammer;
+#[cfg(test)]
+mod candle_inverted_hammer_test;
+mod candle_kicking;
+mod candle_kicking_by_length;
+#[cfg(test)]
+mod candle_kicking_by_length_test;
+#[cfg(test)]
+mod candle_kicking_test;
+mod candle_ladder_bottom;
+#[cfg(test)]
+mod candle_ladder_bottom_test;
+mod candle_long_legged_doji;
+#[cfg(test)]
+mod candle_long_legged_doji_test;
+mod candle_long_line;
+#[cfg(test)]
+mod candle_long_line_test;
+mod candle_marubozu;
+#[cfg(test)]
+mod candle_marubozu_test;
+
+pub use candle_homing_pigeon::CandleHomingPigeon;
+pub use candle_identical_three_crows::CandleIdenticalThreeCrows;
+pub use candle_in_neck::CandleInNeck;
+pub use candle_inverted_hammer::CandleInvertedHammer;
+pub use candle_kicking::CandleKicking;
+pub use candle_kicking_by_length::CandleKickingByLength;
+pub use candle_ladder_bottom::CandleLadderBottom;
+pub use candle_long_legged_doji::CandleLongLeggedDoji;
+pub use candle_long_line::CandleLongLine;
+pub use candle_marubozu::CandleMarubozu;
+
 mod candle_evening_star;
 #[cfg(test)]
 mod candle_evening_star_test;

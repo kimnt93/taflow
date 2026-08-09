@@ -40,34 +40,6 @@ pub(crate) mod tests_extrema_support {
 
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
-mod candle_homing_pigeon;
-#[cfg(test)]
-mod candle_homing_pigeon_test;
-mod candle_identical_three_crows;
-#[cfg(test)]
-mod candle_identical_three_crows_test;
-mod candle_in_neck;
-#[cfg(test)]
-mod candle_in_neck_test;
-mod candle_inverted_hammer;
-#[cfg(test)]
-mod candle_inverted_hammer_test;
-mod candle_kicking;
-mod candle_kicking_by_length;
-#[cfg(test)]
-mod candle_kicking_by_length_test;
-mod candle_ladder_bottom;
-#[cfg(test)]
-mod candle_ladder_bottom_test;
-mod candle_long_legged_doji;
-#[cfg(test)]
-mod candle_long_legged_doji_test;
-mod candle_long_line;
-#[cfg(test)]
-mod candle_long_line_test;
-mod candle_marubozu;
-#[cfg(test)]
-mod candle_marubozu_test;
 mod candle_mat_hold;
 #[cfg(test)]
 mod candle_mat_hold_test;
@@ -303,16 +275,6 @@ mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use candle_homing_pigeon::CandleHomingPigeon;
-pub use candle_identical_three_crows::CandleIdenticalThreeCrows;
-pub use candle_in_neck::CandleInNeck;
-pub use candle_inverted_hammer::CandleInvertedHammer;
-pub use candle_kicking::CandleKicking;
-pub use candle_kicking_by_length::CandleKickingByLength;
-pub use candle_ladder_bottom::CandleLadderBottom;
-pub use candle_long_legged_doji::CandleLongLeggedDoji;
-pub use candle_long_line::CandleLongLine;
-pub use candle_marubozu::CandleMarubozu;
 pub use candle_mat_hold::CandleMatHold;
 pub use candle_matching_low::CandleMatchingLow;
 pub use candle_morning_doji_star::CandleMorningDojiStar;

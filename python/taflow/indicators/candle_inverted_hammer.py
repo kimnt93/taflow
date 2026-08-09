@@ -1,13 +1,13 @@
-"""Persistent In Neck recognition (CDLINNECK)."""
+"""Persistent Inverted CandleHammer recognition (CDLINVERTEDHAMMER)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleInNeck as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleInvertedHammer as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleInNeck:
-    """Persistent In Neck recognition (CDLINNECK).
+class CandleInvertedHammer:
+    """Persistent Inverted CandleHammer recognition (CDLINVERTEDHAMMER).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleInNeck:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleInNeck":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleInvertedHammer":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleInNeck:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleInNeck":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleInvertedHammer":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleInNeck:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleInNeck":
+    def reset(self) -> "CandleInvertedHammer":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

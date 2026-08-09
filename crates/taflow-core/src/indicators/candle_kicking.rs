@@ -1,6 +1,6 @@
-//! Incremental Kicking - bull/bear determined by the longer body - (CDLKICKINGBYLENGTH).
-use super::pattern::*;
+//! Incremental Kicking candlestick recognition (CDLKICKING).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -27,20 +27,20 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleKickingByLength candle recognizer.
+/// Stateful CandleKicking candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleKickingByLength {
+pub struct CandleKicking {
     candles: VecDeque<Candle>,
     shadow_sum: [f64; 2],
     body_sum: [f64; 2],
     value: Option<i32>,
 }
-impl Default for CandleKickingByLength {
+impl Default for CandleKicking {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleKickingByLength {
+impl CandleKicking {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -86,12 +86,9 @@ impl CandleKickingByLength {
                 && cur.body() > body_cur
                 && cur.upper() < vs_cur
                 && cur.lower() < vs_cur;
-            let has_gap = base
-                && ((color_prev == -1 && color_cur == 1 && cur.l > prev.h)
-                    || (color_prev == 1 && color_cur == -1 && cur.h < prev.l));
-            let curr_longer = cur.body() > prev.body();
-            let color = if curr_longer { color_cur } else { color_prev };
-            Some(has_gap as i32 * color * 100)
+            let bull = base && color_prev == -1 && color_cur == 1 && cur.l > prev.h;
+            let bear = base && color_prev == 1 && color_cur == -1 && cur.h < prev.l;
+            Some((bull as i32) * 100 - (bear as i32) * 100)
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
             let i = self.candles.len();

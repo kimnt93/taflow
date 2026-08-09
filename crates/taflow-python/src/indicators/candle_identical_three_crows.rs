@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleIdenticalThreeCrows as CandleIdentical3Crows;
+use taflow::indicators::CandleIdenticalThreeCrows as CandleIdentical3Crows;
 #[pyclass]
 /// Stateful CandleIdenticalThreeCrows candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.

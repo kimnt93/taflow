@@ -1,6 +1,6 @@
-//! Incremental Inverted Hammer candlestick recognition (CDLINVERTEDHAMMER).
-use super::pattern::*;
+//! Incremental Ladder Bottom candlestick recognition (CDLLADDERBOTTOM).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -10,50 +10,30 @@ struct Candle {
     c: f64,
 }
 impl Candle {
-    fn body(self) -> f64 {
-        (self.c - self.o).abs()
-    }
     fn upper(self) -> f64 {
         self.h - self.o.max(self.c)
     }
-    fn lower(self) -> f64 {
-        self.o.min(self.c) - self.l
+    fn color(self) -> i32 {
+        if self.c >= self.o {
+            1
+        } else {
+            -1
+        }
     }
 }
-
-/// Compute the candle pattern signal for aligned OHLC bars.
-///
-/// # Parameters
-///
-/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
-///
-/// # Returns
-///
-/// A same-length vector containing -100, 0, or 100 pattern signals; bars
-/// Compute the candle inverted hammer result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub struct CandleInvertedHammer {
+/// Stateful CandleLadderBottom candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleLadderBottom {
     candles: VecDeque<Candle>,
-    body_sum: f64,
-    shadow_vs_sum: f64,
+    shadow_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleInvertedHammer {
+impl Default for CandleLadderBottom {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleInvertedHammer {
+impl CandleLadderBottom {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -61,9 +41,8 @@ impl CandleInvertedHammer {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(11),
-            body_sum: 0.0,
-            shadow_vs_sum: 0.0,
+            candles: VecDeque::with_capacity(14),
+            shadow_sum: 0.0,
             value: None,
         }
     }
@@ -74,33 +53,40 @@ impl CandleInvertedHammer {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
-        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
-        let value = if self.candles.len() == 11 {
-            let prev = self.candles[10]; // bar i-1
-            let body = ca_realbody_scalar(BODY_SHORT, self.body_sum, o, c);
-            let vs = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_vs_sum, h, l);
-            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_sum +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
-            self.shadow_vs_sum +=
-                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+        // Deque holds bars i-14..=i-1; bar j maps to index 14 - (i - j).
+        let value = if self.candles.len() == 14 {
+            let a = self.candles[10]; // bar i-4
+            let b = self.candles[11];
+            let cnd = self.candles[12];
+            let d = self.candles[13];
+            let shadow = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum, d.h, d.l);
+            // Slide the sum exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
+            self.shadow_sum += cr_highlow_scalar(d.h, d.l)
+                - cr_highlow_scalar(self.candles[3].h, self.candles[3].l);
             Some(
-                (cur.body() < body
-                    && cur.upper() > cur.body()
-                    && cur.lower() < vs
-                    && cur.o.max(cur.c) < prev.o.min(prev.c)) as i32
+                (a.color() == -1
+                    && b.color() == -1
+                    && cnd.color() == -1
+                    && d.color() == -1
+                    && a.o > b.o
+                    && b.o > cnd.o
+                    && a.c > b.c
+                    && b.c > cnd.c
+                    && d.color() == -1
+                    && d.upper() > shadow
+                    && cur.color() == 1
+                    && cur.o > d.o
+                    && cur.c > d.h) as i32
                     * 100,
             )
         } else {
-            // Warm-up: seed the sums exactly like the batch prologue.
-            let i = self.candles.len();
-            if (1..11).contains(&i) {
-                self.body_sum += cr_realbody_scalar(o, c);
-                self.shadow_vs_sum += cr_highlow_scalar(h, l);
+            // Warm-up: seed the sum exactly like the batch prologue.
+            if (3..13).contains(&self.candles.len()) {
+                self.shadow_sum += cr_highlow_scalar(h, l);
             }
             None
         };
-        if self.candles.len() == 11 {
+        if self.candles.len() == 14 {
             self.candles.pop_front();
         }
         self.candles.push_back(cur);
@@ -158,8 +144,7 @@ impl CandleInvertedHammer {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.body_sum = 0.0;
-        self.shadow_vs_sum = 0.0;
+        self.shadow_sum = 0.0;
         self.value = None;
     }
 }

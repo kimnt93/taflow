@@ -1,6 +1,6 @@
-//! Incremental Kicking candlestick recognition (CDLKICKING).
-use super::pattern::*;
+//! Incremental Inverted Hammer candlestick recognition (CDLINVERTEDHAMMER).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -19,28 +19,41 @@ impl Candle {
     fn lower(self) -> f64 {
         self.o.min(self.c) - self.l
     }
-    fn color(self) -> i32 {
-        if self.c >= self.o {
-            1
-        } else {
-            -1
-        }
-    }
 }
-/// Stateful CandleKicking candle recognizer.
-/// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleKicking {
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle inverted hammer result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub struct CandleInvertedHammer {
     candles: VecDeque<Candle>,
-    shadow_sum: [f64; 2],
-    body_sum: [f64; 2],
+    body_sum: f64,
+    shadow_vs_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleKicking {
+impl Default for CandleInvertedHammer {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleKicking {
+impl CandleInvertedHammer {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -49,8 +62,8 @@ impl CandleKicking {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
-            shadow_sum: [0.0; 2],
-            body_sum: [0.0; 2],
+            body_sum: 0.0,
+            shadow_vs_sum: 0.0,
             value: None,
         }
     }
@@ -64,41 +77,26 @@ impl CandleKicking {
         // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
         let value = if self.candles.len() == 11 {
             let prev = self.candles[10]; // bar i-1
-            let vs_prev = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[1], prev.h, prev.l);
-            let vs_cur = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum[0], h, l);
-            let body_prev = ca_realbody_scalar(BODY_LONG, self.body_sum[1], prev.o, prev.c);
-            let body_cur = ca_realbody_scalar(BODY_LONG, self.body_sum[0], o, c);
+            let body = ca_realbody_scalar(BODY_SHORT, self.body_sum, o, c);
+            let vs = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_vs_sum, h, l);
             // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.shadow_sum[1] += cr_highlow_scalar(prev.h, prev.l)
-                - cr_highlow_scalar(self.candles[0].h, self.candles[0].l);
-            self.shadow_sum[0] +=
-                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
-            self.body_sum[1] += cr_realbody_scalar(prev.o, prev.c)
-                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_sum[0] +=
+            self.body_sum +=
                 cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
-            let color_prev = prev.color();
-            let color_cur = cur.color();
-            let base = color_prev != color_cur
-                && prev.body() > body_prev
-                && prev.upper() < vs_prev
-                && prev.lower() < vs_prev
-                && cur.body() > body_cur
-                && cur.upper() < vs_cur
-                && cur.lower() < vs_cur;
-            let bull = base && color_prev == -1 && color_cur == 1 && cur.l > prev.h;
-            let bear = base && color_prev == 1 && color_cur == -1 && cur.h < prev.l;
-            Some((bull as i32) * 100 - (bear as i32) * 100)
+            self.shadow_vs_sum +=
+                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            Some(
+                (cur.body() < body
+                    && cur.upper() > cur.body()
+                    && cur.lower() < vs
+                    && cur.o.max(cur.c) < prev.o.min(prev.c)) as i32
+                    * 100,
+            )
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
             let i = self.candles.len();
-            if i < 10 {
-                self.shadow_sum[1] += cr_highlow_scalar(h, l);
-                self.body_sum[1] += cr_realbody_scalar(o, c);
-            }
             if (1..11).contains(&i) {
-                self.shadow_sum[0] += cr_highlow_scalar(h, l);
-                self.body_sum[0] += cr_realbody_scalar(o, c);
+                self.body_sum += cr_realbody_scalar(o, c);
+                self.shadow_vs_sum += cr_highlow_scalar(h, l);
             }
             None
         };
@@ -160,8 +158,8 @@ impl CandleKicking {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.shadow_sum = [0.0; 2];
-        self.body_sum = [0.0; 2];
+        self.body_sum = 0.0;
+        self.shadow_vs_sum = 0.0;
         self.value = None;
     }
 }

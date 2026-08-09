@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleInNeck as CandleInNeckState;
+use taflow::indicators::CandleLadderBottom as CandleLadderBottomState;
 #[pyclass]
-/// Stateful CandleInNeck candlestick recognizer.
+/// Stateful CandleLadderBottom candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleInNeck {
-    inner: CandleInNeckState,
+pub struct CandleLadderBottom {
+    inner: CandleLadderBottomState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleInNeck {
+impl CandleLadderBottom {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleInNeckState::new(),
+            inner: CandleLadderBottomState::new(),
             outputs: vec![],
         }
     }

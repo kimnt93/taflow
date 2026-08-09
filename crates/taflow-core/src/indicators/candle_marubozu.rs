@@ -1,29 +1,27 @@
-//! Incremental Long Line candlestick recognition (CDLLONGLINE).
+//! Incremental Marubozu candlestick recognition (CDLMARUBOZU).
 
 use std::collections::VecDeque;
 
-use super::pattern::*;
 use crate::error::TaResult;
-/// Incremental CDLLONGLINE state using TA-Lib's long-body and short-shadow averages.
-/// Persistent Rust state or aligned output type for `CandleLongLine`.
+use crate::stream::pattern::*;
+/// Incremental CDLMARUBOZU state using TA-Lib's long-body and very-short-shadow averages.
+/// Persistent Rust state or aligned output type for `CandleMarubozu`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct CandleLongLine {
+pub struct CandleMarubozu {
     bodies: VecDeque<f64>,
     body_sum: f64,
-    shadows: VecDeque<f64>,
-    shadow_sum: f64,
+    ranges: VecDeque<f64>,
+    range_sum: f64,
     value: Option<i32>,
 }
-
-impl Default for CandleLongLine {
+impl Default for CandleMarubozu {
     fn default() -> Self {
         Self::new()
     }
 }
-
-impl CandleLongLine {
+impl CandleMarubozu {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -33,8 +31,8 @@ impl CandleLongLine {
         Self {
             bodies: VecDeque::with_capacity(10),
             body_sum: 0.0,
-            shadows: VecDeque::with_capacity(10),
-            shadow_sum: 0.0,
+            ranges: VecDeque::with_capacity(10),
+            range_sum: 0.0,
             value: None,
         }
     }
@@ -48,30 +46,27 @@ impl CandleLongLine {
         }
         window.push_back(value);
     }
-    /// Appends OHLC data and returns a signed long-line signal after warmup.
+    /// Appends OHLC data and returns a signed marubozu signal after the ten-bar warmup.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
         let body = (close - open).abs();
-        let upper = high - open.max(close);
-        let lower = open.min(close) - low;
-        let value = if self.bodies.len() == 10 && self.shadows.len() == 10 {
+        let range = high - low;
+        let output = if self.bodies.len() == 10 && self.ranges.len() == 10 {
+            let upper = high - open.max(close);
+            let lower = open.min(close) - low;
             Some(
                 (body > self.body_sum / 10.0
-                    && upper < self.shadow_sum / 20.0
-                    && lower < self.shadow_sum / 20.0) as i32
+                    && upper < ca_highlow_scalar(SHADOW_VERY_SHORT, self.range_sum, high, low)
+                    && lower < ca_highlow_scalar(SHADOW_VERY_SHORT, self.range_sum, high, low))
+                    as i32
                     * if close >= open { 100 } else { -100 },
             )
         } else {
             None
         };
         Self::push(&mut self.bodies, &mut self.body_sum, body);
-        // SHADOW_SHORT range value, computed exactly like the batch cr_shadows.
-        Self::push(
-            &mut self.shadows,
-            &mut self.shadow_sum,
-            cr_shadows_scalar(open, high, low, close),
-        );
-        self.value = value;
-        value
+        Self::push(&mut self.ranges, &mut self.range_sum, range);
+        self.value = output;
+        output
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
@@ -125,8 +120,8 @@ impl CandleLongLine {
     pub fn reset(&mut self) {
         self.bodies.clear();
         self.body_sum = 0.0;
-        self.shadows.clear();
-        self.shadow_sum = 0.0;
+        self.ranges.clear();
+        self.range_sum = 0.0;
         self.value = None;
     }
 }

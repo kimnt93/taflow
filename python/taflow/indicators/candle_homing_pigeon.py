@@ -1,13 +1,13 @@
-"""Persistent Long Line candlestick recognition (CDLLONGLINE)."""
+"""Persistent Homing Pigeon recognition (CDLHOMINGPIGEON)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleLongLine as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleHomingPigeon as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleLongLine:
-    """Persistent Long Line candlestick recognition (CDLLONGLINE).
+class CandleHomingPigeon:
+    """Persistent Homing Pigeon recognition (CDLHOMINGPIGEON).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,9 +37,13 @@ class CandleLongLine:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self.extend(_open, high, low, close)
+        (
+            self.extend(_open, high, low, close)
+            if any(x is not None for x in (_open, high, low, close))
+            else None
+        )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleLongLine":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleHomingPigeon":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -61,7 +65,7 @@ class CandleLongLine:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleLongLine":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleHomingPigeon":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -108,7 +112,7 @@ class CandleLongLine:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleLongLine":
+    def reset(self) -> "CandleHomingPigeon":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

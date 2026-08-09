@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleKicking as CandleKickingState;
+use taflow::indicators::CandleKickingByLength as CandleKickingByLengthState;
 #[pyclass]
-/// Stateful CandleKicking candlestick recognizer.
+/// Stateful CandleKickingByLength candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleKicking {
-    inner: CandleKickingState,
+pub struct CandleKickingByLength {
+    inner: CandleKickingByLengthState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleKicking {
+impl CandleKickingByLength {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleKickingState::new(),
+            inner: CandleKickingByLengthState::new(),
             outputs: vec![],
         }
     }

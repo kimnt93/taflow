@@ -1,13 +1,13 @@
-"""Persistent Identical Three Crows recognition (CDLIDENTICAL3CROWS)."""
+"""Persistent Long Line candlestick recognition (CDLLONGLINE)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleIdenticalThreeCrows as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleLongLine as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleIdenticalThreeCrows:
-    """Persistent Identical Three Crows recognition (CDLIDENTICAL3CROWS).
+class CandleLongLine:
+    """Persistent Long Line candlestick recognition (CDLLONGLINE).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,13 +37,9 @@ class CandleIdenticalThreeCrows:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        (
-            self.extend(_open, high, low, close)
-            if any(x is not None for x in (_open, high, low, close))
-            else None
-        )
+        self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleIdenticalThreeCrows":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleLongLine":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +61,7 @@ class CandleIdenticalThreeCrows:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleIdenticalThreeCrows":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleLongLine":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +108,7 @@ class CandleIdenticalThreeCrows:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleIdenticalThreeCrows":
+    def reset(self) -> "CandleLongLine":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
