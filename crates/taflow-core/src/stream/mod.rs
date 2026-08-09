@@ -65,6 +65,8 @@ mod candle_belt_hold;
 #[cfg(test)]
 mod candle_belt_hold_test;
 mod candle_breakaway;
+#[cfg(test)]
+mod candle_breakaway_test;
 mod candle_closing_marubozu;
 #[cfg(test)]
 mod candle_closing_marubozu_test;
@@ -106,7 +108,11 @@ mod candle_hanging_man;
 #[cfg(test)]
 mod candle_hanging_man_test;
 mod candle_harami;
-mod candle_haramicross;
+mod candle_harami_cross;
+#[cfg(test)]
+mod candle_harami_cross_test;
+#[cfg(test)]
+mod candle_harami_test;
 mod candle_high_wave;
 #[cfg(test)]
 mod candle_high_wave_test;
@@ -116,8 +122,12 @@ mod candle_hikkake_modified;
 mod candle_hikkake_modified_test;
 #[cfg(test)]
 mod candle_hikkake_test;
-mod candle_homingpigeon;
-mod candle_identical3crows;
+mod candle_homing_pigeon;
+#[cfg(test)]
+mod candle_homing_pigeon_test;
+mod candle_identical_three_crows;
+#[cfg(test)]
+mod candle_identical_three_crows_test;
 mod candle_in_neck;
 #[cfg(test)]
 mod candle_in_neck_test;
@@ -140,11 +150,21 @@ mod candle_long_line_test;
 mod candle_marubozu;
 #[cfg(test)]
 mod candle_marubozu_test;
-mod candle_matchinglow;
-mod candle_mathold;
-mod candle_morningdojistar;
-mod candle_morningstar;
-mod candle_onneck;
+mod candle_mat_hold;
+#[cfg(test)]
+mod candle_mat_hold_test;
+mod candle_matching_low;
+#[cfg(test)]
+mod candle_matching_low_test;
+mod candle_morning_doji_star;
+#[cfg(test)]
+mod candle_morning_doji_star_test;
+mod candle_morning_star;
+#[cfg(test)]
+mod candle_morning_star_test;
+mod candle_on_neck;
+#[cfg(test)]
+mod candle_on_neck_test;
 mod candle_piercing;
 mod candle_rickshawman;
 #[cfg(test)]
@@ -547,12 +567,12 @@ pub use candle_gravestone_doji::CandleGravestoneDoji;
 pub use candle_hammer::CandleHammer;
 pub use candle_hanging_man::CandleHangingMan;
 pub use candle_harami::CandleHarami;
-pub use candle_haramicross::CandleHaramiCross;
+pub use candle_harami_cross::CandleHaramiCross;
 pub use candle_high_wave::CandleHighWave;
 pub use candle_hikkake::CandleHikkake;
 pub use candle_hikkake_modified::CandleHikkakeModified;
-pub use candle_homingpigeon::CandleHomingPigeon;
-pub use candle_identical3crows::CandleIdenticalThreeCrows;
+pub use candle_homing_pigeon::CandleHomingPigeon;
+pub use candle_identical_three_crows::CandleIdenticalThreeCrows;
 pub use candle_in_neck::CandleInNeck;
 pub use candle_inverted_hammer::CandleInvertedHammer;
 pub use candle_kicking::CandleKicking;
@@ -561,11 +581,11 @@ pub use candle_ladder_bottom::CandleLadderBottom;
 pub use candle_long_legged_doji::CandleLongLeggedDoji;
 pub use candle_long_line::CandleLongLine;
 pub use candle_marubozu::CandleMarubozu;
-pub use candle_matchinglow::CandleMatchingLow;
-pub use candle_mathold::CandleMatHold;
-pub use candle_morningdojistar::CandleMorningDojiStar;
-pub use candle_morningstar::CandleMorningStar;
-pub use candle_onneck::CandleOnNeck;
+pub use candle_mat_hold::CandleMatHold;
+pub use candle_matching_low::CandleMatchingLow;
+pub use candle_morning_doji_star::CandleMorningDojiStar;
+pub use candle_morning_star::CandleMorningStar;
+pub use candle_on_neck::CandleOnNeck;
 pub use candle_piercing::CandlePiercing;
 pub use candle_rickshawman::CandleRickshawman;
 pub use candle_risefall3methods::CandleRiseFallThreeMethods;
@@ -809,26 +829,6 @@ mod signal_delay_test;
 mod smoothed_trend_channel_lifecycle_test;
 #[cfg(test)]
 mod value_when_test;
-#[allow(unused_imports)]
-pub(crate) use candle_breakaway::candle_breakaway;
-#[allow(unused_imports)]
-pub(crate) use candle_harami::candle_harami;
-#[allow(unused_imports)]
-pub(crate) use candle_haramicross::candle_harami_cross;
-#[allow(unused_imports)]
-pub(crate) use candle_homingpigeon::candle_homing_pigeon;
-#[allow(unused_imports)]
-pub(crate) use candle_identical3crows::candle_identical_three_crows;
-#[allow(unused_imports)]
-pub(crate) use candle_matchinglow::candle_matching_low;
-#[allow(unused_imports)]
-pub(crate) use candle_mathold::candle_mat_hold;
-#[allow(unused_imports)]
-pub(crate) use candle_morningdojistar::candle_morning_doji_star;
-#[allow(unused_imports)]
-pub(crate) use candle_morningstar::candle_morning_star;
-#[allow(unused_imports)]
-pub(crate) use candle_onneck::candle_on_neck;
 #[allow(unused_imports)]
 pub(crate) use candle_piercing::candle_piercing;
 #[allow(unused_imports)]

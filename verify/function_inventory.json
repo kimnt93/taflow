@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 143,
+    "complete": 153,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 171,
+    "structure": 181,
     "talib_functions": 161
   },
   "rows": [
@@ -1602,7 +1602,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "breakaway",
+      "module": "candle_breakaway",
       "name": "CandleBreakaway",
       "native_binding": true,
       "native_symbols": [
@@ -1722,7 +1722,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "harami",
+      "module": "candle_harami",
       "name": "CandleHarami",
       "native_binding": true,
       "native_symbols": [
@@ -1737,7 +1737,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "harami_cross",
+      "module": "candle_harami_cross",
       "name": "CandleHaramiCross",
       "native_binding": true,
       "native_symbols": [
@@ -1752,7 +1752,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "homing_pigeon",
+      "module": "candle_homing_pigeon",
       "name": "CandleHomingPigeon",
       "native_binding": true,
       "native_symbols": [
@@ -1767,7 +1767,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "identical_three_crows",
+      "module": "candle_identical_three_crows",
       "name": "CandleIdenticalThreeCrows",
       "native_binding": true,
       "native_symbols": [
@@ -1857,7 +1857,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "matching_low",
+      "module": "candle_matching_low",
       "name": "CandleMatchingLow",
       "native_binding": true,
       "native_symbols": [
@@ -1872,7 +1872,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "mat_hold",
+      "module": "candle_mat_hold",
       "name": "CandleMatHold",
       "native_binding": true,
       "native_symbols": [
@@ -1887,7 +1887,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "morning_doji_star",
+      "module": "candle_morning_doji_star",
       "name": "CandleMorningDojiStar",
       "native_binding": true,
       "native_symbols": [
@@ -1902,7 +1902,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "morning_star",
+      "module": "candle_morning_star",
       "name": "CandleMorningStar",
       "native_binding": true,
       "native_symbols": [
@@ -1917,7 +1917,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "on_neck",
+      "module": "candle_on_neck",
       "name": "CandleOnNeck",
       "native_binding": true,
       "native_symbols": [

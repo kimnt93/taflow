@@ -1,13 +1,13 @@
-"""Persistent Morning CandleDoji Star recognition (CDLMORNINGDOJISTAR)."""
+"""Persistent Mat Hold recognition (CDLMATHOLD)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleMorningDojiStar as _Native
-from ._series import as_float64_series
+from ._native import CandleMatHold as _Native
+from ._candle_ohlc import as_ohlc_arrays
 
 
-class CandleMorningDojiStar:
-    """Persistent Morning CandleDoji Star recognition (CDLMORNINGDOJISTAR).
+class CandleMatHold:
+    """Persistent Mat Hold recognition (CDLMATHOLD).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleMorningDojiStar:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleMorningDojiStar":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleMatHold":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -62,10 +62,10 @@ class CandleMorningDojiStar:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_open, high, low, close)
+        self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleMorningDojiStar":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleMatHold":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,12 +84,7 @@ class CandleMorningDojiStar:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(
-            as_float64_series(_open),
-            as_float64_series(high),
-            as_float64_series(low),
-            as_float64_series(close),
-        )
+        self._state.extend(*as_ohlc_arrays(_open, high, low, close))
         return self
 
     def compute(self) -> np.ndarray:
@@ -103,7 +98,7 @@ class CandleMorningDojiStar:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> int | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -113,7 +108,11 @@ class CandleMorningDojiStar:
         """
         return self._state.value
 
-    def reset(self) -> "CandleMorningDojiStar":
+    def __len__(self) -> int:
+        """Return the number of processed OHLC bars."""
+        return len(self._state.compute())
+
+    def reset(self) -> "CandleMatHold":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
