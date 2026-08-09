@@ -1209,12 +1209,12 @@ mod zero_lag_exponential_moving_average;
 mod zero_lag_exponential_moving_average_test;
 pub use fisher_transform::FisherTransform;
 mod chaikin_volatility;
+#[cfg(test)]
+mod chaikin_volatility_test;
+mod rolling_volume_weighted_average_price;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
-#[allow(unused_imports)]
-pub(crate) use chaikin_volatility::chaikin_volatility;
-mod rolling_volume_weighted_average_price;
 #[allow(unused_imports)]
 pub(crate) use rolling_volume_weighted_average_price::rolling_volume_weighted_average_price;
 mod force_index;
