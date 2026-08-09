@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CumulativeMinimum as CumulativeMinimumState;
+use taflow::indicators::CumulativeMinimum as CumulativeMinimumState;
 
 #[pyclass]
 pub struct CumulativeMinimum {

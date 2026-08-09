@@ -50,4 +50,3 @@ macro_rules! hurst_operator {
 }
 
 hurst_operator!(HurstOperator, Hurst);
-hurst_operator!(FractalDimensionOperator, FractalDimension);

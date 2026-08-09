@@ -765,6 +765,18 @@ suite, interface audit, formatter, and diff checks passed. Generated rows may
 still lag; source scans are authoritative. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The nineteenth structural batch migrated `ChandeMomentumOscillator`,
+`CloseToCloseSigma`, `CommodityChannelIndex`, `CumulativeMaximum`,
+`CumulativeMinimum`, `ChaikinMoneyFlow`, `CumulativeSumControlChart`,
+`DetrendedPriceOscillator`, `EqualHighsLows`, and `FractalDimension`. Their
+Rust implementations/tests and Python adapters now use canonical paths; the
+PyO3 bindings use matching files, including a dedicated
+`fractal_dimension.rs` split from the former grouped `hurst.rs`. The release
+extension, workspace Rust tests, focused tests, full Python suite, interface
+audit, formatter, and diff checks passed. Generated rows may still lag;
+source scans are authoritative. Benchmark fields remain `TODO`; no benchmark
+command was run.
+
 The eighteenth structural batch migrated `CandleThreeStarsInSouth`,
 `CandleThreeWhiteSoldiers`, `CandleThrusting`, `CandleTriStar`,
 `CandleTwoCrows`, `CandleUniqueThreeRiver`,

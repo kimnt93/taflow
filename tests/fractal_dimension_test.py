@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.fractal_dimension import FractalDimension
+from taflow import FractalDimension
 
 
 def test_fractal_dimension_lifecycle_and_reset():
@@ -10,4 +10,3 @@ def test_fractal_dimension_lifecycle_and_reset():
     assert len(state) == 3
     state.reset()
     assert state.value is None
-

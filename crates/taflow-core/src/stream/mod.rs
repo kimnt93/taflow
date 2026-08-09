@@ -40,12 +40,11 @@ pub(crate) mod tests_extrema_support {
 
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
-mod chande_momentum_oscillator;
-#[cfg(test)]
-mod chande_momentum_oscillator_test;
-mod commodity_channel_index;
-#[cfg(test)]
-mod commodity_channel_index_test;
+pub use crate::indicators::{
+    ChaikinMoneyFlow, ChandeMomentumOscillator, CloseToCloseSigma, CommodityChannelIndex,
+    CumulativeMaximum, CumulativeMinimum, CumulativeSumControlChart, DetrendedPriceOscillator,
+    EqualHighsLows, FractalDimension,
+};
 pub(crate) mod cycle;
 pub(crate) mod directional;
 mod double_exponential_moving_average;
@@ -126,14 +125,6 @@ pub(crate) mod sorted_ring;
 pub(crate) mod statistic;
 pub(crate) mod vhgw;
 pub use session_flags::session_flags;
-mod cumulative_maximum;
-#[cfg(test)]
-mod cumulative_maximum_test;
-mod cumulative_minimum;
-#[cfg(test)]
-mod cumulative_minimum_test;
-pub use cumulative_maximum::CumulativeMaximum;
-pub use cumulative_minimum::CumulativeMinimum;
 mod fast_stochastic_oscillator;
 #[cfg(test)]
 mod fast_stochastic_oscillator_test;
@@ -193,8 +184,6 @@ mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use chande_momentum_oscillator::ChandeMomentumOscillator;
-pub use commodity_channel_index::CommodityChannelIndex;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
@@ -595,15 +584,9 @@ mod chaikin_volatility;
 #[cfg(test)]
 mod chaikin_volatility_test;
 #[allow(unused_imports)]
-mod close_to_close_sigma;
-#[cfg(test)]
-mod close_to_close_sigma_test;
 mod ease_of_movement;
 #[cfg(test)]
 mod ease_of_movement_test;
-mod equal_highs_lows;
-#[cfg(test)]
-mod equal_highs_lows_test;
 mod fair_value_gap;
 #[cfg(test)]
 mod fair_value_gap_test;
@@ -613,9 +596,6 @@ mod falling_test;
 mod force_index;
 #[cfg(test)]
 mod force_index_test;
-mod fractal_dimension;
-#[cfg(test)]
-mod fractal_dimension_test;
 mod garman_klass;
 #[cfg(test)]
 mod garman_klass_test;
@@ -625,7 +605,7 @@ mod garman_klass_yang_zhang_test;
 mod hedge_ratio;
 #[cfg(test)]
 mod hedge_ratio_test;
-mod hurst;
+pub(crate) mod hurst;
 #[cfg(test)]
 mod hurst_test;
 #[allow(unused_imports)]
@@ -687,9 +667,6 @@ mod decay_linear;
 #[cfg(test)]
 mod decay_linear_test;
 pub use decay_linear::DecayLinear;
-mod cumulative_sum_control_chart;
-#[cfg(test)]
-mod cumulative_sum_control_chart_test;
 mod frac_diff;
 #[cfg(test)]
 mod frac_diff_test;
@@ -745,12 +722,6 @@ mod swing_low;
 #[cfg(test)]
 mod swing_low_test;
 pub use swing_low::SwingLow;
-mod chaikin_money_flow;
-#[cfg(test)]
-mod chaikin_money_flow_test;
-mod detrended_price_oscillator;
-#[cfg(test)]
-mod detrended_price_oscillator_test;
 mod exponentially_weighted_standard_deviation;
 mod exponentially_weighted_variance;
 mod mass_index;
@@ -791,15 +762,11 @@ mod lowest_since;
 mod outside_bar;
 mod value_when;
 pub use bars_since::BarsSince;
-pub use close_to_close_sigma::CloseToCloseSigma;
-pub use cumulative_sum_control_chart::CumulativeSumControlChart;
-pub use equal_highs_lows::{EqualHighsLows, EqualHighsLowsValue};
 pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
 pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use fair_value_gap::{FairValueGap, FairValueGapValue};
 pub use falling::Falling;
 pub use frac_diff::FracDiff;
-pub use fractal_dimension::FractalDimension;
 pub use gap_down::GapDown;
 pub use gap_up::GapUp;
 pub use garman_klass::GarmanKlass;
@@ -866,9 +833,7 @@ mod crossunder;
 mod crossunder_test;
 pub use crossunder::Crossunder;
 mod cross;
-pub use chaikin_money_flow::ChaikinMoneyFlow;
 pub use cross::Cross;
-pub use detrended_price_oscillator::DetrendedPriceOscillator;
 pub use mass_index::MassIndex;
 pub use mc_ginley_dynamic::McGinleyDynamic;
 pub use negative_volume_index::NegativeVolumeIndex;

@@ -1,7 +1,7 @@
-use super::operator_states::*;
-use super::*;
 use crate::error::TaResult;
 use crate::indicators::RollingSum;
+use crate::stream::operator_states::*;
+use crate::stream::*;
 
 /// Stateful Chaikin Money Flow, aligned to `ta.volume.ChaikinMoneyFlowIndicator`.
 #[derive(Debug, Clone)]

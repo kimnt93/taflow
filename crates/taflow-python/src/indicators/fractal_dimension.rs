@@ -1,34 +1,38 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::indicators::CumulativeMaximum as CumulativeMaximumState;
+use taflow::indicators::FractalDimension;
 
 #[pyclass]
-pub struct CumulativeMaximum {
-    inner: CumulativeMaximumState,
+pub struct FractalDimensionOperator {
+    inner: FractalDimension,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl CumulativeMaximum {
+impl FractalDimensionOperator {
     #[new]
-    fn new() -> PyResult<Self> {
+    fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: CumulativeMaximumState::new()
+            inner: FractalDimension::new(timeperiod)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
         })
     }
 
-    fn append(&mut self, input: f64) -> f64 {
+    fn append(&mut self, input: f64) -> Option<f64> {
         let value = self.inner.append(input);
-        self.outputs.push(value);
+        self.outputs.push(value.unwrap_or(f64::NAN));
         value
     }
 
     fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
         let input = input.as_slice()?;
-        py.allow_threads(|| self.inner.extend_slice_into(input, &mut self.outputs));
+        py.allow_threads(|| {
+            for &input in input {
+                self.append(input);
+            }
+        });
         Ok(())
     }
 
@@ -44,9 +48,5 @@ impl CumulativeMaximum {
     fn reset(&mut self) {
         self.inner.reset();
         self.outputs.clear();
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
     }
 }

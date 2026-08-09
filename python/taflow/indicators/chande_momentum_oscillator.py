@@ -1,8 +1,8 @@
 """Canonical native-backed Chande Momentum Oscillator adapter."""
 from typing import Any
 import numpy as np
-from ._native import ChandeMomentumOscillator as _NativeChandeMomentumOscillator
-from ._series import as_float64_series
+from .._native import ChandeMomentumOscillator as _NativeChandeMomentumOscillator
+from .._series import as_float64_series
 
 class ChandeMomentumOscillator:
     """Compute CMO from required ``values`` with period 14 by default."""

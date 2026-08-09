@@ -5,7 +5,7 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, StreamingIndicator};
+use crate::stream::{invalid_period, StreamingIndicator};
 
 /// Incremental Chande Momentum Oscillator with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]

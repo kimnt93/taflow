@@ -1,7 +1,7 @@
-use super::operator_states::*;
-use super::StreamingIndicator;
-use super::{SimpleMovingAverage, Window};
 use crate::error::TaResult;
+use crate::stream::operator_states::*;
+use crate::stream::StreamingIndicator;
+use crate::stream::{SimpleMovingAverage, Window};
 
 pub struct DetrendedPriceOscillator {
     sma: SimpleMovingAverage,

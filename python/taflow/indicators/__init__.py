@@ -6,7 +6,7 @@ from .anchored_volume_weighted_average_price import AnchoredVolumeWeightedAverag
 from .average_daily_dollar_value import AverageDailyDollarValue
 from .bollinger_bands import BollingerBands
 
-from ..commodity_channel_index import CommodityChannelIndex
+from .commodity_channel_index import CommodityChannelIndex
 from .cumulative_count import CumulativeCount
 from .even_better_sinewave import EvenBetterSinewave
 from .klinger_volume_oscillator import KlingerVolumeOscillator
@@ -119,8 +119,8 @@ from .exponentially_weighted_sum import ExponentiallyWeightedSum
 from ..exponentially_weighted_standard_deviation import ExponentiallyWeightedStandardDeviation
 from .exponentially_weighted_covariance import ExponentiallyWeightedCovariance
 from .exponentially_weighted_correlation import ExponentiallyWeightedCorrelation
-from ..cumulative_maximum import CumulativeMaximum
-from ..cumulative_minimum import CumulativeMinimum
+from .cumulative_maximum import CumulativeMaximum
+from .cumulative_minimum import CumulativeMinimum
 from .drawdown import Drawdown
 from .rolling_sharpe import RollingSharpe
 from .rolling_sortino import RollingSortino
@@ -239,7 +239,7 @@ from ..swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from ..order_block import OrderBlock
 from ..liquidity import Liquidity
-from ..equal_highs_lows import EqualHighsLows
+from .equal_highs_lows import EqualHighsLows
 from ..hedge_ratio import HedgeRatio
 from .rolling_entropy import RollingEntropy
 from .rolling_sum import RollingSum
@@ -250,10 +250,10 @@ from .rolling_standard_deviation import RollingStandardDeviation
 from .rolling_variance import RollingVariance
 from ..rolling_autocorr import RollingAutocorr
 from ..hurst import Hurst
-from ..fractal_dimension import FractalDimension
+from .fractal_dimension import FractalDimension
 from ..rolling_alpha import RollingAlpha
 from ..rolling_information_ratio import RollingInformationRatio
-from ..close_to_close_sigma import CloseToCloseSigma
+from .close_to_close_sigma import CloseToCloseSigma
 from ..parkinson import Parkinson
 from ..garman_klass import GarmanKlass
 from ..rogers_satchell import RogersSatchell

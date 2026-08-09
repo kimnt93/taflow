@@ -1,7 +1,7 @@
 //! Persistent cumulative minimum state.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
 /// Compute the cumulative minimum of chronological scalar observations.
 #[derive(Debug, Clone)]

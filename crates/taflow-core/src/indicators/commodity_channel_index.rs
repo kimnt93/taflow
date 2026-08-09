@@ -6,7 +6,7 @@
 
 use crate::error::{TaError, TaResult};
 
-use super::{invalid_period, Window};
+use crate::stream::{invalid_period, Window};
 
 /// Reseed cadence for the sliding typical-price sum, in absolute appends.
 ///

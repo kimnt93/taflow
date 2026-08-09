@@ -3,7 +3,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CommodityChannelIndex as NativeCommodityChannelIndex;
+use taflow::indicators::CommodityChannelIndex as NativeCommodityChannelIndex;
 
 use crate::conversion::to_py_array;
 

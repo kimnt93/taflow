@@ -12,7 +12,7 @@ from .indicators import AccumulationDistribution, AccumulationDistributionOscill
 from .indicators import BalanceOfPower, OnBalanceVolume
 from .indicators.absolute_price_oscillator import AbsolutePriceOscillator
 from .percentage_price_oscillator import PercentagePriceOscillator
-from .chande_momentum_oscillator import ChandeMomentumOscillator
+from .indicators.chande_momentum_oscillator import ChandeMomentumOscillator
 from .indicators import Momentum
 from .indicators import RateOfChange
 from .indicators import RateOfChangePercent
@@ -21,7 +21,7 @@ from .indicators import RateOfChangeRatioPercent
 from .indicators import WilliamsPercentR
 from .indicators import AverageDirectionalIndex, AverageDirectionalIndexRating
 from .indicators.bollinger_bands import BollingerBands
-from .commodity_channel_index import CommodityChannelIndex
+from .indicators.commodity_channel_index import CommodityChannelIndex
 from .indicators import DirectionalMovementIndex
 from .indicators.candle_doji import CandleDoji
 from .indicators.candle_takuri import CandleTakuri
@@ -196,8 +196,8 @@ from .indicators import ExponentiallyWeightedSum
 from .exponentially_weighted_standard_deviation import ExponentiallyWeightedStandardDeviation
 from .indicators import ExponentiallyWeightedCovariance
 from .indicators import ExponentiallyWeightedCorrelation
-from .cumulative_maximum import CumulativeMaximum
-from .cumulative_minimum import CumulativeMinimum
+from .indicators.cumulative_maximum import CumulativeMaximum
+from .indicators.cumulative_minimum import CumulativeMinimum
 from .indicators import Drawdown
 from .indicators import RollingSharpe
 from .indicators import RollingSortino
@@ -248,15 +248,15 @@ from .swing_highs_lows import SwingHighsLows
 from .indicators.break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from .order_block import OrderBlock
 from .liquidity import Liquidity
-from .equal_highs_lows import EqualHighsLows
+from .indicators.equal_highs_lows import EqualHighsLows
 from .hedge_ratio import HedgeRatio
 from .indicators import RollingEntropy
 from .rolling_autocorr import RollingAutocorr
 from .hurst import Hurst
-from .fractal_dimension import FractalDimension
+from .indicators.fractal_dimension import FractalDimension
 from .rolling_alpha import RollingAlpha
 from .rolling_information_ratio import RollingInformationRatio
-from .close_to_close_sigma import CloseToCloseSigma
+from .indicators.close_to_close_sigma import CloseToCloseSigma
 from .parkinson import Parkinson
 from .garman_klass import GarmanKlass
 from .rogers_satchell import RogersSatchell
@@ -266,7 +266,7 @@ from .indicators.average_daily_dollar_value import AverageDailyDollarValue
 from .indicators.amihud import Amihud
 from .roll_spread import RollSpread
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
-from .cumulative_sum_control_chart import CumulativeSumControlChart
+from .indicators.cumulative_sum_control_chart import CumulativeSumControlChart
 from .spread_z_score import SpreadZScore
 from .frac_diff import FracDiff
 from .kalman_hedge_ratio import KalmanHedgeRatio
@@ -278,8 +278,8 @@ from .schaff_trend_cycle import SchaffTrendCycle
 from .vortex import Vortex
 from .know_sure_thing import KnowSureThing
 from .mass_index import MassIndex
-from .detrended_price_oscillator import DetrendedPriceOscillator
-from .chaikin_money_flow import ChaikinMoneyFlow
+from .indicators.detrended_price_oscillator import DetrendedPriceOscillator
+from .indicators.chaikin_money_flow import ChaikinMoneyFlow
 from .volume_price_trend import VolumePriceTrend
 from .negative_volume_index import NegativeVolumeIndex
 from .positive_volume_index import PositiveVolumeIndex

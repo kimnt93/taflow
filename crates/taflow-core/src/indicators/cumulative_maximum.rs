@@ -1,7 +1,7 @@
 //! Persistent cumulative maximum state.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
 /// Compute the cumulative maximum of chronological scalar observations.
 #[derive(Debug, Clone)]
