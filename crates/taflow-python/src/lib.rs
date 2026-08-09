@@ -300,8 +300,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::MathTanh>()?;
     m.add_class::<indicators::MathAdd>()?;
     m.add_class::<indicators::MathSubtract>()?;
-    m.add_class::<state_api::MathMultiply>()?;
-    m.add_class::<state_api::MathDivide>()?;
+    m.add_class::<indicators::MathMultiply>()?;
+    m.add_class::<indicators::MathDivide>()?;
     m.add_class::<indicators::AverageTrueRange>()?;
     m.add_class::<indicators::TrueRange>()?;
     m.add_class::<indicators::NormalizedAverageTrueRange>()?;

@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._math_state import MathBinaryState
-from ._native import MathMultiply as _NativeMathMultiply
+from .._math_state import MathBinaryState
+from .._native import MathMultiply as _NativeMathMultiply
 
 
 class MathMultiply(MathBinaryState):

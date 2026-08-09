@@ -462,6 +462,16 @@ pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 
+mod math_divide;
+#[cfg(test)]
+mod math_divide_test;
+mod math_multiply;
+#[cfg(test)]
+mod math_multiply_test;
+
+pub use math_divide::MathDivide;
+pub use math_multiply::MathMultiply;
+
 mod intraday_momentum_index;
 #[cfg(test)]
 mod intraday_momentum_index_test;

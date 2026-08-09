@@ -202,12 +202,6 @@ pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
 pub use weighted_moving_average::WeightedMovingAverage;
 pub use window::Window;
 
-mod math_multiply;
-pub use math_multiply::MathMultiply;
-mod math_divide;
-#[cfg(test)]
-mod math_multiply_test;
-pub use math_divide::MathDivide;
 #[cfg(test)]
 mod bars_since_test;
 #[cfg(test)]
@@ -234,8 +228,6 @@ mod highest_since_test;
 mod keltner_channels_test;
 #[cfg(test)]
 mod lowest_since_test;
-#[cfg(test)]
-mod math_divide_test;
 #[cfg(test)]
 mod outside_bar_test;
 #[cfg(test)]

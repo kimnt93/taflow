@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._math_state import MathBinaryState
-from ._native import MathDivide as _NativeMathDivide
+from .._math_state import MathBinaryState
+from .._native import MathDivide as _NativeMathDivide
 
 
 class MathDivide(MathBinaryState):

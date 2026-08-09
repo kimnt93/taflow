@@ -178,9 +178,8 @@ from ..falling import Falling
 from .math_abs import MathAbs
 from .math_acos import MathAcos
 from .math_acosh import MathAcosh
-from ..math_transform import (
-    MathMultiply, MathDivide,
-)
+from .math_multiply import MathMultiply
+from .math_divide import MathDivide
 from .math_asinh import MathAsinh
 from .math_atanh import MathAtanh
 from .math_asin import MathAsin

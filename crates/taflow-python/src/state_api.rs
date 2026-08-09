@@ -256,9 +256,6 @@ macro_rules! binary_math_state_class {
     };
 }
 
-binary_math_state_class!(MathMultiply);
-binary_math_state_class!(MathDivide);
-
 macro_rules! binary_state_class {
     ($class:ident) => {
         #[pyclass]

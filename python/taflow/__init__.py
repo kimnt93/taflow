@@ -116,8 +116,8 @@ from .indicators import MathCosh, MathCot, MathDegrees, MathExp, MathFloor
 from .indicators import MathLn, MathLog10, MathLog1p, MathRadians
 from .indicators import MathSin
 from .indicators import MathSinh, MathSqrt, MathTan, MathTanh, MathAdd, MathSubtract
-from .math_multiply import MathMultiply
-from .math_divide import MathDivide
+from .indicators.math_multiply import MathMultiply
+from .indicators.math_divide import MathDivide
 from .indicators import (
     RollingAverageDeviation,
     RollingMidpoint,

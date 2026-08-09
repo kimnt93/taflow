@@ -17,13 +17,13 @@ from .indicators.math_cos import MathCos
 from .indicators.math_cosh import MathCosh
 from .indicators.math_cot import MathCot
 from .indicators.math_degrees import MathDegrees
-from .math_divide import MathDivide
+from .indicators.math_divide import MathDivide
 from .indicators.math_exp import MathExp
 from .indicators.math_floor import MathFloor
 from .indicators.math_ln import MathLn
 from .indicators.math_log10 import MathLog10
 from .indicators.math_log1p import MathLog1p
-from .math_multiply import MathMultiply
+from .indicators.math_multiply import MathMultiply
 from .indicators.math_radians import MathRadians
 from .indicators.math_sin import MathSin
 from .indicators.math_sinh import MathSinh

@@ -19,6 +19,14 @@ file under `crates/taflow-python/src/indicators/`. Focused Rust (10 tests),
 Python (14 tests), and PyO3 compilation checks passed. Benchmark fields remain
 `TODO` intentionally; no benchmark command was run.
 
+The twenty-third structural batch extracted `MathMultiply` and `MathDivide`
+from the grouped PyO3 state API into one binding file per class, and moved
+their Rust implementations/tests and Python adapters to matching canonical
+`indicators/` paths. Import surfaces and the shared math-transform adapter
+were updated accordingly. Focused tests, the release extension build, the
+full Python suite (592 passed, 2 skipped), and the 304/304 interface audit
+passed. Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,
