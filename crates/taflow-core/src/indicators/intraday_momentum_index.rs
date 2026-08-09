@@ -1,7 +1,7 @@
 //! Persistent Intraday Momentum Index state.
 
-use super::{invalid_period, Window};
 use crate::error::TaResult;
+use crate::stream::{invalid_period, Window};
 
 /// Incremental Intraday Momentum Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]

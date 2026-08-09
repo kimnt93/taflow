@@ -1,8 +1,8 @@
 """Canonical native-backed Mass Index adapter."""
 from typing import Any
 import numpy as np
-from ._native import MassIndexOperator as _Native
-from ._series import as_float64_series
+from .._native import MassIndexOperator as _Native
+from .._series import as_float64_series
 
 
 class MassIndex:

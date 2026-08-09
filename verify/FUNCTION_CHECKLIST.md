@@ -765,6 +765,16 @@ suite, interface audit, formatter, and diff checks passed. Generated rows may
 still lag; source scans are authoritative. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The twenty-first structural batch migrated `IntradayMomentumIndex`,
+`JurikMovingAverage`, `KalmanHedgeRatio`, `KaufmanAdaptiveMovingAverage`,
+`KnowSureThing`, `LaguerreRelativeStrengthIndex`, `Liquidity`, `MassIndex`,
+and `McGinleyDynamic`. Their Rust implementations/tests, Python adapters,
+and PyO3 bindings now use canonical one-indicator files and exports. The
+release extension, workspace Rust tests, 29 focused Python tests, full Python
+suite, interface audit, formatter, and diff checks passed. Generated rows may
+still lag; source scans are authoritative. Benchmark fields remain `TODO`;
+no benchmark command was run.
+
 The twentieth structural batch migrated `GarmanKlass`,
 `GarmanKlassYangZhang`, `HedgeRatio`, `HeikinAshi`,
 `HilbertTransformDominantCyclePeriod`, `HilbertTransformDominantCyclePhase`,

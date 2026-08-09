@@ -1,9 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{
-    LaguerreRelativeStrengthIndex as LaguerreRelativeStrengthIndexState, StreamingIndicator,
-};
+use taflow::indicators::LaguerreRelativeStrengthIndex as LaguerreRelativeStrengthIndexState;
+use taflow::stream::StreamingIndicator;
 
 /// Python boundary for the canonical Rust Laguerre Relative Strength Index state.
 #[pyclass]

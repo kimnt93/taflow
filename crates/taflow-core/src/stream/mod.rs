@@ -44,6 +44,7 @@ pub use crate::indicators::{
     ChaikinMoneyFlow, ChandeMomentumOscillator, CloseToCloseSigma, CommodityChannelIndex,
     CumulativeMaximum, CumulativeMinimum, CumulativeSumControlChart, DetrendedPriceOscillator,
     EqualHighsLows, FractalDimension, HilbertTransformDominantCyclePhase,
+    KaufmanAdaptiveMovingAverage,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -57,12 +58,6 @@ mod hilbert_transform_trendline;
 #[cfg(test)]
 mod hilbert_transform_trendline_test;
 mod indicator;
-mod intraday_momentum_index;
-#[cfg(test)]
-mod intraday_momentum_index_test;
-mod kaufman_adaptive_moving_average;
-#[cfg(test)]
-mod kaufman_adaptive_moving_average_test;
 mod math_operator;
 mod minus_directional_indicator;
 #[cfg(test)]
@@ -117,13 +112,7 @@ mod fibonacci_retracement;
 #[cfg(test)]
 mod fibonacci_retracement_test;
 mod helpers;
-mod jurik_moving_average;
-#[cfg(test)]
-mod jurik_moving_average_test;
 pub(crate) mod lagged_common;
-mod laguerre_relative_strength_index;
-#[cfg(test)]
-mod laguerre_relative_strength_index_test;
 pub(crate) mod operator_states;
 mod relative_momentum_index;
 #[cfg(test)]
@@ -172,10 +161,6 @@ pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue}
 pub use hilbert_transform_trendline::HilbertTransformTrendline;
 pub use indicator::StreamingIndicator;
 #[allow(unused_imports)]
-pub use intraday_momentum_index::IntradayMomentumIndex;
-pub use jurik_moving_average::JurikMovingAverage;
-pub use kaufman_adaptive_moving_average::KaufmanAdaptiveMovingAverage;
-pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 #[allow(unused_imports)]
 pub use minus_directional_indicator::MinusDirectionalIndicator;
 pub use minus_directional_movement::MinusDirectionalMovement;
@@ -573,9 +558,6 @@ mod force_index;
 #[cfg(test)]
 mod force_index_test;
 #[allow(unused_imports)]
-mod liquidity;
-#[cfg(test)]
-mod liquidity_test;
 #[allow(unused_imports)]
 mod order_block;
 #[cfg(test)]
@@ -637,12 +619,6 @@ mod frac_diff_test;
 mod ichimoku;
 #[cfg(test)]
 mod ichimoku_test;
-mod kalman_hedge_ratio;
-#[cfg(test)]
-mod kalman_hedge_ratio_test;
-mod know_sure_thing;
-#[cfg(test)]
-mod know_sure_thing_test;
 mod ornstein_uhlenbeck_half_life;
 #[cfg(test)]
 mod ornstein_uhlenbeck_half_life_test;
@@ -688,12 +664,6 @@ mod swing_low_test;
 pub use swing_low::SwingLow;
 mod exponentially_weighted_standard_deviation;
 mod exponentially_weighted_variance;
-mod mass_index;
-#[cfg(test)]
-mod mass_index_test;
-mod mc_ginley_dynamic;
-#[cfg(test)]
-mod mc_ginley_dynamic_test;
 mod negative_volume_index;
 #[cfg(test)]
 mod negative_volume_index_test;
@@ -737,9 +707,6 @@ pub use higher_high::HigherHigh;
 pub use highest_since::HighestSince;
 pub use ichimoku::{Ichimoku, IchimokuValue};
 pub use inside_bar::InsideBar;
-pub use kalman_hedge_ratio::KalmanHedgeRatio;
-pub use know_sure_thing::{KnowSureThing, KnowSureThingValue};
-pub use liquidity::{Liquidity, LiquidityValue};
 pub use lower_low::LowerLow;
 pub use lowest_since::LowestSince;
 pub use order_block::{OrderBlock, OrderBlockValue};
@@ -794,8 +761,6 @@ mod crossunder_test;
 pub use crossunder::Crossunder;
 mod cross;
 pub use cross::Cross;
-pub use mass_index::MassIndex;
-pub use mc_ginley_dynamic::McGinleyDynamic;
 pub use negative_volume_index::NegativeVolumeIndex;
 pub use positive_volume_index::PositiveVolumeIndex;
 pub use volume_price_trend::VolumePriceTrend;

@@ -462,6 +462,44 @@ pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 
+mod intraday_momentum_index;
+#[cfg(test)]
+mod intraday_momentum_index_test;
+mod jurik_moving_average;
+#[cfg(test)]
+mod jurik_moving_average_test;
+mod kalman_hedge_ratio;
+#[cfg(test)]
+mod kalman_hedge_ratio_test;
+mod kaufman_adaptive_moving_average;
+#[cfg(test)]
+mod kaufman_adaptive_moving_average_test;
+mod know_sure_thing;
+#[cfg(test)]
+mod know_sure_thing_test;
+mod laguerre_relative_strength_index;
+#[cfg(test)]
+mod laguerre_relative_strength_index_test;
+mod liquidity;
+#[cfg(test)]
+mod liquidity_test;
+mod mass_index;
+#[cfg(test)]
+mod mass_index_test;
+mod mc_ginley_dynamic;
+#[cfg(test)]
+mod mc_ginley_dynamic_test;
+
+pub use intraday_momentum_index::IntradayMomentumIndex;
+pub use jurik_moving_average::JurikMovingAverage;
+pub use kalman_hedge_ratio::KalmanHedgeRatio;
+pub use kaufman_adaptive_moving_average::KaufmanAdaptiveMovingAverage;
+pub use know_sure_thing::KnowSureThing;
+pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
+pub use liquidity::Liquidity;
+pub use mass_index::MassIndex;
+pub use mc_ginley_dynamic::McGinleyDynamic;
+
 mod garman_klass;
 #[cfg(test)]
 mod garman_klass_test;

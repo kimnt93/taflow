@@ -1,7 +1,7 @@
 //! Stateful pandas-ta-classic Jurik moving average reconstruction.
 
-use super::{invalid_period, StreamingIndicator};
 use crate::error::TaResult;
+use crate::stream::{invalid_period, StreamingIndicator};
 use std::collections::VecDeque;
 
 /// Computes the documented adaptive Jurik-like moving-average recurrence.

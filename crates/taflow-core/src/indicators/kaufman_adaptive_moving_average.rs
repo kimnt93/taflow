@@ -7,7 +7,7 @@ use multiversion::multiversion;
 
 use crate::error::TaResult;
 
-use super::{invalid_period, StreamingIndicator};
+use crate::stream::{invalid_period, StreamingIndicator};
 
 const SLOW: f64 = 2.0 / 31.0;
 const FAST_MINUS_SLOW: f64 = 2.0 / 3.0 - SLOW;

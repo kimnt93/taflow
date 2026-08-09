@@ -1,7 +1,7 @@
 //! Stateful Laguerre Relative Strength Index.
 
-use super::StreamingIndicator;
 use crate::error::{TaError, TaResult};
+use crate::stream::StreamingIndicator;
 
 /// Ehlers' four-stage Laguerre oscillator on a zero-to-one-hundred scale.
 #[derive(Debug, Clone)]

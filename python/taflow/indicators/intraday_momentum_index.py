@@ -1,8 +1,8 @@
 """Canonical native-backed IntradayMomentumIndex adapter."""
 from typing import Any
 import numpy as np
-from ._native import IntradayMomentumIndex as _NativeIntradayMomentumIndex
-from ._series import as_float64_series
+from .._native import IntradayMomentumIndex as _NativeIntradayMomentumIndex
+from .._series import as_float64_series
 
 
 class IntradayMomentumIndex:

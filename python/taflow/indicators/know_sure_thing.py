@@ -1,8 +1,8 @@
 """Canonical native-backed Know Sure Thing adapter."""
 from typing import Any
 import numpy as np
-from ._native import KnowSureThingOperator as _Native
-from ._series import as_float64_series
+from .._native import KnowSureThingOperator as _Native
+from .._series import as_float64_series
 
 
 class KnowSureThing:

@@ -1,7 +1,7 @@
-use super::operator_states::*;
-use super::*;
 use crate::error::TaResult;
 use crate::indicators::RollingSum;
+use crate::stream::operator_states::*;
+use crate::stream::*;
 
 /// Stateful Mass Index (Dorsey): rolling sum of the ratio between a short EMA
 /// of the high-low range and an EMA of that EMA.
