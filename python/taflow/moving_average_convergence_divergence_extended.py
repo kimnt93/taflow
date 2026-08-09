@@ -21,15 +21,15 @@ class MovingAverageConvergenceDivergenceExtended:
 
     def __init__(
         self,
+        _input: Any,
         fast_period: object = 12,
         fast_average_type: object = 1,
         slow_period: object = 26,
         slow_average_type: object = 1,
         signal_period: object = 9,
         signal_average_type: object = 1,
-        _input: Any | None = None,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -64,7 +64,7 @@ class MovingAverageConvergenceDivergenceExtended:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: object) -> object:
+    def append(self, _input: object) -> "MovingAverageConvergenceDivergenceExtended":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -80,7 +80,7 @@ class MovingAverageConvergenceDivergenceExtended:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: object) -> object:
+    def extend(self, _input: object) -> "MovingAverageConvergenceDivergenceExtended":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -97,13 +97,12 @@ class MovingAverageConvergenceDivergenceExtended:
         return self
 
     def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the aligned native output histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
@@ -117,7 +116,7 @@ class MovingAverageConvergenceDivergenceExtended:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "MovingAverageConvergenceDivergenceExtended":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

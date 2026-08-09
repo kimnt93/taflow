@@ -21,12 +21,12 @@ class AverageDirectionalIndex:
 
     def __init__(
         self,
+        high: Any,
+        low: Any,
+        close: Any,
         period: int = 14,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
     ) -> None:
-        """Create the indicator and optionally process an initial history.
+        """Create the indicator and process an initial history.
 
         Parameters are ``period`` (Wilder lookback), ``high``, ``low``, and
         ``close`` (aligned OHLC series).  The constructor returns no value;
@@ -36,7 +36,7 @@ class AverageDirectionalIndex:
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
-    def append(self, high: object, low: object, close: object) -> object:
+    def append(self, high: object, low: object, close: object) -> "AverageDirectionalIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -56,7 +56,7 @@ class AverageDirectionalIndex:
         self._state.append(high, low, close)
         return self
 
-    def extend(self, high: object, low: object, close: object) -> object:
+    def extend(self, high: object, low: object, close: object) -> "AverageDirectionalIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -77,13 +77,12 @@ class AverageDirectionalIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
@@ -97,7 +96,7 @@ class AverageDirectionalIndex:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "AverageDirectionalIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

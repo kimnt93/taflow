@@ -1,104 +1,13 @@
-from typing import Any
-import numpy as np
-from ._series import as_float64_series
+"""Compatibility re-exports for bar-relation classes.
 
+Canonical classes live in their same-named modules.
+"""
 
-def _make(native: object, name: object) -> object:
-    """Execute the _make operation through the native Rust implementation.
+from .gap_down import GapDown
+from .gap_up import GapUp
+from .higher_high import HigherHigh
+from .inside_bar import InsideBar
+from .lower_low import LowerLow
+from .outside_bar import OutsideBar
 
-    Parameters
-    ----------
-    native : object
-        Input parameter or configuration value for this operation.
-    name : object
-        Input parameter or configuration value for this operation.
-
-    Returns
-    -------
-    object
-        The updated adapter, native value, aligned output array, or execution node.
-    """
-
-    def init(self, high: Any | None = None, low: Any | None = None) -> object:
-        """Execute the init operation through the native Rust implementation.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-
-        Returns
-        -------
-        object
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state = native()
-        self.extend(high, low) if high is not None or low is not None else None
-
-    def append(self, high: float, low: float) -> object:
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(high, low)
-        return self
-
-    def extend(self, high: Any, low: Any) -> object:
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(high), as_float64_series(low))
-        return self
-
-    return type(
-        name,
-        (),
-        {
-            "__init__": init,
-            "append": append,
-            "extend": extend,
-            "compute": lambda self: self._state.compute(),
-            "value": property(lambda self: self._state.value),
-            "reset": lambda self: (self._state.reset() or self),
-        },
-    )
-
-
-from ._native import (
-    HigherHighOperator,
-    LowerLowOperator,
-    InsideBarOperator,
-    OutsideBarOperator,
-    GapUpOperator,
-    GapDownOperator,
-)
-
-HigherHigh = _make(HigherHighOperator, "HigherHigh")
-LowerLow = _make(LowerLowOperator, "LowerLow")
-InsideBar = _make(InsideBarOperator, "InsideBar")
-OutsideBar = _make(OutsideBarOperator, "OutsideBar")
-GapUp = _make(GapUpOperator, "GapUp")
-GapDown = _make(GapDownOperator, "GapDown")
+__all__ = ["HigherHigh", "LowerLow", "InsideBar", "OutsideBar", "GapUp", "GapDown"]

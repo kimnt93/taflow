@@ -21,17 +21,17 @@ class AverageDirectionalIndexRating:
 
     def __init__(
         self,
+        high: Any,
+        low: Any,
+        close: Any,
         period: int = 14,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
     ) -> None:
         """Create ADXR with an optional aligned high/low/close history."""
         self._state = StatefulAdxr(period)
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
-    def append(self, high: object, low: object, close: object) -> object:
+    def append(self, high: object, low: object, close: object) -> "AverageDirectionalIndexRating":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -51,7 +51,7 @@ class AverageDirectionalIndexRating:
         self._state.append(high, low, close)
         return self
 
-    def extend(self, high: object, low: object, close: object) -> object:
+    def extend(self, high: object, low: object, close: object) -> "AverageDirectionalIndexRating":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -72,13 +72,12 @@ class AverageDirectionalIndexRating:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
@@ -92,7 +91,7 @@ class AverageDirectionalIndexRating:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "AverageDirectionalIndexRating":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

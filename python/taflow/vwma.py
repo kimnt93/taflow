@@ -7,16 +7,17 @@ from ._series import as_float64_series
 
 
 class VolumeWeightedMovingAverage:
-    """Stateful VolumeWeightedMovingAverage indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent volume-weighted moving average.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `price`, `volume`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, timeperiod: int, price: Any | None = None, volume: Any | None = None
+        self,
+        price: Any,
+        volume: Any,
+        timeperiod: int = 10,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -35,7 +36,7 @@ class VolumeWeightedMovingAverage:
         self._state = _Native(timeperiod)
         self.extend(price, volume) if price is not None or volume is not None else None
 
-    def append(self, price: float, volume: float) -> object:
+    def append(self, price: float, volume: float) -> "VolumeWeightedMovingAverage":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -53,7 +54,7 @@ class VolumeWeightedMovingAverage:
         self._state.append(price, volume)
         return self
 
-    def extend(self, price: Any, volume: Any) -> object:
+    def extend(self, price: Any, volume: Any) -> "VolumeWeightedMovingAverage":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -92,7 +93,7 @@ class VolumeWeightedMovingAverage:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "VolumeWeightedMovingAverage":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -111,22 +111,49 @@ from .opening_range import OpeningRange
 from .pivot_points import PivotPoints
 from . import executions
 from . import op
-from .math_transform import (
-    MathAbs, MathAcos, MathAcosh, MathAsin, MathAsinh, MathAtan, MathAtanh,
-    MathCbrt, MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathExp,
-    MathFloor, MathLn, MathLog10, MathLog1p, MathRadians, MathSin, MathSinh,
-    MathSqrt, MathTan, MathTanh,
-    MathAdd, MathSubtract, MathMultiply, MathDivide,
-)
+from .math_abs import MathAbs
+from .math_acos import MathAcos
+from .math_acosh import MathAcosh
+from .math_asin import MathAsin
+from .math_asinh import MathAsinh
+from .math_atan import MathAtan
+from .math_atanh import MathAtanh
+from .math_cbrt import MathCbrt
+from .math_ceil import MathCeil
+from .math_cos import MathCos
+from .math_cosh import MathCosh
+from .math_cot import MathCot
+from .math_degrees import MathDegrees
+from .math_exp import MathExp
+from .math_floor import MathFloor
+from .math_ln import MathLn
+from .math_log10 import MathLog10
+from .math_log1p import MathLog1p
+from .math_radians import MathRadians
+from .math_sin import MathSin
+from .math_sinh import MathSinh
+from .math_sqrt import MathSqrt
+from .math_tan import MathTan
+from .math_tanh import MathTanh
+from .math_add import MathAdd
+from .math_subtract import MathSubtract
+from .math_multiply import MathMultiply
+from .math_divide import MathDivide
 from .rolling_std import RollingStandardDeviation
-from .statistics import (
-    RollingAverageDeviation, RollingMidpoint, RollingMidprice, RollingVariance,
-    RollingLinearRegression, RollingLinearRegressionAngle,
-    RollingLinearRegressionIntercept, RollingLinearRegressionSlope,
-    RollingTimeSeriesForecast, RollingBeta, RollingCorrelation,
-    MesaAdaptiveMovingAverage,
-    RollingMinMax, RollingMinMaxIndex,
-)
+from .rolling_average_deviation import RollingAverageDeviation
+from .rolling_midpoint import RollingMidpoint
+from .rolling_midprice import RollingMidprice
+from .rolling_variance import RollingVariance
+from .rolling_linear_regression import RollingLinearRegression
+from .rolling_linear_regression_angle import RollingLinearRegressionAngle
+from .rolling_linear_regression_intercept import RollingLinearRegressionIntercept
+from .rolling_linear_regression_slope import RollingLinearRegressionSlope
+from .rolling_time_series_forecast import RollingTimeSeriesForecast
+from .rolling_beta import RollingBeta
+from .rolling_correlation import RollingCorrelation
+from .mesa_adaptive_moving_average import MesaAdaptiveMovingAverage
+from .rolling_min_max import RollingMinMax
+from .rolling_min_max_index import RollingMinMaxIndex
 from .klinger_volume_oscillator import KlingerVolumeOscillator
 from .session_volume_levels import SessionVolumeLevels
 from .up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
@@ -216,13 +243,22 @@ from .falling import Falling
 from .vwap import RollingVolumeWeightedAveragePrice
 from .force_index import ForceIndex
 from .ease_of_movement import EaseOfMovement
-from .bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
+from .higher_high import HigherHigh
+from .lower_low import LowerLow
+from .inside_bar import InsideBar
+from .outside_bar import OutsideBar
+from .gap_up import GapUp
+from .gap_down import GapDown
 from .bars_since import BarsSince
-from .state_helpers import ValueWhen, HighestSince, LowestSince
+from .value_when import ValueWhen
+from .highest_since import HighestSince
+from .lowest_since import LowestSince
 from .signal_delay import SignalDelay
 from .position_hold import PositionHold
 from .entry_exit import EntryExit
-from .swing import SwingHighLow, SwingHigh, SwingLow
+from .swing import SwingHighLow
+from .swing_high import SwingHigh
+from .swing_low import SwingLow
 from .retracements import Retracements
 from .session import SessionExtrema
 from .previous_high_low import PreviousHighLow
@@ -548,3 +584,11 @@ __all__ = [
     "op",
     "__version__",
 ]
+
+# Public adapters share a native-backed lifecycle.  A few older extension
+# classes do not yet export Rust's inexpensive length method, so install the
+# common adapter implementation once after the complete public API is known.
+from ._adapter_protocol import install_adapter_protocol as _install_adapter_protocol
+
+_install_adapter_protocol(globals(), __all__)
+del _install_adapter_protocol

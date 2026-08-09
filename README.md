@@ -4,20 +4,24 @@
     Rust technical analysis with O(1) streaming updates — TA-Lib parity, no C dependencies
   </p>
   <p align="center">
-    <a href="docs/INDICATORS.md">Indicators</a> ·
-    <a href="docs/STREAMING.md">Streaming</a> ·
-    <a href="docs/PIPELINES.md">Pipelines</a> ·
-    <a href="docs/DATA.md">Data&nbsp;in&nbsp;/&nbsp;out</a> ·
-    <a href="#benchmarks">Benchmarks</a> ·
-    <a href="docs/PERFORMANCE.md">Performance</a>
+    Rust-backed, stateful technical analysis for Python
   </p>
 </p>
+
+## Contents
+
+1. [Indicators](docs/INDICATORS.md)
+2. [Streaming](docs/STREAMING.md)
+3. [Pipelines](docs/PIPELINES.md)
+4. [Data IO](docs/DATA.md)
+5. [Correctness](#correctness)
+6. [Performance](#performance)
 
 <p align="center">
   <img src="https://img.shields.io/badge/functions-287-blue" alt="287 functions" />
   <img src="https://img.shields.io/badge/TA--Lib_parity-161-blue" alt="161 TA-Lib functions" />
   <img src="https://img.shields.io/badge/correctness-287%2F287_MATCH-brightgreen" alt="287/287 match" />
-  <img src="https://img.shields.io/badge/vs_TA--Lib-1.61%C3%97_median-blue" alt="1.61x median vs TA-Lib" />
+  <img src="https://img.shields.io/badge/vs_TA--Lib-1.55%C3%97_median-blue" alt="1.55x median vs TA-Lib" />
   <img src="https://img.shields.io/badge/unsafe-zero-brightgreen" alt="zero unsafe" />
   <img src="https://img.shields.io/badge/C_deps-zero-orange" alt="zero C deps" />
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT" />
@@ -128,15 +132,14 @@ atr = AverageTrueRange(high, low, close, timeperiod=14).compute()
 down, up = Aroon(high, low, timeperiod=14).compute()     # multi-output → tuple
 ```
 
-**One wrinkle.** Most classes take their series first and configuration after.
-A minority (64 of 299 — Bollinger Bands, the stochastics, MACD, the `Rolling*`
-statistics) take configuration first, so pass the data by keyword:
+Every class takes its required input series first and configuration after it.
+Configuration has documented defaults, so positional or keyword style works:
 
 ```python
 from taflow import BollingerBands, StochasticOscillator
 
-upper, middle, lower = BollingerBands(values=close, period=20).compute()
-slowk, slowd = StochasticOscillator(high=high, low=low, close=close).compute()
+upper, middle, lower = BollingerBands(close, period=20).compute()
+slowk, slowd = StochasticOscillator(high, low, close).compute()
 ```
 
 Keywords always work. **[docs/INDICATORS.md](docs/INDICATORS.md)** lists every
@@ -150,7 +153,7 @@ bar is flat:
 ```python
 from taflow import ExponentialMovingAverage
 
-ema = ExponentialMovingAverage(timeperiod=20)
+ema = ExponentialMovingAverage(np.array([], dtype=np.float64), timeperiod=20)
 ema.extend(history)          # backfill in one call
 
 for tick in feed:
@@ -171,14 +174,19 @@ A pipeline is a causal graph: each bar is dispatched once, and shared
 sub-expressions are evaluated once no matter how many outputs use them.
 
 ```python
+import numpy as np
+from taflow import AverageTrueRange, ExponentialMovingAverage
 from taflow.op import TAPipeline
 
 pipe = TAPipeline()
 high_s, low_s, close_s = pipe.source("high"), pipe.source("low"), pipe.source("close")
 
-fast = pipe.indicator("fast", ExponentialMovingAverage(timeperiod=12), close_s)
-slow = pipe.indicator("slow", ExponentialMovingAverage(timeperiod=26), close_s)
-atr_n = pipe.indicator("atr", AverageTrueRange(timeperiod=14), high_s, low_s, close_s)
+empty = np.array([], dtype=np.float64)
+fast = pipe.indicator("fast", ExponentialMovingAverage(empty, timeperiod=12), close_s)
+slow = pipe.indicator("slow", ExponentialMovingAverage(empty, timeperiod=26), close_s)
+atr_n = pipe.indicator(
+    "atr", AverageTrueRange(empty, empty, empty, timeperiod=14), high_s, low_s, close_s
+)
 
 pipe.output("macd", pipe.expression("macd", fast - slow))
 pipe.output("normalized", pipe.expression("normalized", (fast - slow) / atr_n))
@@ -201,10 +209,10 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 | [Pipelines](docs/PIPELINES.md) | Building causal graphs, expressions, evaluate-once semantics, custom nodes, when not to use one |
 | [Data in / out](docs/DATA.md) | Every accepted input container, output converters, dataframes, the adapter gateway, `RollingApply`, `SessionFlags` |
 | [Performance](docs/PERFORMANCE.md) | What was optimized and how, measured results, the bit-exactness contract, and which optimizations were rejected |
-| [Correctness report](verify/REPORT.md) | Current per-function oracle status |
+| [Correctness report](verify/SOURCE_COMPARISON.md) | Priority-selected oracle, API mapping, version, and current result |
 | [Benchmarks](verify/benchmark_reports/BENCHMARK.md) | Throughput vs TA-Lib at 1k/10k/100k/1M bars |
 
-## Benchmarks
+## Performance
 
 Measured 2026-08-09 on an Intel i7-10750H, Python 3.12, against C TA-Lib 0.7.1
 over identical contiguous arrays. **A stock portable build** — no
@@ -217,26 +225,12 @@ Across the 161 functions with a TA-Lib equivalent, at 10,000 bars:
 
 | | |
 |---|---|
-| Median | **1.61× TA-Lib** |
-| Mean | **2.01×** |
-| At or above parity | **153 of 161** |
-
-By category (median, 10k bars):
-
-| Category | n | Median | Range |
-|---|---:|---:|---|
-| Price transforms | 5 | **4.73×** | 1.77–7.13× |
-| Cycle (Hilbert) | 6 | **2.20×** | 0.84–4.31× |
-| Volume | 4 | **1.82×** | 0.83–2.86× |
-| Moving averages | 15 | **1.70×** | 0.69–5.76× |
-| Volatility | 5 | **1.66×** | 1.33–2.75× |
-| Candlestick patterns | 61 | **1.65×** | 0.88–4.64× |
-| Rolling statistics | 19 | **1.60×** | 1.03–2.64× |
-| Momentum & trend | 27 | **1.41×** | 0.85–5.45× |
-| Math transforms | 19 | **1.38×** | 1.11–8.32× |
+| Median | **1.55× TA-Lib** |
+| Mean | **1.81×** |
+| At or above parity | **150 of 161** |
 
 The 126 extended operators have no TA-Lib counterpart; their median throughput
-is **95M bars/s**.
+is **85M bars/s**.
 
 ### Live updates — where the design pays off
 
@@ -245,8 +239,8 @@ backfill, feeding 1,000 more bars one at a time:
 
 | | |
 |---|---|
-| Per `append` | **0.21 µs** median (p90 0.29 µs) |
-| vs TA-Lib recomputing full history | **3,242× faster** median |
+| Per `append` | **0.24 µs** median (p90 0.34 µs) |
+| vs TA-Lib recomputing the current history | **172×** median |
 
 TAFlow's per-tick cost is flat because state is bounded; a batch library redoes
 work proportional to its window on every tick, so this gap widens with history
@@ -254,15 +248,8 @@ length rather than being a fixed constant.
 
 ### Threading
 
-Bulk kernels release the GIL, so independent indicators scale across threads:
-
-| Threads | TAFlow | TA-Lib |
-|---:|---:|---:|
-| 2 | **1.93×** | 0.93× |
-| 4 | **3.38×** | 0.99× |
-
-TA-Lib's binding holds the GIL throughout, so it stays flat no matter how many
-threads you give it.
+Bulk kernels release the GIL, so independent indicators can run concurrently.
+Per-function thread-scaling results are recorded in the benchmark artifacts.
 
 ### Reproduce it
 
@@ -277,17 +264,8 @@ here are medians over repeated runs; individual functions vary by a few percent
 between runs, and rows near 1.0× can land on either side.
 
 `make build-native` builds with `-C target-cpu=native` for local measurement.
-It is no longer faster than the shipped build for the hot kernels — runtime
-dispatch already selects AVX2+FMA clones — and it must never be shipped, since
-the resulting binary crashes on older CPUs.
-
-### Known slow spots
-
-Eight TA-Lib functions remain below parity, all inherently serial bar-to-bar
-recurrences where TA-Lib's C does the same work: MAVP (0.69×), ADOSC (0.83×),
-HT_TRENDLINE (0.84×), SAR and SAREXT (0.85×), STOCHRSI, STOCHF and
-CDLXSIDEGAP3METHODS (0.88×). What remains is per-bar constant factor, not
-algorithm.
+It must never be shipped, since the resulting binary may use instructions that
+are unavailable on older CPUs.
 
 ## Correctness
 
@@ -300,11 +278,9 @@ Correctness is verified before performance is measured, on every run.
 - Four functions — VAR, STDDEV, CORREL and BETA — reproduce TA-Lib
   **bitwise**, byte for byte at 1M bars, by replicating its exact accumulation
   order.
-- At 1M bars, four candle patterns (ADVANCEBLOCK, GAPSIDESIDEWHITE, KICKING,
-  KICKINGBYLENGTH) differ from TA-Lib on 5–30 bars per million on knife-edge
-  threshold comparisons. This is long-standing behaviour, not a regression —
-  verified by building the pre-optimization commit and observing identical
-  divergences on identical bars.
+- Every public class is also checked for constructor backfill, empty-state
+  startup, scalar append, chunked continuation, fluent identity, length, and
+  reset behavior. Current status: **305/305 lifecycle scenarios pass**.
 
 ```bash
 make check                   # unit tests + oracle parity for all 287 functions

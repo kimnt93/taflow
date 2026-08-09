@@ -1,6 +1,7 @@
 //! Batch implementation for `rolling_alpha`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `rolling_alpha` through the native Rust kernel.
@@ -156,5 +157,94 @@ mod tests {
             let from_fresh = fresh.append(a[bar], b[bar]).unwrap_or(f64::NAN);
             assert_eq!(after_reset.to_bits(), from_fresh.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingAlpha`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollingAlpha {
+    values: VecDeque<(f64, f64)>,
+    period: usize,
+    value: Option<f64>,
+}
+
+impl RollingAlpha {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self {
+            values: VecDeque::with_capacity(period),
+            period,
+            value: None,
+        })
+    }
+    /// Append one causal observation and return the latest result.
+    ///
+    pub fn append(&mut self, input: f64, benchmark: f64) -> Option<f64> {
+        if self.values.len() == self.period {
+            self.values.pop_front();
+        }
+        self.values.push_back((input, benchmark));
+        self.value = (self.values.len() == self.period).then(|| {
+            let n = self.period as f64;
+            // Contiguous two-slice scans with fused accumulators: each
+            // accumulator adds the same terms in the same order as the
+            // original per-quantity passes, so results are bit-identical.
+            let (front, back) = self.values.as_slices();
+            let mut sum_input = 0.0;
+            let mut sum_benchmark = 0.0;
+            for &(input, benchmark) in front {
+                sum_input += input;
+                sum_benchmark += benchmark;
+            }
+            for &(input, benchmark) in back {
+                sum_input += input;
+                sum_benchmark += benchmark;
+            }
+            let mean_input = sum_input / n;
+            let mean_benchmark = sum_benchmark / n;
+            let mut covariance = 0.0;
+            let mut variance = 0.0;
+            for &(input, benchmark) in front {
+                let delta_benchmark = benchmark - mean_benchmark;
+                covariance += (input - mean_input) * delta_benchmark;
+                variance += delta_benchmark * delta_benchmark;
+            }
+            for &(input, benchmark) in back {
+                let delta_benchmark = benchmark - mean_benchmark;
+                covariance += (input - mean_input) * delta_benchmark;
+                variance += delta_benchmark * delta_benchmark;
+            }
+            let beta = if variance > 0.0 {
+                covariance / variance
+            } else {
+                0.0
+            };
+            mean_input - beta * mean_benchmark
+        });
+        self.value
+    }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
     }
 }

@@ -13,76 +13,74 @@ class PositionHold:
 
     Parameters
     ----------
-    _input : array-like, optional
+    _input : array-like
         Initial position history.
     """
 
-    def __init__(self, _input: Any | None = None) -> None:
-        """Create the state and optionally process position history."""
+    def __init__(
+        self,
+        _input: Any,
+    ) -> None:
+        """Create the state and process position history."""
         self._state = PositionHoldOperator()
         if _input is not None:
             self.extend(_input)
 
     def append(self, _input: float) -> "PositionHold":
-        """Append one position value and update the native result
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _input : float
+            Current input.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        PositionHold
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(_input)
         return self
 
     def extend(self, _input: Any) -> "PositionHold":
-        """Process an aligned position series in native Rust
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _input : Any
+            Chronological input series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        PositionHold
+            This indicator, for fluent chaining."""
         self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned held-position series
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest held position
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
     def reset(self) -> "PositionHold":
-        """Reset the native state and accumulated history
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        PositionHold
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self

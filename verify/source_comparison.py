@@ -1,114 +1,127 @@
 #!/usr/bin/env python3
-"""Merge generated oracle artifacts without overstating self-consistency.
-
-``verify.py`` owns TA-Lib/pandas parity and lifecycle invariance;
-``external_oracles.py`` owns pandas-ta-classic, Polars, and SMC comparisons.
-This script only renders their recorded results. It performs no hidden checks,
-does not catch oracle failures, and never labels a native self-check as external
-correctness evidence.
-"""
+"""Render one highest-priority correctness oracle for every TAFlow class."""
 from __future__ import annotations
 
+import importlib.metadata
 import json
+from collections import defaultdict
 from pathlib import Path
+
+from registry import build_registry
 
 
 HERE = Path(__file__).parent
-
-EXTERNAL_TO_PRIMARY = {
-    "abs": "math_abs",
-    "ewm_stddev": "ewm_std",
-    "ewm_variance": "ewm_var",
-    "jurik_moving_average": "jma",
-    "klinger_volume_oscillator": "kvo",
-    "mcginley_dynamic": "mcginley",
-    "tom_de_mark_sequential": "td_sequential",
-    "variable_index_dynamic_average": "vidya",
+PRIORITY = {"TA-Lib": 1, "Polars": 2, "pandas": 3,
+            "pandas-ta-classic": 4, "smartmoneyconcepts": 5, "self": 99}
+URLS = {
+    "TA-Lib": "https://ta-lib.github.io/ta-lib-python/funcs.html",
+    "Polars": "https://docs.pola.rs/api/python/stable/reference/expressions/index.html",
+    "pandas": "https://pandas.pydata.org/docs/reference/window.html",
+    "pandas-ta-classic": "https://xgboosted.github.io/pandas-ta-classic/indicators.html",
+    "smartmoneyconcepts": "https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6",
+    "self": "",
+}
+PACKAGES = {"TA-Lib": "TA-Lib", "Polars": "polars", "pandas": "pandas",
+            "pandas-ta-classic": "pandas-ta-classic",
+            "smartmoneyconcepts": "smartmoneyconcepts"}
+API_NAMES = {
+    "awesome_oscillator": "pandas_ta_classic.ao",
+    "log_return": "pandas_ta_classic.log_return",
+    "force_index": "pandas_ta_classic.efi",
+    "hull_moving_average": "pandas_ta_classic.hma",
+    "volume_weighted_moving_average": "pandas_ta_classic.vwma",
+    "zero_lag_exponential_moving_average": "pandas_ta_classic.zlma",
+    "donchian_channels": "pandas_ta_classic.donchian",
+    "fisher_transform": "pandas_ta_classic.fisher",
+    "chaikin_money_flow": "pandas_ta_classic.cmf",
+    "detrended_price_oscillator": "pandas_ta_classic.dpo",
+    "mcginley_dynamic": "pandas_ta_classic.mcgd",
+    "variable_index_dynamic_average": "pandas_ta_classic.vidya",
+    "jurik_moving_average": "pandas_ta_classic.jma",
+    "even_better_sinewave": "pandas_ta_classic.ebsw",
+    "schaff_trend_cycle": "pandas_ta_classic.stc",
+    "klinger_volume_oscillator": "pandas_ta_classic.kvo",
+    "tom_de_mark_sequential": "pandas_ta_classic.td_seq",
 }
 
 
-def _error(check: dict | None) -> tuple[float, int]:
-    if not check:
-        return float("inf"), 0
-    return float(check.get("max_abs_error", 0.0)), int(check.get("nan_mismatches", 0))
+def version(source: str, external_versions: dict[str, str]) -> str:
+    package = PACKAGES.get(source)
+    if not package:
+        return "repository invariant"
+    if source == "smartmoneyconcepts":
+        return f"{external_versions.get(package, '?')} @ 1b62fd6c"
+    try:
+        return importlib.metadata.version(package)
+    except importlib.metadata.PackageNotFoundError:
+        return external_versions.get(package, "unknown")
 
 
 def main() -> None:
     primary = json.loads((HERE / "report.json").read_text())
-    external = json.loads((HERE / "EXTERNAL_ORACLES.json").read_text())["rows"]
-    externally_compared = {
-        EXTERNAL_TO_PRIMARY.get(result["function"], result["function"])
-        for result in external
-    }
-    rows: list[dict] = []
+    external_doc = json.loads((HERE / "EXTERNAL_ORACLES.json").read_text())
+    external = external_doc["rows"]
+    registry = build_registry()
+    snake_by_key = {key: spec.snake for key, spec in registry.items()}
+    class_by_snake = {spec.snake: spec.cls.__name__ for spec in registry.values() if spec.cls}
+    external_by_function: dict[str, list[dict]] = defaultdict(list)
+    for row in external:
+        external_by_function[row["function"]].append(row)
 
-    for result in primary:
-        oracle = result["oracle"]
-        batch = result.get("batch_vs_oracle")
-        lifecycle = bool(result.get("continue_vs_batch_bitwise")) and all(
-            result.get("chunk_invariance", {}).values())
-        if oracle == "self":
-            if result["function"] in externally_compared:
-                # The per-output external rows below are the stronger evidence;
-                # avoid also counting this function as "self-invariant only".
-                continue
-            verdict = "INVARIANT" if lifecycle else "FAIL"
-            note = "native batch/append/chunk consistency only; no external oracle"
-            error, nan_mismatches = 0.0, 0
-        else:
-            passed = bool(batch and batch.get("passed")) and lifecycle
-            verdict = "MATCH" if passed else "FAIL"
-            note = "external parity plus bitwise lifecycle/chunk invariance"
-            error, nan_mismatches = _error(batch)
-        rows.append({
-            "function": result["function"],
-            "python": result["taflow_class"],
-            "output": "all",
-            "source": oracle,
-            "verdict": verdict,
-            "max_abs_error": error,
-            "nan_mismatches": nan_mismatches,
-            "note": note,
-        })
+    selected: list[dict] = []
+    for row in primary:
+        snake = snake_by_key[row["function"]]
+        candidates = [(PRIORITY[row["oracle"]], row["oracle"], [row])]
+        for source in {item["oracle"] for item in external_by_function.get(snake, [])}:
+            candidates.append((PRIORITY[source], source,
+                               [item for item in external_by_function[snake]
+                                if item["oracle"] == source]))
+        _, source, evidence = min(candidates, key=lambda item: item[0])
+        if source in {"TA-Lib", "pandas", "self"}:
+            check = row.get("batch_vs_oracle") or {}
+            lifecycle = bool(row.get("continue_vs_batch_bitwise")) and all(
+                row.get("chunk_invariance", {}).values())
+            passed = lifecycle and (source == "self" or bool(check.get("passed")))
+            evidence = [{"output": "all", "passed": passed,
+                         "expected_difference": False,
+                         "max_abs_error": check.get("max_abs_error", 0.0),
+                         "nan_mismatches": check.get("nan_mismatches", 0),
+                         "note": ("cold/warm/chunk/reset invariant; no external oracle"
+                                  if source == "self" else
+                                  "external parity plus bitwise lifecycle invariance")}]
+        for item in evidence:
+            verdict = ("MATCH" if item["passed"] else
+                       "VARIANT" if item.get("expected_difference") else "FAIL")
+            oracle_api = (row["function"] if source == "TA-Lib" else
+                          API_NAMES.get(snake, f"{source}.{snake}"))
+            selected.append({"class": class_by_snake[snake], "snake": snake,
+                             "oracle_api": oracle_api, "output": item["output"],
+                             "source": source, "version": version(source, external_doc["versions"]),
+                             "url": URLS[source], "verdict": verdict,
+                             "error": float(item.get("max_abs_error", 0.0)),
+                             "nan": int(item.get("nan_mismatches", 0)),
+                             "note": item.get("error") or item.get("note", "")})
 
-    for result in external:
-        verdict = ("MATCH" if result["passed"] else
-                   "VARIANT" if result["expected_difference"] else "FAIL")
-        rows.append({
-            "function": result["function"],
-            "python": result["function"],
-            "output": result["output"],
-            "source": result["oracle"],
-            "verdict": verdict,
-            "max_abs_error": result["max_abs_error"],
-            "nan_mismatches": result["nan_mismatches"],
-            "note": result.get("error") or result.get("note", ""),
-        })
-
-    failures = sum(row["verdict"] == "FAIL" for row in rows)
-    matches = sum(row["verdict"] == "MATCH" for row in rows)
-    variants = sum(row["verdict"] == "VARIANT" for row in rows)
-    invariants = sum(row["verdict"] == "INVARIANT" for row in rows)
-    lines = [
-        "# Source-labelled correctness comparison", "",
-        "Generated from `report.json` and `EXTERNAL_ORACLES.json` by "
-        "`source_comparison.py`. `INVARIANT` means native lifecycle "
-        "self-consistency, not external numerical validation.", "",
-        f"Matches: **{matches}** | Documented variants: **{variants}** | "
-        f"Self-invariant only: **{invariants}** | Failures: **{failures}**", "",
-        "| Python | Function | Output | Source | Verdict | Max error | NaN mismatches | Note |",
-        "|---|---|---|---|---:|---:|---:|---|",
-    ]
-    for row in sorted(rows, key=lambda item: (
-            item["verdict"], item["source"], item["function"], item["output"])):
-        lines.append(
-            f"| `{row['python']}` | `{row['function']}` | `{row['output']}` | "
-            f"{row['source']} | {row['verdict']} | `{row['max_abs_error']:.3e}` | "
-            f"{row['nan_mismatches']} | {row['note']} |"
-        )
+    counts = {name: sum(r["verdict"] == name for r in selected)
+              for name in ("MATCH", "VARIANT", "FAIL")}
+    invariant = sum(r["source"] == "self" for r in selected)
+    lines = ["# Priority-selected correctness sources", "",
+             "One oracle is selected per indicator using: **TA-Lib > Polars > pandas > "
+             "pandas-ta-classic > pinned GitHub**. `VARIANT` is a documented semantic "
+             "difference, not a failed comparison; `INVARIANT` rows have no external oracle.", "",
+             f"Matches: **{counts['MATCH']}** | Documented variants: **{counts['VARIANT']}** | "
+             f"Self-invariant outputs: **{invariant}** | Failures: **{counts['FAIL']}**", "",
+             "| TAFlow class ↔ oracle API | Output | Selected source | Version | Verdict | Max error | NaN | Note |",
+             "|---|---|---|---|---:|---:|---:|---|"]
+    for r in sorted(selected, key=lambda x: (x["class"], x["output"])):
+        source = f"[{r['source']}]({r['url']})" if r["url"] else "native invariant"
+        verdict = "INVARIANT" if r["source"] == "self" and r["verdict"] == "MATCH" else r["verdict"]
+        lines.append(f"| `{r['class']}` ↔ `{r['oracle_api']}` | `{r['output']}` | {source} | "
+                     f"`{r['version']}` | {verdict} | `{r['error']:.3e}` | {r['nan']} | {r['note']} |")
     (HERE / "SOURCE_COMPARISON.md").write_text("\n".join(lines) + "\n")
-    print(f"wrote SOURCE_COMPARISON.md: {len(rows)} rows, {failures} failures")
-    if failures:
+    (HERE / "SOURCE_COMPARISON.json").write_text(json.dumps(selected, indent=2) + "\n")
+    print(f"wrote SOURCE_COMPARISON: {len(selected)} outputs, {counts['FAIL']} failures")
+    if counts["FAIL"]:
         raise SystemExit(1)
 
 

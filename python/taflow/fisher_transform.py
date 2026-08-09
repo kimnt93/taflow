@@ -7,25 +7,44 @@ from ._series import as_float64_series
 
 
 class FisherTransform:
-    """Stateful FisherTransform indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
+    """Compute the causal Ehlers Fisher Transform of high/low midpoints.
+
+    Each midpoint is normalized by the trailing high and low over
+    ``timeperiod`` bars, recursively smoothed, bounded, and transformed with
+    the Fisher logarithm. The first ``timeperiod - 1`` outputs are ``NaN``;
+    the first complete window seeds the recurrence at zero. This definition
+    maps to pandas-ta-classic ``fisher(...).iloc[:, 0]`` (TA-Lib has no Fisher
+    Transform function).
+
+    Parameters
+    ----------
+    high, low : array-like
+        Aligned initial high- and low-price histories.
+    timeperiod : int, default 10
+        Positive trailing normalization window in bars.
+
+    Notes
+    -----
+    The object owns persistent Rust state. ``append``, ``extend``, and
+    ``reset`` return this object for fluent use; ``value`` returns the latest
+    scalar or ``None`` during warm-up, and ``compute`` returns the complete
+    aligned NumPy history.
     """
 
     def __init__(
-        self, high: Any | None = None, low: Any | None = None, timeperiod: int = 10
+        self,
+        high: Any,
+        low: Any,
+        timeperiod: int = 10,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        timeperiod : object
-            Trailing window length in bars.
+        high, low : array-like
+            Aligned initial high- and low-price histories.
+        timeperiod : int, default 10
+            Positive trailing normalization window in bars.
 
         Returns
         -------
@@ -35,38 +54,39 @@ class FisherTransform:
         self._state = _Native(timeperiod)
         self.extend(high, low) if high is not None or low is not None else None
 
-    def append(self, high: float, low: float) -> object:
-        """Append one observation or aligned bar to the native Rust state.
+    def append(self, high: float, low: float) -> "FisherTransform":
+        """Append one high/low bar to the persistent Rust state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
+        high, low : float
+            Current bar's high and low prices.
 
         Returns
         -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
+        FisherTransform
+            This indicator, for fluent chaining. Read ``value`` for the result.
         """
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any) -> object:
-        """Append aligned input series to the native Rust state.
+    def extend(self, high: Any, low: Any) -> "FisherTransform":
+        """Append aligned high/low histories to the persistent Rust state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
+        high, low : array-like
+            Equal-length high- and low-price histories in chronological order.
 
         Returns
         -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
+        FisherTransform
+            This indicator, for fluent chaining.
+
+        Raises
+        ------
+        ValueError
+            If the input lengths differ.
         """
         self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
@@ -76,29 +96,33 @@ class FisherTransform:
 
         Returns
         -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
+        numpy.ndarray
+            One value per processed bar, with ``NaN`` during warm-up.
         """
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
         -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
+        float or None
+            Latest transform value, or ``None`` before warm-up completes.
         """
         return self._state.value
 
-    def reset(self) -> object:
-        """Execute the reset operation through the native Rust implementation.
+    def reset(self) -> "FisherTransform":
+        """Restore fresh-state behavior and clear the output history.
 
         Returns
         -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
+        FisherTransform
+            This indicator, for fluent chaining.
         """
         self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of bars processed by the Rust state."""
+        return len(self._state)

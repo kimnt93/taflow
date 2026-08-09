@@ -7,21 +7,19 @@ from ._series import as_float64_series
 
 
 class KeltnerChannels:
-    """Stateful KeltnerChannels indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Keltner Channels.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
         timeperiod: int = 20,
         multiplier: float = 2.0,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -48,7 +46,7 @@ class KeltnerChannels:
             else None
         )
 
-    def append(self, high: float, low: float, close: float) -> object:
+    def append(self, high: float, low: float, close: float) -> "KeltnerChannels":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -68,7 +66,7 @@ class KeltnerChannels:
         self._state.append(high, low, close)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any) -> object:
+    def extend(self, high: Any, low: Any, close: Any) -> "KeltnerChannels":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -111,7 +109,7 @@ class KeltnerChannels:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "KeltnerChannels":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

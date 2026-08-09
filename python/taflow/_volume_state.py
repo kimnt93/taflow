@@ -25,46 +25,56 @@ class OhlcvStateAdapter:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
-        volume: Any | None = None,
-        *parameters: int,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
+        *parameters,
     ) -> None:
-        """Create native state and optionally process initial OHLCV data."""
+        """Create native state and process initial OHLCV data."""
         self._state = self._native_cls(*parameters)
         if any(value is not None for value in (high, low, close, volume)):
             self.extend(high, low, close, volume)
 
-    def append(self, high: float, low: float, close: float, volume: float) -> object:
-        """Append one OHLCV bar and update native state
+    def append(self, high: float, low: float, close: float, volume: float) -> "Self":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : float
+            Current high price.
+        low : float
+            Current low price.
+        close : float
+            Current close price.
+        volume : float
+            Current volume.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(float(high), float(low), float(close), float(volume))
         return self
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
-        """Append aligned OHLCV histories to native state
+    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> "Self":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : Any
+            Chronological high price series.
+        low : Any
+            Chronological low price series.
+        close : Any
+            Chronological close price series.
+        volume : Any
+            Chronological volume series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining."""
         self._state.extend(
             as_float64_series(high),
             as_float64_series(low),
@@ -74,34 +84,31 @@ class OhlcvStateAdapter:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return latest native output, or ``None`` during warm-up
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Reset native state and accumulated output history
+    def reset(self) -> "Self":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self
 
@@ -124,73 +131,76 @@ class CloseVolumeStateAdapter:
 
     _native_cls = None
 
-    def __init__(self, close: Any | None = None, volume: Any | None = None) -> None:
-        """Create native state and optionally process initial close/volume data."""
+    def __init__(
+        self,
+        close: Any,
+        volume: Any,
+    ) -> None:
+        """Create native state and process initial close/volume data."""
         self._state = self._native_cls()
         if close is not None or volume is not None:
             self.extend(close, volume)
 
-    def append(self, close: float, volume: float) -> object:
-        """Append one close/volume observation and update native state
+    def append(self, close: float, volume: float) -> "Self":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        close : float
+            Current close price.
+        volume : float
+            Current volume.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(float(close), float(volume))
         return self
 
-    def extend(self, close: Any, volume: Any) -> object:
-        """Append aligned close and volume histories to native state
+    def extend(self, close: Any, volume: Any) -> "Self":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        close : Any
+            Chronological close price series.
+        volume : Any
+            Chronological volume series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining."""
         self._state.extend(as_float64_series(close), as_float64_series(volume))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned native output history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return latest native output, or ``None`` during warm-up
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Reset native state and accumulated output history
+    def reset(self) -> "Self":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self
 

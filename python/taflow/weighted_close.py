@@ -18,3 +18,18 @@ class WeightedClose(HlcPriceState):
     """
 
     _native_cls = StatefulWclprice
+
+    def append(self, high: object, low: object, close: object) -> "WeightedClose":
+        """Append one observation and return this indicator."""
+        super().append(high, low, close)
+        return self
+
+    def extend(self, high: object, low: object, close: object) -> "WeightedClose":
+        """Append aligned histories and return this indicator."""
+        super().extend(high, low, close)
+        return self
+
+    def reset(self) -> "WeightedClose":
+        """Reset native state and return this indicator."""
+        super().reset()
+        return self

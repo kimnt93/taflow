@@ -1,6 +1,7 @@
 //! Batch implementation for `swing_highs_lows`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Causal swing-point confirmation.
@@ -182,5 +183,128 @@ pub(crate) mod tests {
             assert_eq!(level[i].to_bits(), l.to_bits());
             assert_eq!(bars_since[i].to_bits(), b.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `SwingValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct SwingValue {
+    pub signal: f64,
+    pub level: f64,
+    pub bars_since: f64,
+}
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `SwingHighLow`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct SwingHighLow {
+    /// Rolling extrema over the confirmation window (`2 * length + 1`).
+    high_extrema: MonotonicMax,
+    low_extrema: MonotonicMin,
+    /// Delay lines of `length + 1` bars: their oldest slot is the center bar
+    /// under test once the confirmation window is full.
+    center_highs: ContiguousWindow,
+    center_lows: ContiguousWindow,
+    bars_since: Option<usize>,
+    value: Option<SwingValue>,
+}
+
+impl SwingHighLow {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(length: usize) -> TaResult<Self> {
+        validate_period(length)?;
+        let capacity = length.saturating_mul(2).saturating_add(1);
+        Ok(Self {
+            high_extrema: MonotonicMax::new(capacity)?,
+            low_extrema: MonotonicMin::new(capacity)?,
+            center_highs: ContiguousWindow::new(length + 1),
+            center_lows: ContiguousWindow::new(length + 1),
+            bars_since: None,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    ///
+    /// M1: the two O(2·length) window rescans become amortized-O(1) monotonic
+    /// deques, and the center bar comes from a fixed delay ring instead of
+    /// indexing a `VecDeque`. Extrema are comparison-only, so the confirmed
+    /// signals and levels are bit-identical to the rescan version.
+    pub fn append(&mut self, high: f64, low: f64) -> Option<SwingValue> {
+        let window_high = self.high_extrema.append(high);
+        let window_low = self.low_extrema.append(low);
+        self.center_highs.push(high);
+        self.center_lows.push(low);
+
+        let (Some(window_high), Some(window_low)) = (window_high, window_low) else {
+            self.value = None;
+            return None;
+        };
+        let center_high = self.center_highs.window()[0];
+        let center_low = self.center_lows.window()[0];
+        let is_high = center_high >= window_high;
+        let is_low = center_low <= window_low;
+        let (signal, level) = match (is_high, is_low) {
+            (true, false) => (1.0, center_high),
+            (false, true) => (-1.0, center_low),
+            _ => (f64::NAN, f64::NAN),
+        };
+        self.bars_since = if signal.is_nan() {
+            self.bars_since.map(|bars| bars + 1)
+        } else {
+            Some(0)
+        };
+        let value = SwingValue {
+            signal,
+            level,
+            bars_since: self.bars_since.map_or(f64::NAN, |bars| bars as f64),
+        };
+        self.value = Some(value);
+        Some(value)
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<SwingValue> {
+        self.value
+    }
+
+    /// Return the current bars-since result, if available.
+    ///
+    pub fn bars_since(&self) -> Option<f64> {
+        self.bars_since.map(|bars| bars as f64)
+    }
+
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn reset(&mut self) {
+        self.high_extrema.reset();
+        self.low_extrema.reset();
+        self.center_highs.clear();
+        self.center_lows.clear();
+        self.bars_since = None;
+        self.value = None;
     }
 }

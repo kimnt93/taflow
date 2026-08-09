@@ -9,21 +9,19 @@ from ._series import as_float64_series
 
 
 class ChaikinMoneyFlow:
-    """Stateful ChaikinMoneyFlow indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Chaikin Money Flow.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`, `volume`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
-        volume: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
         period: object = 20,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -47,7 +45,7 @@ class ChaikinMoneyFlow:
         if any(value is not None for value in (high, low, close, volume)):
             self.extend(high, low, close, volume)
 
-    def append(self, high: float, low: float, close: float, volume: float) -> object:
+    def append(self, high: float, low: float, close: float, volume: float) -> "ChaikinMoneyFlow":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -69,7 +67,7 @@ class ChaikinMoneyFlow:
         self._state.append(high, low, close, volume)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
+    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> "ChaikinMoneyFlow":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -117,7 +115,7 @@ class ChaikinMoneyFlow:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "ChaikinMoneyFlow":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -1,6 +1,7 @@
 //! Batch implementation for `rolling_volume_weighted_average_price`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes the causal rolling volume weighted average price series.
@@ -134,5 +135,69 @@ mod tests {
                 assert_eq!(want.to_bits(), got.to_bits(), "p={period} post-reset {i}");
             }
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingVolumeWeightedAveragePrice`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollingVolumeWeightedAveragePrice {
+    prices: ContiguousWindow,
+    volumes: ContiguousWindow,
+    value: Option<f64>,
+}
+
+impl RollingVolumeWeightedAveragePrice {
+    /// Create a new empty state.
+    ///
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self {
+            prices: ContiguousWindow::new(period),
+            volumes: ContiguousWindow::new(period),
+            value: None,
+        })
+    }
+    /// Append one causal observation and return the latest result.
+    ///
+    /// Like [`VolumeWeightedMovingAverage`], both window sums are contiguous
+    /// per-bar rescans: sliding add/evict sums would reassociate them and
+    /// perturb the low bits of the historical output.
+    pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
+        self.prices.push((high + low + close) / 3.0);
+        self.volumes.push(volume);
+        self.value = self.prices.is_full().then(|| {
+            let prices = self.prices.window();
+            let volumes = self.volumes.window();
+            let total = volumes.iter().sum::<f64>();
+            if total != 0.0 {
+                prices
+                    .iter()
+                    .zip(volumes)
+                    .map(|(&p, &v)| p * v)
+                    .sum::<f64>()
+                    / total
+            } else {
+                0.0
+            }
+        });
+        self.value
+    }
+    /// Return the latest computed result, if warm-up is complete.
+    ///
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+    /// Reset the state and clear its accumulated history.
+    ///
+    pub fn reset(&mut self) {
+        self.prices.clear();
+        self.volumes.clear();
+        self.value = None;
     }
 }

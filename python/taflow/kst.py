@@ -7,15 +7,13 @@ from ._series import as_float64_series
 
 
 class KnowSureThing:
-    """Stateful KnowSureThing indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Know Sure Thing (bukosabino `ta` alignment).
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        close: Any | None = None,
+        close: Any,
         roc1: int = 10,
         roc2: int = 15,
         roc3: int = 20,
@@ -26,7 +24,7 @@ class KnowSureThing:
         sma4: int = 15,
         signal: int = 9,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -59,7 +57,7 @@ class KnowSureThing:
         self._state = _Native(roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, signal)
         self.extend(close) if close is not None else None
 
-    def append(self, close: float) -> object:
+    def append(self, close: float) -> "KnowSureThing":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -75,7 +73,7 @@ class KnowSureThing:
         self._state.append(close)
         return self
 
-    def extend(self, close: Any) -> object:
+    def extend(self, close: Any) -> "KnowSureThing":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +110,7 @@ class KnowSureThing:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "KnowSureThing":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

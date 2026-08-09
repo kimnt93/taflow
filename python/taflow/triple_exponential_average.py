@@ -13,9 +13,9 @@ class TripleExponentialAverage:
 
     def __init__(
         self,
+        _input: Any,
         timeperiod: int = 5,
         volume_factor: float = 0.7,
-        _input: Any | None = None,
     ) -> None:
         self._state = StatefulT3(timeperiod, volume_factor)
         if _input is not None:

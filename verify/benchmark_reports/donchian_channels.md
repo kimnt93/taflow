@@ -1,4 +1,4 @@
-# Donchian benchmark
+# DonchianChannels benchmark
 
 Correctness: **MATCH**.
 
@@ -8,30 +8,27 @@ taflow class.extend over contiguous NumPy arrays; this exercises the compiled Ru
 
 | Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | TA-Lib ms | API speedup | Kernel speedup |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1,000 | 0.008 | 126.53M | 0.006 | 167.14M | nan | — | — |
-| 10,000 | 0.080 | 124.42M | 0.074 | 135.10M | nan | — | — |
-| 100,000 | 0.822 | 121.68M | 0.739 | 135.36M | nan | — | — |
-| 1,000,000 | 20.579 | 48.59M | 8.993 | 111.20M | nan | — | — |
+| 1,000 | 0.011 | 92.57M | 0.009 | 110.03M | nan | — | — |
+| 10,000 | 0.107 | 93.20M | 0.087 | 115.16M | nan | — | — |
 
 ## Warm-up
 
-Construct + canonical extend over 100,000 bars: **0.805 ms**; native kernel **0.739 ms**.
+Construct + canonical extend over 1,500 bars: **0.014 ms**; native kernel **0.011 ms**.
 
 ## Warmed continuation
 
 | Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | TA-Lib full µs | vs full | vs tail |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 100,000 | 1 | 0.390 | 0.354 | 2.83M | nan | — | — |
-| 100,000 | 10 | 2.356 | 1.695 | 5.90M | nan | — | — |
-| 100,000 | 1,000 | 98.392 | 103.552 | 9.66M | nan | — | — |
+| 1,500 | 1 | 0.399 | 0.285 | 3.51M | nan | — | — |
+| 1,500 | 10 | 1.938 | 1.089 | 9.19M | nan | — | — |
+| 1,500 | 100 | 5.616 | 4.570 | 21.88M | nan | — | — |
 
 ## Independent-stream threads
 
 | Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | TA-Lib vector/s |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 83.87M | 104.57M | 1.00× | 1.64M | 1.57M | 1.00× | — |
-| 2 | 130.89M | 192.90M | 1.84× | 1.78M | 1.80M | 1.14× | — |
-| 4 | 145.84M | 249.34M | 2.38× | 1.46M | 1.44M | 0.92× | — |
+| 1 | 8.60M | 15.92M | 1.00× | 1.06M | 1.15M | 1.00× | — |
+| 2 | 16.57M | 16.33M | 1.03× | 1.27M | 1.39M | 1.22× | — |
 
 ---
 Times include Python conversion/binding overhead. Raw samples are retained in JSON.

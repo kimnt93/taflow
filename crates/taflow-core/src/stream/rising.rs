@@ -1,7 +1,11 @@
 //! Batch implementation for `rising`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
+use std::collections::VecDeque;
+
+direction_operator!(Rising, |current: f64, previous: f64| current > previous);
 
 /// Computes or updates `rising` through the native Rust kernel.
 ///

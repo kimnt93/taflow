@@ -23,10 +23,11 @@ Outputs are `float64` arrays the same length as the input, `NaN` through
 warm-up. Multi-output indicators return a tuple. Candle patterns return
 `int32` scores (`0`, `±100`).
 
-### Argument order — read this before passing data positionally
+### Argument order
 
-Most classes (235 of 299) take their input
-series **first**, then configuration:
+Every stateful indicator takes its required input series **first**, then
+configuration. Configuration values have defaults unless the algorithm cannot
+define one semantically:
 
 ```python
 from taflow import SimpleMovingAverage, MoneyFlowIndex
@@ -35,89 +36,10 @@ SimpleMovingAverage(close, timeperiod=30)
 MoneyFlowIndex(high, low, close, volume, timeperiod=14)
 ```
 
-**64 classes take configuration first and the series last.** For those,
-pass the series by keyword:
-
-```python
-from taflow import BollingerBands, StochasticOscillator
-
-BollingerBands(values=close, period=20)
-StochasticOscillator(high=high, low=low, close=close)
-```
-
 The `Constructor order` column below is authoritative — it is introspected from
 the live signature. Passing data by keyword always works.
 
-<details><summary>The 64 classes that take configuration first</summary>
-
-- `AccelerationBands`
-- `ActiveZoneList`
-- `ArnaudLegouxMovingAverage`
-- `AverageDirectionalIndex`
-- `AverageDirectionalIndexRating`
-- `BollingerBands`
-- `Cross`
-- `Crossover`
-- `Crossunder`
-- `CumulativeSumControlChart`
-- `DirectionalMovementIndex`
-- `EntryExit`
-- `ExponentiallyWeightedCorrelation`
-- `ExponentiallyWeightedCovariance`
-- `ExponentiallyWeightedStandardDeviation`
-- `ExponentiallyWeightedSum`
-- `ExponentiallyWeightedVariance`
-- `Falling`
-- `FastStochasticOscillator`
-- `HullMovingAverage`
-- `IntradayMomentumIndex`
-- `Lag`
-- `LogReturn`
-- `MaType`
-- `MathAdd`
-- `MathDivide`
-- `MathMultiply`
-- `MathSubtract`
-- `MesaAdaptiveMovingAverage`
-- `MovingAverage`
-- `MovingAverageConvergenceDivergence`
-- `MovingAverageConvergenceDivergenceExtended`
-- `MovingAverageConvergenceDivergenceFixed`
-- `ParabolicSar`
-- `ParabolicSarExtended`
-- `Rising`
-- `RollingBeta`
-- `RollingCalmar`
-- `RollingCorrelation`
-- `RollingCov`
-- `RollingInterquartileRange`
-- `RollingKurtosis`
-- `RollingMedian`
-- `RollingMidprice`
-- `RollingMode`
-- `RollingPercentile`
-- `RollingQuantile`
-- `RollingRank`
-- `RollingSharpe`
-- `RollingSkew`
-- `RollingSortino`
-- `RollingWinsorize`
-- `RollingZScore`
-- `SignalDelay`
-- `SignedPower`
-- `StochasticOscillator`
-- `StochasticRelativeStrengthIndex`
-- `TimeSeriesRank`
-- `TripleExponentialAverage`
-- `TrueStrengthIndex`
-- `UlcerIndex`
-- `VariablePeriodMovingAverage`
-- `VolumeWeightedMovingAverage`
-- `ZeroLagExponentialMovingAverage`
-
-</details>
-
-Correctness for every row is checked against TA-Lib (or pandas, for rolling and EWM operators) in [../verify/REPORT.md](../verify/REPORT.md); throughput is in [../verify/benchmark_reports/BENCHMARK.md](../verify/benchmark_reports/BENCHMARK.md).
+Correctness uses the highest-priority available external oracle in [../verify/SOURCE_COMPARISON.md](../verify/SOURCE_COMPARISON.md); throughput is in [../verify/benchmark_reports/BENCHMARK.md](../verify/benchmark_reports/BENCHMARK.md).
 
 ## Contents
 
@@ -138,58 +60,58 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 
 | Class | TA-Lib | Parameters | Constructor order |
 |---|---|---|---|
-| `ArnaudLegouxMovingAverage` | — | timeperiod, offset=0.85, sigma=6.0 | `(timeperiod, offset, sigma, _input)` ⚠️ |
+| `ArnaudLegouxMovingAverage` | — | timeperiod=10, offset=0.85, sigma=6.0 | `(_input, timeperiod, offset, sigma)` |
 | `DoubleExponentialMovingAverage` | DEMA | timeperiod=14 | `(_input, timeperiod)` |
 | `ExponentialMovingAverage` | EMA | timeperiod=30, column=None | `(_input, timeperiod, column)` |
-| `HullMovingAverage` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `HullMovingAverage` | — | timeperiod=10 | `(_input, timeperiod)` |
 | `JurikMovingAverage` | — | length=7, phase=0 | `(close, length, phase)` |
 | `KaufmanAdaptiveMovingAverage` | KAMA | timeperiod=14 | `(_input, timeperiod)` |
 | `McGinleyDynamic` | — | length=10, c=1.0 | `(close, length, c)` |
-| `MesaAdaptiveMovingAverage` | MAMA | fastlimit=0.5, slowlimit=0.05 | `(fastlimit, slowlimit, _input)` ⚠️ |
-| `MovingAverage` | MA | period=30, moving_average_type=0 | `(period, moving_average_type, values)` ⚠️ |
-| `MovingAverageConvergenceDivergence` | MACD | fast_period=12, slow_period=26, signal_period=9 | `(fast_period, slow_period, signal_period, _input)` ⚠️ |
-| `MovingAverageConvergenceDivergenceExtended` | MACDEXT | fast_period=12, fast_average_type=1, slow_period=26, slow_average_type=1, signal_period=9, signal_average_type=1 | `(fast_period, fast_average_type, slow_period, slow_average_type, signal_period, signal_average_type, _input)` ⚠️ |
-| `MovingAverageConvergenceDivergenceFixed` | MACDFIX | signal_period=9 | `(signal_period, values)` ⚠️ |
+| `MesaAdaptiveMovingAverage` | MAMA | fastlimit=0.5, slowlimit=0.05 | `(_input, fastlimit, slowlimit)` |
+| `MovingAverage` | MA | period=30, moving_average_type=0 | `(values, period, moving_average_type)` |
+| `MovingAverageConvergenceDivergence` | MACD | fast_period=12, slow_period=26, signal_period=9 | `(_input, fast_period, slow_period, signal_period)` |
+| `MovingAverageConvergenceDivergenceExtended` | MACDEXT | fast_period=12, fast_average_type=1, slow_period=26, slow_average_type=1, signal_period=9, signal_average_type=1 | `(_input, fast_period, fast_average_type, slow_period, slow_average_type, signal_period, signal_average_type)` |
+| `MovingAverageConvergenceDivergenceFixed` | MACDFIX | signal_period=9 | `(values, signal_period)` |
 | `ParabolicMovingAverageStop` | — | length=10, multiplier=3.0 | `(high, low, close, length, multiplier)` |
 | `SimpleMovingAverage` | SMA | timeperiod=14 | `(_input, timeperiod)` |
 | `TriangularMovingAverage` | TRIMA | timeperiod=14 | `(_input, timeperiod)` |
-| `TripleExponentialAverage` | T3 | timeperiod=5, volume_factor=0.7 | `(timeperiod, volume_factor, _input)` ⚠️ |
+| `TripleExponentialAverage` | T3 | timeperiod=5, volume_factor=0.7 | `(_input, timeperiod, volume_factor)` |
 | `TripleExponentialMovingAverage` | TEMA | timeperiod=14 | `(_input, timeperiod)` |
 | `TripleExponentialRateOfChange` | TRIX | timeperiod=30 | `(_input, timeperiod)` |
-| `VariablePeriodMovingAverage` | MAVP | min_period=2, max_period=30, average_type=0 | `(min_period, max_period, average_type, _input, periods)` ⚠️ |
-| `VolumeWeightedMovingAverage` | — | timeperiod | `(timeperiod, price, volume)` ⚠️ |
+| `VariablePeriodMovingAverage` | MAVP | min_period=2, max_period=30, average_type=0 | `(_input, periods, min_period, max_period, average_type)` |
+| `VolumeWeightedMovingAverage` | — | timeperiod=10 | `(price, volume, timeperiod)` |
 | `WeightedMovingAverage` | WMA | timeperiod=14 | `(_input, timeperiod)` |
-| `ZeroLagExponentialMovingAverage` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `ZeroLagExponentialMovingAverage` | — | timeperiod=10 | `(_input, timeperiod)` |
 
 ## Momentum & trend
 
 | Class | TA-Lib | Parameters | Constructor order |
 |---|---|---|---|
-| `ActiveZoneList` | — | capacity=64 | `(capacity)` ⚠️ |
+| `ActiveZoneList` | — | capacity=64 | `(capacity)` |
 | `Aroon` | AROON | timeperiod=14 | `(high, low, timeperiod)` |
 | `AroonOscillator` | AROONOSC | timeperiod=14 | `(high, low, timeperiod)` |
 | `AverageDailyDollarValue` | — | timeperiod=20 | `(close, volume, timeperiod)` |
-| `AverageDirectionalIndex` | ADX | period=14 | `(period, high, low, close)` ⚠️ |
-| `AverageDirectionalIndexRating` | ADXR | period=14 | `(period, high, low, close)` ⚠️ |
+| `AverageDirectionalIndex` | ADX | period=14 | `(high, low, close, period)` |
+| `AverageDirectionalIndexRating` | ADXR | period=14 | `(high, low, close, period)` |
 | `AwesomeOscillator` | — | fast=5, slow=34 | `(high, low, fast, slow)` |
 | `BalanceOfPower` | BOP | — | `(_open, high, low, close)` |
 | `ChandeMomentumOscillator` | CMO | timeperiod=14 | `(_input, timeperiod)` |
 | `CommodityChannelIndex` | CCI | timeperiod=14, high_column='high', low_column='low', close_column='close' | `(high, low, close, timeperiod, high_column, low_column, close_column)` |
-| `Cross` | — | left=None, right=None | `(left, right)` ⚠️ |
-| `DirectionalMovementIndex` | DX | period=14 | `(period, high, low, close)` ⚠️ |
+| `Cross` | — | left, right | `(left, right)` |
+| `DirectionalMovementIndex` | DX | period=14 | `(high, low, close, period)` |
 | `EvenBetterSinewave` | — | length=40 | `(close, length)` |
-| `FastStochasticOscillator` | STOCHF | fast_k_period=5, fast_d_period=3, fast_d_average_type=0 | `(fast_k_period, fast_d_period, fast_d_average_type, high, low, close)` ⚠️ |
+| `FastStochasticOscillator` | STOCHF | fast_k_period=5, fast_d_period=3, fast_d_average_type=0 | `(high, low, close, fast_k_period, fast_d_period, fast_d_average_type)` |
 | `FisherTransform` | — | timeperiod=10 | `(high, low, timeperiod)` |
 | `Ichimoku` | — | tenkan=9, kijun=26, senkou=52 | `(high, low, close, tenkan, kijun, senkou)` |
-| `IntradayMomentumIndex` | IMI | period=14 | `(period, _open, close)` ⚠️ |
+| `IntradayMomentumIndex` | IMI | period=14 | `(_open, close, period)` |
 | `KnowSureThing` | — | roc1=10, roc2=15, roc3=20, roc4=30, sma1=10, sma2=10, sma3=10, sma4=15, signal=9 | `(close, roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, signal)` |
-| `MaType` | — | args, kwds | `(args, kwds)` ⚠️ |
+| `MaType` | — | args, kwds | `(args, kwds)` |
 | `MassIndex` | — | ema_period=9, sum_period=25 | `(high, low, ema_period, sum_period)` |
 | `MinusDirectionalIndicator` | MINUS_DI | timeperiod=14 | `(high, low, close, timeperiod)` |
 | `MinusDirectionalMovement` | MINUS_DM | timeperiod=14 | `(high, low, timeperiod)` |
 | `Momentum` | MOM | timeperiod=14 | `(_input, timeperiod)` |
-| `ParabolicSar` | SAR | acceleration=0.02, maximum=0.2 | `(acceleration, maximum, high, low)` ⚠️ |
-| `ParabolicSarExtended` | SAREXT | start_value=0.0, offset_on_reverse=0.0, acceleration_init_long=0.02, acceleration_long=0.02, acceleration_max_long=0.2, acceleration_init_short=0.02, acceleration_short=0.02, acceleration_max_short=0.2 | `(start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short, high, low)` ⚠️ |
+| `ParabolicSar` | SAR | acceleration=0.02, maximum=0.2 | `(high, low, acceleration, maximum)` |
+| `ParabolicSarExtended` | SAREXT | start_value=0.0, offset_on_reverse=0.0, acceleration_init_long=0.02, acceleration_long=0.02, acceleration_max_long=0.2, acceleration_init_short=0.02, acceleration_short=0.02, acceleration_max_short=0.2 | `(high, low, start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short)` |
 | `PlusDirectionalIndicator` | PLUS_DI | timeperiod=14 | `(high, low, close, timeperiod)` |
 | `PlusDirectionalMovement` | PLUS_DM | timeperiod=14 | `(high, low, timeperiod)` |
 | `RateOfChange` | ROC | timeperiod=14 | `(_input, timeperiod)` |
@@ -200,10 +122,10 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `RelativeStrengthIndex` | RSI | timeperiod=14 | `(close, timeperiod)` |
 | `SchaffTrendCycle` | — | tclength=10, fast=12, slow=26, factor=0.5 | `(close, tclength, fast, slow, factor)` |
 | `SmoothedTrendChannel` | — | length=10 | `(high, low, close, length)` |
-| `StochasticOscillator` | STOCH | fast_k_period=5, slow_k_period=3, slow_k_average_type=0, slow_d_period=3, slow_d_average_type=0 | `(fast_k_period, slow_k_period, slow_k_average_type, slow_d_period, slow_d_average_type, high, low, close)` ⚠️ |
-| `StochasticRelativeStrengthIndex` | STOCHRSI | time_period=14, fast_k_period=5, fast_d_period=3, fast_d_average_type=0 | `(time_period, fast_k_period, fast_d_period, fast_d_average_type, _input)` ⚠️ |
+| `StochasticOscillator` | STOCH | fast_k_period=5, slow_k_period=3, slow_k_average_type=0, slow_d_period=3, slow_d_average_type=0 | `(high, low, close, fast_k_period, slow_k_period, slow_k_average_type, slow_d_period, slow_d_average_type)` |
+| `StochasticRelativeStrengthIndex` | STOCHRSI | time_period=14, fast_k_period=5, fast_d_period=3, fast_d_average_type=0 | `(_input, time_period, fast_k_period, fast_d_period, fast_d_average_type)` |
 | `TomDeMarkSequential` | — | — | `(close)` |
-| `TrueStrengthIndex` | — | fast=13, slow=25 | `(fast, slow, _input)` ⚠️ |
+| `TrueStrengthIndex` | — | fast=13, slow=25 | `(_input, fast, slow)` |
 | `UltimateOscillator` | ULTOSC | timeperiod1=7, timeperiod2=14, timeperiod3=28 | `(high, low, close, timeperiod1, timeperiod2, timeperiod3)` |
 | `VariableIndexDynamicAverage` | — | length=14, alpha=None | `(close, length, alpha)` |
 | `Vortex` | — | window=14 | `(high, low, close, window)` |
@@ -214,9 +136,9 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 
 | Class | TA-Lib | Parameters | Constructor order |
 |---|---|---|---|
-| `AccelerationBands` | ACCBANDS | period=20 | `(period, high, low, close)` ⚠️ |
+| `AccelerationBands` | ACCBANDS | period=20 | `(high, low, close, period)` |
 | `AverageTrueRange` | ATR | timeperiod=14 | `(high, low, close, timeperiod)` |
-| `BollingerBands` | BBANDS | period=5, deviations_up=2.0, deviations_down=2.0, moving_average_type=0 | `(period, deviations_up, deviations_down, moving_average_type, values)` ⚠️ |
+| `BollingerBands` | BBANDS | period=5, deviations_up=2.0, deviations_down=2.0, moving_average_type=0 | `(values, period, deviations_up, deviations_down, moving_average_type)` |
 | `ChaikinVolatility` | — | timeperiod=10, roc_period=10 | `(high, low, timeperiod, roc_period)` |
 | `CloseToCloseSigma` | — | timeperiod=20 | `(close, timeperiod)` |
 | `Donchian` | — | timeperiod=20 | `(high, low, timeperiod)` |
@@ -231,7 +153,7 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `SqueezePro` | — | bb_length=20, bb_std=2.0, kc_length=20, kc_scalar_wide=2.0, kc_scalar_normal=1.5, kc_scalar_narrow=1.0, mom_length=12, mom_smooth=6 | `(high, low, close, bb_length, bb_std, kc_length, kc_scalar_wide, kc_scalar_normal, kc_scalar_narrow, mom_length, mom_smooth)` |
 | `Supertrend` | — | timeperiod=7, multiplier=3.0 | `(high, low, close, timeperiod, multiplier)` |
 | `TrueRange` | TRANGE | timeperiod=14 | `(high, low, close, timeperiod)` |
-| `UlcerIndex` | — | timeperiod=14 | `(timeperiod, _input)` ⚠️ |
+| `UlcerIndex` | — | timeperiod=14 | `(_input, timeperiod)` |
 | `YangZhang` | — | timeperiod=20 | `(_open, high, low, close, timeperiod)` |
 
 ## Volume
@@ -241,7 +163,7 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `AccumulationDistribution` | AD | parameters | `(high, low, close, volume, parameters)` |
 | `AccumulationDistributionOscillator` | ADOSC | fastperiod=3, slowperiod=10 | `(high, low, close, volume, fastperiod, slowperiod)` |
 | `Amihud` | — | timeperiod=20 | `(close, volume, timeperiod)` |
-| `AnchoredVolumeWeightedAveragePrice` | — | anchor=None, stdev=1.0 | `(high, low, close, volume, anchor, stdev)` |
+| `AnchoredVolumeWeightedAveragePrice` | — | anchor, stdev=1.0 | `(high, low, close, volume, anchor, stdev)` |
 | `ChaikinMoneyFlow` | — | period=20 | `(high, low, close, volume, period)` |
 | `EaseOfMovement` | — | — | `(high, low, volume)` |
 | `ForceIndex` | — | — | `(close, volume)` |
@@ -250,7 +172,7 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `NegativeVolumeIndex` | — | — | `(close, volume)` |
 | `OnBalanceVolume` | OBV | — | `(close, volume)` |
 | `PositiveVolumeIndex` | — | — | `(close, volume)` |
-| `SessionVolumeLevels` | — | anchor=None, bins=24, value_area=0.7 | `(high, low, close, volume, anchor, bins, value_area)` |
+| `SessionVolumeLevels` | — | anchor, bins=24, value_area=0.7 | `(high, low, close, volume, anchor, bins, value_area)` |
 | `VolumePriceTrend` | — | — | `(close, volume)` |
 
 ## Price transforms
@@ -269,49 +191,49 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 
 | Class | TA-Lib | Parameters | Constructor order |
 |---|---|---|---|
-| `ExponentiallyWeightedCorrelation` | — | timeperiod, left=None, right=None | `(timeperiod, left, right)` ⚠️ |
-| `ExponentiallyWeightedCovariance` | — | timeperiod, left=None, right=None | `(timeperiod, left, right)` ⚠️ |
-| `ExponentiallyWeightedStandardDeviation` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `ExponentiallyWeightedSum` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `ExponentiallyWeightedVariance` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `RollingAlpha` | — | benchmark=None, timeperiod=20 | `(_input, benchmark, timeperiod)` |
+| `ExponentiallyWeightedCorrelation` | — | left, right, timeperiod=14 | `(left, right, timeperiod)` |
+| `ExponentiallyWeightedCovariance` | — | left, right, timeperiod=14 | `(left, right, timeperiod)` |
+| `ExponentiallyWeightedStandardDeviation` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `ExponentiallyWeightedSum` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `ExponentiallyWeightedVariance` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `RollingAlpha` | — | benchmark, timeperiod=20 | `(_input, benchmark, timeperiod)` |
 | `RollingArgmax` | MAXINDEX | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingArgmin` | MININDEX | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingAutocorr` | — | timeperiod=20 | `(_input, timeperiod)` |
 | `RollingAverageDeviation` | AVGDEV | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingBeta` | BETA | _input0=None, _input1=None, timeperiod=5 | `(_input0, _input1, timeperiod)` ⚠️ |
-| `RollingCalmar` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `RollingCorrelation` | CORREL | _input0=None, _input1=None, timeperiod=5 | `(_input0, _input1, timeperiod)` ⚠️ |
-| `RollingCov` | — | timeperiod, left=None, right=None | `(timeperiod, left, right)` ⚠️ |
+| `RollingBeta` | BETA | _input0, _input1, timeperiod=5 | `(_input0, _input1, timeperiod)` |
+| `RollingCalmar` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `RollingCorrelation` | CORREL | _input0, _input1, timeperiod=5 | `(_input0, _input1, timeperiod)` |
+| `RollingCov` | — | left, right, timeperiod=14 | `(left, right, timeperiod)` |
 | `RollingEntropy` | — | timeperiod=20 | `(_input, timeperiod)` |
-| `RollingInformationRatio` | — | benchmark=None, timeperiod=20 | `(_input, benchmark, timeperiod)` |
-| `RollingInterquartileRange` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `RollingKurtosis` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `RollingInformationRatio` | — | benchmark, timeperiod=20 | `(_input, benchmark, timeperiod)` |
+| `RollingInterquartileRange` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `RollingKurtosis` | — | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingLinearRegression` | LINEARREG | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingLinearRegressionAngle` | LINEARREG_ANGLE | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingLinearRegressionIntercept` | LINEARREG_INTERCEPT | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingLinearRegressionSlope` | LINEARREG_SLOPE | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingMax` | MAX | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMedian` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `RollingMedian` | — | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingMidpoint` | MIDPOINT | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMidprice` | MIDPRICE | _input0=None, _input1=None, timeperiod=5 | `(_input0, _input1, timeperiod)` ⚠️ |
+| `RollingMidprice` | MIDPRICE | _input0, _input1, timeperiod=14 | `(_input0, _input1, timeperiod)` |
 | `RollingMin` | MIN | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingMinMax` | MINMAX | timeperiod=30 | `(_input, timeperiod)` |
 | `RollingMinMaxIndex` | MINMAXINDEX | timeperiod=30 | `(_input, timeperiod)` |
-| `RollingMode` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `RollingPercentile` | — | timeperiod, percentile | `(timeperiod, percentile, _input)` ⚠️ |
-| `RollingQuantile` | — | timeperiod, quantile | `(timeperiod, quantile, _input)` ⚠️ |
-| `RollingRank` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `RollingSharpe` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `RollingSkew` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `RollingSortino` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `RollingMode` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `RollingPercentile` | — | timeperiod=14, percentile=50.0 | `(_input, timeperiod, percentile)` |
+| `RollingQuantile` | — | timeperiod=14, quantile=0.5 | `(_input, timeperiod, quantile)` |
+| `RollingRank` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `RollingSharpe` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `RollingSkew` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `RollingSortino` | — | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingStandardDeviation` | STDDEV | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingSum` | SUM | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingTimeSeriesForecast` | TSF | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingVariance` | VAR | timeperiod=14 | `(_input, timeperiod)` |
 | `RollingVolumeWeightedAveragePrice` | — | timeperiod=20 | `(high, low, close, volume, timeperiod)` |
-| `RollingWinsorize` | — | timeperiod, lower=0.05, upper=0.95 | `(timeperiod, lower, upper, _input)` ⚠️ |
-| `RollingZScore` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `RollingWinsorize` | — | timeperiod=14, lower=0.05, upper=0.95 | `(_input, timeperiod, lower, upper)` |
+| `RollingZScore` | — | timeperiod=14 | `(_input, timeperiod)` |
 
 ## Cycle (Hilbert transform)
 
@@ -331,7 +253,7 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `MathAbs` | — | — | `(_input)` |
 | `MathAcos` | ACOS | — | `(_input)` |
 | `MathAcosh` | — | — | `(_input)` |
-| `MathAdd` | ADD | left=None, right=None | `(left, right)` ⚠️ |
+| `MathAdd` | ADD | left, right | `(left, right)` |
 | `MathAsin` | ASIN | — | `(_input)` |
 | `MathAsinh` | — | — | `(_input)` |
 | `MathAtan` | ATAN | — | `(_input)` |
@@ -342,18 +264,18 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `MathCosh` | COSH | — | `(_input)` |
 | `MathCot` | — | — | `(_input)` |
 | `MathDegrees` | — | — | `(_input)` |
-| `MathDivide` | DIV | left=None, right=None | `(left, right)` ⚠️ |
+| `MathDivide` | DIV | left, right | `(left, right)` |
 | `MathExp` | EXP | — | `(_input)` |
 | `MathFloor` | FLOOR | — | `(_input)` |
 | `MathLn` | LN | — | `(_input)` |
 | `MathLog10` | LOG10 | — | `(_input)` |
 | `MathLog1p` | — | — | `(_input)` |
-| `MathMultiply` | MULT | left=None, right=None | `(left, right)` ⚠️ |
+| `MathMultiply` | MULT | left, right | `(left, right)` |
 | `MathRadians` | — | — | `(_input)` |
 | `MathSin` | SIN | — | `(_input)` |
 | `MathSinh` | SINH | — | `(_input)` |
 | `MathSqrt` | SQRT | — | `(_input)` |
-| `MathSubtract` | SUB | left=None, right=None | `(left, right)` ⚠️ |
+| `MathSubtract` | SUB | left, right | `(left, right)` |
 | `MathTan` | TAN | — | `(_input)` |
 | `MathTanh` | TANH | — | `(_input)` |
 
@@ -437,10 +359,10 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `InsideBar` | — | — | `(high, low)` |
 | `Liquidity` | — | swing_length=50, range_percent=0.01 | `(high, low, swing_length, range_percent)` |
 | `LowerLow` | — | — | `(high, low)` |
-| `OpeningRange` | — | anchor=None, bars=30 | `(high, low, close, anchor, bars)` |
+| `OpeningRange` | — | anchor, bars=30 | `(high, low, close, anchor, bars)` |
 | `OrderBlock` | — | swing_length=50, internal_length=5, atr_period=200, threshold=2.0 | `(high, low, close, volume, swing_length, internal_length, atr_period, threshold)` |
 | `OutsideBar` | — | — | `(high, low)` |
-| `PivotPoints` | — | anchor=None | `(high, low, close, anchor)` |
+| `PivotPoints` | — | anchor | `(high, low, close, anchor)` |
 | `PremiumDiscount` | — | window=20 | `(close, window)` |
 | `PreviousHighLow` | — | — | `(new_session, high, low)` |
 | `Retracements` | — | swing_length=5 | `(high, low, close, swing_length)` |
@@ -455,7 +377,7 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 
 | Class | TA-Lib | Parameters | Constructor order |
 |---|---|---|---|
-| `CumulativeSumControlChart` | — | change=None, threshold=1.0 | `(change, threshold)` ⚠️ |
+| `CumulativeSumControlChart` | — | change, threshold=1.0 | `(change, threshold)` |
 | `FracDiff` | — | d=0.5, threshold=1e-05 | `(_input, d, threshold)` |
 | `FractalDimension` | — | timeperiod=20 | `(_input, timeperiod)` |
 | `HedgeRatio` | — | timeperiod=20 | `(x, y, timeperiod)` |
@@ -470,8 +392,8 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | Class | TA-Lib | Parameters | Constructor order |
 |---|---|---|---|
 | `BarsSince` | — | — | `(condition)` |
-| `Crossover` | — | left=None, right=None | `(left, right)` ⚠️ |
-| `Crossunder` | — | left=None, right=None | `(left, right)` ⚠️ |
+| `Crossover` | — | left, right | `(left, right)` |
+| `Crossunder` | — | left, right | `(left, right)` |
 | `CumulativeCount` | — | — | `(_input)` |
 | `CumulativeMaximum` | — | — | `(_input)` |
 | `CumulativeMinimum` | — | — | `(_input)` |
@@ -479,18 +401,16 @@ Correctness for every row is checked against TA-Lib (or pandas, for rolling and 
 | `CumulativeSum` | — | — | `(_input)` |
 | `DecayLinear` | — | timeperiod=14 | `(_input, timeperiod)` |
 | `Drawdown` | — | — | `(_input)` |
-| `EntryExit` | — | entry=None, _exit=None | `(entry, _exit)` ⚠️ |
-| `Falling` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `EntryExit` | — | entry, _exit | `(entry, _exit)` |
+| `Falling` | — | timeperiod=1 | `(_input, timeperiod)` |
 | `HighestSince` | — | — | `(condition, _input)` |
-| `Lag` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `Lag` | — | timeperiod=1 | `(_input, timeperiod)` |
 | `LaguerreRelativeStrengthIndex` | — | gamma=0.5 | `(close, gamma)` |
-| `LogReturn` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `LogReturn` | — | timeperiod=1 | `(_input, timeperiod)` |
 | `LowestSince` | — | — | `(condition, _input)` |
 | `PositionHold` | — | — | `(_input)` |
-| `Rising` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `SignalDelay` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
-| `SignedPower` | — | exponent | `(exponent, _input)` ⚠️ |
-| `TimeSeriesRank` | — | timeperiod | `(timeperiod, _input)` ⚠️ |
+| `Rising` | — | timeperiod=1 | `(_input, timeperiod)` |
+| `SignalDelay` | — | timeperiod=1 | `(_input, timeperiod)` |
+| `SignedPower` | — | exponent=2.0 | `(_input, exponent)` |
+| `TimeSeriesRank` | — | timeperiod=14 | `(_input, timeperiod)` |
 | `ValueWhen` | — | — | `(condition, _input)` |
-
-⚠️ = configuration comes before the series; pass the data by keyword.

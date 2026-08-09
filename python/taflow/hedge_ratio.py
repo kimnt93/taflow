@@ -7,16 +7,17 @@ from ._series import as_float64_series
 
 
 class HedgeRatio:
-    """Stateful HedgeRatio indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Rolling OLS hedge ratio over price levels.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `x`, `y`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, x: Any | None = None, y: Any | None = None, timeperiod: int = 20
+        self,
+        x: Any,
+        y: Any,
+        timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -35,7 +36,7 @@ class HedgeRatio:
         self._state = _Native(timeperiod)
         self.extend(x, y) if x is not None or y is not None else None
 
-    def append(self, x: float, y: float) -> object:
+    def append(self, x: float, y: float) -> "HedgeRatio":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -53,7 +54,7 @@ class HedgeRatio:
         self._state.append(x, y)
         return self
 
-    def extend(self, x: Any, y: Any) -> object:
+    def extend(self, x: Any, y: Any) -> "HedgeRatio":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -92,7 +93,7 @@ class HedgeRatio:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "HedgeRatio":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

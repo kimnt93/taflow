@@ -1,7 +1,23 @@
 //! Batch implementation for `rolling_sharpe`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
+use std::collections::VecDeque;
+
+rolling_risk_operator!(RollingSharpe, |values: &VecDeque<f64>| {
+    let average = mean(values);
+    let variance = values
+        .iter()
+        .map(|&value| (value - average).powi(2))
+        .sum::<f64>()
+        / values.len() as f64;
+    if variance > 0.0 {
+        average / variance.sqrt()
+    } else {
+        0.0
+    }
+});
 
 /// Computes or updates `rolling_sharpe` through the native Rust kernel.
 ///

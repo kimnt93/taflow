@@ -19,8 +19,12 @@ class MovingAverageConvergenceDivergenceFixed:
         A persistent native-backed indicator adapter.
     """
 
-    def __init__(self, signal_period: int = 9, values: Any | None = None) -> None:
-        """Create fixed MACD with an optional initial price series."""
+    def __init__(
+        self,
+        values: Any,
+        signal_period: int = 9,
+    ) -> None:
+        """Create fixed MACD with an initial price series."""
         self._state = StatefulMacdFix(signal_period)
         if values is not None:
             self.extend(values)
@@ -58,13 +62,12 @@ class MovingAverageConvergenceDivergenceFixed:
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return aligned MACD, signal, and histogram histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property

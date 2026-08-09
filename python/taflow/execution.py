@@ -35,7 +35,7 @@ class Expr:
         deps: object = (),
         name: object = "expr",
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -238,7 +238,7 @@ class _Source(Expr):
     field: str = ""
 
     def __init__(self, field: str) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -258,7 +258,7 @@ class _Source(Expr):
 
 class _Indicator(Expr):
     def __init__(self, name: str, state: Any, inputs: Sequence[Expr]) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -318,7 +318,7 @@ class _Indicator(Expr):
 
 class _Expression(Expr):
     def __init__(self, expression: Expr) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -403,7 +403,7 @@ class Pipeline:
     """
 
     def __init__(self) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Returns
         -------

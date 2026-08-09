@@ -21,8 +21,12 @@ class DetrendedPriceOscillator:
         A persistent native-backed indicator adapter.
     """
 
-    def __init__(self, close: Any | None = None, period: object = 20) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    def __init__(
+        self,
+        close: Any,
+        period: object = 20,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -39,7 +43,7 @@ class DetrendedPriceOscillator:
         self._state = _Native(period)
         self.extend(close) if close is not None else None
 
-    def append(self, close: float) -> object:
+    def append(self, close: float) -> "DetrendedPriceOscillator":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -55,7 +59,7 @@ class DetrendedPriceOscillator:
         self._state.append(close)
         return self
 
-    def extend(self, close: Any) -> object:
+    def extend(self, close: Any) -> "DetrendedPriceOscillator":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -92,7 +96,7 @@ class DetrendedPriceOscillator:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "DetrendedPriceOscillator":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

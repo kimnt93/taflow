@@ -196,3 +196,197 @@ mod tests {
         }
     }
 }
+use super::aroon_true_range::*;
+use super::*;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `AroonValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct AroonValue {
+    pub down: f64,
+    pub up: f64,
+}
+
+/// Stateful Aroon down/up pair over a `period + 1` bar window.
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `Aroon`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct Aroon {
+    period: usize,
+    inverse_period: f64,
+    index: usize,
+    highs: MonotonicMax,
+    lows: MonotonicMin,
+    value: Option<AroonValue>,
+}
+
+impl Aroon {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        if period < 2 {
+            return Err(invalid_period("timeperiod", period, 2));
+        }
+        Ok(Self {
+            period,
+            inverse_period: 100.0 / period as f64,
+            index: 0,
+            highs: MonotonicMax::new(period + 1)?,
+            lows: MonotonicMin::new(period + 1)?,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, high: f64, low: f64) -> Option<AroonValue> {
+        let current = self.index;
+        self.index += 1;
+        let highest = self.highs.append_indexed(high).map(|(index, _)| index);
+        let lowest = self.lows.append_indexed(low).map(|(index, _)| index);
+        self.value = highest.zip(lowest).map(|(highest, lowest)| AroonValue {
+            down: (self.period - (current - lowest)) as f64 * self.inverse_period,
+            up: (self.period - (current - highest)) as f64 * self.inverse_period,
+        });
+        self.value
+    }
+
+    /// Bulk kernel: one fused [`aroon_rescan`] pass writing both aligned
+    /// series straight into their output caches — no index scratch buffers, no
+    /// second combining pass. Outputs and post-run state are bit-identical to
+    /// per-bar [`Self::append`]; warm-up bars are NaN.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        down_out: &mut Vec<f64>,
+        up_out: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let n = self.check_bulk_lengths(high, low)?;
+        if self.index != 0 || n < self.period + 1 {
+            down_out.reserve(n);
+            up_out.reserve(n);
+            for index in 0..n {
+                match self.append(high[index], low[index]) {
+                    Some(value) => {
+                        down_out.push(value.down);
+                        up_out.push(value.up);
+                    }
+                    None => {
+                        down_out.push(f64::NAN);
+                        up_out.push(f64::NAN);
+                    }
+                }
+            }
+            return Ok(());
+        }
+
+        let down_start = down_out.len();
+        let up_start = up_out.len();
+        down_out.resize(down_start + n, f64::NAN);
+        up_out.resize(up_start + n, f64::NAN);
+        let downs = &mut down_out[down_start..];
+        let ups = &mut up_out[up_start..];
+        aroon_rescan(
+            high,
+            low,
+            self.period,
+            self.inverse_period,
+            |today, down, up| {
+                downs[today] = down;
+                ups[today] = up;
+            },
+        );
+        self.finish_bulk_run(high, low);
+        self.value = Some(AroonValue {
+            down: *down_out.last().expect("at least one warmed bar"),
+            up: *up_out.last().expect("at least one warmed bar"),
+        });
+        Ok(())
+    }
+
+    /// Bulk kernel for [`AroonOscillator`]: the same single rescan pass, with
+    /// `up - down` formed in registers so the oscillator never materializes
+    /// the two component series.
+    pub(crate) fn extend_oscillator_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let n = self.check_bulk_lengths(high, low)?;
+        if self.index != 0 || n < self.period + 1 {
+            output.reserve(n);
+            for index in 0..n {
+                output.push(
+                    self.append(high[index], low[index])
+                        .map_or(f64::NAN, |value| value.up - value.down),
+                );
+            }
+            return Ok(());
+        }
+
+        let start = output.len();
+        output.resize(start + n, f64::NAN);
+        let slots = &mut output[start..];
+        let mut last = AroonValue { down: 0.0, up: 0.0 };
+        aroon_rescan(
+            high,
+            low,
+            self.period,
+            self.inverse_period,
+            |today, down, up| {
+                slots[today] = up - down;
+                last = AroonValue { down, up };
+            },
+        );
+        self.finish_bulk_run(high, low);
+        self.value = Some(last);
+        Ok(())
+    }
+
+    fn check_bulk_lengths(&self, high: &[f64], low: &[f64]) -> TaResult<usize> {
+        if high.len() != low.len() {
+            return Err(TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len(),
+            });
+        }
+        Ok(high.len())
+    }
+
+    /// Restores the monotonic deques and bar counter a full from-empty
+    /// `append` run would have left.
+    fn finish_bulk_run(&mut self, high: &[f64], low: &[f64]) {
+        self.highs.rebuild_from_full_run(high);
+        self.lows.rebuild_from_full_run(low);
+        self.index = high.len();
+    }
+
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<AroonValue> {
+        self.value
+    }
+
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn reset(&mut self) {
+        self.index = 0;
+        self.highs.reset();
+        self.lows.reset();
+        self.value = None;
+    }
+}

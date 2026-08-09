@@ -1,0 +1,28 @@
+"""Persistent outside-bar relation."""
+
+from typing import Any
+
+from ._bar_relation_adapter import BarRelationAdapter
+from ._native import OutsideBarOperator
+
+
+class OutsideBar(BarRelationAdapter):
+    """Return 1 when a bar strictly contains the preceding range.
+
+    ``high`` and ``low`` are required aligned series. The first output is
+    ``NaN`` because no preceding bar exists. All calculations run in Rust.
+    """
+
+    _native_cls = OutsideBarOperator
+
+    def append(self, high: float, low: float) -> "OutsideBar":
+        super().append(high, low)
+        return self
+
+    def extend(self, high: Any, low: Any) -> "OutsideBar":
+        super().extend(high, low)
+        return self
+
+    def reset(self) -> "OutsideBar":
+        super().reset()
+        return self

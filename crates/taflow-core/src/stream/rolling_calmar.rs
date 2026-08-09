@@ -1,6 +1,7 @@
 //! Batch implementation for `rolling_calmar`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `rolling_calmar` through the native Rust kernel.
@@ -112,5 +113,70 @@ mod tests {
             let got = state.append(input[i]).unwrap_or(f64::NAN);
             assert_eq!(value.to_bits(), got.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+/// Rolling Calmar ratio: window mean over the window's maximum drawdown.
+///
+/// Split out of `rolling_risk_operator!` because the maximum drawdown is
+/// driven by a *prefix* maximum inside the window — no rolling-extrema
+/// structure and no sliding sum can reproduce the series when the window
+/// slides. The O(period) rescan is therefore inherent; what this version
+/// removes is the deque (one contiguous ring slice instead) and the second
+/// pass: the window sum is accumulated in the same oldest-to-newest order,
+/// inside the drawdown loop, so the emitted ratio is bit-identical.
+#[derive(Debug, Clone)]
+pub struct RollingCalmar {
+    values: ContiguousWindow,
+    timeperiod: usize,
+    value: Option<f64>,
+}
+
+impl RollingCalmar {
+    /// Creates the state for a positive rolling window.
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self {
+            values: ContiguousWindow::new(timeperiod),
+            timeperiod,
+            value: None,
+        })
+    }
+
+    /// Append one causal observation and return the latest result.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        self.values.push(input);
+        self.value = self.values.is_full().then(|| {
+            let window = self.values.window();
+            let mut sum = 0.0;
+            let mut peak = window[0];
+            let mut drawdown: f64 = 0.0;
+            for &value in window {
+                sum += value;
+                peak = peak.max(value);
+                drawdown = drawdown.min(if peak != 0.0 { value / peak - 1.0 } else { 0.0 });
+            }
+            let average = sum / self.timeperiod as f64;
+            if drawdown < 0.0 {
+                average / -drawdown
+            } else {
+                0.0
+            }
+        });
+        self.value
+    }
+
+    /// Return the latest computed result, if warm-up is complete.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
     }
 }

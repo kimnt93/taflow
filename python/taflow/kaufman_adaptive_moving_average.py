@@ -1,4 +1,5 @@
 """Canonical Kaufman Adaptive Moving Average adapter."""
+from typing import Any
 
 from ._native import StatefulKama
 from ._unary_state import UnaryStateAdapter
@@ -18,3 +19,18 @@ class KaufmanAdaptiveMovingAverage(UnaryStateAdapter):
     """
 
     _native_cls = StatefulKama
+
+    def append(self, _input: float) -> "KaufmanAdaptiveMovingAverage":
+        """Append one observation and return this indicator."""
+        super().append(_input)
+        return self
+
+    def extend(self, _input: Any) -> "KaufmanAdaptiveMovingAverage":
+        """Append aligned histories and return this indicator."""
+        super().extend(_input)
+        return self
+
+    def reset(self) -> "KaufmanAdaptiveMovingAverage":
+        """Reset native state and return this indicator."""
+        super().reset()
+        return self

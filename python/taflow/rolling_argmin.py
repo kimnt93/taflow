@@ -1,4 +1,5 @@
 """Canonical rolling argmin adapter."""
+from typing import Any
 
 from ._native import StatefulMinindex
 from ._unary_state import UnaryStateAdapter
@@ -18,3 +19,18 @@ class RollingArgmin(UnaryStateAdapter):
     """
 
     _native_cls = StatefulMinindex
+
+    def append(self, _input: float) -> "RollingArgmin":
+        """Append one observation and return this indicator."""
+        super().append(_input)
+        return self
+
+    def extend(self, _input: Any) -> "RollingArgmin":
+        """Append aligned histories and return this indicator."""
+        super().extend(_input)
+        return self
+
+    def reset(self) -> "RollingArgmin":
+        """Reset native state and return this indicator."""
+        super().reset()
+        return self

@@ -7,14 +7,16 @@ from ._series import as_float64_series
 
 
 class PositiveVolumeIndex:
-    """Stateful PositiveVolumeIndex indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Positive Volume Index.
 
-    def __init__(self, close: Any | None = None, volume: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `close`, `volume`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        close: Any,
+        volume: Any,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -31,7 +33,7 @@ class PositiveVolumeIndex:
         self._state = _Native()
         self.extend(close, volume) if close is not None or volume is not None else None
 
-    def append(self, close: float, volume: float) -> object:
+    def append(self, close: float, volume: float) -> "PositiveVolumeIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -49,7 +51,7 @@ class PositiveVolumeIndex:
         self._state.append(close, volume)
         return self
 
-    def extend(self, close: Any, volume: Any) -> object:
+    def extend(self, close: Any, volume: Any) -> "PositiveVolumeIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -88,7 +90,7 @@ class PositiveVolumeIndex:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "PositiveVolumeIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

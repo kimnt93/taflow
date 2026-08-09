@@ -21,45 +21,55 @@ class BalanceOfPower:
 
     def __init__(
         self,
-        _open: Any | None = None,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        _open: Any,
+        high: Any,
+        low: Any,
+        close: Any,
     ) -> None:
-        """Create native state and optionally process initial OHLC data."""
+        """Create native state and process initial OHLC data."""
         self._state = StatefulBop()
         if any(value is not None for value in (_open, high, low, close)):
             self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> object:
-        """Append one OHLC bar and update native state
+    def append(self, _open: float, high: float, low: float, close: float) -> "BalanceOfPower":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _open : float
+            Current open price.
+        high : float
+            Current high price.
+        low : float
+            Current low price.
+        close : float
+            Current close price.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        BalanceOfPower
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(_open, high, low, close)
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
-        """Append aligned OHLC histories to native state
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "BalanceOfPower":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _open : Any
+            Chronological open price series.
+        high : Any
+            Chronological high price series.
+        low : Any
+            Chronological low price series.
+        close : Any
+            Chronological close price series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        BalanceOfPower
+            This indicator, for fluent chaining."""
         self._state.extend(
             as_float64_series(_open),
             as_float64_series(high),
@@ -69,36 +79,33 @@ class BalanceOfPower:
         return self
 
     def compute(self) -> object:
-        """Return aligned native Balance of Power history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         import numpy as np
 
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest native value
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Reset native state and accumulated output history
+    def reset(self) -> "BalanceOfPower":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        BalanceOfPower
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self
 

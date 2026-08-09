@@ -196,7 +196,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | cumulative_sum_control_chart | CumulativeSumControlChart | self | MATCH | — | yes | yes | — |
 | decay_linear | DecayLinear | self | MATCH | — | yes | yes | — |
 | detrended_price_oscillator | DetrendedPriceOscillator | self | MATCH | — | yes | yes | — |
-| donchian_channels | Donchian | self | MATCH | — | yes | yes | — |
+| donchian_channels | DonchianChannels | self | MATCH | — | yes | yes | — |
 | drawdown | Drawdown | self | MATCH | — | yes | yes | — |
 | ease_of_movement | EaseOfMovement | self | MATCH | — | yes | yes | — |
 | equal_highs_lows | EqualHighsLows | self | MATCH | — | yes | yes | — |
@@ -290,7 +290,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | squeeze_pro | SqueezePro | self | MATCH | — | yes | yes | — |
 | ssl_channel | SmoothedTrendChannel | self | MATCH | — | yes | yes | — |
 | supertrend | Supertrend | self | MATCH | — | yes | yes | — |
-| swing_highs_lows | SwingHighLow | self | MATCH | — | yes | yes | — |
+| swing_highs_lows | SwingHighsLows | self | MATCH | — | yes | yes | — |
 | td_sequential | TomDeMarkSequential | self | MATCH | — | yes | yes | — |
 | time_series_rank | TimeSeriesRank | self | MATCH | — | yes | yes | — |
 | true_strength_index | TrueStrengthIndex | self | MATCH | — | yes | yes | — |

@@ -7,16 +7,17 @@ from ._series import as_float64_series
 
 
 class RollingQuantile:
-    """Stateful RollingQuantile indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent causal rolling quantile operator.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, timeperiod: int, quantile: float, _input: Any | None = None
+        self,
+        _input: Any,
+        timeperiod: int = 14,
+        quantile: float = 0.5,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -36,7 +37,7 @@ class RollingQuantile:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: float) -> object:
+    def append(self, _input: float) -> "RollingQuantile":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -52,7 +53,7 @@ class RollingQuantile:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any) -> object:
+    def extend(self, _input: Any) -> "RollingQuantile":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -89,7 +90,7 @@ class RollingQuantile:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "RollingQuantile":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

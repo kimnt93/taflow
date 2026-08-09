@@ -7,14 +7,16 @@ from ._series import as_float64_series
 
 
 class OrnsteinUhlenbeckHalfLife:
-    """Stateful OrnsteinUhlenbeckHalfLife indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Ornstein-Uhlenbeck mean-reversion half-life of a price series.
 
-    def __init__(self, price: Any | None = None, timeperiod: int = 20) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `price`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        price: Any,
+        timeperiod: int = 20,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -31,7 +33,7 @@ class OrnsteinUhlenbeckHalfLife:
         self._state = _Native(timeperiod)
         self.extend(price) if price is not None else None
 
-    def append(self, price: float) -> object:
+    def append(self, price: float) -> "OrnsteinUhlenbeckHalfLife":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +49,7 @@ class OrnsteinUhlenbeckHalfLife:
         self._state.append(price)
         return self
 
-    def extend(self, price: Any) -> object:
+    def extend(self, price: Any) -> "OrnsteinUhlenbeckHalfLife":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,7 +86,7 @@ class OrnsteinUhlenbeckHalfLife:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "OrnsteinUhlenbeckHalfLife":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

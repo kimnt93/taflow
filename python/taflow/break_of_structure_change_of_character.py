@@ -7,20 +7,18 @@ from ._series import as_float64_series
 
 
 class BreakOfStructureChangeOfCharacter:
-    """Stateful break-of-structure and change-of-character indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Causal break-of-structure and change-of-character events.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
         swing_length: int = 5,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -45,7 +43,7 @@ class BreakOfStructureChangeOfCharacter:
             else None
         )
 
-    def append(self, high: float, low: float, close: float) -> object:
+    def append(self, high: float, low: float, close: float) -> "BreakOfStructureChangeOfCharacter":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +63,7 @@ class BreakOfStructureChangeOfCharacter:
         self._state.append(high, low, close)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any) -> object:
+    def extend(self, high: Any, low: Any, close: Any) -> "BreakOfStructureChangeOfCharacter":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -108,7 +106,7 @@ class BreakOfStructureChangeOfCharacter:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "BreakOfStructureChangeOfCharacter":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -13,7 +13,7 @@ class AbsolutePriceOscillator:
 
     Parameters
     ----------
-    _input : array-like, optional
+    _input : array-like
         Initial input history.
     fastperiod, slowperiod : int
         Fast and slow moving-average periods.
@@ -23,77 +23,72 @@ class AbsolutePriceOscillator:
 
     def __init__(
         self,
-        _input: Any | None = None,
+        _input: Any,
         fastperiod: int = 12,
         slowperiod: int = 26,
         moving_average_type: int = 0,
     ) -> None:
-        """Create native APO state and optionally process initial inputs."""
+        """Create native APO state and process initial inputs."""
         self._state = StatefulApo(fastperiod, slowperiod, int(moving_average_type))
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: float) -> object:
-        """Append one input value to native APO state
+    def append(self, _input: float) -> "AbsolutePriceOscillator":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _input : float
+            Current input.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        AbsolutePriceOscillator
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(float(_input))
         return self
 
-    def extend(self, _input: Any) -> object:
-        """Append an aligned input history to native APO state
+    def extend(self, _input: Any) -> "AbsolutePriceOscillator":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _input : Any
+            Chronological input series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        AbsolutePriceOscillator
+            This indicator, for fluent chaining."""
         self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned APO history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest APO value
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Reset native state and accumulated output history
+    def reset(self) -> "AbsolutePriceOscillator":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        AbsolutePriceOscillator
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self
 

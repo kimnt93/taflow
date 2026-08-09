@@ -1,6 +1,7 @@
 //! Batch implementation for `hull_moving_average`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes the causal hull moving average series.
@@ -131,5 +132,73 @@ mod tests {
             let got = state.append(input[i]).unwrap_or(f64::NAN);
             assert_eq!(value.to_bits(), got.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `HullMovingAverage`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct HullMovingAverage {
+    raw: ContiguousWindow,
+    intermediate: ContiguousWindow,
+    period: usize,
+    half: usize,
+    smooth: usize,
+    value: Option<f64>,
+}
+
+impl HullMovingAverage {
+    /// Create a new empty state.
+    ///
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        let half = (period / 2).max(1);
+        let smooth = ((period as f64).sqrt().floor() as usize).max(1);
+        Ok(Self {
+            raw: ContiguousWindow::new(period),
+            intermediate: ContiguousWindow::new(smooth),
+            period,
+            half,
+            smooth,
+            value: None,
+        })
+    }
+    /// Append one causal observation and return the latest result.
+    ///
+    /// The WMA rescans run over contiguous ring slices in the same
+    /// oldest-to-newest order (and therefore the same rounding) as the
+    /// historical deque implementation, without its per-bar allocation.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        self.raw.push(input);
+        if self.raw.is_full() {
+            let window = self.raw.window();
+            let half = weighted_mean_slice(&window[self.period - self.half..]);
+            let full = weighted_mean_slice(window);
+            self.intermediate.push(2.0 * half - full);
+            self.value = self
+                .intermediate
+                .is_full()
+                .then(|| weighted_mean_slice(self.intermediate.window()));
+        } else {
+            self.value = None
+        }
+        self.value
+    }
+    /// Return the latest computed result, if warm-up is complete.
+    ///
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+    /// Reset the state and clear its accumulated history.
+    ///
+    pub fn reset(&mut self) {
+        self.raw.clear();
+        self.intermediate.clear();
+        self.value = None;
     }
 }

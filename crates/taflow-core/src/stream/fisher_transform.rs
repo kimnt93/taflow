@@ -1,35 +1,90 @@
-//! Batch implementation for `fisher_transform`.
+//! Persistent and batch Fisher Transform implementation.
 
-use super::operator_states::*;
+use super::{MonotonicMax, MonotonicMin};
 use crate::error::{TaError, TaResult};
 
-/// Compute the Fisher transform from aligned high and low prices.
+/// Causal Fisher Transform over the midpoint of aligned high/low bars.
 ///
-/// `timeperiod` controls the trailing normalization window; warm-up output
-/// Compute the fisher transform result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn fisher_transform(high: &[f64], low: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() {
-        return Err(TaError::LengthMismatch {
-            expected: high.len(),
-            got: low.len(),
-        });
+/// Rolling extrema use monotonic deques, so each appended bar is amortized
+/// O(1). The first complete window seeds the pandas-ta-classic recurrence at
+/// zero; subsequent values apply the bounded logarithmic transform.
+#[derive(Debug, Clone)]
+pub struct FisherTransform {
+    highs: MonotonicMax,
+    lows: MonotonicMin,
+    previous_position: f64,
+    previous_fisher: f64,
+    seeded: bool,
+    value: Option<f64>,
+}
+
+impl FisherTransform {
+    /// Create an empty transform with a positive trailing window length.
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        if timeperiod == 0 {
+            return Err(TaError::InvalidParameter {
+                name: "timeperiod",
+                value: timeperiod.to_string(),
+                reason: "must be >= 1",
+            });
+        }
+        Ok(Self {
+            highs: MonotonicMax::new(timeperiod)?,
+            lows: MonotonicMin::new(timeperiod)?,
+            previous_position: 0.0,
+            previous_fisher: 0.0,
+            seeded: false,
+            value: None,
+        })
     }
-    let mut state = FisherTransform::new(timeperiod)?;
-    Ok(high
-        .iter()
-        .zip(low)
-        .map(|(&h, &l)| state.append(h, l).unwrap_or(f64::NAN))
-        .collect())
+
+    /// Append one high/low bar and return the latest value after warm-up.
+    pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+        let midpoint = (high + low) * 0.5;
+        let maximum = self.highs.append(midpoint);
+        let minimum = self.lows.append(midpoint);
+        self.value = maximum.zip(minimum).map(|(high, low)| {
+            if !self.seeded {
+                self.seeded = true;
+                self.previous_position = 0.0;
+                self.previous_fisher = 0.0;
+                return 0.0;
+            }
+            let position = if high != low {
+                (midpoint - low) / (high - low) - 0.5
+            } else {
+                0.0
+            };
+            let raw = 0.66 * position + 0.67 * self.previous_position;
+            let bounded = if raw < -0.99 {
+                -0.999
+            } else if raw > 0.99 {
+                0.999
+            } else {
+                raw
+            };
+            let fisher = 0.5 * (((1.0 + bounded) / (1.0 - bounded)).ln() + self.previous_fisher);
+            self.previous_position = bounded;
+            self.previous_fisher = fisher;
+            fisher
+        });
+        self.value
+    }
+
+    /// Return the latest value, or `None` before the first complete window.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Restore fresh-state behavior while retaining deque allocations.
+    pub fn reset(&mut self) {
+        self.highs.reset();
+        self.lows.reset();
+        self.previous_position = 0.0;
+        self.previous_fisher = 0.0;
+        self.seeded = false;
+        self.value = None;
+    }
 }
 
 #[cfg(test)]
@@ -136,19 +191,6 @@ mod tests {
                 let got = state.append(high[i], low[i]).unwrap_or(f64::NAN);
                 assert_eq!(want.to_bits(), got.to_bits(), "p={period} post-reset {i}");
             }
-        }
-    }
-
-    #[test]
-    fn batch_matches_streaming() {
-        let base = lcg_series(1_000, 0xB2_5EED_82);
-        let high: Vec<f64> = base.iter().map(|v| v + 0.6).collect();
-        let low: Vec<f64> = base.iter().map(|v| v - 0.6).collect();
-        let batch = fisher_transform(&high, &low, 9).unwrap();
-        let mut state = FisherTransform::new(9).unwrap();
-        for (i, value) in batch.iter().enumerate() {
-            let got = state.append(high[i], low[i]).unwrap_or(f64::NAN);
-            assert_eq!(value.to_bits(), got.to_bits());
         }
     }
 }

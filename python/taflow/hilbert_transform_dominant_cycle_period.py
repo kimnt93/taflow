@@ -8,14 +8,15 @@ from ._series import as_float64_series
 
 
 class HilbertTransformDominantCyclePeriod:
-    """Stateful HilbertTransformDominantCyclePeriod indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Hilbert Transform dominant cycle period (HT_DCPERIOD).
 
-    def __init__(self, _input: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        _input: Any,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -31,7 +32,7 @@ class HilbertTransformDominantCyclePeriod:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, value: float) -> object:
+    def append(self, value: float) -> "HilbertTransformDominantCyclePeriod":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +48,7 @@ class HilbertTransformDominantCyclePeriod:
         self._state.append(float(value))
         return self
 
-    def extend(self, _input: Any) -> object:
+    def extend(self, _input: Any) -> "HilbertTransformDominantCyclePeriod":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,7 +85,7 @@ class HilbertTransformDominantCyclePeriod:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "HilbertTransformDominantCyclePeriod":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

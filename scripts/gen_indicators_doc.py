@@ -113,7 +113,6 @@ def main():
     for row in rows:
         grouped.setdefault(row["cat"], []).append(row)
     talib_n = sum(1 for r in rows if r["talib"])
-    config_first = sorted(r["cls"] for r in rows if not r["series_first"])
 
     out = [
         "# TAFlow indicator reference\n",
@@ -139,9 +138,10 @@ Outputs are `float64` arrays the same length as the input, `NaN` through
 warm-up. Multi-output indicators return a tuple. Candle patterns return
 `int32` scores (`0`, `±100`).
 """,
-        "### Argument order — read this before passing data positionally\n",
-        f"""Most classes ({len(rows) - len(config_first)} of {len(rows)}) take their input
-series **first**, then configuration:
+        "### Argument order\n",
+        """Every stateful indicator takes its required input series **first**, then
+configuration. Configuration values have defaults unless the algorithm cannot
+define one semantically:
 
 ```python
 from taflow import SimpleMovingAverage, MoneyFlowIndex
@@ -150,24 +150,11 @@ SimpleMovingAverage(close, timeperiod=30)
 MoneyFlowIndex(high, low, close, volume, timeperiod=14)
 ```
 
-**{len(config_first)} classes take configuration first and the series last.** For those,
-pass the series by keyword:
-
-```python
-from taflow import BollingerBands, StochasticOscillator
-
-BollingerBands(values=close, period=20)
-StochasticOscillator(high=high, low=low, close=close)
-```
-
 The `Constructor order` column below is authoritative — it is introspected from
 the live signature. Passing data by keyword always works.
 """,
-        f"<details><summary>The {len(config_first)} classes that take configuration first</summary>\n",
-        "\n".join(f"- `{name}`" for name in config_first),
-        "\n</details>\n",
-        "Correctness for every row is checked against TA-Lib (or pandas, for rolling and "
-        "EWM operators) in [../verify/REPORT.md](../verify/REPORT.md); throughput is in "
+        "Correctness uses the highest-priority available external oracle in "
+        "[../verify/SOURCE_COMPARISON.md](../verify/SOURCE_COMPARISON.md); throughput is in "
         "[../verify/benchmark_reports/BENCHMARK.md](../verify/benchmark_reports/BENCHMARK.md).\n",
         "## Contents\n",
     ]
@@ -183,16 +170,14 @@ the live signature. Passing data by keyword always works.
         out.append("| Class | TA-Lib | Parameters | Constructor order |")
         out.append("|---|---|---|---|")
         for row in sorted(grouped[cat], key=lambda r: r["cls"]):
-            flag = "" if row["series_first"] else " ⚠️"
             out.append(f"| `{row['cls']}` | {row['talib'] or '—'} | {row['cfg']} "
-                       f"| `({row['order']})`{flag} |")
+                       f"| `({row['order']})` |")
         out.append("")
-    out.append("⚠️ = configuration comes before the series; pass the data by keyword.\n")
 
     target = ROOT / "docs/INDICATORS.md"
     target.write_text("\n".join(out))
     print(f"wrote {target.relative_to(ROOT)}: {len(rows)} classes, "
-          f"{talib_n} TA-Lib, {len(config_first)} config-first")
+          f"{talib_n} TA-Lib")
 
 
 if __name__ == "__main__":

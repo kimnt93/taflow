@@ -7,20 +7,18 @@ from ._series import as_float64_series
 
 
 class KalmanHedgeRatio:
-    """Stateful KalmanHedgeRatio indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Online Kalman estimate of the hedge ratio in ``y = alpha + beta*x``.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `x`, `y`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        x: Any | None = None,
-        y: Any | None = None,
-        delta: float = 1e-4,
-        observation_variance: float = 1e-3,
+        x: Any,
+        y: Any,
+        delta: float = 0.0001,
+        observation_variance: float = 0.001,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -42,7 +40,7 @@ class KalmanHedgeRatio:
         if x is not None or y is not None:
             self.extend(x, y)
 
-    def append(self, x: float, y: float) -> object:
+    def append(self, x: float, y: float) -> "KalmanHedgeRatio":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -60,7 +58,7 @@ class KalmanHedgeRatio:
         self._state.append(x, y)
         return self
 
-    def extend(self, x: Any, y: Any) -> object:
+    def extend(self, x: Any, y: Any) -> "KalmanHedgeRatio":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -132,7 +130,7 @@ class KalmanHedgeRatio:
         """
         return self._state.std
 
-    def reset(self) -> object:
+    def reset(self) -> "KalmanHedgeRatio":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

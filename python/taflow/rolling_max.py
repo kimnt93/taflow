@@ -1,4 +1,5 @@
 """Canonical rolling maximum adapter."""
+from typing import Any
 
 from ._native import StatefulMax
 from ._unary_state import UnaryStateAdapter
@@ -18,3 +19,18 @@ class RollingMax(UnaryStateAdapter):
     """
 
     _native_cls = StatefulMax
+
+    def append(self, _input: float) -> "RollingMax":
+        """Append one observation and return this indicator."""
+        super().append(_input)
+        return self
+
+    def extend(self, _input: Any) -> "RollingMax":
+        """Append aligned histories and return this indicator."""
+        super().extend(_input)
+        return self
+
+    def reset(self) -> "RollingMax":
+        """Reset native state and return this indicator."""
+        super().reset()
+        return self

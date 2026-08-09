@@ -131,3 +131,112 @@ mod tests {
         }
     }
 }
+use super::rolling_extrema::*;
+use super::*;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `RollingMinmaxValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollingMinmaxValue {
+    pub minimum: f64,
+    pub maximum: f64,
+}
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingMinmax`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollingMinmax {
+    extrema: RollingExtrema,
+    value: Option<RollingMinmaxValue>,
+}
+
+impl RollingMinmax {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        Ok(Self {
+            extrema: RollingExtrema::new(period)?,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, input: f64) -> Option<RollingMinmaxValue> {
+        self.value = self
+            .extrema
+            .append(input)
+            .map(|(maximum, minimum)| RollingMinmaxValue { minimum, maximum });
+        self.value
+    }
+
+    /// Bulk kernel: two vHGW comparison-only passes over the whole slice when
+    /// the state is still empty, then the trailing `period` inputs are replayed
+    /// to rebuild the monotonic deques. Outputs and post-run state are
+    /// bit-identical to per-bar [`Self::append`]; warm-up bars are NaN.
+    pub fn extend_slices_into(
+        &mut self,
+        inputs: &[f64],
+        min_out: &mut Vec<f64>,
+        max_out: &mut Vec<f64>,
+    ) {
+        let period = self.extrema.period();
+        if self.extrema.count() != 0 || inputs.len() < period {
+            min_out.reserve(inputs.len());
+            max_out.reserve(inputs.len());
+            for &input in inputs {
+                match self.append(input) {
+                    Some(value) => {
+                        min_out.push(value.minimum);
+                        max_out.push(value.maximum);
+                    }
+                    None => {
+                        min_out.push(f64::NAN);
+                        max_out.push(f64::NAN);
+                    }
+                }
+            }
+            return;
+        }
+        let min_start = min_out.len();
+        let max_start = max_out.len();
+        min_out.resize(min_start + inputs.len(), f64::NAN);
+        max_out.resize(max_start + inputs.len(), f64::NAN);
+        vhgw::sliding_max_into(inputs, period, &mut max_out[max_start + period - 1..]);
+        vhgw::sliding_min_into(inputs, period, &mut min_out[min_start + period - 1..]);
+        self.extrema.rebuild_from_full_run(inputs);
+        self.value = Some(RollingMinmaxValue {
+            minimum: *min_out.last().expect("at least one warmed bar"),
+            maximum: *max_out.last().expect("at least one warmed bar"),
+        });
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<RollingMinmaxValue> {
+        self.value
+    }
+
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn reset(&mut self) {
+        self.extrema.reset();
+        self.value = None;
+    }
+}

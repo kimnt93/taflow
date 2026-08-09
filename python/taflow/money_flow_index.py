@@ -25,13 +25,13 @@ class MoneyFlowIndex:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
-        volume: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------

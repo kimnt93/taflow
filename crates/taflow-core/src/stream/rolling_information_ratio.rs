@@ -1,6 +1,7 @@
 //! Batch implementation for `rolling_information_ratio`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `rolling_information_ratio` through the native Rust kernel.
@@ -125,5 +126,73 @@ mod tests {
             let got = state.append(input[i], benchmark[i]).unwrap_or(f64::NAN);
             assert_eq!(value.to_bits(), got.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingInformationRatio`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollingInformationRatio {
+    values: ContiguousWindow,
+    period: usize,
+    value: Option<f64>,
+}
+
+impl RollingInformationRatio {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self {
+            values: ContiguousWindow::new(period),
+            period,
+            value: None,
+        })
+    }
+    /// Append one causal observation and return the latest result.
+    ///
+    /// The variance pass needs the window mean, so the two passes cannot be
+    /// collapsed into sliding sums without changing the summation order (and
+    /// therefore the low bits). Both passes now walk one contiguous ring
+    /// slice, so the second pass reads cache-hot memory.
+    pub fn append(&mut self, input: f64, benchmark: f64) -> Option<f64> {
+        self.values.push(input - benchmark);
+        self.value = self.values.is_full().then(|| {
+            let window = self.values.window();
+            let n = self.period as f64;
+            let mean = window.iter().sum::<f64>() / n;
+            let variance = window
+                .iter()
+                .map(|&value| (value - mean).powi(2))
+                .sum::<f64>()
+                / n;
+            if variance > 0.0 {
+                mean / variance.sqrt()
+            } else {
+                0.0
+            }
+        });
+        self.value
+    }
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
     }
 }

@@ -7,20 +7,18 @@ from ._series import as_float64_series
 
 
 class AwesomeOscillator:
-    """Stateful AwesomeOscillator indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Awesome Oscillator.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
+        high: Any,
+        low: Any,
         fast: int = 5,
         slow: int = 34,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -41,7 +39,7 @@ class AwesomeOscillator:
         self._state = _Native(fast, slow)
         self.extend(high, low) if high is not None or low is not None else None
 
-    def append(self, high: float, low: float) -> object:
+    def append(self, high: float, low: float) -> "AwesomeOscillator":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -59,7 +57,7 @@ class AwesomeOscillator:
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any) -> object:
+    def extend(self, high: Any, low: Any) -> "AwesomeOscillator":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -98,7 +96,7 @@ class AwesomeOscillator:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "AwesomeOscillator":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

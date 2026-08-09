@@ -1,6 +1,7 @@
 //! Batch implementation for `retracements`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `retracements` through the native Rust kernel.
@@ -163,5 +164,133 @@ mod tests {
                 value.deepest_retracement_pct.to_bits()
             );
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `RetracementsValue`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RetracementsValue {
+    pub direction: f64,
+    pub current_retracement_pct: f64,
+    pub deepest_retracement_pct: f64,
+}
+
+/// Causal swing-leg retracement tracking. On each confirmed swing a leg is
+/// established from the opposite prior pivot; the retracement percentage is
+/// the fraction of that leg already given back by the current close, with
+/// the deepest value tracked since the leg began.
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `Retracements`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct Retracements {
+    swing: SwingHighLow,
+    last_high: Option<f64>,
+    last_low: Option<f64>,
+    leg_high: Option<f64>,
+    leg_low: Option<f64>,
+    direction: Option<f64>,
+    deepest: f64,
+    value: Option<RetracementsValue>,
+}
+
+impl Retracements {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(swing_length: usize) -> TaResult<Self> {
+        Ok(Self {
+            swing: SwingHighLow::new(swing_length)?,
+            last_high: None,
+            last_low: None,
+            leg_high: None,
+            leg_low: None,
+            direction: None,
+            deepest: 0.0,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, high: f64, low: f64, close: f64) -> RetracementsValue {
+        if let Some(swing) = self.swing.append(high, low) {
+            if swing.signal > 0.0 {
+                self.last_high = Some(swing.level);
+                if let Some(last_low) = self.last_low {
+                    self.leg_high = Some(swing.level);
+                    self.leg_low = Some(last_low);
+                    self.direction = Some(1.0);
+                    self.deepest = 0.0;
+                }
+            } else if swing.signal < 0.0 {
+                self.last_low = Some(swing.level);
+                if let Some(last_high) = self.last_high {
+                    self.leg_high = Some(last_high);
+                    self.leg_low = Some(swing.level);
+                    self.direction = Some(-1.0);
+                    self.deepest = 0.0;
+                }
+            }
+        }
+
+        let mut current_retracement_pct = f64::NAN;
+        let mut deepest_retracement_pct = f64::NAN;
+        if let (Some(leg_high), Some(leg_low), Some(direction)) =
+            (self.leg_high, self.leg_low, self.direction)
+        {
+            let range = leg_high - leg_low;
+            if range > 0.0 {
+                let pct = if direction > 0.0 {
+                    (leg_high - close) / range * 100.0
+                } else {
+                    (close - leg_low) / range * 100.0
+                };
+                current_retracement_pct = pct.max(0.0);
+                self.deepest = self.deepest.max(current_retracement_pct);
+                deepest_retracement_pct = self.deepest;
+            }
+        }
+
+        let value = RetracementsValue {
+            direction: self.direction.unwrap_or(f64::NAN),
+            current_retracement_pct,
+            deepest_retracement_pct,
+        };
+        self.value = Some(value);
+        value
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<RetracementsValue> {
+        self.value
+    }
+
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.swing.reset();
+        self.last_high = None;
+        self.last_low = None;
+        self.leg_high = None;
+        self.leg_low = None;
+        self.direction = None;
+        self.deepest = 0.0;
+        self.value = None;
     }
 }
