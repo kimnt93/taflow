@@ -28,16 +28,16 @@ class ParabolicMovingAverageStop:
         length: int = 10,
         multiplier: float = 3.0,
     ) -> None:
-        self._state = _NativeParabolicMovingAverageStop(length, multiplier)
+        self._state = _NativeParabolicMovingAverageStop(int(length), float(multiplier))
         self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "ParabolicMovingAverageStop":
-        """Append one OHLC bar and return this adapter."""
+        """Append one high/low/close bar and return this adapter."""
         self._state.append(float(high), float(low), float(close))
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "ParabolicMovingAverageStop":
-        """Append aligned OHLC histories and return this adapter."""
+        """Append aligned high/low/close histories in that order."""
         high_array = as_float64_series(high)
         low_array = as_float64_series(low)
         close_array = as_float64_series(close)

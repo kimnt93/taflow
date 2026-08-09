@@ -40,7 +40,7 @@ class SessionVolumeLevels:
         volume: float,
         anchor: bool,
     ) -> "SessionVolumeLevels":
-        """Append one OHLCV/anchor bar and return this adapter."""
+        """Append one high/low/close/volume/anchor bar in that order."""
         self._state.append(
             float(high), float(low), float(close), float(volume), bool(anchor)
         )
@@ -49,7 +49,7 @@ class SessionVolumeLevels:
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any, anchor: Any
     ) -> "SessionVolumeLevels":
-        """Append aligned OHLCV/anchor histories and return this adapter."""
+        """Append aligned high/low/close/volume/anchor histories in that order."""
         arrays = (
             as_float64_series(high),
             as_float64_series(low),

@@ -35,14 +35,14 @@ class OpeningRange:
     def append(
         self, high: float, low: float, close: float, anchor: bool
     ) -> "OpeningRange":
-        """Append one OHLC/anchor bar and return this adapter."""
+        """Append one high/low/close/anchor bar in that order."""
         self._state.append(float(high), float(low), float(close), bool(anchor))
         return self
 
     def extend(
         self, high: Any, low: Any, close: Any, anchor: Any
     ) -> "OpeningRange":
-        """Append aligned OHLC/anchor histories and return this adapter."""
+        """Append aligned high/low/close/anchor histories in that order."""
         arrays = (
             as_float64_series(high),
             as_float64_series(low),

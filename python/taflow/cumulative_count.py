@@ -23,12 +23,12 @@ class CumulativeCount:
         self.extend(_input)
 
     def append(self, _input: float) -> "CumulativeCount":
-        """Append one observation and return this adapter."""
+        """Append one chronological observation and return this adapter."""
         self._state.append(float(_input))
         return self
 
     def extend(self, _input: Any) -> "CumulativeCount":
-        """Append a chronological observation series and return this adapter."""
+        """Append a converted chronological observation history."""
         self._state.extend(as_float64_series(_input))
         return self
 

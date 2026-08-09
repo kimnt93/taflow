@@ -31,12 +31,12 @@ class PremiumDiscount:
         self.extend(close)
 
     def append(self, close: float) -> "PremiumDiscount":
-        """Append one close and return this adapter."""
+        """Append one chronological close and return this adapter."""
         self._state.append(float(close))
         return self
 
     def extend(self, close: Any) -> "PremiumDiscount":
-        """Append a chronological close series and return this adapter."""
+        """Append a converted chronological close history."""
         self._state.extend(as_float64_series(close))
         return self
 

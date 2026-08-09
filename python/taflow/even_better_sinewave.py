@@ -19,16 +19,16 @@ class EvenBetterSinewave:
     """
 
     def __init__(self, close: Any, length: int = 40) -> None:
-        self._state = _NativeEvenBetterSinewave(length)
+        self._state = _NativeEvenBetterSinewave(int(length))
         self.extend(close)
 
     def append(self, close: float) -> "EvenBetterSinewave":
-        """Append one close and return this adapter."""
+        """Append one chronological close and return this adapter."""
         self._state.append(float(close))
         return self
 
     def extend(self, close: Any) -> "EvenBetterSinewave":
-        """Append a chronological close series and return this adapter."""
+        """Append a converted chronological close history."""
         self._state.extend(as_float64_series(close))
         return self
 

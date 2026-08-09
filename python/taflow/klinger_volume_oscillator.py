@@ -30,20 +30,20 @@ class KlingerVolumeOscillator:
         slow: int = 55,
         signal: int = 13,
     ) -> None:
-        self._state = _NativeKlingerVolumeOscillator(fast, slow, signal)
+        self._state = _NativeKlingerVolumeOscillator(int(fast), int(slow), int(signal))
         self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float
     ) -> "KlingerVolumeOscillator":
-        """Append one OHLCV bar and return this adapter."""
+        """Append one high/low/close/volume bar in that order."""
         self._state.append(float(high), float(low), float(close), float(volume))
         return self
 
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any
     ) -> "KlingerVolumeOscillator":
-        """Append aligned OHLCV histories and return this adapter."""
+        """Append aligned high/low/close/volume histories in that order."""
         arrays = tuple(as_float64_series(value) for value in (high, low, close, volume))
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, close, and volume must have equal lengths")

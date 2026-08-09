@@ -18,16 +18,16 @@ class SmoothedTrendChannel:
     """
 
     def __init__(self, high: Any, low: Any, close: Any, length: int = 10) -> None:
-        self._state = _NativeSmoothedTrendChannel(length)
+        self._state = _NativeSmoothedTrendChannel(int(length))
         self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "SmoothedTrendChannel":
-        """Append one aligned bar and return this indicator."""
+        """Append one high/low/close bar and return this adapter."""
         self._state.append(float(high), float(low), float(close))
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "SmoothedTrendChannel":
-        """Append aligned high, low and close series and return this indicator."""
+        """Append aligned high, low, and close histories in that order."""
         arrays = tuple(as_float64_series(series) for series in (high, low, close))
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, and close must have equal lengths")

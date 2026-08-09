@@ -431,3 +431,9 @@ class EqualHighsLows:
   functions, refactor them, run correctness and interface/style checks, update
   the checklist, and push the verified commit to `main`. Do not run benchmark
   commands unless the user explicitly changes that instruction.
+- Python correctness tests must compare the canonical class API against the
+  selected independent target library. Generate deterministic random series
+  (along with constant, monotonic, repeated-extrema, and minimum-length cases),
+  compare every output and warm-up position with the target, and exercise reset,
+  chunked `extend`, and scalar `append` through the same class. A lifecycle-only
+  test is not sufficient when an external oracle exists.
