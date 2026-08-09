@@ -1,38 +1,40 @@
 //! Persistent cumulative maximum state.
 
-/// Cumulative maximum of scalar observations.
+use super::StreamingIndicator;
+use crate::error::TaResult;
+
+/// Compute the cumulative maximum of chronological scalar observations.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `CumulativeMaximum`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct CumulativeMaximum {
     extreme: f64,
     value: Option<f64>,
 }
 
 impl CumulativeMaximum {
-    /// Create an empty cumulative maximum.
-    pub fn new() -> Self {
-        Self {
-            extreme: f64::NEG_INFINITY,
-            value: None,
-        }
+    /// Create a fresh cumulative state.
+    pub fn new() -> TaResult<Self> {
+        Ok(Self::default())
     }
 
-    /// Append one observation and return the cumulative maximum.
+    /// Append one value and return the current cumulative result.
     pub fn append(&mut self, input: f64) -> f64 {
         self.extreme = self.extreme.max(input);
         self.value = Some(self.extreme);
         self.extreme
     }
 
-    /// Return the latest cumulative maximum.
+    /// Append a slice into `output` in scalar replay order.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        output.extend(input.iter().map(|&input| self.append(input)));
+    }
+
+    /// Return the latest result, or `None` before the first observation.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    /// Reset the accumulated maximum.
+    /// Restore fresh-state behavior without reallocating.
     pub fn reset(&mut self) {
         self.extreme = f64::NEG_INFINITY;
         self.value = None;
@@ -41,32 +43,25 @@ impl CumulativeMaximum {
 
 impl Default for CumulativeMaximum {
     fn default() -> Self {
-        Self::new()
+        Self {
+            extreme: f64::NEG_INFINITY,
+            value: None,
+        }
     }
 }
 
-/// Computes the running maximum of an aligned numeric series.
-///
-/// # Parameters
-/// `input`: numeric observations in chronological order.
-///
-/// # Returns
-/// Compute the cumulative maximum result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn cumulative_maximum(input: &[f64]) -> Vec<f64> {
-    let mut maximum = f64::NEG_INFINITY;
-    input
-        .iter()
-        .map(|&value| {
-            maximum = maximum.max(value);
-            maximum
-        })
-        .collect()
+impl StreamingIndicator for CumulativeMaximum {
+    type Output = f64;
+
+    fn append(&mut self, input: f64) -> Option<Self::Output> {
+        Some(Self::append(self, input))
+    }
+
+    fn value(&self) -> Option<Self::Output> {
+        Self::value(self)
+    }
+
+    fn reset(&mut self) {
+        Self::reset(self);
+    }
 }

@@ -2,7 +2,7 @@
 mod tests {
     use super::*;
     use crate::stream::*;
-    use crate::stream::{CumulativeProduct, CumulativeSum, LogReturn, RollingMedian, RollingMode};
+    use crate::stream::{RollingMedian, RollingMode};
 
     fn bulk_lcg_series(n: usize, mut state: u64) -> Vec<f64> {
         (0..n)
@@ -125,34 +125,9 @@ mod tests {
     }
 
     #[test]
-    fn batch_and_stream_match() {
-        let input = vec![2.0, 4.0, 1.0, 8.0, 2.0];
-        assert_eq!(lag(&input, 2).unwrap()[2..], [2.0, 4.0, 1.0]);
-        assert_eq!(cumulative_sum(&input), vec![2.0, 6.0, 7.0, 15.0, 17.0]);
-        assert_eq!(cumulative_product(&input), vec![2.0, 8.0, 8.0, 64.0, 128.0]);
-        assert_eq!(cumulative_maximum(&input), vec![2.0, 4.0, 4.0, 8.0, 8.0]);
-        assert_eq!(cumulative_minimum(&input), vec![2.0, 2.0, 1.0, 1.0, 1.0]);
+    fn drawdown_batch_matches_definition() {
+        let input = [2.0, 4.0, 1.0, 8.0, 2.0];
         assert_eq!(drawdown(&input), vec![0.0, 0.0, -0.75, 0.0, -0.75]);
-        let expected = log_return(&input, 2).unwrap();
-        let mut state = LogReturn::new(2).unwrap();
-        for (input, expected) in input.iter().zip(expected) {
-            assert_eq!(
-                state.append(*input).map(f64::to_bits),
-                (!expected.is_nan()).then_some(expected.to_bits())
-            );
-        }
-    }
-
-    #[test]
-    fn cumulative_states_reset() {
-        let mut sum = CumulativeSum::new();
-        let mut product = CumulativeProduct::new();
-        assert_eq!(sum.append(2.0), 2.0);
-        assert_eq!(product.append(2.0), 2.0);
-        sum.reset();
-        product.reset();
-        assert_eq!(sum.append(3.0), 3.0);
-        assert_eq!(product.append(3.0), 3.0);
     }
 
     #[test]

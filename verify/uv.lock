@@ -233,6 +233,8 @@ provides-extras = ["arrow", "polars", "adapters"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "pandas", specifier = ">=2" },
+    { name = "polars", specifier = ">=0.20" },
     { name = "pytest", specifier = ">=8" },
     { name = "ta-lib", specifier = ">=0.6" },
 ]

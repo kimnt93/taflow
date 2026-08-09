@@ -53,7 +53,7 @@ impl Drawdown {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            maximum: CumulativeMaximum::new(),
+            maximum: CumulativeMaximum::default(),
             value: None,
         }
     }

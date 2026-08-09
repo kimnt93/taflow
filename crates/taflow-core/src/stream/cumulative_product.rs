@@ -1,38 +1,40 @@
 //! Persistent cumulative product state.
 
-/// Cumulative product of scalar observations.
+use super::StreamingIndicator;
+use crate::error::TaResult;
+
+/// Compute the cumulative product of chronological scalar observations.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `CumulativeProduct`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct CumulativeProduct {
     total: f64,
     value: Option<f64>,
 }
 
 impl CumulativeProduct {
-    /// Create an empty cumulative product.
-    pub fn new() -> Self {
-        Self {
-            total: 1.0,
-            value: None,
-        }
+    /// Create a fresh cumulative state.
+    pub fn new() -> TaResult<Self> {
+        Ok(Self::default())
     }
 
-    /// Append one observation and return the cumulative product.
+    /// Append one value and return the current cumulative result.
     pub fn append(&mut self, input: f64) -> f64 {
         self.total *= input;
         self.value = Some(self.total);
         self.total
     }
 
-    /// Return the latest cumulative product.
+    /// Append a slice into `output` in scalar replay order.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        output.extend(input.iter().map(|&input| self.append(input)));
+    }
+
+    /// Return the latest result, or `None` before the first observation.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    /// Reset the accumulated product.
+    /// Restore fresh-state behavior without reallocating.
     pub fn reset(&mut self) {
         self.total = 1.0;
         self.value = None;
@@ -41,36 +43,25 @@ impl CumulativeProduct {
 
 impl Default for CumulativeProduct {
     fn default() -> Self {
-        Self::new()
+        Self {
+            total: 1.0,
+            value: None,
+        }
     }
 }
 
-/// Computes the prefix product of an aligned numeric series.
-///
-/// `input` is consumed in chronological order and every output element is
-/// the product through the corresponding bar. The output has the same length
-/// as `input`; no warm-up values are required.
-///
-/// # Parameters
-/// `input`: numeric observations in chronological order.
-///
-/// # Returns
-/// Compute the cumulative product result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn cumulative_product(input: &[f64]) -> Vec<f64> {
-    let mut total = 1.0;
-    input
-        .iter()
-        .map(|&value| {
-            total *= value;
-            total
-        })
-        .collect()
+impl StreamingIndicator for CumulativeProduct {
+    type Output = f64;
+
+    fn append(&mut self, input: f64) -> Option<Self::Output> {
+        Some(Self::append(self, input))
+    }
+
+    fn value(&self) -> Option<Self::Output> {
+        Self::value(self)
+    }
+
+    fn reset(&mut self) {
+        Self::reset(self);
+    }
 }

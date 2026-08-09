@@ -84,11 +84,25 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
                 span=spec.ctor_kwargs.get("timeperiod", 14), adjust=False, bias=True),
         }
         return functions[spec.snake]()
+    if source == "pandas" and spec.snake == "lag":
+        import pandas as pd
+        return pd.Series(arrays[0]).shift(
+            spec.ctor_kwargs.get("timeperiod", 1)
+        ).to_numpy()
+    if source == "pandas-ta-classic" and spec.snake == "log_return":
+        import pandas as pd
+        import pandas_ta_classic as pta
+        return pta.log_return(
+            pd.Series(arrays[0]),
+            length=spec.ctor_kwargs.get("timeperiod", 1),
+        ).to_numpy()
     raise KeyError(source)
 
 
 def has_timed_reference(reference: dict) -> bool:
-    return reference.get("source") in {"TA-Lib", "NumPy", "Polars"}
+    return reference.get("source") in {
+        "TA-Lib", "NumPy", "Polars", "pandas", "pandas-ta-classic"
+    }
 
 
 def timed(fn: Callable[[], object], repeats: int,

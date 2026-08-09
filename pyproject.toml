@@ -23,6 +23,8 @@ adapters = ["pyarrow>=12", "polars>=0.20"]
 
 [dependency-groups]
 dev = [
+    "pandas>=2",
+    "polars>=0.20",
     "pytest>=8",
     "ta-lib>=0.6",
 ]

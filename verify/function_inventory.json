@@ -1,7 +1,7 @@
 {
   "counts": {
-    "benchmark": 178,
-    "complete": 33,
+    "benchmark": 184,
+    "complete": 39,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 602,
     "smc_functions": 8,
-    "structure": 33,
+    "structure": 39,
     "talib_functions": 161
   },
   "rows": [
@@ -2033,8 +2033,8 @@
       "name": "Lag",
       "native_binding": true,
       "native_symbols": [
-        "LagOperator",
-        "_Native"
+        "Lag",
+        "_NativeLag"
       ],
       "pandas_ta_reference": true,
       "rust_export": true,
@@ -2048,8 +2048,8 @@
       "name": "LogReturn",
       "native_binding": true,
       "native_symbols": [
-        "LogReturnOperator",
-        "_Native"
+        "LogReturn",
+        "_NativeLogReturn"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2063,8 +2063,8 @@
       "name": "CumulativeSum",
       "native_binding": true,
       "native_symbols": [
-        "CumulativeSumOperator",
-        "_Native"
+        "CumulativeSum",
+        "_NativeCumulativeSum"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2078,8 +2078,8 @@
       "name": "CumulativeProduct",
       "native_binding": true,
       "native_symbols": [
-        "CumulativeProductOperator",
-        "_Native"
+        "CumulativeProduct",
+        "_NativeCumulativeProduct"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -3048,8 +3048,8 @@
       "name": "CumulativeMaximum",
       "native_binding": true,
       "native_symbols": [
-        "CumulativeMaximumOperator",
-        "_Native"
+        "CumulativeMaximum",
+        "_NativeCumulativeMaximum"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -3063,8 +3063,8 @@
       "name": "CumulativeMinimum",
       "native_binding": true,
       "native_symbols": [
-        "CumulativeMinimumOperator",
-        "_Native"
+        "CumulativeMinimum",
+        "_NativeCumulativeMinimum"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4487,11 +4487,11 @@
         "CrossoverOperator",
         "CrossunderOperator",
         "CumulativeCountOperator",
-        "CumulativeMaximumOperator",
-        "CumulativeMinimumOperator",
-        "CumulativeProductOperator",
+        "CumulativeMaximum",
+        "CumulativeMinimum",
+        "CumulativeProduct",
+        "CumulativeSum",
         "CumulativeSumControlChartOperator",
-        "CumulativeSumOperator",
         "DetrendedPriceOscillatorOperator",
         "DonchianOperator",
         "DrawdownOperator",
@@ -4529,9 +4529,9 @@
         "KalmanHedgeRatioOperator",
         "KeltnerChannelsOperator",
         "KnowSureThingOperator",
-        "LagOperator",
+        "Lag",
         "LiquidityOperator",
-        "LogReturnOperator",
+        "LogReturn",
         "LowerLowOperator",
         "LowestSinceOperator",
         "MassIndexOperator",
@@ -4793,11 +4793,11 @@
         "CrossoverOperator",
         "CrossunderOperator",
         "CumulativeCountOperator",
-        "CumulativeMaximumOperator",
-        "CumulativeMinimumOperator",
-        "CumulativeProductOperator",
+        "CumulativeMaximum",
+        "CumulativeMinimum",
+        "CumulativeProduct",
+        "CumulativeSum",
         "CumulativeSumControlChartOperator",
-        "CumulativeSumOperator",
         "DetrendedPriceOscillatorOperator",
         "DonchianOperator",
         "DrawdownOperator",
@@ -4835,9 +4835,9 @@
         "KalmanHedgeRatioOperator",
         "KeltnerChannelsOperator",
         "KnowSureThingOperator",
-        "LagOperator",
+        "Lag",
         "LiquidityOperator",
-        "LogReturnOperator",
+        "LogReturn",
         "LowerLowOperator",
         "LowestSinceOperator",
         "MassIndexOperator",

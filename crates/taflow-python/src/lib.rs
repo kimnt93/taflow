@@ -53,10 +53,10 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::MinusDirectionalMovement>()?;
     m.add_class::<indicators::TripleExponentialRateOfChange>()?;
     m.add_class::<indicators::UltimateOscillator>()?;
-    m.add_class::<indicators::LagOperator>()?;
-    m.add_class::<indicators::LogReturnOperator>()?;
-    m.add_class::<indicators::CumulativeSumOperator>()?;
-    m.add_class::<indicators::CumulativeProductOperator>()?;
+    m.add_class::<indicators::Lag>()?;
+    m.add_class::<indicators::LogReturn>()?;
+    m.add_class::<indicators::CumulativeSum>()?;
+    m.add_class::<indicators::CumulativeProduct>()?;
     m.add_class::<indicators::CumulativeCountOperator>()?;
     m.add_class::<indicators::RollingMedianOperator>()?;
     m.add_class::<indicators::RollingModeOperator>()?;
@@ -74,8 +74,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::EwmStdOperator>()?;
     m.add_class::<indicators::EwmCovOperator>()?;
     m.add_class::<indicators::EwmCorrOperator>()?;
-    m.add_class::<indicators::CumulativeMaximumOperator>()?;
-    m.add_class::<indicators::CumulativeMinimumOperator>()?;
+    m.add_class::<indicators::CumulativeMaximum>()?;
+    m.add_class::<indicators::CumulativeMinimum>()?;
     m.add_class::<indicators::DrawdownOperator>()?;
     m.add_class::<indicators::RollingSharpeOperator>()?;
     m.add_class::<indicators::RollingSortinoOperator>()?;

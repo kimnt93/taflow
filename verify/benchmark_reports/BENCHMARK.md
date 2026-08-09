@@ -474,10 +474,10 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 9.12× | 2.24× | 1.31× | 1.13× |
-| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 6.75× | 2.15× | 1.29× | 1.07× |
-| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 10.41× | 3.65× | 1.96× | 1.54× |
-| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 11.25× | 3.54× | 2.03× | 1.71× |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 10.42× | 3.14× | 1.74× | 1.63× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 10.89× | 2.95× | 1.73× | 1.60× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 18.28× | 7.45× | 4.60× | 3.94× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 18.30× | 7.19× | 4.62× | 3.96× |
 | CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
@@ -515,10 +515,10 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
-| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 11.76× | 2.61× | 0.48× | 0.38× |
 | LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
-| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
+| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 21.32× | 3.07× | 0.95× | 1.22× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
@@ -684,10 +684,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 1.72× | 2.03× | 2.52× |
-| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.88× | 2.17× | 2.70× |
-| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.79× | 2.56× | 2.54× |
-| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.23× | 2.29× | 3.28× |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 4.43× | 2.59× | 2.60× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.22× | 2.70× | 2.80× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 1.17× | 2.16× | 2.71× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 1.91× | 2.89× | 2.91× |
 | CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -737,10 +737,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 1.45× | 2.64× | 2.92× |
 | LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 3.53× | 3.71× | 5.20× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -976,10 +976,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.78× | 2.48× | 2.56× |
-| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 4.05× | 2.47× | 2.67× |
-| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.99× | 2.48× | 2.76× |
-| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.86× | 2.61× | 2.53× |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.15× | 2.46× | 2.70× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.15× | 2.65× | 2.67× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.03× | 2.49× | 3.19× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.02× | 2.47× | 2.67× |
 | CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1029,10 +1029,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.63× | 2.84× | 2.95× |
 | LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.52× | 5.31× | 5.06× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1268,10 +1268,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.94× | 2.32× | 2.54× |
-| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.15× | 2.26× | 2.32× |
-| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.02× | 2.60× | 2.62× |
-| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.98× | 2.53× | 2.51× |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.21× | 2.56× | 2.71× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.59× | 2.63× | 2.54× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.17× | 2.55× | 2.49× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.18× | 2.65× | 2.59× |
 | CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1321,10 +1321,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.68× | 2.91× | 2.85× |
 | LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.51× | 5.32× | 5.10× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1560,10 +1560,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Crossover | [pandas-ta-classic: `pandas-ta-classic.crossover`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Crossunder | [pandas-ta-classic: `pandas-ta-classic.crossunder`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | CumulativeCount | [pandas: `pandas.cumulative_count`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 2.98× | 2.40× | 2.40× |
-| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.02× | 2.36× | 2.30× |
-| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.06× | 2.43× | 2.36× |
-| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.23× | 2.54× | 2.50× |
+| CumulativeMaximum | [Polars: `Polars.cumulative_maximum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.21× | 2.33× | 2.29× |
+| CumulativeMinimum | [Polars: `Polars.cumulative_minimum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.03× | 2.39× | 2.32× |
+| CumulativeProduct | [Polars: `Polars.cumulative_product`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.13× | 2.48× | 2.45× |
+| CumulativeSum | [Polars: `Polars.cumulative_sum`](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | 3.09× | 2.44× | 2.46× |
 | CumulativeSumControlChart | [pandas: `pandas.cumulative_sum_control_chart`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DecayLinear | [pandas: `pandas.decay_linear`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | DetrendedPriceOscillator | [pandas-ta-classic: `pandas_ta_classic.dpo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1613,10 +1613,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.60× | 2.83× | 2.99× |
 | LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.47× | 5.48× | 5.42× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | LowestSince | [pandas: `pandas.lowest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | MassIndex | [pandas-ta-classic: `pandas-ta-classic.mass_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |

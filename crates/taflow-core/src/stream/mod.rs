@@ -254,9 +254,17 @@ mod volume_states;
 pub use session_flags::session_flags;
 mod cumulative_count;
 mod cumulative_maximum;
+#[cfg(test)]
+mod cumulative_maximum_test;
 mod cumulative_minimum;
+#[cfg(test)]
+mod cumulative_minimum_test;
 mod cumulative_product;
+#[cfg(test)]
+mod cumulative_product_test;
 mod cumulative_sum;
+#[cfg(test)]
+mod cumulative_sum_test;
 #[allow(unused_imports)]
 pub(crate) use cumulative_count::cumulative_count;
 pub use cumulative_count::CumulativeCount;
@@ -272,10 +280,14 @@ mod helpers;
 mod jurik_moving_average;
 mod klinger_volume_oscillator;
 mod lag;
+#[cfg(test)]
+mod lag_test;
 mod lagged;
 mod lagged_common;
 mod laguerre_rsi;
 mod log_return;
+#[cfg(test)]
+mod log_return_test;
 mod momentum;
 mod opening_range;
 mod operator_states;
@@ -1397,18 +1409,6 @@ mod positive_volume_index;
 #[allow(unused_imports)]
 pub(crate) use positive_volume_index::positive_volume_index;
 mod mcginley_dynamic;
-#[allow(unused_imports)]
-pub(crate) use cumulative_maximum::cumulative_maximum;
-#[allow(unused_imports)]
-pub(crate) use cumulative_minimum::cumulative_minimum;
-#[allow(unused_imports)]
-pub(crate) use cumulative_product::cumulative_product;
-#[allow(unused_imports)]
-pub(crate) use cumulative_sum::cumulative_sum;
-#[allow(unused_imports)]
-pub(crate) use lag::lag;
-#[allow(unused_imports)]
-pub(crate) use log_return::log_return;
 #[allow(unused_imports)]
 pub(crate) use mcginley_dynamic::mcginley_dynamic;
 #[allow(unused_imports)]

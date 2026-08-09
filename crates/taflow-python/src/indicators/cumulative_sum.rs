@@ -1,45 +1,52 @@
 use numpy::{PyArray1, PyReadonlyArray1};
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CumulativeProduct;
+use taflow::stream::CumulativeSum as CumulativeSumState;
 
 #[pyclass]
-pub struct CumulativeProductOperator {
-    inner: CumulativeProduct,
+pub struct CumulativeSum {
+    inner: CumulativeSumState,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl CumulativeProductOperator {
+impl CumulativeSum {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: CumulativeProduct::new(),
+    fn new() -> PyResult<Self> {
+        Ok(Self {
+            inner: CumulativeSumState::new()
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
-        }
+        })
     }
+
     fn append(&mut self, input: f64) -> f64 {
         let value = self.inner.append(input);
         self.outputs.push(value);
         value
     }
+
     fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
         let input = input.as_slice()?;
-        py.allow_threads(|| {
-            for &value in input {
-                self.append(value);
-            }
-        });
+        py.allow_threads(|| self.inner.extend_slice_into(input, &mut self.outputs));
         Ok(())
     }
+
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
         PyArray1::from_vec(py, self.outputs.clone())
     }
+
     #[getter]
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
+
     fn reset(&mut self) {
         self.inner.reset();
         self.outputs.clear();
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
     }
 }

@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Lag;
+use taflow::stream::Lag as LagState;
 
 #[pyclass]
-pub struct LagOperator {
-    inner: Lag,
+pub struct Lag {
+    inner: LagState,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl LagOperator {
+impl Lag {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: Lag::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: LagState::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }
@@ -25,11 +25,7 @@ impl LagOperator {
     }
     fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
         let input = input.as_slice()?;
-        py.allow_threads(|| {
-            for &value in input {
-                self.append(value);
-            }
-        });
+        py.allow_threads(|| self.inner.extend_slice_into(input, &mut self.outputs));
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
@@ -42,5 +38,8 @@ impl LagOperator {
     fn reset(&mut self) {
         self.inner.reset();
         self.outputs.clear();
+    }
+    fn __len__(&self) -> usize {
+        self.outputs.len()
     }
 }

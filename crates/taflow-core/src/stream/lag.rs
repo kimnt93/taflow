@@ -2,7 +2,7 @@
 
 use std::collections::VecDeque;
 
-use super::operator_states::validate_period;
+use super::{operator_states::validate_period, StreamingIndicator};
 use crate::TaResult;
 
 /// Delays a scalar series by a fixed number of bars.
@@ -43,6 +43,16 @@ impl Lag {
         self.value
     }
 
+    /// Append a slice into `output` with `NaN` at warm-up positions.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        output.extend(
+            input
+                .iter()
+                .map(|&input| self.append(input).unwrap_or(f64::NAN)),
+        );
+    }
+
     /// Returns the latest delayed value, or `None` during warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
@@ -55,21 +65,18 @@ impl Lag {
     }
 }
 
-/// Compute the lag result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn lag(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    validate_period(timeperiod)?;
-    let mut output = vec![f64::NAN; input.len()];
-    for index in timeperiod..input.len() {
-        output[index] = input[index - timeperiod];
+impl StreamingIndicator for Lag {
+    type Output = f64;
+
+    fn append(&mut self, input: f64) -> Option<Self::Output> {
+        Self::append(self, input)
     }
-    Ok(output)
+
+    fn value(&self) -> Option<Self::Output> {
+        Self::value(self)
+    }
+
+    fn reset(&mut self) {
+        Self::reset(self);
+    }
 }

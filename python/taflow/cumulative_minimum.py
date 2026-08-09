@@ -1,95 +1,49 @@
-"""Persistent cumulative minimum operator."""
+"""Persistent cumulative minimum indicator."""
 
 from typing import Any
+
 import numpy as np
-from ._native import CumulativeMinimumOperator as _Native
+
+from ._native import CumulativeMinimum as _NativeCumulativeMinimum
 from ._series import as_float64_series
 
 
 class CumulativeMinimum:
-    """Persistent cumulative minimum operator.
+    """Compute the cumulative minimum in persistent Rust state.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    ``_input`` is a required chronological numeric series; pass an empty array
+    for a fresh streaming state. There is no warm-up. Correctness maps to the
+    Polars ``Series.cum_min`` expression.
+    """
 
-    def __init__(
-        self,
-        _input: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = _Native()
-        self.extend(_input) if _input is not None else None
+    def __init__(self, _input: Any) -> None:
+        self._state = _NativeCumulativeMinimum()
+        self.extend(_input)
 
     def append(self, _input: float) -> "CumulativeMinimum":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(_input)
+        """Append one observation and return this indicator."""
+        self._state.append(float(_input))
         return self
 
     def extend(self, _input: Any) -> "CumulativeMinimum":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append chronological observations and return this indicator."""
         self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the complete aligned ``float64`` history."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> float | None:
+        """Return the latest result, or ``None`` before the first value."""
         return self._state.value
 
     def reset(self) -> "CumulativeMinimum":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this indicator."""
         self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed observations."""
+        return len(self._state)
