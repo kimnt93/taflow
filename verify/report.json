@@ -647,9 +647,6 @@
   "function": "STDDEV",
   "taflow_class": "RollingStandardDeviation",
   "oracle": "TA-Lib",
-  "warnings": [
-   "talib param 'nbdev' (default 1.0) has no constructor counterpart \u2014 compared at defaults only"
-  ],
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,
@@ -696,9 +693,6 @@
   "function": "VAR",
   "taflow_class": "RollingVariance",
   "oracle": "TA-Lib",
-  "warnings": [
-   "talib param 'nbdev' (default 1.0) has no constructor counterpart \u2014 compared at defaults only"
-  ],
   "batch_vs_oracle": {
    "passed": true,
    "nan_mismatches": 0,

@@ -307,4 +307,4 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 
 - Mismatches: none
 - Errors (class/mapping/runtime): none
-- Compared at TA-Lib defaults only (unmapped params): STDDEV, VAR, CDLABANDONEDBABY, CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD, CDLMORNINGDOJISTAR, CDLMORNINGSTAR
+- Compared at TA-Lib defaults only (unmapped params): CDLABANDONEDBABY, CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD, CDLMORNINGDOJISTAR, CDLMORNINGSTAR
