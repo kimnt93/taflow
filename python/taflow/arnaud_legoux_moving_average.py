@@ -1,15 +1,24 @@
-"""Persistent Arnaud Legoux moving average."""
+"""Native-backed Arnaud Legoux moving-average adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import AlmaOperator as _Native
 from ._series import as_float64_series
 
 
 class ArnaudLegouxMovingAverage:
-    """Persistent Arnaud Legoux moving average.
+    """Compute the Gaussian-weighted Arnaud Legoux moving average.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    ``_input`` is the required chronological price series and may be empty for
+    a fresh stream. ``timeperiod`` defaults to 10, ``offset`` to 0.85, and
+    ``sigma`` to 6.0. Rust owns Gaussian weights, warm-up, and aligned output;
+    ``compute`` returns one float array, ``value`` is the latest scalar or
+    ``None`` during warm-up, and lifecycle mutators return ``self``. The oracle
+    is pandas-ta-classic ``alma``; its initialization difference is recorded as
+    a documented VARIANT by the verifier.
+    """
 
     def __init__(
         self,
@@ -18,96 +27,41 @@ class ArnaudLegouxMovingAverage:
         offset: float = 0.85,
         sigma: float = 6.0,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        timeperiod : object
-            Trailing window length in bars.
-        offset : object
-            Moving-average center offset.
-        sigma : object
-            Moving-average Gaussian width.
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = _Native(timeperiod, offset, sigma)
+        self._state = _Native(int(timeperiod), float(offset), float(sigma))
         self._length = 0
         self.extend(_input)
 
     def append(self, _input: float) -> "ArnaudLegouxMovingAverage":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append one observation and return this adapter."""
         self._state.append(float(_input))
         self._length += 1
         return self
 
     def extend(self, _input: Any) -> "ArnaudLegouxMovingAverage":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append a chronological observation series and return this adapter."""
         values = as_float64_series(_input)
         self._state.extend(values)
         self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned Arnaud Legoux average history."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest average, or ``None`` during warm-up."""
         return self._state.value
 
-    def __len__(self) -> int:
-        """Return the number of observations consumed by this state."""
-        return self._length
-
     def reset(self) -> "ArnaudLegouxMovingAverage":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
         self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed observations."""
+        return self._length
+
+
+__all__ = ["ArnaudLegouxMovingAverage"]
