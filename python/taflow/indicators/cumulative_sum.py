@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import CumulativeSum as _NativeCumulativeSum
-from ._series import as_float64_series
+from .._native import CumulativeSum as _NativeCumulativeSum
+from .._series import as_float64_series
 
 
 class CumulativeSum:

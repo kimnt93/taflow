@@ -264,7 +264,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::AccumulationDistributionOscillator>()?;
     m.add_class::<state_api::OnBalanceVolume>()?;
     m.add_class::<state_api::BalanceOfPower>()?;
-    m.add_class::<state_api::WilliamsPercentR>()?;
+    m.add_class::<indicators::WilliamsPercentR>()?;
     m.add_class::<state_api::Aroon>()?;
     m.add_class::<state_api::AroonOscillator>()?;
     m.add_class::<state_api::AveragePrice>()?;

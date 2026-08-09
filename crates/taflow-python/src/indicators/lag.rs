@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Lag as LagState;
+use taflow::indicators::Lag as LagState;
 
 #[pyclass]
 pub struct Lag {

@@ -1,16 +1,16 @@
-//! Persistent cumulative product state.
+//! Persistent cumulative sum state.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Compute the cumulative product of chronological scalar observations.
+/// Compute the cumulative sum of chronological scalar observations.
 #[derive(Debug, Clone)]
-pub struct CumulativeProduct {
+pub struct CumulativeSum {
     total: f64,
     value: Option<f64>,
 }
 
-impl CumulativeProduct {
+impl CumulativeSum {
     /// Create a fresh cumulative state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -18,7 +18,7 @@ impl CumulativeProduct {
 
     /// Append one value and return the current cumulative result.
     pub fn append(&mut self, input: f64) -> f64 {
-        self.total *= input;
+        self.total += input;
         self.value = Some(self.total);
         self.total
     }
@@ -36,21 +36,21 @@ impl CumulativeProduct {
 
     /// Restore fresh-state behavior without reallocating.
     pub fn reset(&mut self) {
-        self.total = 1.0;
+        self.total = 0.0;
         self.value = None;
     }
 }
 
-impl Default for CumulativeProduct {
+impl Default for CumulativeSum {
     fn default() -> Self {
         Self {
-            total: 1.0,
+            total: 0.0,
             value: None,
         }
     }
 }
 
-impl StreamingIndicator for CumulativeProduct {
+impl StreamingIndicator for CumulativeSum {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

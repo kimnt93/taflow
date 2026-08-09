@@ -1,7 +1,6 @@
 //! Causal logarithmic-return state.
 
-use super::StreamingIndicator;
-use crate::{stream::Lag, TaResult};
+use crate::{indicators::Lag, stream::StreamingIndicator, TaResult};
 
 /// Computes `ln(x_t / x_(t-n))` with causal warm-up.
 #[derive(Debug, Clone)]

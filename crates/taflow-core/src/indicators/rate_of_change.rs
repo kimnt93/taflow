@@ -1,18 +1,19 @@
-//! Persistent momentum state.
+//! Persistent percentage rate-of-change state.
 
-use crate::error::TaResult;
+use crate::TaResult;
 
-use super::{lagged_common::LaggedValue, StreamingIndicator};
+use crate::stream::lagged_common::LaggedValue;
+use crate::stream::StreamingIndicator;
 
-/// Computes the causal difference from the value `period` bars earlier.
+/// Computes percentage rate of change incrementally.
 #[derive(Debug, Clone)]
-pub struct Momentum {
+pub struct RateOfChange {
     lag: LaggedValue,
     value: Option<f64>,
 }
 
-impl Momentum {
-    /// Creates momentum state for a positive lag period.
+impl RateOfChange {
+    /// Creates rate-of-change state for a positive lag period.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             lag: LaggedValue::new(period)?,
@@ -20,12 +21,15 @@ impl Momentum {
         })
     }
 
-    /// Appends one chronological value and returns the current momentum.
+    /// Appends one value and returns `100 * (current - previous) / previous`.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self
-            .lag
-            .append(input)
-            .map(|(current, previous)| current - previous);
+        self.value = self.lag.append(input).map(|(current, previous)| {
+            if previous != 0.0 {
+                (current - previous) / previous * 100.0
+            } else {
+                0.0
+            }
+        });
         self.value
     }
 
@@ -39,7 +43,7 @@ impl Momentum {
         );
     }
 
-    /// Returns the latest momentum, or `None` during warm-up.
+    /// Returns the latest percentage rate of change.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
@@ -51,17 +55,14 @@ impl Momentum {
     }
 }
 
-impl StreamingIndicator for Momentum {
+impl StreamingIndicator for RateOfChange {
     type Output = f64;
-
     fn append(&mut self, input: f64) -> Option<f64> {
         Self::append(self, input)
     }
-
     fn value(&self) -> Option<f64> {
         Self::value(self)
     }
-
     fn reset(&mut self) {
         Self::reset(self);
     }

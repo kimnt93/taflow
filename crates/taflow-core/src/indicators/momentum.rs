@@ -1,16 +1,19 @@
-//! Persistent hundred-scaled rate-of-change-ratio state.
+//! Persistent momentum state.
 
-use super::{lagged_common::LaggedValue, StreamingIndicator};
-use crate::TaResult;
+use crate::error::TaResult;
 
-/// Computes the scaled lagged ratio incrementally.
+use crate::stream::lagged_common::LaggedValue;
+use crate::stream::StreamingIndicator;
+
+/// Computes the causal difference from the value `period` bars earlier.
 #[derive(Debug, Clone)]
-pub struct RateOfChangeRatioPercent {
+pub struct Momentum {
     lag: LaggedValue,
     value: Option<f64>,
 }
-impl RateOfChangeRatioPercent {
-    /// Creates scaled ratio state for a positive lag period.
+
+impl Momentum {
+    /// Creates momentum state for a positive lag period.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             lag: LaggedValue::new(period)?,
@@ -18,15 +21,12 @@ impl RateOfChangeRatioPercent {
         })
     }
 
-    /// Appends one value and returns `100 * current / previous`.
+    /// Appends one chronological value and returns the current momentum.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self.lag.append(input).map(|(current, previous)| {
-            if previous != 0.0 {
-                current / previous * 100.0
-            } else {
-                0.0
-            }
-        });
+        self.value = self
+            .lag
+            .append(input)
+            .map(|(current, previous)| current - previous);
         self.value
     }
 
@@ -40,7 +40,7 @@ impl RateOfChangeRatioPercent {
         );
     }
 
-    /// Returns the latest hundred-scaled rate-of-change ratio.
+    /// Returns the latest momentum, or `None` during warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
@@ -51,14 +51,18 @@ impl RateOfChangeRatioPercent {
         self.value = None;
     }
 }
-impl StreamingIndicator for RateOfChangeRatioPercent {
+
+impl StreamingIndicator for Momentum {
     type Output = f64;
+
     fn append(&mut self, input: f64) -> Option<f64> {
         Self::append(self, input)
     }
+
     fn value(&self) -> Option<f64> {
         Self::value(self)
     }
+
     fn reset(&mut self) {
         Self::reset(self);
     }

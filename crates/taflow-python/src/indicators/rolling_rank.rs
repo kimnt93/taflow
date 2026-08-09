@@ -13,8 +13,7 @@ impl RollingRank {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new(timeperiod)
-                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

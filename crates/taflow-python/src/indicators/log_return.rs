@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::LogReturn as LogReturnState;
+use taflow::indicators::LogReturn as LogReturnState;
 
 #[pyclass]
 pub struct LogReturn {

@@ -6,7 +6,7 @@ use super::invalid_period;
 
 /// A pure delay line: a ring of `period` values with one cursor.
 #[derive(Debug, Clone)]
-pub(super) struct LaggedValue {
+pub(crate) struct LaggedValue {
     buf: Box<[f64]>,
     /// Slot holding the value from `period` bars ago once warm.
     cursor: usize,
@@ -14,7 +14,7 @@ pub(super) struct LaggedValue {
 }
 
 impl LaggedValue {
-    pub(super) fn new(period: usize) -> TaResult<Self> {
+    pub(crate) fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(invalid_period("timeperiod", period, 1));
         }
@@ -26,7 +26,7 @@ impl LaggedValue {
     }
 
     #[inline]
-    pub(super) fn append(&mut self, input: f64) -> Option<(f64, f64)> {
+    pub(crate) fn append(&mut self, input: f64) -> Option<(f64, f64)> {
         let period = self.buf.len();
         if self.len < period {
             self.buf[self.cursor] = input;
@@ -46,7 +46,7 @@ impl LaggedValue {
         Some((input, previous))
     }
 
-    pub(super) fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         self.cursor = 0;
         self.len = 0;
     }

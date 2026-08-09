@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CumulativeSum as CumulativeSumState;
+use taflow::indicators::CumulativeSum as CumulativeSumState;
 
 #[pyclass]
 pub struct CumulativeSum {

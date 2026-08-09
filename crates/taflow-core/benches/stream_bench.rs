@@ -1,11 +1,14 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use taflow::indicators::{
+    Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent,
+    WilliamsPercentR,
+};
 use taflow::stream::{
     self, AbsolutePriceOscillator, AccelerationBands, AverageTrueRange, BollingerBands,
     DoubleExponentialMovingAverage, ExponentialMovingAverage, FastStochasticOscillator,
-    IntradayMomentumIndex, MesaAdaptiveMovingAverage, Momentum, MovingAverage,
+    IntradayMomentumIndex, MesaAdaptiveMovingAverage, MovingAverage,
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceFixed,
     NormalizedAverageTrueRange, ParabolicSar, ParabolicSarExtended, PercentagePriceOscillator,
-    RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent,
     RelativeStrengthIndex, RollingMidpoint, RollingMidprice, SimpleMovingAverage,
     StochasticOscillator, StreamingIndicator, TriangularMovingAverage, TripleExponentialAverage,
     TripleExponentialMovingAverage, TrueRange, WeightedMovingAverage,
@@ -472,7 +475,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("willr", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::WilliamsPercentR::new(14).unwrap();
+            let mut state = WilliamsPercentR::new(14).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }

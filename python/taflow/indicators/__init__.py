@@ -87,10 +87,16 @@ from ..candle_thrusting import CandleThrusting
 from ..candle_tri_star import CandleTriStar
 from ..candle_unique_three_river import CandleUniqueThreeRiver
 from ..candle_upside_gap_two_crows import CandleUpsideGapTwoCrows
-from ..lag import Lag
-from ..log_return import LogReturn
-from ..cumulative_sum import CumulativeSum
-from ..cumulative_product import CumulativeProduct
+from .lag import Lag
+from .log_return import LogReturn
+from .cumulative_sum import CumulativeSum
+from .cumulative_product import CumulativeProduct
+from .momentum import Momentum
+from .rate_of_change import RateOfChange
+from .rate_of_change_percent import RateOfChangePercent
+from .rate_of_change_ratio import RateOfChangeRatio
+from .rate_of_change_ratio_percent import RateOfChangeRatioPercent
+from .williams_percent_r import WilliamsPercentR
 from ..rolling_median import RollingMedian
 from .rolling_mode import RollingMode
 from .rolling_quantile import RollingQuantile
@@ -268,6 +274,12 @@ __all__ = [
     "CandleUpsideGapTwoCrows",
     "Lag",
     "LogReturn",
+    "Momentum",
+    "RateOfChange",
+    "RateOfChangePercent",
+    "RateOfChangeRatio",
+    "RateOfChangeRatioPercent",
+    "WilliamsPercentR",
     "CumulativeSum",
     "CumulativeProduct",
     "CumulativeCount",

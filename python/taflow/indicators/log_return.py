@@ -1,32 +1,32 @@
-"""Persistent causal lag indicator."""
+"""Persistent causal logarithmic-return indicator."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import Lag as _NativeLag
-from ._series import as_float64_series
+from .._native import LogReturn as _NativeLogReturn
+from .._series import as_float64_series
 
 
-class Lag:
-    """Return the value from ``timeperiod`` bars earlier using Rust state.
+class LogReturn:
+    """Compute ``ln(x[t] / x[t-timeperiod])`` using persistent Rust state.
 
     ``_input`` is required; pass an empty series for a fresh streaming state.
     ``timeperiod`` defaults to 1 and must be positive. The first
     ``timeperiod`` history positions are ``NaN``. Correctness maps to pandas
-    ``Series.shift``.
+    shifted division followed by ``numpy.log``.
     """
 
     def __init__(self, _input: Any, timeperiod: int = 1) -> None:
-        self._state = _NativeLag(timeperiod)
+        self._state = _NativeLogReturn(timeperiod)
         self.extend(_input)
 
-    def append(self, _input: float) -> "Lag":
+    def append(self, _input: float) -> "LogReturn":
         """Append one observation and return this indicator."""
         self._state.append(float(_input))
         return self
 
-    def extend(self, _input: Any) -> "Lag":
+    def extend(self, _input: Any) -> "LogReturn":
         """Append chronological observations and return this indicator."""
         self._state.extend(as_float64_series(_input))
         return self
@@ -37,10 +37,10 @@ class Lag:
 
     @property
     def value(self) -> float | None:
-        """Return the latest delayed value, or ``None`` during warm-up."""
+        """Return the latest logarithmic return, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self) -> "Lag":
+    def reset(self) -> "LogReturn":
         """Restore fresh native state and return this indicator."""
         self._state.reset()
         return self

@@ -1,6 +1,7 @@
 //! Persistent fractional rate-of-change state.
 
-use super::{lagged_common::LaggedValue, StreamingIndicator};
+use crate::stream::lagged_common::LaggedValue;
+use crate::stream::StreamingIndicator;
 use crate::TaResult;
 
 /// Computes fractional rate of change incrementally.

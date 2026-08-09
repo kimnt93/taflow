@@ -1,7 +1,7 @@
 //! Persistent Williams Percent R state.
 
-use super::{invalid_period, vhgw, MonotonicMax, MonotonicMin};
 use crate::error::{TaError, TaResult};
+use crate::stream::{invalid_period, vhgw, MonotonicMax, MonotonicMin};
 
 /// Locate the close within the trailing high-low range on a -100 to 0 scale.
 #[derive(Debug, Clone)]

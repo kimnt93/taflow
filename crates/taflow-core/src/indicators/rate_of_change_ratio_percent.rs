@@ -1,16 +1,17 @@
-//! Persistent rate-of-change-ratio state.
+//! Persistent hundred-scaled rate-of-change-ratio state.
 
-use super::{lagged_common::LaggedValue, StreamingIndicator};
+use crate::stream::lagged_common::LaggedValue;
+use crate::stream::StreamingIndicator;
 use crate::TaResult;
 
-/// Computes the lagged value ratio incrementally.
+/// Computes the scaled lagged ratio incrementally.
 #[derive(Debug, Clone)]
-pub struct RateOfChangeRatio {
+pub struct RateOfChangeRatioPercent {
     lag: LaggedValue,
     value: Option<f64>,
 }
-impl RateOfChangeRatio {
-    /// Creates ratio state for a positive lag period.
+impl RateOfChangeRatioPercent {
+    /// Creates scaled ratio state for a positive lag period.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             lag: LaggedValue::new(period)?,
@@ -18,11 +19,11 @@ impl RateOfChangeRatio {
         })
     }
 
-    /// Appends one value and returns `current / previous`.
+    /// Appends one value and returns `100 * current / previous`.
     pub fn append(&mut self, input: f64) -> Option<f64> {
         self.value = self.lag.append(input).map(|(current, previous)| {
             if previous != 0.0 {
-                current / previous
+                current / previous * 100.0
             } else {
                 0.0
             }
@@ -40,7 +41,7 @@ impl RateOfChangeRatio {
         );
     }
 
-    /// Returns the latest rate-of-change ratio.
+    /// Returns the latest hundred-scaled rate-of-change ratio.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
@@ -51,7 +52,7 @@ impl RateOfChangeRatio {
         self.value = None;
     }
 }
-impl StreamingIndicator for RateOfChangeRatio {
+impl StreamingIndicator for RateOfChangeRatioPercent {
     type Output = f64;
     fn append(&mut self, input: f64) -> Option<f64> {
         Self::append(self, input)

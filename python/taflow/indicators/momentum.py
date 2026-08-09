@@ -1,32 +1,31 @@
-"""Persistent percentage Rate of Change adapter."""
+"""Persistent Momentum adapter."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import RateOfChange as _NativeRateOfChange
-from ._series import as_float64_series
+from .._native import Momentum as _NativeMomentum
+from .._series import as_float64_series
 
 
-class RateOfChange:
-    """Compute ``100 * (current - previous) / previous`` in Rust.
+class Momentum:
+    """Compute the causal difference from ``timeperiod`` bars earlier.
 
     ``values`` is required; pass an empty series to create a fresh streaming
     state. ``timeperiod`` defaults to 14 and must be positive. The first
-    ``timeperiod`` outputs are NaN; a warmed zero denominator produces zero,
-    matching TA-Lib ``ROC``.
+    ``timeperiod`` aligned outputs are NaN. This maps to TA-Lib ``MOM``.
     """
 
     def __init__(self, values: Any, timeperiod: int = 14) -> None:
-        self._state = _NativeRateOfChange(timeperiod)
+        self._state = _NativeMomentum(timeperiod)
         self.extend(values)
 
-    def append(self, value: float) -> "RateOfChange":
+    def append(self, value: float) -> "Momentum":
         """Append one chronological value and return this indicator."""
         self._state.append(float(value))
         return self
 
-    def extend(self, values: Any) -> "RateOfChange":
+    def extend(self, values: Any) -> "Momentum":
         """Append a chronological series and return this indicator."""
         self._state.extend(as_float64_series(values))
         return self
@@ -37,10 +36,10 @@ class RateOfChange:
 
     @property
     def value(self) -> float | None:
-        """Return the latest percentage rate of change, or ``None`` in warm-up."""
+        """Return the latest momentum, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self) -> "RateOfChange":
+    def reset(self) -> "Momentum":
         """Restore fresh native state, clear history, and return this indicator."""
         self._state.reset()
         return self

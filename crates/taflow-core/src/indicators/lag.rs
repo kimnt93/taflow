@@ -2,7 +2,7 @@
 
 use std::collections::VecDeque;
 
-use super::{operator_states::validate_period, StreamingIndicator};
+use crate::stream::{operator_states::validate_period, StreamingIndicator};
 use crate::TaResult;
 
 /// Delays a scalar series by a fixed number of bars.

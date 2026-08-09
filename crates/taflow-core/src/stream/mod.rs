@@ -430,7 +430,7 @@ mod statistic;
 mod variable_period_moving_average;
 #[cfg(test)]
 mod variable_period_moving_average_test;
-mod vhgw;
+pub(crate) mod vhgw;
 pub use session_flags::session_flags;
 mod cumulative_maximum;
 #[cfg(test)]
@@ -438,16 +438,8 @@ mod cumulative_maximum_test;
 mod cumulative_minimum;
 #[cfg(test)]
 mod cumulative_minimum_test;
-mod cumulative_product;
-#[cfg(test)]
-mod cumulative_product_test;
-mod cumulative_sum;
-#[cfg(test)]
-mod cumulative_sum_test;
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
-pub use cumulative_product::CumulativeProduct;
-pub use cumulative_sum::CumulativeSum;
 mod active_zone_list;
 #[cfg(test)]
 mod active_zone_list_test;
@@ -464,19 +456,10 @@ mod helpers;
 mod jurik_moving_average;
 #[cfg(test)]
 mod jurik_moving_average_test;
-mod lag;
-#[cfg(test)]
-mod lag_test;
-mod lagged_common;
+pub(crate) mod lagged_common;
 mod laguerre_relative_strength_index;
 #[cfg(test)]
 mod laguerre_relative_strength_index_test;
-mod log_return;
-#[cfg(test)]
-mod log_return_test;
-mod momentum;
-#[cfg(test)]
-mod momentum_test;
 pub(crate) mod operator_states;
 pub use active_zone_list::ActiveZoneList;
 mod fast_stochastic_oscillator;
@@ -488,18 +471,6 @@ mod parabolic_sar_extended;
 mod parabolic_sar_extended_test;
 #[cfg(test)]
 mod parabolic_sar_test;
-mod rate_of_change;
-mod rate_of_change_percent;
-#[cfg(test)]
-mod rate_of_change_percent_test;
-mod rate_of_change_ratio;
-mod rate_of_change_ratio_percent;
-#[cfg(test)]
-mod rate_of_change_ratio_percent_test;
-#[cfg(test)]
-mod rate_of_change_ratio_test;
-#[cfg(test)]
-mod rate_of_change_test;
 mod relative_momentum_index;
 #[cfg(test)]
 mod relative_momentum_index_test;
@@ -631,14 +602,11 @@ pub use indicator::StreamingIndicator;
 pub use intraday_momentum_index::IntradayMomentumIndex;
 pub use jurik_moving_average::JurikMovingAverage;
 pub use kaufman_adaptive_moving_average::KaufmanAdaptiveMovingAverage;
-pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
-pub use log_return::LogReturn;
 pub use mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
 pub use minus_directional_indicator::MinusDirectionalIndicator;
 pub use minus_directional_movement::MinusDirectionalMovement;
-pub use momentum::Momentum;
 pub use money_flow_index::MoneyFlowIndex;
 pub use moving_average::MovingAverage;
 pub use moving_average_convergence_divergence::{
@@ -650,10 +618,6 @@ pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDiv
 pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use plus_directional_indicator::PlusDirectionalIndicator;
 pub use plus_directional_movement::PlusDirectionalMovement;
-pub use rate_of_change::RateOfChange;
-pub use rate_of_change_percent::RateOfChangePercent;
-pub use rate_of_change_ratio::RateOfChangeRatio;
-pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
 pub use relative_momentum_index::RelativeMomentumIndex;
 pub use rolling_argmax::RollingArgmax;
 pub use rolling_argmin::RollingArgmin;
@@ -1217,9 +1181,6 @@ mod time_series_rank_test;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
-mod williams_percent_r;
-#[cfg(test)]
-mod williams_percent_r_test;
 mod yang_zhang;
 #[cfg(test)]
 mod yang_zhang_test;
@@ -1460,4 +1421,3 @@ pub use rolling_standard_deviation::RollingStandardDeviation;
 pub use rolling_variance::RollingVariance;
 pub use true_range::TrueRange;
 pub use volume_price_trend::VolumePriceTrend;
-pub use williams_percent_r::WilliamsPercentR;

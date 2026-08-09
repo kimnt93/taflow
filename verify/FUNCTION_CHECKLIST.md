@@ -39,6 +39,15 @@ MATCH results passed. Generated inventory/export rows below may retain stale
 historical binding names; the source scan is authoritative. Benchmark fields
 remain `TODO` intentionally; no benchmark command was run.
 
+The fourth structural batch migrated `CumulativeProduct`, `CumulativeSum`,
+`Lag`, `LogReturn`, `Momentum`, `RateOfChange`, `RateOfChangePercent`,
+`RateOfChangeRatio`, `RateOfChangeRatioPercent`, and `WilliamsPercentR`.
+`WilliamsPercentR` was also removed from the multi-indicator `state_api.rs` and
+given its own PyO3 binding file. Rust lifecycle tests, the release PyO3 build,
+the full Python suite, interface audit, and ten external-oracle MATCH results
+passed. Benchmark fields remain `TODO` intentionally; no benchmark command was
+run.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**
