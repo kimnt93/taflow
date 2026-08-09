@@ -34,8 +34,8 @@ class SpreadZScore:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        if x is not None or y is not None:
-            self.extend(x, y)
+        self._length = 0
+        self.extend(x, y)
 
     def append(self, x: float, y: float) -> "SpreadZScore":
         """Append one observation or aligned bar to the native Rust state.
@@ -52,7 +52,8 @@ class SpreadZScore:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(x, y)
+        self._state.append(float(x), float(y))
+        self._length += 1
         return self
 
     def extend(self, x: Any, y: Any) -> "SpreadZScore":
@@ -70,7 +71,12 @@ class SpreadZScore:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(x), as_float64_series(y))
+        x_array = as_float64_series(x)
+        y_array = as_float64_series(y)
+        if x_array.shape != y_array.shape:
+            raise ValueError("x and y must have equal lengths")
+        self._state.extend(x_array, y_array)
+        self._length += len(x_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -84,7 +90,7 @@ class SpreadZScore:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -103,4 +109,9 @@ class SpreadZScore:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed pairs."""
+        return self._length

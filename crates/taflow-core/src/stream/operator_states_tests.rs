@@ -268,7 +268,12 @@ mod tests {
         let y = vec![20.0, 22.0, 18.5, 23.0, 25.0, 22.0];
         let period = 4;
 
-        let z = spread_zscore(&x, &y, period).unwrap();
+        let mut z_state = SpreadZScore::new(period).unwrap();
+        let z: Vec<f64> = x
+            .iter()
+            .zip(&y)
+            .map(|(&x, &y)| z_state.append(x, y).unwrap_or(f64::NAN))
+            .collect();
         assert!(z[..period - 1].iter().all(|&value| value.is_nan()));
 
         let mut hedge_state = HedgeRatio::new(period).unwrap();

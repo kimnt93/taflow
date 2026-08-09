@@ -1326,10 +1326,10 @@ pub(crate) use ornstein_uhlenbeck_half_life::ornstein_uhlenbeck_half_life;
 mod cumulative_sum_control_chart;
 #[allow(unused_imports)]
 pub(crate) use cumulative_sum_control_chart::cumulative_sum_control_chart;
-mod spread_zscore;
-#[allow(unused_imports)]
-pub(crate) use spread_zscore::spread_zscore;
 mod frac_diff;
+mod spread_zscore;
+#[cfg(test)]
+mod spread_zscore_test;
 #[allow(unused_imports)]
 pub(crate) use frac_diff::frac_diff;
 mod kalman_hedge_ratio;
