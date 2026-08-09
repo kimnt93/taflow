@@ -105,16 +105,15 @@ from .indicators import OpeningRange
 from .indicators import PivotPoints
 from . import executions
 from . import op
-from .math_abs import MathAbs
-from .math_acos import MathAcos
+from .indicators import MathAbs, MathAcos
 from .math_acosh import MathAcosh
-from .math_asin import MathAsin
+from .indicators import MathAsin
 from .math_asinh import MathAsinh
-from .math_atan import MathAtan
+from .indicators import MathAtan
 from .math_atanh import MathAtanh
 from .math_cbrt import MathCbrt
 from .math_ceil import MathCeil
-from .math_cos import MathCos
+from .indicators import MathCos
 from .math_cosh import MathCosh
 from .math_cot import MathCot
 from .math_degrees import MathDegrees
@@ -124,7 +123,7 @@ from .math_ln import MathLn
 from .math_log10 import MathLog10
 from .math_log1p import MathLog1p
 from .math_radians import MathRadians
-from .math_sin import MathSin
+from .indicators import MathSin
 from .math_sinh import MathSinh
 from .math_sqrt import MathSqrt
 from .math_tan import MathTan
@@ -194,11 +193,9 @@ from .indicators import CumulativeSum
 from .indicators import CumulativeProduct
 from .indicators import CumulativeCount
 from .indicators import RollingMedian
-from .rolling_min import RollingMin
-from .rolling_max import RollingMax
+from .indicators import RollingMinimum, RollingMaximum
 from .indicators import RollingSum
-from .rolling_argmin import RollingArgmin
-from .rolling_argmax import RollingArgmax
+from .indicators import RollingMinimumIndex, RollingMaximumIndex
 from .indicators import RollingMode
 from .indicators import RollingQuantile
 from .indicators import RollingPercentile
@@ -450,11 +447,11 @@ __all__ = [
     "CumulativeProduct",
     "CumulativeCount",
     "RollingMedian",
-    "RollingMin",
-    "RollingMax",
+    "RollingMinimum",
+    "RollingMaximum",
     "RollingSum",
-    "RollingArgmin",
-    "RollingArgmax",
+    "RollingMinimumIndex",
+    "RollingMaximumIndex",
     "RollingMode",
     "RollingQuantile",
     "RollingPercentile",

@@ -247,10 +247,10 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Transitional state classes remain available while their indicators move
     // to the unified object surface above.
-    m.add_class::<state_api::StatefulMax>()?;
-    m.add_class::<state_api::StatefulMaxindex>()?;
-    m.add_class::<state_api::StatefulMin>()?;
-    m.add_class::<state_api::StatefulMinindex>()?;
+    m.add_class::<indicators::RollingMaximum>()?;
+    m.add_class::<indicators::RollingMaximumIndex>()?;
+    m.add_class::<indicators::RollingMinimum>()?;
+    m.add_class::<indicators::RollingMinimumIndex>()?;
     m.add_class::<indicators::RollingMinMax>()?;
     m.add_class::<indicators::RollingMinMaxIndex>()?;
     m.add_class::<indicators::RollingBeta>()?;
@@ -274,16 +274,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::MedianPrice>()?;
     m.add_class::<indicators::TypicalPrice>()?;
     m.add_class::<indicators::WeightedClose>()?;
-    m.add_class::<state_api::MathAbs>()?;
-    m.add_class::<state_api::MathAcos>()?;
+    m.add_class::<indicators::MathAbs>()?;
+    m.add_class::<indicators::MathAcos>()?;
     m.add_class::<state_api::MathAcosh>()?;
-    m.add_class::<state_api::MathAsin>()?;
+    m.add_class::<indicators::MathAsin>()?;
     m.add_class::<state_api::MathAsinh>()?;
-    m.add_class::<state_api::MathAtan>()?;
+    m.add_class::<indicators::MathAtan>()?;
     m.add_class::<state_api::MathAtanh>()?;
     m.add_class::<state_api::MathCbrt>()?;
     m.add_class::<state_api::MathCeil>()?;
-    m.add_class::<state_api::MathCos>()?;
+    m.add_class::<indicators::MathCos>()?;
     m.add_class::<state_api::MathCosh>()?;
     m.add_class::<state_api::MathCot>()?;
     m.add_class::<state_api::MathDegrees>()?;
@@ -293,7 +293,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::MathLog10>()?;
     m.add_class::<state_api::MathLog1p>()?;
     m.add_class::<state_api::MathRadians>()?;
-    m.add_class::<state_api::MathSin>()?;
+    m.add_class::<indicators::MathSin>()?;
     m.add_class::<state_api::MathSinh>()?;
     m.add_class::<state_api::MathSqrt>()?;
     m.add_class::<state_api::MathTan>()?;

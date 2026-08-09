@@ -261,7 +261,7 @@ mod intraday_momentum_index_test;
 mod kaufman_adaptive_moving_average;
 #[cfg(test)]
 mod kaufman_adaptive_moving_average_test;
-mod math_abs;
+mod math_acosh;
 mod math_operator;
 mod moving_average;
 mod moving_average_convergence_divergence;
@@ -274,29 +274,13 @@ mod moving_average_convergence_divergence_fixed_test;
 mod moving_average_convergence_divergence_helpers;
 #[cfg(test)]
 mod moving_average_convergence_divergence_test;
-pub use math_abs::MathAbs;
-#[cfg(test)]
-mod math_abs_test;
-mod math_acos;
-pub use math_acos::MathAcos;
-#[cfg(test)]
-mod math_acos_test;
-mod math_acosh;
 pub use math_acosh::MathAcosh;
 #[cfg(test)]
 mod math_acosh_test;
-mod math_asin;
-pub use math_asin::MathAsin;
-#[cfg(test)]
-mod math_asin_test;
 mod math_asinh;
 pub use math_asinh::MathAsinh;
 #[cfg(test)]
 mod math_asinh_test;
-mod math_atan;
-pub use math_atan::MathAtan;
-#[cfg(test)]
-mod math_atan_test;
 mod math_atanh;
 pub use math_atanh::MathAtanh;
 #[cfg(test)]
@@ -309,10 +293,6 @@ mod math_ceil;
 pub use math_ceil::MathCeil;
 #[cfg(test)]
 mod math_ceil_test;
-mod math_cos;
-pub use math_cos::MathCos;
-#[cfg(test)]
-mod math_cos_test;
 mod math_cosh;
 pub use math_cosh::MathCosh;
 #[cfg(test)]
@@ -349,10 +329,6 @@ mod math_radians;
 pub use math_radians::MathRadians;
 #[cfg(test)]
 mod math_radians_test;
-mod math_sin;
-pub use math_sin::MathSin;
-#[cfg(test)]
-mod math_sin_test;
 mod math_sinh;
 pub use math_sinh::MathSinh;
 #[cfg(test)]
@@ -579,12 +555,8 @@ pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use plus_directional_indicator::PlusDirectionalIndicator;
 pub use plus_directional_movement::PlusDirectionalMovement;
 pub use relative_momentum_index::RelativeMomentumIndex;
-pub use rolling_argmax::RollingArgmax;
-pub use rolling_argmin::RollingArgmin;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
-pub use rolling_max::RollingMax;
-pub use rolling_min::RollingMin;
 
 #[allow(unused_imports)]
 pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
@@ -655,18 +627,6 @@ mod math_divide_test;
 mod outside_bar_test;
 #[cfg(test)]
 mod position_hold_test;
-mod rolling_argmax;
-#[cfg(test)]
-mod rolling_argmax_test;
-mod rolling_argmin;
-#[cfg(test)]
-mod rolling_argmin_test;
-mod rolling_max;
-#[cfg(test)]
-mod rolling_max_test;
-mod rolling_min;
-#[cfg(test)]
-mod rolling_min_test;
 #[cfg(test)]
 mod signal_delay_test;
 #[cfg(test)]
@@ -679,9 +639,10 @@ mod tests {
     use crate::indicators::{
         MedianPrice, RollingAverageDeviation, RollingBeta, RollingCorrelation,
         RollingLinearRegression, RollingLinearRegressionAngle, RollingLinearRegressionIntercept,
-        RollingLinearRegressionSlope, RollingMidpoint, RollingMidprice, RollingMinMax,
-        RollingMinMaxIndex, RollingStandardDeviation, RollingSum, RollingTimeSeriesForecast,
-        RollingVariance, TypicalPrice, WeightedClose,
+        RollingLinearRegressionSlope, RollingMaximum, RollingMaximumIndex, RollingMidpoint,
+        RollingMidprice, RollingMinMax, RollingMinMaxIndex, RollingMinimum, RollingMinimumIndex,
+        RollingStandardDeviation, RollingSum, RollingTimeSeriesForecast, RollingVariance,
+        TypicalPrice, WeightedClose,
     };
 
     fn assert_optional_eq(actual: Option<f64>, expected: f64) {
@@ -789,19 +750,19 @@ mod tests {
             4.0, 2.0, 2.0, 5.0, 3.0, 3.0, 5.0, 1.0, 1.0, 4.0, 4.0, 2.0, 6.0, 6.0, 0.0, 0.0, 5.0,
         ];
         let period = 4;
-        let mut max_expected_state = RollingMax::new(period).unwrap();
+        let mut max_expected_state = RollingMaximum::new(period).unwrap();
         let mut max_expected = Vec::new();
         max_expected_state.extend_slice_into(&input, &mut max_expected);
-        let mut min_expected_state = RollingMin::new(period).unwrap();
+        let mut min_expected_state = RollingMinimum::new(period).unwrap();
         let mut min_expected = Vec::new();
         min_expected_state.extend_slice_into(&input, &mut min_expected);
         let mut sum_batch_state = RollingSum::new(period).unwrap();
         let mut sum_expected = Vec::new();
         sum_batch_state.extend_slice_into(&input, &mut sum_expected);
-        let mut maxindex_expected_state = RollingArgmax::new(period).unwrap();
+        let mut maxindex_expected_state = RollingMaximumIndex::new(period).unwrap();
         let mut maxindex_expected = Vec::new();
         maxindex_expected_state.extend_slice_into(&input, &mut maxindex_expected);
-        let mut minindex_expected_state = RollingArgmin::new(period).unwrap();
+        let mut minindex_expected_state = RollingMinimumIndex::new(period).unwrap();
         let mut minindex_expected = Vec::new();
         minindex_expected_state.extend_slice_into(&input, &mut minindex_expected);
         let mut minmax_expected_state = RollingMinMax::new(period).unwrap();
@@ -812,11 +773,11 @@ mod tests {
         let mut minidx = Vec::new();
         let mut maxidx = Vec::new();
         minmaxindex_expected_state.extend_slices_into(&input, &mut minidx, &mut maxidx);
-        let mut max = RollingMax::new(period).unwrap();
-        let mut min = RollingMin::new(period).unwrap();
+        let mut max = RollingMaximum::new(period).unwrap();
+        let mut min = RollingMinimum::new(period).unwrap();
         let mut sum = RollingSum::new(period).unwrap();
-        let mut maxindex = RollingArgmax::new(period).unwrap();
-        let mut minindex = RollingArgmin::new(period).unwrap();
+        let mut maxindex = RollingMaximumIndex::new(period).unwrap();
+        let mut minindex = RollingMinimumIndex::new(period).unwrap();
         let mut minmax = RollingMinMax::new(period).unwrap();
         let mut minmaxindex = RollingMinMaxIndex::new(period).unwrap();
 

@@ -136,6 +136,10 @@ from .rolling_min_max_index import RollingMinMaxIndex
 from .parabolic_sar import ParabolicSar
 from .parabolic_sar_extended import ParabolicSarExtended
 from .variable_period_moving_average import VariablePeriodMovingAverage
+from .rolling_maximum import RollingMaximum
+from .rolling_maximum_index import RollingMaximumIndex
+from .rolling_minimum import RollingMinimum
+from .rolling_minimum_index import RollingMinimumIndex
 from .accumulation_distribution import AccumulationDistribution
 from .accumulation_distribution_oscillator import AccumulationDistributionOscillator
 from .on_balance_volume import OnBalanceVolume
@@ -165,13 +169,18 @@ from ..crossunder import Crossunder
 from ..cross import Cross
 from ..rising import Rising
 from ..falling import Falling
+from .math_abs import MathAbs
+from .math_acos import MathAcos
 from ..math_transform import (
-    MathAbs, MathAcos, MathAcosh, MathAsin, MathAsinh, MathAtan, MathAtanh,
-    MathCbrt, MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathExp,
-    MathFloor, MathLn, MathLog10, MathLog1p, MathRadians, MathSin, MathSinh,
-    MathSqrt, MathTan, MathTanh,
-    MathAdd, MathSubtract, MathMultiply, MathDivide,
+    MathAcosh, MathAsinh, MathAtanh, MathCbrt, MathCeil, MathCosh, MathCot,
+    MathDegrees, MathExp, MathFloor, MathLn, MathLog10, MathLog1p,
+    MathRadians, MathSinh, MathSqrt, MathTan, MathTanh, MathAdd, MathSubtract,
+    MathMultiply, MathDivide,
 )
+from .math_asin import MathAsin
+from .math_atan import MathAtan
+from .math_cos import MathCos
+from .math_sin import MathSin
 from ..statistics import (
     MesaAdaptiveMovingAverage, RollingAverageDeviation, RollingMidpoint,
     RollingMidprice, RollingStandardDeviation, RollingVariance,
@@ -346,6 +355,10 @@ __all__ = [
     "CumulativeProduct",
     "CumulativeCount",
     "RollingMedian",
+    "RollingMaximum",
+    "RollingMaximumIndex",
+    "RollingMinimum",
+    "RollingMinimumIndex",
     "RollingMode",
     "RollingQuantile",
     "RollingPercentile",
@@ -353,6 +366,12 @@ __all__ = [
     "RollingZScore",
     "RollingSkew",
     "RollingKurtosis",
+    "MathAbs",
+    "MathAcos",
+    "MathAsin",
+    "MathAtan",
+    "MathCos",
+    "MathSin",
     "RollingInterquartileRange",
     "RollingCovariance",
     "RollingWinsorize",

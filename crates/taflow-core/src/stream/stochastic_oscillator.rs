@@ -5,11 +5,10 @@
 //! averages.
 
 use crate::error::{TaError, TaResult};
+use crate::indicators::{RollingMaximum, RollingMinimum};
 use crate::ma_type::MaType;
 
-use super::{
-    moving_average_dispatcher::MovingAverageDispatcher, RollingMax, RollingMin, StreamingIndicator,
-};
+use super::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
 
 /// One aligned slow %K and slow %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -28,8 +27,8 @@ pub struct StochasticOscillatorValue {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct StochasticOscillator {
-    highest: RollingMax,
-    lowest: RollingMin,
+    highest: RollingMaximum,
+    lowest: RollingMinimum,
     slowk: MovingAverageDispatcher,
     slowd: MovingAverageDispatcher,
     value: Option<StochasticOscillatorValue>,
@@ -45,8 +44,8 @@ impl StochasticOscillator {
         slowd_matype: MaType,
     ) -> TaResult<Self> {
         Ok(Self {
-            highest: RollingMax::new(fastk_period)?,
-            lowest: RollingMin::new(fastk_period)?,
+            highest: RollingMaximum::new(fastk_period)?,
+            lowest: RollingMinimum::new(fastk_period)?,
             slowk: MovingAverageDispatcher::new(slowk_period, slowk_matype)?,
             slowd: MovingAverageDispatcher::new(slowd_period, slowd_matype)?,
             value: None,
@@ -78,7 +77,7 @@ impl StochasticOscillator {
     }
 
     /// Bulk kernel: vHGW sliding extrema for the fast %K window (via the
-    /// `RollingMax`/`RollingMin` bulk paths, which also rebuild their deques),
+    /// `RollingMaximum`/`RollingMinimum` bulk paths, which also rebuild their deques),
     /// then the slow %K and slow %D moving averages are each driven by ONE
     /// bulk call instead of a per-bar dispatch.
     ///

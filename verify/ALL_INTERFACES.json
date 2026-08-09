@@ -604,11 +604,11 @@
     "status": "PASS"
   },
   {
-    "name": "RollingMin",
+    "name": "RollingMinimum",
     "status": "PASS"
   },
   {
-    "name": "RollingMax",
+    "name": "RollingMaximum",
     "status": "PASS"
   },
   {
@@ -616,11 +616,11 @@
     "status": "PASS"
   },
   {
-    "name": "RollingArgmin",
+    "name": "RollingMinimumIndex",
     "status": "PASS"
   },
   {
-    "name": "RollingArgmax",
+    "name": "RollingMaximumIndex",
     "status": "PASS"
   },
   {

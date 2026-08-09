@@ -4,11 +4,10 @@
 //! into the selected incremental moving average for fast %D.
 
 use crate::error::{TaError, TaResult};
+use crate::indicators::{RollingMaximum, RollingMinimum};
 use crate::ma_type::MaType;
 
-use super::{
-    moving_average_dispatcher::MovingAverageDispatcher, RollingMax, RollingMin, StreamingIndicator,
-};
+use super::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
 
 /// One aligned fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -27,8 +26,8 @@ pub struct FastStochasticOscillatorValue {
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct FastStochasticOscillator {
-    highest: RollingMax,
-    lowest: RollingMin,
+    highest: RollingMaximum,
+    lowest: RollingMinimum,
     fastd: MovingAverageDispatcher,
     value: Option<FastStochasticOscillatorValue>,
 }
@@ -37,8 +36,8 @@ impl FastStochasticOscillator {
     /// Creates a STOCHF state for the selected fast %D moving-average type.
     pub fn new(fastk_period: usize, fastd_period: usize, fastd_matype: MaType) -> TaResult<Self> {
         Ok(Self {
-            highest: RollingMax::new(fastk_period)?,
-            lowest: RollingMin::new(fastk_period)?,
+            highest: RollingMaximum::new(fastk_period)?,
+            lowest: RollingMinimum::new(fastk_period)?,
             fastd: MovingAverageDispatcher::new(fastd_period, fastd_matype)?,
             value: None,
         })
@@ -70,7 +69,7 @@ impl FastStochasticOscillator {
     }
 
     /// Bulk kernel: vHGW sliding extrema for the fast %K window (via the
-    /// `RollingMax`/`RollingMin` bulk paths, which also rebuild their deques),
+    /// `RollingMaximum`/`RollingMinimum` bulk paths, which also rebuild their deques),
     /// then the fast %D sub-state is driven per emitted bar exactly as
     /// [`Self::append`] does. Outputs and post-run state are bit-identical to
     /// per-bar [`Self::append`]; warm-up bars are NaN.

@@ -78,6 +78,24 @@ mod lag_test;
 mod log_return;
 #[cfg(test)]
 mod log_return_test;
+mod math_abs;
+#[cfg(test)]
+mod math_abs_test;
+mod math_acos;
+#[cfg(test)]
+mod math_acos_test;
+mod math_asin;
+#[cfg(test)]
+mod math_asin_test;
+mod math_atan;
+#[cfg(test)]
+mod math_atan_test;
+mod math_cos;
+#[cfg(test)]
+mod math_cos_test;
+mod math_sin;
+#[cfg(test)]
+mod math_sin_test;
 mod median_price;
 #[cfg(test)]
 mod median_price_test;
@@ -159,6 +177,12 @@ mod rolling_linear_regression_slope;
 mod rolling_linear_regression_slope_test;
 #[cfg(test)]
 mod rolling_linear_regression_test;
+mod rolling_maximum;
+mod rolling_maximum_index;
+#[cfg(test)]
+mod rolling_maximum_index_test;
+#[cfg(test)]
+mod rolling_maximum_test;
 mod rolling_median;
 #[cfg(test)]
 mod rolling_median_test;
@@ -174,6 +198,12 @@ mod rolling_min_max_index;
 mod rolling_min_max_index_test;
 #[cfg(test)]
 mod rolling_min_max_test;
+mod rolling_minimum;
+mod rolling_minimum_index;
+#[cfg(test)]
+mod rolling_minimum_index_test;
+#[cfg(test)]
+mod rolling_minimum_test;
 mod rolling_mode;
 #[cfg(test)]
 mod rolling_mode_test;
@@ -284,6 +314,12 @@ pub use hull_moving_average::HullMovingAverage;
 pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
 pub use lag::Lag;
 pub use log_return::LogReturn;
+pub use math_abs::MathAbs;
+pub use math_acos::MathAcos;
+pub use math_asin::MathAsin;
+pub use math_atan::MathAtan;
+pub use math_cos::MathCos;
+pub use math_sin::MathSin;
 pub use median_price::MedianPrice;
 pub use mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 pub use momentum::Momentum;
@@ -313,11 +349,15 @@ pub use rolling_linear_regression::RollingLinearRegression;
 pub use rolling_linear_regression_angle::RollingLinearRegressionAngle;
 pub use rolling_linear_regression_intercept::RollingLinearRegressionIntercept;
 pub use rolling_linear_regression_slope::RollingLinearRegressionSlope;
+pub use rolling_maximum::RollingMaximum;
+pub use rolling_maximum_index::RollingMaximumIndex;
 pub use rolling_median::RollingMedian;
 pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;
 pub use rolling_min_max::{RollingMinMax, RollingMinMaxValue};
 pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
+pub use rolling_minimum::RollingMinimum;
+pub use rolling_minimum_index::RollingMinimumIndex;
 pub use rolling_mode::RollingMode;
 pub use rolling_percentile::RollingPercentile;
 pub use rolling_quantile::RollingQuantile;

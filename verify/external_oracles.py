@@ -633,8 +633,8 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
 
     actual = {
         "sum": taflow.RollingSum(close, timeperiod=n).compute(),
-        "min": taflow.RollingMin(close, timeperiod=n).compute(),
-        "max": taflow.RollingMax(close, timeperiod=n).compute(),
+        "min": taflow.RollingMinimum(close, timeperiod=n).compute(),
+        "max": taflow.RollingMaximum(close, timeperiod=n).compute(),
         "mean": taflow.SimpleMovingAverage(close, timeperiod=n).compute(),
         "median": taflow.RollingMedian(close, n).compute(),
         "quantile": taflow.RollingQuantile(close, n, q).compute(),

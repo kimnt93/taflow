@@ -296,8 +296,8 @@ Matches: **356** | Documented variants: **38** | Self-invariant outputs: **0** |
 | `RogersSatchell` ↔ `pandas.rogers_satchell` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.821e-17` | 0 | Rogers-Satchell via Rolling.mean |
 | `RollSpread` ↔ `pandas.roll_spread` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.623e-14` | 0 | Series.diff/Rolling.cov(ddof=1) |
 | `RollingAlpha` ↔ `pandas.rolling_alpha` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `8.285e-10` | 0 | Rolling.cov/Rolling.var/Rolling.mean |
-| `RollingArgmax` ↔ `MAXINDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
-| `RollingArgmin` ↔ `MININDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMaximumIndex` ↔ `MAXINDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMinimumIndex` ↔ `MININDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingAutocorr` ↔ `pandas.rolling_autocorr` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `6.661e-16` | 0 | Series.rolling.apply/Series.corr |
 | `RollingAverageDeviation` ↔ `AVGDEV` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingBeta` ↔ `BETA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
@@ -312,11 +312,11 @@ Matches: **356** | Documented variants: **38** | Self-invariant outputs: **0** |
 | `RollingLinearRegressionAngle` ↔ `LINEARREG_ANGLE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `4.924e-12` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingLinearRegressionIntercept` ↔ `LINEARREG_INTERCEPT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.969e-13` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingLinearRegressionSlope` ↔ `LINEARREG_SLOPE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `9.137e-14` | 0 | external parity plus bitwise lifecycle invariance |
-| `RollingMax` ↔ `MAX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMaximum` ↔ `MAX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMedian` ↔ `pandas.rolling_median` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMidpoint` ↔ `MIDPOINT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMidprice` ↔ `MIDPRICE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
-| `RollingMin` ↔ `MIN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMinimum` ↔ `MIN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMinMax` ↔ `MINMAX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMinMaxIndex` ↔ `MINMAXINDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMode` ↔ `pandas.rolling_mode` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | Series.rolling.apply/value_counts |

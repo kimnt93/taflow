@@ -466,7 +466,9 @@ pub(crate) fn tracked_index_rescan_into<const MAXIMUM: bool>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::stream::{RollingArgmax, RollingArgmin, RollingMax, RollingMin};
+    use crate::indicators::{
+        RollingMaximum, RollingMaximumIndex, RollingMinimum, RollingMinimumIndex,
+    };
 
     /// Original two-deque implementation, kept verbatim as the reference
     /// oracle for the split monotonic states.
@@ -797,8 +799,8 @@ mod tests {
     fn rolling_argmax_argmin_bulk_matches_append_bitwise() {
         for data in index_bulk_datasets(5_000) {
             for period in INDEX_BULK_PERIODS {
-                let mut reference_max = RollingArgmax::new(period).unwrap();
-                let mut reference_min = RollingArgmin::new(period).unwrap();
+                let mut reference_max = RollingMaximumIndex::new(period).unwrap();
+                let mut reference_min = RollingMinimumIndex::new(period).unwrap();
                 let expected_max: Vec<f64> = data
                     .iter()
                     .map(|&v| reference_max.append(v).unwrap_or(f64::NAN))
@@ -808,8 +810,8 @@ mod tests {
                     .map(|&v| reference_min.append(v).unwrap_or(f64::NAN))
                     .collect();
                 for chunk in INDEX_BULK_CHUNKS.iter().copied().chain([data.len()]) {
-                    let mut max_state = RollingArgmax::new(period).unwrap();
-                    let mut min_state = RollingArgmin::new(period).unwrap();
+                    let mut max_state = RollingMaximumIndex::new(period).unwrap();
+                    let mut min_state = RollingMinimumIndex::new(period).unwrap();
                     let (mut max_out, mut min_out) = (Vec::new(), Vec::new());
                     for piece in data.chunks(chunk) {
                         max_state.extend_slice_into(piece, &mut max_out);
@@ -892,22 +894,22 @@ mod tests {
         let fast_path = [3.0, 5.0, 4.0, 5.0];
         let rescan = [9.0, 5.0, 4.0, 5.0];
         let mut out = Vec::new();
-        RollingArgmax::new(3)
+        RollingMaximumIndex::new(3)
             .unwrap()
             .extend_slice_into(&fast_path, &mut out);
         assert_eq!(out, vec![0.0, 0.0, 1.0, 3.0]);
         out.clear();
-        RollingArgmax::new(3)
+        RollingMaximumIndex::new(3)
             .unwrap()
             .extend_slice_into(&rescan, &mut out);
         assert_eq!(out, vec![0.0, 0.0, 0.0, 1.0]);
         out.clear();
-        RollingArgmin::new(3)
+        RollingMinimumIndex::new(3)
             .unwrap()
             .extend_slice_into(&[9.0, 2.0, 4.0, 2.0], &mut out);
         assert_eq!(out[3], 3.0);
         out.clear();
-        RollingArgmin::new(3)
+        RollingMinimumIndex::new(3)
             .unwrap()
             .extend_slice_into(&[1.0, 2.0, 4.0, 2.0], &mut out);
         assert_eq!(out[3], 1.0);
@@ -919,8 +921,8 @@ mod tests {
             for data in datasets(len) {
                 for chunk in [1usize, 7, data.len().max(1)] {
                     // Fresh pure-append reference run per chunking.
-                    let mut append_max = RollingMax::new(period).unwrap();
-                    let mut append_min = RollingMin::new(period).unwrap();
+                    let mut append_max = RollingMaximum::new(period).unwrap();
+                    let mut append_min = RollingMinimum::new(period).unwrap();
                     let expected_max: Vec<f64> = data
                         .iter()
                         .map(|&v| append_max.append(v).unwrap_or(f64::NAN))
@@ -930,8 +932,8 @@ mod tests {
                         .map(|&v| append_min.append(v).unwrap_or(f64::NAN))
                         .collect();
 
-                    let mut max_state = RollingMax::new(period).unwrap();
-                    let mut min_state = RollingMin::new(period).unwrap();
+                    let mut max_state = RollingMaximum::new(period).unwrap();
+                    let mut min_state = RollingMinimum::new(period).unwrap();
                     let mut max_out = Vec::new();
                     let mut min_out = Vec::new();
                     for piece in data.chunks(chunk) {

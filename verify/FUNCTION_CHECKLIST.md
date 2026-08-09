@@ -95,6 +95,17 @@ external-oracle MATCH results passed. Generated rows may still show historical
 names; source scan is authoritative. Benchmark fields remain `TODO`; no
 benchmark command was run.
 
+The ninth structural batch migrated `RollingMaximum`, `RollingMinimum`,
+`RollingMaximumIndex`, `RollingMinimumIndex`, `MathAbs`, `MathAcos`,
+`MathAsin`, `MathAtan`, `MathCos`, and `MathSin`. The abbreviated extrema
+states and grouped PyO3 state classes were replaced by complete canonical
+names; each moved Rust state/test, Python adapter, and binding now has a
+matching file. Rust lifecycle tests, the release PyO3 build, the full Python
+suite, interface audit, and ten external-oracle MATCH results passed. `MathAbs`
+uses NumPy as its independent scalar oracle because TA-Lib exposes no ABS
+function. Generated rows may still show historical names; source scan is
+authoritative. Benchmark fields remain `TODO`; no benchmark command was run.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**

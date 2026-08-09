@@ -158,11 +158,11 @@ Indicator invariant: constructor history == native `extend` history == one-bar `
 | `CumulativeProduct` | PASS |  |
 | `CumulativeCount` | PASS |  |
 | `RollingMedian` | PASS |  |
-| `RollingMin` | PASS |  |
-| `RollingMax` | PASS |  |
+| `RollingMinimum` | PASS |  |
+| `RollingMaximum` | PASS |  |
 | `RollingSum` | PASS |  |
-| `RollingArgmin` | PASS |  |
-| `RollingArgmax` | PASS |  |
+| `RollingMinimumIndex` | PASS |  |
+| `RollingMaximumIndex` | PASS |  |
 | `RollingMode` | PASS |  |
 | `RollingQuantile` | PASS |  |
 | `RollingPercentile` | PASS |  |

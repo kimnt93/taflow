@@ -30,62 +30,6 @@ pub(crate) fn push_option(cache: &mut Vec<f64>, value: Option<f64>) -> Option<f6
     value
 }
 
-macro_rules! scalar_state_class {
-    ($class:ident, $inner:ty, $default_period:literal) => {
-        #[pyclass]
-        pub struct $class {
-            inner: $inner,
-            outputs: Vec<f64>,
-        }
-
-        #[pymethods]
-        impl $class {
-            #[new]
-            #[pyo3(signature = (timeperiod=$default_period))]
-            fn new(timeperiod: usize) -> PyResult<Self> {
-                Ok(Self {
-                    inner: <$inner>::new(timeperiod).map_err(py_value_error)?,
-                    outputs: Vec::new(),
-                })
-            }
-
-            fn append(&mut self, input: f64) -> Option<f64> {
-                push_option(&mut self.outputs, self.inner.append(input))
-            }
-
-            fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-                let input = input.as_slice()?;
-                let outputs = &mut self.outputs;
-                py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
-                Ok(())
-            }
-
-            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-                to_py_array(py, self.outputs.clone())
-            }
-
-            fn __len__(&self) -> usize {
-                self.outputs.len()
-            }
-
-            #[getter]
-            fn value(&self) -> Option<f64> {
-                self.inner.value()
-            }
-
-            fn reset(&mut self) {
-                self.inner.reset();
-                self.outputs.clear();
-            }
-        }
-    };
-}
-
-scalar_state_class!(StatefulMax, stream::RollingMax, 30);
-scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);
-scalar_state_class!(StatefulMin, stream::RollingMin, 30);
-scalar_state_class!(StatefulMinindex, stream::RollingArgmin, 30);
-
 macro_rules! deviation_state_class {
     ($class:ident, $inner:ident) => {
         #[pyclass]
@@ -253,16 +197,11 @@ macro_rules! unary_state_class {
     };
 }
 
-unary_state_class!(MathAbs);
-unary_state_class!(MathAcos);
 unary_state_class!(MathAcosh);
-unary_state_class!(MathAsin);
 unary_state_class!(MathAsinh);
-unary_state_class!(MathAtan);
 unary_state_class!(MathAtanh);
 unary_state_class!(MathCbrt);
 unary_state_class!(MathCeil);
-unary_state_class!(MathCos);
 unary_state_class!(MathCosh);
 unary_state_class!(MathCot);
 unary_state_class!(MathDegrees);
@@ -272,7 +211,6 @@ unary_state_class!(MathLn);
 unary_state_class!(MathLog10);
 unary_state_class!(MathLog1p);
 unary_state_class!(MathRadians);
-unary_state_class!(MathSin);
 unary_state_class!(MathSinh);
 unary_state_class!(MathSqrt);
 unary_state_class!(MathTan);
