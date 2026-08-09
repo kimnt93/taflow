@@ -37,7 +37,8 @@ class ArnaudLegouxMovingAverage:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod, offset, sigma)
-        self.extend(_input) if _input is not None else None
+        self._length = 0
+        self.extend(_input)
 
     def append(self, _input: float) -> "ArnaudLegouxMovingAverage":
         """Append one observation or aligned bar to the native Rust state.
@@ -52,7 +53,8 @@ class ArnaudLegouxMovingAverage:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_input)
+        self._state.append(float(_input))
+        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "ArnaudLegouxMovingAverage":
@@ -68,7 +70,9 @@ class ArnaudLegouxMovingAverage:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(_input))
+        values = as_float64_series(_input)
+        self._state.extend(values)
+        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -82,7 +86,7 @@ class ArnaudLegouxMovingAverage:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -91,6 +95,10 @@ class ArnaudLegouxMovingAverage:
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
+
+    def __len__(self) -> int:
+        """Return the number of observations consumed by this state."""
+        return self._length
 
     def reset(self) -> "ArnaudLegouxMovingAverage":
         """Execute the reset operation through the native Rust implementation.
@@ -101,4 +109,5 @@ class ArnaudLegouxMovingAverage:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self

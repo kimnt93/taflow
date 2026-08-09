@@ -107,8 +107,8 @@ from ..rolling_calmar import RollingCalmar
 from ..hull_moving_average import HullMovingAverage
 from ..volume_weighted_moving_average import VolumeWeightedMovingAverage
 from ..zero_lag_exponential_moving_average import ZeroLagExponentialMovingAverage
-from ..alma import ArnaudLegouxMovingAverage
-from ..tsi import TrueStrengthIndex
+from ..arnaud_legoux_moving_average import ArnaudLegouxMovingAverage
+from ..true_strength_index import TrueStrengthIndex
 from ..awesome_oscillator import AwesomeOscillator
 from ..fisher_transform import FisherTransform
 from ..donchian import Donchian

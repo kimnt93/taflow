@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 622,
     "smc_functions": 8,
-    "structure": 233,
+    "structure": 235,
     "talib_functions": 161
   },
   "rows": [
@@ -3238,7 +3238,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "alma",
+      "module": "arnaud_legoux_moving_average",
       "name": "ArnaudLegouxMovingAverage",
       "native_binding": true,
       "native_symbols": [
@@ -3253,7 +3253,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "tsi",
+      "module": "true_strength_index",
       "name": "TrueStrengthIndex",
       "native_binding": true,
       "native_symbols": [

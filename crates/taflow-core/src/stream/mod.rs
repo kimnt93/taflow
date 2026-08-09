@@ -1186,22 +1186,22 @@ pub use rolling_sharpe::RollingSharpe;
 mod rolling_sortino;
 pub use rolling_sortino::RollingSortino;
 mod arnaud_legoux_moving_average;
+#[cfg(test)]
+mod arnaud_legoux_moving_average_test;
+mod awesome_oscillator;
 mod hull_moving_average;
 #[cfg(test)]
 mod hull_moving_average_test;
 mod rolling_calmar;
+mod true_strength_index;
+#[cfg(test)]
+mod true_strength_index_test;
 mod volume_weighted_moving_average;
 #[cfg(test)]
 mod volume_weighted_moving_average_test;
 mod zero_lag_exponential_moving_average;
 #[cfg(test)]
 mod zero_lag_exponential_moving_average_test;
-#[allow(unused_imports)]
-pub(crate) use arnaud_legoux_moving_average::arnaud_legoux_moving_average;
-mod true_strength_index;
-#[allow(unused_imports)]
-pub(crate) use true_strength_index::true_strength_index;
-mod awesome_oscillator;
 #[allow(unused_imports)]
 pub(crate) use awesome_oscillator::awesome_oscillator;
 mod fisher_transform;
