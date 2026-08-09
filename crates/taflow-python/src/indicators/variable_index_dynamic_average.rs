@@ -1,9 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{
-    StreamingIndicator, VariableIndexDynamicAverage as VariableIndexDynamicAverageState,
-};
+use taflow::indicators::VariableIndexDynamicAverage as VariableIndexDynamicAverageState;
+use taflow::stream::StreamingIndicator;
 
 /// Python boundary for the canonical Rust Variable Index Dynamic Average state.
 #[pyclass]

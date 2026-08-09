@@ -178,6 +178,17 @@ Focused Python tests (10), full Rust tests (386), release build, and the
 300/300 interface audit passed. Benchmark fields remain `TODO`; no benchmark
 command was run.
 
+The fortieth structural batch migrated the Rust implementations and separate
+tests for `TimeSeriesRank`, `TripleExponentialAverage`,
+`TripleExponentialMovingAverage`, `TripleExponentialRateOfChange`,
+`UltimateOscillator`, `ValueWhen`, `VariableIndexDynamicAverage`, `Vortex`,
+`WeightedMovingAverage`, and `YangZhang` into the canonical indicators
+directory. The stream module now only re-exports those states, the PyO3
+bindings target `taflow::indicators`, and the remaining root Python adapters
+were moved into `python/taflow/indicators/`. Focused Python tests (33), full
+Rust tests (386), release build, and the 300/300 interface audit passed.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

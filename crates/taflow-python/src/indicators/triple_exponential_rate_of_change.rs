@@ -4,9 +4,8 @@ use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{
-    StreamingIndicator, TripleExponentialRateOfChange as NativeTripleExponentialRateOfChange,
-};
+use taflow::indicators::TripleExponentialRateOfChange as NativeTripleExponentialRateOfChange;
+use taflow::stream::StreamingIndicator;
 
 #[pyclass]
 pub struct TripleExponentialRateOfChange {

@@ -4,7 +4,8 @@ use multiversion::multiversion;
 
 use crate::error::TaResult;
 
-use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
+use crate::indicators::ExponentialMovingAverage;
+use crate::stream::{invalid_period, StreamingIndicator};
 
 /// Steady-state kernel for the triple EMA cascade plus the ROC step.
 ///

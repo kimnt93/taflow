@@ -70,30 +70,7 @@ pub use session_flags::session_flags;
 mod helpers;
 pub(crate) mod lagged_common;
 pub(crate) mod operator_states;
-mod triple_exponential_average;
-#[cfg(test)]
-mod triple_exponential_average_test;
-mod triple_exponential_moving_average;
-#[cfg(test)]
-mod triple_exponential_moving_average_test;
-mod triple_exponential_rate_of_change;
-#[cfg(test)]
-mod triple_exponential_rate_of_change_test;
-mod ultimate_oscillator;
-#[cfg(test)]
-mod ultimate_oscillator_test;
-mod variable_index_dynamic_average;
-#[cfg(test)]
-mod variable_index_dynamic_average_test;
 mod window;
-#[allow(unused_imports)]
-pub(crate) use helpers::invalid_period;
-pub(crate) use operator_states::{ewm_alpha, validate_period, validate_quantile};
-pub(crate) use operator_states::{weighted_mean_slice, ContiguousWindow};
-mod weighted_moving_average;
-#[cfg(test)]
-mod weighted_moving_average_test;
-
 pub use crate::indicators::{
     BarsSince, EntryExit, ForceIndex, HighestSince, LowestSince, PositionHold, PreviousHighLow,
     PreviousHighLowValue, RelativeStrengthIndex, Retracements, RetracementsValue, RogersSatchell,
@@ -121,28 +98,24 @@ pub use crate::indicators::{
     StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue, Supertrend,
     SupertrendValue, TriangularMovingAverage,
 };
+pub use crate::indicators::{
+    TimeSeriesRank, TripleExponentialAverage, TripleExponentialMovingAverage,
+    TripleExponentialRateOfChange, UltimateOscillator, ValueWhen, VariableIndexDynamicAverage,
+    Vortex, VortexValue, WeightedMovingAverage, YangZhang,
+};
+#[allow(unused_imports)]
+pub(crate) use helpers::invalid_period;
 #[allow(unused_imports)]
 #[allow(unused_imports)]
 pub use indicator::StreamingIndicator;
+pub(crate) use operator_states::{ewm_alpha, validate_period, validate_quantile};
+pub(crate) use operator_states::{weighted_mean_slice, ContiguousWindow};
 #[allow(unused_imports)]
 #[allow(unused_imports)]
 #[allow(unused_imports)]
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 
-#[allow(unused_imports)]
-#[allow(unused_imports)]
-#[allow(unused_imports)]
-#[allow(unused_imports)]
-#[allow(unused_imports)]
-pub use triple_exponential_average::TripleExponentialAverage;
-#[allow(unused_imports)]
-pub use triple_exponential_moving_average::TripleExponentialMovingAverage;
-pub use triple_exponential_rate_of_change::TripleExponentialRateOfChange;
-#[allow(unused_imports)]
-pub use ultimate_oscillator::UltimateOscillator;
-pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
-pub use weighted_moving_average::WeightedMovingAverage;
 pub use window::Window;
 
 #[cfg(test)]
@@ -151,7 +124,6 @@ pub use window::Window;
 #[cfg(test)]
 #[cfg(test)]
 #[cfg(test)]
-mod value_when_test;
 #[allow(unused_imports)]
 #[cfg(test)]
 mod tests {
@@ -449,22 +421,6 @@ mod tests {
     }
 }
 #[allow(unused_imports)]
-mod time_series_rank;
-#[cfg(test)]
-mod time_series_rank_test;
-mod yang_zhang;
-#[cfg(test)]
-mod yang_zhang_test;
-pub use time_series_rank::TimeSeriesRank;
-#[allow(unused_imports)]
 pub(crate) mod bar_relation;
 #[cfg(test)]
 pub(crate) mod swing_highs_lows_test;
-mod vortex;
-#[cfg(test)]
-mod vortex_test;
-
-mod value_when;
-pub use value_when::ValueWhen;
-pub use vortex::{Vortex, VortexValue};
-pub use yang_zhang::YangZhang;

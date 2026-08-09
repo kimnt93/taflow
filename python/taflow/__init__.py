@@ -68,28 +68,27 @@ from .indicators import ParabolicSar, ParabolicSarExtended
 from .indicators import PlusDirectionalIndicator, PlusDirectionalMovement
 from .indicators import StochasticOscillator, StochasticRelativeStrengthIndex
 from .indicators.candle_stick_sandwich import CandleStickSandwich
-from .triple_exponential_rate_of_change import TripleExponentialRateOfChange
+from .indicators import TripleExponentialRateOfChange
 from .indicators.candle_three_black_crows import CandleThreeBlackCrows
 from .indicators.candle_three_inside import CandleThreeInside
 from .indicators.candle_three_line_strike import CandleThreeLineStrike
 from .indicators.candle_three_stars_in_south import CandleThreeStarsInSouth
 from .indicators.candle_three_outside import CandleThreeOutside
 from .indicators.candle_two_crows import CandleTwoCrows
-from .ultimate_oscillator import UltimateOscillator
+from .indicators import UltimateOscillator
 from .indicators import VariablePeriodMovingAverage
 from .indicators.heikin_ashi import HeikinAshi
 from .indicators import FibonacciRetracement
 from .indicators.anchored_volume_weighted_average_price import (
     AnchoredVolumeWeightedAveragePrice,
 )
-from .variable_index_dynamic_average import VariableIndexDynamicAverage
+from .indicators import VariableIndexDynamicAverage
 from .indicators.laguerre_relative_strength_index import LaguerreRelativeStrengthIndex
 from .indicators import SimpleMovingAverage
 from .indicators import NormalizedAverageTrueRange, TrueRange
 from .indicators import TriangularMovingAverage
-from .triple_exponential_moving_average import TripleExponentialMovingAverage
-from .triple_exponential_average import TripleExponentialAverage
-from .weighted_moving_average import WeightedMovingAverage
+from .indicators import TripleExponentialMovingAverage, TripleExponentialAverage
+from .indicators import WeightedMovingAverage
 from .indicators import RelativeStrengthIndex
 from .indicators import RelativeMomentumIndex
 from .indicators import SmoothedTrendChannel
@@ -254,7 +253,7 @@ from .indicators import Parkinson
 from .indicators.garman_klass import GarmanKlass
 from .indicators import RogersSatchell
 from .indicators.garman_klass_yang_zhang import GarmanKlassYangZhang
-from .yang_zhang import YangZhang
+from .indicators import YangZhang
 from .indicators.average_daily_dollar_value import AverageDailyDollarValue
 from .indicators.amihud import Amihud
 from .indicators import RollSpread, OrnsteinUhlenbeckHalfLife
@@ -266,7 +265,7 @@ from .indicators import Supertrend
 from .indicators import Ichimoku
 from .indicators import Squeeze, SqueezePro
 from .indicators import SchaffTrendCycle
-from .vortex import Vortex
+from .indicators import Vortex
 from .indicators.know_sure_thing import KnowSureThing
 from .indicators.mass_index import MassIndex
 from .indicators.detrended_price_oscillator import DetrendedPriceOscillator
@@ -277,7 +276,7 @@ from .indicators.positive_volume_index import PositiveVolumeIndex
 from .indicators.mc_ginley_dynamic import McGinleyDynamic
 from .indicators import DecayLinear
 from .indicators import SignedPower
-from .time_series_rank import TimeSeriesRank
+from .indicators import TimeSeriesRank
 
 __all__ = [
     "MovingAverage",

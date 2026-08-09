@@ -1196,3 +1196,45 @@ pub use break_of_structure_change_of_character::{
 pub use candle_abandoned_baby::CandleAbandonedBaby;
 pub use candle_advance_block::CandleAdvanceBlock;
 pub use candle_belt_hold::CandleBeltHold;
+
+mod time_series_rank;
+#[cfg(test)]
+mod time_series_rank_test;
+mod triple_exponential_average;
+#[cfg(test)]
+mod triple_exponential_average_test;
+mod triple_exponential_moving_average;
+#[cfg(test)]
+mod triple_exponential_moving_average_test;
+mod triple_exponential_rate_of_change;
+#[cfg(test)]
+mod triple_exponential_rate_of_change_test;
+mod ultimate_oscillator;
+#[cfg(test)]
+mod ultimate_oscillator_test;
+mod value_when;
+#[cfg(test)]
+mod value_when_test;
+mod variable_index_dynamic_average;
+#[cfg(test)]
+mod variable_index_dynamic_average_test;
+mod vortex;
+#[cfg(test)]
+mod vortex_test;
+mod weighted_moving_average;
+#[cfg(test)]
+mod weighted_moving_average_test;
+mod yang_zhang;
+#[cfg(test)]
+mod yang_zhang_test;
+
+pub use time_series_rank::TimeSeriesRank;
+pub use triple_exponential_average::TripleExponentialAverage;
+pub use triple_exponential_moving_average::TripleExponentialMovingAverage;
+pub use triple_exponential_rate_of_change::TripleExponentialRateOfChange;
+pub use ultimate_oscillator::UltimateOscillator;
+pub use value_when::ValueWhen;
+pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
+pub use vortex::{Vortex, VortexValue};
+pub use weighted_moving_average::WeightedMovingAverage;
+pub use yang_zhang::YangZhang;

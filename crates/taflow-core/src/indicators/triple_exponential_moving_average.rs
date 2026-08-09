@@ -2,7 +2,8 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
+use crate::indicators::ExponentialMovingAverage;
+use crate::stream::{invalid_period, StreamingIndicator};
 
 /// Stateful triple EMA composed from the shared EMA primitive.
 #[derive(Debug, Clone)]

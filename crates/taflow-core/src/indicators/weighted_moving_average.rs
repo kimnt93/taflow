@@ -2,7 +2,7 @@
 
 use crate::error::TaResult;
 
-use super::{StreamingIndicator, Window};
+use crate::stream::{StreamingIndicator, Window};
 
 /// Compute the weighted moving average result for the supplied aligned series.
 ///

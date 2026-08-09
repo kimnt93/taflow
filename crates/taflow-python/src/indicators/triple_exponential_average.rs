@@ -1,7 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{StreamingIndicator, TripleExponentialAverage as State};
+use taflow::indicators::TripleExponentialAverage as State;
+use taflow::stream::StreamingIndicator;
 
 /// Python boundary for the canonical Rust Tillson T3 state.
 #[pyclass]

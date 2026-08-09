@@ -1,8 +1,8 @@
 //! Persistent WorldQuant Alpha101 time-series rank state.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
 use crate::indicators::RollingRank;
+use crate::stream::StreamingIndicator;
 
 /// Rank of each value within a trailing chronological window.
 #[derive(Debug, Clone)]

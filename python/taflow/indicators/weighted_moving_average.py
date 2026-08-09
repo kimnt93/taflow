@@ -1,8 +1,8 @@
 """Canonical native-backed Weighted Moving Average adapter."""
 from typing import Any
 import numpy as np
-from ._native import WeightedMovingAverage as _NativeWeightedMovingAverage
-from ._series import as_float64_series
+from .._native import WeightedMovingAverage as _NativeWeightedMovingAverage
+from .._series import as_float64_series
 
 class WeightedMovingAverage:
     """Compute linearly weighted MA from required ``values`` in Rust."""

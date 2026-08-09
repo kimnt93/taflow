@@ -61,7 +61,10 @@ from .minus_directional_indicator import MinusDirectionalIndicator
 from .minus_directional_movement import MinusDirectionalMovement
 from .plus_directional_indicator import PlusDirectionalIndicator
 from .plus_directional_movement import PlusDirectionalMovement
-from ..triple_exponential_rate_of_change import TripleExponentialRateOfChange
+from .triple_exponential_rate_of_change import TripleExponentialRateOfChange
+from .triple_exponential_average import TripleExponentialAverage
+from .triple_exponential_moving_average import TripleExponentialMovingAverage
+from .weighted_moving_average import WeightedMovingAverage
 from .candle_stick_sandwich import CandleStickSandwich
 from .moving_average_convergence_divergence import MovingAverageConvergenceDivergence
 from .moving_average_convergence_divergence_extended import MovingAverageConvergenceDivergenceExtended
@@ -72,7 +75,7 @@ from .candle_three_line_strike import CandleThreeLineStrike
 from .candle_three_stars_in_south import CandleThreeStarsInSouth
 from .candle_three_outside import CandleThreeOutside
 from .candle_two_crows import CandleTwoCrows
-from ..ultimate_oscillator import UltimateOscillator
+from .ultimate_oscillator import UltimateOscillator
 from .candle_up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
 from .candle_three_white_soldiers import CandleThreeWhiteSoldiers
 from .candle_abandoned_baby import CandleAbandonedBaby
@@ -223,7 +226,9 @@ from ..statistics import (
     RollingMinMax, RollingMinMaxIndex,
 )
 from .signed_power import SignedPower
-from ..time_series_rank import TimeSeriesRank
+from .time_series_rank import TimeSeriesRank
+from .variable_index_dynamic_average import VariableIndexDynamicAverage
+from .vortex import Vortex
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
 from .roll_spread import RollSpread
 from .schaff_trend_cycle import SchaffTrendCycle
@@ -282,7 +287,7 @@ from .garman_klass import GarmanKlass
 from .rogers_satchell import RogersSatchell
 from .relative_strength_index import RelativeStrengthIndex
 from .garman_klass_yang_zhang import GarmanKlassYangZhang
-from ..yang_zhang import YangZhang
+from .yang_zhang import YangZhang
 
 __all__ = [
     "AbsolutePriceOscillator",
@@ -362,8 +367,13 @@ __all__ = [
     "PlusDirectionalMovement",
     "PercentagePriceOscillator",
     "RelativeMomentumIndex",
+    "TripleExponentialAverage",
+    "TripleExponentialMovingAverage",
     "TripleExponentialRateOfChange",
     "UltimateOscillator",
+    "VariableIndexDynamicAverage",
+    "Vortex",
+    "WeightedMovingAverage",
     "CandleUpDownSideGapThreeMethods",
     "CandleThreeBlackCrows",
     "CandleThreeInside",

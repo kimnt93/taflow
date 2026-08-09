@@ -1,7 +1,7 @@
 //! Stateful Variable Index Dynamic Average.
 
-use super::StreamingIndicator;
 use crate::error::{TaError, TaResult};
+use crate::stream::StreamingIndicator;
 
 /// Chande Momentum Oscillator-modulated exponential moving average.
 #[derive(Debug, Clone)]

@@ -4,7 +4,7 @@ use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::UltimateOscillator as NativeUltimateOscillator;
+use taflow::indicators::UltimateOscillator as NativeUltimateOscillator;
 
 #[pyclass]
 pub struct UltimateOscillator {

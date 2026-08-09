@@ -7,7 +7,8 @@ use multiversion::multiversion;
 
 use crate::error::{TaError, TaResult};
 
-use super::{ExponentialMovingAverage, StreamingIndicator};
+use crate::indicators::ExponentialMovingAverage;
+use crate::stream::StreamingIndicator;
 
 /// Steady-state kernel for the six fused EMA recurrences.
 ///

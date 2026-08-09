@@ -1,7 +1,7 @@
 //! Incremental Ultimate Oscillator (ULTOSC).
 
-use super::Window;
 use crate::error::{TaError, TaResult};
+use crate::stream::Window;
 
 /// The element pushed `lag` pushes ago (`1 ..= len`), via contiguous slices.
 #[inline]
