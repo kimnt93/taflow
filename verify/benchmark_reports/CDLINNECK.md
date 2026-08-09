@@ -8,30 +8,30 @@ taflow class.extend over contiguous NumPy arrays; this exercises the compiled Ru
 
 | Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | TA-Lib ms | API speedup | Kernel speedup |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1,000 | 0.006 | 164.56M | 0.004 | 246.13M | 0.033 | 5.49× | 8.21× |
-| 10,000 | 0.067 | 148.38M | 0.057 | 174.45M | 0.123 | 1.82× | 2.14× |
-| 100,000 | 0.844 | 118.50M | 0.853 | 117.21M | 0.960 | 1.14× | 1.13× |
-| 1,000,000 | 9.135 | 109.47M | 8.943 | 111.82M | 9.508 | 1.04× | 1.06× |
+| 1,000 | 0.006 | 172.54M | 0.004 | 252.93M | 0.033 | 5.63× | 8.25× |
+| 10,000 | 0.062 | 160.97M | 0.057 | 174.80M | 0.116 | 1.87× | 2.04× |
+| 100,000 | 0.872 | 114.64M | 0.840 | 119.02M | 0.896 | 1.03× | 1.07× |
+| 1,000,000 | 9.187 | 108.84M | 9.391 | 106.48M | 9.401 | 1.02× | 1.00× |
 
 ## Warm-up
 
-Construct + canonical extend over 100,000 bars: **0.844 ms**; native kernel **0.811 ms**; TA-Lib 0.942 ms.
+Construct + canonical extend over 100,000 bars: **0.919 ms**; native kernel **0.844 ms**; TA-Lib 0.900 ms.
 
 ## Warmed continuation
 
 | Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | TA-Lib full µs | vs full | vs tail |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 100,000 | 1 | 0.532 | 0.284 | 3.52M | 964.452 | 3394.94× | 101.11× |
-| 100,000 | 10 | 2.676 | 1.391 | 7.19M | 948.388 | 681.56× | 20.53× |
-| 100,000 | 1,000 | 33.028 | 28.101 | 35.59M | 969.272 | 34.49× | 1.16× |
+| 100,000 | 1 | 0.313 | 0.277 | 3.61M | 890.761 | 3214.67× | 104.16× |
+| 100,000 | 10 | 2.877 | 1.298 | 7.70M | 929.989 | 716.51× | 21.06× |
+| 100,000 | 1,000 | 32.678 | 26.662 | 37.51M | 915.234 | 34.33× | 1.22× |
 
 ## Independent-stream threads
 
 | Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | TA-Lib vector/s |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 90.87M | 99.36M | 1.00× | 2.16M | 2.29M | 1.00× | 82.28M |
-| 2 | 184.67M | 202.99M | 2.04× | 2.23M | 2.52M | 1.10× | 92.32M |
-| 4 | 305.38M | 338.61M | 3.41× | 2.23M | 2.45M | 1.07× | 90.79M |
+| 1 | 90.17M | 97.11M | 1.00× | 2.29M | 2.65M | 1.00× | 94.74M |
+| 2 | 183.58M | 191.65M | 1.97× | 2.36M | 2.50M | 0.95× | 92.11M |
+| 4 | 315.20M | 345.41M | 3.56× | 2.25M | 2.48M | 0.93× | 91.91M |
 
 ---
 Times include Python conversion/binding overhead. Raw samples are retained in JSON.

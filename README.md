@@ -8,6 +8,7 @@
     <a href="docs/STREAMING.md">Streaming</a> ·
     <a href="docs/PIPELINES.md">Pipelines</a> ·
     <a href="docs/DATA.md">Data&nbsp;in&nbsp;/&nbsp;out</a> ·
+    <a href="#benchmarks">Benchmarks</a> ·
     <a href="docs/PERFORMANCE.md">Performance</a>
   </p>
 </p>
@@ -16,6 +17,7 @@
   <img src="https://img.shields.io/badge/functions-287-blue" alt="287 functions" />
   <img src="https://img.shields.io/badge/TA--Lib_parity-161-blue" alt="161 TA-Lib functions" />
   <img src="https://img.shields.io/badge/correctness-287%2F287_MATCH-brightgreen" alt="287/287 match" />
+  <img src="https://img.shields.io/badge/vs_TA--Lib-1.61%C3%97_median-blue" alt="1.61x median vs TA-Lib" />
   <img src="https://img.shields.io/badge/unsafe-zero-brightgreen" alt="zero unsafe" />
   <img src="https://img.shields.io/badge/C_deps-zero-orange" alt="zero C deps" />
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT" />
@@ -202,28 +204,115 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 | [Correctness report](verify/REPORT.md) | Current per-function oracle status |
 | [Benchmarks](verify/benchmark_reports/BENCHMARK.md) | Throughput vs TA-Lib at 1k/10k/100k/1M bars |
 
-## Correctness and performance
+## Benchmarks
+
+Measured 2026-08-09 on an Intel i7-10750H, Python 3.12, against C TA-Lib 0.7.1
+over identical contiguous arrays. **A stock portable build** — no
+`target-cpu=native`, no platform-specific flags — because that is what
+`pip install` gives you. Correctness is checked before anything is timed.
+
+### Bulk throughput vs TA-Lib
+
+Across the 161 functions with a TA-Lib equivalent, at 10,000 bars:
+
+| | |
+|---|---|
+| Median | **1.61× TA-Lib** |
+| Mean | **2.01×** |
+| At or above parity | **153 of 161** |
+
+By category (median, 10k bars):
+
+| Category | n | Median | Range |
+|---|---:|---:|---|
+| Price transforms | 5 | **4.73×** | 1.77–7.13× |
+| Cycle (Hilbert) | 6 | **2.20×** | 0.84–4.31× |
+| Volume | 4 | **1.82×** | 0.83–2.86× |
+| Moving averages | 15 | **1.70×** | 0.69–5.76× |
+| Volatility | 5 | **1.66×** | 1.33–2.75× |
+| Candlestick patterns | 61 | **1.65×** | 0.88–4.64× |
+| Rolling statistics | 19 | **1.60×** | 1.03–2.64× |
+| Momentum & trend | 27 | **1.41×** | 0.85–5.45× |
+| Math transforms | 19 | **1.38×** | 1.11–8.32× |
+
+The 126 extended operators have no TA-Lib counterpart; their median throughput
+is **95M bars/s**.
+
+### Live updates — where the design pays off
+
+This is the number that matters for a running feed. After a 100,000-bar
+backfill, feeding 1,000 more bars one at a time:
+
+| | |
+|---|---|
+| Per `append` | **0.21 µs** median (p90 0.29 µs) |
+| vs TA-Lib recomputing full history | **3,242× faster** median |
+
+TAFlow's per-tick cost is flat because state is bounded; a batch library redoes
+work proportional to its window on every tick, so this gap widens with history
+length rather than being a fixed constant.
+
+### Threading
+
+Bulk kernels release the GIL, so independent indicators scale across threads:
+
+| Threads | TAFlow | TA-Lib |
+|---:|---:|---:|
+| 2 | **1.93×** | 0.93× |
+| 4 | **3.38×** | 0.99× |
+
+TA-Lib's binding holds the GIL throughout, so it stays flat no matter how many
+threads you give it.
+
+### Reproduce it
+
+```bash
+make bench                   # all 287 functions, 1k/10k/100k/1M bars
+make bench ARGS="SMA MAX"    # a subset
+```
+
+Per-function reports with raw timing samples land in
+[`verify/benchmark_reports/`](verify/benchmark_reports/BENCHMARK.md). Figures
+here are medians over repeated runs; individual functions vary by a few percent
+between runs, and rows near 1.0× can land on either side.
+
+`make build-native` builds with `-C target-cpu=native` for local measurement.
+It is no longer faster than the shipped build for the hot kernels — runtime
+dispatch already selects AVX2+FMA clones — and it must never be shipped, since
+the resulting binary crashes on older CPUs.
+
+### Known slow spots
+
+Eight TA-Lib functions remain below parity, all inherently serial bar-to-bar
+recurrences where TA-Lib's C does the same work: MAVP (0.69×), ADOSC (0.83×),
+HT_TRENDLINE (0.84×), SAR and SAREXT (0.85×), STOCHRSI, STOCHF and
+CDLXSIDEGAP3METHODS (0.88×). What remains is per-bar constant factor, not
+algorithm.
+
+## Correctness
 
 Correctness is verified before performance is measured, on every run.
 
 - **Oracle verification** — every function is checked against TA-Lib (or
   pandas, for rolling and EWM operators) on batch output, on a 9k-warm-up +
   1k-live-append continuation, and for bitwise chunk invariance at chunk sizes
-  1, 10 and 1000. Current status: **287/287 MATCH**.
-- **Benchmarks** — bulk throughput against TA-Lib at 1k/10k/100k/1M bars, plus
-  per-append latency and thread scaling, with raw timing samples retained.
+  1, 10 and 1000. Current status: **287/287 MATCH** at the 10k-bar protocol.
+- Four functions — VAR, STDDEV, CORREL and BETA — reproduce TA-Lib
+  **bitwise**, byte for byte at 1M bars, by replicating its exact accumulation
+  order.
+- At 1M bars, four candle patterns (ADVANCEBLOCK, GAPSIDESIDEWHITE, KICKING,
+  KICKINGBYLENGTH) differ from TA-Lib on 5–30 bars per million on knife-edge
+  threshold comparisons. This is long-standing behaviour, not a regression —
+  verified by building the pre-optimization commit and observing identical
+  divergences on identical bars.
 
 ```bash
 make check                   # unit tests + oracle parity for all 287 functions
 make verify ARGS="EMA ATR"   # oracle parity for a subset
-make bench  ARGS="SMA MAX"   # benchmark a subset
 ```
 
-151 of the 161 TA-Lib functions meet or beat the C implementation at 10k bars,
-and every extended operator clears 20M bars/s. On a live feed the advantage is
-structural rather than a constant factor: per-tick cost is flat while a
-recompute-the-window approach grows with the period. See
-[docs/PERFORMANCE.md](docs/PERFORMANCE.md) for methods and measurements.
+See [docs/PERFORMANCE.md](docs/PERFORMANCE.md) for the optimization methods
+behind these numbers and the trade-offs that were rejected.
 
 ## Development
 

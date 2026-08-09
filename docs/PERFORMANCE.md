@@ -98,9 +98,31 @@ dropped from unbounded (200,000 samples under benchmark conditions) to 176.
 Kernels are plain auto-vectorizable loops with
 [`multiversion`](https://crates.io/crates/multiversion) runtime dispatch
 (AVX2+FMA / AVX / SSE4.2), replacing hand-written SIMD intrinsics that were
-being compiled for the SSE2 baseline — the previous build shipped no AVX and no
-FMA at all, so every `mul_add` became a multiply plus an add. Still zero
-`unsafe`, and one wheel runs well on old and new CPUs.
+being compiled for the SSE2 baseline. Still zero `unsafe`, and one wheel runs
+well on old and new CPUs.
+
+Dispatch initially covered only the element-wise kernels, which left the
+recurrence kernels — the ones that actually use `f64::mul_add` — without FMA on
+a stock wheel, where each call fell back to libm's `fma()`. Benchmarking a
+portable build caught it: T3 sat at 0.51× vs TA-Lib while the same source built
+with `target-cpu=native` cleared 1×. Extending dispatch to ten recurrence
+kernels fixed it:
+
+| kernel | before | after |
+|---|---:|---:|
+| T3 | 68M bars/s | **289M** (4.2×) |
+| TRIX | 124M | **491M** (4.0×) |
+| MACD family | ~135M | **405–429M** (~3×) |
+| PPO / APO | 179M / 223M | **505M / 532M** |
+| KAMA | 157M | **345M** |
+| BBANDS | 151M | **318M** |
+
+The dispatched portable build is now *faster* than a whole-crate
+`target-cpu=native` build for these kernels, so portability costs nothing.
+`mul_add` is an explicitly fused operation and libm's `fma()` is correctly
+rounded, so hardware FMA returns the identical bit pattern — verified by
+fingerprinting 18 kernels × 4 chunkings × 250k bars against the pre-change
+build: all 81 fingerprints identical.
 
 Never build a released wheel with `-C target-cpu=native`: it defeats the
 runtime dispatch and produces a binary that crashes on older CPUs.
@@ -163,8 +185,9 @@ Kernel throughput vs TA-Lib at 10,000 bars, before and after:
 | TripleExponentialAverage (T3) | 0.29× | **1.40×** |
 | BollingerBands (BBANDS) | 0.46× | **1.19×** |
 
-151 of the 161 TA-Lib-mapped functions now meet or beat the C implementation
-at 10k bars, and **every** extended operator clears 20M bars/s. Per-function
+153 of the 161 TA-Lib-mapped functions now meet or beat the C implementation
+at 10k bars (median **1.61×**, mean **2.01×**), and **every** extended operator
+clears 20M bars/s. Per-function
 numbers across 1k/10k/100k/1M bars, plus append latency and thread scaling, are
 in [the benchmark reports](../verify/benchmark_reports/BENCHMARK.md).
 
