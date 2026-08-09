@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingZScore;
+use taflow::indicators::RollingAutocorr as State;
 
 #[pyclass]
-pub struct RollingZScoreOperator {
-    inner: RollingZScore,
+pub struct RollingAutocorrOperator {
+    inner: State,
     outputs: Vec<f64>,
 }
+
 #[pymethods]
-impl RollingZScoreOperator {
+impl RollingAutocorrOperator {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingZScore::new(timeperiod)
-                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }
@@ -42,5 +42,8 @@ impl RollingZScoreOperator {
     fn reset(&mut self) {
         self.inner.reset();
         self.outputs.clear();
+    }
+    fn __len__(&self) -> usize {
+        self.outputs.len()
     }
 }

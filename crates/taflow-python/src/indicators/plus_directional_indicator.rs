@@ -2,7 +2,7 @@ use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::PlusDirectionalIndicator as NativePlusDirectionalIndicator;
+use taflow::indicators::PlusDirectionalIndicator as NativePlusDirectionalIndicator;
 #[pyclass]
 pub struct PlusDirectionalIndicator {
     inner: NativePlusDirectionalIndicator,

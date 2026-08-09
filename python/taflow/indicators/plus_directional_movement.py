@@ -1,27 +1,28 @@
-"""Rolling lag-one Pearson autocorrelation."""
-
 from typing import Any
 import numpy as np
-from ._native import RollingAutocorrOperator as _Native
-from ._series import as_float64_series
+from .._native import PlusDirectionalMovement as _Native
+from .._series import as_float64_series
 
 
-class RollingAutocorr:
-    """Rolling lag-one Pearson autocorrelation.
+class PlusDirectionalMovement:
+    """Plus Directional Movement
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        _input: Any,
-        timeperiod: int = 20,
+        high: Any,
+        low: Any,
+        timeperiod: int = 14,
     ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
+        high : object
+            High-price series or the current bar high.
+        low : object
+            Low-price series or the current bar low.
         timeperiod : object
             Trailing window length in bars.
 
@@ -32,41 +33,48 @@ class RollingAutocorr:
         """
         self._state = _Native(timeperiod)
         self._length = 0
-        self.extend(_input)
+        self.extend(high, low)
 
-    def append(self, _input: float) -> "RollingAutocorr":
+    def append(self, high: float, low: float) -> "PlusDirectionalMovement":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
+        h : object
+            Input parameter or configuration value for this operation.
+        l : object
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(_input))
+        self._state.append(float(high), float(low))
         self._length += 1
         return self
 
-    def extend(self, _input: Any) -> "RollingAutocorr":
+    def extend(self, high: Any, low: Any) -> "PlusDirectionalMovement":
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
+        high : object
+            Input parameter or configuration value for this operation.
+        low : object
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        values = as_float64_series(_input)
-        self._state.extend(values)
-        self._length += len(values)
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        if len(high_array) != len(low_array):
+            raise ValueError("high and low must have equal lengths")
+        self._state.extend(high_array, low_array)
+        self._length += len(high_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -90,7 +98,7 @@ class RollingAutocorr:
         """
         return self._state.value
 
-    def reset(self) -> "RollingAutocorr":
+    def reset(self) -> "PlusDirectionalMovement":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -103,4 +111,5 @@ class RollingAutocorr:
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed bars."""
         return self._length

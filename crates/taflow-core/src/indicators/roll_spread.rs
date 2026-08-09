@@ -1,5 +1,5 @@
-use super::operator_states::*;
 use crate::error::TaResult;
+use crate::stream::operator_states::*;
 
 pub struct RollSpread {
     previous_price: Option<f64>,

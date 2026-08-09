@@ -1,10 +1,8 @@
 //! Batch implementation for `rolling_zscore`.
 
-use super::operator_states::*;
-use super::operator_states::*;
-use super::*;
-use super::*;
 use crate::error::{TaError, TaResult};
+use crate::stream::operator_states::*;
+use crate::stream::*;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone)]

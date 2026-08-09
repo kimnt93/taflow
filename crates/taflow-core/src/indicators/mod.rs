@@ -131,6 +131,48 @@ pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
 pub use retracements::{Retracements, RetracementsValue};
 pub use rogers_satchell::RogersSatchell;
 
+mod ease_of_movement;
+#[cfg(test)]
+mod ease_of_movement_test;
+mod ornstein_uhlenbeck_half_life;
+#[cfg(test)]
+mod ornstein_uhlenbeck_half_life_test;
+mod plus_directional_indicator;
+#[cfg(test)]
+mod plus_directional_indicator_test;
+mod plus_directional_movement;
+#[cfg(test)]
+mod plus_directional_movement_test;
+mod roll_spread;
+#[cfg(test)]
+mod roll_spread_test;
+mod rolling_autocorr;
+#[cfg(test)]
+mod rolling_autocorr_test;
+mod rolling_volume_weighted_average_price;
+#[cfg(test)]
+mod rolling_volume_weighted_average_price_test;
+mod rolling_z_score;
+#[cfg(test)]
+mod rolling_z_score_test;
+mod schaff_trend_cycle;
+#[cfg(test)]
+mod schaff_trend_cycle_test;
+mod session_extrema;
+#[cfg(test)]
+mod session_extrema_test;
+
+pub use ease_of_movement::EaseOfMovement;
+pub use ornstein_uhlenbeck_half_life::OrnsteinUhlenbeckHalfLife;
+pub use plus_directional_indicator::PlusDirectionalIndicator;
+pub use plus_directional_movement::PlusDirectionalMovement;
+pub use roll_spread::RollSpread;
+pub use rolling_autocorr::RollingAutocorr;
+pub use rolling_volume_weighted_average_price::RollingVolumeWeightedAveragePrice;
+pub use rolling_z_score::RollingZScore;
+pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
+pub use session_extrema::{SessionExtrema, SessionExtremaValue};
+
 mod acceleration_bands;
 #[cfg(test)]
 mod acceleration_bands_test;

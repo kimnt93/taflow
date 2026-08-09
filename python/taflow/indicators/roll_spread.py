@@ -1,84 +1,75 @@
-"""Persistent Schaff Trend Cycle (pandas-ta classic alignment)."""
+"""Roll spread estimate: ``2 * sqrt(max(0, -cov(delta_p_t, delta_p_{t-1})))``."""
 
 from typing import Any
 import numpy as np
-from ._native import SchaffTrendCycleOperator as _Native
-from ._series import as_float64_series
+from .._native import RollSpreadOperator as _Native
+from .._series import as_float64_series
 
 
-class SchaffTrendCycle:
-    """Persistent Schaff Trend Cycle (pandas-ta classic alignment).
+class RollSpread:
+    """Roll spread estimate: ``2 * sqrt(max(0, -cov(delta_p_t, delta_p_{t-1})))``.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `close`. Warm-up positions are represented by `NaN` in history."""
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `price`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        close: Any,
-        tclength: int = 10,
-        fast: int = 12,
-        slow: int = 26,
-        factor: float = 0.5,
+        price: Any,
+        timeperiod: int = 20,
     ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
-        close : object
-            Close-price series or the current bar close.
-        tclength : object
-            Schaff cycle length.
-        fast : object
-            Fast smoothing period in bars.
-        slow : object
-            Slow smoothing period in bars.
-        factor : object
-            Trend multiplier.
+        price : object
+            Price series or the current price observation.
+        timeperiod : object
+            Trailing window length in bars.
 
         Returns
         -------
         None
             The constructor initializes the adapter and returns no value.
         """
-        self._state = _Native(tclength, fast, slow, factor)
+        self._state = _Native(timeperiod)
         self._length = 0
-        self.extend(close)
+        self.extend(price)
 
-    def append(self, close: float) -> "SchaffTrendCycle":
+    def append(self, price: float) -> "RollSpread":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
         ----------
-        close : object
-            Close-price series or the current bar close.
+        price : object
+            Price series or the current price observation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(close))
+        self._state.append(float(price))
         self._length += 1
         return self
 
-    def extend(self, close: Any) -> "SchaffTrendCycle":
+    def extend(self, price: Any) -> "RollSpread":
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        close : object
-            Close-price series or the current bar close.
+        price : object
+            Price series or the current price observation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        close_array = as_float64_series(close)
-        self._state.extend(close_array)
-        self._length += len(close_array)
+        price_array = as_float64_series(price)
+        self._state.extend(price_array)
+        self._length += len(price_array)
         return self
 
-    def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def compute(self) -> np.ndarray:
         """Return the aligned output history as a NumPy array.
 
         Returns
@@ -89,7 +80,7 @@ class SchaffTrendCycle:
         return self._state.compute()
 
     @property
-    def value(self) -> tuple[float, float, float] | None:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -99,7 +90,7 @@ class SchaffTrendCycle:
         """
         return self._state.value
 
-    def reset(self) -> "SchaffTrendCycle":
+    def reset(self) -> "RollSpread":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -112,5 +103,5 @@ class SchaffTrendCycle:
         return self
 
     def __len__(self) -> int:
-        """Return the number of processed closes."""
+        """Return the number of processed prices."""
         return self._length

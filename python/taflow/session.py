@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 
 from ._native import session_flags_array as _native_session_flags
-from .session_extrema import SessionExtrema
+from .indicators.session_extrema import SessionExtrema
 
 
 def session_flags(session_id: Any) -> np.ndarray:

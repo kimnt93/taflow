@@ -57,12 +57,6 @@ mod indicator;
 mod math_operator;
 pub(crate) mod moving_average_dispatcher;
 pub(crate) mod pattern;
-mod plus_directional_indicator;
-#[cfg(test)]
-mod plus_directional_indicator_test;
-mod plus_directional_movement;
-#[cfg(test)]
-mod plus_directional_movement_test;
 pub(crate) mod price_transform;
 pub(crate) mod regression;
 pub(crate) mod rolling_extrema;
@@ -122,6 +116,11 @@ pub use crate::indicators::{
     PercentagePriceOscillator, RelativeMomentumIndex,
 };
 pub use crate::indicators::{
+    EaseOfMovement, OrnsteinUhlenbeckHalfLife, PlusDirectionalIndicator, PlusDirectionalMovement,
+    RollSpread, RollingAutocorr, RollingVolumeWeightedAveragePrice, RollingZScore,
+    SchaffTrendCycle, SchaffTrendCycleValue, SessionExtrema, SessionExtremaValue,
+};
+pub use crate::indicators::{
     ExponentiallyWeightedStandardDeviation, ExponentiallyWeightedVariance,
     FastStochasticOscillator, FastStochasticOscillatorValue, FibonacciRetracement,
     FibonacciRetracementValue, FracDiff, MinusDirectionalIndicator, MinusDirectionalMovement,
@@ -134,8 +133,6 @@ pub use indicator::StreamingIndicator;
 #[allow(unused_imports)]
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use plus_directional_indicator::PlusDirectionalIndicator;
-pub use plus_directional_movement::PlusDirectionalMovement;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 
@@ -466,18 +463,6 @@ mod tests {
     }
 }
 #[allow(unused_imports)]
-mod ease_of_movement;
-#[cfg(test)]
-mod ease_of_movement_test;
-mod rolling_autocorr;
-#[cfg(test)]
-mod rolling_autocorr_test;
-mod rolling_volume_weighted_average_price;
-#[cfg(test)]
-mod rolling_volume_weighted_average_price_test;
-mod session_extrema;
-#[cfg(test)]
-mod session_extrema_test;
 mod sessions;
 #[cfg(test)]
 mod sessions_test;
@@ -494,18 +479,6 @@ mod signed_power_test;
 pub use signed_power::SignedPower;
 #[allow(unused_imports)]
 pub(crate) mod bar_relation;
-mod ornstein_uhlenbeck_half_life;
-#[cfg(test)]
-mod ornstein_uhlenbeck_half_life_test;
-mod roll_spread;
-#[cfg(test)]
-mod roll_spread_test;
-mod rolling_z_score;
-#[cfg(test)]
-mod rolling_z_score_test;
-mod schaff_trend_cycle;
-#[cfg(test)]
-mod schaff_trend_cycle_test;
 mod squeeze;
 mod squeeze_pro;
 #[cfg(test)]
@@ -522,14 +495,6 @@ mod vortex;
 mod vortex_test;
 
 mod value_when;
-pub use ease_of_movement::EaseOfMovement;
-pub use ornstein_uhlenbeck_half_life::OrnsteinUhlenbeckHalfLife;
-pub use roll_spread::RollSpread;
-pub use rolling_autocorr::RollingAutocorr;
-pub use rolling_volume_weighted_average_price::RollingVolumeWeightedAveragePrice;
-pub use rolling_z_score::RollingZScore;
-pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
-pub use session_extrema::{SessionExtrema, SessionExtremaValue};
 pub use sessions::{Sessions, SessionsValue};
 pub use squeeze::{Squeeze, SqueezeValue};
 pub use squeeze_pro::{SqueezePro, SqueezeProValue};

@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.rolling_autocorr import RollingAutocorr
+from taflow import RollingAutocorr
 
 
 def test_rolling_autocorr_lifecycle_and_reset():
@@ -10,4 +10,3 @@ def test_rolling_autocorr_lifecycle_and_reset():
     assert len(state) == 3
     state.reset()
     assert state.value is None
-

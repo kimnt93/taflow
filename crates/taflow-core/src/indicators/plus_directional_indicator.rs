@@ -1,6 +1,6 @@
 //! Incremental Plus Directional Indicator (+DI).
-use super::directional::DirectionalMovement;
 use crate::error::TaResult;
+use crate::stream::directional::DirectionalMovement;
 
 /// Persistent Rust state or aligned output type for `PlusDirectionalIndicator`.
 ///

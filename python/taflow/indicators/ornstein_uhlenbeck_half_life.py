@@ -1,29 +1,29 @@
-"""Persistent causal rolling z-score operator."""
+"""Ornstein-Uhlenbeck mean-reversion half-life of a price series."""
 
 from typing import Any
 import numpy as np
-from ._native import RollingZScoreOperator as _Native
-from ._series import as_float64_series
+from .._native import OrnsteinUhlenbeckHalfLifeOperator as _Native
+from .._series import as_float64_series
 
 
-class RollingZScore:
-    """Persistent causal rolling z-score operator.
+class OrnsteinUhlenbeckHalfLife:
+    """Ornstein-Uhlenbeck mean-reversion half-life of a price series.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `price`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        _input: Any,
-        timeperiod: int = 14,
+        price: Any,
+        timeperiod: int = 20,
     ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
+        price : object
+            Price series or the current price observation.
         timeperiod : object
             Trailing window length in bars.
-        _input : object
-            Input series or the current scalar observation.
 
         Returns
         -------
@@ -31,38 +31,42 @@ class RollingZScore:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(_input)
+        self._length = 0
+        self.extend(price)
 
-    def append(self, _input: float) -> "RollingZScore":
+    def append(self, price: float) -> "OrnsteinUhlenbeckHalfLife":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
+        price : object
+            Price series or the current price observation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(_input))
+        self._state.append(float(price))
+        self._length += 1
         return self
 
-    def extend(self, _input: Any) -> "RollingZScore":
+    def extend(self, price: Any) -> "OrnsteinUhlenbeckHalfLife":
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
+        price : object
+            Price series or the current price observation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(_input))
+        price_array = as_float64_series(price)
+        self._state.extend(price_array)
+        self._length += len(price_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -86,7 +90,7 @@ class RollingZScore:
         """
         return self._state.value
 
-    def reset(self) -> "RollingZScore":
+    def reset(self) -> "OrnsteinUhlenbeckHalfLife":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -95,4 +99,9 @@ class RollingZScore:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed prices."""
+        return self._length

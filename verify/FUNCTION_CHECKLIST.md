@@ -156,6 +156,17 @@ adapters were moved into `python/taflow/indicators/`. Focused Python tests
 (32), full Rust tests (386), release build, and the 300/300 interface audit
 passed. Benchmark fields remain `TODO`; no benchmark command was run.
 
+The thirty-eighth structural batch migrated the Rust implementations and
+separate tests for `EaseOfMovement`, `OrnsteinUhlenbeckHalfLife`,
+`PlusDirectionalIndicator`, `PlusDirectionalMovement`, `RollSpread`,
+`RollingAutocorr`, `RollingVolumeWeightedAveragePrice`, `RollingZScore`,
+`SchaffTrendCycle`, and `SessionExtrema` into the canonical indicators
+directory. Alias-named PyO3 files (`ou_half_life`, `vwap`, `stc`, and related
+paths) were renamed to their canonical modules, and root Python adapters and
+exports were normalized. Focused Python tests (10), full Rust tests (386),
+release build, and the 300/300 interface audit passed. Benchmark fields remain
+`TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

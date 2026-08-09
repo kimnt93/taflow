@@ -1,54 +1,53 @@
+"""Persistent Schaff Trend Cycle (pandas-ta classic alignment)."""
+
 from typing import Any
 import numpy as np
-from ._native import PlusDirectionalIndicator as _Native
-from ._series import as_float64_series
+from .._native import SchaffTrendCycleOperator as _Native
+from .._series import as_float64_series
 
 
-class PlusDirectionalIndicator:
-    """Plus Directional Indicator
+class SchaffTrendCycle:
+    """Persistent Schaff Trend Cycle (pandas-ta classic alignment).
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
         close: Any,
-        timeperiod: int = 14,
+        tclength: int = 10,
+        fast: int = 12,
+        slow: int = 26,
+        factor: float = 0.5,
     ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
         close : object
             Close-price series or the current bar close.
-        timeperiod : object
-            Trailing window length in bars.
+        tclength : object
+            Schaff cycle length.
+        fast : object
+            Fast smoothing period in bars.
+        slow : object
+            Slow smoothing period in bars.
+        factor : object
+            Trend multiplier.
 
         Returns
         -------
         None
             The constructor initializes the adapter and returns no value.
         """
-        self._state = _Native(timeperiod)
+        self._state = _Native(tclength, fast, slow, factor)
         self._length = 0
-        self.extend(high, low, close)
+        self.extend(close)
 
-    def append(
-        self, high: float, low: float, close: float
-    ) -> "PlusDirectionalIndicator":
+    def append(self, close: float) -> "SchaffTrendCycle":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
         close : object
             Close-price series or the current bar close.
 
@@ -57,21 +56,15 @@ class PlusDirectionalIndicator:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(high), float(low), float(close))
+        self._state.append(float(close))
         self._length += 1
         return self
 
-    def extend(
-        self, high: Any, low: Any, close: Any
-    ) -> "PlusDirectionalIndicator":
+    def extend(self, close: Any) -> "SchaffTrendCycle":
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
         close : object
             Close-price series or the current bar close.
 
@@ -80,14 +73,12 @@ class PlusDirectionalIndicator:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        arrays = tuple(as_float64_series(value) for value in (high, low, close))
-        if len({len(array) for array in arrays}) != 1:
-            raise ValueError("high, low, and close must have equal lengths")
-        self._state.extend(*arrays)
-        self._length += len(arrays[0])
+        close_array = as_float64_series(close)
+        self._state.extend(close_array)
+        self._length += len(close_array)
         return self
 
-    def compute(self) -> np.ndarray:
+    def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Return the aligned output history as a NumPy array.
 
         Returns
@@ -98,7 +89,7 @@ class PlusDirectionalIndicator:
         return self._state.compute()
 
     @property
-    def value(self) -> float | None:
+    def value(self) -> tuple[float, float, float] | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -108,7 +99,7 @@ class PlusDirectionalIndicator:
         """
         return self._state.value
 
-    def reset(self) -> "PlusDirectionalIndicator":
+    def reset(self) -> "SchaffTrendCycle":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -121,5 +112,5 @@ class PlusDirectionalIndicator:
         return self
 
     def __len__(self) -> int:
-        """Return the number of processed bars."""
+        """Return the number of processed closes."""
         return self._length
