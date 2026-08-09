@@ -47,7 +47,8 @@ pub use crate::indicators::{
     DonchianValue, EqualHighsLows, FairValueGap, FairValueGapValue, Falling, FractalDimension,
     GapDown, GapUp, HedgeRatio, HigherHigh, HilbertTransformDominantCyclePhase, InsideBar,
     KaufmanAdaptiveMovingAverage, KeltnerChannels, KeltnerValue, KnowSureThing, LowerLow,
-    MassIndex, OutsideBar, Rising, RollingAlpha, RollingInformationRatio, UlcerIndex,
+    MassIndex, NegativeVolumeIndex, OutsideBar, PositiveVolumeIndex, Rising, RollingAlpha,
+    RollingInformationRatio, UlcerIndex, VolumePriceTrend,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -627,24 +628,14 @@ mod swing_low;
 #[cfg(test)]
 mod swing_low_test;
 pub use swing_low::SwingLow;
+#[allow(unused_imports)]
+pub(crate) mod bar_relation;
+mod bars_since;
 mod exponentially_weighted_standard_deviation;
 mod exponentially_weighted_variance;
-mod negative_volume_index;
-#[cfg(test)]
-mod negative_volume_index_test;
-mod positive_volume_index;
-#[cfg(test)]
-mod positive_volume_index_test;
 mod rolling_z_score;
 #[cfg(test)]
 mod rolling_z_score_test;
-#[allow(unused_imports)]
-mod volume_price_trend;
-#[cfg(test)]
-mod volume_price_trend_test;
-
-pub(crate) mod bar_relation;
-mod bars_since;
 
 mod highest_since;
 
@@ -685,6 +676,3 @@ mod position_hold;
 pub use position_hold::PositionHold;
 mod entry_exit;
 pub use entry_exit::EntryExit;
-pub use negative_volume_index::NegativeVolumeIndex;
-pub use positive_volume_index::PositiveVolumeIndex;
-pub use volume_price_trend::VolumePriceTrend;

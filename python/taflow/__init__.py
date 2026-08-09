@@ -279,9 +279,9 @@ from .indicators.know_sure_thing import KnowSureThing
 from .indicators.mass_index import MassIndex
 from .indicators.detrended_price_oscillator import DetrendedPriceOscillator
 from .indicators.chaikin_money_flow import ChaikinMoneyFlow
-from .volume_price_trend import VolumePriceTrend
-from .negative_volume_index import NegativeVolumeIndex
-from .positive_volume_index import PositiveVolumeIndex
+from .indicators.volume_price_trend import VolumePriceTrend
+from .indicators.negative_volume_index import NegativeVolumeIndex
+from .indicators.positive_volume_index import PositiveVolumeIndex
 from .indicators.mc_ginley_dynamic import McGinleyDynamic
 from .decay_linear import DecayLinear
 from .signed_power import SignedPower

@@ -1,5 +1,5 @@
-use super::operator_states::*;
 use super::*;
+use crate::stream::operator_states::*;
 
 /// Stateful Volume-price Trend, aligned to `ta.volume.VolumePriceTrendIndicator`.
 #[derive(Debug, Clone)]

@@ -1,17 +1,17 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::NegativeVolumeIndex;
+use taflow::stream::PositiveVolumeIndex;
 #[pyclass]
-pub struct NegativeVolumeIndexOperator {
-    inner: NegativeVolumeIndex,
+pub struct PositiveVolumeIndexOperator {
+    inner: PositiveVolumeIndex,
     values: Vec<f64>,
 }
 #[pymethods]
-impl NegativeVolumeIndexOperator {
+impl PositiveVolumeIndexOperator {
     #[new]
     fn new() -> Self {
         Self {
-            inner: NegativeVolumeIndex::new(),
+            inner: PositiveVolumeIndex::new(),
             values: Vec::new(),
         }
     }
@@ -49,5 +49,8 @@ impl NegativeVolumeIndexOperator {
     fn reset(&mut self) {
         self.inner.reset();
         self.values.clear();
+    }
+    fn __len__(&self) -> usize {
+        self.values.len()
     }
 }

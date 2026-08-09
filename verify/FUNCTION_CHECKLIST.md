@@ -80,6 +80,15 @@ The release extension, three focused Python tests, focused Rust tests, full
 Python suite (591 passed, 2 skipped), and 303/303 interface audit passed.
 Benchmark fields remain `TODO`; no benchmark command was run.
 
+The thirtieth structural batch removed duplicate root volume adapters
+(`cmf`, `nvi`, `pvi`, and `vpt`), moved the canonical volume-index adapters
+and bindings to full-name indicator paths, and migrated their Rust states/tests
+from `stream/` into `indicators/`. Native length delegation was added for the
+three moved bindings. The release extension, three focused Python tests,
+focused Rust tests, full Python suite (591 passed, 2 skipped), and 303/303
+interface audit passed. Benchmark fields remain `TODO`; no benchmark command
+was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

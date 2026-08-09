@@ -623,9 +623,15 @@ mod keltner_channels_test;
 mod lower_low;
 #[cfg(test)]
 mod lower_low_test;
+mod negative_volume_index;
+#[cfg(test)]
+mod negative_volume_index_test;
 mod outside_bar;
 #[cfg(test)]
 mod outside_bar_test;
+mod positive_volume_index;
+#[cfg(test)]
+mod positive_volume_index_test;
 mod rising;
 #[cfg(test)]
 mod rising_test;
@@ -638,6 +644,9 @@ mod rolling_information_ratio_test;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
+mod volume_price_trend;
+#[cfg(test)]
+mod volume_price_trend_test;
 
 pub use chaikin_money_flow::ChaikinMoneyFlow;
 pub use chaikin_volatility::ChaikinVolatility;
@@ -662,11 +671,14 @@ pub use higher_high::HigherHigh;
 pub use inside_bar::InsideBar;
 pub use keltner_channels::{KeltnerChannels, KeltnerValue};
 pub use lower_low::LowerLow;
+pub use negative_volume_index::NegativeVolumeIndex;
 pub use outside_bar::OutsideBar;
+pub use positive_volume_index::PositiveVolumeIndex;
 pub use rising::Rising;
 pub use rolling_alpha::RollingAlpha;
 pub use rolling_information_ratio::RollingInformationRatio;
 pub use ulcer_index::UlcerIndex;
+pub use volume_price_trend::VolumePriceTrend;
 
 mod candle_three_stars_in_south;
 #[cfg(test)]

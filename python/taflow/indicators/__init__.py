@@ -236,6 +236,9 @@ from ..previous_high_low import PreviousHighLow
 from ..sessions import Sessions
 from .active_zone_list import ActiveZoneList
 from .fair_value_gap import FairValueGap
+from .volume_price_trend import VolumePriceTrend
+from .negative_volume_index import NegativeVolumeIndex
+from .positive_volume_index import PositiveVolumeIndex
 from ..swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from ..order_block import OrderBlock

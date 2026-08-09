@@ -1,17 +1,17 @@
-use super::operator_states::*;
 use super::*;
+use crate::stream::operator_states::*;
 
-/// Persistent Rust state or aligned output type for `NegativeVolumeIndex`.
+/// Persistent Rust state or aligned output type for `PositiveVolumeIndex`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct NegativeVolumeIndex(VolumeIndex);
+pub struct PositiveVolumeIndex(VolumeIndex);
 
-impl NegativeVolumeIndex {
+impl PositiveVolumeIndex {
     /// Create a new empty state.
     ///
     pub fn new() -> Self {
-        Self(VolumeIndex::new(VolumeIndexMode::Negative))
+        Self(VolumeIndex::new(VolumeIndexMode::Positive))
     }
     /// Append one causal observation and return the latest result.
     ///
