@@ -1,36 +1,18 @@
-"""Canonical Weighted Moving Average adapter."""
+"""Canonical native-backed Weighted Moving Average adapter."""
 from typing import Any
+import numpy as np
+from ._native import WeightedMovingAverage as _NativeWeightedMovingAverage
+from ._series import as_float64_series
 
-from ._native import StatefulWma
-from ._unary_state import UnaryStateAdapter
-
-
-class WeightedMovingAverage(UnaryStateAdapter):
-    """Compute the linearly weighted moving average using Rust
-
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    WeightedMovingAverage
-        A persistent native-backed indicator adapter.
-    """
-
-    _native_cls = StatefulWma
-
-    def append(self, _input: float) -> "WeightedMovingAverage":
-        """Append one observation and return this indicator."""
-        super().append(_input)
-        return self
-
-    def extend(self, _input: Any) -> "WeightedMovingAverage":
-        """Append aligned histories and return this indicator."""
-        super().extend(_input)
-        return self
-
-    def reset(self) -> "WeightedMovingAverage":
-        """Reset native state and return this indicator."""
-        super().reset()
-        return self
+class WeightedMovingAverage:
+    """Compute linearly weighted MA from required ``values`` in Rust."""
+    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+        self._state = _NativeWeightedMovingAverage(timeperiod); self.extend(values)
+    def append(self, value: float) -> "WeightedMovingAverage": self._state.append(float(value)); return self
+    def extend(self, values: Any) -> "WeightedMovingAverage": self._state.extend(as_float64_series(values)); return self
+    def compute(self) -> np.ndarray: return self._state.compute()
+    @property
+    def value(self) -> float | None: return self._state.value
+    def reset(self) -> "WeightedMovingAverage": self._state.reset(); return self
+    def __len__(self) -> int: return len(self._state)
+__all__ = ["WeightedMovingAverage"]

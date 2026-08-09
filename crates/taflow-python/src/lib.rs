@@ -14,6 +14,14 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Unified indicator objects. Each TA binding lives in its own module and
     // owns its accumulated outputs so compute() never replays prior input.
     m.add_class::<indicators::ExponentialMovingAverage>()?;
+    m.add_class::<indicators::SimpleMovingAverage>()?;
+    m.add_class::<indicators::WeightedMovingAverage>()?;
+    m.add_class::<indicators::DoubleExponentialMovingAverage>()?;
+    m.add_class::<indicators::TriangularMovingAverage>()?;
+    m.add_class::<indicators::RollingSum>()?;
+    m.add_class::<indicators::RollingAverageDeviation>()?;
+    m.add_class::<indicators::RollingVariance>()?;
+    m.add_class::<indicators::RollingStandardDeviation>()?;
     m.add_class::<indicators::CandleDoji>()?;
     m.add_class::<indicators::CandleTakuri>()?;
     m.add_class::<indicators::CandleClosingMarubozu>()?;
@@ -62,6 +70,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RelativeMomentumIndex>()?;
     m.add_class::<indicators::MovingAverage>()?;
     m.add_class::<indicators::TripleExponentialMovingAverage>()?;
+    m.add_class::<indicators::TripleExponentialAverage>()?;
     m.add_class::<indicators::HilbertTransformTrendline>()?;
     m.add_class::<indicators::JurikMovingAverage>()?;
     m.add_class::<indicators::EvenBetterSinewave>()?;
@@ -221,11 +230,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Transitional state classes remain available while their indicators move
     // to the unified object surface above.
-    m.add_class::<state_api::StatefulSma>()?;
-    m.add_class::<state_api::StatefulEma>()?;
-    m.add_class::<state_api::StatefulWma>()?;
-    m.add_class::<state_api::StatefulDema>()?;
-    m.add_class::<state_api::StatefulTrima>()?;
     m.add_class::<state_api::StatefulMidpoint>()?;
     m.add_class::<state_api::StatefulMidprice>()?;
     m.add_class::<state_api::Momentum>()?;
@@ -237,12 +241,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulMaxindex>()?;
     m.add_class::<state_api::StatefulMin>()?;
     m.add_class::<state_api::StatefulMinindex>()?;
-    m.add_class::<state_api::StatefulSum>()?;
     m.add_class::<state_api::StatefulMinmax>()?;
     m.add_class::<state_api::StatefulMinmaxindex>()?;
-    m.add_class::<state_api::StatefulAvgdev>()?;
-    m.add_class::<state_api::StatefulVar>()?;
-    m.add_class::<state_api::StatefulStddev>()?;
     m.add_class::<state_api::StatefulBeta>()?;
     m.add_class::<state_api::StatefulCorrel>()?;
     m.add_class::<state_api::StatefulLinearreg>()?;
@@ -303,7 +303,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulStochf>()?;
     m.add_class::<state_api::StatefulStochrsi>()?;
     m.add_class::<state_api::StatefulMama>()?;
-    m.add_class::<state_api::StatefulT3>()?;
     m.add_class::<state_api::StatefulApo>()?;
     m.add_class::<state_api::StatefulPpo>()?;
     m.add_class::<state_api::StatefulBbands>()?;

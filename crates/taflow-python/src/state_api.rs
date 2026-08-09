@@ -5,16 +5,14 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
     self, AverageDirectionalIndex, AverageDirectionalIndexRating,
-    AverageTrueRange as CoreAverageTrueRange, DirectionalMovementIndex,
-    DoubleExponentialMovingAverage, ExponentialMovingAverage, FastStochasticOscillator,
+    AverageTrueRange as CoreAverageTrueRange, DirectionalMovementIndex, FastStochasticOscillator,
     MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
     NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, RateOfChange as CoreRateOfChange,
     RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
     RateOfChangeRatioPercent as CoreRateOfChangeRatioPercent, RollingMidpoint, RollingMidprice,
-    SimpleMovingAverage, SmoothedTrendChannel, StochasticOscillator,
-    StochasticRelativeStrengthIndex, StreamingIndicator, TriangularMovingAverage,
-    TrueRange as CoreTrueRange, VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage,
-    WeightedMovingAverage,
+    SmoothedTrendChannel, StochasticOscillator, StochasticRelativeStrengthIndex,
+    StreamingIndicator, TrueRange as CoreTrueRange,
+    VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage,
 };
 use taflow::MaType;
 
@@ -101,8 +99,6 @@ scalar_state_class!(StatefulMax, stream::RollingMax, 30);
 scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);
 scalar_state_class!(StatefulMin, stream::RollingMin, 30);
 scalar_state_class!(StatefulMinindex, stream::RollingArgmin, 30);
-scalar_state_class!(StatefulSum, stream::RollingSum, 30);
-scalar_state_class!(StatefulAvgdev, stream::RollingAverageDeviation, 14);
 scalar_state_class!(StatefulCmo, stream::ChandeMomentumOscillator, 14);
 scalar_state_class!(StatefulKama, stream::KaufmanAdaptiveMovingAverage, 30);
 scalar_state_class!(StatefulLinearreg, stream::Linearreg, 14);
@@ -174,54 +170,6 @@ impl StatefulSmoothedTrendChannel {
         self.inner.reset();
         self.lower.clear();
         self.upper.clear();
-    }
-}
-
-#[pyclass]
-pub struct StatefulT3 {
-    inner: stream::TripleExponentialAverage,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulT3 {
-    #[new]
-    #[pyo3(signature = (timeperiod=5, vfactor=0.7))]
-    fn new(timeperiod: usize, vfactor: f64) -> PyResult<Self> {
-        Ok(Self {
-            inner: stream::TripleExponentialAverage::new(timeperiod, vfactor)
-                .map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
     }
 }
 
@@ -637,9 +585,6 @@ macro_rules! deviation_state_class {
         }
     };
 }
-
-deviation_state_class!(StatefulVar, RollingVariance);
-deviation_state_class!(StatefulStddev, RollingStandardDeviation);
 
 macro_rules! bivariate_statistic_class {
     ($class:ident, $inner:ident) => {
@@ -1610,241 +1555,6 @@ impl StatefulMidprice {
                 .extend_slices_into(high, low, outputs)
                 .expect("lengths validated above")
         });
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pyclass]
-pub struct StatefulSma {
-    inner: SimpleMovingAverage,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulSma {
-    #[new]
-    #[pyo3(signature = (timeperiod=30))]
-    fn new(timeperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: SimpleMovingAverage::new(timeperiod).map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pyclass]
-pub struct StatefulEma {
-    inner: ExponentialMovingAverage,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulEma {
-    #[new]
-    #[pyo3(signature = (timeperiod=30))]
-    fn new(timeperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: ExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pyclass]
-pub struct StatefulWma {
-    inner: WeightedMovingAverage,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulWma {
-    #[new]
-    #[pyo3(signature = (timeperiod=30))]
-    fn new(timeperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: WeightedMovingAverage::new(timeperiod).map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pyclass]
-pub struct StatefulDema {
-    inner: DoubleExponentialMovingAverage,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulDema {
-    #[new]
-    #[pyo3(signature = (timeperiod=30))]
-    fn new(timeperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: DoubleExponentialMovingAverage::new(timeperiod).map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pyclass]
-pub struct StatefulTrima {
-    inner: TriangularMovingAverage,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulTrima {
-    #[new]
-    #[pyo3(signature = (timeperiod=30))]
-    fn new(timeperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: TriangularMovingAverage::new(timeperiod).map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
         Ok(())
     }
 

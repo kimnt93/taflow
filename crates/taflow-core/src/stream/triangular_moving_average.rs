@@ -14,13 +14,6 @@ use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn triangular_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = TriangularMovingAverage::new(timeperiod)?;
-    let mut output = Vec::new();
-    state.extend_slice_into(input, &mut output);
-    Ok(output)
-}
-
 /// Stateful triangular moving average as two cascaded SMA windows.
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `TriangularMovingAverage`.
@@ -103,63 +96,5 @@ impl StreamingIndicator for TriangularMovingAverage {
         self.sma1.reset();
         self.sma2.reset();
         self.value = None;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
-        (0..n)
-            .map(|_| {
-                state = state
-                    .wrapping_mul(6364136223846793005)
-                    .wrapping_add(1442695040888963407);
-                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
-            })
-            .collect()
-    }
-
-    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
-        assert_eq!(actual.len(), expected.len(), "{label}: length");
-        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
-            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
-        }
-    }
-
-    #[test]
-    fn trima_bulk_is_bitwise_identical_to_per_bar_append() {
-        let input = lcg_series(5_000, 0x5EED_0071);
-        let tail = lcg_series(256, 0x7A11_0071);
-        for period in [2usize, 5, 14, 30, 200] {
-            let mut per_bar = TriangularMovingAverage::new(period).unwrap();
-            let reference: Vec<f64> = input
-                .iter()
-                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
-                .collect();
-            let tail_reference: Vec<f64> = tail
-                .iter()
-                .map(|&x| per_bar.append(x).unwrap_or(f64::NAN))
-                .collect();
-
-            for chunk in [usize::MAX, 1, 7, 97] {
-                let mut state = TriangularMovingAverage::new(period).unwrap();
-                let mut out = Vec::new();
-                for piece in input.chunks(chunk.min(input.len())) {
-                    state.extend_slice_into(piece, &mut out);
-                }
-                assert_same_bits(&out, &reference, &format!("p{period} chunk {chunk}"));
-                let tail_out: Vec<f64> = tail
-                    .iter()
-                    .map(|&x| state.append(x).unwrap_or(f64::NAN))
-                    .collect();
-                assert_same_bits(
-                    &tail_out,
-                    &tail_reference,
-                    &format!("p{period} chunk {chunk} tail"),
-                );
-            }
-        }
     }
 }

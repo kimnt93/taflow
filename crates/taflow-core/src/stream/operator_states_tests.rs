@@ -190,8 +190,12 @@ mod tests {
                 .iter()
                 .map(|&x| x.to_bits())
                 .collect::<Vec<_>>(),
-            crate::stream::weighted_moving_average(&close, 3)
-                .unwrap()
+            {
+                let mut state = crate::stream::WeightedMovingAverage::new(3).unwrap();
+                let mut output = Vec::new();
+                state.extend_slice_into(&close, &mut output);
+                output
+            }
                 .iter()
                 .map(|&x| x.to_bits())
                 .collect::<Vec<_>>()

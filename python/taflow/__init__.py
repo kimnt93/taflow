@@ -141,7 +141,7 @@ from .math_add import MathAdd
 from .math_subtract import MathSubtract
 from .math_multiply import MathMultiply
 from .math_divide import MathDivide
-from .rolling_std import RollingStandardDeviation
+from .rolling_standard_deviation import RollingStandardDeviation
 from .rolling_average_deviation import RollingAverageDeviation
 from .rolling_midpoint import RollingMidpoint
 from .rolling_midprice import RollingMidprice

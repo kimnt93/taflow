@@ -1,36 +1,5 @@
 use crate::error::{TaError, TaResult};
 
-/// Compute the rolling sum result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn rolling_sum(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    validate_period(input, timeperiod)?;
-    let len = input.len();
-    let lookback = timeperiod - 1;
-    let mut output = vec![0.0_f64; len];
-    output[..lookback].fill(f64::NAN);
-    // Keep the same left-to-right arithmetic order as `RollingSum::append`.
-    // This makes a batch call and an extend/append split bitwise identical.
-    let mut s = 0.0_f64;
-    for &value in &input[..timeperiod] {
-        s += value;
-    }
-    output[lookback] = s;
-    for i in timeperiod..len {
-        s -= input[i - timeperiod];
-        s += input[i];
-        output[i] = s;
-    }
-    Ok(output)
-}
-
 /// MINMAXINDEX -- original fused implementation (unused, kept for reference)
 #[allow(dead_code)]
 pub(crate) fn minmaxindex_fused(

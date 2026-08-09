@@ -1,31 +1,18 @@
-"""Persistent RollingAverageDeviation interface."""
-
+"""Canonical native-backed Rolling Average Deviation adapter."""
 from typing import Any
+import numpy as np
+from ._native import RollingAverageDeviation as _NativeRollingAverageDeviation
+from ._series import as_float64_series
 
-from ._unary_state import UnaryStateAdapter
-from ._native import StatefulAvgdev
-
-
-class RollingAverageDeviation(UnaryStateAdapter):
-    """Compute RollingAverageDeviation over a required series in native Rust state.
-
-    ``timeperiod`` defaults to 14. History is aligned and contains NaN
-    until the trailing window is complete.
-    """
-
-    _native_cls = StatefulAvgdev
-
-    def append(self, _input: float) -> "RollingAverageDeviation":
-        """Append one value and return this indicator."""
-        super().append(_input)
-        return self
-
-    def extend(self, _input: Any) -> "RollingAverageDeviation":
-        """Append a chronological series and return this indicator."""
-        super().extend(_input)
-        return self
-
-    def reset(self) -> "RollingAverageDeviation":
-        """Reset native state and return this indicator."""
-        super().reset()
-        return self
+class RollingAverageDeviation:
+    """Compute AVGDEV from required ``values`` with period 14 by default."""
+    def __init__(self, values: Any, timeperiod: int = 14) -> None:
+        self._state = _NativeRollingAverageDeviation(timeperiod); self.extend(values)
+    def append(self, value: float) -> "RollingAverageDeviation": self._state.append(float(value)); return self
+    def extend(self, values: Any) -> "RollingAverageDeviation": self._state.extend(as_float64_series(values)); return self
+    def compute(self) -> np.ndarray: return self._state.compute()
+    @property
+    def value(self) -> float | None: return self._state.value
+    def reset(self) -> "RollingAverageDeviation": self._state.reset(); return self
+    def __len__(self) -> int: return len(self._state)
+__all__ = ["RollingAverageDeviation"]

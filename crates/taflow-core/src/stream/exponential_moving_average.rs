@@ -34,15 +34,6 @@ fn ema_steady_loop(inputs: &[f64], k: f64, seed: f64, outputs: &mut Vec<Option<f
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = ExponentialMovingAverage::new(timeperiod)?;
-    Ok(state
-        .extend_slice(input)
-        .into_iter()
-        .map(|value| value.unwrap_or(f64::NAN))
-        .collect())
-}
-
 /// Stateful EMA with the same SMA seed as TA-Lib's batch EMA.
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `ExponentialMovingAverage`.

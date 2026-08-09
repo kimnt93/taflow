@@ -20,6 +20,11 @@ fn reset_replay_matches() {
     state
         .extend_slice_into(&high, &low, &close, &anchor, &mut replay)
         .unwrap();
-    assert_eq!(output, replay);
+    for (expected, actual) in output.iter().zip(&replay) {
+        assert_eq!(expected.len(), actual.len());
+        for (expected, actual) in expected.iter().zip(actual) {
+            assert_eq!(expected.to_bits(), actual.to_bits());
+        }
+    }
     assert_eq!(state.value(), final_value);
 }

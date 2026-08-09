@@ -1,31 +1,18 @@
-"""Persistent RollingVariance interface."""
-
+"""Canonical native-backed Rolling Variance adapter."""
 from typing import Any
+import numpy as np
+from ._native import RollingVariance as _NativeRollingVariance
+from ._series import as_float64_series
 
-from ._unary_state import UnaryStateAdapter
-from ._native import StatefulVar
-
-
-class RollingVariance(UnaryStateAdapter):
-    """Compute RollingVariance over a required series in native Rust state.
-
-    ``timeperiod`` defaults to 14. History is aligned and contains NaN
-    until the trailing window is complete.
-    """
-
-    _native_cls = StatefulVar
-
-    def append(self, _input: float) -> "RollingVariance":
-        """Append one value and return this indicator."""
-        super().append(_input)
-        return self
-
-    def extend(self, _input: Any) -> "RollingVariance":
-        """Append a chronological series and return this indicator."""
-        super().extend(_input)
-        return self
-
-    def reset(self) -> "RollingVariance":
-        """Reset native state and return this indicator."""
-        super().reset()
-        return self
+class RollingVariance:
+    """Compute population variance from required ``values``; ``nbdev`` is accepted for API parity."""
+    def __init__(self, values: Any, timeperiod: int = 14, nbdev: float = 1.0) -> None:
+        self._state = _NativeRollingVariance(timeperiod, nbdev); self.extend(values)
+    def append(self, value: float) -> "RollingVariance": self._state.append(float(value)); return self
+    def extend(self, values: Any) -> "RollingVariance": self._state.extend(as_float64_series(values)); return self
+    def compute(self) -> np.ndarray: return self._state.compute()
+    @property
+    def value(self) -> float | None: return self._state.value
+    def reset(self) -> "RollingVariance": self._state.reset(); return self
+    def __len__(self) -> int: return len(self._state)
+__all__ = ["RollingVariance"]

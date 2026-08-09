@@ -113,10 +113,10 @@ mod commodity_channel_index;
 #[cfg(test)]
 mod commodity_channel_index_test;
 mod cycle;
-mod dema;
 mod directional;
+mod double_exponential_moving_average;
 mod dx;
-mod ema;
+mod exponential_moving_average;
 mod hilbert_transform_trendline;
 #[cfg(test)]
 mod hilbert_transform_trendline_test;
@@ -361,16 +361,18 @@ mod sarext;
 mod session_volume_levels;
 #[cfg(test)]
 mod session_volume_levels_test;
-mod sma;
+mod simple_moving_average;
 mod ssl_channel;
 mod stoch;
 mod stochf;
 mod stochrsi;
-mod t3;
 mod tom_de_mark_sequential;
 #[cfg(test)]
 mod tom_de_mark_sequential_test;
-mod trima;
+mod triangular_moving_average;
+mod triple_exponential_average;
+#[cfg(test)]
+mod triple_exponential_average_test;
 mod triple_exponential_moving_average;
 #[cfg(test)]
 mod triple_exponential_moving_average_test;
@@ -382,7 +384,7 @@ mod variable_index_dynamic_average_test;
 mod window;
 #[allow(unused_imports)]
 pub(crate) use helpers::invalid_period;
-mod wma;
+mod weighted_moving_average;
 
 #[allow(unused_imports)]
 pub(crate) use accbands::acceleration_bands;
@@ -468,16 +470,12 @@ pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
 pub(crate) use cmo::chande_momentum_oscillator;
 pub use cmo::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
-#[allow(unused_imports)]
-pub(crate) use dema::double_exponential_moving_average;
-pub use dema::DoubleExponentialMovingAverage;
+pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
 #[allow(unused_imports)]
 pub(crate) use dx::directional_movement_index;
 pub use dx::DirectionalMovementIndex;
-#[allow(unused_imports)]
-pub(crate) use ema::exponential_moving_average;
-pub use ema::ExponentialMovingAverage;
 pub use even_better_sinewave::EvenBetterSinewave;
+pub use exponential_moving_average::ExponentialMovingAverage;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
 pub use heikin_ashi::{HeikinAshi, HeikinAshiValue};
 pub use hilbert_transform_trendline::HilbertTransformTrendline;
@@ -501,7 +499,6 @@ pub use log_return::LogReturn;
 pub(crate) use mama::mesa_adaptive_moving_average;
 pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
-pub(crate) use math_operator::rolling_sum;
 pub use minus_directional_indicator::MinusDirectionalIndicator;
 pub use minus_directional_movement::MinusDirectionalMovement;
 pub use momentum::Momentum;
@@ -550,9 +547,7 @@ pub use sar::ParabolicSar;
 pub(crate) use sarext::parabolic_sar_extended;
 pub use sarext::ParabolicSarExtended;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
-#[allow(unused_imports)]
-pub(crate) use sma::simple_moving_average;
-pub use sma::SimpleMovingAverage;
+pub use simple_moving_average::SimpleMovingAverage;
 pub use ssl_channel::SmoothedTrendChannel;
 #[allow(unused_imports)]
 pub(crate) use stoch::stochastic_oscillator;
@@ -563,13 +558,10 @@ pub use stochf::{FastStochasticOscillator, FastStochasticOscillatorValue};
 #[allow(unused_imports)]
 pub(crate) use stochrsi::stochastic_relative_strength_index;
 pub use stochrsi::{StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue};
-#[allow(unused_imports)]
-pub(crate) use t3::triple_exponential_average;
-pub use t3::TripleExponentialAverage;
 pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
+pub use triangular_moving_average::TriangularMovingAverage;
 #[allow(unused_imports)]
-pub(crate) use trima::triangular_moving_average;
-pub use trima::TriangularMovingAverage;
+pub use triple_exponential_average::TripleExponentialAverage;
 #[allow(unused_imports)]
 pub use triple_exponential_moving_average::TripleExponentialMovingAverage;
 #[allow(unused_imports)]
@@ -579,10 +571,8 @@ pub use trix::TripleExponentialRateOfChange;
 pub(crate) use ultosc::ultimate_oscillator;
 pub use ultosc::UltimateOscillator;
 pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
+pub use weighted_moving_average::WeightedMovingAverage;
 pub use window::Window;
-#[allow(unused_imports)]
-pub(crate) use wma::weighted_moving_average;
-pub use wma::WeightedMovingAverage;
 
 mod average_true_range;
 #[cfg(test)]
@@ -641,18 +631,12 @@ pub use typical_price::TypicalPrice;
 mod typical_price_test;
 mod weighted_close;
 pub use weighted_close::WeightedClose;
-mod rolling_avgdev;
+mod rolling_average_deviation;
+mod rolling_beta;
+mod rolling_standard_deviation;
+mod rolling_variance;
 #[cfg(test)]
 mod weighted_close_test;
-#[allow(unused_imports)]
-pub(crate) use rolling_avgdev::rolling_avgdev;
-mod rolling_std;
-#[allow(unused_imports)]
-pub(crate) use rolling_std::rolling_std;
-mod rolling_var;
-#[allow(unused_imports)]
-pub(crate) use rolling_var::rolling_var;
-mod rolling_beta;
 #[allow(unused_imports)]
 pub(crate) use rolling_beta::rolling_beta;
 mod rolling_corr;
@@ -843,14 +827,24 @@ mod tests {
         let input: Vec<f64> = (0..80)
             .map(|i| 100.0 + (i as f64 * 0.37).sin() * 8.0 + i as f64 * 0.05)
             .collect();
-        let sma_batch = simple_moving_average(&input, 7).unwrap();
-        let ema_batch = exponential_moving_average(&input, 7).unwrap();
-        let wma_batch = weighted_moving_average(&input, 7).unwrap();
-        let dema_batch = double_exponential_moving_average(&input, 7).unwrap();
+        let mut sma_batch_state = SimpleMovingAverage::new(7).unwrap();
+        let mut sma_batch = Vec::new();
+        sma_batch_state.extend_slice_into(&input, &mut sma_batch);
+        let mut ema_batch_state = ExponentialMovingAverage::new(7).unwrap();
+        let mut ema_batch = Vec::new();
+        ema_batch_state.extend_slice_into(&input, &mut ema_batch);
+        let mut wma_batch_state = WeightedMovingAverage::new(7).unwrap();
+        let mut wma_batch = Vec::new();
+        wma_batch_state.extend_slice_into(&input, &mut wma_batch);
+        let mut dema_batch_state = DoubleExponentialMovingAverage::new(7).unwrap();
+        let mut dema_batch = Vec::new();
+        dema_batch_state.extend_slice_into(&input, &mut dema_batch);
         let mut tema_batch_state = TripleExponentialMovingAverage::new(7).unwrap();
         let mut tema_batch = Vec::new();
         tema_batch_state.extend_slice_into(&input, &mut tema_batch);
-        let trima_batch = triangular_moving_average(&input, 7).unwrap();
+        let mut trima_batch_state = TriangularMovingAverage::new(7).unwrap();
+        let mut trima_batch = Vec::new();
+        trima_batch_state.extend_slice_into(&input, &mut trima_batch);
         let kama_batch = kaufman_adaptive_moving_average(&input, 7).unwrap();
         let midpoint_batch = rolling_midpoint(&input, 7).unwrap();
         let cmo_batch = chande_momentum_oscillator(&input, 14).unwrap();
@@ -908,7 +902,9 @@ mod tests {
         let period = 4;
         let max_expected = crate::stream::rolling_max(&input, period).unwrap();
         let min_expected = crate::stream::rolling_min(&input, period).unwrap();
-        let sum_expected = crate::stream::rolling_sum(&input, period).unwrap();
+        let mut sum_batch_state = RollingSum::new(period).unwrap();
+        let mut sum_expected = Vec::new();
+        sum_batch_state.extend_slice_into(&input, &mut sum_expected);
         let maxindex_expected = crate::stream::rolling_argmax(&input, period).unwrap();
         let minindex_expected = crate::stream::rolling_argmin(&input, period).unwrap();
         let (minmax_min, minmax_max) = crate::stream::rolling_minmax(&input, period).unwrap();
@@ -951,9 +947,15 @@ mod tests {
             })
             .collect();
         let period = 12;
-        let avgdev_expected = crate::stream::rolling_avgdev(&input, period).unwrap();
-        let var_expected = crate::stream::rolling_var(&input, period, 2.0).unwrap();
-        let stddev_expected = crate::stream::rolling_std(&input, period, 2.0).unwrap();
+        let mut avgdev_batch = RollingAverageDeviation::new(period).unwrap();
+        let mut avgdev_expected = Vec::new();
+        avgdev_batch.extend_slice_into(&input, &mut avgdev_expected);
+        let mut var_batch = RollingVariance::new(period, 2.0).unwrap();
+        let mut var_expected = Vec::new();
+        var_batch.extend_slice_into(&input, &mut var_expected);
+        let mut stddev_batch = RollingStandardDeviation::new(period, 2.0).unwrap();
+        let mut stddev_expected = Vec::new();
+        stddev_batch.extend_slice_into(&input, &mut stddev_expected);
         let mut avgdev = RollingAverageDeviation::new(period).unwrap();
         let mut var = RollingVariance::new(period, 2.0).unwrap();
         let mut stddev = RollingStandardDeviation::new(period, 2.0).unwrap();
@@ -964,7 +966,9 @@ mod tests {
         }
 
         let constant = vec![42.0; 30];
-        let expected = crate::stream::rolling_std(&constant, 5, 3.0).unwrap();
+        let mut expected_state = RollingStandardDeviation::new(5, 3.0).unwrap();
+        let mut expected = Vec::new();
+        expected_state.extend_slice_into(&constant, &mut expected);
         let mut state = RollingStandardDeviation::new(5, 3.0).unwrap();
         for (input, expected) in constant.into_iter().zip(expected) {
             assert_optional_eq(state.append(input), expected);
@@ -1422,7 +1426,7 @@ pub use negative_volume_index::NegativeVolumeIndex;
 pub use normalized_average_true_range::NormalizedAverageTrueRange;
 pub use on_balance_volume::OnBalanceVolume;
 pub use positive_volume_index::PositiveVolumeIndex;
-pub use rolling_avgdev::RollingAverageDeviation;
+pub use rolling_average_deviation::RollingAverageDeviation;
 pub use rolling_beta::RollingBeta;
 pub use rolling_calmar::RollingCalmar;
 pub use rolling_corr::RollingCorrelation;
@@ -1430,8 +1434,8 @@ pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;
 pub use rolling_minmax::{RollingMinmax, RollingMinmaxValue};
 pub use rolling_minmax_index::{RollingMinmaxIndex, RollingMinmaxIndexValue};
-pub use rolling_std::RollingStandardDeviation;
-pub use rolling_var::RollingVariance;
+pub use rolling_standard_deviation::RollingStandardDeviation;
+pub use rolling_variance::RollingVariance;
 pub use true_range::TrueRange;
 pub use volume_price_trend::VolumePriceTrend;
 pub use williams_percent_r::WilliamsPercentR;

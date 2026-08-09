@@ -736,9 +736,13 @@ mod tests {
             );
 
             // The batch kernels must agree with the states bit for bit too.
-            let batch_var = crate::stream::rolling_var(&input, period, 1.0).unwrap();
+            let mut batch_var_state = RollingVariance::new(period, 1.0).unwrap();
+            let mut batch_var = Vec::new();
+            batch_var_state.extend_slice_into(&input, &mut batch_var);
             assert_same_bits(&batch_var, &reference, &format!("VAR batch p{period}"));
-            let batch_std = crate::stream::rolling_std(&input, period, 1.0).unwrap();
+            let mut batch_std_state = RollingStandardDeviation::new(period, 1.0).unwrap();
+            let mut batch_std = Vec::new();
+            batch_std_state.extend_slice_into(&input, &mut batch_std);
             assert_same_bits(
                 &batch_std,
                 &expected_std,

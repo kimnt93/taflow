@@ -1,5 +1,8 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use taflow::simd;
+use taflow::stream::{
+    ExponentialMovingAverage, RollingStandardDeviation, SimpleMovingAverage, StreamingIndicator,
+};
 
 fn bench_sum(c: &mut Criterion) {
     let mut group = c.benchmark_group("sum_f64");
@@ -89,10 +92,20 @@ fn bench_indicators(c: &mut Criterion) {
 
     let mut group = c.benchmark_group("indicators_10k");
     group.bench_function("SMA_20", |b| {
-        b.iter(|| taflow::stream::simple_moving_average(black_box(&close), 20));
+        b.iter(|| {
+            let mut state = SimpleMovingAverage::new(20).unwrap();
+            let mut output = Vec::new();
+            state.extend_slice_into(black_box(&close), &mut output);
+            output
+        });
     });
     group.bench_function("EMA_20", |b| {
-        b.iter(|| taflow::stream::exponential_moving_average(black_box(&close), 20));
+        b.iter(|| {
+            let mut state = ExponentialMovingAverage::new(20).unwrap();
+            let mut output = Vec::new();
+            state.extend_slice_into(black_box(&close), &mut output);
+            output
+        });
     });
     group.bench_function("RSI_14", |b| {
         b.iter(|| {
@@ -108,7 +121,12 @@ fn bench_indicators(c: &mut Criterion) {
         });
     });
     group.bench_function("STDDEV_20", |b| {
-        b.iter(|| taflow::stream::rolling_std(black_box(&close), 20, 1.0));
+        b.iter(|| {
+            let mut state = RollingStandardDeviation::new(20, 1.0).unwrap();
+            let mut output = Vec::new();
+            state.extend_slice_into(black_box(&close), &mut output);
+            output
+        });
     });
     group.finish();
 }

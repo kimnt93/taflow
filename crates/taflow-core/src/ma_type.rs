@@ -1,4 +1,5 @@
 use crate::error::{TaError, TaResult};
+use crate::stream::StreamingIndicator;
 
 /// Moving-average types compatible with TA-Lib `MA_Type`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -70,13 +71,29 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
         return Ok(input.to_vec());
     }
     match ma_type {
-        MaType::SimpleMovingAverage => crate::stream::simple_moving_average(input, period),
-        MaType::ExponentialMovingAverage => {
-            crate::stream::exponential_moving_average(input, period)
+        MaType::SimpleMovingAverage => {
+            let mut state = crate::stream::SimpleMovingAverage::new(period)?;
+            let mut output = Vec::with_capacity(input.len());
+            state.extend_slice_into(input, &mut output);
+            Ok(output)
         }
-        MaType::WeightedMovingAverage => crate::stream::weighted_moving_average(input, period),
+        MaType::ExponentialMovingAverage => {
+            let mut state = crate::stream::ExponentialMovingAverage::new(period)?;
+            let mut output = Vec::with_capacity(input.len());
+            state.extend_slice_into(input, &mut output);
+            Ok(output)
+        }
+        MaType::WeightedMovingAverage => {
+            let mut state = crate::stream::WeightedMovingAverage::new(period)?;
+            let mut output = Vec::with_capacity(input.len());
+            state.extend_slice_into(input, &mut output);
+            Ok(output)
+        }
         MaType::DoubleExponentialMovingAverage => {
-            crate::stream::double_exponential_moving_average(input, period)
+            let mut state = crate::stream::DoubleExponentialMovingAverage::new(period)?;
+            let mut output = Vec::with_capacity(input.len());
+            state.extend_slice_into(input, &mut output);
+            Ok(output)
         }
         MaType::TripleExponentialMovingAverage => {
             let mut state = crate::stream::TripleExponentialMovingAverage::new(period)?;
@@ -84,7 +101,12 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
             state.extend_slice_into(input, &mut output);
             Ok(output)
         }
-        MaType::TriangularMovingAverage => crate::stream::triangular_moving_average(input, period),
+        MaType::TriangularMovingAverage => {
+            let mut state = crate::stream::TriangularMovingAverage::new(period)?;
+            let mut output = Vec::with_capacity(input.len());
+            state.extend_slice_into(input, &mut output);
+            Ok(output)
+        }
         MaType::KaufmanAdaptiveMovingAverage => {
             crate::stream::kaufman_adaptive_moving_average(input, period)
         }
@@ -97,7 +119,10 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
             Ok(mama)
         }
         MaType::TripleExponentialAverage => {
-            crate::stream::triple_exponential_average(input, period, 0.7)
+            let mut state = crate::stream::TripleExponentialAverage::new(period, 0.7)?;
+            let mut output = Vec::with_capacity(input.len());
+            state.extend_slice_into(input, &mut output);
+            Ok(output)
         }
     }
 }
