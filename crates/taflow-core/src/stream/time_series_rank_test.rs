@@ -1,4 +1,5 @@
 use super::TimeSeriesRank;
+use crate::stream::StreamingIndicator;
 
 #[test]
 fn time_series_rank_replays_after_reset() {
