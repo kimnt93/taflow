@@ -1,107 +1,65 @@
-"""Persistent exponentially weighted variance."""
+"""Native-backed exponentially weighted variance adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import ExponentiallyWeightedVarianceOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
 class ExponentiallyWeightedVariance:
-    """Persistent exponentially weighted variance.
+    """Compute causal exponentially weighted variance.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    ``_input`` is the required chronological numeric history and may be empty
+    for a fresh stream. ``timeperiod`` defaults to 14 and controls the span of
+    the pandas ``Series.ewm(..., adjust=False)`` recurrence. Rust owns all
+    weighting, warm-up, and output storage; ``compute`` returns one aligned
+    float array with NaN warm-up values. The independent oracle is pandas EWM
+    variance with ``bias=True``. Lifecycle mutators return ``self``.
+    """
 
-    def __init__(
-        self,
-        _input: Any,
-        timeperiod: int = 14,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
+    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
+        """Initialize the state and process the supplied input history.
 
         Parameters
         ----------
-        timeperiod : object
-            Trailing window length in bars.
         _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
+            Required chronological values; an empty series creates a fresh state.
+        timeperiod : int, default 14
+            Positive EWM span in bars.
         """
-        self._state = _Native(timeperiod)
-        self._length = 0
+        self._state = _Native(int(timeperiod))
         self.extend(_input)
 
     def append(self, _input: float) -> "ExponentiallyWeightedVariance":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append one observation and return this adapter."""
         self._state.append(float(_input))
-        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "ExponentiallyWeightedVariance":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        values = as_float64_series(_input)
-        self._state.extend(values)
-        self._length += len(values)
+        """Append one chronological input history and return this adapter."""
+        self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned EWM variance history."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest variance, or ``None`` during scalar warm-up."""
         return self._state.value
 
-    def __len__(self) -> int:
-        """Return the number of observations consumed by this state."""
-        return self._length
-
     def reset(self) -> "ExponentiallyWeightedVariance":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of observations processed by Rust."""
+        return adapter_length(self)
+
+
+__all__ = ["ExponentiallyWeightedVariance"]

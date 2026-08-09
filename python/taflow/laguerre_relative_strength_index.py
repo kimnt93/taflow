@@ -34,7 +34,7 @@ class LaguerreRelativeStrengthIndex:
     """
 
     def __init__(self, close: Any, gamma: float = 0.5) -> None:
-        self._state = _NativeLaguerreRelativeStrengthIndex(gamma)
+        self._state = _NativeLaguerreRelativeStrengthIndex(float(gamma))
         self.extend(close)
 
     def append(self, close: float) -> "LaguerreRelativeStrengthIndex":

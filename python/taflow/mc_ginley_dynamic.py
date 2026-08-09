@@ -1,27 +1,67 @@
-"""Canonical native-backed McGinley Dynamic adapter."""
+"""Native-backed McGinley Dynamic adapter."""
+
 from typing import Any
+
 import numpy as np
+
 from ._native import McGinleyDynamicOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
 class McGinleyDynamic:
-    """Native-backed causal McGinley Dynamic moving average.
+    """Compute the causal McGinley Dynamic moving average.
 
-    ``close`` is a required chronological price series. ``length`` (default
-    10) and ``c`` (default 1.0) are positive recurrence parameters. ``compute``
-    returns one aligned NumPy array, ``value`` is ``None`` before the first
-    append, and ``append``, ``extend``, and ``reset`` mutate and return this
-    adapter. The independent pandas-ta-classic oracle is ``mcginley``.
+    ``close`` is the required chronological price history and may be empty
+    for a fresh stream. ``length`` defaults to 10 and ``c`` defaults to 1.0;
+    both are validated by Rust. Rust owns the recurrence, warm-up, and aligned
+    output. ``compute`` returns one float array, ``value`` is ``None`` before
+    the first bar, and lifecycle mutators return ``self``. The independent
+    oracle/name mapping is pandas-ta-classic ``mcginley``.
     """
+
     def __init__(self, close: Any, length: int = 10, c: float = 1.0) -> None:
-        self._state = _Native(int(length), float(c)); self._length = 0; self.extend(close)
+        """Initialize and process the supplied close history.
+
+        Parameters
+        ----------
+        close : object
+            Required chronological close prices; empty creates a fresh state.
+        length : int, default 10
+            Positive recurrence length.
+        c : float, default 1.0
+            Positive McGinley adjustment constant.
+        """
+        self._state = _Native(int(length), float(c))
+        self.extend(close)
+
     def append(self, close: float) -> "McGinleyDynamic":
-        self._state.append(float(close)); self._length += 1; return self
+        """Append one close price and return this adapter."""
+        self._state.append(float(close))
+        return self
+
     def extend(self, close: Any) -> "McGinleyDynamic":
-        values = as_float64_series(close); self._state.extend(values); self._length += len(values); return self
-    def compute(self) -> np.ndarray: return self._state.compute()
+        """Append a chronological close history and return this adapter."""
+        self._state.extend(as_float64_series(close))
+        return self
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned McGinley Dynamic history."""
+        return self._state.compute()
+
     @property
-    def value(self) -> float | None: return self._state.value
-    def reset(self) -> "McGinleyDynamic": self._state.reset(); self._length = 0; return self
-    def __len__(self) -> int: return self._length
+    def value(self) -> float | None:
+        """Return the latest average, or ``None`` while empty."""
+        return self._state.value
+
+    def reset(self) -> "McGinleyDynamic":
+        """Restore fresh native state and return this adapter."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the number of close prices processed by Rust."""
+        return adapter_length(self)
+
+
+__all__ = ["McGinleyDynamic"]

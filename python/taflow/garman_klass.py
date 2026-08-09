@@ -1,15 +1,25 @@
-"""Rolling mean of ``0.5·ln(H/L)^2 - (2ln2-1)·ln(C/O)^2`` (Garman-Klass)."""
+"""Native-backed Garman-Klass volatility adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import GarmanKlassOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
 class GarmanKlass:
-    """Rolling mean of ``0.5·ln(H/L)^2 - (2ln2-1)·ln(C/O)^2`` (Garman-Klass).
+    """Compute rolling Garman-Klass OHLC volatility.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
+    ``_open``, ``high``, ``low``, and ``close`` are required aligned
+    chronological histories; four empty arrays create a fresh stream.
+    ``timeperiod`` defaults to 20 and controls the trailing mean. Rust owns
+    the formula ``0.5*ln(H/L)^2 - (2*ln(2)-1)*ln(C/O)^2``, rolling window, and
+    NaN warm-up. ``compute`` returns one aligned float array and ``value`` the
+    latest scalar. Lifecycle mutators return ``self``. The independent oracle
+    is the Garman-Klass definition used by pandas-ta-classic.
+    """
 
     def __init__(
         self,
@@ -19,112 +29,52 @@ class GarmanKlass:
         close: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize and process aligned OHLC histories.
 
         Parameters
         ----------
-        _open : object
-            Open-price series or the current bar open.
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-        timeperiod : object
-            Trailing window length in bars.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
+        _open, high, low, close : object
+            Required aligned OHLC histories; empty arrays create a fresh state.
+        timeperiod : int, default 20
+            Positive trailing window length in bars.
         """
-        self._state = _Native(timeperiod)
-        self._length = 0
+        self._state = _Native(int(timeperiod))
         self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "GarmanKlass":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _open : object
-            Open-price series or the current bar open.
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def append(
+        self, _open: float, high: float, low: float, close: float
+    ) -> "GarmanKlass":
+        """Append one OHLC bar in open/high/low/close order."""
         self._state.append(float(_open), float(high), float(low), float(close))
-        self._length += 1
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "GarmanKlass":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _open : object
-            Open-price series or the current bar open.
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def extend(
+        self, _open: Any, high: Any, low: Any, close: Any
+    ) -> "GarmanKlass":
+        """Append aligned OHLC histories without mutating on mismatch."""
         arrays = tuple(as_float64_series(value) for value in (_open, high, low, close))
-        if not all(array.shape == arrays[0].shape for array in arrays[1:]):
+        if len({len(array) for array in arrays}) != 1:
             raise ValueError("_open, high, low, and close must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned rolling volatility history."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest volatility, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "GarmanKlass":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
-        """Return the number of processed bars."""
-        return self._length
+        """Return the number of OHLC bars processed by Rust."""
+        return adapter_length(self)
+
+
+__all__ = ["GarmanKlass"]

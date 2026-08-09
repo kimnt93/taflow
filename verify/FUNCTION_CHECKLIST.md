@@ -399,7 +399,7 @@ separate same-named Rust and Python tests exist, an independent source reports
 | implemented | `BalanceOfPower` | class | `balance_of_power` | `BalanceOfPower`, `_NativeBalanceOfPower` | yes | `` | — | — |
 | implemented | `OnBalanceVolume` | class | `on_balance_volume` | `OnBalanceVolume`, `_NativeOnBalanceVolume` | yes | `` | — | — |
 | implemented | `AbsolutePriceOscillator` | class | `absolute_price_oscillator` | `AbsolutePriceOscillator`, `_NativeAbsolutePriceOscillator` | yes | `` | — | — |
-| implemented | `PercentagePriceOscillator` | class | `percentage_price_oscillator` | `PercentagePriceOscillator`, `_NativePercentagePriceOscillator` | yes | `` | — | — |
+| implemented | `PercentagePriceOscillator` | class | `percentage_price_oscillator` | `PercentagePriceOscillator`, `_Native` | yes | `` | — | — |
 | implemented | `ChandeMomentumOscillator` | class | `chande_momentum_oscillator` | `ChandeMomentumOscillator`, `_NativeChandeMomentumOscillator` | yes | `` | — | — |
 | implemented | `Momentum` | class | `momentum` | `Momentum`, `_NativeMomentum` | yes | `` | yes | — |
 | implemented | `RateOfChange` | class | `rate_of_change` | `RateOfChange`, `_NativeRateOfChange` | yes | `` | — | — |

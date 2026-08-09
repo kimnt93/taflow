@@ -20,7 +20,7 @@ class Aroon:
     """
 
     def __init__(self, high: Any, low: Any, timeperiod: int = 14) -> None:
-        self._state = _NativeAroon(timeperiod)
+        self._state = _NativeAroon(int(timeperiod))
         self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Aroon":
@@ -30,7 +30,10 @@ class Aroon:
 
     def extend(self, high: Any, low: Any) -> "Aroon":
         """Append aligned high and low histories and return this indicator."""
-        self._state.extend(as_float64_series(high), as_float64_series(low))
+        arrays = as_float64_series(high), as_float64_series(low)
+        if len(arrays[0]) != len(arrays[1]):
+            raise ValueError("high and low must have equal lengths")
+        self._state.extend(*arrays)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray]:

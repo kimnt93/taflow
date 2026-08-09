@@ -96,13 +96,16 @@ class AnchoredVolumeWeightedAveragePrice:
         AnchoredVolumeWeightedAveragePrice
             This updated adapter.
         """
-        self._state.extend(
+        arrays = (
             as_float64_series(high),
             as_float64_series(low),
             as_float64_series(close),
             as_float64_series(volume),
             as_bool_series(anchor),
         )
+        if len({len(array) for array in arrays}) != 1:
+            raise ValueError("high, low, close, volume, and anchor must have equal lengths")
+        self._state.extend(*arrays)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:

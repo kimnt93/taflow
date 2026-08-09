@@ -1101,7 +1101,7 @@
       "native_binding": true,
       "native_symbols": [
         "PercentagePriceOscillator",
-        "_NativePercentagePriceOscillator"
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,

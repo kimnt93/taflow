@@ -1,22 +1,67 @@
-"""Canonical native-backed Negative Volume Index adapter."""
+"""Native-backed Negative Volume Index adapter."""
+
 from typing import Any
+
 import numpy as np
+
 from ._native import NegativeVolumeIndexOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
 class NegativeVolumeIndex:
-    """Causal index updated when volume decreases."""
+    """Track the Negative Volume Index from aligned close and volume bars.
+
+    ``close`` and ``volume`` are required equal-length chronological histories;
+    empty aligned arrays create a fresh stream. Rust starts at the conventional
+    1000 and updates the index only when current volume is below the previous
+    volume, using the percentage close change. ``compute`` returns one aligned
+    float array, ``value`` is ``None`` for an empty stream, and lifecycle
+    mutators return ``self``. The definition has no independent TA-Lib oracle;
+    it is recorded as a native stateful variant.
+    """
+
     def __init__(self, close: Any, volume: Any) -> None:
-        self._state = _Native(); self._length = 0; self.extend(close, volume)
+        """Initialize and process aligned close/volume histories.
+
+        Parameters
+        ----------
+        close, volume : object
+            Required aligned numeric histories; empty arrays create a fresh state.
+        """
+        self._state = _Native()
+        self.extend(close, volume)
+
     def append(self, close: float, volume: float) -> "NegativeVolumeIndex":
-        self._state.append(float(close), float(volume)); self._length += 1; return self
+        """Append one close/volume bar in that order."""
+        self._state.append(float(close), float(volume))
+        return self
+
     def extend(self, close: Any, volume: Any) -> "NegativeVolumeIndex":
-        arrays = [as_float64_series(v) for v in (close, volume)]
-        if arrays[0].shape != arrays[1].shape: raise ValueError("close and volume must have equal lengths")
-        self._state.extend(*arrays); self._length += len(arrays[0]); return self
-    def compute(self) -> np.ndarray: return self._state.compute()
+        """Append aligned histories without mutating on length mismatch."""
+        arrays = as_float64_series(close), as_float64_series(volume)
+        if len(arrays[0]) != len(arrays[1]):
+            raise ValueError("close and volume must have equal lengths")
+        self._state.extend(*arrays)
+        return self
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned Negative Volume Index history."""
+        return self._state.compute()
+
     @property
-    def value(self) -> float: return self._state.value
-    def reset(self) -> "NegativeVolumeIndex": self._state.reset(); self._length = 0; return self
-    def __len__(self) -> int: return self._length
+    def value(self) -> float | None:
+        """Return the latest index, or ``None`` when no bar was processed."""
+        return self._state.value
+
+    def reset(self) -> "NegativeVolumeIndex":
+        """Restore fresh native state and return this adapter."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the number of close/volume bars processed by Rust."""
+        return adapter_length(self)
+
+
+__all__ = ["NegativeVolumeIndex"]

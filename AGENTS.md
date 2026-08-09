@@ -345,18 +345,89 @@ full diff for unintended generated or unrelated changes.
 
 Before declaring an indicator complete, run its separate
 `<class_name>_test.rs` Rust tests, separate `<class_name>_test.py` Python tests,
-canonical Python lifecycle audit, Python-class-versus-external-oracle
-comparison, and focused full-protocol benchmark. Before repository-wide
-completion, run:
+canonical Python lifecycle audit, and Python-class-versus-external-oracle
+comparison. Run benchmark gates only when the user explicitly authorizes
+benchmarking. Before repository-wide completion, run:
 
 ```bash
 cargo test --workspace
 uv run pytest -q
 make check
 cd verify && uv run python all_interfaces.py
-cd verify && uv run python benchmark.py
+cd verify && uv run python benchmark.py  # only with explicit user authorization
 cargo fmt --all --check
 git diff --check
 ```
 
 Generated reports and README claims must agree with those results.
+
+## Repository-wide naming and binding normalization
+
+- Every indicator implementation and its tests use the same mechanically
+  derived full-name path. Rust files are `<snake_case_class>.rs` with a
+  matching `<snake_case_class>_test.rs`; Python files are
+  `python/taflow/indicators/<snake_case_class>.py` with matching tests under
+  `tests/`. A class may not be implemented in a differently named alias file.
+- Python indicator modules under `taflow/indicators/` are the canonical adapter
+  implementations. `taflow/indicators/__init__.py` and `taflow/__init__.py`
+  are import surfaces only and may contain imports/re-exports, but no numerical
+  logic or compatibility implementation. Each canonical class is exported from
+  `taflow/indicators` and from the top-level `taflow` surface.
+- Python adapters do not maintain a duplicate length counter. `__len__` must
+  delegate to the native state (or an existing shared protocol), while Rust
+  remains the source of truth for processed-bar counts and histories.
+- The PyO3 binding follows the same one-file/one-class rule. A binding module
+  such as `crates/taflow-python/src/indicators/candle_hikkake.rs` owns the
+  `CandleHikkake` operator binding; do not place multiple public indicator
+  classes in `state_api.rs`, `state_helpers.rs`, or another aggregation module.
+  Binding `mod.rs` and `lib.rs` contain declarations, imports, and registration
+  only.
+- The canonical Rust core indicator directory is
+  `crates/taflow-core/src/indicators/`; migrate legacy `stream/` modules and
+  their matching tests there while preserving one class per file and updating
+  declarations/re-exports. Do not leave duplicate implementations in both
+  directories.
+- Remove duplicate indicator modules and aliases when their names represent the
+  same calculation (for example `rolling_vwap.py`,
+  `rolling_volume_weighted_average_price.py`, and `vwap.py`). Keep the complete
+  canonical class/module name and retain shorter names only as explicit oracle
+  or metadata aliases. Update all exports, bindings, registries, tests, and
+  documentation to point at that canonical implementation.
+
+Good Python adapter style:
+
+```python
+class EqualHighsLows:
+    """Causal equal-high/equal-low detection.
+
+    Rust owns the persistent state and arithmetic; Python converts input
+    containers once. ``append``, ``extend``, and ``reset`` return ``self``;
+    ``value`` exposes the latest tuple and ``compute`` returns aligned arrays.
+    Required inputs are ``high``, ``low``, and ``close``; warm-up is represented
+    by ``NaN`` in history. The oracle/name mapping is pandas-ta ``equal_re``.
+    """
+
+    def __init__(self, high: Any, low: Any, close: Any, eq_len: int = 3) -> None:
+        """Initialize and process aligned chronological input histories.
+
+        Parameters
+        ----------
+        high, low, close : object
+            Required aligned price histories; empty arrays create a fresh state.
+        eq_len : int, default 3
+            Equality lookback in bars.
+        """
+        self._state = _Native(eq_len)
+        self.extend(high, low, close)
+
+    def append(self, high: float, low: float, close: float) -> "EqualHighsLows":
+        """Append one high/low/close bar and return this adapter."""
+        self._state.append(float(high), float(low), float(close))
+        return self
+```
+
+- Before each batch, reread this file, inspect `verify/FUNCTION_CHECKLIST.md`,
+  scan all aliases with `rg`, select ten remaining or structurally nonconforming
+  functions, refactor them, run correctness and interface/style checks, update
+  the checklist, and push the verified commit to `main`. Do not run benchmark
+  commands unless the user explicitly changes that instruction.

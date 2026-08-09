@@ -45,5 +45,8 @@ class CumulativeMaximum:
         return self
 
     def __len__(self) -> int:
-        """Return the number of processed observations."""
+        """Return the number of observations recorded by Rust."""
         return len(self._state)
+
+
+__all__ = ["CumulativeMaximum"]
