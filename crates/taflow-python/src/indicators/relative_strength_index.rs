@@ -1,7 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{RelativeStrengthIndex as RelativeStrengthIndexState, StreamingIndicator};
+use taflow::indicators::RelativeStrengthIndex as RelativeStrengthIndexState;
+use taflow::stream::StreamingIndicator;
 
 /// Python boundary for the canonical Rust Relative Strength Index state.
 #[pyclass]

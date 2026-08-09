@@ -146,6 +146,16 @@ tests), focused Python tests (132), release extension build, and 300/300
 interface audit passed. Benchmark fields remain `TODO`; no benchmark command
 was run.
 
+The thirty-seventh structural batch migrated the Rust implementations and
+separate tests for `BarsSince`, `EntryExit`, `ForceIndex`, `HighestSince`,
+`LowestSince`, `PositionHold`, `PreviousHighLow`, `RelativeStrengthIndex`,
+`Retracements`, and `RogersSatchell` into `crates/taflow-core/src/indicators/`.
+The stream module now only re-exports those canonical states, all ten PyO3
+bindings target `taflow::indicators`, and the four remaining root Python
+adapters were moved into `python/taflow/indicators/`. Focused Python tests
+(32), full Rust tests (386), release build, and the 300/300 interface audit
+passed. Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

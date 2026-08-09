@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::HighestSince;
+use taflow::indicators::HighestSince;
 
 #[pyclass]
 pub struct HighestSinceOperator {

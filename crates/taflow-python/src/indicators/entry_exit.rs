@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::EntryExit;
+use taflow::indicators::EntryExit;
 
 #[pyclass]
 pub struct EntryExitOperator {

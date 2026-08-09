@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::LowestSince;
+use taflow::indicators::LowestSince;
 
 #[pyclass]
 pub struct LowestSinceOperator {

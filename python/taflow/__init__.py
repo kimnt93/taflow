@@ -92,7 +92,7 @@ from .triangular_moving_average import TriangularMovingAverage
 from .triple_exponential_moving_average import TripleExponentialMovingAverage
 from .triple_exponential_average import TripleExponentialAverage
 from .weighted_moving_average import WeightedMovingAverage
-from .relative_strength_index import RelativeStrengthIndex
+from .indicators import RelativeStrengthIndex
 from .indicators import RelativeMomentumIndex
 from .indicators import SmoothedTrendChannel
 from .indicators.jurik_moving_average import JurikMovingAverage
@@ -234,9 +234,9 @@ from .indicators.signal_delay import SignalDelay
 from .indicators.position_hold import PositionHold
 from .indicators.entry_exit import EntryExit
 from .indicators.swing_high_low import SwingHighLow
-from .retracements import Retracements
+from .indicators import Retracements
 from .session_extrema import SessionExtrema
-from .previous_high_low import PreviousHighLow
+from .indicators import PreviousHighLow
 from .sessions import Sessions
 from .indicators.active_zone_list import ActiveZoneList
 from .indicators.fair_value_gap import FairValueGap
@@ -254,7 +254,7 @@ from .indicators.rolling_information_ratio import RollingInformationRatio
 from .indicators.close_to_close_sigma import CloseToCloseSigma
 from .indicators import Parkinson
 from .indicators.garman_klass import GarmanKlass
-from .rogers_satchell import RogersSatchell
+from .indicators import RogersSatchell
 from .indicators.garman_klass_yang_zhang import GarmanKlassYangZhang
 from .yang_zhang import YangZhang
 from .indicators.average_daily_dollar_value import AverageDailyDollarValue

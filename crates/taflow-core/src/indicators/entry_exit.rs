@@ -1,21 +1,20 @@
-//! Persistent `PositionHold` state.
+//! Persistent `EntryExit` state.
 
-use super::operator_states::*;
-use super::*;
 use crate::error::{TaError, TaResult};
+use crate::stream::operator_states::*;
+use crate::stream::*;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `PositionHold`.
+/// Stateful entry/exit signal helper with causal position transitions.
 ///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct PositionHold {
+/// The state emits aligned signals and can be reset for replay.
+pub struct EntryExit {
     position: f64,
     value: Option<f64>,
 }
 
-impl PositionHold {
+impl EntryExit {
     /// Create a new empty state.
     ///
     pub fn new() -> Self {
@@ -26,9 +25,11 @@ impl PositionHold {
     }
     /// Append one causal observation and return the latest result.
     ///
-    pub fn append(&mut self, input: f64) -> f64 {
-        if input != 0.0 {
-            self.position = input;
+    pub fn append(&mut self, entry: bool, exit: bool) -> f64 {
+        if entry && !exit {
+            self.position = 1.0
+        } else if exit && !entry {
+            self.position = -1.0
         }
         self.value = Some(self.position);
         self.position
@@ -46,7 +47,7 @@ impl PositionHold {
     }
 }
 
-impl Default for PositionHold {
+impl Default for EntryExit {
     fn default() -> Self {
         Self::new()
     }

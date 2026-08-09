@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.previous_high_low import PreviousHighLow
+from taflow import PreviousHighLow
 
 
 def test_previous_high_low_lifecycle_and_reset():
@@ -10,4 +10,3 @@ def test_previous_high_low_lifecycle_and_reset():
     assert len(state) == 2
     state.reset()
     assert state.value is None
-

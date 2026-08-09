@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Retracements;
+use taflow::indicators::Retracements;
 
 #[pyclass]
 pub struct RetracementsOperator {

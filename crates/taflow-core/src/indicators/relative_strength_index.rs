@@ -1,7 +1,7 @@
 //! Stateful Relative Strength Index.
 
-use super::{invalid_period, StreamingIndicator};
 use crate::error::TaResult;
+use crate::stream::{invalid_period, StreamingIndicator};
 
 /// Incremental Wilder Relative Strength Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]

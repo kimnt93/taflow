@@ -65,9 +65,6 @@ mod plus_directional_movement;
 mod plus_directional_movement_test;
 pub(crate) mod price_transform;
 pub(crate) mod regression;
-mod relative_strength_index;
-#[cfg(test)]
-mod relative_strength_index_test;
 pub(crate) mod rolling_extrema;
 mod rolling_price;
 pub(crate) mod rolling_statistics;
@@ -116,6 +113,10 @@ mod weighted_moving_average;
 mod weighted_moving_average_test;
 
 pub use crate::indicators::{
+    BarsSince, EntryExit, ForceIndex, HighestSince, LowestSince, PositionHold, PreviousHighLow,
+    PreviousHighLowValue, RelativeStrengthIndex, Retracements, RetracementsValue, RogersSatchell,
+};
+pub use crate::indicators::{
     DecayLinear, DoubleExponentialMovingAverage, ExponentialMovingAverage,
     HilbertTransformTrendline, Ichimoku, IchimokuValue, MoneyFlowIndex, MovingAverage, Parkinson,
     PercentagePriceOscillator, RelativeMomentumIndex,
@@ -140,7 +141,6 @@ pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use relative_strength_index::RelativeStrengthIndex;
 pub use simple_moving_average::SimpleMovingAverage;
 #[allow(unused_imports)]
 pub use stochastic_oscillator::{StochasticOscillator, StochasticOscillatorValue};
@@ -161,19 +161,9 @@ pub use weighted_moving_average::WeightedMovingAverage;
 pub use window::Window;
 
 #[cfg(test)]
-mod bars_since_test;
-#[cfg(test)]
-#[cfg(test)]
-mod entry_exit_test;
 #[cfg(test)]
 #[cfg(test)]
 #[cfg(test)]
-mod highest_since_test;
-#[cfg(test)]
-mod lowest_since_test;
-#[cfg(test)]
-#[cfg(test)]
-mod position_hold_test;
 #[cfg(test)]
 mod signal_delay_test;
 #[cfg(test)]
@@ -479,18 +469,6 @@ mod tests {
 mod ease_of_movement;
 #[cfg(test)]
 mod ease_of_movement_test;
-mod force_index;
-#[cfg(test)]
-mod force_index_test;
-mod previous_high_low;
-#[cfg(test)]
-mod previous_high_low_test;
-mod retracements;
-#[cfg(test)]
-mod retracements_test;
-mod rogers_satchell;
-#[cfg(test)]
-mod rogers_satchell_test;
 mod rolling_autocorr;
 #[cfg(test)]
 mod rolling_autocorr_test;
@@ -516,7 +494,6 @@ mod signed_power_test;
 pub use signed_power::SignedPower;
 #[allow(unused_imports)]
 pub(crate) mod bar_relation;
-mod bars_since;
 mod ornstein_uhlenbeck_half_life;
 #[cfg(test)]
 mod ornstein_uhlenbeck_half_life_test;
@@ -544,19 +521,9 @@ mod vortex;
 #[cfg(test)]
 mod vortex_test;
 
-mod highest_since;
-
-mod lowest_since;
 mod value_when;
-pub use bars_since::BarsSince;
 pub use ease_of_movement::EaseOfMovement;
-pub use force_index::ForceIndex;
-pub use highest_since::HighestSince;
-pub use lowest_since::LowestSince;
 pub use ornstein_uhlenbeck_half_life::OrnsteinUhlenbeckHalfLife;
-pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
-pub use retracements::{Retracements, RetracementsValue};
-pub use rogers_satchell::RogersSatchell;
 pub use roll_spread::RollSpread;
 pub use rolling_autocorr::RollingAutocorr;
 pub use rolling_volume_weighted_average_price::RollingVolumeWeightedAveragePrice;
@@ -572,7 +539,3 @@ pub use vortex::{Vortex, VortexValue};
 pub use yang_zhang::YangZhang;
 mod signal_delay;
 pub use signal_delay::SignalDelay;
-mod position_hold;
-pub use position_hold::PositionHold;
-mod entry_exit;
-pub use entry_exit::EntryExit;

@@ -241,9 +241,9 @@ from .signal_delay import SignalDelay
 from .position_hold import PositionHold
 from .entry_exit import EntryExit
 from .swing_high_low import SwingHighLow
-from ..retracements import Retracements
+from .retracements import Retracements
 from ..session import SessionExtrema
-from ..previous_high_low import PreviousHighLow
+from .previous_high_low import PreviousHighLow
 from ..sessions import Sessions
 from .active_zone_list import ActiveZoneList
 from .fair_value_gap import FairValueGap
@@ -269,7 +269,8 @@ from .rolling_alpha import RollingAlpha
 from .rolling_information_ratio import RollingInformationRatio
 from .close_to_close_sigma import CloseToCloseSigma
 from .garman_klass import GarmanKlass
-from ..rogers_satchell import RogersSatchell
+from .rogers_satchell import RogersSatchell
+from .relative_strength_index import RelativeStrengthIndex
 from .garman_klass_yang_zhang import GarmanKlassYangZhang
 from ..yang_zhang import YangZhang
 
@@ -495,6 +496,7 @@ __all__ = [
     "Retracements",
     "SessionExtrema",
     "PreviousHighLow",
+    "RelativeStrengthIndex",
     "Sessions",
     "ActiveZoneList",
     "FairValueGap",

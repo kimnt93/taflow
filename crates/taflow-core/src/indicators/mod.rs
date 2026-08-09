@@ -77,6 +77,9 @@ mod percentage_price_oscillator_test;
 mod relative_momentum_index;
 #[cfg(test)]
 mod relative_momentum_index_test;
+mod relative_strength_index;
+#[cfg(test)]
+mod relative_strength_index_test;
 
 pub use decay_linear::DecayLinear;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
@@ -88,6 +91,45 @@ pub use moving_average::MovingAverage;
 pub use parkinson::Parkinson;
 pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use relative_momentum_index::RelativeMomentumIndex;
+pub use relative_strength_index::RelativeStrengthIndex;
+
+mod bars_since;
+#[cfg(test)]
+mod bars_since_test;
+mod entry_exit;
+#[cfg(test)]
+mod entry_exit_test;
+mod force_index;
+#[cfg(test)]
+mod force_index_test;
+mod highest_since;
+#[cfg(test)]
+mod highest_since_test;
+mod lowest_since;
+#[cfg(test)]
+mod lowest_since_test;
+mod position_hold;
+#[cfg(test)]
+mod position_hold_test;
+mod previous_high_low;
+#[cfg(test)]
+mod previous_high_low_test;
+mod retracements;
+#[cfg(test)]
+mod retracements_test;
+mod rogers_satchell;
+#[cfg(test)]
+mod rogers_satchell_test;
+
+pub use bars_since::BarsSince;
+pub use entry_exit::EntryExit;
+pub use force_index::ForceIndex;
+pub use highest_since::HighestSince;
+pub use lowest_since::LowestSince;
+pub use position_hold::PositionHold;
+pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
+pub use retracements::{Retracements, RetracementsValue};
+pub use rogers_satchell::RogersSatchell;
 
 mod acceleration_bands;
 #[cfg(test)]
