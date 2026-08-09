@@ -26,3 +26,7 @@ class GapDown(BarRelationAdapter):
     def reset(self) -> "GapDown":
         super().reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return super().__len__()

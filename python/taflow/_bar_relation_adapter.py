@@ -22,7 +22,11 @@ class BarRelationAdapter:
         return self
 
     def extend(self, high: Any, low: Any) -> "BarRelationAdapter":
-        self._state.extend(as_float64_series(high), as_float64_series(low))
+        high_values = as_float64_series(high)
+        low_values = as_float64_series(low)
+        if len(high_values) != len(low_values):
+            raise ValueError("high and low must have equal lengths")
+        self._state.extend(high_values, low_values)
         return self
 
     def compute(self) -> np.ndarray:

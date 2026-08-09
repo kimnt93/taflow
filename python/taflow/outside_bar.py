@@ -26,3 +26,7 @@ class OutsideBar(BarRelationAdapter):
     def reset(self) -> "OutsideBar":
         super().reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return super().__len__()

@@ -565,7 +565,7 @@ separate same-named Rust and Python tests exist, an independent source reports
 | implemented | `OutsideBar` | class | `outside_bar` | `OutsideBarOperator` | yes | `` | — | — |
 | implemented | `GapUp` | class | `gap_up` | `GapUpOperator` | yes | `` | — | — |
 | implemented | `GapDown` | class | `gap_down` | `GapDownOperator` | yes | `` | — | — |
-| implemented | `BarsSince` | class | `bars_since` | `BarsSinceOperator` | yes | `` | — | — |
+| implemented | `BarsSince` | class | `bars_since` | `BarsSinceOperator`, `_Native` | yes | `` | — | — |
 | implemented | `ValueWhen` | class | `value_when` | `ValueWhenOperator` | yes | `` | — | — |
 | implemented | `HighestSince` | class | `highest_since` | `HighestSinceOperator` | yes | `` | — | — |
 | implemented | `LowestSince` | class | `lowest_since` | `LowestSinceOperator` | yes | `` | — | — |

@@ -1,113 +1,61 @@
-"""Persistent Force Index."""
+"""Native-backed Force Index adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import ForceIndexOperator as _Native
 from ._series import as_float64_series
 
 
 class ForceIndex:
-    """Persistent Force Index.
+    """Compute signed price change multiplied by volume.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `close`, `volume`. Warm-up positions are represented by `NaN` in history."""
+    ``close`` and ``volume`` are required equal-length chronological series
+    and may both be empty for a fresh stream. Rust emits the first value as
+    warm-up NaN, then computes ``(close_t - close_(t-1)) * volume_t``.
+    ``compute`` returns one aligned float array, ``value`` is the latest scalar
+    or ``None`` during warm-up, and lifecycle mutators return ``self``.
+    """
 
-    def __init__(
-        self,
-        close: Any,
-        volume: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        close : object
-            Close-price series or the current bar close.
-        volume : object
-            Volume series or the current bar volume.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
+    def __init__(self, close: Any, volume: Any) -> None:
         self._state = _Native()
         self._length = 0
         self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "ForceIndex":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        close : object
-            Close-price series or the current bar close.
-        volume : object
-            Volume series or the current bar volume.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append one close/volume pair and return this adapter."""
         self._state.append(float(close), float(volume))
         self._length += 1
         return self
 
     def extend(self, close: Any, volume: Any) -> "ForceIndex":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        close : object
-            Close-price series or the current bar close.
-        volume : object
-            Volume series or the current bar volume.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        close_values = as_float64_series(close)
-        volume_values = as_float64_series(volume)
-        if len(close_values) != len(volume_values):
+        """Append equal-length close and volume histories."""
+        arrays = as_float64_series(close), as_float64_series(volume)
+        if len(arrays[0]) != len(arrays[1]):
             raise ValueError("close and volume must have equal lengths")
-        self._state.extend(close_values, volume_values)
-        self._length += len(close_values)
+        self._state.extend(*arrays)
+        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned Force Index history."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest force value, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "ForceIndex":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
         self._length = 0
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed pairs."""
         return self._length
+
+
+__all__ = ["ForceIndex"]

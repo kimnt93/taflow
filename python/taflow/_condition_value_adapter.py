@@ -20,9 +20,11 @@ class ConditionValueAdapter:
         return self
 
     def extend(self, condition: Any, _input: Any) -> "ConditionValueAdapter":
-        self._state.extend(
-            np.asarray(condition, dtype=bool), as_float64_series(_input)
-        )
+        condition_values = np.asarray(condition, dtype=bool)
+        input_values = as_float64_series(_input)
+        if len(condition_values) != len(input_values):
+            raise ValueError("condition and input must have equal lengths")
+        self._state.extend(condition_values, input_values)
         return self
 
     def compute(self) -> np.ndarray:

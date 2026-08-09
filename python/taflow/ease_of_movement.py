@@ -1,121 +1,61 @@
-"""Persistent Ease of Movement."""
+"""Native-backed Ease of Movement adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import EaseOfMovementOperator as _Native
 from ._series import as_float64_series
 
 
 class EaseOfMovement:
-    """Persistent Ease of Movement.
+    """Compute high-low midpoint movement normalized by volume and range.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `volume`. Warm-up positions are represented by `NaN` in history."""
+    ``high``, ``low``, and ``volume`` are required equal-length chronological
+    series and may all be empty for a fresh stream. Rust owns midpoint change,
+    box ratio, warm-up, and aligned output. ``compute`` returns one float
+    array, ``value`` is the latest scalar or ``None`` during warm-up, and
+    lifecycle mutators return ``self``. The oracle is pandas-ta-classic ``eom``.
+    """
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        volume: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        volume : object
-            Volume series or the current bar volume.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
+    def __init__(self, high: Any, low: Any, volume: Any) -> None:
         self._state = _Native()
         self._length = 0
         self.extend(high, low, volume)
 
     def append(self, high: float, low: float, volume: float) -> "EaseOfMovement":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        volume : object
-            Volume series or the current bar volume.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append one high/low/volume bar and return this adapter."""
         self._state.append(float(high), float(low), float(volume))
         self._length += 1
         return self
 
     def extend(self, high: Any, low: Any, volume: Any) -> "EaseOfMovement":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        volume : object
-            Volume series or the current bar volume.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        high_values = as_float64_series(high)
-        low_values = as_float64_series(low)
-        volume_values = as_float64_series(volume)
-        if len({len(high_values), len(low_values), len(volume_values)}) != 1:
+        """Append equal-length high, low, and volume histories."""
+        arrays = tuple(as_float64_series(series) for series in (high, low, volume))
+        if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, and volume must have equal lengths")
-        self._state.extend(high_values, low_values, volume_values)
-        self._length += len(high_values)
+        self._state.extend(*arrays)
+        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned Ease of Movement history."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest movement value, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "EaseOfMovement":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
         self._length = 0
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed bars."""
         return self._length
+
+
+__all__ = ["EaseOfMovement"]

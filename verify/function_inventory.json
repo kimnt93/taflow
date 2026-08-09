@@ -3566,7 +3566,8 @@
       "name": "BarsSince",
       "native_binding": true,
       "native_symbols": [
-        "BarsSinceOperator"
+        "BarsSinceOperator",
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,

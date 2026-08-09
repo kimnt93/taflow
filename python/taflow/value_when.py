@@ -26,3 +26,7 @@ class ValueWhen(ConditionValueAdapter):
     def reset(self) -> "ValueWhen":
         super().reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed condition/input pairs."""
+        return super().__len__()

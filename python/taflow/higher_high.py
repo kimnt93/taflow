@@ -26,3 +26,7 @@ class HigherHigh(BarRelationAdapter):
     def reset(self) -> "HigherHigh":
         super().reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return super().__len__()
