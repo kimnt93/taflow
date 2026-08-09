@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.rising import Rising
+from taflow import Rising
 
 
 def test_rising_lifecycle_and_reset():

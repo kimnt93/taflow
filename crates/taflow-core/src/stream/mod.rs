@@ -41,10 +41,11 @@ pub(crate) mod tests_extrema_support {
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
 pub use crate::indicators::{
-    ChaikinMoneyFlow, ChandeMomentumOscillator, CloseToCloseSigma, CommodityChannelIndex,
-    CumulativeMaximum, CumulativeMinimum, CumulativeSumControlChart, DetrendedPriceOscillator,
-    EqualHighsLows, FractalDimension, HilbertTransformDominantCyclePhase,
-    KaufmanAdaptiveMovingAverage,
+    ChaikinMoneyFlow, ChandeMomentumOscillator, CloseToCloseSigma, CommodityChannelIndex, Cross,
+    Crossover, Crossunder, CumulativeMaximum, CumulativeMinimum, CumulativeSumControlChart,
+    DetrendedPriceOscillator, EqualHighsLows, Falling, FractalDimension,
+    HilbertTransformDominantCyclePhase, KaufmanAdaptiveMovingAverage, Rising,
+    Amihud, AverageDailyDollarValue, HedgeRatio, KnowSureThing, MassIndex,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -205,7 +206,6 @@ pub use window::Window;
 #[cfg(test)]
 mod bars_since_test;
 #[cfg(test)]
-mod cross_test;
 #[cfg(test)]
 mod donchian_test;
 #[cfg(test)]
@@ -543,9 +543,6 @@ mod ease_of_movement_test;
 mod fair_value_gap;
 #[cfg(test)]
 mod fair_value_gap_test;
-mod falling;
-#[cfg(test)]
-mod falling_test;
 mod force_index;
 #[cfg(test)]
 mod force_index_test;
@@ -563,9 +560,6 @@ mod previous_high_low_test;
 mod retracements;
 #[cfg(test)]
 mod retracements_test;
-mod rising;
-#[cfg(test)]
-mod rising_test;
 mod rogers_satchell;
 #[cfg(test)]
 mod rogers_satchell_test;
@@ -648,7 +642,7 @@ mod swing_highs_lows_indicator;
 #[cfg(test)]
 mod swing_highs_lows_indicator_test;
 #[cfg(test)]
-mod swing_highs_lows_test;
+pub(crate) mod swing_highs_lows_test;
 pub use swing_high::SwingHigh;
 mod swing_low;
 #[cfg(test)]
@@ -691,7 +685,6 @@ pub use bars_since::BarsSince;
 pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
 pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use fair_value_gap::{FairValueGap, FairValueGapValue};
-pub use falling::Falling;
 pub use frac_diff::FracDiff;
 pub use gap_down::GapDown;
 pub use gap_up::GapUp;
@@ -707,7 +700,6 @@ pub use outside_bar::OutsideBar;
 pub use parkinson::Parkinson;
 pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
 pub use retracements::{Retracements, RetracementsValue};
-pub use rising::Rising;
 pub use rogers_satchell::RogersSatchell;
 pub use roll_spread::RollSpread;
 pub use rolling_alpha::RollingAlpha;
@@ -743,16 +735,6 @@ mod position_hold;
 pub use position_hold::PositionHold;
 mod entry_exit;
 pub use entry_exit::EntryExit;
-mod crossover;
-#[cfg(test)]
-mod crossover_test;
-pub use crossover::Crossover;
-mod crossunder;
-#[cfg(test)]
-mod crossunder_test;
-pub use crossunder::Crossunder;
-mod cross;
-pub use cross::Cross;
 pub use negative_volume_index::NegativeVolumeIndex;
 pub use positive_volume_index::PositiveVolumeIndex;
 pub use volume_price_trend::VolumePriceTrend;

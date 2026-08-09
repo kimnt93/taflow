@@ -1,15 +1,15 @@
-"""Native-backed causal rising-signal adapter."""
+"""Native-backed causal falling-signal adapter."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import RisingOperator as _Native
-from ._series import as_float64_series
+from .._native import FallingOperator as _Native
+from .._series import as_float64_series
 
 
-class Rising:
-    """Emit one when the latest value rises over the trailing comparison.
+class Falling:
+    """Emit one when the latest value falls under the trailing comparison.
 
     ``_input`` is the required chronological series and may be empty for a
     fresh stream. ``timeperiod`` defaults to 1 and must be positive. Rust owns
@@ -21,24 +21,21 @@ class Rising:
 
     def __init__(self, _input: Any, timeperiod: int = 1) -> None:
         self._state = _Native(int(timeperiod))
-        self._length = 0
         self.extend(_input)
 
-    def append(self, _input: float) -> "Rising":
+    def append(self, _input: float) -> "Falling":
         """Append one observation and return this adapter."""
         self._state.append(float(_input))
-        self._length += 1
         return self
 
-    def extend(self, _input: Any) -> "Rising":
+    def extend(self, _input: Any) -> "Falling":
         """Append a chronological observation series and return this adapter."""
         values = as_float64_series(_input)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned rising flags."""
+        """Return the aligned falling flags."""
         return self._state.compute()
 
     @property
@@ -46,15 +43,14 @@ class Rising:
         """Return the latest flag, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self) -> "Rising":
+    def reset(self) -> "Falling":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed observations."""
-        return self._length
+        return len(self._state)
 
 
-__all__ = ["Rising"]
+__all__ = ["Falling"]

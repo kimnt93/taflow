@@ -170,11 +170,11 @@ from ..donchian import Donchian
 from ..ulcer_index import UlcerIndex
 from ..keltner_channels import KeltnerChannels
 from ..chaikin_volatility import ChaikinVolatility
-from ..crossover import Crossover
-from ..crossunder import Crossunder
-from ..cross import Cross
-from ..rising import Rising
-from ..falling import Falling
+from .crossover import Crossover
+from .crossunder import Crossunder
+from .cross import Cross
+from .rising import Rising
+from .falling import Falling
 from .math_abs import MathAbs
 from .math_acos import MathAcos
 from .math_acosh import MathAcosh

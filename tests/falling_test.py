@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.falling import Falling
+from taflow import Falling
 
 
 def test_falling_lifecycle_and_reset():

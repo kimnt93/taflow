@@ -213,11 +213,11 @@ from .donchian import Donchian
 from .ulcer_index import UlcerIndex
 from .keltner_channels import KeltnerChannels
 from .chaikin_volatility import ChaikinVolatility
-from .crossover import Crossover
-from .crossunder import Crossunder
-from .cross import Cross
-from .rising import Rising
-from .falling import Falling
+from .indicators.crossover import Crossover
+from .indicators.crossunder import Crossunder
+from .indicators.cross import Cross
+from .indicators.rising import Rising
+from .indicators.falling import Falling
 from .indicators.rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
 from .indicators.force_index import ForceIndex
 from .indicators.ease_of_movement import EaseOfMovement

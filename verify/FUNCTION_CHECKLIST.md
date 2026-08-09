@@ -36,6 +36,16 @@ duplicate length counters. The release extension, focused lifecycle tests,
 full Python suite (592 passed, 2 skipped), and 304/304 interface audit passed.
 Benchmark fields remain `TODO`; no benchmark command was run.
 
+The twenty-fifth structural batch split the grouped signal-helper bindings
+into dedicated `Cross`, `Crossover`, `Crossunder`, `Rising`, and `Falling`
+files, moved their Python adapters into `taflow/indicators/`, and migrated
+the five corresponding Rust states/tests from `stream/` into
+`crates/taflow-core/src/indicators/`. Top-level and package exports remain
+available through both `taflow` and `taflow.indicators`. Rust focused tests,
+PyO3 compilation, focused Python tests, the full Python suite (592 passed, 2
+skipped), and the 304/304 interface audit passed. Benchmark fields remain
+`TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

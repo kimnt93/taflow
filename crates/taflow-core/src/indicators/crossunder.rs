@@ -1,8 +1,8 @@
 //! Persistent `Crossunder` state.
 
-use super::operator_states::*;
 use super::*;
 use crate::error::{TaError, TaResult};
+use crate::stream::operator_states::*;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone)]

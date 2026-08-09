@@ -1,5 +1,7 @@
 //! Canonical persistent technical indicators.
 
+pub use crate::stream::StreamingIndicator;
+
 mod acceleration_bands;
 #[cfg(test)]
 mod acceleration_bands_test;
@@ -564,6 +566,15 @@ mod close_to_close_sigma_test;
 mod commodity_channel_index;
 #[cfg(test)]
 mod commodity_channel_index_test;
+mod cross;
+#[cfg(test)]
+mod cross_test;
+mod crossover;
+#[cfg(test)]
+mod crossover_test;
+mod crossunder;
+#[cfg(test)]
+mod crossunder_test;
 mod cumulative_maximum;
 #[cfg(test)]
 mod cumulative_maximum_test;
@@ -579,20 +590,31 @@ mod detrended_price_oscillator_test;
 mod equal_highs_lows;
 #[cfg(test)]
 mod equal_highs_lows_test;
+mod falling;
+#[cfg(test)]
+mod falling_test;
 mod fractal_dimension;
 #[cfg(test)]
 mod fractal_dimension_test;
+mod rising;
+#[cfg(test)]
+mod rising_test;
 
 pub use chaikin_money_flow::ChaikinMoneyFlow;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use close_to_close_sigma::CloseToCloseSigma;
 pub use commodity_channel_index::CommodityChannelIndex;
+pub use cross::Cross;
+pub use crossover::Crossover;
+pub use crossunder::Crossunder;
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
 pub use cumulative_sum_control_chart::CumulativeSumControlChart;
 pub use detrended_price_oscillator::DetrendedPriceOscillator;
 pub use equal_highs_lows::EqualHighsLows;
+pub use falling::Falling;
 pub use fractal_dimension::FractalDimension;
+pub use rising::Rising;
 
 mod candle_three_stars_in_south;
 #[cfg(test)]
