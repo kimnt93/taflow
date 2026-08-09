@@ -1,8 +1,9 @@
 //! Persistent `Donchian` state.
 
-use super::operator_states::*;
 use super::*;
 use crate::error::{TaError, TaResult};
+use crate::stream::operator_states::*;
+use crate::stream::{vhgw, MonotonicMax, MonotonicMin};
 use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -100,8 +101,8 @@ impl Donchian {
         upper_out.resize(upper_start + n, f64::NAN);
         lower_out.resize(lower_start + n, f64::NAN);
         middle_out.resize(middle_start + n, f64::NAN);
-        super::vhgw::sliding_max_into(high, period, &mut upper_out[upper_start + period - 1..]);
-        super::vhgw::sliding_min_into(low, period, &mut lower_out[lower_start + period - 1..]);
+        vhgw::sliding_max_into(high, period, &mut upper_out[upper_start + period - 1..]);
+        vhgw::sliding_min_into(low, period, &mut lower_out[lower_start + period - 1..]);
         for (slot, (&upper, &lower)) in middle_out[middle_start + period - 1..].iter_mut().zip(
             upper_out[upper_start + period - 1..]
                 .iter()

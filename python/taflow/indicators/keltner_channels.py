@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import KeltnerChannelsOperator as _Native
-from ._series import as_float64_series
+from .._native import KeltnerChannelsOperator as _Native
+from .._series import as_float64_series
 
 
 class KeltnerChannels:
@@ -30,13 +30,11 @@ class KeltnerChannels:
         multiplier: float = 2.0,
     ) -> None:
         self._state = _Native(int(timeperiod), float(multiplier))
-        self._length = 0
         self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "KeltnerChannels":
         """Append one OHLC bar and return this adapter."""
         self._state.append(float(high), float(low), float(close))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "KeltnerChannels":
@@ -45,7 +43,6 @@ class KeltnerChannels:
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, and close must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -60,12 +57,11 @@ class KeltnerChannels:
     def reset(self) -> "KeltnerChannels":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return len(self._state)
 
 
 __all__ = ["KeltnerChannels"]

@@ -166,10 +166,10 @@ from .rolling_linear_regression_angle import RollingLinearRegressionAngle
 from .rolling_linear_regression_intercept import RollingLinearRegressionIntercept
 from .rolling_linear_regression_slope import RollingLinearRegressionSlope
 from .rolling_time_series_forecast import RollingTimeSeriesForecast
-from ..donchian import Donchian
-from ..ulcer_index import UlcerIndex
-from ..keltner_channels import KeltnerChannels
-from ..chaikin_volatility import ChaikinVolatility
+from .donchian import Donchian
+from .ulcer_index import UlcerIndex
+from .keltner_channels import KeltnerChannels
+from .chaikin_volatility import ChaikinVolatility
 from .crossover import Crossover
 from .crossunder import Crossunder
 from .cross import Cross
@@ -231,7 +231,6 @@ from ..previous_high_low import PreviousHighLow
 from ..sessions import Sessions
 from .active_zone_list import ActiveZoneList
 from ..fvg import FairValueGap
-from ..donchian_channels import DonchianChannels
 from ..swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from ..order_block import OrderBlock
@@ -477,7 +476,6 @@ __all__ = [
     "Sessions",
     "ActiveZoneList",
     "FairValueGap",
-    "DonchianChannels",
     "RollingVolumeWeightedAveragePrice",
     "SwingHighsLows",
     "BreakOfStructureChangeOfCharacter",

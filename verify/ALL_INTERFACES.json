@@ -1040,10 +1040,6 @@
     "status": "PASS"
   },
   {
-    "name": "DonchianChannels",
-    "status": "PASS"
-  },
-  {
     "name": "SwingHighsLows",
     "status": "PASS"
   },

@@ -41,11 +41,12 @@ pub(crate) mod tests_extrema_support {
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
 pub use crate::indicators::{
-    ChaikinMoneyFlow, ChandeMomentumOscillator, CloseToCloseSigma, CommodityChannelIndex, Cross,
-    Crossover, Crossunder, CumulativeMaximum, CumulativeMinimum, CumulativeSumControlChart,
-    DetrendedPriceOscillator, EqualHighsLows, Falling, FractalDimension,
-    HilbertTransformDominantCyclePhase, KaufmanAdaptiveMovingAverage, Rising,
-    Amihud, AverageDailyDollarValue, HedgeRatio, KnowSureThing, MassIndex,
+    Amihud, AverageDailyDollarValue, ChaikinMoneyFlow, ChaikinVolatility, ChandeMomentumOscillator,
+    CloseToCloseSigma, CommodityChannelIndex, Cross, Crossover, Crossunder, CumulativeMaximum,
+    CumulativeMinimum, CumulativeSumControlChart, DetrendedPriceOscillator, Donchian,
+    DonchianValue, EqualHighsLows, Falling, FractalDimension, HedgeRatio,
+    HilbertTransformDominantCyclePhase, KaufmanAdaptiveMovingAverage, KeltnerChannels,
+    KeltnerValue, KnowSureThing, MassIndex, Rising, UlcerIndex,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -207,9 +208,6 @@ pub use window::Window;
 mod bars_since_test;
 #[cfg(test)]
 #[cfg(test)]
-mod donchian_test;
-#[cfg(test)]
-#[cfg(test)]
 mod entry_exit_test;
 #[cfg(test)]
 #[cfg(test)]
@@ -224,8 +222,6 @@ mod gap_down_test;
 mod gap_up_test;
 #[cfg(test)]
 mod highest_since_test;
-#[cfg(test)]
-mod keltner_channels_test;
 #[cfg(test)]
 mod lowest_since_test;
 #[cfg(test)]
@@ -533,9 +529,6 @@ mod tests {
         }
     }
 }
-mod chaikin_volatility;
-#[cfg(test)]
-mod chaikin_volatility_test;
 #[allow(unused_imports)]
 mod ease_of_movement;
 #[cfg(test)]
@@ -584,9 +577,6 @@ mod sessions_test;
 mod time_series_rank;
 #[cfg(test)]
 mod time_series_rank_test;
-mod ulcer_index;
-#[cfg(test)]
-mod ulcer_index_test;
 mod yang_zhang;
 #[cfg(test)]
 mod yang_zhang_test;
@@ -682,9 +672,11 @@ mod lowest_since;
 mod outside_bar;
 mod value_when;
 pub use bars_since::BarsSince;
+pub use ease_of_movement::EaseOfMovement;
 pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
 pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use fair_value_gap::{FairValueGap, FairValueGapValue};
+pub use force_index::ForceIndex;
 pub use frac_diff::FracDiff;
 pub use gap_down::GapDown;
 pub use gap_up::GapUp;
@@ -705,6 +697,7 @@ pub use roll_spread::RollSpread;
 pub use rolling_alpha::RollingAlpha;
 pub use rolling_autocorr::RollingAutocorr;
 pub use rolling_information_ratio::RollingInformationRatio;
+pub use rolling_volume_weighted_average_price::RollingVolumeWeightedAveragePrice;
 pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
 pub use session_extrema::{SessionExtrema, SessionExtremaValue};
@@ -716,19 +709,6 @@ pub use supertrend::{Supertrend, SupertrendValue};
 pub use value_when::ValueWhen;
 pub use vortex::{Vortex, VortexValue};
 pub use yang_zhang::YangZhang;
-mod donchian;
-pub use donchian::{Donchian, DonchianValue};
-mod donchian_channels;
-#[cfg(test)]
-mod donchian_channels_test;
-pub use donchian_channels::DonchianChannels;
-pub use ulcer_index::UlcerIndex;
-mod keltner_channels;
-pub use chaikin_volatility::ChaikinVolatility;
-pub use ease_of_movement::EaseOfMovement;
-pub use force_index::ForceIndex;
-pub use keltner_channels::{KeltnerChannels, KeltnerValue};
-pub use rolling_volume_weighted_average_price::RollingVolumeWeightedAveragePrice;
 mod signal_delay;
 pub use signal_delay::SignalDelay;
 mod position_hold;

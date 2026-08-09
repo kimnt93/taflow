@@ -209,10 +209,10 @@ from .indicators import ArnaudLegouxMovingAverage
 from .indicators import TrueStrengthIndex
 from .indicators import AwesomeOscillator
 from .indicators import FisherTransform
-from .donchian import Donchian
-from .ulcer_index import UlcerIndex
-from .keltner_channels import KeltnerChannels
-from .chaikin_volatility import ChaikinVolatility
+from .indicators.donchian import Donchian
+from .indicators.ulcer_index import UlcerIndex
+from .indicators.keltner_channels import KeltnerChannels
+from .indicators.chaikin_volatility import ChaikinVolatility
 from .indicators.crossover import Crossover
 from .indicators.crossunder import Crossunder
 from .indicators.cross import Cross
@@ -243,7 +243,6 @@ from .previous_high_low import PreviousHighLow
 from .sessions import Sessions
 from .indicators.active_zone_list import ActiveZoneList
 from .fair_value_gap import FairValueGap
-from .donchian_channels import DonchianChannels
 from .swing_highs_lows import SwingHighsLows
 from .indicators.break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from .order_block import OrderBlock
@@ -513,7 +512,6 @@ __all__ = [
     "Sessions",
     "ActiveZoneList",
     "FairValueGap",
-    "DonchianChannels",
     "SwingHighsLows",
     "BreakOfStructureChangeOfCharacter",
     "OrderBlock",

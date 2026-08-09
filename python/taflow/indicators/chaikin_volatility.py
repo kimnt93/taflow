@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import ChaikinVolatilityOperator as _Native
-from ._series import as_float64_series
+from .._native import ChaikinVolatilityOperator as _Native
+from .._series import as_float64_series
 
 
 class ChaikinVolatility:
@@ -27,13 +27,11 @@ class ChaikinVolatility:
         roc_period: int = 10,
     ) -> None:
         self._state = _Native(int(timeperiod), int(roc_period))
-        self._length = 0
         self.extend(high, low)
 
     def append(self, high: float, low: float) -> "ChaikinVolatility":
         """Append one high/low bar and return this adapter."""
         self._state.append(float(high), float(low))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any) -> "ChaikinVolatility":
@@ -42,7 +40,6 @@ class ChaikinVolatility:
         if len(arrays[0]) != len(arrays[1]):
             raise ValueError("high and low must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -57,12 +54,11 @@ class ChaikinVolatility:
     def reset(self) -> "ChaikinVolatility":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return len(self._state)
 
 
 __all__ = ["ChaikinVolatility"]

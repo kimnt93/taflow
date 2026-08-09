@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import UlcerIndexOperator as _Native
-from ._series import as_float64_series
+from .._native import UlcerIndexOperator as _Native
+from .._series import as_float64_series
 
 
 class UlcerIndex:
@@ -21,20 +21,17 @@ class UlcerIndex:
 
     def __init__(self, _input: Any, timeperiod: int = 14) -> None:
         self._state = _Native(int(timeperiod))
-        self._length = 0
         self.extend(_input)
 
     def append(self, _input: float) -> "UlcerIndex":
         """Append one price and return this adapter."""
         self._state.append(float(_input))
-        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "UlcerIndex":
         """Append a chronological price series and return this adapter."""
         values = as_float64_series(_input)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -49,12 +46,11 @@ class UlcerIndex:
     def reset(self) -> "UlcerIndex":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed prices."""
-        return self._length
+        return len(self._state)
 
 
 __all__ = ["UlcerIndex"]

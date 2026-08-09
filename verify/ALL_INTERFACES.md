@@ -2,7 +2,7 @@
 
 Indicator invariant: constructor history == native `extend` history == one-bar `append` history. Stateful adapters must also provide fluent `append`, `extend`, and `reset`, plus an exact `len()`. Helper functions receive smoke checks.
 
-- Passed: **304**
+- Passed: **303**
 - Failed: **0**
 
 | Interface | Status | Error |
@@ -267,7 +267,6 @@ Indicator invariant: constructor history == native `extend` history == one-bar `
 | `PreviousHighLow` | PASS |  |
 | `Sessions` | PASS |  |
 | `FairValueGap` | PASS |  |
-| `DonchianChannels` | PASS |  |
 | `SwingHighsLows` | PASS |  |
 | `BreakOfStructureChangeOfCharacter` | PASS |  |
 | `OrderBlock` | PASS |  |

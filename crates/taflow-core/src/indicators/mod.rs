@@ -557,6 +557,9 @@ pub use hurst::Hurst;
 mod chaikin_money_flow;
 #[cfg(test)]
 mod chaikin_money_flow_test;
+mod chaikin_volatility;
+#[cfg(test)]
+mod chaikin_volatility_test;
 mod chande_momentum_oscillator;
 #[cfg(test)]
 mod chande_momentum_oscillator_test;
@@ -587,6 +590,9 @@ mod cumulative_sum_control_chart_test;
 mod detrended_price_oscillator;
 #[cfg(test)]
 mod detrended_price_oscillator_test;
+mod donchian;
+#[cfg(test)]
+mod donchian_test;
 mod equal_highs_lows;
 #[cfg(test)]
 mod equal_highs_lows_test;
@@ -596,11 +602,18 @@ mod falling_test;
 mod fractal_dimension;
 #[cfg(test)]
 mod fractal_dimension_test;
+mod keltner_channels;
+#[cfg(test)]
+mod keltner_channels_test;
 mod rising;
 #[cfg(test)]
 mod rising_test;
+mod ulcer_index;
+#[cfg(test)]
+mod ulcer_index_test;
 
 pub use chaikin_money_flow::ChaikinMoneyFlow;
+pub use chaikin_volatility::ChaikinVolatility;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use close_to_close_sigma::CloseToCloseSigma;
 pub use commodity_channel_index::CommodityChannelIndex;
@@ -611,10 +624,13 @@ pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
 pub use cumulative_sum_control_chart::CumulativeSumControlChart;
 pub use detrended_price_oscillator::DetrendedPriceOscillator;
+pub use donchian::{Donchian, DonchianValue};
 pub use equal_highs_lows::EqualHighsLows;
 pub use falling::Falling;
 pub use fractal_dimension::FractalDimension;
+pub use keltner_channels::{KeltnerChannels, KeltnerValue};
 pub use rising::Rising;
+pub use ulcer_index::UlcerIndex;
 
 mod candle_three_stars_in_south;
 #[cfg(test)]

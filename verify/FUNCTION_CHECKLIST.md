@@ -46,6 +46,16 @@ PyO3 compilation, focused Python tests, the full Python suite (592 passed, 2
 skipped), and the 304/304 interface audit passed. Benchmark fields remain
 `TODO`; no benchmark command was run.
 
+The twenty-sixth structural batch split the grouped volatility bindings into
+dedicated `ChaikinVolatility`, `KeltnerChannels`, `Donchian`, and `UlcerIndex`
+files, migrated their Rust implementations/tests into the canonical
+`indicators/` directory, and moved their Python adapters there as well. The
+duplicate `DonchianChannels` forwarding adapter/export/test was removed in
+favor of `Donchian`. Rust focused tests, the release extension, four focused
+Python tests, the full Python suite (591 passed, 2 skipped), and the 303/303
+interface audit passed. Benchmark fields remain `TODO`; no benchmark command
+was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

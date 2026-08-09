@@ -1,7 +1,7 @@
 //! Persistent Chaikin Volatility state.
 
-use super::operator_states::validate_period;
 use crate::error::TaResult;
+use crate::stream::operator_states::validate_period;
 use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]
