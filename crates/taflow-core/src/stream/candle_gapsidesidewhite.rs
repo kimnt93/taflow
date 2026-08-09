@@ -63,10 +63,12 @@ impl CandleGapSideSideWhite {
             let equal = ca_highlow_scalar(EQUAL, self.equal_sum, b.h, b.l);
             let base = b.color() == 1
                 && cur.color() == 1
-                && (b.body() - cur.body()).abs() < near
-                && (b.o - cur.o).abs() < equal;
-            let bull = base && b.o.min(b.c) > a.o.max(a.c);
-            let bear = base && b.o.max(b.c) < a.o.min(a.c);
+                && cur.body() >= b.body() - near
+                && cur.body() <= b.body() + near
+                && cur.o >= b.o - equal
+                && cur.o <= b.o + equal;
+            let bull = base && b.o.min(b.c) > a.o.max(a.c) && cur.o.min(cur.c) > a.o.max(a.c);
+            let bear = base && b.o.max(b.c) < a.o.min(a.c) && cur.o.max(cur.c) < a.o.min(a.c);
             // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 5).
             self.near_sum += cr_highlow_scalar(b.h, b.l)
                 - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
@@ -198,16 +200,24 @@ pub fn candle_gap_side_side_white(
     }
 
     for i in start..len {
+        let near = ca_highlow(NEAR, near_sum, open, high, low, close, i - 1);
+        let equal = ca_highlow(EQUAL, equal_sum, open, high, low, close, i - 1);
+        let current_body = real_body(open[i], close[i]);
+        let previous_body = real_body(open[i - 1], close[i - 1]);
         let base = candle_color(open[i - 1], close[i - 1]) == 1
             && candle_color(open[i], close[i]) == 1
-            && (real_body(open[i - 1], close[i - 1]) - real_body(open[i], close[i])).abs()
-                < ca_highlow(NEAR, near_sum, open, high, low, close, i - 1)
-            && (open[i - 1] - open[i]).abs()
-                < ca_highlow(EQUAL, equal_sum, open, high, low, close, i - 1);
+            && current_body >= previous_body - near
+            && current_body <= previous_body + near
+            && open[i] >= open[i - 1] - equal
+            && open[i] <= open[i - 1] + equal;
         // Upside gap
-        let bull = base && real_body_gap_up(open, close, i - 1, i - 2);
+        let bull = base
+            && real_body_gap_up(open, close, i - 1, i - 2)
+            && real_body_gap_up(open, close, i, i - 2);
         // Downside gap
-        let bear = base && real_body_gap_down(open, close, i - 1, i - 2);
+        let bear = base
+            && real_body_gap_down(open, close, i - 1, i - 2)
+            && real_body_gap_down(open, close, i, i - 2);
         output[i] = (bull as i32) * 100 - (bear as i32) * 100;
         near_sum += cr_highlow(open, high, low, close, i - 1)
             - cr_highlow(open, high, low, close, i - 1 - NEAR.avg_period);

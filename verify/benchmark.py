@@ -28,9 +28,10 @@ import numpy as np
 from registry import Spec, build_registry, make_data, resolve_specs
 from verify import pandas_oracles, verdict, verify_function
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 DEFAULT_SIZES = (1_000, 10_000, 100_000, 1_000_000)
-DEFAULT_THREADS = (1, 2, 4)
+DEFAULT_THREADS = (1, 5, 10)
+DEFAULT_WARMUP_SIZES = (1, 10, 100, 1_000)
 DEFAULT_CHUNKS = (1, 10, 1_000)
 DEFAULT_SCENARIOS = ("correctness", "vector", "warmup", "continue", "threads")
 MIN_SAMPLE_SECONDS = 0.02
@@ -42,6 +43,52 @@ def talib_call(spec: Spec, arrays: list[np.ndarray]):
 
     params = dict(abstract.Function(spec.talib_name).info["parameters"])
     return getattr(talib, spec.talib_name)(*arrays, **params)
+
+
+def selected_reference(spec: Spec) -> dict:
+    path = Path(__file__).parent / "SOURCE_COMPARISON.json"
+    if not path.exists() or not spec.cls:
+        return {}
+    rows = json.loads(path.read_text())
+    return next((row for row in rows if row["class"] == spec.cls.__name__), {})
+
+
+def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dict):
+    """Invoke timed external references currently supported by the harness."""
+    source = reference.get("source")
+    if source == "TA-Lib":
+        return talib_call(spec, arrays)
+    if source == "NumPy":
+        functions = {
+            "math_abs": np.abs,
+            "math_acosh": np.arccosh,
+            "math_asinh": np.arcsinh,
+            "math_atanh": np.arctanh,
+            "math_cbrt": np.cbrt,
+            "math_cot": lambda value: 1.0 / np.tan(value),
+            "math_degrees": np.degrees,
+            "math_log1p": np.log1p,
+            "math_radians": np.radians,
+            "signed_power": lambda value: np.sign(value) * np.abs(value) ** 2.0,
+        }
+        return functions[spec.snake](arrays[0])
+    if source == "Polars":
+        import polars as pl
+        series = pl.Series(arrays[0])
+        functions = {
+            "cumulative_maximum": lambda: series.cum_max(),
+            "cumulative_minimum": lambda: series.cum_min(),
+            "cumulative_product": lambda: series.cum_prod(),
+            "cumulative_sum": lambda: series.cum_sum(),
+            "ewm_var": lambda: series.ewm_var(
+                span=spec.ctor_kwargs.get("timeperiod", 14), adjust=False, bias=True),
+        }
+        return functions[spec.snake]()
+    raise KeyError(source)
+
+
+def has_timed_reference(reference: dict) -> bool:
+    return reference.get("source") in {"TA-Lib", "NumPy", "Polars"}
 
 
 def timed(fn: Callable[[], object], repeats: int,
@@ -97,6 +144,7 @@ def native_vector(spec: Spec, arrays: list[np.ndarray]):
 
 def vector_rows(spec: Spec, data: dict, sizes: tuple[int, ...],
                 repeats: int) -> list[dict]:
+    reference = selected_reference(spec)
     rows = []
     for size in sizes:
         arrays = spec.arrays(data, size)
@@ -109,36 +157,49 @@ def vector_rows(spec: Spec, data: dict, sizes: tuple[int, ...],
         }
         for key in ("taflow_canonical_vector", "taflow_native_kernel"):
             row[key]["bars_per_second"] = size / (row[key]["mean_ms"] / 1e3)
-        if spec.talib_name:
-            row["talib_original"] = timed(
-                lambda: talib_call(spec, arrays), repeats)
-            row["talib_original"]["bars_per_second"] = (
-                size / (row["talib_original"]["mean_ms"] / 1e3))
-            row["speedup_canonical"] = (row["talib_original"]["mean_ms"]
+        if has_timed_reference(reference):
+            row["external_reference"] = timed(
+                lambda: external_reference_call(spec, arrays, reference), repeats)
+            row["external_reference"]["bars_per_second"] = (
+                size / (row["external_reference"]["mean_ms"] / 1e3))
+            row["speedup_canonical"] = (row["external_reference"]["mean_ms"]
                                          / row["taflow_canonical_vector"]["mean_ms"])
-            row["speedup_kernel"] = (row["talib_original"]["mean_ms"]
+            row["speedup_kernel"] = (row["external_reference"]["mean_ms"]
                                       / row["taflow_native_kernel"]["mean_ms"])
         rows.append(row)
     return rows
 
 
-def warmup_row(spec: Spec, data: dict, bars: int, repeats: int) -> dict:
-    arrays = spec.arrays(data, bars)
-    row = {
-        "bars": bars,
-        "taflow_canonical_warmup": timed(
-            lambda: full_vector(spec, arrays), repeats),
-        "taflow_native_warmup": timed(
-            lambda: native_vector(spec, arrays), repeats),
-    }
-    if spec.talib_name:
-        row["talib_original"] = timed(
-            lambda: talib_call(spec, arrays), repeats)
-        row["speedup_canonical"] = (row["talib_original"]["mean_ms"]
-                                     / row["taflow_canonical_warmup"]["mean_ms"])
-        row["speedup_kernel"] = (row["talib_original"]["mean_ms"]
+def warmup_rows(spec: Spec, data: dict, sizes: tuple[int, ...],
+                thread_counts: tuple[int, ...], repeats: int) -> list[dict]:
+    """Construct fresh independent states at each bar/thread matrix point."""
+    rows = []
+    reference = selected_reference(spec)
+    for bars in sizes:
+        arrays = spec.arrays(data, bars)
+        for count in thread_counts:
+            native_samples = []
+            reference_samples = []
+            for _ in range(min(repeats, 3)):
+                native_samples.append(_thread_wall([
+                    lambda a=arrays: native_vector(spec, a) for _ in range(count)
+                ]))
+                if has_timed_reference(reference):
+                    reference_samples.append(_thread_wall([
+                        lambda a=arrays: external_reference_call(spec, a, reference)
+                        for _ in range(count)
+                    ]))
+            row = {
+                "bars": bars,
+                "threads": count,
+                "taflow_native_warmup": sample_stats(native_samples, count * bars),
+            }
+            if reference_samples:
+                row["reference_warmup"] = sample_stats(reference_samples, count * bars)
+                row["speedup"] = (row["reference_warmup"]["mean_ms"]
                                   / row["taflow_native_warmup"]["mean_ms"])
-    return row
+            rows.append(row)
+    return rows
 
 
 def _continue_taflow(spec: Spec, base_arrays: list[np.ndarray],
@@ -344,12 +405,12 @@ def render(report: dict) -> str:
     lines += [report["environment"]["native_vector_note"], ""]
     if report.get("vector"):
         lines += ["## Whole-vector performance", "",
-                  "| Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | TA-Lib ms | API speedup | Kernel speedup |",
+                  "| Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | Reference ms | API speedup | Kernel speedup |",
                   "|---:|---:|---:|---:|---:|---:|---:|---:|"]
         for row in report["vector"]:
             api = row["taflow_canonical_vector"]
             kernel = row["taflow_native_kernel"]
-            ta = row.get("talib_original", {})
+            ta = row.get("external_reference", {})
             lines.append(f"| {row['bars']:,} | {api['mean_ms']:.3f} | "
                          f"{fmt_rate(api['bars_per_second'])} | "
                          f"{kernel['mean_ms']:.3f} | "
@@ -359,13 +420,17 @@ def render(report: dict) -> str:
                          + " | " + (f"{row['speedup_kernel']:.2f}×" if "speedup_kernel" in row else "—") + " |")
         lines.append("")
     if report.get("warmup"):
-        row = report["warmup"]
-        lines += ["## Warm-up", "",
-                  f"Construct + canonical extend over {row['bars']:,} bars: "
-                  f"**{row['taflow_canonical_warmup']['mean_ms']:.3f} ms**; "
-                  f"native kernel **{row['taflow_native_warmup']['mean_ms']:.3f} ms**" +
-                  (f"; TA-Lib {row['talib_original']['mean_ms']:.3f} ms."
-                   if "talib_original" in row else "."), ""]
+        lines += ["## Fresh-state warm-up", "",
+                  "| Bars | Threads | TAFlow ms | Reference ms | Speedup |",
+                  "|---:|---:|---:|---:|---:|"]
+        for row in report["warmup"]:
+            reference = row.get("reference_warmup", {})
+            lines.append(
+                f"| {row['bars']:,} | {row['threads']} | "
+                f"{row['taflow_native_warmup']['mean_ms']:.3f} | "
+                f"{reference.get('mean_ms', float('nan')):.3f} | "
+                + (f"{row['speedup']:.2f}× |" if "speedup" in row else "— |"))
+        lines.append("")
     if report.get("continuation"):
         lines += ["## Warmed continuation", "",
                   "| Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | TA-Lib full µs | vs full | vs tail |",
@@ -412,7 +477,8 @@ def run_spec(spec: Spec, args, data: dict, env: dict) -> dict:
         "protocol": {
             "repeats": args.repeats,
             "sizes": args.sizes,
-            "warmup_bars": args.warmup_bars,
+            "warmup_sizes": args.warmup_sizes,
+            "continue_base": args.continue_base,
             "continue_bars": args.continue_bars,
             "chunks": args.chunks,
             "threads": args.threads,
@@ -431,20 +497,20 @@ def run_spec(spec: Spec, args, data: dict, env: dict) -> dict:
             check_spec.input_roles = oracle["inputs"]
         report["correctness"] = verify_function(
             check_spec, data, args.correctness_bars,
-            min(args.warmup_bars, args.correctness_bars - 1),
+            min(args.continue_base, args.correctness_bars - 1),
             oracle_fn=oracle["oracle"] if oracle else None)
     if "vector" in scenarios:
         report["vector"] = vector_rows(spec, data, args.sizes, args.repeats)
     if "warmup" in scenarios:
-        report["warmup"] = warmup_row(
-            spec, data, args.warmup_bars, args.repeats)
+        report["warmup"] = warmup_rows(
+            spec, data, args.warmup_sizes, args.threads, args.repeats)
     if "continue" in scenarios:
         report["continuation"] = continuation_rows(
-            spec, data, args.warmup_bars, args.continue_bars,
+            spec, data, args.continue_base, args.continue_bars,
             args.chunks, args.repeats)
     if "threads" in scenarios:
         report["threads"] = thread_rows(
-            spec, data, min(args.thread_bars, args.warmup_bars),
+            spec, data, min(args.thread_bars, args.continue_base),
             min(args.continue_bars, 1_000), args.threads, args.repeats)
     return report
 
@@ -452,37 +518,76 @@ def run_spec(spec: Spec, args, data: dict, env: dict) -> dict:
 def aggregate(reports: list[dict]) -> str:
     selected_path = Path(__file__).parent / "SOURCE_COMPARISON.json"
     selected_rows = json.loads(selected_path.read_text()) if selected_path.exists() else []
-    selected_by_class = {}
+    selected_by_class: dict[str, list[dict]] = {}
     for row in selected_rows:
-        selected_by_class.setdefault(row["class"], row)
-    lines = ["# TAFlow verification benchmark", "",
-             f"Generated {date.today().isoformat()} from {len(reports)} functions.", "",
-             "Reference ratios use the same priority-selected correctness source. "
-             "A dash means that source is not timed by this harness.", "",
-             "| Canonical class | Selected reference | Correctness | Largest vector bars/s | Reference ratio | Append µs | 4T vector scaling |",
-             "|---|---|---|---:|---:|---:|---:|"]
+        selected_by_class.setdefault(row["class"], []).append(row)
+    lines = ["# Correctness and performance", "",
+             f"Generated {date.today().isoformat()} from {len(reports)} indicator implementations.", "",
+             "Every correctness row uses an external implementation. `VARIANT` means the "
+             "external calculation was executed and the documented causal or initialization "
+             "difference was observed; it is not a failed comparison. Speedups are "
+             "`reference time / TAFlow native-kernel time`, so values above 1× favor TAFlow. "
+             "A dash means that reference is correctness-only in the timing harness.", "",
+             "## 1. Correctness", "",
+             "| Class | Reference | Correctness | Max error |",
+             "|---|---|---:|---:|"]
+    report_by_class = {report["canonical_class"]: report for report in reports}
+    for class_name in sorted(selected_by_class):
+        evidence = selected_by_class[class_name]
+        first = evidence[0]
+        reference = (f"[{first['source']}: `{first['oracle_api']}`]"
+                     f"({first['url']})")
+        correctness = ("FAIL" if any(row["verdict"] == "FAIL" for row in evidence) else
+                       "VARIANT" if any(row["verdict"] == "VARIANT" for row in evidence) else
+                       "MATCH")
+        max_error = max(row.get("error", 0.0) for row in evidence)
+        lines.append(f"| {class_name} | {reference} | {correctness} | `{max_error:.3e}` |")
+
+    lines += ["", "## 2. Performance on vector", "",
+              "| Class | Reference | 1k bars | 10k bars | 100k bars | 1m bars |",
+              "|---|---|---:|---:|---:|---:|"]
     for report in reports:
-        vector = (report.get("vector") or [None])[-1]
-        continuation = next((r for r in report.get("continuation", [])
-                             if r["chunk"] == 1), None)
-        threaded = (report.get("threads") or [None])[-1]
-        check = report.get("correctness")
-        selected = selected_by_class.get(report["canonical_class"], {})
-        selected_source = selected.get("source", "self")
-        selected_api = selected.get("oracle_api", "native invariant")
-        speedup = (f"{vector['speedup_kernel']:.2f}×"
-                   if selected_source == "TA-Lib" and vector and
-                   "speedup_kernel" in vector else "—")
-        append_us = (f"{continuation['taflow_native_continue']['mean_call_us']:.3f}"
-                     if continuation else "—")
-        scaling = (f"{threaded['taflow_vector_scaling']:.2f}×"
-                   if threaded else "—")
-        lines.append(
-            f"| {report['canonical_class']} | {selected_source}: `{selected_api}` | "
-            f"{selected.get('verdict') or (verdict(check) if check else ('ERROR' if report.get('error') else '—'))} | "
-            f"{fmt_rate(vector['taflow_native_kernel']['bars_per_second']) if vector else '—'} | "
-            f"{speedup} | {append_us} | {scaling} |")
-    return "\n".join(lines) + "\n"
+        evidence = selected_by_class.get(report["canonical_class"], [{}])
+        selected = evidence[0]
+        reference = (f"[{selected['source']}: `{selected['oracle_api']}`]({selected['url']})"
+                     if selected else "—")
+        vector_by_size = {row["bars"]: row for row in report.get("vector", [])}
+        cells = []
+        for size in DEFAULT_SIZES:
+            row = vector_by_size.get(size)
+            cells.append(f"{row['speedup_kernel']:.2f}×"
+                         if row and "speedup_kernel" in row else "—")
+        lines.append(f"| {report['canonical_class']} | {reference} | "
+                     + " | ".join(cells) + " |")
+
+    lines += ["", "## 3. Warm up", "",
+              "Fresh independent states are constructed and fed the stated number of bars. "
+              "Thread columns measure that many states concurrently.", ""]
+    for bars in DEFAULT_WARMUP_SIZES:
+        lines += [f"### {bars:,} bar" + ("s" if bars != 1 else ""), "",
+                  "| Class | Reference | 1 thread | 5 threads | 10 threads |",
+                  "|---|---|---:|---:|---:|"]
+        for class_name in sorted(report_by_class):
+            report = report_by_class[class_name]
+            selected = selected_by_class.get(class_name, [{}])[0]
+            reference = (f"[{selected['source']}: `{selected['oracle_api']}`]({selected['url']})"
+                         if selected else "—")
+            by_threads = {row["threads"]: row for row in report.get("warmup", [])
+                          if row["bars"] == bars}
+            cells = [f"{by_threads[count]['speedup']:.2f}×"
+                     if count in by_threads and "speedup" in by_threads[count] else "—"
+                     for count in DEFAULT_THREADS]
+            lines.append(f"| {class_name} | {reference} | " + " | ".join(cells) + " |")
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def write_aggregate(reports: list[dict], reports_dir: Path) -> None:
+    """Write the single canonical report to docs and the report artifact dir."""
+    content = aggregate(reports)
+    (reports_dir / "BENCHMARK.md").write_text(content)
+    docs_report = Path(__file__).resolve().parent.parent / "docs" / "CORRECTNESS.md"
+    docs_report.write_text(content)
 
 
 def ints(value: str) -> tuple[int, ...]:
@@ -498,7 +603,8 @@ def main() -> int:
     parser.add_argument("--repeats", type=int, default=7)
     parser.add_argument("--sizes", type=ints, default=DEFAULT_SIZES)
     parser.add_argument("--correctness-bars", type=int, default=100_000)
-    parser.add_argument("--warmup-bars", type=int, default=100_000)
+    parser.add_argument("--warmup-sizes", type=ints, default=DEFAULT_WARMUP_SIZES)
+    parser.add_argument("--continue-base", type=int, default=100_000)
     parser.add_argument("--continue-bars", type=int, default=1_000)
     parser.add_argument("--thread-bars", type=int, default=100_000)
     parser.add_argument("--chunks", type=ints, default=DEFAULT_CHUNKS)
@@ -516,10 +622,10 @@ def main() -> int:
         # Keep the oracle pass at the same 10k scale as verify.py; only the
         # performance matrix is reduced by --quick.
         args.correctness_bars = min(args.correctness_bars, 10_000)
-        args.warmup_bars = min(args.warmup_bars, 1_500)
+        args.warmup_sizes = tuple(size for size in DEFAULT_WARMUP_SIZES if size <= 1_000)
+        args.continue_base = min(args.continue_base, 1_500)
         args.continue_bars = min(args.continue_bars, 100)
         args.thread_bars = min(args.thread_bars, 1_000)
-        args.threads = tuple(value for value in args.threads if value <= 2) or (1,)
         args.chunks = tuple(sorted({min(chunk, args.continue_bars)
                                    for chunk in args.chunks}))
 
@@ -534,7 +640,7 @@ def main() -> int:
             if candidate.get("schema_version") == SCHEMA_VERSION:
                 reports.append(candidate)
         args.reports_dir.mkdir(parents=True, exist_ok=True)
-        (args.reports_dir / "BENCHMARK.md").write_text(aggregate(reports))
+        write_aggregate(reports, args.reports_dir)
         print(f"wrote {args.reports_dir / 'BENCHMARK.md'} from {len(reports)} reports")
         return 0
     if args.list:
@@ -548,7 +654,7 @@ def main() -> int:
         print("unknown functions: " + ", ".join(unknown), file=sys.stderr)
         return 2
     required = max((*args.sizes, args.correctness_bars,
-                    args.warmup_bars + args.continue_bars,
+                    max(args.warmup_sizes), args.continue_base + args.continue_bars,
                     args.thread_bars + min(args.continue_bars, 1_000)))
     data = make_data(required)
     env = environment()
@@ -588,7 +694,7 @@ def main() -> int:
             continue
         if candidate.get("schema_version") == SCHEMA_VERSION:
             all_reports.append(candidate)
-    (args.reports_dir / "BENCHMARK.md").write_text(aggregate(all_reports))
+    write_aggregate(all_reports, args.reports_dir)
     failures = sum(report.get("error") is not None or
                    (report.get("correctness") is not None
                     and verdict(report["correctness"]) != "MATCH")

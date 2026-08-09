@@ -86,8 +86,8 @@ impl CandleKicking {
                 && cur.body() > body_cur
                 && cur.upper() < vs_cur
                 && cur.lower() < vs_cur;
-            let bull = base && color_prev == -1 && color_cur == 1 && cur.o > prev.o;
-            let bear = base && color_prev == 1 && color_cur == -1 && cur.o < prev.o;
+            let bull = base && color_prev == -1 && color_cur == 1 && cur.l > prev.h;
+            let bear = base && color_prev == 1 && color_cur == -1 && cur.h < prev.l;
             Some((bull as i32) * 100 - (bear as i32) * 100)
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
@@ -257,8 +257,8 @@ pub fn candle_kicking(
                 < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i)
         {
             // Gap: black then white = bullish, white then black = bearish
-            let bull = color_prev == -1 && color_curr == 1 && open[i] > open[i - 1];
-            let bear = color_prev == 1 && color_curr == -1 && open[i] < open[i - 1];
+            let bull = color_prev == -1 && color_curr == 1 && low[i] > high[i - 1];
+            let bear = color_prev == 1 && color_curr == -1 && high[i] < low[i - 1];
             output[i] = (bull as i32) * 100 - (bear as i32) * 100;
         }
         shadow_sum[1] += cr_highlow(open, high, low, close, i - 1)

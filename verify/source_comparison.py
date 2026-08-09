@@ -11,17 +11,18 @@ from registry import build_registry
 
 
 HERE = Path(__file__).parent
-PRIORITY = {"TA-Lib": 1, "Polars": 2, "pandas": 3,
-            "pandas-ta-classic": 4, "smartmoneyconcepts": 5, "self": 99}
+PRIORITY = {"TA-Lib": 1, "NumPy": 2, "Polars": 3, "pandas": 4,
+            "pandas-ta-classic": 5, "smartmoneyconcepts": 6, "self": 99}
 URLS = {
     "TA-Lib": "https://ta-lib.github.io/ta-lib-python/funcs.html",
+    "NumPy": "https://numpy.org/doc/stable/reference/ufuncs.html",
     "Polars": "https://docs.pola.rs/api/python/stable/reference/expressions/index.html",
     "pandas": "https://pandas.pydata.org/docs/reference/window.html",
     "pandas-ta-classic": "https://xgboosted.github.io/pandas-ta-classic/indicators.html",
     "smartmoneyconcepts": "https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6",
     "self": "",
 }
-PACKAGES = {"TA-Lib": "TA-Lib", "Polars": "polars", "pandas": "pandas",
+PACKAGES = {"TA-Lib": "TA-Lib", "NumPy": "numpy", "Polars": "polars", "pandas": "pandas",
             "pandas-ta-classic": "pandas-ta-classic",
             "smartmoneyconcepts": "smartmoneyconcepts"}
 API_NAMES = {
@@ -64,9 +65,18 @@ def main() -> None:
     registry = build_registry()
     snake_by_key = {key: spec.snake for key, spec in registry.items()}
     class_by_snake = {spec.snake: spec.cls.__name__ for spec in registry.values() if spec.cls}
+    canonical_snake_by_class = {
+        spec.cls.__name__: spec.snake for spec in registry.values() if spec.cls
+    }
     external_by_function: dict[str, list[dict]] = defaultdict(list)
     for row in external:
-        external_by_function[row["function"]].append(row)
+        # External checks use descriptive names while CHECK.md retains a few
+        # compatibility keys (for example ``kvo``). Resolve through the live
+        # class so both identities select the same evidence.
+        from registry import resolve_class
+        cls = resolve_class(row["function"])
+        key = canonical_snake_by_class.get(cls.__name__) if cls else row["function"]
+        external_by_function[key].append(row)
 
     selected: list[dict] = []
     for row in primary:
@@ -77,7 +87,7 @@ def main() -> None:
                                [item for item in external_by_function[snake]
                                 if item["oracle"] == source]))
         _, source, evidence = min(candidates, key=lambda item: item[0])
-        if source in {"TA-Lib", "pandas", "self"}:
+        if source == "self" or source == row["oracle"]:
             check = row.get("batch_vs_oracle") or {}
             lifecycle = bool(row.get("continue_vs_batch_bitwise")) and all(
                 row.get("chunk_invariance", {}).values())
@@ -92,7 +102,9 @@ def main() -> None:
         for item in evidence:
             verdict = ("MATCH" if item["passed"] else
                        "VARIANT" if item.get("expected_difference") else "FAIL")
+            evidence_api = item.get("note", "") if source == "NumPy" else ""
             oracle_api = (row["function"] if source == "TA-Lib" else
+                          evidence_api if evidence_api.startswith("numpy.") else
                           API_NAMES.get(snake, f"{source}.{snake}"))
             selected.append({"class": class_by_snake[snake], "snake": snake,
                              "oracle_api": oracle_api, "output": item["output"],
@@ -106,7 +118,7 @@ def main() -> None:
               for name in ("MATCH", "VARIANT", "FAIL")}
     invariant = sum(r["source"] == "self" for r in selected)
     lines = ["# Priority-selected correctness sources", "",
-             "One oracle is selected per indicator using: **TA-Lib > Polars > pandas > "
+             "One oracle is selected per indicator using: **TA-Lib > NumPy > Polars > pandas > "
              "pandas-ta-classic > pinned GitHub**. `VARIANT` is a documented semantic "
              "difference, not a failed comparison; `INVARIANT` rows have no external oracle.", "",
              f"Matches: **{counts['MATCH']}** | Documented variants: **{counts['VARIANT']}** | "
