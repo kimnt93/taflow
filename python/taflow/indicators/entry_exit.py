@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import EntryExitOperator as _Native
-from ._series import as_bool_series
+from .._native import EntryExitOperator as _Native
+from .._series import as_bool_series
 
 
 class EntryExit:
@@ -21,13 +21,11 @@ class EntryExit:
 
     def __init__(self, entry: Any, exit: Any) -> None:
         self._state = _Native()
-        self._length = 0
         self.extend(entry, exit)
 
     def append(self, entry: bool, exit: bool) -> "EntryExit":
         """Append one entry/exit pair and return this adapter."""
         self._state.append(bool(entry), bool(exit))
-        self._length += 1
         return self
 
     def extend(self, entry: Any, exit: Any) -> "EntryExit":
@@ -36,7 +34,6 @@ class EntryExit:
         if len(arrays[0]) != len(arrays[1]):
             raise ValueError("entry and exit must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -51,12 +48,11 @@ class EntryExit:
     def reset(self) -> "EntryExit":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed event pairs."""
-        return self._length
+        return len(self._state)
 
 
 __all__ = ["EntryExit"]

@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import PositionHoldOperator as _Native
-from ._series import as_float64_series
+from .._native import PositionHoldOperator as _Native
+from .._series import as_float64_series
 
 
 class PositionHold:
@@ -21,20 +21,17 @@ class PositionHold:
 
     def __init__(self, position: Any) -> None:
         self._state = _Native()
-        self._length = 0
         self.extend(position)
 
     def append(self, position: float) -> "PositionHold":
         """Append one position and return this adapter."""
         self._state.append(float(position))
-        self._length += 1
         return self
 
     def extend(self, position: Any) -> "PositionHold":
         """Append a chronological position series and return this adapter."""
         values = as_float64_series(position)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -49,12 +46,11 @@ class PositionHold:
     def reset(self) -> "PositionHold":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed positions."""
-        return self._length
+        return len(self._state)
 
 
 __all__ = ["PositionHold"]

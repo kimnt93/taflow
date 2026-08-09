@@ -27,6 +27,15 @@ were updated accordingly. Focused tests, the release extension build, the
 full Python suite (592 passed, 2 skipped), and the 304/304 interface audit
 passed. Benchmark fields remain `TODO`; no benchmark command was run.
 
+The twenty-fourth structural batch split the seven public state-helper
+bindings (`BarsSince`, `EntryExit`, `PositionHold`, `ValueWhen`,
+`HighestSince`, `LowestSince`, and `SignalDelay`) from the grouped PyO3
+module into one binding file per class. Their Python adapters now live under
+`python/taflow/indicators/`, and native `__len__` methods replace adapter-side
+duplicate length counters. The release extension, focused lifecycle tests,
+full Python suite (592 passed, 2 skipped), and 304/304 interface audit passed.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

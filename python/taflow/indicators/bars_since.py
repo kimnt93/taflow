@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import BarsSinceOperator as _Native
-from ._series import as_bool_series
+from .._native import BarsSinceOperator as _Native
+from .._series import as_bool_series
 
 
 class BarsSince:
@@ -21,20 +21,17 @@ class BarsSince:
 
     def __init__(self, condition: Any) -> None:
         self._state = _Native()
-        self._length = 0
         self.extend(condition)
 
     def append(self, condition: bool) -> "BarsSince":
         """Append one condition and return this adapter."""
         self._state.append(bool(condition))
-        self._length += 1
         return self
 
     def extend(self, condition: Any) -> "BarsSince":
         """Append a chronological boolean condition series."""
         values = as_bool_series(condition)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -49,12 +46,11 @@ class BarsSince:
     def reset(self) -> "BarsSince":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed conditions."""
-        return self._length
+        return len(self._state)
 
 
 __all__ = ["BarsSince"]

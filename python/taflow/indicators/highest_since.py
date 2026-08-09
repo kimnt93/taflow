@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._condition_value_adapter import ConditionValueAdapter
-from ._native import HighestSinceOperator
+from .._condition_value_adapter import ConditionValueAdapter
+from .._native import HighestSinceOperator
 
 
 class HighestSince(ConditionValueAdapter):

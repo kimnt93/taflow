@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._condition_value_adapter import ConditionValueAdapter
-from ._native import LowestSinceOperator
+from .._condition_value_adapter import ConditionValueAdapter
+from .._native import LowestSinceOperator
 
 
 class LowestSince(ConditionValueAdapter):
