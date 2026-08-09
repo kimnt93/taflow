@@ -156,7 +156,7 @@ from ..retracements import Retracements
 from ..session import SessionExtrema
 from ..previous_high_low import PreviousHighLow
 from ..sessions import Sessions
-from ..zones import ActiveZoneList
+from ..active_zone_list import ActiveZoneList
 from ..fvg import FairValueGap
 from ..donchian_channels import DonchianChannels
 from ..rolling_vwap import RollingVolumeWeightedAveragePrice

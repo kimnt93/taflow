@@ -454,6 +454,9 @@ pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
 pub use cumulative_product::CumulativeProduct;
 pub use cumulative_sum::CumulativeSum;
+mod active_zone_list;
+#[cfg(test)]
+mod active_zone_list_test;
 mod anchored_volume_weighted_average_price;
 #[cfg(test)]
 mod anchored_volume_weighted_average_price_test;
@@ -490,7 +493,7 @@ mod opening_range;
 #[cfg(test)]
 mod opening_range_test;
 mod operator_states;
-pub use operator_states::ActiveZoneList;
+pub use active_zone_list::ActiveZoneList;
 mod fast_stochastic_oscillator;
 #[cfg(test)]
 mod fast_stochastic_oscillator_test;

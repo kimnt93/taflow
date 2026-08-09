@@ -10,7 +10,7 @@
     "python_exports": 300,
     "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 262,
+    "structure": 263,
     "talib_functions": 161
   },
   "rows": [
@@ -3763,7 +3763,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "zones",
+      "module": "active_zone_list",
       "name": "ActiveZoneList",
       "native_binding": true,
       "native_symbols": [

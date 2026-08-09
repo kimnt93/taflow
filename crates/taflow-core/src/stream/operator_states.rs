@@ -29,26 +29,6 @@ pub(crate) fn validate_quantile(quantile: f64) -> TaResult<()> {
     Ok(())
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) struct Zone {
-    pub top: f64,
-    pub bottom: f64,
-    pub birth: usize,
-    pub flags: u32,
-}
-
-/// Bounded active-zone storage for causal zone-based indicators.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `ActiveZoneList`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct ActiveZoneList {
-    zones: Vec<Zone>,
-    capacity: usize,
-    index: usize,
-}
-
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct ObZone {
     pub(crate) direction: f64,
@@ -496,90 +476,6 @@ impl RollingMeanMin0 {
         self.count = 0;
         self.sum = 0.0;
         self.value = None;
-    }
-}
-
-impl ActiveZoneList {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(capacity: usize) -> TaResult<Self> {
-        if capacity == 0 {
-            return Err(TaError::InvalidParameter {
-                name: "capacity",
-                value: capacity.to_string(),
-                reason: "must be >= 1",
-            });
-        }
-        Ok(Self {
-            zones: Vec::with_capacity(capacity),
-            capacity,
-            index: 0,
-        })
-    }
-
-    /// Computes or updates `add` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn add(&mut self, top: f64, bottom: f64, flags: u32) -> usize {
-        if self.zones.len() == self.capacity {
-            self.zones.remove(0);
-        }
-        let (top, bottom) = if top >= bottom {
-            (top, bottom)
-        } else {
-            (bottom, top)
-        };
-        self.zones.push(Zone {
-            top,
-            bottom,
-            birth: self.index,
-            flags,
-        });
-        self.zones.len() - 1
-    }
-
-    /// Computes or updates `advance` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn advance(&mut self, price: f64, max_age: Option<usize>) -> Vec<bool> {
-        self.index = self.index.saturating_add(1);
-        let mut mitigated = vec![false; self.zones.len()];
-        for (index, zone) in self.zones.iter_mut().enumerate() {
-            let expired = max_age.is_some_and(|age| self.index.saturating_sub(zone.birth) > age);
-            if !expired && price >= zone.bottom && price <= zone.top {
-                zone.flags |= 1;
-                mitigated[index] = true;
-            }
-        }
-        self.zones.retain(|zone| {
-            let expired = max_age.is_some_and(|age| self.index.saturating_sub(zone.birth) > age);
-            !expired && zone.flags & 1 == 0
-        });
-        mitigated.truncate(self.zones.len());
-        mitigated
-    }
-
-    /// Computes or updates `zones` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    /// Returns the number of currently active zones.
-    pub fn zone_count(&self) -> usize {
-        self.zones.len()
-    }
-
-    /// Reset the persistent state and clear the latest value.
-    pub fn reset(&mut self) {
-        self.zones.clear();
-        self.index = 0;
     }
 }
 
