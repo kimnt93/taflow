@@ -1,8 +1,8 @@
 """Canonical native-backed order-block adapter."""
 from typing import Any
 import numpy as np
-from ._native import OrderBlockOperator as _Native
-from ._series import as_float64_series
+from .._native import OrderBlockOperator as _Native
+from .._series import as_float64_series
 
 
 class OrderBlock:
@@ -31,4 +31,3 @@ class OrderBlock:
         self._state.reset(); self._length = 0; return self
     def __len__(self) -> int:
         return self._length
-

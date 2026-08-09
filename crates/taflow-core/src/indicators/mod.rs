@@ -626,6 +626,9 @@ mod lower_low_test;
 mod negative_volume_index;
 #[cfg(test)]
 mod negative_volume_index_test;
+mod order_block;
+#[cfg(test)]
+mod order_block_test;
 mod outside_bar;
 #[cfg(test)]
 mod outside_bar_test;
@@ -641,6 +644,9 @@ mod rolling_alpha_test;
 mod rolling_information_ratio;
 #[cfg(test)]
 mod rolling_information_ratio_test;
+mod spread_z_score;
+#[cfg(test)]
+mod spread_z_score_test;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
@@ -672,11 +678,13 @@ pub use inside_bar::InsideBar;
 pub use keltner_channels::{KeltnerChannels, KeltnerValue};
 pub use lower_low::LowerLow;
 pub use negative_volume_index::NegativeVolumeIndex;
+pub use order_block::{OrderBlock, OrderBlockValue};
 pub use outside_bar::OutsideBar;
 pub use positive_volume_index::PositiveVolumeIndex;
 pub use rising::Rising;
 pub use rolling_alpha::RollingAlpha;
 pub use rolling_information_ratio::RollingInformationRatio;
+pub use spread_z_score::SpreadZScore;
 pub use ulcer_index::UlcerIndex;
 pub use volume_price_trend::VolumePriceTrend;
 

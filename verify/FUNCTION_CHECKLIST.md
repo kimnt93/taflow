@@ -89,6 +89,13 @@ focused Rust tests, full Python suite (591 passed, 2 skipped), and 303/303
 interface audit passed. Benchmark fields remain `TODO`; no benchmark command
 was run.
 
+The thirty-first structural batch removed the abbreviated `ob` binding and
+adapter alias, moved `OrderBlock` and `SpreadZScore` core/binding/Python
+implementations to full-name indicator paths, and updated both import
+surfaces. The release extension, two focused Python tests, focused Rust test,
+full Python suite (591 passed, 2 skipped), and 303/303 interface audit passed.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

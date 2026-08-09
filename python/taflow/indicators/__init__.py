@@ -241,7 +241,7 @@ from .negative_volume_index import NegativeVolumeIndex
 from .positive_volume_index import PositiveVolumeIndex
 from ..swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
-from ..order_block import OrderBlock
+from .order_block import OrderBlock
 from .liquidity import Liquidity
 from .equal_highs_lows import EqualHighsLows
 from .hedge_ratio import HedgeRatio

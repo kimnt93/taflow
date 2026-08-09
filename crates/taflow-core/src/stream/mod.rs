@@ -47,8 +47,8 @@ pub use crate::indicators::{
     DonchianValue, EqualHighsLows, FairValueGap, FairValueGapValue, Falling, FractalDimension,
     GapDown, GapUp, HedgeRatio, HigherHigh, HilbertTransformDominantCyclePhase, InsideBar,
     KaufmanAdaptiveMovingAverage, KeltnerChannels, KeltnerValue, KnowSureThing, LowerLow,
-    MassIndex, NegativeVolumeIndex, OutsideBar, PositiveVolumeIndex, Rising, RollingAlpha,
-    RollingInformationRatio, UlcerIndex, VolumePriceTrend,
+    MassIndex, NegativeVolumeIndex, OrderBlock, OrderBlockValue, OutsideBar, PositiveVolumeIndex,
+    Rising, RollingAlpha, RollingInformationRatio, SpreadZScore, UlcerIndex, VolumePriceTrend,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -535,11 +535,6 @@ mod ease_of_movement_test;
 mod force_index;
 #[cfg(test)]
 mod force_index_test;
-#[allow(unused_imports)]
-#[allow(unused_imports)]
-mod order_block;
-#[cfg(test)]
-mod order_block_test;
 mod parkinson;
 #[cfg(test)]
 mod parkinson_test;
@@ -594,9 +589,6 @@ mod roll_spread_test;
 mod schaff_trend_cycle;
 #[cfg(test)]
 mod schaff_trend_cycle_test;
-mod spread_z_score;
-#[cfg(test)]
-mod spread_z_score_test;
 mod squeeze;
 mod squeeze_pro;
 #[cfg(test)]
@@ -650,7 +642,6 @@ pub use frac_diff::FracDiff;
 pub use highest_since::HighestSince;
 pub use ichimoku::{Ichimoku, IchimokuValue};
 pub use lowest_since::LowestSince;
-pub use order_block::{OrderBlock, OrderBlockValue};
 pub use ornstein_uhlenbeck_half_life::OrnsteinUhlenbeckHalfLife;
 pub use parkinson::Parkinson;
 pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
@@ -663,7 +654,6 @@ pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
 pub use session_extrema::{SessionExtrema, SessionExtremaValue};
 pub use sessions::{Sessions, SessionsValue};
-pub use spread_z_score::SpreadZScore;
 pub use squeeze::{Squeeze, SqueezeValue};
 pub use squeeze_pro::{SqueezePro, SqueezeProValue};
 pub use supertrend::{Supertrend, SupertrendValue};

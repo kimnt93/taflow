@@ -245,7 +245,7 @@ from .indicators.active_zone_list import ActiveZoneList
 from .indicators.fair_value_gap import FairValueGap
 from .swing_highs_lows import SwingHighsLows
 from .indicators.break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
-from .order_block import OrderBlock
+from .indicators.order_block import OrderBlock
 from .indicators.liquidity import Liquidity
 from .indicators.equal_highs_lows import EqualHighsLows
 from .indicators.hedge_ratio import HedgeRatio
@@ -266,7 +266,7 @@ from .indicators.amihud import Amihud
 from .roll_spread import RollSpread
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
 from .indicators.cumulative_sum_control_chart import CumulativeSumControlChart
-from .spread_z_score import SpreadZScore
+from .indicators.spread_z_score import SpreadZScore
 from .frac_diff import FracDiff
 from .indicators.kalman_hedge_ratio import KalmanHedgeRatio
 from .supertrend import Supertrend
