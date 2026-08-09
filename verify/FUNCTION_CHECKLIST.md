@@ -189,6 +189,12 @@ were moved into `python/taflow/indicators/`. Focused Python tests (33), full
 Rust tests (386), release build, and the 300/300 interface audit passed.
 Benchmark fields remain `TODO`; no benchmark command was run.
 
+The forty-first structural cleanup removed the unused grouped PyO3 indicator
+macros and their stale imports from `state_api.rs`. Binding implementations
+remain in dedicated indicator files, while `state_api.rs` now contains only
+shared conversion/error helpers. Rust formatting and core/PyO3 compilation
+passed; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,
