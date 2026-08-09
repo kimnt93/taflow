@@ -214,7 +214,12 @@ from ..time_series_rank import TimeSeriesRank
 from .rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
 from .force_index import ForceIndex
 from .ease_of_movement import EaseOfMovement
-from ..bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
+from .higher_high import HigherHigh
+from .lower_low import LowerLow
+from .inside_bar import InsideBar
+from .outside_bar import OutsideBar
+from .gap_up import GapUp
+from .gap_down import GapDown
 from .bars_since import BarsSince
 from .value_when import ValueWhen
 from .highest_since import HighestSince

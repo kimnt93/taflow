@@ -1,29 +1,29 @@
-"""Persistent outside-bar relation."""
+"""Persistent higher-high relation."""
 
 from typing import Any
 
-from ._bar_relation_adapter import BarRelationAdapter
-from ._native import OutsideBarOperator
+from .._bar_relation_adapter import BarRelationAdapter
+from .._native import HigherHighOperator
 
 
-class OutsideBar(BarRelationAdapter):
-    """Return 1 when a bar strictly contains the preceding range.
+class HigherHigh(BarRelationAdapter):
+    """Return 1 when a bar's high exceeds the preceding bar's high.
 
     ``high`` and ``low`` are required aligned series. The first output is
     ``NaN`` because no preceding bar exists. All calculations run in Rust.
     """
 
-    _native_cls = OutsideBarOperator
+    _native_cls = HigherHighOperator
 
-    def append(self, high: float, low: float) -> "OutsideBar":
+    def append(self, high: float, low: float) -> "HigherHigh":
         super().append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any) -> "OutsideBar":
+    def extend(self, high: Any, low: Any) -> "HigherHigh":
         super().extend(high, low)
         return self
 
-    def reset(self) -> "OutsideBar":
+    def reset(self) -> "HigherHigh":
         super().reset()
         return self
 

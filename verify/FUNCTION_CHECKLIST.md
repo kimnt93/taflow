@@ -64,6 +64,14 @@ native length delegation. The FairValueGap lifecycle test, release extension,
 full Python suite (591 passed, 2 skipped), and 303/303 interface audit passed.
 Benchmark fields remain `TODO`; no benchmark command was run.
 
+The twenty-eighth structural batch split the grouped bar-relation bindings
+into dedicated `HigherHigh`, `LowerLow`, `InsideBar`, `OutsideBar`, `GapUp`,
+and `GapDown` files, moved their Python adapters into `taflow/indicators/`,
+and migrated the corresponding Rust states/tests out of `stream/`. The
+release extension, six focused Python tests, focused Rust tests, full Python
+suite (591 passed, 2 skipped), and 303/303 interface audit passed. Benchmark
+fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

@@ -1,14 +1,14 @@
-//! Persistent inside-bar relation.
+//! Persistent outside-bar relation.
 
-use super::bar_relation::BarRelation;
+use crate::stream::bar_relation::BarRelation;
 
-/// Emit `1` when the current range is strictly inside the previous range.
+/// Emit `1` when the current range strictly contains the previous range.
 #[derive(Debug, Clone, Default)]
-pub struct InsideBar {
+pub struct OutsideBar {
     relation: BarRelation,
 }
 
-impl InsideBar {
+impl OutsideBar {
     pub fn new() -> Self {
         Self::default()
     }
@@ -16,7 +16,7 @@ impl InsideBar {
     pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
         self.relation
             .append(high, low, |h, l, previous_h, previous_l| {
-                h < previous_h && l > previous_l
+                h > previous_h && l < previous_l
             })
     }
 

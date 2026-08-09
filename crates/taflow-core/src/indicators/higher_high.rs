@@ -1,6 +1,6 @@
 //! Persistent higher-high relation.
 
-use super::bar_relation::BarRelation;
+use crate::stream::bar_relation::BarRelation;
 
 /// Emit `1` when the current high exceeds the previous high, otherwise `0`.
 #[derive(Debug, Clone, Default)]

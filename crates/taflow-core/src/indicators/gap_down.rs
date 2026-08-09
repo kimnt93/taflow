@@ -1,6 +1,6 @@
 //! Persistent gap-down relation.
 
-use super::bar_relation::BarRelation;
+use crate::stream::bar_relation::BarRelation;
 
 /// Emit `1` when the current high is below the previous low.
 #[derive(Debug, Clone, Default)]

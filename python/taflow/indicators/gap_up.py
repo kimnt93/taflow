@@ -1,29 +1,29 @@
-"""Persistent downside-gap relation."""
+"""Persistent upside-gap relation."""
 
 from typing import Any
 
-from ._bar_relation_adapter import BarRelationAdapter
-from ._native import GapDownOperator
+from .._bar_relation_adapter import BarRelationAdapter
+from .._native import GapUpOperator
 
 
-class GapDown(BarRelationAdapter):
-    """Return 1 when a bar's high is below the preceding bar's low.
+class GapUp(BarRelationAdapter):
+    """Return 1 when a bar's low is above the preceding bar's high.
 
     ``high`` and ``low`` are required aligned series. The first output is
     ``NaN`` because no preceding bar exists. All calculations run in Rust.
     """
 
-    _native_cls = GapDownOperator
+    _native_cls = GapUpOperator
 
-    def append(self, high: float, low: float) -> "GapDown":
+    def append(self, high: float, low: float) -> "GapUp":
         super().append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any) -> "GapDown":
+    def extend(self, high: Any, low: Any) -> "GapUp":
         super().extend(high, low)
         return self
 
-    def reset(self) -> "GapDown":
+    def reset(self) -> "GapUp":
         super().reset()
         return self
 

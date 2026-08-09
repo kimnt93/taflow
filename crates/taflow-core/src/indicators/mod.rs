@@ -605,9 +605,27 @@ mod falling_test;
 mod fractal_dimension;
 #[cfg(test)]
 mod fractal_dimension_test;
+mod gap_down;
+#[cfg(test)]
+mod gap_down_test;
+mod gap_up;
+#[cfg(test)]
+mod gap_up_test;
+mod higher_high;
+#[cfg(test)]
+mod higher_high_test;
+mod inside_bar;
+#[cfg(test)]
+mod inside_bar_test;
 mod keltner_channels;
 #[cfg(test)]
 mod keltner_channels_test;
+mod lower_low;
+#[cfg(test)]
+mod lower_low_test;
+mod outside_bar;
+#[cfg(test)]
+mod outside_bar_test;
 mod rising;
 #[cfg(test)]
 mod rising_test;
@@ -632,7 +650,13 @@ pub use equal_highs_lows::EqualHighsLows;
 pub use fair_value_gap::{FairValueGap, FairValueGapValue};
 pub use falling::Falling;
 pub use fractal_dimension::FractalDimension;
+pub use gap_down::GapDown;
+pub use gap_up::GapUp;
+pub use higher_high::HigherHigh;
+pub use inside_bar::InsideBar;
 pub use keltner_channels::{KeltnerChannels, KeltnerValue};
+pub use lower_low::LowerLow;
+pub use outside_bar::OutsideBar;
 pub use rising::Rising;
 pub use ulcer_index::UlcerIndex;
 

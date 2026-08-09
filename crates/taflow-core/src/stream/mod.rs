@@ -45,8 +45,9 @@ pub use crate::indicators::{
     CloseToCloseSigma, CommodityChannelIndex, Cross, Crossover, Crossunder, CumulativeMaximum,
     CumulativeMinimum, CumulativeSumControlChart, DetrendedPriceOscillator, Donchian,
     DonchianValue, EqualHighsLows, FairValueGap, FairValueGapValue, Falling, FractalDimension,
-    HedgeRatio, HilbertTransformDominantCyclePhase, KaufmanAdaptiveMovingAverage, KeltnerChannels,
-    KeltnerValue, KnowSureThing, MassIndex, Rising, UlcerIndex,
+    GapDown, GapUp, HedgeRatio, HigherHigh, HilbertTransformDominantCyclePhase, InsideBar,
+    KaufmanAdaptiveMovingAverage, KeltnerChannels, KeltnerValue, KnowSureThing, LowerLow,
+    MassIndex, OutsideBar, Rising, UlcerIndex,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -217,15 +218,12 @@ mod exponentially_weighted_standard_deviation_test;
 #[cfg(test)]
 mod exponentially_weighted_variance_test;
 #[cfg(test)]
-mod gap_down_test;
 #[cfg(test)]
-mod gap_up_test;
 #[cfg(test)]
 mod highest_since_test;
 #[cfg(test)]
 mod lowest_since_test;
 #[cfg(test)]
-mod outside_bar_test;
 #[cfg(test)]
 mod position_hold_test;
 #[cfg(test)]
@@ -651,22 +649,12 @@ mod volume_price_trend;
 #[cfg(test)]
 mod volume_price_trend_test;
 
-mod bar_relation;
+pub(crate) mod bar_relation;
 mod bars_since;
-mod gap_down;
-mod gap_up;
-mod higher_high;
-#[cfg(test)]
-mod higher_high_test;
+
 mod highest_since;
-mod inside_bar;
-#[cfg(test)]
-mod inside_bar_test;
-mod lower_low;
-#[cfg(test)]
-mod lower_low_test;
+
 mod lowest_since;
-mod outside_bar;
 mod value_when;
 pub use bars_since::BarsSince;
 pub use ease_of_movement::EaseOfMovement;
@@ -674,17 +662,11 @@ pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandard
 pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use force_index::ForceIndex;
 pub use frac_diff::FracDiff;
-pub use gap_down::GapDown;
-pub use gap_up::GapUp;
-pub use higher_high::HigherHigh;
 pub use highest_since::HighestSince;
 pub use ichimoku::{Ichimoku, IchimokuValue};
-pub use inside_bar::InsideBar;
-pub use lower_low::LowerLow;
 pub use lowest_since::LowestSince;
 pub use order_block::{OrderBlock, OrderBlockValue};
 pub use ornstein_uhlenbeck_half_life::OrnsteinUhlenbeckHalfLife;
-pub use outside_bar::OutsideBar;
 pub use parkinson::Parkinson;
 pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
 pub use retracements::{Retracements, RetracementsValue};
