@@ -61,6 +61,9 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RelativeStrengthIndex>()?;
     m.add_class::<indicators::RelativeMomentumIndex>()?;
     m.add_class::<indicators::MovingAverage>()?;
+    m.add_class::<indicators::MovingAverageConvergenceDivergence>()?;
+    m.add_class::<indicators::MovingAverageConvergenceDivergenceExtended>()?;
+    m.add_class::<indicators::MovingAverageConvergenceDivergenceFixed>()?;
     m.add_class::<indicators::Lag>()?;
     m.add_class::<indicators::LogReturn>()?;
     m.add_class::<indicators::CumulativeSum>()?;
@@ -292,14 +295,11 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::AverageTrueRange>()?;
     m.add_class::<state_api::TrueRange>()?;
     m.add_class::<state_api::NormalizedAverageTrueRange>()?;
-    m.add_class::<state_api::StatefulMacd>()?;
-    m.add_class::<state_api::StatefulMacdExt>()?;
     m.add_class::<state_api::VariablePeriodMovingAverage>()?;
     m.add_class::<state_api::StatefulHtTrendline>()?;
     m.add_class::<state_api::StatefulAdx>()?;
     m.add_class::<state_api::StatefulAdxr>()?;
     m.add_class::<state_api::StatefulDx>()?;
-    m.add_class::<state_api::StatefulMacdFix>()?;
     m.add_class::<state_api::StatefulStoch>()?;
     m.add_class::<state_api::StatefulStochf>()?;
     m.add_class::<state_api::StatefulStochrsi>()?;

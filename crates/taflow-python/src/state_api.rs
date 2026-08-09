@@ -9,8 +9,6 @@ use taflow::stream::{
     DoubleExponentialMovingAverage, EvenBetterSinewave, ExponentialMovingAverage,
     FastStochasticOscillator, HilbertTransformTrendline, IntradayMomentumIndex, JurikMovingAverage,
     KlingerVolumeOscillator, MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
-    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended,
-    MovingAverageConvergenceDivergenceFixed,
     NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange,
     ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange as CoreRateOfChange,
     RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
@@ -2803,30 +2801,6 @@ impl NormalizedAverageTrueRange {
 }
 
 #[pyclass]
-pub struct StatefulMacd {
-    inner: MovingAverageConvergenceDivergence,
-    macds: Vec<f64>,
-    signals: Vec<f64>,
-    histograms: Vec<f64>,
-}
-
-#[pyclass]
-pub struct StatefulMacdFix {
-    inner: MovingAverageConvergenceDivergenceFixed,
-    macds: Vec<f64>,
-    signals: Vec<f64>,
-    histograms: Vec<f64>,
-}
-
-#[pyclass]
-pub struct StatefulMacdExt {
-    inner: MovingAverageConvergenceDivergenceExtended,
-    macds: Vec<f64>,
-    signals: Vec<f64>,
-    histograms: Vec<f64>,
-}
-
-#[pyclass]
 pub struct VariablePeriodMovingAverage {
     inner: CoreVariablePeriodMovingAverage,
     outputs: Vec<f64>,
@@ -2946,134 +2920,6 @@ impl StatefulMama {
         self.inner.reset();
         self.mamas.clear();
         self.famas.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulMacd {
-    #[new]
-    #[pyo3(signature = (fastperiod=12, slowperiod=26, signalperiod=9))]
-    fn new(fastperiod: usize, slowperiod: usize, signalperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: MovingAverageConvergenceDivergence::new(fastperiod, slowperiod, signalperiod)
-                .map_err(py_value_error)?,
-            macds: Vec::new(),
-            signals: Vec::new(),
-            histograms: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
-        let value = self
-            .inner
-            .append(input)
-            .map(|value| (value.macd, value.signal, value.histogram));
-        let (macd, signal, histogram) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
-        self.macds.push(macd);
-        self.signals.push(signal);
-        self.histograms.push(histogram);
-        value
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let (macds, signals, histograms) =
-            (&mut self.macds, &mut self.signals, &mut self.histograms);
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(input, macds, signals, histograms)
-        });
-        Ok(())
-    }
-
-    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
-        (
-            to_py_array(py, self.macds.clone()),
-            to_py_array(py, self.signals.clone()),
-            to_py_array(py, self.histograms.clone()),
-        )
-    }
-
-    fn __len__(&self) -> usize {
-        self.macds.len()
-    }
-
-    #[getter]
-    fn value(&self) -> Option<(f64, f64, f64)> {
-        self.inner
-            .value()
-            .map(|value| (value.macd, value.signal, value.histogram))
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.macds.clear();
-        self.signals.clear();
-        self.histograms.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulMacdFix {
-    #[new]
-    #[pyo3(signature = (signalperiod=9))]
-    fn new(signalperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: MovingAverageConvergenceDivergenceFixed::new(signalperiod)
-                .map_err(py_value_error)?,
-            macds: Vec::new(),
-            signals: Vec::new(),
-            histograms: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
-        let value = self
-            .inner
-            .append(input)
-            .map(|value| (value.macd, value.signal, value.histogram));
-        let (macd, signal, histogram) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
-        self.macds.push(macd);
-        self.signals.push(signal);
-        self.histograms.push(histogram);
-        value
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let (macds, signals, histograms) =
-            (&mut self.macds, &mut self.signals, &mut self.histograms);
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(input, macds, signals, histograms)
-        });
-        Ok(())
-    }
-
-    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
-        (
-            to_py_array(py, self.macds.clone()),
-            to_py_array(py, self.signals.clone()),
-            to_py_array(py, self.histograms.clone()),
-        )
-    }
-
-    fn __len__(&self) -> usize {
-        self.macds.len()
-    }
-
-    #[getter]
-    fn value(&self) -> Option<(f64, f64, f64)> {
-        self.inner
-            .value()
-            .map(|value| (value.macd, value.signal, value.histogram))
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.macds.clear();
-        self.signals.clear();
-        self.histograms.clear();
     }
 }
 
@@ -3296,87 +3142,6 @@ impl StatefulStochrsi {
         self.inner.reset();
         self.fastks.clear();
         self.fastds.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulMacdExt {
-    #[new]
-    #[pyo3(signature = (fastperiod=12, fastmatype=1, slowperiod=26, slowmatype=1, signalperiod=9, signalmatype=1))]
-    fn new(
-        fastperiod: usize,
-        fastmatype: i32,
-        slowperiod: usize,
-        slowmatype: i32,
-        signalperiod: usize,
-        signalmatype: i32,
-    ) -> PyResult<Self> {
-        let fast_type = MaType::try_from(fastmatype).map_err(py_value_error)?;
-        let slow_type = MaType::try_from(slowmatype).map_err(py_value_error)?;
-        let signal_type = MaType::try_from(signalmatype).map_err(py_value_error)?;
-        Ok(Self {
-            inner: MovingAverageConvergenceDivergenceExtended::new(
-                fastperiod,
-                fast_type,
-                slowperiod,
-                slow_type,
-                signalperiod,
-                signal_type,
-            )
-            .map_err(py_value_error)?,
-            macds: Vec::new(),
-            signals: Vec::new(),
-            histograms: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
-        let value = self
-            .inner
-            .append(input)
-            .map(|value| (value.macd, value.signal, value.histogram));
-        let (macd, signal, histogram) = value.unwrap_or((f64::NAN, f64::NAN, f64::NAN));
-        self.macds.push(macd);
-        self.signals.push(signal);
-        self.histograms.push(histogram);
-        value
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let (macds, signals, histograms) =
-            (&mut self.macds, &mut self.signals, &mut self.histograms);
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(input, macds, signals, histograms)
-        });
-        Ok(())
-    }
-
-    fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
-        (
-            to_py_array(py, self.macds.clone()),
-            to_py_array(py, self.signals.clone()),
-            to_py_array(py, self.histograms.clone()),
-        )
-    }
-
-    fn __len__(&self) -> usize {
-        self.macds.len()
-    }
-
-    #[getter]
-    fn value(&self) -> Option<(f64, f64, f64)> {
-        self.inner
-            .value()
-            .map(|value| (value.macd, value.signal, value.histogram))
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.macds.clear();
-        self.signals.clear();
-        self.histograms.clear();
     }
 }
 

@@ -1,96 +1,48 @@
-"""Descriptive stateful interface for fixed-parameter MACD."""
+"""Canonical native-backed fixed-parameter MACD adapter."""
 
-from taflow._native import StatefulMacdFix
 from typing import Any
 
 import numpy as np
 
+from ._native import MovingAverageConvergenceDivergenceFixed as _NativeMovingAverageConvergenceDivergenceFixed
+from ._series import as_float64_series
+
 
 class MovingAverageConvergenceDivergenceFixed:
-    """Incrementally compute TA-Lib's fixed 12/26 MACD variant
+    """Compute TA-Lib ``MACDFIX`` with fixed 12/26 fast and slow constants.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    MovingAverageConvergenceDivergenceFixed
-        A persistent native-backed indicator adapter.
+    ``values`` is the chronological close series; empty input creates a fresh
+    state. ``signal_period`` defaults to 9. ``compute`` returns aligned
+    MACD/signal/histogram arrays, with NaN warm-up positions, and ``value`` is
+    the latest tuple or ``None`` during warm-up. ``append``, ``extend``, and
+    ``reset`` mutate and return this adapter. Oracle: ``MACDFIX``.
     """
 
-    def __init__(
-        self,
-        values: Any,
-        signal_period: int = 9,
-    ) -> None:
-        """Create fixed MACD with an initial price series."""
-        self._state = StatefulMacdFix(signal_period)
-        if values is not None:
-            self.extend(values)
+    def __init__(self, values: Any, signal_period: int = 9) -> None:
+        self._state = _NativeMovingAverageConvergenceDivergenceFixed(signal_period)
+        self.extend(values)
 
     def append(self, value: float) -> "MovingAverageConvergenceDivergenceFixed":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        value : object
-            Input value processed at each bar.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
         self._state.append(float(value))
         return self
 
     def extend(self, values: Any) -> "MovingAverageConvergenceDivergenceFixed":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        values : object
-            Input values processed in chronological order.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(values)
+        self._state.extend(as_float64_series(values))
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> tuple[float, float, float] | None:
         return self._state.value
 
     def reset(self) -> "MovingAverageConvergenceDivergenceFixed":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
         self._state.reset()
         return self
 
     def __len__(self) -> int:
         return len(self._state)
+
+
+__all__ = ["MovingAverageConvergenceDivergenceFixed"]

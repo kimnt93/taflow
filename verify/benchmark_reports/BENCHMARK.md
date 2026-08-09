@@ -406,9 +406,9 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.97× | 1.57× | 1.00× | 1.06× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.49× | 1.32× | 1.02× | 0.88× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.18× | 2.43× | 1.11× | 0.95× |
-| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.99× | 5.33× | 4.27× | 4.38× |
-| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.45× | 1.11× | 0.79× | 0.84× |
-| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.87× | 4.96× | 4.10× | 4.33× |
+| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 11.09× | 5.41× | 4.10× | 5.84× |
+| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.29× | 1.20× | 0.76× | 1.26× |
+| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 10.01× | 5.33× | 4.48× | 6.10× |
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.01× | 0.98× | 0.92× |
 | VariablePeriodMovingAverage | [TA-Lib: `MAVP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.93× | 0.67× | 0.69× | 0.78× |
 | RollingMax | [TA-Lib: `MAX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.20× | 2.43× | 1.55× | 1.29× |
@@ -780,9 +780,9 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.02× | 1.44× | 2.01× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.56× | 1.84× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.82× | 2.08× |
-| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.43× | 2.28× |
-| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.29× | 2.19× |
-| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.84× | 2.44× |
+| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.18× | 2.05× | 2.13× |
+| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.38× | 2.27× | 2.21× |
+| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 2.05× | 2.09× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.99× | 1.62× | 1.98× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.12× | 1.19× | 1.96× |
@@ -1072,9 +1072,9 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.05× | 2.11× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.05× | 1.95× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.01× | 2.11× |
-| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.22× | 2.44× | 2.23× |
-| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.19× | 2.37× | 2.24× |
-| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.10× | 1.99× | 2.25× |
+| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.00× | 2.41× | 2.27× |
+| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.17× | 2.13× | 2.11× |
+| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.09× | 2.11× | 2.12× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.22× | 1.99× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.89× | 2.01× |
@@ -1364,9 +1364,9 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.96× | 1.96× | 2.02× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.87× | 1.90× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.92× | 2.04× |
-| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.19× | 2.20× | 2.25× |
-| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.09× | 2.28× | 2.26× |
-| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.12× | 2.28× | 2.25× |
+| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.28× | 2.28× |
+| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.25× | 2.18× |
+| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.06× | 2.09× | 2.22× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.93× | 2.01× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.89× | 1.89× |
@@ -1656,9 +1656,9 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.94× | 2.03× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 1.99× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.04× | 1.97× |
-| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.07× | 2.47× | 2.37× |
-| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.42× | 2.33× |
-| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.50× | 2.41× |
+| MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.12× | 1.95× | 2.33× |
+| MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 2.31× | 2.30× |
+| MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.18× | 2.34× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.89× | 1.82× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.95× | 1.89× |

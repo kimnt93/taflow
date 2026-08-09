@@ -1,0 +1,83 @@
+use numpy::{PyArray1, PyReadonlyArray1};
+use pyo3::exceptions::PyValueError;
+use pyo3::prelude::*;
+use taflow::stream::MovingAverageConvergenceDivergenceFixed as State;
+
+/// Native-backed Python boundary for canonical MACDFIX state.
+#[pyclass]
+pub struct MovingAverageConvergenceDivergenceFixed {
+    inner: State,
+    macds: Vec<f64>,
+    signals: Vec<f64>,
+    histograms: Vec<f64>,
+}
+
+#[pymethods]
+impl MovingAverageConvergenceDivergenceFixed {
+    #[new]
+    #[pyo3(signature = (signalperiod=9))]
+    fn new(signalperiod: usize) -> PyResult<Self> {
+        Ok(Self {
+            inner: State::new(signalperiod)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
+            macds: Vec::new(),
+            signals: Vec::new(),
+            histograms: Vec::new(),
+        })
+    }
+
+    fn append(&mut self, input: f64) -> Option<(f64, f64, f64)> {
+        let value = self.inner.append(input);
+        let output = value
+            .map(|value| (value.macd, value.signal, value.histogram))
+            .unwrap_or((f64::NAN, f64::NAN, f64::NAN));
+        self.macds.push(output.0);
+        self.signals.push(output.1);
+        self.histograms.push(output.2);
+        value.map(|value| (value.macd, value.signal, value.histogram))
+    }
+
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
+        let (macds, signals, histograms) =
+            (&mut self.macds, &mut self.signals, &mut self.histograms);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(input, macds, signals, histograms)
+        });
+        Ok(())
+    }
+
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.macds.clone()),
+            PyArray1::from_vec(py, self.signals.clone()),
+            PyArray1::from_vec(py, self.histograms.clone()),
+        )
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|value| (value.macd, value.signal, value.histogram))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.macds.clear();
+        self.signals.clear();
+        self.histograms.clear();
+    }
+
+    fn __len__(&self) -> usize {
+        self.macds.len()
+    }
+}

@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 190,
-    "complete": 62,
+    "complete": 65,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 612,
+    "rust_exports": 610,
     "smc_functions": 8,
-    "structure": 62,
+    "structure": 65,
     "talib_functions": 161
   },
   "rows": [
@@ -141,7 +141,8 @@
       "name": "MovingAverageConvergenceDivergenceFixed",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMacdFix"
+        "MovingAverageConvergenceDivergenceFixed",
+        "_NativeMovingAverageConvergenceDivergenceFixed"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -155,10 +156,11 @@
       "name": "MovingAverageConvergenceDivergence",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMacd"
+        "MovingAverageConvergenceDivergence",
+        "_NativeMovingAverageConvergenceDivergence"
       ],
       "pandas_ta_reference": false,
-      "rust_export": true,
+      "rust_export": false,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -169,7 +171,8 @@
       "name": "MovingAverageConvergenceDivergenceExtended",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMacdExt"
+        "MovingAverageConvergenceDivergenceExtended",
+        "_NativeMovingAverageConvergenceDivergenceExtended"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4603,6 +4606,9 @@
         "Momentum",
         "MoneyFlowIndex",
         "MovingAverage",
+        "MovingAverageConvergenceDivergence",
+        "MovingAverageConvergenceDivergenceExtended",
+        "MovingAverageConvergenceDivergenceFixed",
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
         "OnBalanceVolume",
@@ -4672,9 +4678,6 @@
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
         "StatefulLinearregSlope",
-        "StatefulMacd",
-        "StatefulMacdExt",
-        "StatefulMacdFix",
         "StatefulMama",
         "StatefulMax",
         "StatefulMaxindex",
@@ -4909,6 +4912,9 @@
         "Momentum",
         "MoneyFlowIndex",
         "MovingAverage",
+        "MovingAverageConvergenceDivergence",
+        "MovingAverageConvergenceDivergenceExtended",
+        "MovingAverageConvergenceDivergenceFixed",
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
         "OnBalanceVolume",
@@ -4978,9 +4984,6 @@
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
         "StatefulLinearregSlope",
-        "StatefulMacd",
-        "StatefulMacdExt",
-        "StatefulMacdFix",
         "StatefulMama",
         "StatefulMax",
         "StatefulMaxindex",

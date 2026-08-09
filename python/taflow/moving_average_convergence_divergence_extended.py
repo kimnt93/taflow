@@ -1,59 +1,36 @@
-"""Descriptive stateful interface for extended MACD."""
+"""Canonical native-backed extended MACD adapter."""
 
-from taflow._native import StatefulMacdExt
 from typing import Any
 
 import numpy as np
 
+from ._native import MovingAverageConvergenceDivergenceExtended as _NativeMovingAverageConvergenceDivergenceExtended
+from ._series import as_float64_series
+
 
 class MovingAverageConvergenceDivergenceExtended:
-    """Incrementally compute MACDEXT with independently selected MA types
+    """Compute TA-Lib ``MACDEXT`` with independently selected MA types.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    MovingAverageConvergenceDivergenceExtended
-        A persistent native-backed indicator adapter.
+    ``values`` is the chronological close series; pass an empty array for a
+    fresh stream. Periods default to 12/26/9 and ``fast_matype``,
+    ``slow_matype``, and ``signal_matype`` default to TA-Lib code 1 (EMA).
+    ``compute`` returns MACD/signal/histogram arrays with NaN warm-up values;
+    ``value`` is the latest tuple or ``None``. Lifecycle mutators are fluent.
+    Oracle mapping: ``MovingAverageConvergenceDivergenceExtended`` ⇔
+    ``MACDEXT``.
     """
 
     def __init__(
         self,
-        _input: Any,
-        fast_period: object = 12,
-        fast_average_type: object = 1,
-        slow_period: object = 26,
-        slow_average_type: object = 1,
-        signal_period: object = 9,
-        signal_average_type: object = 1,
+        values: Any,
+        fast_period: int = 12,
+        fast_average_type: int = 1,
+        slow_period: int = 26,
+        slow_average_type: int = 1,
+        signal_period: int = 9,
+        signal_average_type: int = 1,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        fast_period : object
-            Fast smoothing length in bars.
-        fast_average_type : object
-            Input parameter or configuration value for this operation.
-        slow_period : object
-            Slow smoothing length in bars.
-        slow_average_type : object
-            Input parameter or configuration value for this operation.
-        signal_period : object
-            Signal smoothing length in bars.
-        signal_average_type : object
-            Input parameter or configuration value for this operation.
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = StatefulMacdExt(
+        self._state = _NativeMovingAverageConvergenceDivergenceExtended(
             fast_period,
             fast_average_type,
             slow_period,
@@ -61,71 +38,29 @@ class MovingAverageConvergenceDivergenceExtended:
             signal_period,
             signal_average_type,
         )
-        if _input is not None:
-            self.extend(_input)
+        self.extend(values)
 
-    def append(self, _input: object) -> "MovingAverageConvergenceDivergenceExtended":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(_input)
+    def append(self, value: float) -> "MovingAverageConvergenceDivergenceExtended":
+        self._state.append(float(value))
         return self
 
-    def extend(self, _input: object) -> "MovingAverageConvergenceDivergenceExtended":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(_input)
+    def extend(self, values: Any) -> "MovingAverageConvergenceDivergenceExtended":
+        self._state.extend(as_float64_series(values))
         return self
 
-    def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
+    def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> tuple[float, float, float] | None:
         return self._state.value
 
     def reset(self) -> "MovingAverageConvergenceDivergenceExtended":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
         self._state.reset()
         return self
 
     def __len__(self) -> int:
         return len(self._state)
+
+
+__all__ = ["MovingAverageConvergenceDivergenceExtended"]

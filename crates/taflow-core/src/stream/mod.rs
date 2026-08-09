@@ -124,13 +124,20 @@ mod ht_trendmode;
 mod imi;
 mod indicator;
 mod kama;
-mod macd;
-mod macdext;
-mod macdfix;
 mod mama;
 mod math_abs;
 mod math_operator;
 mod moving_average;
+mod moving_average_convergence_divergence;
+mod moving_average_convergence_divergence_extended;
+#[cfg(test)]
+mod moving_average_convergence_divergence_extended_test;
+mod moving_average_convergence_divergence_fixed;
+#[cfg(test)]
+mod moving_average_convergence_divergence_fixed_test;
+mod moving_average_convergence_divergence_helpers;
+#[cfg(test)]
+mod moving_average_convergence_divergence_test;
 pub use math_abs::MathAbs;
 #[cfg(test)]
 mod math_abs_test;
@@ -464,15 +471,6 @@ pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
 #[allow(unused_imports)]
-pub(crate) use macd::moving_average_convergence_divergence;
-pub use macd::{MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue};
-#[allow(unused_imports)]
-pub(crate) use macdext::moving_average_convergence_divergence_extended;
-pub use macdext::MovingAverageConvergenceDivergenceExtended;
-#[allow(unused_imports)]
-pub(crate) use macdfix::moving_average_convergence_divergence_fixed;
-pub use macdfix::MovingAverageConvergenceDivergenceFixed;
-#[allow(unused_imports)]
 pub(crate) use mama::mesa_adaptive_moving_average;
 pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
@@ -488,6 +486,11 @@ pub(crate) use minus_dm::minus_directional_movement;
 pub use minus_dm::MinusDirectionalMovement;
 pub use momentum::Momentum;
 pub use moving_average::MovingAverage;
+pub use moving_average_convergence_divergence::{
+    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue,
+};
+pub use moving_average_convergence_divergence_extended::MovingAverageConvergenceDivergenceExtended;
+pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDivergenceFixed;
 pub use opening_range::OpeningRange;
 pub use parabolic_moving_average_stop::ParabolicMovingAverageStop;
 pub use pivot_points::PivotPoints;
@@ -1008,38 +1011,6 @@ mod tests {
             assert_optional_eq(angle.append(input[index]), angle_expected[index]);
             assert_optional_eq(tsf.append(input[index]), tsf_expected[index]);
         }
-    }
-
-    #[test]
-    fn atr_and_macd_match_batch_for_every_bar() {
-        let close: Vec<f64> = (0..90)
-            .map(|i| 100.0 + (i as f64 * 0.21).cos() * 4.0 + i as f64 * 0.1)
-            .collect();
-        let (macd_batch, signal_batch, histogram_batch) =
-            crate::stream::moving_average_convergence_divergence(&close, 12, 26, 9).unwrap();
-        let mut macd = MovingAverageConvergenceDivergence::new(12, 26, 9).unwrap();
-
-        for i in 0..close.len() {
-            let actual = macd.append(close[i]);
-            if macd_batch[i].is_nan() {
-                assert_eq!(actual, None);
-            } else {
-                let actual = actual.expect("expected a warm MACD value");
-                assert!((actual.macd - macd_batch[i]).abs() < 1e-12);
-                assert!((actual.signal - signal_batch[i]).abs() < 1e-12);
-                assert!((actual.histogram - histogram_batch[i]).abs() < 1e-12);
-            }
-        }
-    }
-
-    #[test]
-    fn reset_replays_identically() {
-        let input = [1.0, 2.0, 4.0, 8.0, 16.0];
-        let mut state = ExponentialMovingAverage::new(3).unwrap();
-        let first: Vec<_> = input.iter().map(|&v| state.append(v)).collect();
-        state.reset();
-        let second: Vec<_> = input.iter().map(|&v| state.append(v)).collect();
-        assert_eq!(first, second);
     }
 }
 mod on_balance_volume;
