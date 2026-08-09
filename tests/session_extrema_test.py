@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.session import SessionExtrema
+from taflow import SessionExtrema
 
 
 def test_session_extrema_lifecycle_and_reset():
@@ -12,4 +12,3 @@ def test_session_extrema_lifecycle_and_reset():
     assert len(state) == 2
     state.reset()
     assert state.value is None
-

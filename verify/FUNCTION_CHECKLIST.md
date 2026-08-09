@@ -195,6 +195,14 @@ remain in dedicated indicator files, while `state_api.rs` now contains only
 shared conversion/error helpers. Rust formatting and core/PyO3 compilation
 passed; no benchmark command was run.
 
+The forty-second structural cleanup removed unused root compatibility
+re-export modules (`state_helpers.py`, `statistics.py`, and `zones.py`),
+changed `taflow.indicators` statistical exports to direct canonical modules,
+and updated the session lifecycle test to use the public top-level class.
+Focused tests (7), full Python tests (588 passed, 2 skipped), and the 300/300
+interface audit passed. Benchmark fields remain `TODO`; no benchmark command
+was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,
