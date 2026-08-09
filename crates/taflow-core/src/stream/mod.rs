@@ -422,5 +422,3 @@ mod tests {
 }
 #[allow(unused_imports)]
 pub(crate) mod bar_relation;
-#[cfg(test)]
-pub(crate) mod swing_highs_lows_test;

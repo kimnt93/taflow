@@ -209,6 +209,12 @@ forwarding module; pointwise math adapters remain exclusively under
 The module had no internal or test references. Benchmark fields remain
 `TODO`; no benchmark command was run.
 
+The forty-fourth structural cleanup removed the stale stream-side
+`smoothed_trend_channel_lifecycle_test.rs` and duplicate `swing_highs_lows_test.rs`.
+Their canonical tests remain beside `SmoothedTrendChannel` and `SwingHighLow`
+under `crates/taflow-core/src/indicators/`. Benchmark fields remain `TODO`;
+no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,
