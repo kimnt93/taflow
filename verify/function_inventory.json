@@ -1,16 +1,16 @@
 {
   "counts": {
-    "benchmark": 185,
-    "complete": 55,
+    "benchmark": 186,
+    "complete": 56,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 612,
+    "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 55,
+    "structure": 56,
     "talib_functions": 161
   },
   "rows": [
@@ -552,7 +552,8 @@
       "name": "FibonacciRetracement",
       "native_binding": true,
       "native_symbols": [
-        "StatefulFibonacciRetracement"
+        "FibonacciRetracement",
+        "_NativeFibonacciRetracement"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4528,6 +4529,7 @@
         "ExponentialMovingAverage",
         "FairValueGapOperator",
         "FallingOperator",
+        "FibonacciRetracement",
         "FisherTransformOperator",
         "ForceIndexOperator",
         "FracDiffOperator",
@@ -4651,7 +4653,6 @@
         "StatefulDema",
         "StatefulDx",
         "StatefulEvenBetterSinewave",
-        "StatefulFibonacciRetracement",
         "StatefulHtTrendline",
         "StatefulImi",
         "StatefulJurikMovingAverage",
@@ -4834,6 +4835,7 @@
         "ExponentialMovingAverage",
         "FairValueGapOperator",
         "FallingOperator",
+        "FibonacciRetracement",
         "FisherTransformOperator",
         "ForceIndexOperator",
         "FracDiffOperator",
@@ -4957,7 +4959,6 @@
         "StatefulDema",
         "StatefulDx",
         "StatefulEvenBetterSinewave",
-        "StatefulFibonacciRetracement",
         "StatefulHtTrendline",
         "StatefulImi",
         "StatefulJurikMovingAverage",

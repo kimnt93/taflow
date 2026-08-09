@@ -38,6 +38,7 @@ mod ewm_var;
 mod exponential_moving_average;
 mod extended_momentum;
 mod extended_trend;
+mod fibonacci_retracement;
 mod frac_diff;
 mod fvg;
 mod gap_side_side_white;
@@ -200,6 +201,7 @@ pub use extended_momentum::{
     AwesomeOscillatorOperator, FisherTransformOperator, TrueStrengthIndexOperator,
 };
 pub use extended_trend::{AlmaOperator, HmaOperator, VwmaOperator, ZlemaOperator};
+pub use fibonacci_retracement::FibonacciRetracement;
 pub use frac_diff::FracDiffOperator;
 pub use fvg::FairValueGapOperator;
 pub use gap_side_side_white::CandleGapSideSideWhite;

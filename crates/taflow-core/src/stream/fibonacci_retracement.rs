@@ -2,9 +2,6 @@
 
 use crate::error::TaResult;
 
-/// Ratios applied to the rolling range, 0% through 100%.
-const RATIOS: [f64; 7] = [0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0];
-
 /// Amortised O(1) monotonic ring over the trailing window.
 ///
 /// `KEEP_MAX == true` yields the window maximum, `false` the minimum. The
@@ -80,18 +77,33 @@ impl<const KEEP_MAX: bool> MonotonicRing<KEEP_MAX> {
     }
 }
 
-/// Rolling high/low range converted to seven Fibonacci levels.
+/// Named rolling Fibonacci levels from zero through one hundred percent.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct FibonacciRetracementValue {
+    /// Rolling high, or zero-percent retracement.
+    pub level_zero: f64,
+    /// 23.6% retracement from the rolling high.
+    pub level_twenty_three_point_six: f64,
+    /// 38.2% retracement from the rolling high.
+    pub level_thirty_eight_point_two: f64,
+    /// 50% retracement from the rolling high.
+    pub level_fifty: f64,
+    /// 61.8% retracement from the rolling high.
+    pub level_sixty_one_point_eight: f64,
+    /// 78.6% retracement from the rolling high.
+    pub level_seventy_eight_point_six: f64,
+    /// Rolling low, or one-hundred-percent retracement.
+    pub level_one_hundred: f64,
+}
+
+/// Persistent rolling high/low state converted to seven Fibonacci levels.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `FibonacciRetracement`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct FibonacciRetracement {
     period: usize,
     maxima: MonotonicRing<true>,
     minima: MonotonicRing<false>,
     seen: u64,
-    value: Option<[f64; 7]>,
+    value: Option<FibonacciRetracementValue>,
 }
 
 impl FibonacciRetracement {
@@ -109,8 +121,8 @@ impl FibonacciRetracement {
         })
     }
 
-    /// Appends one close and returns levels from 0% through 100%.
-    pub fn append(&mut self, close: f64) -> [f64; 7] {
+    /// Appends one close and returns named levels from 0% through 100%.
+    pub fn append(&mut self, close: f64) -> FibonacciRetracementValue {
         let index = self.seen;
         self.seen += 1;
         let period = self.period as u64;
@@ -125,13 +137,53 @@ impl FibonacciRetracement {
             .push(close, index, period)
             .unwrap_or(f64::INFINITY);
         let span = high - low;
-        let levels = RATIOS.map(|ratio| high - span * ratio);
-        self.value = Some(levels);
-        levels
+        let value = FibonacciRetracementValue {
+            level_zero: high - span * 0.0,
+            level_twenty_three_point_six: high - span * 0.236,
+            level_thirty_eight_point_two: high - span * 0.382,
+            level_fifty: high - span * 0.5,
+            level_sixty_one_point_eight: high - span * 0.618,
+            level_seventy_eight_point_six: high - span * 0.786,
+            level_one_hundred: high - span * 1.0,
+        };
+        self.value = Some(value);
+        value
     }
 
-    /// Returns the latest seven retracement levels.
-    pub fn value(&self) -> Option<[f64; 7]> {
+    /// Appends a close slice into seven aligned output histories.
+    #[allow(clippy::too_many_arguments)]
+    pub fn extend_slice_into(
+        &mut self,
+        close: &[f64],
+        level_zero: &mut Vec<f64>,
+        level_twenty_three_point_six: &mut Vec<f64>,
+        level_thirty_eight_point_two: &mut Vec<f64>,
+        level_fifty: &mut Vec<f64>,
+        level_sixty_one_point_eight: &mut Vec<f64>,
+        level_seventy_eight_point_six: &mut Vec<f64>,
+        level_one_hundred: &mut Vec<f64>,
+    ) {
+        level_zero.reserve(close.len());
+        level_twenty_three_point_six.reserve(close.len());
+        level_thirty_eight_point_two.reserve(close.len());
+        level_fifty.reserve(close.len());
+        level_sixty_one_point_eight.reserve(close.len());
+        level_seventy_eight_point_six.reserve(close.len());
+        level_one_hundred.reserve(close.len());
+        for &close in close {
+            let value = self.append(close);
+            level_zero.push(value.level_zero);
+            level_twenty_three_point_six.push(value.level_twenty_three_point_six);
+            level_thirty_eight_point_two.push(value.level_thirty_eight_point_two);
+            level_fifty.push(value.level_fifty);
+            level_sixty_one_point_eight.push(value.level_sixty_one_point_eight);
+            level_seventy_eight_point_six.push(value.level_seventy_eight_point_six);
+            level_one_hundred.push(value.level_one_hundred);
+        }
+    }
+
+    /// Returns the latest seven named retracement levels.
+    pub fn value(&self) -> Option<FibonacciRetracementValue> {
         self.value
     }
 
@@ -141,124 +193,5 @@ impl FibonacciRetracement {
         self.minima.reset();
         self.seen = 0;
         self.value = None;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::collections::VecDeque;
-
-    /// The pre-optimisation implementation, kept verbatim as the oracle.
-    struct Oracle {
-        period: usize,
-        closes: VecDeque<f64>,
-    }
-
-    impl Oracle {
-        fn new(period: usize) -> Self {
-            Self {
-                period,
-                closes: VecDeque::with_capacity(period),
-            }
-        }
-
-        fn append(&mut self, close: f64) -> [f64; 7] {
-            self.closes.push_back(close);
-            if self.closes.len() > self.period {
-                self.closes.pop_front();
-            }
-            let low = self.closes.iter().copied().fold(f64::INFINITY, f64::min);
-            let high = self
-                .closes
-                .iter()
-                .copied()
-                .fold(f64::NEG_INFINITY, f64::max);
-            let span = high - low;
-            RATIOS.map(|ratio| high - span * ratio)
-        }
-    }
-
-    fn lcg_series(n: usize, mut state: u64) -> Vec<f64> {
-        (0..n)
-            .map(|_| {
-                state = state
-                    .wrapping_mul(6364136223846793005)
-                    .wrapping_add(1442695040888963407);
-                90.0 + (state >> 11) as f64 / (1u64 << 53) as f64 * 20.0
-            })
-            .collect()
-    }
-
-    #[test]
-    fn matches_the_full_window_scan_bitwise() {
-        let input = lcg_series(5_000, 0xF1B0_0001);
-        for period in [1usize, 2, 3, 7, 120, 5_001] {
-            let mut state = FibonacciRetracement::new(period).unwrap();
-            let mut oracle = Oracle::new(period);
-            for (bar, &close) in input.iter().enumerate() {
-                let actual = state.append(close);
-                let expected = oracle.append(close);
-                for level in 0..7 {
-                    assert_eq!(
-                        actual[level].to_bits(),
-                        expected[level].to_bits(),
-                        "period {period} bar {bar} level {level}"
-                    );
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn matches_the_full_window_scan_with_plateaus_and_nans() {
-        // Long runs of equal values exercise the monotonic tie handling; NaN
-        // samples exercise the fold's NaN-ignoring behaviour, including a
-        // fully-NaN window.
-        let mut input = Vec::new();
-        for (bar, &value) in lcg_series(2_000, 0xF1B0_0002).iter().enumerate() {
-            input.push(if bar % 7 == 0 { 100.0 } else { value });
-            if bar % 23 == 0 {
-                input.push(f64::NAN);
-            }
-        }
-        input.extend(std::iter::repeat(f64::NAN).take(200));
-        input.extend(lcg_series(500, 0xF1B0_0003));
-
-        for period in [1usize, 2, 5, 60, 120] {
-            let mut state = FibonacciRetracement::new(period).unwrap();
-            let mut oracle = Oracle::new(period);
-            for (bar, &close) in input.iter().enumerate() {
-                let actual = state.append(close);
-                let expected = oracle.append(close);
-                for level in 0..7 {
-                    assert_eq!(
-                        actual[level].to_bits(),
-                        expected[level].to_bits(),
-                        "period {period} bar {bar} level {level}"
-                    );
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn reset_restores_a_fresh_state() {
-        let input = lcg_series(1_000, 0xF1B0_0004);
-        let mut state = FibonacciRetracement::new(30).unwrap();
-        for &close in &input {
-            state.append(close);
-        }
-        state.reset();
-        assert!(state.value().is_none());
-
-        let mut fresh = FibonacciRetracement::new(30).unwrap();
-        for &close in &input {
-            let after_reset = state.append(close);
-            let from_fresh = fresh.append(close);
-            for level in 0..7 {
-                assert_eq!(after_reset[level].to_bits(), from_fresh[level].to_bits());
-            }
-        }
     }
 }

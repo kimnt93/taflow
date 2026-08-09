@@ -493,7 +493,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | ExponentiallyWeightedSum | [pandas: `pandas.exponentially_weighted_sum`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
 | Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 30.17× | 4.14× | 1.81× | 1.66× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
@@ -707,7 +707,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.33× | 0.91× | 0.94× |
-| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 7.47× | 11.13× | 16.03× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -999,7 +999,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.17× | 4.66× | 1.75× |
-| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 12.77× | 16.42× | 15.77× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1291,7 +1291,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 1.65× | 1.99× |
-| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 14.20× | 16.16× | 15.94× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1583,7 +1583,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | FairValueGap | [smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Falling | [pandas: `pandas.falling`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 2.16× | 2.08× |
-| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| FibonacciRetracement | [pandas: `pandas.fib_retracement`](https://pandas.pydata.org/docs/reference/window.html) | 10.00× | 16.92× | 16.06× |
 | FisherTransform | [pandas-ta-classic: `pandas_ta_classic.fisher`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | ForceIndex | [pandas-ta-classic: `pandas_ta_classic.efi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | FracDiff | [pandas: `pandas.frac_diff`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |

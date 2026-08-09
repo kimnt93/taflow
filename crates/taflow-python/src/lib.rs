@@ -54,6 +54,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::TripleExponentialRateOfChange>()?;
     m.add_class::<indicators::UltimateOscillator>()?;
     m.add_class::<indicators::HeikinAshi>()?;
+    m.add_class::<indicators::FibonacciRetracement>()?;
     m.add_class::<indicators::Lag>()?;
     m.add_class::<indicators::LogReturn>()?;
     m.add_class::<indicators::CumulativeSum>()?;
@@ -239,7 +240,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulJurikMovingAverage>()?;
     m.add_class::<state_api::StatefulSmoothedTrendChannel>()?;
     m.add_class::<state_api::StatefulPremiumDiscount>()?;
-    m.add_class::<state_api::StatefulFibonacciRetracement>()?;
     m.add_class::<state_api::StatefulOpeningRange>()?;
     m.add_class::<state_api::StatefulSessionVolumeLevels>()?;
     m.add_class::<state_api::StatefulKlingerVolumeOscillator>()?;

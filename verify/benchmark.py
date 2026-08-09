@@ -84,6 +84,17 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
                 span=spec.ctor_kwargs.get("timeperiod", 14), adjust=False, bias=True),
         }
         return functions[spec.snake]()
+    if source == "pandas" and spec.snake == "fib_retracement":
+        import pandas as pd
+        series = pd.Series(arrays[0])
+        window = spec.ctor_kwargs.get("window", 120)
+        high = series.rolling(window, min_periods=1).max()
+        low = series.rolling(window, min_periods=1).min()
+        span = high - low
+        return tuple(
+            (high - span * ratio).to_numpy()
+            for ratio in (0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0)
+        )
     if source == "pandas" and spec.snake == "lag":
         import pandas as pd
         return pd.Series(arrays[0]).shift(
