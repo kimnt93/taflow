@@ -108,8 +108,10 @@ mod candle_tristar;
 mod candle_unique3river;
 mod candle_upsidegap2crows;
 mod candle_xsidegap3methods;
-mod cci;
 mod cmo;
+mod commodity_channel_index;
+#[cfg(test)]
+mod commodity_channel_index_test;
 mod cycle;
 mod dema;
 mod directional;
@@ -439,11 +441,9 @@ pub use candle_unique3river::CandleUniqueThreeRiver;
 pub use candle_upsidegap2crows::CandleUpsideGapTwoCrows;
 pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
 #[allow(unused_imports)]
-pub(crate) use cci::commodity_channel_index;
-pub use cci::CommodityChannelIndex;
-#[allow(unused_imports)]
 pub(crate) use cmo::chande_momentum_oscillator;
 pub use cmo::ChandeMomentumOscillator;
+pub use commodity_channel_index::CommodityChannelIndex;
 #[allow(unused_imports)]
 pub(crate) use dema::double_exponential_moving_average;
 pub use dema::DoubleExponentialMovingAverage;

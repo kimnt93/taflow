@@ -59,15 +59,14 @@ class CommodityChannelIndex:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _NativeCommodityChannelIndex(timeperiod)
-        if high is not None or low is not None or close is not None:
-            self.extend(
-                high,
-                low,
-                close,
-                high_column=high_column,
-                low_column=low_column,
-                close_column=close_column,
-            )
+        self.extend(
+            high,
+            low,
+            close,
+            high_column=high_column,
+            low_column=low_column,
+            close_column=close_column,
+        )
 
     def append(self, high: float, low: float, close: float) -> "CommodityChannelIndex":
         """Append one observation or aligned bar to the native Rust state.
@@ -92,8 +91,8 @@ class CommodityChannelIndex:
     def extend(
         self,
         high: Any,
-        low: Any | None = None,
-        close: Any | None = None,
+        low: Any,
+        close: Any,
         *,
         high_column: str = "high",
         low_column: str = "low",

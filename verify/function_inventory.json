@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 190,
-    "complete": 68,
+    "complete": 69,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
-    "native_state_classes": 295,
+    "native_state_classes": 294,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
     "rust_exports": 610,
     "smc_functions": 8,
-    "structure": 68,
+    "structure": 69,
     "talib_functions": 161
   },
   "rows": [

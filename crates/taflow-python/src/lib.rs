@@ -251,7 +251,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulParabolicMovingAverageStop>()?;
     m.add_class::<state_api::StatefulTomDeMarkSequential>()?;
     m.add_class::<state_api::StatefulPivotPoints>()?;
-    m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::AccumulationDistribution>()?;
     m.add_class::<state_api::AccumulationDistributionOscillator>()?;
