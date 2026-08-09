@@ -71,6 +71,182 @@ new indicators and for repairs to existing indicators.
   `f64::NAN` at those positions. Batch, repeated `extend`, and scalar `append`
   must leave identical state and bitwise-identical histories.
 
+## Canonical structure for AI agents
+
+For a class named `VariablePeriodMovingAverage`, create or maintain this shape:
+
+```text
+crates/taflow-core/src/stream/
+├── variable_period_moving_average.rs
+├── variable_period_moving_average_test.rs
+└── mod.rs                                      # declarations/re-exports only
+
+python/taflow/
+├── variable_period_moving_average.py
+└── __init__.py                                 # imports/re-exports only
+
+tests/
+└── variable_period_moving_average_test.py
+
+verify/
+└── ...                                         # Python class vs external oracle
+```
+
+GOOD Rust production shape:
+
+```rust
+// variable_period_moving_average.rs
+pub struct VariablePeriodMovingAverage {
+    // bounded persistent state
+}
+
+impl VariablePeriodMovingAverage {
+    pub fn new(/* configuration */) -> TaResult<Self> { /* ... */ }
+    pub fn append(&mut self, value: f64, period: f64) -> Option<f64> { /* ... */ }
+    pub fn extend_slices_into(
+        &mut self,
+        values: &[f64],
+        periods: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> { /* ... */ }
+    pub fn value(&self) -> Option<f64> { /* ... */ }
+    pub fn reset(&mut self) { /* ... */ }
+}
+```
+
+BAD Rust shapes:
+
+```rust
+pub struct Mavp { /* abbreviated canonical class */ }
+pub struct VariablePeriodMovingAverage { /* ... */ }
+
+pub fn variable_period_moving_average(/* ... */) -> Vec<f64> {
+    /* parallel free-function implementation */
+}
+
+#[cfg(test)]
+mod tests { /* test code inside the production implementation file */ }
+```
+
+GOOD Rust module and test shape:
+
+```rust
+// mod.rs — declarations and re-exports only
+mod variable_period_moving_average;
+pub use variable_period_moving_average::VariablePeriodMovingAverage;
+
+#[cfg(test)]
+mod variable_period_moving_average_test;
+```
+
+```rust
+// variable_period_moving_average_test.rs
+use super::variable_period_moving_average::VariablePeriodMovingAverage;
+
+#[test]
+fn matches_expected_state_lifecycle() {
+    // Exercise the class methods; do not call a free-function implementation.
+}
+```
+
+GOOD Python production and correctness shape:
+
+```python
+# python/taflow/variable_period_moving_average.py
+class VariablePeriodMovingAverage:
+    def __init__(self, values, periods): ...
+    def append(self, value: float, period: float) -> "VariablePeriodMovingAverage": ...
+    def extend(self, values, periods) -> "VariablePeriodMovingAverage": ...
+    def compute(self) -> np.ndarray: ...
+    def reset(self) -> "VariablePeriodMovingAverage": ...
+```
+
+```python
+# tests/variable_period_moving_average_test.py
+def test_variable_period_moving_average_matches_reference():
+    actual = VariablePeriodMovingAverage(values, periods).compute()
+    expected = external_library_reference(values, periods)
+    np.testing.assert_allclose(actual, expected, equal_nan=True)
+```
+
+BAD Python shapes:
+
+```python
+class Mavp:  # abbreviated canonical class
+    ...
+
+def variable_period_moving_average(values, periods):
+    return VariablePeriodMovingAverage(values, periods).compute()
+
+# BAD correctness comparison: compares a local function instead of the class.
+actual = variable_period_moving_average(values, periods)
+```
+
+The snippets describe structure, not permission to use placeholder bodies in
+finished code. Production methods, docstrings, types, validation, and tests must
+be complete.
+
+## Required implementation and scan workflow
+
+Before editing an indicator, an AI agent must inspect the existing canonical
+surface and all aliases instead of assuming the requested name is unused:
+
+```bash
+rg -n "VariablePeriodMovingAverage|variable_period_moving_average|Mavp|MAVP" \
+  crates python tests verify
+rg --files crates/taflow-core/src/stream python/taflow tests \
+  | sort
+```
+
+Then follow this order:
+
+1. Resolve the full canonical class name and the independent external oracle.
+   Reject shortened names before creating files.
+2. Locate every existing implementation, export, binding, test, registry entry,
+   documentation entry, and compatibility alias. Determine which code is the
+   canonical class and which duplicate/free-function paths must be removed.
+3. Put the Rust class in exactly one full-name implementation file and its Rust
+   tests in the matching `_test.rs` file.
+4. Put the Python adapter class in exactly one full-name implementation file and
+   its Python tests in the matching `_test.py` file under `tests/`.
+5. Keep `mod.rs`, `lib.rs`, and `__init__.py` limited to declarations, imports,
+   and re-exports. Update registries as metadata only; do not place calculations
+   there.
+6. Compare `CanonicalClass(...).compute()` with the selected external library.
+   Exercise `append`, `extend`, `value`, and `reset` separately for lifecycle
+   invariance.
+7. Remove obsolete abbreviated classes, indicator free functions, inline tests,
+   duplicate implementations, and imports of those removed symbols. Do not keep
+   deprecated forwarding wrappers unless the user explicitly requires a
+   compatibility transition that overrides this file.
+
+After editing, scan the changed indicator again. Adapt the names in these
+commands to the class being changed:
+
+```bash
+# Exactly one Rust and one Python production class definition should remain.
+rg -n "(struct|class) VariablePeriodMovingAverage" crates python
+
+# No same-named indicator free function should remain.
+rg -n "(fn|def) variable_period_moving_average" crates python tests verify
+
+# Tests must be in separate files; implementation/import files must contain no tests.
+rg -n "#\[cfg\(test\)\]|#\[test\]|def test_" \
+  crates/taflow-core/src/stream/variable_period_moving_average.rs \
+  python/taflow/variable_period_moving_average.py \
+  python/taflow/__init__.py
+
+# Review every shortened/external alias occurrence; only metadata mappings may remain.
+rg -n "\b(Mavp|MAVP)\b" crates python tests verify docs
+```
+
+Interpret scan results rather than relying only on counts. A native binding may
+also expose a Rust struct named `VariablePeriodMovingAverage`; that is part of
+the Python adapter boundary, not permission for a second numerical
+implementation. Any short alias found outside explicit metadata must be removed
+or renamed. Finish by inspecting `git diff --check`, `git diff --stat`, and the
+full diff for unintended generated or unrelated changes.
+
 ## Rust performance rules
 
 - `append` must be allocation-free after construction. Retain bounded state;
