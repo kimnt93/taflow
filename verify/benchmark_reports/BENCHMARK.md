@@ -303,7 +303,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.74× | 1.31× | 0.87× | 0.79× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.53× | 1.18× | 0.94× | 0.85× |
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.61× | 2.21× | 1.15× | 1.02× |
-| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.47× | 4.64× | 1.75× | 0.66× |
+| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.50× | 4.81× | 1.64× | 1.04× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.03× | 0.77× | 0.39× | 0.39× |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.71× | 1.48× | 1.12× | 1.12× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.99× | 1.17× | 0.94× | 0.92× |
@@ -386,7 +386,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | MathCos | [TA-Lib: `COS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.19× | 1.13× | 1.00× | 0.95× |
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.85× | 1.26× | 0.95× | 0.86× |
 | DoubleExponentialMovingAverage | [TA-Lib: `DEMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.87× | 1.55× | 1.17× | 1.99× |
-| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.84× | 4.24× | 1.60× | 1.12× |
+| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.30× | 4.08× | 1.50× | 0.86× |
 | DirectionalMovementIndex | [TA-Lib: `DX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.17× | 1.19× | 0.88× | 0.84× |
 | ExponentialMovingAverage | [TA-Lib: `EMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.95× | 2.19× | 1.24× | 1.01× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.08× | 1.33× | 0.93× | 0.79× |
@@ -424,7 +424,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.10× | 0.95× | 0.71× | 0.81× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.20× | 1.73× | 1.03× | 0.97× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.02× | 1.66× | 0.37× | 0.33× |
-| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.06× | 4.26× | 1.70× | 1.32× |
+| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.40× | 4.77× | 1.65× | 1.06× |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.86× | 1.39× | 0.93× | 0.96× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.98× | 1.63× | 0.90× | 0.83× |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.05× | 1.59× | 1.22× | 1.15× |
@@ -445,7 +445,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | StochasticOscillator | [TA-Lib: `STOCH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.61× | 1.21× | 0.89× | 0.81× |
 | FastStochasticOscillator | [TA-Lib: `STOCHF`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.82× | 0.86× | 0.63× | 0.84× |
 | StochasticRelativeStrengthIndex | [TA-Lib: `STOCHRSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.42× | 0.88× | 0.67× | 0.65× |
-| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.47× | 4.91× | 1.70× | 0.96× |
+| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.32× | 6.09× | 1.71× | 1.09× |
 | RollingSum | [TA-Lib: `SUM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.87× | 1.41× | 0.77× | 0.63× |
 | TripleExponentialAverage | [TA-Lib: `T3`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.00× | 2.15× | 1.20× | 1.18× |
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.31× | 1.11× | 0.96× | 0.93× |
@@ -747,7 +747,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.69× | 0.62× | 0.84× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.37× | 1.77× | 1.97× |
 | MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.05× | 0.83× | 0.80× |
-| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.86× | 1.73× | 2.03× |
+| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.88× | 1.69× | 1.90× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.96× | 1.75× | 1.85× |
 | MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.84× | 0.75× | 0.88× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.41× | 1.91× | 2.02× |
@@ -758,18 +758,18 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 1.72× | 1.87× |
 | MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.87× | 0.88× | 0.87× |
 | MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.63× | 0.75× | 0.85× |
-| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.12× | 2.03× | 2.08× |
+| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.03× | 1.53× | 1.81× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.97× | 1.25× | 1.92× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 1.48× | 1.89× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.90× | 1.48× | 1.86× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.95× | 1.70× | 1.95× |
 | MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.67× | 0.75× | 0.80× |
-| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.31× | 1.71× | 1.89× |
+| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.46× | 1.12× | 1.89× |
 | MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.43× | 0.90× | 0.83× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.54× | 1.93× | 2.03× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.05× | 1.86× | 1.88× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.86× | 1.44× | 1.88× |
-| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.01× | 1.78× | 1.88× |
+| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.66× | 1.56× | 1.94× |
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.17× | 1.59× | 1.86× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.13× | 1.71× | 1.92× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1039,7 +1039,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.85× | 0.83× | 0.83× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.80× | 1.86× |
 | MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.03× | 0.83× | 0.83× |
-| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.60× | 1.77× | 2.03× |
+| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.93× | 1.84× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.86× | 1.82× |
 | MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.76× | 0.69× | 0.88× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.66× | 1.93× |
@@ -1050,18 +1050,18 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.82× | 1.92× |
 | MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.90× | 0.97× | 0.97× |
 | MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.03× | 0.79× | 0.88× |
-| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.88× | 1.94× | 1.94× |
+| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.96× | 1.91× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.90× | 1.90× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.79× | 1.91× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.81× | 1.83× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.69× | 1.89× |
 | MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.85× | 0.87× | 0.80× |
-| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.85× | 1.76× |
+| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.91× | 1.83× |
 | MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.90× | 0.86× | 0.87× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 1.88× | 1.92× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.92× | 1.88× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.83× | 1.86× |
-| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 1.82× | 1.86× |
+| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.86× | 1.97× |
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.85× | 1.87× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.74× | 1.92× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1331,7 +1331,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.82× | 0.86× | 0.84× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.78× | 1.94× |
 | MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.78× | 0.97× | 0.83× |
-| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.85× | 2.05× |
+| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.93× | 1.89× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.59× | 1.40× | 1.78× |
 | MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.87× | 1.03× | 0.79× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.86× | 1.86× |
@@ -1342,18 +1342,18 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.68× | 1.86× |
 | MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.89× | 0.84× | 0.91× |
 | MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.97× | 0.83× | 0.80× |
-| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.79× | 1.72× |
+| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.85× | 1.96× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.96× | 1.79× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 1.97× | 1.85× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.84× | 1.90× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.90× | 1.91× |
 | MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.86× | 0.94× | 0.88× |
-| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.83× | 1.85× |
+| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.84× | 1.88× |
 | MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.09× | 0.75× | 0.76× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.60× | 1.83× | 1.80× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.68× | 1.76× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 1.75× | 1.92× |
-| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.91× | 1.89× |
+| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 1.98× | 1.86× |
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.77× | 1.78× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.90× | 1.83× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1623,7 +1623,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathAbs | [NumPy: `numpy.abs`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.86× | 0.86× | 0.90× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 2.00× | 2.05× |
 | MathAcosh | [NumPy: `numpy.arccosh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.91× | 0.83× | 0.84× |
-| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.82× | 2.00× |
+| MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.94× | 2.02× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 2.04× | 1.92× |
 | MathAsinh | [NumPy: `numpy.arcsinh`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.88× | 0.85× | 0.96× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.86× | 1.95× |
@@ -1634,18 +1634,18 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MathCosh | [TA-Lib: `COSH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.95× | 2.03× |
 | MathCot | [NumPy: `numpy.tan reciprocal`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.90× | 1.13× | 0.87× |
 | MathDegrees | [NumPy: `numpy.degrees`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.82× | 2.00× | 0.89× |
-| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 1.87× | 2.23× |
+| MathDivide | [TA-Lib: `DIV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.69× | 1.78× |
 | MathExp | [TA-Lib: `EXP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.85× | 1.87× |
 | MathFloor | [TA-Lib: `FLOOR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.82× | 1.82× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.72× | 1.89× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 2.07× | 1.92× |
 | MathLog1p | [NumPy: `numpy.log1p`](https://numpy.org/doc/stable/reference/ufuncs.html) | 1.08× | 0.83× | 0.92× |
-| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 2.03× | 1.92× |
+| MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.08× | 1.88× | 1.94× |
 | MathRadians | [NumPy: `numpy.radians`](https://numpy.org/doc/stable/reference/ufuncs.html) | 0.87× | 0.92× | 0.92× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.98× | 2.23× |
 | MathSinh | [TA-Lib: `SINH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.97× | 2.00× |
 | MathSqrt | [TA-Lib: `SQRT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.71× | 1.91× |
-| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 2.01× | 1.85× |
+| MathSubtract | [TA-Lib: `SUB`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.96× | 1.91× |
 | MathTan | [TA-Lib: `TAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.49× | 2.17× | 2.17× |
 | MathTanh | [TA-Lib: `TANH`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.96× | 1.94× |
 | McGinleyDynamic | [pandas-ta-classic: `pandas-ta-classic.mcginley`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |

@@ -3,7 +3,7 @@
 from typing import Any
 
 from ._math_state import MathBinaryState
-from ._native import StatefulMathDivide
+from ._native import MathDivide as _NativeMathDivide
 
 
 class MathDivide(MathBinaryState):
@@ -13,7 +13,7 @@ class MathDivide(MathBinaryState):
     history has no rolling warm-up beyond the native operation's domain rules.
     """
 
-    _native_cls = StatefulMathDivide
+    _native_cls = _NativeMathDivide
 
     def append(self, left: float, right: float) -> "MathDivide":
         """Append one observation and return this indicator."""

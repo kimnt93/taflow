@@ -356,10 +356,10 @@ pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
 pub(crate) use math_operator::rolling_sum;
 pub use math_price::{
-    AveragePrice, MathAbs, MathAcos, MathAcosh, MathAdd, MathAsin, MathAsinh, MathAtan, MathAtanh,
-    MathCbrt, MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathDivide, MathExp, MathFloor,
-    MathLn, MathLog10, MathLog1p, MathMultiply, MathRadians, MathSin, MathSinh, MathSqrt,
-    MathSubtract, MathTan, MathTanh, MedianPrice, TypicalPrice, WeightedClose,
+    AveragePrice, MathAbs, MathAcos, MathAcosh, MathAsin, MathAsinh, MathAtan, MathAtanh, MathCbrt,
+    MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathExp, MathFloor, MathLn, MathLog10,
+    MathLog1p, MathRadians, MathSin, MathSinh, MathSqrt, MathTan, MathTanh, MedianPrice,
+    TypicalPrice, WeightedClose,
 };
 #[allow(unused_imports)]
 pub(crate) use mfi::money_flow_index;
@@ -447,18 +447,22 @@ pub(crate) use average_true_range::average_true_range;
 mod normalized_average_true_range;
 #[allow(unused_imports)]
 pub(crate) use normalized_average_true_range::normalized_average_true_range;
-mod add;
-#[allow(unused_imports)]
-pub(crate) use add::add;
-mod sub;
-#[allow(unused_imports)]
-pub(crate) use sub::sub;
-mod mult;
-#[allow(unused_imports)]
-pub(crate) use mult::mult;
-mod div;
-#[allow(unused_imports)]
-pub(crate) use div::div;
+mod math_add;
+pub use math_add::MathAdd;
+#[cfg(test)]
+mod math_add_test;
+mod math_subtract;
+pub use math_subtract::MathSubtract;
+mod math_multiply;
+#[cfg(test)]
+mod math_subtract_test;
+pub use math_multiply::MathMultiply;
+mod math_divide;
+#[cfg(test)]
+mod math_multiply_test;
+pub use math_divide::MathDivide;
+#[cfg(test)]
+mod math_divide_test;
 mod rolling_max;
 #[allow(unused_imports)]
 pub(crate) use rolling_max::rolling_max;
@@ -805,20 +809,6 @@ mod tests {
         check_unary!(MathSqrt, crate::stream::sqrt);
         check_unary!(MathTan, crate::stream::tan);
         check_unary!(MathTanh, crate::stream::tanh);
-
-        macro_rules! check_binary {
-            ($state:ty, $batch:path) => {{
-                let expected = $batch(&input, &other).unwrap();
-                let mut state = <$state>::new();
-                for index in 0..input.len() {
-                    assert_eq!(state.append(input[index], other[index]), expected[index]);
-                }
-            }};
-        }
-        check_binary!(MathAdd, crate::stream::add);
-        check_binary!(MathSubtract, crate::stream::sub);
-        check_binary!(MathMultiply, crate::stream::mult);
-        check_binary!(MathDivide, crate::stream::div);
 
         let open = &input;
         let high: Vec<_> = input.iter().map(|value| value + 0.2).collect();

@@ -3,7 +3,7 @@
 from typing import Any
 
 from ._math_state import MathBinaryState
-from ._native import StatefulMathMultiply
+from ._native import MathMultiply as _NativeMathMultiply
 
 
 class MathMultiply(MathBinaryState):
@@ -13,7 +13,7 @@ class MathMultiply(MathBinaryState):
     history has no rolling warm-up beyond the native operation's domain rules.
     """
 
-    _native_cls = StatefulMathMultiply
+    _native_cls = _NativeMathMultiply
 
     def append(self, left: float, right: float) -> "MathMultiply":
         """Append one observation and return this indicator."""

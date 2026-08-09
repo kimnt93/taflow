@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 169,
-    "complete": 1,
+    "complete": 5,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 539,
+    "rust_exports": 547,
     "smc_functions": 8,
-    "structure": 1,
+    "structure": 5,
     "talib_functions": 161
   },
   "rows": [
@@ -2885,10 +2885,11 @@
       "name": "MathAdd",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAdd"
+        "MathAdd",
+        "_NativeMathAdd"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2899,10 +2900,11 @@
       "name": "MathSubtract",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathSubtract"
+        "MathSubtract",
+        "_NativeMathSubtract"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2913,10 +2915,11 @@
       "name": "MathMultiply",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathMultiply"
+        "MathMultiply",
+        "_NativeMathMultiply"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2927,10 +2930,11 @@
       "name": "MathDivide",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathDivide"
+        "MathDivide",
+        "_NativeMathDivide"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4502,6 +4506,10 @@
         "LowerLowOperator",
         "LowestSinceOperator",
         "MassIndexOperator",
+        "MathAdd",
+        "MathDivide",
+        "MathMultiply",
+        "MathSubtract",
         "McGinleyDynamicOperator",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
@@ -4586,7 +4594,6 @@
         "StatefulMathAbs",
         "StatefulMathAcos",
         "StatefulMathAcosh",
-        "StatefulMathAdd",
         "StatefulMathAsin",
         "StatefulMathAsinh",
         "StatefulMathAtan",
@@ -4597,18 +4604,15 @@
         "StatefulMathCosh",
         "StatefulMathCot",
         "StatefulMathDegrees",
-        "StatefulMathDivide",
         "StatefulMathExp",
         "StatefulMathFloor",
         "StatefulMathLn",
         "StatefulMathLog10",
         "StatefulMathLog1p",
-        "StatefulMathMultiply",
         "StatefulMathRadians",
         "StatefulMathSin",
         "StatefulMathSinh",
         "StatefulMathSqrt",
-        "StatefulMathSubtract",
         "StatefulMathTan",
         "StatefulMathTanh",
         "StatefulMax",
@@ -4808,6 +4812,10 @@
         "LowerLowOperator",
         "LowestSinceOperator",
         "MassIndexOperator",
+        "MathAdd",
+        "MathDivide",
+        "MathMultiply",
+        "MathSubtract",
         "McGinleyDynamicOperator",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
@@ -4892,7 +4900,6 @@
         "StatefulMathAbs",
         "StatefulMathAcos",
         "StatefulMathAcosh",
-        "StatefulMathAdd",
         "StatefulMathAsin",
         "StatefulMathAsinh",
         "StatefulMathAtan",
@@ -4903,18 +4910,15 @@
         "StatefulMathCosh",
         "StatefulMathCot",
         "StatefulMathDegrees",
-        "StatefulMathDivide",
         "StatefulMathExp",
         "StatefulMathFloor",
         "StatefulMathLn",
         "StatefulMathLog10",
         "StatefulMathLog1p",
-        "StatefulMathMultiply",
         "StatefulMathRadians",
         "StatefulMathSin",
         "StatefulMathSinh",
         "StatefulMathSqrt",
-        "StatefulMathSubtract",
         "StatefulMathTan",
         "StatefulMathTanh",
         "StatefulMax",

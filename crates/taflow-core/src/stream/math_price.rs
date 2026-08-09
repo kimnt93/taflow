@@ -113,11 +113,6 @@ macro_rules! binary_indicator {
     };
 }
 
-binary_indicator!(MathAdd, |left: f64, right: f64| left + right);
-binary_indicator!(MathSubtract, |left: f64, right: f64| left - right);
-binary_indicator!(MathMultiply, |left: f64, right: f64| left * right);
-binary_indicator!(MathDivide, |left: f64, right: f64| left / right);
-
 /// Stateful average price `(open + high + low + close) / 4`.
 #[derive(Debug, Clone, Default)]
 /// Persistent Rust state or aligned output type for `AveragePrice`.

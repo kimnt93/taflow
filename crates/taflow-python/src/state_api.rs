@@ -2555,6 +2555,70 @@ unary_state_class!(StatefulMathSqrt, MathSqrt);
 unary_state_class!(StatefulMathTan, MathTan);
 unary_state_class!(StatefulMathTanh, MathTanh);
 
+macro_rules! binary_math_state_class {
+    ($class:ident) => {
+        #[pyclass]
+        pub struct $class {
+            inner: stream::$class,
+            outputs: Vec<f64>,
+        }
+
+        #[pymethods]
+        impl $class {
+            #[new]
+            fn new() -> PyResult<Self> {
+                Ok(Self {
+                    inner: stream::$class::new().map_err(py_value_error)?,
+                    outputs: Vec::new(),
+                })
+            }
+
+            fn append(&mut self, left: f64, right: f64) -> f64 {
+                let value = self.inner.append(left, right);
+                self.outputs.push(value);
+                value
+            }
+
+            fn extend(
+                &mut self,
+                py: Python<'_>,
+                left: PyReadonlyArray1<f64>,
+                right: PyReadonlyArray1<f64>,
+            ) -> PyResult<()> {
+                let left = left.as_slice()?;
+                let right = right.as_slice()?;
+                let inner = &mut self.inner;
+                let outputs = &mut self.outputs;
+                py.allow_threads(|| inner.extend_slices_into(left, right, outputs))
+                    .map_err(py_value_error)
+            }
+
+            #[getter]
+            fn value(&self) -> Option<f64> {
+                self.inner.value()
+            }
+
+            fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+                to_py_array(py, self.outputs.clone())
+            }
+
+            fn __len__(&self) -> usize {
+                self.outputs.len()
+            }
+
+            fn reset(&mut self) {
+                self.inner.reset();
+                self.outputs.clear();
+            }
+        }
+    };
+}
+
+binary_math_state_class!(MathAdd);
+binary_math_state_class!(MathSubtract);
+binary_math_state_class!(MathMultiply);
+binary_math_state_class!(MathDivide);
+
 macro_rules! binary_state_class {
     ($class:ident, $inner:ident) => {
         #[pyclass]
@@ -2622,10 +2686,6 @@ macro_rules! binary_state_class {
     };
 }
 
-binary_state_class!(StatefulMathAdd, MathAdd);
-binary_state_class!(StatefulMathSubtract, MathSubtract);
-binary_state_class!(StatefulMathMultiply, MathMultiply);
-binary_state_class!(StatefulMathDivide, MathDivide);
 binary_state_class!(StatefulMedprice, MedianPrice);
 
 macro_rules! price3_state_class {

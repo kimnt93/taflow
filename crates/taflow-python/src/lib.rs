@@ -284,10 +284,10 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulMathSqrt>()?;
     m.add_class::<state_api::StatefulMathTan>()?;
     m.add_class::<state_api::StatefulMathTanh>()?;
-    m.add_class::<state_api::StatefulMathAdd>()?;
-    m.add_class::<state_api::StatefulMathSubtract>()?;
-    m.add_class::<state_api::StatefulMathMultiply>()?;
-    m.add_class::<state_api::StatefulMathDivide>()?;
+    m.add_class::<state_api::MathAdd>()?;
+    m.add_class::<state_api::MathSubtract>()?;
+    m.add_class::<state_api::MathMultiply>()?;
+    m.add_class::<state_api::MathDivide>()?;
     m.add_class::<state_api::StatefulAtr>()?;
     m.add_class::<state_api::StatefulTrange>()?;
     m.add_class::<state_api::StatefulNatr>()?;

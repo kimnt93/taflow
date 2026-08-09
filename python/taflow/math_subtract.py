@@ -3,7 +3,7 @@
 from typing import Any
 
 from ._math_state import MathBinaryState
-from ._native import StatefulMathSubtract
+from ._native import MathSubtract as _NativeMathSubtract
 
 
 class MathSubtract(MathBinaryState):
@@ -13,7 +13,7 @@ class MathSubtract(MathBinaryState):
     history has no rolling warm-up beyond the native operation's domain rules.
     """
 
-    _native_cls = StatefulMathSubtract
+    _native_cls = _NativeMathSubtract
 
     def append(self, left: float, right: float) -> "MathSubtract":
         """Append one observation and return this indicator."""

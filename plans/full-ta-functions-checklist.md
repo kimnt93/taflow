@@ -13,10 +13,10 @@ look-ahead operations, and internal-only primitives are excluded.
 
 ## Audit summary
 
-- Computation surfaces: **298**
-- Rust/native implementations: **297**
-- Python interfaces: **298**
-- Complete in both layers: **297**
+- Computation surfaces: **300**
+- Rust/native implementations: **299**
+- Python interfaces: **300**
+- Complete in both layers: **299**
 - Layer gaps: **1**
 
 ## Complete source inventory
@@ -211,6 +211,7 @@ look-ahead operations, and internal-only primitives are excluded.
 | Momentum | x | x |
 | MoneyFlowIndex | x | x |
 | MovingAverage | x | x |
+| MovingAverageConvergenceDivergence | x | x |
 | MovingAverageConvergenceDivergenceExtended | x | x |
 | MovingAverageConvergenceDivergenceFixed | x | x |
 | NegativeVolumeIndex | x | x |
@@ -303,6 +304,7 @@ look-ahead operations, and internal-only primitives are excluded.
 | TimeSeriesRank | x | x |
 | TomDeMarkSequential | x | x |
 | TriangularMovingAverage | x | x |
+| TripleExponentialAverage | x | x |
 | TripleExponentialMovingAverage | x | x |
 | TripleExponentialRateOfChange | x | x |
 | TrueRange | x | x |
@@ -337,10 +339,10 @@ spellings. The old Rust/PyO3 names are no longer exported.
 
 | Former Rust | Former PyO3 | Canonical class | Status |
 |---|---|---|---|
-| Add | StatefulAdd | MathAdd / StatefulMathAdd | complete |
-| Sub | StatefulSub | MathSubtract / StatefulMathSubtract | complete |
-| Mult | StatefulMult | MathMultiply / StatefulMathMultiply | complete |
-| Div | StatefulDiv | MathDivide / StatefulMathDivide | complete |
+| Add | MathAdd | MathAdd | complete |
+| Sub | MathSubtract | MathSubtract | complete |
+| Mult | MathMultiply | MathMultiply | complete |
+| Div | MathDivide | MathDivide | complete |
 
 The unary math structs were normalized in the same pass (`Acos` → `MathAcos`, ...,
 `Tanh` → `MathTanh`).
