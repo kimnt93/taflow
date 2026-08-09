@@ -8,7 +8,7 @@ use crate::error::{TaError, TaResult};
 use crate::indicators::{RollingMaximum, RollingMinimum};
 use crate::ma_type::MaType;
 
-use super::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
+use crate::stream::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
 
 /// One aligned slow %K and slow %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]

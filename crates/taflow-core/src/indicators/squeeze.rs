@@ -1,8 +1,8 @@
-use super::operator_states::*;
-use super::*;
 use crate::error::{TaError, TaResult};
 use crate::indicators::RollingStandardDeviation;
 use crate::indicators::TrueRange;
+use crate::stream::operator_states::*;
+use crate::stream::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Persistent Rust state or aligned output type for `SqueezeValue`.

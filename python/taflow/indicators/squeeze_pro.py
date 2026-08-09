@@ -1,8 +1,8 @@
 """Canonical native-backed Squeeze PRO adapter."""
 from typing import Any
 import numpy as np
-from ._native import SqueezeProOperator as _Native
-from ._series import as_float64_series
+from .._native import SqueezeProOperator as _Native
+from .._series import as_float64_series
 
 
 class SqueezePro:

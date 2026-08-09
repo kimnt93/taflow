@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::SignedPower;
+use taflow::indicators::SignedPower;
 
 /// Native persistent adapter for pointwise signed power.
 #[pyclass]

@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.sessions import Sessions
+from taflow import Sessions
 
 
 def test_sessions_lifecycle_and_reset():
@@ -10,4 +10,3 @@ def test_sessions_lifecycle_and_reset():
     assert len(state) == 2
     state.reset()
     assert state.value is None
-

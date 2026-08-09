@@ -6,7 +6,8 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{FastStochasticOscillator, RelativeStrengthIndex, StreamingIndicator};
+use crate::indicators::{FastStochasticOscillator, RelativeStrengthIndex};
+use crate::stream::StreamingIndicator;
 
 /// One aligned stochastic-RSI fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]

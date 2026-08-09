@@ -70,18 +70,6 @@ pub use session_flags::session_flags;
 mod helpers;
 pub(crate) mod lagged_common;
 pub(crate) mod operator_states;
-mod simple_moving_average;
-#[cfg(test)]
-mod simple_moving_average_test;
-mod stochastic_oscillator;
-#[cfg(test)]
-mod stochastic_oscillator_test;
-mod stochastic_relative_strength_index;
-#[cfg(test)]
-mod stochastic_relative_strength_index_test;
-mod triangular_moving_average;
-#[cfg(test)]
-mod triangular_moving_average_test;
 mod triple_exponential_average;
 #[cfg(test)]
 mod triple_exponential_average_test;
@@ -127,6 +115,12 @@ pub use crate::indicators::{
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended,
     MovingAverageConvergenceDivergenceFixed, MovingAverageConvergenceDivergenceValue,
 };
+pub use crate::indicators::{
+    Sessions, SessionsValue, SignalDelay, SignedPower, SimpleMovingAverage, Squeeze, SqueezePro,
+    SqueezeProValue, SqueezeValue, StochasticOscillator, StochasticOscillatorValue,
+    StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue, Supertrend,
+    SupertrendValue, TriangularMovingAverage,
+};
 #[allow(unused_imports)]
 #[allow(unused_imports)]
 pub use indicator::StreamingIndicator;
@@ -138,14 +132,8 @@ pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use simple_moving_average::SimpleMovingAverage;
 #[allow(unused_imports)]
-pub use stochastic_oscillator::{StochasticOscillator, StochasticOscillatorValue};
 #[allow(unused_imports)]
-pub use stochastic_relative_strength_index::{
-    StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue,
-};
-pub use triangular_moving_average::TriangularMovingAverage;
 #[allow(unused_imports)]
 pub use triple_exponential_average::TripleExponentialAverage;
 #[allow(unused_imports)]
@@ -161,8 +149,6 @@ pub use window::Window;
 #[cfg(test)]
 #[cfg(test)]
 #[cfg(test)]
-#[cfg(test)]
-mod signal_delay_test;
 #[cfg(test)]
 #[cfg(test)]
 mod value_when_test;
@@ -463,9 +449,6 @@ mod tests {
     }
 }
 #[allow(unused_imports)]
-mod sessions;
-#[cfg(test)]
-mod sessions_test;
 mod time_series_rank;
 #[cfg(test)]
 mod time_series_rank_test;
@@ -473,21 +456,8 @@ mod yang_zhang;
 #[cfg(test)]
 mod yang_zhang_test;
 pub use time_series_rank::TimeSeriesRank;
-mod signed_power;
-#[cfg(test)]
-mod signed_power_test;
-pub use signed_power::SignedPower;
 #[allow(unused_imports)]
 pub(crate) mod bar_relation;
-mod squeeze;
-mod squeeze_pro;
-#[cfg(test)]
-mod squeeze_pro_test;
-#[cfg(test)]
-mod squeeze_test;
-mod supertrend;
-#[cfg(test)]
-mod supertrend_test;
 #[cfg(test)]
 pub(crate) mod swing_highs_lows_test;
 mod vortex;
@@ -495,12 +465,6 @@ mod vortex;
 mod vortex_test;
 
 mod value_when;
-pub use sessions::{Sessions, SessionsValue};
-pub use squeeze::{Squeeze, SqueezeValue};
-pub use squeeze_pro::{SqueezePro, SqueezeProValue};
-pub use supertrend::{Supertrend, SupertrendValue};
 pub use value_when::ValueWhen;
 pub use vortex::{Vortex, VortexValue};
 pub use yang_zhang::YangZhang;
-mod signal_delay;
-pub use signal_delay::SignalDelay;

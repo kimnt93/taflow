@@ -6,7 +6,7 @@
 //! must correspond to a batch `0`. After the first pass the state is `reset()`
 //! and replayed to prove the in-place reset restores a pristine state.
 
-use taflow::stream as s;
+use taflow::indicators as s;
 
 /// Minimal 64-bit LCG (Knuth MMIX constants).
 struct Lcg(u64);

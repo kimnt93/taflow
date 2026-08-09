@@ -222,7 +222,7 @@ from ..statistics import (
     RollingMidprice, RollingStandardDeviation, RollingVariance,
     RollingMinMax, RollingMinMaxIndex,
 )
-from ..signed_power import SignedPower
+from .signed_power import SignedPower
 from ..time_series_rank import TimeSeriesRank
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
 from .roll_spread import RollSpread
@@ -247,7 +247,14 @@ from .entry_exit import EntryExit
 from .swing_high_low import SwingHighLow
 from .retracements import Retracements
 from .previous_high_low import PreviousHighLow
-from ..sessions import Sessions
+from .sessions import Sessions
+from .simple_moving_average import SimpleMovingAverage
+from .squeeze import Squeeze
+from .squeeze_pro import SqueezePro
+from .stochastic_oscillator import StochasticOscillator
+from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
+from .supertrend import Supertrend
+from .triangular_moving_average import TriangularMovingAverage
 from .active_zone_list import ActiveZoneList
 from .fair_value_gap import FairValueGap
 from .volume_price_trend import VolumePriceTrend
@@ -530,4 +537,11 @@ __all__ = [
     "MovingAverageConvergenceDivergence",
     "MovingAverageConvergenceDivergenceExtended",
     "MovingAverageConvergenceDivergenceFixed",
+    "SimpleMovingAverage",
+    "Squeeze",
+    "SqueezePro",
+    "StochasticOscillator",
+    "StochasticRelativeStrengthIndex",
+    "Supertrend",
+    "TriangularMovingAverage",
 ]

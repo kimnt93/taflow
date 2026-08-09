@@ -1,8 +1,8 @@
 """Canonical native-backed Triangular Moving Average adapter."""
 from typing import Any
 import numpy as np
-from ._native import TriangularMovingAverage as _NativeTriangularMovingAverage
-from ._series import as_float64_series
+from .._native import TriangularMovingAverage as _NativeTriangularMovingAverage
+from .._series import as_float64_series
 
 class TriangularMovingAverage:
     """Compute TRIMA from required ``values`` through the Rust state."""

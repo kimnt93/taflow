@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::SignalDelay;
+use taflow::indicators::SignalDelay;
 
 #[pyclass]
 pub struct SignalDelayOperator {

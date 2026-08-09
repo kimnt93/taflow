@@ -66,8 +66,7 @@ from .indicators.moving_average_convergence_divergence_extended import (
 )
 from .indicators import ParabolicSar, ParabolicSarExtended
 from .indicators import PlusDirectionalIndicator, PlusDirectionalMovement
-from .stochastic_oscillator import StochasticOscillator
-from .stochastic_relative_strength_index import StochasticRelativeStrengthIndex
+from .indicators import StochasticOscillator, StochasticRelativeStrengthIndex
 from .indicators.candle_stick_sandwich import CandleStickSandwich
 from .triple_exponential_rate_of_change import TripleExponentialRateOfChange
 from .indicators.candle_three_black_crows import CandleThreeBlackCrows
@@ -85,9 +84,9 @@ from .indicators.anchored_volume_weighted_average_price import (
 )
 from .variable_index_dynamic_average import VariableIndexDynamicAverage
 from .indicators.laguerre_relative_strength_index import LaguerreRelativeStrengthIndex
-from .simple_moving_average import SimpleMovingAverage
+from .indicators import SimpleMovingAverage
 from .indicators import NormalizedAverageTrueRange, TrueRange
-from .triangular_moving_average import TriangularMovingAverage
+from .indicators import TriangularMovingAverage
 from .triple_exponential_moving_average import TripleExponentialMovingAverage
 from .triple_exponential_average import TripleExponentialAverage
 from .weighted_moving_average import WeightedMovingAverage
@@ -236,7 +235,7 @@ from .indicators.swing_high_low import SwingHighLow
 from .indicators import Retracements
 from .indicators import SessionExtrema
 from .indicators import PreviousHighLow
-from .sessions import Sessions
+from .indicators import Sessions
 from .indicators.active_zone_list import ActiveZoneList
 from .indicators.fair_value_gap import FairValueGap
 from .indicators.break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
@@ -263,10 +262,9 @@ from .indicators.cumulative_sum_control_chart import CumulativeSumControlChart
 from .indicators.spread_z_score import SpreadZScore
 from .indicators import FracDiff
 from .indicators.kalman_hedge_ratio import KalmanHedgeRatio
-from .supertrend import Supertrend
+from .indicators import Supertrend
 from .indicators import Ichimoku
-from .squeeze import Squeeze
-from .squeeze_pro import SqueezePro
+from .indicators import Squeeze, SqueezePro
 from .indicators import SchaffTrendCycle
 from .vortex import Vortex
 from .indicators.know_sure_thing import KnowSureThing
@@ -278,7 +276,7 @@ from .indicators.negative_volume_index import NegativeVolumeIndex
 from .indicators.positive_volume_index import PositiveVolumeIndex
 from .indicators.mc_ginley_dynamic import McGinleyDynamic
 from .indicators import DecayLinear
-from .signed_power import SignedPower
+from .indicators import SignedPower
 from .time_series_rank import TimeSeriesRank
 
 __all__ = [

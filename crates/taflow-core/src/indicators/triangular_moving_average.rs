@@ -2,7 +2,7 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
+use crate::stream::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
 /// Compute the triangular moving average result for the supplied aligned series.
 ///

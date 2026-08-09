@@ -167,6 +167,17 @@ exports were normalized. Focused Python tests (10), full Rust tests (386),
 release build, and the 300/300 interface audit passed. Benchmark fields remain
 `TODO`; no benchmark command was run.
 
+The thirty-ninth structural batch migrated the Rust implementations and
+separate tests for `Sessions`, `SignalDelay`, `SignedPower`,
+`SimpleMovingAverage`, `Squeeze`, `SqueezePro`, `StochasticOscillator`,
+`StochasticRelativeStrengthIndex`, `Supertrend`, and `TriangularMovingAverage`
+into the canonical indicators directory. The stream module now only
+re-exports those states, all ten PyO3 bindings target `taflow::indicators`, and
+nine root Python adapters were moved into `python/taflow/indicators/`.
+Focused Python tests (10), full Rust tests (386), release build, and the
+300/300 interface audit passed. Benchmark fields remain `TODO`; no benchmark
+command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

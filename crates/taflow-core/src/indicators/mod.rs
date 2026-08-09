@@ -173,6 +173,50 @@ pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
 pub use session_extrema::{SessionExtrema, SessionExtremaValue};
 
+mod sessions;
+#[cfg(test)]
+mod sessions_test;
+mod signal_delay;
+#[cfg(test)]
+mod signal_delay_test;
+mod signed_power;
+#[cfg(test)]
+mod signed_power_test;
+mod simple_moving_average;
+#[cfg(test)]
+mod simple_moving_average_test;
+mod squeeze;
+mod squeeze_pro;
+#[cfg(test)]
+mod squeeze_pro_test;
+#[cfg(test)]
+mod squeeze_test;
+mod stochastic_oscillator;
+#[cfg(test)]
+mod stochastic_oscillator_test;
+mod stochastic_relative_strength_index;
+#[cfg(test)]
+mod stochastic_relative_strength_index_test;
+mod supertrend;
+#[cfg(test)]
+mod supertrend_test;
+mod triangular_moving_average;
+#[cfg(test)]
+mod triangular_moving_average_test;
+
+pub use sessions::{Sessions, SessionsValue};
+pub use signal_delay::SignalDelay;
+pub use signed_power::SignedPower;
+pub use simple_moving_average::SimpleMovingAverage;
+pub use squeeze::{Squeeze, SqueezeValue};
+pub use squeeze_pro::{SqueezePro, SqueezeProValue};
+pub use stochastic_oscillator::{StochasticOscillator, StochasticOscillatorValue};
+pub use stochastic_relative_strength_index::{
+    StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue,
+};
+pub use supertrend::{Supertrend, SupertrendValue};
+pub use triangular_moving_average::TriangularMovingAverage;
+
 mod acceleration_bands;
 #[cfg(test)]
 mod acceleration_bands_test;
