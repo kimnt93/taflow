@@ -51,7 +51,7 @@ def compare(actual, expected) -> dict:
     if len(actuals) != len(expecteds):
         return {"passed": False,
                 "error": f"output arity {len(actuals)} != {len(expecteds)}"}
-    nan_mismatches, max_err = 0, 0.0
+    nan_mismatches, infinity_mismatches, max_err = 0, 0, 0.0
     for a, b in zip(actuals, expecteds):
         a = np.asarray(a, dtype=np.float64)
         b = np.asarray(b, dtype=np.float64)
@@ -59,15 +59,20 @@ def compare(actual, expected) -> dict:
             return {"passed": False, "error": f"shape {a.shape}!={b.shape}"}
         nan_a, nan_b = np.isnan(a), np.isnan(b)
         nan_mismatches += int((nan_a != nan_b).sum())
-        both = ~nan_a & ~nan_b
+        inf_a, inf_b = np.isinf(a), np.isinf(b)
+        infinity_mismatches += int(
+            ((inf_a != inf_b) | (inf_a & inf_b & (np.signbit(a) != np.signbit(b)))).sum()
+        )
+        both = np.isfinite(a) & np.isfinite(b)
         if both.any():
             max_err = max(max_err, float(np.max(np.abs(a[both] - b[both]))))
-    passed = nan_mismatches == 0 and all(
-        np.allclose(np.nan_to_num(np.asarray(x, dtype=np.float64)),
-                    np.nan_to_num(np.asarray(y, dtype=np.float64)),
-                    rtol=RTOL, atol=ATOL)
+    passed = nan_mismatches == 0 and infinity_mismatches == 0 and all(
+        np.allclose(np.asarray(x, dtype=np.float64),
+                    np.asarray(y, dtype=np.float64),
+                    rtol=RTOL, atol=ATOL, equal_nan=True)
         for x, y in zip(actuals, expecteds))
     return {"passed": passed, "nan_mismatches": nan_mismatches,
+            "infinity_mismatches": infinity_mismatches,
             "max_abs_error": max_err}
 
 

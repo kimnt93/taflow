@@ -490,15 +490,23 @@ def run_spec(spec: Spec, args, data: dict, env: dict) -> dict:
     scenarios = set(args.scenarios)
     if "correctness" in scenarios:
         oracle = pandas_oracles().get(spec.snake)
+        reference = selected_reference(spec)
         check_spec = spec
         if oracle and not spec.talib_name:
             check_spec = Spec.build(spec.snake, None)
             check_spec.ctor_kwargs.update(oracle["kwargs"])
             check_spec.input_roles = oracle["inputs"]
+        oracle_fn = oracle["oracle"] if oracle else None
+        if not spec.talib_name and not oracle_fn and has_timed_reference(reference):
+            oracle_fn = lambda arrays: external_reference_call(
+                check_spec, arrays, reference
+            )
         report["correctness"] = verify_function(
             check_spec, data, args.correctness_bars,
             min(args.continue_base, args.correctness_bars - 1),
-            oracle_fn=oracle["oracle"] if oracle else None)
+            oracle_fn=oracle_fn)
+        if oracle_fn and reference:
+            report["correctness"]["oracle"] = reference["source"]
     if "vector" in scenarios:
         report["vector"] = vector_rows(spec, data, args.sizes, args.repeats)
     if "warmup" in scenarios:

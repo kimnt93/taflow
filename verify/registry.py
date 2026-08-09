@@ -95,6 +95,9 @@ PARAM_SYNONYMS = {
 # Input domains narrower than a price series.
 INPUT_DOMAIN_OVERRIDES = {"ACOS": "unit", "ASIN": "unit"}
 
+# Canonical-only pointwise operations with a restricted real-valued domain.
+SNAKE_DOMAIN_OVERRIDES = {"math_atanh": "unit"}
+
 # Series-typed constructor/extend parameter names (never mapped as params).
 SERIES_PARAM_NAMES = {
     "_input", "input", "values", "close", "high", "low", "open", "_open",
@@ -209,6 +212,7 @@ class Spec:
             spec.input_roles = tuple(
                 "close" if a in ("_input", "input", "values") else a
                 for a in spec.series_args)
+            spec.domain = SNAKE_DOMAIN_OVERRIDES.get(snake, spec.domain)
         for name, parameter in ctor_params.items():
             if (name not in SERIES_PARAM_NAMES
                     and name not in spec.ctor_kwargs

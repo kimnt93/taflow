@@ -129,9 +129,104 @@ mod macd;
 mod macdext;
 mod macdfix;
 mod mama;
+mod math_abs;
 mod math_operator;
 mod math_price;
-mod math_transform;
+pub use math_abs::MathAbs;
+#[cfg(test)]
+mod math_abs_test;
+mod math_acos;
+pub use math_acos::MathAcos;
+#[cfg(test)]
+mod math_acos_test;
+mod math_acosh;
+pub use math_acosh::MathAcosh;
+#[cfg(test)]
+mod math_acosh_test;
+mod math_asin;
+pub use math_asin::MathAsin;
+#[cfg(test)]
+mod math_asin_test;
+mod math_asinh;
+pub use math_asinh::MathAsinh;
+#[cfg(test)]
+mod math_asinh_test;
+mod math_atan;
+pub use math_atan::MathAtan;
+#[cfg(test)]
+mod math_atan_test;
+mod math_atanh;
+pub use math_atanh::MathAtanh;
+#[cfg(test)]
+mod math_atanh_test;
+mod math_cbrt;
+pub use math_cbrt::MathCbrt;
+#[cfg(test)]
+mod math_cbrt_test;
+mod math_ceil;
+pub use math_ceil::MathCeil;
+#[cfg(test)]
+mod math_ceil_test;
+mod math_cos;
+pub use math_cos::MathCos;
+#[cfg(test)]
+mod math_cos_test;
+mod math_cosh;
+pub use math_cosh::MathCosh;
+#[cfg(test)]
+mod math_cosh_test;
+mod math_cot;
+pub use math_cot::MathCot;
+#[cfg(test)]
+mod math_cot_test;
+mod math_degrees;
+pub use math_degrees::MathDegrees;
+#[cfg(test)]
+mod math_degrees_test;
+mod math_exp;
+pub use math_exp::MathExp;
+#[cfg(test)]
+mod math_exp_test;
+mod math_floor;
+pub use math_floor::MathFloor;
+#[cfg(test)]
+mod math_floor_test;
+mod math_ln;
+pub use math_ln::MathLn;
+#[cfg(test)]
+mod math_ln_test;
+mod math_log10;
+pub use math_log10::MathLog10;
+#[cfg(test)]
+mod math_log10_test;
+mod math_log1p;
+pub use math_log1p::MathLog1p;
+#[cfg(test)]
+mod math_log1p_test;
+mod math_radians;
+pub use math_radians::MathRadians;
+#[cfg(test)]
+mod math_radians_test;
+mod math_sin;
+pub use math_sin::MathSin;
+#[cfg(test)]
+mod math_sin_test;
+mod math_sinh;
+pub use math_sinh::MathSinh;
+#[cfg(test)]
+mod math_sinh_test;
+mod math_sqrt;
+pub use math_sqrt::MathSqrt;
+#[cfg(test)]
+mod math_sqrt_test;
+mod math_tan;
+pub use math_tan::MathTan;
+#[cfg(test)]
+mod math_tan_test;
+mod math_tanh;
+pub use math_tanh::MathTanh;
+#[cfg(test)]
+mod math_tanh_test;
 mod mfi;
 mod minus_di;
 mod minus_dm;
@@ -355,12 +450,7 @@ pub(crate) use mama::mesa_adaptive_moving_average;
 pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
 pub(crate) use math_operator::rolling_sum;
-pub use math_price::{
-    AveragePrice, MathAbs, MathAcos, MathAcosh, MathAsin, MathAsinh, MathAtan, MathAtanh, MathCbrt,
-    MathCeil, MathCos, MathCosh, MathCot, MathDegrees, MathExp, MathFloor, MathLn, MathLog10,
-    MathLog1p, MathRadians, MathSin, MathSinh, MathSqrt, MathTan, MathTanh, MedianPrice,
-    TypicalPrice, WeightedClose,
-};
+pub use math_price::{AveragePrice, MedianPrice, TypicalPrice, WeightedClose};
 #[allow(unused_imports)]
 pub(crate) use mfi::money_flow_index;
 pub use mfi::MoneyFlowIndex;
@@ -771,45 +861,6 @@ mod tests {
         let input: Vec<f64> = (0..40).map(|i| 0.1 + i as f64 / 50.0).collect();
         let other: Vec<f64> = (0..40).map(|i| 1.0 + i as f64 * 0.03).collect();
 
-        macro_rules! check_unary {
-            ($state:ty, $batch:path) => {{
-                let expected = $batch(&input);
-                let mut state = <$state>::new();
-                for (value, expected) in input.iter().zip(expected) {
-                    let actual = state.append(*value).expect("pointwise states are warm");
-                    if expected.is_nan() {
-                        assert!(actual.is_nan());
-                    } else {
-                        assert_eq!(actual, expected);
-                    }
-                }
-            }};
-        }
-        check_unary!(MathAbs, crate::stream::abs);
-        check_unary!(MathAcos, crate::stream::acos);
-        check_unary!(MathAcosh, crate::stream::acosh);
-        check_unary!(MathAsin, crate::stream::asin);
-        check_unary!(MathAsinh, crate::stream::asinh);
-        check_unary!(MathAtan, crate::stream::atan);
-        check_unary!(MathAtanh, crate::stream::atanh);
-        check_unary!(MathCbrt, crate::stream::cbrt);
-        check_unary!(MathCeil, crate::stream::ceil);
-        check_unary!(MathCos, crate::stream::cos);
-        check_unary!(MathCosh, crate::stream::cosh);
-        check_unary!(MathCot, crate::stream::cot);
-        check_unary!(MathDegrees, crate::stream::degrees);
-        check_unary!(MathExp, crate::stream::exp);
-        check_unary!(MathFloor, crate::stream::floor);
-        check_unary!(MathLn, crate::stream::ln);
-        check_unary!(MathLog10, crate::stream::log10);
-        check_unary!(MathLog1p, crate::stream::log1p);
-        check_unary!(MathRadians, crate::stream::radians);
-        check_unary!(MathSin, crate::stream::sin);
-        check_unary!(MathSinh, crate::stream::sinh);
-        check_unary!(MathSqrt, crate::stream::sqrt);
-        check_unary!(MathTan, crate::stream::tan);
-        check_unary!(MathTanh, crate::stream::tanh);
-
         let open = &input;
         let high: Vec<_> = input.iter().map(|value| value + 0.2).collect();
         let low: Vec<_> = input.iter().map(|value| value - 0.1).collect();
@@ -1115,78 +1166,6 @@ mod tests {
         assert_eq!(first, second);
     }
 }
-mod abs;
-#[allow(unused_imports)]
-pub(crate) use abs::abs;
-mod acos;
-#[allow(unused_imports)]
-pub(crate) use acos::acos;
-mod acosh;
-#[allow(unused_imports)]
-pub(crate) use acosh::acosh;
-mod asin;
-#[allow(unused_imports)]
-pub(crate) use asin::asin;
-mod asinh;
-#[allow(unused_imports)]
-pub(crate) use asinh::asinh;
-mod atan;
-#[allow(unused_imports)]
-pub(crate) use atan::atan;
-mod atanh;
-#[allow(unused_imports)]
-pub(crate) use atanh::atanh;
-mod cbrt;
-#[allow(unused_imports)]
-pub(crate) use cbrt::cbrt;
-mod ceil;
-#[allow(unused_imports)]
-pub(crate) use ceil::ceil;
-mod cos;
-#[allow(unused_imports)]
-pub(crate) use cos::cos;
-mod cosh;
-#[allow(unused_imports)]
-pub(crate) use cosh::cosh;
-mod cot;
-#[allow(unused_imports)]
-pub(crate) use cot::cot;
-mod degrees;
-#[allow(unused_imports)]
-pub(crate) use degrees::degrees;
-mod exp;
-#[allow(unused_imports)]
-pub(crate) use exp::exp;
-mod floor;
-#[allow(unused_imports)]
-pub(crate) use floor::floor;
-mod ln;
-#[allow(unused_imports)]
-pub(crate) use ln::ln;
-mod log10;
-#[allow(unused_imports)]
-pub(crate) use log10::log10;
-mod log1p;
-#[allow(unused_imports)]
-pub(crate) use log1p::log1p;
-mod radians;
-#[allow(unused_imports)]
-pub(crate) use radians::radians;
-mod sin;
-#[allow(unused_imports)]
-pub(crate) use sin::sin;
-mod sinh;
-#[allow(unused_imports)]
-pub(crate) use sinh::sinh;
-mod sqrt;
-#[allow(unused_imports)]
-pub(crate) use sqrt::sqrt;
-mod tan;
-#[allow(unused_imports)]
-pub(crate) use tan::tan;
-mod tanh;
-#[allow(unused_imports)]
-pub(crate) use tanh::tanh;
 mod on_balance_volume;
 #[allow(unused_imports)]
 pub(crate) use on_balance_volume::on_balance_volume;

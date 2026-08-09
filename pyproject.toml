@@ -21,6 +21,12 @@ arrow = ["pyarrow>=12"]
 polars = ["polars>=0.20"]
 adapters = ["pyarrow>=12", "polars>=0.20"]
 
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ta-lib>=0.6",
+]
+
 [tool.maturin]
 manifest-path = "crates/taflow-python/Cargo.toml"
 python-source = "python"

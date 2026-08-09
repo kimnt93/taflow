@@ -1,16 +1,16 @@
 {
   "counts": {
-    "benchmark": 169,
-    "complete": 5,
+    "benchmark": 178,
+    "complete": 29,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 547,
+    "rust_exports": 599,
     "smc_functions": 8,
-    "structure": 5,
+    "structure": 29,
     "talib_functions": 161
   },
   "rows": [
@@ -83,7 +83,7 @@
         "StatefulAvgprice"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -97,7 +97,7 @@
         "StatefulMedprice"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -111,7 +111,7 @@
         "StatefulTypprice"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -125,7 +125,7 @@
         "StatefulWclprice"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2549,10 +2549,11 @@
       "name": "MathAbs",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAbs"
+        "MathAbs",
+        "_NativeMathAbs"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2563,10 +2564,11 @@
       "name": "MathAcos",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAcos"
+        "MathAcos",
+        "_NativeMathAcos"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2577,10 +2579,11 @@
       "name": "MathAcosh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAcosh"
+        "MathAcosh",
+        "_NativeMathAcosh"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2591,10 +2594,11 @@
       "name": "MathAsin",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAsin"
+        "MathAsin",
+        "_NativeMathAsin"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2605,10 +2609,11 @@
       "name": "MathAsinh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAsinh"
+        "MathAsinh",
+        "_NativeMathAsinh"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2619,10 +2624,11 @@
       "name": "MathAtan",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAtan"
+        "MathAtan",
+        "_NativeMathAtan"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2633,10 +2639,11 @@
       "name": "MathAtanh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathAtanh"
+        "MathAtanh",
+        "_NativeMathAtanh"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2647,10 +2654,11 @@
       "name": "MathCbrt",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathCbrt"
+        "MathCbrt",
+        "_NativeMathCbrt"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2661,10 +2669,11 @@
       "name": "MathCeil",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathCeil"
+        "MathCeil",
+        "_NativeMathCeil"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2675,10 +2684,11 @@
       "name": "MathCos",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathCos"
+        "MathCos",
+        "_NativeMathCos"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2689,10 +2699,11 @@
       "name": "MathCosh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathCosh"
+        "MathCosh",
+        "_NativeMathCosh"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2703,10 +2714,11 @@
       "name": "MathCot",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathCot"
+        "MathCot",
+        "_NativeMathCot"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2717,10 +2729,11 @@
       "name": "MathDegrees",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathDegrees"
+        "MathDegrees",
+        "_NativeMathDegrees"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2731,10 +2744,11 @@
       "name": "MathExp",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathExp"
+        "MathExp",
+        "_NativeMathExp"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2745,10 +2759,11 @@
       "name": "MathFloor",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathFloor"
+        "MathFloor",
+        "_NativeMathFloor"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2759,10 +2774,11 @@
       "name": "MathLn",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathLn"
+        "MathLn",
+        "_NativeMathLn"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2773,10 +2789,11 @@
       "name": "MathLog10",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathLog10"
+        "MathLog10",
+        "_NativeMathLog10"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2787,10 +2804,11 @@
       "name": "MathLog1p",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathLog1p"
+        "MathLog1p",
+        "_NativeMathLog1p"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2801,10 +2819,11 @@
       "name": "MathRadians",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathRadians"
+        "MathRadians",
+        "_NativeMathRadians"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2815,10 +2834,11 @@
       "name": "MathSin",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathSin"
+        "MathSin",
+        "_NativeMathSin"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2829,10 +2849,11 @@
       "name": "MathSinh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathSinh"
+        "MathSinh",
+        "_NativeMathSinh"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2843,10 +2864,11 @@
       "name": "MathSqrt",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathSqrt"
+        "MathSqrt",
+        "_NativeMathSqrt"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2857,10 +2879,11 @@
       "name": "MathTan",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathTan"
+        "MathTan",
+        "_NativeMathTan"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2871,10 +2894,11 @@
       "name": "MathTanh",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMathTanh"
+        "MathTanh",
+        "_NativeMathTanh"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4506,10 +4530,34 @@
         "LowerLowOperator",
         "LowestSinceOperator",
         "MassIndexOperator",
+        "MathAbs",
+        "MathAcos",
+        "MathAcosh",
         "MathAdd",
+        "MathAsin",
+        "MathAsinh",
+        "MathAtan",
+        "MathAtanh",
+        "MathCbrt",
+        "MathCeil",
+        "MathCos",
+        "MathCosh",
+        "MathCot",
+        "MathDegrees",
         "MathDivide",
+        "MathExp",
+        "MathFloor",
+        "MathLn",
+        "MathLog10",
+        "MathLog1p",
         "MathMultiply",
+        "MathRadians",
+        "MathSin",
+        "MathSinh",
+        "MathSqrt",
         "MathSubtract",
+        "MathTan",
+        "MathTanh",
         "McGinleyDynamicOperator",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
@@ -4591,30 +4639,6 @@
         "StatefulMacdExt",
         "StatefulMacdFix",
         "StatefulMama",
-        "StatefulMathAbs",
-        "StatefulMathAcos",
-        "StatefulMathAcosh",
-        "StatefulMathAsin",
-        "StatefulMathAsinh",
-        "StatefulMathAtan",
-        "StatefulMathAtanh",
-        "StatefulMathCbrt",
-        "StatefulMathCeil",
-        "StatefulMathCos",
-        "StatefulMathCosh",
-        "StatefulMathCot",
-        "StatefulMathDegrees",
-        "StatefulMathExp",
-        "StatefulMathFloor",
-        "StatefulMathLn",
-        "StatefulMathLog10",
-        "StatefulMathLog1p",
-        "StatefulMathRadians",
-        "StatefulMathSin",
-        "StatefulMathSinh",
-        "StatefulMathSqrt",
-        "StatefulMathTan",
-        "StatefulMathTanh",
         "StatefulMax",
         "StatefulMaxindex",
         "StatefulMedprice",
@@ -4812,10 +4836,34 @@
         "LowerLowOperator",
         "LowestSinceOperator",
         "MassIndexOperator",
+        "MathAbs",
+        "MathAcos",
+        "MathAcosh",
         "MathAdd",
+        "MathAsin",
+        "MathAsinh",
+        "MathAtan",
+        "MathAtanh",
+        "MathCbrt",
+        "MathCeil",
+        "MathCos",
+        "MathCosh",
+        "MathCot",
+        "MathDegrees",
         "MathDivide",
+        "MathExp",
+        "MathFloor",
+        "MathLn",
+        "MathLog10",
+        "MathLog1p",
         "MathMultiply",
+        "MathRadians",
+        "MathSin",
+        "MathSinh",
+        "MathSqrt",
         "MathSubtract",
+        "MathTan",
+        "MathTanh",
         "McGinleyDynamicOperator",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
@@ -4897,30 +4945,6 @@
         "StatefulMacdExt",
         "StatefulMacdFix",
         "StatefulMama",
-        "StatefulMathAbs",
-        "StatefulMathAcos",
-        "StatefulMathAcosh",
-        "StatefulMathAsin",
-        "StatefulMathAsinh",
-        "StatefulMathAtan",
-        "StatefulMathAtanh",
-        "StatefulMathCbrt",
-        "StatefulMathCeil",
-        "StatefulMathCos",
-        "StatefulMathCosh",
-        "StatefulMathCot",
-        "StatefulMathDegrees",
-        "StatefulMathExp",
-        "StatefulMathFloor",
-        "StatefulMathLn",
-        "StatefulMathLog10",
-        "StatefulMathLog1p",
-        "StatefulMathRadians",
-        "StatefulMathSin",
-        "StatefulMathSinh",
-        "StatefulMathSqrt",
-        "StatefulMathTan",
-        "StatefulMathTanh",
         "StatefulMax",
         "StatefulMaxindex",
         "StatefulMedprice",

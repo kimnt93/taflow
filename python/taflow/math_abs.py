@@ -1,31 +1,36 @@
-"""Pointwise abs transform."""
+"""Persistent pointwise abs transform."""
 
 from typing import Any
 
 from ._math_state import MathUnaryState
-from ._native import StatefulMathAbs
+from ._native import MathAbs as _NativeMathAbs
 
 
 class MathAbs(MathUnaryState):
-    """Apply the pointwise abs operation in persistent Rust state.
+    """Apply pointwise abs in persistent Rust state.
 
-    Construction accepts a required input series. This class maps to TA-Lib `ABS`; aligned
-    history has no rolling warm-up beyond the native operation's domain rules.
+    Parameters:
+        _input: Required chronological values. Pass an empty series for a fresh
+            streaming state.
+
+    The output is a same-length ``float64`` array with no rolling warm-up.
+    Domain behavior follows IEEE 754. The independent correctness oracle is
+    ``np.abs``.
     """
 
-    _native_cls = StatefulMathAbs
+    _native_cls = _NativeMathAbs
 
     def append(self, _input: float) -> "MathAbs":
-        """Append one observation and return this indicator."""
+        """Append one value and return this indicator."""
         super().append(_input)
         return self
 
     def extend(self, _input: Any) -> "MathAbs":
-        """Append aligned histories and return this indicator."""
+        """Append chronological values and return this indicator."""
         super().extend(_input)
         return self
 
     def reset(self) -> "MathAbs":
-        """Reset native state and return this indicator."""
+        """Restore fresh native state and return this indicator."""
         super().reset()
         return self

@@ -2469,21 +2469,21 @@ impl StatefulMinmaxindex {
 }
 
 macro_rules! unary_state_class {
-    ($class:ident, $inner:ident) => {
+    ($class:ident) => {
         #[pyclass]
         pub struct $class {
-            inner: stream::$inner,
+            inner: stream::$class,
             outputs: Vec<f64>,
         }
 
         #[pymethods]
         impl $class {
             #[new]
-            fn new() -> Self {
-                Self {
-                    inner: stream::$inner::new(),
+            fn new() -> PyResult<Self> {
+                Ok(Self {
+                    inner: stream::$class::new().map_err(py_value_error)?,
                     outputs: Vec::new(),
-                }
+                })
             }
 
             fn append(&mut self, input: f64) -> f64 {
@@ -2498,14 +2498,7 @@ macro_rules! unary_state_class {
             fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
                 let input = input.as_slice()?;
                 let outputs = &mut self.outputs;
-                py.allow_threads(|| {
-                    outputs.extend(
-                        self.inner
-                            .extend(input.iter().copied())
-                            .into_iter()
-                            .map(|value| value.expect("stateless transform is warm")),
-                    )
-                });
+                py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
                 Ok(())
             }
 
@@ -2530,30 +2523,30 @@ macro_rules! unary_state_class {
     };
 }
 
-unary_state_class!(StatefulMathAbs, MathAbs);
-unary_state_class!(StatefulMathAcos, MathAcos);
-unary_state_class!(StatefulMathAcosh, MathAcosh);
-unary_state_class!(StatefulMathAsin, MathAsin);
-unary_state_class!(StatefulMathAsinh, MathAsinh);
-unary_state_class!(StatefulMathAtan, MathAtan);
-unary_state_class!(StatefulMathAtanh, MathAtanh);
-unary_state_class!(StatefulMathCbrt, MathCbrt);
-unary_state_class!(StatefulMathCeil, MathCeil);
-unary_state_class!(StatefulMathCos, MathCos);
-unary_state_class!(StatefulMathCosh, MathCosh);
-unary_state_class!(StatefulMathCot, MathCot);
-unary_state_class!(StatefulMathDegrees, MathDegrees);
-unary_state_class!(StatefulMathExp, MathExp);
-unary_state_class!(StatefulMathFloor, MathFloor);
-unary_state_class!(StatefulMathLn, MathLn);
-unary_state_class!(StatefulMathLog10, MathLog10);
-unary_state_class!(StatefulMathLog1p, MathLog1p);
-unary_state_class!(StatefulMathRadians, MathRadians);
-unary_state_class!(StatefulMathSin, MathSin);
-unary_state_class!(StatefulMathSinh, MathSinh);
-unary_state_class!(StatefulMathSqrt, MathSqrt);
-unary_state_class!(StatefulMathTan, MathTan);
-unary_state_class!(StatefulMathTanh, MathTanh);
+unary_state_class!(MathAbs);
+unary_state_class!(MathAcos);
+unary_state_class!(MathAcosh);
+unary_state_class!(MathAsin);
+unary_state_class!(MathAsinh);
+unary_state_class!(MathAtan);
+unary_state_class!(MathAtanh);
+unary_state_class!(MathCbrt);
+unary_state_class!(MathCeil);
+unary_state_class!(MathCos);
+unary_state_class!(MathCosh);
+unary_state_class!(MathCot);
+unary_state_class!(MathDegrees);
+unary_state_class!(MathExp);
+unary_state_class!(MathFloor);
+unary_state_class!(MathLn);
+unary_state_class!(MathLog10);
+unary_state_class!(MathLog1p);
+unary_state_class!(MathRadians);
+unary_state_class!(MathSin);
+unary_state_class!(MathSinh);
+unary_state_class!(MathSqrt);
+unary_state_class!(MathTan);
+unary_state_class!(MathTanh);
 
 macro_rules! binary_math_state_class {
     ($class:ident) => {

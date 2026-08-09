@@ -1,31 +1,36 @@
-"""Pointwise radians transform."""
+"""Persistent pointwise radians transform."""
 
 from typing import Any
 
 from ._math_state import MathUnaryState
-from ._native import StatefulMathRadians
+from ._native import MathRadians as _NativeMathRadians
 
 
 class MathRadians(MathUnaryState):
-    """Apply the pointwise radians operation in persistent Rust state.
+    """Apply pointwise radians in persistent Rust state.
 
-    Construction accepts a required input series. This class maps to the equivalent Polars expression; aligned
-    history has no rolling warm-up beyond the native operation's domain rules.
+    Parameters:
+        _input: Required chronological values. Pass an empty series for a fresh
+            streaming state.
+
+    The output is a same-length ``float64`` array with no rolling warm-up.
+    Domain behavior follows IEEE 754. The independent correctness oracle is
+    ``np.radians``.
     """
 
-    _native_cls = StatefulMathRadians
+    _native_cls = _NativeMathRadians
 
     def append(self, _input: float) -> "MathRadians":
-        """Append one observation and return this indicator."""
+        """Append one value and return this indicator."""
         super().append(_input)
         return self
 
     def extend(self, _input: Any) -> "MathRadians":
-        """Append aligned histories and return this indicator."""
+        """Append chronological values and return this indicator."""
         super().extend(_input)
         return self
 
     def reset(self) -> "MathRadians":
-        """Reset native state and return this indicator."""
+        """Restore fresh native state and return this indicator."""
         super().reset()
         return self
