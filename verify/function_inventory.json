@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 95,
+    "complete": 105,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 123,
+    "structure": 133,
     "talib_functions": 161
   },
   "rows": [
@@ -242,7 +242,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "hikkake",
+      "module": "candle_hikkake",
       "name": "CandleHikkake",
       "native_binding": true,
       "native_symbols": [
@@ -257,7 +257,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "hikkake_modified",
+      "module": "candle_hikkake_modified",
       "name": "CandleHikkakeModified",
       "native_binding": true,
       "native_symbols": [
@@ -272,7 +272,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "hammer",
+      "module": "candle_hammer",
       "name": "CandleHammer",
       "native_binding": true,
       "native_symbols": [
@@ -392,7 +392,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "stick_sandwich",
+      "module": "candle_stick_sandwich",
       "name": "CandleStickSandwich",
       "native_binding": true,
       "native_symbols": [
@@ -422,7 +422,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "three_black_crows",
+      "module": "candle_three_black_crows",
       "name": "CandleThreeBlackCrows",
       "native_binding": true,
       "native_symbols": [
@@ -437,7 +437,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "three_inside",
+      "module": "candle_three_inside",
       "name": "CandleThreeInside",
       "native_binding": true,
       "native_symbols": [
@@ -452,7 +452,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "three_line_strike",
+      "module": "candle_three_line_strike",
       "name": "CandleThreeLineStrike",
       "native_binding": true,
       "native_symbols": [
@@ -467,7 +467,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "three_stars_in_south",
+      "module": "candle_three_stars_in_south",
       "name": "CandleThreeStarsInSouth",
       "native_binding": true,
       "native_symbols": [
@@ -482,7 +482,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "three_outside",
+      "module": "candle_three_outside",
       "name": "CandleThreeOutside",
       "native_binding": true,
       "native_symbols": [
@@ -497,7 +497,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "two_crows",
+      "module": "candle_two_crows",
       "name": "CandleTwoCrows",
       "native_binding": true,
       "native_symbols": [

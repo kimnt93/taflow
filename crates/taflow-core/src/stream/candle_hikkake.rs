@@ -209,51 +209,59 @@ impl CandleHikkake {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_hikkake(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = 5;
-    if len <= lookback {
-        return Ok(output);
-    }
+impl CandleHikkake {
+    fn batch(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+        let len = validate_ohlc(open, high, low, close)?;
+        let mut output = vec![0i32; len];
+        let lookback = 5;
+        if len <= lookback {
+            return Ok(output);
+        }
 
-    let mut pattern_idx: i32 = -1;
-    let mut pattern_result: i32 = 0;
+        let mut pattern_idx: i32 = -1;
+        let mut pattern_result: i32 = 0;
 
-    // Pre-scan bars before start
-    let start = lookback;
-    for i in (start.saturating_sub(3))..start {
-        if i >= 2 {
-            // Inside bar: 2nd has lower high and higher low than 1st
-            if high[i - 1] < high[i - 2] && low[i - 1] > low[i - 2] {
-                // 3rd bar determines direction
-                if high[i] < high[i - 1] && low[i] < low[i - 1] {
-                    pattern_result = 100; // bullish
-                    pattern_idx = i as i32;
-                } else if high[i] > high[i - 1] && low[i] > low[i - 1] {
-                    pattern_result = -100; // bearish
-                    pattern_idx = i as i32;
+        // Pre-scan bars before start
+        let start = lookback;
+        for i in (start.saturating_sub(3))..start {
+            if i >= 2 {
+                // Inside bar: 2nd has lower high and higher low than 1st
+                if high[i - 1] < high[i - 2] && low[i - 1] > low[i - 2] {
+                    // 3rd bar determines direction
+                    if high[i] < high[i - 1] && low[i] < low[i - 1] {
+                        pattern_result = 100; // bullish
+                        pattern_idx = i as i32;
+                    } else if high[i] > high[i - 1] && low[i] > low[i - 1] {
+                        pattern_result = -100; // bearish
+                        pattern_idx = i as i32;
+                    }
                 }
             }
         }
-    }
 
-    for i in start..len {
-        if i >= 2 && high[i - 1] < high[i - 2] && low[i - 1] > low[i - 2] {
-            // Inside bar found at i-1,i-2
-            if high[i] < high[i - 1] && low[i] < low[i - 1] {
-                pattern_result = 100;
-                pattern_idx = i as i32;
-                output[i] = pattern_result;
-            } else if high[i] > high[i - 1] && low[i] > low[i - 1] {
-                pattern_result = -100;
-                pattern_idx = i as i32;
-                output[i] = pattern_result;
+        for i in start..len {
+            if i >= 2 && high[i - 1] < high[i - 2] && low[i - 1] > low[i - 2] {
+                // Inside bar found at i-1,i-2
+                if high[i] < high[i - 1] && low[i] < low[i - 1] {
+                    pattern_result = 100;
+                    pattern_idx = i as i32;
+                    output[i] = pattern_result;
+                } else if high[i] > high[i - 1] && low[i] > low[i - 1] {
+                    pattern_result = -100;
+                    pattern_idx = i as i32;
+                    output[i] = pattern_result;
+                } else {
+                    // Check confirmation
+                    if pattern_idx >= 0 && (i as i32 - pattern_idx) <= 3 {
+                        if pattern_result > 0 && close[i] > high[pattern_idx as usize - 1] {
+                            output[i] = pattern_result + 100;
+                            pattern_idx = -1;
+                        } else if pattern_result < 0 && close[i] < low[pattern_idx as usize - 1] {
+                            output[i] = pattern_result - 100;
+                            pattern_idx = -1;
+                        }
+                    }
+                }
             } else {
                 // Check confirmation
                 if pattern_idx >= 0 && (i as i32 - pattern_idx) <= 3 {
@@ -266,42 +274,7 @@ pub fn candle_hikkake(
                     }
                 }
             }
-        } else {
-            // Check confirmation
-            if pattern_idx >= 0 && (i as i32 - pattern_idx) <= 3 {
-                if pattern_result > 0 && close[i] > high[pattern_idx as usize - 1] {
-                    output[i] = pattern_result + 100;
-                    pattern_idx = -1;
-                } else if pattern_result < 0 && close[i] < low[pattern_idx as usize - 1] {
-                    output[i] = pattern_result - 100;
-                    pattern_idx = -1;
-                }
-            }
         }
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let open = vec![10.; 15];
-        let high = vec![
-            12., 11., 10., 11., 12., 13., 12., 11., 10., 11., 12., 13., 14., 15., 16.,
-        ];
-        let low = vec![
-            8., 9., 8., 7., 6., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14.,
-        ];
-        let close = high.clone();
-        let e = crate::stream::candle_hikkake(&open, &high, &low, &close).unwrap();
-        let mut s = CandleHikkake::new();
-        for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
-        {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
-        }
+        Ok(output)
     }
 }

@@ -40,80 +40,77 @@ impl Candle {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_three_line_strike(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = NEAR.avg_period + 3;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut near_sum = [0.0f64; 4];
-    let start = lookback;
-    // Init near sums for bars i-3 and i-2
-    for k in [2usize, 3] {
-        let bar = start - k;
-        if bar >= NEAR.avg_period {
-            for j in (bar - NEAR.avg_period)..bar {
-                near_sum[k] += cr_highlow(open, high, low, close, j);
-            }
+impl CandleThreeLineStrike {
+    fn batch(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+        let len = validate_ohlc(open, high, low, close)?;
+        let mut output = vec![0i32; len];
+        let lookback = NEAR.avg_period + 3;
+        if len <= lookback {
+            return Ok(output);
         }
-    }
 
-    for i in start..len {
-        let c3 = candle_color(open[i - 3], close[i - 3]);
-        let c2 = candle_color(open[i - 2], close[i - 2]);
-        let c1 = candle_color(open[i - 1], close[i - 1]);
-        let c0 = candle_color(open[i], close[i]);
-
-        if c3 == c2 && c2 == c1 && c0 != c1 {
-            // Three same-color, 4th opposite
-            let progressive = if c3 == 1 {
-                close[i - 2] > close[i - 3] && close[i - 1] > close[i - 2]
-            } else {
-                close[i - 2] < close[i - 3] && close[i - 1] < close[i - 2]
-            };
-            let opens_near = if c3 == 1 {
-                open[i - 2] >= open[i - 3].min(close[i - 3])
-                    && open[i - 2]
-                        <= close[i - 3]
-                            + ca_highlow(NEAR, near_sum[3], open, high, low, close, i - 3)
-                    && open[i - 1] >= open[i - 2].min(close[i - 2])
-                    && open[i - 1]
-                        <= close[i - 2]
-                            + ca_highlow(NEAR, near_sum[2], open, high, low, close, i - 2)
-            } else {
-                open[i - 2] <= open[i - 3].max(close[i - 3])
-                    && open[i - 2]
-                        >= close[i - 3]
-                            - ca_highlow(NEAR, near_sum[3], open, high, low, close, i - 3)
-                    && open[i - 1] <= open[i - 2].max(close[i - 2])
-                    && open[i - 1]
-                        >= close[i - 2]
-                            - ca_highlow(NEAR, near_sum[2], open, high, low, close, i - 2)
-            };
-            let strike = if c3 == 1 {
-                open[i] >= close[i - 1] && close[i] <= open[i - 3]
-            } else {
-                open[i] <= close[i - 1] && close[i] >= open[i - 3]
-            };
-            output[i] = (progressive && opens_near && strike) as i32 * c3 * 100;
-        }
-        // Update near sums
+        let mut near_sum = [0.0f64; 4];
+        let start = lookback;
+        // Init near sums for bars i-3 and i-2
         for k in [2usize, 3] {
-            let bar = i - k;
-            if bar >= NEAR.avg_period && NEAR.avg_period > 0 {
-                near_sum[k] += cr_highlow(open, high, low, close, bar)
-                    - cr_highlow(open, high, low, close, bar - NEAR.avg_period);
+            let bar = start - k;
+            if bar >= NEAR.avg_period {
+                for j in (bar - NEAR.avg_period)..bar {
+                    near_sum[k] += cr_highlow(open, high, low, close, j);
+                }
             }
         }
+
+        for i in start..len {
+            let c3 = candle_color(open[i - 3], close[i - 3]);
+            let c2 = candle_color(open[i - 2], close[i - 2]);
+            let c1 = candle_color(open[i - 1], close[i - 1]);
+            let c0 = candle_color(open[i], close[i]);
+
+            if c3 == c2 && c2 == c1 && c0 != c1 {
+                // Three same-color, 4th opposite
+                let progressive = if c3 == 1 {
+                    close[i - 2] > close[i - 3] && close[i - 1] > close[i - 2]
+                } else {
+                    close[i - 2] < close[i - 3] && close[i - 1] < close[i - 2]
+                };
+                let opens_near = if c3 == 1 {
+                    open[i - 2] >= open[i - 3].min(close[i - 3])
+                        && open[i - 2]
+                            <= close[i - 3]
+                                + ca_highlow(NEAR, near_sum[3], open, high, low, close, i - 3)
+                        && open[i - 1] >= open[i - 2].min(close[i - 2])
+                        && open[i - 1]
+                            <= close[i - 2]
+                                + ca_highlow(NEAR, near_sum[2], open, high, low, close, i - 2)
+                } else {
+                    open[i - 2] <= open[i - 3].max(close[i - 3])
+                        && open[i - 2]
+                            >= close[i - 3]
+                                - ca_highlow(NEAR, near_sum[3], open, high, low, close, i - 3)
+                        && open[i - 1] <= open[i - 2].max(close[i - 2])
+                        && open[i - 1]
+                            >= close[i - 2]
+                                - ca_highlow(NEAR, near_sum[2], open, high, low, close, i - 2)
+                };
+                let strike = if c3 == 1 {
+                    open[i] >= close[i - 1] && close[i] <= open[i - 3]
+                } else {
+                    open[i] <= close[i - 1] && close[i] >= open[i - 3]
+                };
+                output[i] = (progressive && opens_near && strike) as i32 * c3 * 100;
+            }
+            // Update near sums
+            for k in [2usize, 3] {
+                let bar = i - k;
+                if bar >= NEAR.avg_period && NEAR.avg_period > 0 {
+                    near_sum[k] += cr_highlow(open, high, low, close, bar)
+                        - cr_highlow(open, high, low, close, bar - NEAR.avg_period);
+                }
+            }
+        }
+        Ok(output)
     }
-    Ok(output)
 }
 /// Incremental CDL3LINESTRIKE state.
 /// Persistent Rust state or aligned output type for `CandleThreeLineStrike`.
@@ -243,7 +240,7 @@ impl CandleThreeLineStrike {
             }
             return Ok(());
         }
-        let scores = candle_three_line_strike(open, high, low, close)?;
+        let scores = Self::batch(open, high, low, close)?;
         output.extend_from_slice(&scores);
         // Every field of this state is a function of the last `BULK_REPLAY_BARS`
         // bars at most (deepest candle window is 10-bar average + 4 offset), so
@@ -269,25 +266,5 @@ impl CandleThreeLineStrike {
         self.candles.clear();
         self.near_sum = [0.0; 2];
         self.value = None;
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let open: Vec<f64> = (0..30).map(|i| 100. + i as f64 * 0.1).collect();
-        let high: Vec<f64> = open.iter().map(|x| x + 2.).collect();
-        let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
-        let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
-        let e = crate::stream::candle_three_line_strike(&open, &high, &low, &close).unwrap();
-        let mut s = CandleThreeLineStrike::new();
-        for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
-        {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
-        }
     }
 }

@@ -148,7 +148,7 @@ impl CandleThreeStarsInSouth {
             }
             return Ok(());
         }
-        let scores = candle_three_stars_in_south(open, high, low, close)?;
+        let scores = Self::batch(open, high, low, close)?;
         output.extend_from_slice(&scores);
         // Every field of this state is a function of the last `BULK_REPLAY_BARS`
         // bars at most (deepest candle window is 10-bar average + 4 offset), so
@@ -200,49 +200,45 @@ impl CandleThreeStarsInSouth {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_three_stars_in_south(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = *[
-        SHADOW_VERY_SHORT.avg_period,
-        SHADOW_LONG.avg_period,
-        BODY_LONG.avg_period,
-        BODY_SHORT.avg_period,
-    ]
-    .iter()
-    .max()
-    .unwrap()
-        + 2;
-    if len <= lookback {
-        return Ok(output);
-    }
+impl CandleThreeStarsInSouth {
+    fn batch(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+        let len = validate_ohlc(open, high, low, close)?;
+        let mut output = vec![0i32; len];
+        let lookback = *[
+            SHADOW_VERY_SHORT.avg_period,
+            SHADOW_LONG.avg_period,
+            BODY_LONG.avg_period,
+            BODY_SHORT.avg_period,
+        ]
+        .iter()
+        .max()
+        .unwrap()
+            + 2;
+        if len <= lookback {
+            return Ok(output);
+        }
 
-    let mut body_long_sum = 0.0;
-    let shadow_long_sum = 0.0;
-    let mut shadow_vs_sum = [0.0f64; 2]; // for 2nd and 3rd candles
-    let mut body_short_sum = 0.0;
-    let start = lookback;
-    for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
-        body_long_sum += cr_realbody(open, high, low, close, i);
-    }
-    // SHADOW_LONG avg_period = 0, no init
-    for i in (start - 1 - SHADOW_VERY_SHORT.avg_period)..(start - 1) {
-        shadow_vs_sum[0] += cr_highlow(open, high, low, close, i);
-    }
-    for i in (start - SHADOW_VERY_SHORT.avg_period)..start {
-        shadow_vs_sum[1] += cr_highlow(open, high, low, close, i);
-    }
-    for i in (start - BODY_SHORT.avg_period)..start {
-        body_short_sum += cr_realbody(open, high, low, close, i);
-    }
+        let mut body_long_sum = 0.0;
+        let shadow_long_sum = 0.0;
+        let mut shadow_vs_sum = [0.0f64; 2]; // for 2nd and 3rd candles
+        let mut body_short_sum = 0.0;
+        let start = lookback;
+        for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
+            body_long_sum += cr_realbody(open, high, low, close, i);
+        }
+        // SHADOW_LONG avg_period = 0, no init
+        for i in (start - 1 - SHADOW_VERY_SHORT.avg_period)..(start - 1) {
+            shadow_vs_sum[0] += cr_highlow(open, high, low, close, i);
+        }
+        for i in (start - SHADOW_VERY_SHORT.avg_period)..start {
+            shadow_vs_sum[1] += cr_highlow(open, high, low, close, i);
+        }
+        for i in (start - BODY_SHORT.avg_period)..start {
+            body_short_sum += cr_realbody(open, high, low, close, i);
+        }
 
-    for i in start..len {
-        output[i] = (candle_color(open[i-2], close[i-2]) == -1
+        for i in start..len {
+            output[i] = (candle_color(open[i-2], close[i-2]) == -1
             && candle_color(open[i-1], close[i-1]) == -1
             && candle_color(open[i], close[i]) == -1
             // 1st: long body, long lower shadow
@@ -257,35 +253,16 @@ pub fn candle_three_stars_in_south(
             && upper_shadow(open[i], high[i], close[i]) < ca_highlow(SHADOW_VERY_SHORT, shadow_vs_sum[1], open, high, low, close, i)
             && lower_shadow(open[i], low[i], close[i]) < ca_highlow(SHADOW_VERY_SHORT, shadow_vs_sum[1], open, high, low, close, i)
             && low[i] > low[i-1] && high[i] < high[i-1]) as i32
-            * 100;
-        body_long_sum += cr_realbody(open, high, low, close, i - 2)
-            - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
-        shadow_vs_sum[0] += cr_highlow(open, high, low, close, i - 1)
-            - cr_highlow(open, high, low, close, i - 1 - SHADOW_VERY_SHORT.avg_period);
-        shadow_vs_sum[1] += cr_highlow(open, high, low, close, i)
-            - cr_highlow(open, high, low, close, i - SHADOW_VERY_SHORT.avg_period);
-        body_short_sum += cr_realbody(open, high, low, close, i)
-            - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let open: Vec<f64> = (0..30).map(|i| 100. + i as f64 * 0.1).collect();
-        let high: Vec<f64> = open.iter().map(|x| x + 2.).collect();
-        let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
-        let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
-        let e = crate::stream::candle_three_stars_in_south(&open, &high, &low, &close).unwrap();
-        let mut s = CandleThreeStarsInSouth::new();
-        for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
-        {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
+                * 100;
+            body_long_sum += cr_realbody(open, high, low, close, i - 2)
+                - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
+            shadow_vs_sum[0] += cr_highlow(open, high, low, close, i - 1)
+                - cr_highlow(open, high, low, close, i - 1 - SHADOW_VERY_SHORT.avg_period);
+            shadow_vs_sum[1] += cr_highlow(open, high, low, close, i)
+                - cr_highlow(open, high, low, close, i - SHADOW_VERY_SHORT.avg_period);
+            body_short_sum += cr_realbody(open, high, low, close, i)
+                - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
         }
+        Ok(output)
     }
 }

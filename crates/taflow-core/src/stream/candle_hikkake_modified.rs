@@ -251,102 +251,79 @@ impl CandleHikkakeModified {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_hikkake_modified(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    // C TA-Lib: lookback = max(1, TA_CandleAvgPeriod(Near)) + 5
-    let lookback = 1_usize.max(NEAR.avg_period) + 5;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    // Initialize Near sum for bar (start - 3), i.e. the "2nd candle" at start
-    let mut near_sum = 0.0;
-    // The first evaluated fourth candle is `lookback`; its second candle is
-    // two bars earlier, and Near averages the five bars immediately before it.
-    let near_bar = lookback - 2;
-    if NEAR.avg_period > 0 && near_bar >= NEAR.avg_period {
-        for j in (near_bar - NEAR.avg_period)..near_bar {
-            near_sum += cr_highlow(open, high, low, close, j);
+impl CandleHikkakeModified {
+    fn batch(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+        let len = validate_ohlc(open, high, low, close)?;
+        let mut output = vec![0i32; len];
+        // C TA-Lib: lookback = max(1, TA_CandleAvgPeriod(Near)) + 5
+        let lookback = 1_usize.max(NEAR.avg_period) + 5;
+        if len <= lookback {
+            return Ok(output);
         }
-    }
 
-    let mut pattern_idx: i32 = -10; // no active pattern
-    let mut pattern_result: i32 = 0;
+        // Initialize Near sum for bar (start - 3), i.e. the "2nd candle" at start
+        let mut near_sum = 0.0;
+        // The first evaluated fourth candle is `lookback`; its second candle is
+        // two bars earlier, and Near averages the five bars immediately before it.
+        let near_bar = lookback - 2;
+        if NEAR.avg_period > 0 && near_bar >= NEAR.avg_period {
+            for j in (near_bar - NEAR.avg_period)..near_bar {
+                near_sum += cr_highlow(open, high, low, close, j);
+            }
+        }
 
-    for i in lookback..len {
-        // C TA-Lib indices: i is current bar
-        // Pattern: bar[i-3] contains bar[i-2], bar[i-2] contains bar[i-1]
-        // Then bar[i] breaks out
-        let mut new_pattern = false;
-        if high[i-1] < high[i-2] && low[i-1] > low[i-2]   // bar[i-1] inside bar[i-2]
+        let mut pattern_idx: i32 = -10; // no active pattern
+        let mut pattern_result: i32 = 0;
+
+        for i in lookback..len {
+            // C TA-Lib indices: i is current bar
+            // Pattern: bar[i-3] contains bar[i-2], bar[i-2] contains bar[i-1]
+            // Then bar[i] breaks out
+            let mut new_pattern = false;
+            if high[i-1] < high[i-2] && low[i-1] > low[i-2]   // bar[i-1] inside bar[i-2]
             && high[i-2] < high[i-3] && low[i-2] > low[i-3]
-        // bar[i-2] inside bar[i-3]
-        {
-            let near_avg = ca_highlow(NEAR, near_sum, open, high, low, close, i - 2);
-            // Bullish: bar[i] breaks down (lower high AND lower low)
-            if high[i] < high[i-1] && low[i] < low[i-1]
+            // bar[i-2] inside bar[i-3]
+            {
+                let near_avg = ca_highlow(NEAR, near_sum, open, high, low, close, i - 2);
+                // Bullish: bar[i] breaks down (lower high AND lower low)
+                if high[i] < high[i-1] && low[i] < low[i-1]
                 // 2nd bar close near the low
                 && close[i-2] <= low[i-2] + near_avg
-            {
-                pattern_result = 100;
-                pattern_idx = i as i32;
-                output[i] = pattern_result;
-                new_pattern = true;
-            }
-            // Bearish: bar[i] breaks up (higher high AND higher low)
-            else if high[i] > high[i-1] && low[i] > low[i-1]
+                {
+                    pattern_result = 100;
+                    pattern_idx = i as i32;
+                    output[i] = pattern_result;
+                    new_pattern = true;
+                }
+                // Bearish: bar[i] breaks up (higher high AND higher low)
+                else if high[i] > high[i-1] && low[i] > low[i-1]
                 // 2nd bar close near the high
                 && close[i-2] >= high[i-2] - near_avg
-            {
-                pattern_result = -100;
-                pattern_idx = i as i32;
-                output[i] = pattern_result;
-                new_pattern = true;
+                {
+                    pattern_result = -100;
+                    pattern_idx = i as i32;
+                    output[i] = pattern_result;
+                    new_pattern = true;
+                }
             }
-        }
 
-        // Confirmation: within 3 bars of pattern
-        if !new_pattern && pattern_idx >= 0 && (i as i32) <= pattern_idx + 3 {
-            if pattern_result > 0 && close[i] > high[(pattern_idx - 1) as usize] {
-                output[i] = pattern_result + 100;
-                pattern_idx = -10;
-            } else if pattern_result < 0 && close[i] < low[(pattern_idx - 1) as usize] {
-                output[i] = pattern_result - 100;
-                pattern_idx = -10;
+            // Confirmation: within 3 bars of pattern
+            if !new_pattern && pattern_idx >= 0 && (i as i32) <= pattern_idx + 3 {
+                if pattern_result > 0 && close[i] > high[(pattern_idx - 1) as usize] {
+                    output[i] = pattern_result + 100;
+                    pattern_idx = -10;
+                } else if pattern_result < 0 && close[i] < low[(pattern_idx - 1) as usize] {
+                    output[i] = pattern_result - 100;
+                    pattern_idx = -10;
+                }
             }
-        }
 
-        // Update Near sum (for the "2nd bar" position, which is i-2)
-        if NEAR.avg_period > 0 && (i - 2) >= NEAR.avg_period {
-            near_sum += cr_highlow(open, high, low, close, i - 2)
-                - cr_highlow(open, high, low, close, i - 2 - NEAR.avg_period);
-        }
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let open = vec![10.; 20];
-        let high: Vec<f64> = (0..20).map(|i| 20. - i as f64 * 0.2).collect();
-        let low: Vec<f64> = (0..20).map(|i| i as f64 * 0.1).collect();
-        let close = high.clone();
-        let e = crate::stream::candle_hikkake_modified(&open, &high, &low, &close).unwrap();
-        let mut s = CandleHikkakeModified::new();
-        for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
-        {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
+            // Update Near sum (for the "2nd bar" position, which is i-2)
+            if NEAR.avg_period > 0 && (i - 2) >= NEAR.avg_period {
+                near_sum += cr_highlow(open, high, low, close, i - 2)
+                    - cr_highlow(open, high, low, close, i - 2 - NEAR.avg_period);
             }
         }
+        Ok(output)
     }
 }

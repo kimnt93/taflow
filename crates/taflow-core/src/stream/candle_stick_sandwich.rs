@@ -122,7 +122,7 @@ impl CandleStickSandwich {
             }
             return Ok(());
         }
-        let scores = candle_stick_sandwich(open, high, low, close)?;
+        let scores = Self::batch(open, high, low, close)?;
         output.extend_from_slice(&scores);
         // Every field of this state is a function of the last `BULK_REPLAY_BARS`
         // bars at most (deepest candle window is 10-bar average + 4 offset), so
@@ -172,56 +172,33 @@ impl CandleStickSandwich {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_stick_sandwich(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = EQUAL.avg_period + 2;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut equal_sum = 0.0;
-    let start = lookback;
-    for i in (start - 2 - EQUAL.avg_period)..(start - 2) {
-        equal_sum += cr_highlow(open, high, low, close, i);
-    }
-
-    for i in start..len {
-        output[i] = (candle_color(open[i - 2], close[i - 2]) == -1
-            && candle_color(open[i - 1], close[i - 1]) == 1
-            && candle_color(open[i], close[i]) == -1
-            && low[i - 1] > close[i - 2]
-            && (close[i] - close[i - 2]).abs()
-                <= ca_highlow(EQUAL, equal_sum, open, high, low, close, i - 2))
-            as i32
-            * 100;
-        equal_sum += cr_highlow(open, high, low, close, i - 2)
-            - cr_highlow(open, high, low, close, i - 2 - EQUAL.avg_period);
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let open: Vec<f64> = (0..30).map(|i| 100. + i as f64 * 0.1).collect();
-        let high: Vec<f64> = open.iter().map(|x| x + 2.).collect();
-        let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
-        let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
-        let e = crate::stream::candle_stick_sandwich(&open, &high, &low, &close).unwrap();
-        let mut s = CandleStickSandwich::new();
-        for (((&o, &h), &l), (&c, &e)) in open.iter().zip(&high).zip(&low).zip(close.iter().zip(&e))
-        {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
+impl CandleStickSandwich {
+    fn batch(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+        let len = validate_ohlc(open, high, low, close)?;
+        let mut output = vec![0i32; len];
+        let lookback = EQUAL.avg_period + 2;
+        if len <= lookback {
+            return Ok(output);
         }
+
+        let mut equal_sum = 0.0;
+        let start = lookback;
+        for i in (start - 2 - EQUAL.avg_period)..(start - 2) {
+            equal_sum += cr_highlow(open, high, low, close, i);
+        }
+
+        for i in start..len {
+            output[i] = (candle_color(open[i - 2], close[i - 2]) == -1
+                && candle_color(open[i - 1], close[i - 1]) == 1
+                && candle_color(open[i], close[i]) == -1
+                && low[i - 1] > close[i - 2]
+                && (close[i] - close[i - 2]).abs()
+                    <= ca_highlow(EQUAL, equal_sum, open, high, low, close, i - 2))
+                as i32
+                * 100;
+            equal_sum += cr_highlow(open, high, low, close, i - 2)
+                - cr_highlow(open, high, low, close, i - 2 - EQUAL.avg_period);
+        }
+        Ok(output)
     }
 }

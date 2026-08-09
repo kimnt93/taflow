@@ -16,9 +16,9 @@ from ..long_line import CandleLongLine
 from ..doji_star import CandleDojiStar
 from ..belt_hold import CandleBeltHold
 from ..engulfing import CandleEngulfing
-from ..hammer import CandleHammer
-from ..hikkake import CandleHikkake
-from ..hikkake_modified import CandleHikkakeModified
+from ..candle_hammer import CandleHammer
+from ..candle_hikkake import CandleHikkake
+from ..candle_hikkake_modified import CandleHikkakeModified
 from ..exponential_moving_average import ExponentialMovingAverage
 from ..hilbert_transform_dominant_cycle_period import (
     HilbertTransformDominantCyclePeriod,
@@ -33,13 +33,13 @@ from ..minus_directional_movement import MinusDirectionalMovement
 from ..plus_directional_indicator import PlusDirectionalIndicator
 from ..plus_directional_movement import PlusDirectionalMovement
 from ..triple_exponential_rate_of_change import TripleExponentialRateOfChange
-from ..stick_sandwich import CandleStickSandwich
-from ..three_black_crows import CandleThreeBlackCrows
-from ..three_inside import CandleThreeInside
-from ..three_line_strike import CandleThreeLineStrike
-from ..three_stars_in_south import CandleThreeStarsInSouth
-from ..three_outside import CandleThreeOutside
-from ..two_crows import CandleTwoCrows
+from ..candle_stick_sandwich import CandleStickSandwich
+from ..candle_three_black_crows import CandleThreeBlackCrows
+from ..candle_three_inside import CandleThreeInside
+from ..candle_three_line_strike import CandleThreeLineStrike
+from ..candle_three_stars_in_south import CandleThreeStarsInSouth
+from ..candle_three_outside import CandleThreeOutside
+from ..candle_two_crows import CandleTwoCrows
 from ..ultimate_oscillator import UltimateOscillator
 from ..up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
 from ..three_white_soldiers import CandleThreeWhiteSoldiers

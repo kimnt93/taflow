@@ -128,7 +128,7 @@ impl CandleThreeInside {
             }
             return Ok(());
         }
-        let scores = candle_three_inside(open, high, low, close)?;
+        let scores = Self::batch(open, high, low, close)?;
         output.extend_from_slice(&scores);
         // Every field of this state is a function of the last `BULK_REPLAY_BARS`
         // bars at most (deepest candle window is 10-bar average + 4 offset), so
@@ -179,72 +179,45 @@ impl CandleThreeInside {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_three_inside(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = BODY_SHORT.avg_period.max(BODY_LONG.avg_period) + 2;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut body_long_sum = 0.0;
-    let mut body_short_sum = 0.0;
-    let start = lookback;
-    for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
-        body_long_sum += cr_realbody(open, high, low, close, i);
-    }
-    for i in (start - 1 - BODY_SHORT.avg_period)..(start - 1) {
-        body_short_sum += cr_realbody(open, high, low, close, i);
-    }
-
-    for i in start..len {
-        output[i] = (real_body(open[i - 2], close[i - 2])
-            > ca_realbody(BODY_LONG, body_long_sum, open, high, low, close, i - 2)
-            && real_body(open[i - 1], close[i - 1])
-                <= ca_realbody(BODY_SHORT, body_short_sum, open, high, low, close, i - 1)
-            && open[i - 1].max(close[i - 1]) < open[i - 2].max(close[i - 2])
-            && open[i - 1].min(close[i - 1]) > open[i - 2].min(close[i - 2])
-            && ((candle_color(open[i - 2], close[i - 2]) == 1
-                && candle_color(open[i], close[i]) == -1
-                && close[i] < open[i - 2])
-                || (candle_color(open[i - 2], close[i - 2]) == -1
-                    && candle_color(open[i], close[i]) == 1
-                    && close[i] > open[i - 2]))) as i32
-            * -candle_color(open[i - 2], close[i - 2])
-            * 100;
-        body_long_sum += cr_realbody(open, high, low, close, i - 2)
-            - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
-        body_short_sum += cr_realbody(open, high, low, close, i - 1)
-            - cr_realbody(open, high, low, close, i - 1 - BODY_SHORT.avg_period);
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let open: Vec<f64> = (0..40).map(|i| 100. + i as f64 * 0.2).collect();
-        let high: Vec<f64> = open.iter().map(|x| x + 2.).collect();
-        let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
-        let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
-        let expected = crate::stream::candle_three_inside(&open, &high, &low, &close).unwrap();
-        let mut s = CandleThreeInside::new();
-        for (((&o, &h), &l), (&c, &e)) in open
-            .iter()
-            .zip(&high)
-            .zip(&low)
-            .zip(close.iter().zip(&expected))
-        {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
+impl CandleThreeInside {
+    fn batch(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+        let len = validate_ohlc(open, high, low, close)?;
+        let mut output = vec![0i32; len];
+        let lookback = BODY_SHORT.avg_period.max(BODY_LONG.avg_period) + 2;
+        if len <= lookback {
+            return Ok(output);
         }
+
+        let mut body_long_sum = 0.0;
+        let mut body_short_sum = 0.0;
+        let start = lookback;
+        for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
+            body_long_sum += cr_realbody(open, high, low, close, i);
+        }
+        for i in (start - 1 - BODY_SHORT.avg_period)..(start - 1) {
+            body_short_sum += cr_realbody(open, high, low, close, i);
+        }
+
+        for i in start..len {
+            output[i] = (real_body(open[i - 2], close[i - 2])
+                > ca_realbody(BODY_LONG, body_long_sum, open, high, low, close, i - 2)
+                && real_body(open[i - 1], close[i - 1])
+                    <= ca_realbody(BODY_SHORT, body_short_sum, open, high, low, close, i - 1)
+                && open[i - 1].max(close[i - 1]) < open[i - 2].max(close[i - 2])
+                && open[i - 1].min(close[i - 1]) > open[i - 2].min(close[i - 2])
+                && ((candle_color(open[i - 2], close[i - 2]) == 1
+                    && candle_color(open[i], close[i]) == -1
+                    && close[i] < open[i - 2])
+                    || (candle_color(open[i - 2], close[i - 2]) == -1
+                        && candle_color(open[i], close[i]) == 1
+                        && close[i] > open[i - 2]))) as i32
+                * -candle_color(open[i - 2], close[i - 2])
+                * 100;
+            body_long_sum += cr_realbody(open, high, low, close, i - 2)
+                - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
+            body_short_sum += cr_realbody(open, high, low, close, i - 1)
+                - cr_realbody(open, high, low, close, i - 1 - BODY_SHORT.avg_period);
+        }
+        Ok(output)
     }
 }

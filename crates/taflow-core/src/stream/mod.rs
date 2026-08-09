@@ -53,12 +53,6 @@ mod average_directional_index_test;
 mod bollinger_bands;
 #[cfg(test)]
 mod bollinger_bands_test;
-mod candle_2crows;
-mod candle_3blackcrows;
-mod candle_3inside;
-mod candle_3linestrike;
-mod candle_3outside;
-mod candle_3starsinsouth;
 mod candle_3whitesoldiers;
 mod candle_abandonedbaby;
 mod candle_advanceblock;
@@ -77,12 +71,18 @@ mod candle_eveningstar;
 mod candle_gapsidesidewhite;
 mod candle_gravestonedoji;
 mod candle_hammer;
+#[cfg(test)]
+mod candle_hammer_test;
 mod candle_hangingman;
 mod candle_harami;
 mod candle_haramicross;
 mod candle_highwave;
 mod candle_hikkake;
-mod candle_hikkakemod;
+mod candle_hikkake_modified;
+#[cfg(test)]
+mod candle_hikkake_modified_test;
+#[cfg(test)]
+mod candle_hikkake_test;
 mod candle_homingpigeon;
 mod candle_identical3crows;
 mod candle_inneck;
@@ -106,11 +106,31 @@ mod candle_shootingstar;
 mod candle_shortline;
 mod candle_spinningtop;
 mod candle_stalledpattern;
-mod candle_sticksandwich;
+mod candle_stick_sandwich;
+#[cfg(test)]
+mod candle_stick_sandwich_test;
 mod candle_takuri;
 mod candle_tasukigap;
+mod candle_three_black_crows;
+#[cfg(test)]
+mod candle_three_black_crows_test;
+mod candle_three_inside;
+#[cfg(test)]
+mod candle_three_inside_test;
+mod candle_three_line_strike;
+#[cfg(test)]
+mod candle_three_line_strike_test;
+mod candle_three_outside;
+#[cfg(test)]
+mod candle_three_outside_test;
+mod candle_three_stars_in_south;
+#[cfg(test)]
+mod candle_three_stars_in_south_test;
 mod candle_thrusting;
 mod candle_tristar;
+mod candle_two_crows;
+#[cfg(test)]
+mod candle_two_crows_test;
 mod candle_unique3river;
 mod candle_upsidegap2crows;
 mod candle_xsidegap3methods;
@@ -439,12 +459,6 @@ pub use average_directional_index::AverageDirectionalIndex;
 
 #[allow(unused_imports)]
 pub use bollinger_bands::{BollingerBands, BollingerBandsValue};
-pub use candle_2crows::CandleTwoCrows;
-pub use candle_3blackcrows::CandleThreeBlackCrows;
-pub use candle_3inside::CandleThreeInside;
-pub use candle_3linestrike::CandleThreeLineStrike;
-pub use candle_3outside::CandleThreeOutside;
-pub use candle_3starsinsouth::CandleThreeStarsInSouth;
 pub use candle_3whitesoldiers::CandleThreeWhiteSoldiers;
 pub use candle_abandonedbaby::CandleAbandonedBaby;
 pub use candle_advanceblock::CandleAdvanceBlock;
@@ -468,7 +482,7 @@ pub use candle_harami::CandleHarami;
 pub use candle_haramicross::CandleHaramiCross;
 pub use candle_highwave::CandleHighWave;
 pub use candle_hikkake::CandleHikkake;
-pub use candle_hikkakemod::CandleHikkakeModified;
+pub use candle_hikkake_modified::CandleHikkakeModified;
 pub use candle_homingpigeon::CandleHomingPigeon;
 pub use candle_identical3crows::CandleIdenticalThreeCrows;
 pub use candle_inneck::CandleInNeck;
@@ -492,11 +506,17 @@ pub use candle_shootingstar::CandleShootingStar;
 pub use candle_shortline::CandleShortLine;
 pub use candle_spinningtop::CandleSpinningTop;
 pub use candle_stalledpattern::CandleStalledPattern;
-pub use candle_sticksandwich::CandleStickSandwich;
+pub use candle_stick_sandwich::CandleStickSandwich;
 pub use candle_takuri::CandleTakuri;
 pub use candle_tasukigap::CandleTasukiGap;
+pub use candle_three_black_crows::CandleThreeBlackCrows;
+pub use candle_three_inside::CandleThreeInside;
+pub use candle_three_line_strike::CandleThreeLineStrike;
+pub use candle_three_outside::CandleThreeOutside;
+pub use candle_three_stars_in_south::CandleThreeStarsInSouth;
 pub use candle_thrusting::CandleThrusting;
 pub use candle_tristar::CandleTriStar;
+pub use candle_two_crows::CandleTwoCrows;
 pub use candle_unique3river::CandleUniqueThreeRiver;
 pub use candle_upsidegap2crows::CandleUpsideGapTwoCrows;
 pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
@@ -740,18 +760,6 @@ mod smoothed_trend_channel_lifecycle_test;
 #[cfg(test)]
 mod value_when_test;
 #[allow(unused_imports)]
-pub(crate) use candle_2crows::candle_two_crows;
-#[allow(unused_imports)]
-pub(crate) use candle_3blackcrows::candle_three_black_crows;
-#[allow(unused_imports)]
-pub(crate) use candle_3inside::candle_three_inside;
-#[allow(unused_imports)]
-pub(crate) use candle_3linestrike::candle_three_line_strike;
-#[allow(unused_imports)]
-pub(crate) use candle_3outside::candle_three_outside;
-#[allow(unused_imports)]
-pub(crate) use candle_3starsinsouth::candle_three_stars_in_south;
-#[allow(unused_imports)]
 pub(crate) use candle_3whitesoldiers::candle_three_white_soldiers;
 #[allow(unused_imports)]
 pub(crate) use candle_abandonedbaby::candle_abandoned_baby;
@@ -786,8 +794,6 @@ pub(crate) use candle_gapsidesidewhite::candle_gap_side_side_white;
 #[allow(unused_imports)]
 pub(crate) use candle_gravestonedoji::candle_gravestone_doji;
 #[allow(unused_imports)]
-pub(crate) use candle_hammer::candle_hammer;
-#[allow(unused_imports)]
 pub(crate) use candle_hangingman::candle_hanging_man;
 #[allow(unused_imports)]
 pub(crate) use candle_harami::candle_harami;
@@ -795,10 +801,6 @@ pub(crate) use candle_harami::candle_harami;
 pub(crate) use candle_haramicross::candle_harami_cross;
 #[allow(unused_imports)]
 pub(crate) use candle_highwave::candle_high_wave;
-#[allow(unused_imports)]
-pub(crate) use candle_hikkake::candle_hikkake;
-#[allow(unused_imports)]
-pub(crate) use candle_hikkakemod::candle_hikkake_modified;
 #[allow(unused_imports)]
 pub(crate) use candle_homingpigeon::candle_homing_pigeon;
 #[allow(unused_imports)]
@@ -845,8 +847,6 @@ pub(crate) use candle_shortline::candle_short_line;
 pub(crate) use candle_spinningtop::candle_spinningtop;
 #[allow(unused_imports)]
 pub(crate) use candle_stalledpattern::candle_stalled_pattern;
-#[allow(unused_imports)]
-pub(crate) use candle_sticksandwich::candle_stick_sandwich;
 #[allow(unused_imports)]
 pub(crate) use candle_takuri::candle_takuri;
 #[allow(unused_imports)]

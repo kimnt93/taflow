@@ -230,96 +230,69 @@ impl CandleThreeBlackCrows {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_three_black_crows(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = SHADOW_VERY_SHORT.avg_period + 3;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut shadow_sum = [0.0f64; 3];
-    let start = lookback;
-    for k in 0..3 {
-        let bar_offset = start - 3 + k;
-        if bar_offset >= SHADOW_VERY_SHORT.avg_period {
-            for j in (bar_offset - SHADOW_VERY_SHORT.avg_period)..bar_offset {
-                shadow_sum[k] += cr_highlow(open, high, low, close, j);
-            }
+impl CandleThreeBlackCrows {
+    fn batch(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> TaResult<Vec<i32>> {
+        let len = validate_ohlc(open, high, low, close)?;
+        let mut output = vec![0i32; len];
+        let lookback = SHADOW_VERY_SHORT.avg_period + 3;
+        if len <= lookback {
+            return Ok(output);
         }
-    }
 
-    for i in start..len {
-        output[i] = (candle_color(open[i - 2], close[i - 2]) == -1
-            && candle_color(open[i - 1], close[i - 1]) == -1
-            && candle_color(open[i], close[i]) == -1
-            && close[i - 1] < close[i - 2]
-            && close[i] < close[i - 1]
-            && open[i - 2] <= open[i - 3].max(close[i - 3])
-            && open[i - 1] <= open[i - 2]
-            && open[i - 1] >= close[i - 2]
-            && open[i] <= open[i - 1]
-            && open[i] >= close[i - 1]
-            && lower_shadow(open[i - 2], low[i - 2], close[i - 2])
-                < ca_highlow(
-                    SHADOW_VERY_SHORT,
-                    shadow_sum[0],
-                    open,
-                    high,
-                    low,
-                    close,
-                    i - 2,
-                )
-            && lower_shadow(open[i - 1], low[i - 1], close[i - 1])
-                < ca_highlow(
-                    SHADOW_VERY_SHORT,
-                    shadow_sum[1],
-                    open,
-                    high,
-                    low,
-                    close,
-                    i - 1,
-                )
-            && lower_shadow(open[i], low[i], close[i])
-                < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[2], open, high, low, close, i))
-            as i32
-            * -100;
+        let mut shadow_sum = [0.0f64; 3];
+        let start = lookback;
         for k in 0..3 {
-            let bar = i - 2 + k;
-            if bar >= SHADOW_VERY_SHORT.avg_period {
-                shadow_sum[k] += cr_highlow(open, high, low, close, bar)
-                    - cr_highlow(open, high, low, close, bar - SHADOW_VERY_SHORT.avg_period);
+            let bar_offset = start - 3 + k;
+            if bar_offset >= SHADOW_VERY_SHORT.avg_period {
+                for j in (bar_offset - SHADOW_VERY_SHORT.avg_period)..bar_offset {
+                    shadow_sum[k] += cr_highlow(open, high, low, close, j);
+                }
             }
         }
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let open: Vec<f64> = (0..50).map(|i| 100. + i as f64 * 0.2).collect();
-        let high: Vec<f64> = open.iter().map(|x| x + 2.).collect();
-        let low: Vec<f64> = open.iter().map(|x| x - 2.).collect();
-        let close: Vec<f64> = open.iter().map(|x| x + 1.).collect();
-        let expected = crate::stream::candle_three_black_crows(&open, &high, &low, &close).unwrap();
-        let mut state = CandleThreeBlackCrows::new();
-        for (((&o, &h), &l), (&c, &expected)) in open
-            .iter()
-            .zip(&high)
-            .zip(&low)
-            .zip(close.iter().zip(&expected))
-        {
-            match state.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, expected),
-                None => assert_eq!(expected, 0),
+
+        for i in start..len {
+            output[i] = (candle_color(open[i - 2], close[i - 2]) == -1
+                && candle_color(open[i - 1], close[i - 1]) == -1
+                && candle_color(open[i], close[i]) == -1
+                && close[i - 1] < close[i - 2]
+                && close[i] < close[i - 1]
+                && open[i - 2] <= open[i - 3].max(close[i - 3])
+                && open[i - 1] <= open[i - 2]
+                && open[i - 1] >= close[i - 2]
+                && open[i] <= open[i - 1]
+                && open[i] >= close[i - 1]
+                && lower_shadow(open[i - 2], low[i - 2], close[i - 2])
+                    < ca_highlow(
+                        SHADOW_VERY_SHORT,
+                        shadow_sum[0],
+                        open,
+                        high,
+                        low,
+                        close,
+                        i - 2,
+                    )
+                && lower_shadow(open[i - 1], low[i - 1], close[i - 1])
+                    < ca_highlow(
+                        SHADOW_VERY_SHORT,
+                        shadow_sum[1],
+                        open,
+                        high,
+                        low,
+                        close,
+                        i - 1,
+                    )
+                && lower_shadow(open[i], low[i], close[i])
+                    < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[2], open, high, low, close, i))
+                as i32
+                * -100;
+            for k in 0..3 {
+                let bar = i - 2 + k;
+                if bar >= SHADOW_VERY_SHORT.avg_period {
+                    shadow_sum[k] += cr_highlow(open, high, low, close, bar)
+                        - cr_highlow(open, high, low, close, bar - SHADOW_VERY_SHORT.avg_period);
+                }
             }
         }
+        Ok(output)
     }
 }
