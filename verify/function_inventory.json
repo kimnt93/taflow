@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 190,
-    "complete": 187,
+    "complete": 189,
     "correctness": 272,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 622,
     "smc_functions": 8,
-    "structure": 221,
+    "structure": 226,
     "talib_functions": 161
   },
   "rows": [
@@ -3028,11 +3028,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ewm_var",
+      "module": "exponentially_weighted_variance",
       "name": "ExponentiallyWeightedVariance",
       "native_binding": true,
       "native_symbols": [
-        "EwmVarOperator",
+        "ExponentiallyWeightedVarianceOperator",
         "_Native"
       ],
       "pandas_ta_reference": false,
@@ -3043,11 +3043,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ewm_sum",
+      "module": "exponentially_weighted_sum",
       "name": "ExponentiallyWeightedSum",
       "native_binding": true,
       "native_symbols": [
-        "EwmSumOperator",
+        "ExponentiallyWeightedSumOperator",
         "_Native"
       ],
       "pandas_ta_reference": false,
@@ -3058,11 +3058,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ewm_std",
+      "module": "exponentially_weighted_standard_deviation",
       "name": "ExponentiallyWeightedStandardDeviation",
       "native_binding": true,
       "native_symbols": [
-        "EwmStdOperator",
+        "ExponentiallyWeightedStandardDeviationOperator",
         "_Native"
       ],
       "pandas_ta_reference": false,
@@ -3073,11 +3073,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ewm_cov",
+      "module": "exponentially_weighted_covariance",
       "name": "ExponentiallyWeightedCovariance",
       "native_binding": true,
       "native_symbols": [
-        "EwmCovOperator",
+        "ExponentiallyWeightedCovarianceOperator",
         "_Native"
       ],
       "pandas_ta_reference": false,
@@ -3088,11 +3088,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ewm_corr",
+      "module": "exponentially_weighted_correlation",
       "name": "ExponentiallyWeightedCorrelation",
       "native_binding": true,
       "native_symbols": [
-        "EwmCorrOperator",
+        "ExponentiallyWeightedCorrelationOperator",
         "_Native"
       ],
       "pandas_ta_reference": false,
@@ -4570,12 +4570,12 @@
         "EntryExitOperator",
         "EqualHighsLowsOperator",
         "EvenBetterSinewave",
-        "EwmCorrOperator",
-        "EwmCovOperator",
-        "EwmStdOperator",
-        "EwmSumOperator",
-        "EwmVarOperator",
         "ExponentialMovingAverage",
+        "ExponentiallyWeightedCorrelationOperator",
+        "ExponentiallyWeightedCovarianceOperator",
+        "ExponentiallyWeightedStandardDeviationOperator",
+        "ExponentiallyWeightedSumOperator",
+        "ExponentiallyWeightedVarianceOperator",
         "FairValueGapOperator",
         "FallingOperator",
         "FastStochasticOscillator",
@@ -4876,12 +4876,12 @@
         "EntryExitOperator",
         "EqualHighsLowsOperator",
         "EvenBetterSinewave",
-        "EwmCorrOperator",
-        "EwmCovOperator",
-        "EwmStdOperator",
-        "EwmSumOperator",
-        "EwmVarOperator",
         "ExponentialMovingAverage",
+        "ExponentiallyWeightedCorrelationOperator",
+        "ExponentiallyWeightedCovarianceOperator",
+        "ExponentiallyWeightedStandardDeviationOperator",
+        "ExponentiallyWeightedSumOperator",
+        "ExponentiallyWeightedVarianceOperator",
         "FairValueGapOperator",
         "FallingOperator",
         "FastStochasticOscillator",

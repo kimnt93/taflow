@@ -276,9 +276,9 @@ mod intraday_momentum_index_test;
 mod kaufman_adaptive_moving_average;
 #[cfg(test)]
 mod kaufman_adaptive_moving_average_test;
+mod mama;
 mod math_abs;
 mod math_operator;
-mod mama;
 mod moving_average;
 mod moving_average_convergence_divergence;
 mod moving_average_convergence_divergence_extended;
@@ -799,6 +799,16 @@ mod cross_test;
 mod donchian_test;
 #[cfg(test)]
 mod entry_exit_test;
+#[cfg(test)]
+mod exponentially_weighted_correlation_test;
+#[cfg(test)]
+mod exponentially_weighted_covariance_test;
+#[cfg(test)]
+mod exponentially_weighted_standard_deviation_test;
+#[cfg(test)]
+mod exponentially_weighted_sum_test;
+#[cfg(test)]
+mod exponentially_weighted_variance_test;
 #[cfg(test)]
 mod gap_down_test;
 #[cfg(test)]
@@ -1365,8 +1375,12 @@ mod rolling_kurtosis;
 #[cfg(test)]
 mod rolling_kurtosis_test;
 pub use rolling_kurtosis::RollingKurtosis;
-#[allow(unused_imports)]
-mod ewm_var;
+mod exponentially_weighted_correlation;
+mod exponentially_weighted_covariance;
+mod exponentially_weighted_standard_deviation;
+mod exponentially_weighted_sum;
+mod exponentially_weighted_variance;
+mod mass_index;
 mod rolling_covariance;
 #[cfg(test)]
 mod rolling_covariance_test;
@@ -1377,22 +1391,6 @@ mod rolling_interquartile_range_test;
 mod rolling_winsorize;
 #[cfg(test)]
 mod rolling_winsorize_test;
-#[allow(unused_imports)]
-pub(crate) use ewm_var::ewm_var;
-mod ewm_sum;
-#[allow(unused_imports)]
-pub(crate) use ewm_sum::ewm_sum;
-pub use ewm_sum::ExponentiallyWeightedSum;
-mod ewm_std;
-#[allow(unused_imports)]
-pub(crate) use ewm_std::ewm_std;
-mod ewm_cov;
-#[allow(unused_imports)]
-pub(crate) use ewm_cov::ewm_cov;
-mod ewm_corr;
-#[allow(unused_imports)]
-pub(crate) use ewm_corr::ewm_corr;
-mod mass_index;
 #[allow(unused_imports)]
 pub(crate) use mass_index::mass_index;
 mod detrended_price_oscillator;
@@ -1446,10 +1444,11 @@ pub use close_to_close_sigma::CloseToCloseSigma;
 pub use cumulative_sum_control_chart::CumulativeSumControlChart;
 pub use drawdown::Drawdown;
 pub use equal_highs_lows::{EqualHighsLows, EqualHighsLowsValue};
-pub use ewm_corr::ExponentiallyWeightedCorrelation;
-pub use ewm_cov::ExponentiallyWeightedCovariance;
-pub use ewm_std::ExponentiallyWeightedStandardDeviation;
-pub use ewm_var::ExponentiallyWeightedVariance;
+pub use exponentially_weighted_correlation::ExponentiallyWeightedCorrelation;
+pub use exponentially_weighted_covariance::ExponentiallyWeightedCovariance;
+pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
+pub use exponentially_weighted_sum::ExponentiallyWeightedSum;
+pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use fair_value_gap::{FairValueGap, FairValueGapValue};
 pub use frac_diff::FracDiff;
 pub use gap_down::GapDown;

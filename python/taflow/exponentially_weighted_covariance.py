@@ -2,7 +2,7 @@
 
 from typing import Any
 import numpy as np
-from ._native import EwmCovOperator as _Native
+from ._native import ExponentiallyWeightedCovarianceOperator as _Native
 from ._series import as_float64_series
 
 
@@ -34,7 +34,8 @@ class ExponentiallyWeightedCovariance:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(left, right) if left is not None or right is not None else None
+        self._length = 0
+        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "ExponentiallyWeightedCovariance":
         """Append one observation or aligned bar to the native Rust state.
@@ -51,7 +52,8 @@ class ExponentiallyWeightedCovariance:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(left, right)
+        self._state.append(float(left), float(right))
+        self._length += 1
         return self
 
     def extend(self, left: Any, right: Any) -> "ExponentiallyWeightedCovariance":
@@ -69,7 +71,12 @@ class ExponentiallyWeightedCovariance:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(left), as_float64_series(right))
+        left_values = as_float64_series(left)
+        right_values = as_float64_series(right)
+        if len(left_values) != len(right_values):
+            raise ValueError("left and right input series must have equal length")
+        self._state.extend(left_values, right_values)
+        self._length += len(left_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -83,7 +90,7 @@ class ExponentiallyWeightedCovariance:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -92,6 +99,10 @@ class ExponentiallyWeightedCovariance:
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
+
+    def __len__(self) -> int:
+        """Return the number of paired observations consumed by this state."""
+        return self._length
 
     def reset(self) -> "ExponentiallyWeightedCovariance":
         """Execute the reset operation through the native Rust implementation.
@@ -102,4 +113,5 @@ class ExponentiallyWeightedCovariance:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self

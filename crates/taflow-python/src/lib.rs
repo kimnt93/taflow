@@ -118,11 +118,11 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingInterquartileRangeOperator>()?;
     m.add_class::<indicators::RollingCovarianceOperator>()?;
     m.add_class::<indicators::RollingWinsorizeOperator>()?;
-    m.add_class::<indicators::EwmVarOperator>()?;
-    m.add_class::<indicators::EwmSumOperator>()?;
-    m.add_class::<indicators::EwmStdOperator>()?;
-    m.add_class::<indicators::EwmCovOperator>()?;
-    m.add_class::<indicators::EwmCorrOperator>()?;
+    m.add_class::<indicators::ExponentiallyWeightedVarianceOperator>()?;
+    m.add_class::<indicators::ExponentiallyWeightedSumOperator>()?;
+    m.add_class::<indicators::ExponentiallyWeightedStandardDeviationOperator>()?;
+    m.add_class::<indicators::ExponentiallyWeightedCovarianceOperator>()?;
+    m.add_class::<indicators::ExponentiallyWeightedCorrelationOperator>()?;
     m.add_class::<indicators::CumulativeMaximum>()?;
     m.add_class::<indicators::CumulativeMinimum>()?;
     m.add_class::<indicators::DrawdownOperator>()?;

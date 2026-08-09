@@ -1,14 +1,7 @@
 //! Causal exponentially weighted moving sum.
 
-use crate::error::TaResult;
-
 use super::operator_states::ewm_alpha;
-
-/// Compute an aligned exponentially weighted sum using span=`timeperiod`.
-pub fn ewm_sum(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = ExponentiallyWeightedSum::new(timeperiod)?;
-    Ok(input.iter().map(|&value| state.append(value)).collect())
-}
+use crate::error::TaResult;
 
 /// Persistent exponentially weighted sum with recurrence
 /// `sum_t = x_t + (1 - alpha) * sum_(t-1)`.
@@ -42,27 +35,5 @@ impl ExponentiallyWeightedSum {
     /// Clear accumulated weight while retaining the configured decay.
     pub fn reset(&mut self) {
         self.value = None;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn matches_polars_documented_example_and_reset() {
-        let expected = vec![1.0, 2.5, 4.25];
-        assert_eq!(ewm_sum(&[1.0, 2.0, 3.0], 3).unwrap(), expected);
-        let mut state = ExponentiallyWeightedSum::new(3).unwrap();
-        assert_eq!(state.append(1.0), 1.0);
-        assert_eq!(state.append(2.0), 2.5);
-        state.reset();
-        assert_eq!(state.value(), None);
-        assert_eq!(state.append(3.0), 3.0);
-    }
-
-    #[test]
-    fn rejects_zero_period() {
-        assert!(ExponentiallyWeightedSum::new(0).is_err());
     }
 }

@@ -1,13 +1,13 @@
-"""Persistent exponentially weighted variance."""
+"""Persistent exponentially weighted standard deviation."""
 
 from typing import Any
 import numpy as np
-from ._native import EwmVarOperator as _Native
+from ._native import ExponentiallyWeightedStandardDeviationOperator as _Native
 from ._series import as_float64_series
 
 
-class ExponentiallyWeightedVariance:
-    """Persistent exponentially weighted variance.
+class ExponentiallyWeightedStandardDeviation:
+    """Persistent exponentially weighted standard deviation.
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
@@ -31,9 +31,10 @@ class ExponentiallyWeightedVariance:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(_input) if _input is not None else None
+        self._length = 0
+        self.extend(_input)
 
-    def append(self, _input: float) -> "ExponentiallyWeightedVariance":
+    def append(self, _input: float) -> "ExponentiallyWeightedStandardDeviation":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -46,10 +47,11 @@ class ExponentiallyWeightedVariance:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_input)
+        self._state.append(float(_input))
+        self._length += 1
         return self
 
-    def extend(self, _input: Any) -> "ExponentiallyWeightedVariance":
+    def extend(self, _input: Any) -> "ExponentiallyWeightedStandardDeviation":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -62,7 +64,9 @@ class ExponentiallyWeightedVariance:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(_input))
+        values = as_float64_series(_input)
+        self._state.extend(values)
+        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -76,7 +80,7 @@ class ExponentiallyWeightedVariance:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -86,7 +90,11 @@ class ExponentiallyWeightedVariance:
         """
         return self._state.value
 
-    def reset(self) -> "ExponentiallyWeightedVariance":
+    def __len__(self) -> int:
+        """Return the number of observations consumed by this state."""
+        return self._length
+
+    def reset(self) -> "ExponentiallyWeightedStandardDeviation":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -95,4 +103,5 @@ class ExponentiallyWeightedVariance:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self

@@ -180,8 +180,10 @@ mod tests {
         let mut winsorize = RollingWinsorize::new(3, 0.0, 0.5).unwrap();
         let winsorized = input.iter().map(|&value| winsorize.append(value).unwrap_or(f64::NAN)).collect::<Vec<_>>();
         assert_eq!(winsorized[2], 2.0);
-        assert_eq!(ewm_var(&input, 2).unwrap()[0], 0.0);
-        assert_eq!(ewm_std(&input, 2).unwrap()[0], 0.0);
+        let mut variance = ExponentiallyWeightedVariance::new(2).unwrap();
+        let mut standard_deviation = ExponentiallyWeightedStandardDeviation::new(2).unwrap();
+        assert_eq!(variance.append(input[0]), 0.0);
+        assert_eq!(standard_deviation.append(input[0]), 0.0);
     }
 
     #[test]

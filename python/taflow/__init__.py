@@ -215,11 +215,11 @@ from .rolling_kurtosis import RollingKurtosis
 from .rolling_interquartile_range import RollingInterquartileRange
 from .rolling_covariance import RollingCovariance
 from .rolling_winsorize import RollingWinsorize
-from .ewm_var import ExponentiallyWeightedVariance
-from .ewm_sum import ExponentiallyWeightedSum
-from .ewm_std import ExponentiallyWeightedStandardDeviation
-from .ewm_cov import ExponentiallyWeightedCovariance
-from .ewm_corr import ExponentiallyWeightedCorrelation
+from .exponentially_weighted_variance import ExponentiallyWeightedVariance
+from .exponentially_weighted_sum import ExponentiallyWeightedSum
+from .exponentially_weighted_standard_deviation import ExponentiallyWeightedStandardDeviation
+from .exponentially_weighted_covariance import ExponentiallyWeightedCovariance
+from .exponentially_weighted_correlation import ExponentiallyWeightedCorrelation
 from .cumulative_maximum import CumulativeMaximum
 from .cumulative_minimum import CumulativeMinimum
 from .drawdown import Drawdown

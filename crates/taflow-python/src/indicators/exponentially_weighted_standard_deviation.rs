@@ -1,40 +1,32 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::ExponentiallyWeightedCovariance;
+use taflow::stream::ExponentiallyWeightedStandardDeviation;
 #[pyclass]
-pub struct EwmCovOperator {
-    inner: ExponentiallyWeightedCovariance,
+pub struct ExponentiallyWeightedStandardDeviationOperator {
+    inner: ExponentiallyWeightedStandardDeviation,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl EwmCovOperator {
+impl ExponentiallyWeightedStandardDeviationOperator {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: ExponentiallyWeightedCovariance::new(timeperiod)
+            inner: ExponentiallyWeightedStandardDeviation::new(timeperiod)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }
-    fn append(&mut self, left: f64, right: f64) -> f64 {
-        let v = self.inner.append(left, right);
+    fn append(&mut self, input: f64) -> f64 {
+        let v = self.inner.append(input);
         self.outputs.push(v);
         v
     }
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        left: PyReadonlyArray1<f64>,
-        right: PyReadonlyArray1<f64>,
-    ) -> PyResult<()> {
-        let (a, b) = (left.as_slice()?, right.as_slice()?);
-        if a.len() != b.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
+    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
+        let input = input.as_slice()?;
         py.allow_threads(|| {
-            for (&x, &y) in a.iter().zip(b) {
-                self.append(x, y);
+            for &v in input {
+                self.append(v);
             }
         });
         Ok(())

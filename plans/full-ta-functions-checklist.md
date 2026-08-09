@@ -251,7 +251,7 @@ look-ahead operations, and internal-only primitives are excluded.
 | RollingBeta | x | x |
 | RollingCalmar | x | x |
 | RollingCorrelation | x | x |
-| RollingCov | x | x |
+| RollingCovariance | x | x |
 | RollingEntropy | x | x |
 | RollingInformationRatio | x | x |
 | RollingInterquartileRange | x | x |
