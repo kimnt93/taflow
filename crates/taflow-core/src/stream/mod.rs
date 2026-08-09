@@ -108,7 +108,9 @@ mod candle_tristar;
 mod candle_unique3river;
 mod candle_upsidegap2crows;
 mod candle_xsidegap3methods;
-mod cmo;
+mod chande_momentum_oscillator;
+#[cfg(test)]
+mod chande_momentum_oscillator_test;
 mod commodity_channel_index;
 #[cfg(test)]
 mod commodity_channel_index_test;
@@ -129,7 +131,9 @@ mod imi;
 #[cfg(test)]
 mod imi_test;
 mod indicator;
-mod kama;
+mod kaufman_adaptive_moving_average;
+#[cfg(test)]
+mod kaufman_adaptive_moving_average_test;
 mod mama;
 mod math_abs;
 mod math_operator;
@@ -362,7 +366,9 @@ mod session_volume_levels;
 #[cfg(test)]
 mod session_volume_levels_test;
 mod simple_moving_average;
-mod ssl_channel;
+mod smoothed_trend_channel;
+#[cfg(test)]
+mod smoothed_trend_channel_test;
 mod stoch;
 mod stochf;
 mod stochrsi;
@@ -466,9 +472,7 @@ pub use candle_tristar::CandleTriStar;
 pub use candle_unique3river::CandleUniqueThreeRiver;
 pub use candle_upsidegap2crows::CandleUpsideGapTwoCrows;
 pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
-#[allow(unused_imports)]
-pub(crate) use cmo::chande_momentum_oscillator;
-pub use cmo::ChandeMomentumOscillator;
+pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
 #[allow(unused_imports)]
@@ -488,9 +492,7 @@ pub use ht_trendmode::HilbertTransformTrendMode;
 pub use imi::IntradayMomentumIndex;
 pub use indicator::StreamingIndicator;
 pub use jurik_moving_average::JurikMovingAverage;
-#[allow(unused_imports)]
-pub(crate) use kama::kaufman_adaptive_moving_average;
-pub use kama::KaufmanAdaptiveMovingAverage;
+pub use kaufman_adaptive_moving_average::KaufmanAdaptiveMovingAverage;
 pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
 pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
@@ -548,7 +550,7 @@ pub(crate) use sarext::parabolic_sar_extended;
 pub use sarext::ParabolicSarExtended;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use simple_moving_average::SimpleMovingAverage;
-pub use ssl_channel::SmoothedTrendChannel;
+pub use smoothed_trend_channel::SmoothedTrendChannel;
 #[allow(unused_imports)]
 pub(crate) use stoch::stochastic_oscillator;
 pub use stoch::{StochasticOscillator, StochasticOscillatorValue};
@@ -673,9 +675,11 @@ mod hilbert_transform_trend_mode;
 #[allow(unused_imports)]
 pub(crate) use hilbert_transform_trend_mode::hilbert_transform_trend_mode;
 mod rolling_midpoint;
-#[allow(unused_imports)]
-pub(crate) use rolling_midpoint::rolling_midpoint;
+#[cfg(test)]
+mod rolling_midpoint_test;
 mod rolling_midprice;
+#[cfg(test)]
+mod rolling_midprice_test;
 #[allow(unused_imports)]
 pub(crate) use candle_2crows::candle_two_crows;
 #[allow(unused_imports)]
@@ -798,8 +802,6 @@ pub(crate) use candle_unique3river::candle_unique_three_river;
 pub(crate) use candle_upsidegap2crows::candle_upside_gap_two_crows;
 #[allow(unused_imports)]
 pub(crate) use candle_xsidegap3methods::candle_xside_gap_three_methods;
-#[allow(unused_imports)]
-pub(crate) use rolling_midprice::rolling_midprice;
 
 #[cfg(test)]
 mod tests {
@@ -845,9 +847,15 @@ mod tests {
         let mut trima_batch_state = TriangularMovingAverage::new(7).unwrap();
         let mut trima_batch = Vec::new();
         trima_batch_state.extend_slice_into(&input, &mut trima_batch);
-        let kama_batch = kaufman_adaptive_moving_average(&input, 7).unwrap();
-        let midpoint_batch = rolling_midpoint(&input, 7).unwrap();
-        let cmo_batch = chande_momentum_oscillator(&input, 14).unwrap();
+        let mut kama_batch_state = KaufmanAdaptiveMovingAverage::new(7).unwrap();
+        let mut kama_batch = Vec::new();
+        kama_batch_state.extend_slice_into(&input, &mut kama_batch);
+        let mut midpoint_batch_state = RollingMidpoint::new(7).unwrap();
+        let mut midpoint_batch = Vec::new();
+        midpoint_batch_state.extend_slice_into(&input, &mut midpoint_batch);
+        let mut cmo_batch_state = ChandeMomentumOscillator::new(14).unwrap();
+        let mut cmo_batch = Vec::new();
+        cmo_batch_state.extend_slice_into(&input, &mut cmo_batch);
         let mut sma = SimpleMovingAverage::new(7).unwrap();
         let mut ema = ExponentialMovingAverage::new(7).unwrap();
         let mut wma = WeightedMovingAverage::new(7).unwrap();
@@ -887,7 +895,11 @@ mod tests {
             .enumerate()
             .map(|(i, value)| value - 0.8 - (i % 4) as f64 * 0.15)
             .collect();
-        let expected = rolling_midprice(&high, &low, 7).unwrap();
+        let mut batch_state = RollingMidprice::new(7).unwrap();
+        let mut expected = Vec::new();
+        batch_state
+            .extend_slices_into(&high, &low, &mut expected)
+            .unwrap();
         let mut state = RollingMidprice::new(7).unwrap();
         for index in 0..close.len() {
             assert_optional_eq(state.append(high[index], low[index]), expected[index]);

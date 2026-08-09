@@ -1,7 +1,7 @@
 //! Batch implementation for `decay_linear`.
 
-use crate::error::TaResult;
 use super::StreamingIndicator;
+use crate::error::TaResult;
 
 /// Canonical WorldQuant name for the linearly weighted moving-average state.
 pub type DecayLinear = super::WeightedMovingAverage;

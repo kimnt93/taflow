@@ -6,13 +6,9 @@ use pyo3::prelude::*;
 use taflow::stream::{
     self, AverageDirectionalIndex, AverageDirectionalIndexRating,
     AverageTrueRange as CoreAverageTrueRange, DirectionalMovementIndex, FastStochasticOscillator,
-    MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
-    NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, RateOfChange as CoreRateOfChange,
-    RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
-    RateOfChangeRatioPercent as CoreRateOfChangeRatioPercent, RollingMidpoint, RollingMidprice,
-    SmoothedTrendChannel, StochasticOscillator, StochasticRelativeStrengthIndex,
-    StreamingIndicator, TrueRange as CoreTrueRange,
-    VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage,
+    MesaAdaptiveMovingAverage, NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange,
+    StochasticOscillator, StochasticRelativeStrengthIndex, StreamingIndicator,
+    TrueRange as CoreTrueRange, VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage,
 };
 use taflow::MaType;
 
@@ -89,90 +85,15 @@ macro_rules! scalar_state_class {
     };
 }
 
-scalar_state_class!(Momentum, CoreMomentum, 14);
-scalar_state_class!(RateOfChange, CoreRateOfChange, 14);
-scalar_state_class!(RateOfChangePercent, CoreRateOfChangePercent, 14);
-scalar_state_class!(RateOfChangeRatio, CoreRateOfChangeRatio, 14);
-scalar_state_class!(RateOfChangeRatioPercent, CoreRateOfChangeRatioPercent, 14);
-scalar_state_class!(StatefulMidpoint, RollingMidpoint, 14);
 scalar_state_class!(StatefulMax, stream::RollingMax, 30);
 scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);
 scalar_state_class!(StatefulMin, stream::RollingMin, 30);
 scalar_state_class!(StatefulMinindex, stream::RollingArgmin, 30);
-scalar_state_class!(StatefulCmo, stream::ChandeMomentumOscillator, 14);
-scalar_state_class!(StatefulKama, stream::KaufmanAdaptiveMovingAverage, 30);
 scalar_state_class!(StatefulLinearreg, stream::Linearreg, 14);
 scalar_state_class!(StatefulLinearregSlope, stream::LinearregSlope, 14);
 scalar_state_class!(StatefulLinearregIntercept, stream::LinearregIntercept, 14);
 scalar_state_class!(StatefulLinearregAngle, stream::LinearregAngle, 14);
 scalar_state_class!(StatefulTsf, stream::Tsf, 14);
-/// Native state adapter for SSL Channel.
-#[pyclass]
-pub struct StatefulSmoothedTrendChannel {
-    inner: SmoothedTrendChannel,
-    lower: Vec<f64>,
-    upper: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulSmoothedTrendChannel {
-    #[new]
-    #[pyo3(signature = (length=10))]
-    fn new(length: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: SmoothedTrendChannel::new(length).map_err(py_value_error)?,
-            lower: Vec::new(),
-            upper: Vec::new(),
-        })
-    }
-    fn append(&mut self, high: f64, low: f64, close: f64) -> (f64, f64) {
-        let value = self
-            .inner
-            .append(high, low, close)
-            .unwrap_or((f64::NAN, f64::NAN));
-        self.lower.push(value.0);
-        self.upper.push(value.1);
-        value
-    }
-    fn extend(
-        &mut self,
-        high: PyReadonlyArray1<f64>,
-        low: PyReadonlyArray1<f64>,
-        close: PyReadonlyArray1<f64>,
-    ) -> PyResult<()> {
-        let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
-        if high.len() != low.len() || high.len() != close.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
-            self.append(high, low, close);
-        }
-        Ok(())
-    }
-    fn compute<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (
-            PyArray1::from_vec(py, self.lower.clone()),
-            PyArray1::from_vec(py, self.upper.clone()),
-        )
-    }
-    #[getter]
-    fn value(&self) -> Option<(f64, f64)> {
-        self.inner.value()
-    }
-    fn __len__(&self) -> usize {
-        self.lower.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.lower.clear();
-        self.upper.clear();
-    }
-}
-
 macro_rules! oscillator_state_class {
     ($class:ident, $inner:ty) => {
         #[pyclass]
@@ -1494,68 +1415,6 @@ impl AveragePrice {
                 .extend_slices_into(open, high, low, close, &mut self.outputs)
         })
         .map_err(py_value_error)
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pyclass]
-pub struct StatefulMidprice {
-    inner: RollingMidprice,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulMidprice {
-    #[new]
-    #[pyo3(signature = (timeperiod=14))]
-    fn new(timeperiod: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: RollingMidprice::new(timeperiod).map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, high: f64, low: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(high, low))
-    }
-
-    fn extend(
-        &mut self,
-        py: Python<'_>,
-        high: PyReadonlyArray1<f64>,
-        low: PyReadonlyArray1<f64>,
-    ) -> PyResult<()> {
-        let high = high.as_slice()?;
-        let low = low.as_slice()?;
-        if high.len() != low.len() {
-            return Err(PyValueError::new_err(
-                "high and low must have equal lengths",
-            ));
-        }
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(high, low, outputs)
-                .expect("lengths validated above")
-        });
-        Ok(())
     }
 
     #[getter]

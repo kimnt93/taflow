@@ -71,6 +71,39 @@ impl SmoothedTrendChannel {
         self.value
     }
 
+    /// Extends aligned OHLC slices while preserving scalar state semantics.
+    pub fn extend_slice_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        lower: &mut Vec<f64>,
+        upper: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(crate::error::TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len().max(close.len()),
+            });
+        }
+        lower.reserve(high.len());
+        upper.reserve(high.len());
+        for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
+            let value = self.append(high, low, close);
+            match value {
+                Some((lower_value, upper_value)) => {
+                    lower.push(lower_value);
+                    upper.push(upper_value);
+                }
+                None => {
+                    lower.push(f64::NAN);
+                    upper.push(f64::NAN);
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// Clears history and restores the initial bullish side.
     pub fn reset(&mut self) {
         self.highs.clear();

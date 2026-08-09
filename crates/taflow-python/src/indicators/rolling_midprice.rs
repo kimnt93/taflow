@@ -1,0 +1,53 @@
+use numpy::{PyArray1, PyReadonlyArray1};
+use pyo3::exceptions::PyValueError;
+use pyo3::prelude::*;
+use taflow::stream::RollingMidprice as State;
+
+#[pyclass]
+pub struct RollingMidprice {
+    inner: State,
+    output: Vec<f64>,
+}
+#[pymethods]
+impl RollingMidprice {
+    #[new]
+    #[pyo3(signature = (timeperiod=14))]
+    fn new(timeperiod: usize) -> PyResult<Self> {
+        Ok(Self {
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            output: Vec::new(),
+        })
+    }
+    fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+        let value = self.inner.append(high, low);
+        self.output.push(value.unwrap_or(f64::NAN));
+        value
+    }
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
+        let (high, low) = (high.as_slice()?, low.as_slice()?);
+        py.allow_threads(|| {
+            self.inner
+                .extend_slices_into(high, low, &mut self.output)
+                .map_err(|e| PyValueError::new_err(e.to_string()))
+        })
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
+        PyArray1::from_vec(py, self.output.clone())
+    }
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.output.clear();
+    }
+    fn __len__(&self) -> usize {
+        self.output.len()
+    }
+}

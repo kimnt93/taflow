@@ -7,24 +7,6 @@ use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator};
 
-/// Compute the chande momentum oscillator result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn chande_momentum_oscillator(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = ChandeMomentumOscillator::new(timeperiod)?;
-    Ok(input
-        .iter()
-        .map(|&value| state.append(value).unwrap_or(f64::NAN))
-        .collect())
-}
-
 /// Incremental Chande Momentum Oscillator with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `ChandeMomentumOscillator`.
@@ -64,12 +46,9 @@ impl ChandeMomentumOscillator {
             0.0
         }
     }
-}
 
-impl StreamingIndicator for ChandeMomentumOscillator {
-    type Output = f64;
-
-    fn append(&mut self, input: f64) -> Option<f64> {
+    /// Appends one chronological value and returns the latest oscillator.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
         let Some(previous) = self.previous_input.replace(input) else {
             return None;
         };
@@ -95,15 +74,43 @@ impl StreamingIndicator for ChandeMomentumOscillator {
         self.value
     }
 
-    fn value(&self) -> Option<f64> {
+    /// Extends the state with one aligned input slice and warm-up NaNs.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        output.extend(
+            input
+                .iter()
+                .map(|&value| self.append(value).unwrap_or(f64::NAN)),
+        );
+    }
+
+    /// Returns the latest oscillator after warm-up.
+    pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    fn reset(&mut self) {
+    /// Restores fresh-state behavior without reallocating.
+    pub fn reset(&mut self) {
         self.previous_input = None;
         self.changes = 0;
         self.sum_up = 0.0;
         self.sum_down = 0.0;
         self.value = None;
+    }
+}
+
+impl StreamingIndicator for ChandeMomentumOscillator {
+    type Output = f64;
+
+    fn append(&mut self, input: f64) -> Option<f64> {
+        Self::append(self, input)
+    }
+
+    fn value(&self) -> Option<f64> {
+        Self::value(self)
+    }
+
+    fn reset(&mut self) {
+        Self::reset(self)
     }
 }

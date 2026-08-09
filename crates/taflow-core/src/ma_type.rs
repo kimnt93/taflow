@@ -108,7 +108,10 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
             Ok(output)
         }
         MaType::KaufmanAdaptiveMovingAverage => {
-            crate::stream::kaufman_adaptive_moving_average(input, period)
+            let mut state = crate::stream::KaufmanAdaptiveMovingAverage::new(period)?;
+            let mut output = Vec::with_capacity(input.len());
+            state.extend_slice_into(input, &mut output);
+            Ok(output)
         }
         // MAMA and TripleExponentialAverage use fixed defaults through the
         // MA dispatcher, matching C TA-Lib ta_MA.c:

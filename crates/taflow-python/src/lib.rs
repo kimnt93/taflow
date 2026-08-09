@@ -23,6 +23,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingVariance>()?;
     m.add_class::<indicators::RollingStandardDeviation>()?;
     m.add_class::<indicators::CandleDoji>()?;
+    m.add_class::<indicators::ChandeMomentumOscillator>()?;
+    m.add_class::<indicators::KaufmanAdaptiveMovingAverage>()?;
+    m.add_class::<indicators::SmoothedTrendChannel>()?;
+    m.add_class::<indicators::Momentum>()?;
+    m.add_class::<indicators::RateOfChange>()?;
+    m.add_class::<indicators::RateOfChangePercent>()?;
+    m.add_class::<indicators::RateOfChangeRatio>()?;
+    m.add_class::<indicators::RateOfChangeRatioPercent>()?;
+    m.add_class::<indicators::RollingMidpoint>()?;
+    m.add_class::<indicators::RollingMidprice>()?;
     m.add_class::<indicators::CandleTakuri>()?;
     m.add_class::<indicators::CandleClosingMarubozu>()?;
     m.add_class::<indicators::CandleEngulfing>()?;
@@ -230,13 +240,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // Transitional state classes remain available while their indicators move
     // to the unified object surface above.
-    m.add_class::<state_api::StatefulMidpoint>()?;
-    m.add_class::<state_api::StatefulMidprice>()?;
-    m.add_class::<state_api::Momentum>()?;
-    m.add_class::<state_api::RateOfChange>()?;
-    m.add_class::<state_api::RateOfChangePercent>()?;
-    m.add_class::<state_api::RateOfChangeRatio>()?;
-    m.add_class::<state_api::RateOfChangeRatioPercent>()?;
     m.add_class::<state_api::StatefulMax>()?;
     m.add_class::<state_api::StatefulMaxindex>()?;
     m.add_class::<state_api::StatefulMin>()?;
@@ -250,9 +253,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulLinearregIntercept>()?;
     m.add_class::<state_api::StatefulLinearregAngle>()?;
     m.add_class::<state_api::StatefulTsf>()?;
-    m.add_class::<state_api::StatefulCmo>()?;
-    m.add_class::<state_api::StatefulSmoothedTrendChannel>()?;
-    m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::AccumulationDistribution>()?;
     m.add_class::<state_api::AccumulationDistributionOscillator>()?;
     m.add_class::<state_api::OnBalanceVolume>()?;
