@@ -123,6 +123,8 @@ mod commodity_channel_index_test;
 mod cycle;
 mod directional;
 mod double_exponential_moving_average;
+#[cfg(test)]
+mod double_exponential_moving_average_test;
 mod dx;
 mod exponential_moving_average;
 mod hilbert_transform_trendline;
@@ -380,6 +382,8 @@ mod session_volume_levels;
 #[cfg(test)]
 mod session_volume_levels_test;
 mod simple_moving_average;
+#[cfg(test)]
+mod simple_moving_average_test;
 mod smoothed_trend_channel;
 #[cfg(test)]
 mod smoothed_trend_channel_test;
@@ -393,6 +397,8 @@ mod tom_de_mark_sequential;
 #[cfg(test)]
 mod tom_de_mark_sequential_test;
 mod triangular_moving_average;
+#[cfg(test)]
+mod triangular_moving_average_test;
 mod triple_exponential_average;
 #[cfg(test)]
 mod triple_exponential_average_test;
@@ -410,6 +416,8 @@ mod window;
 #[allow(unused_imports)]
 pub(crate) use helpers::invalid_period;
 mod weighted_moving_average;
+#[cfg(test)]
+mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 pub use absolute_price_oscillator::AbsolutePriceOscillator;
