@@ -37,16 +37,8 @@ impl MinusDirectionalIndicator {
         if h.len() != l.len() || h.len() != c.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let outputs = &mut self.outputs;
-        let inner = &mut self.inner;
-        py.allow_threads(|| {
-            outputs.extend(
-                h.iter()
-                    .zip(l)
-                    .zip(c)
-                    .map(|((&h, &l), &c)| inner.append(h, l, c).unwrap_or(f64::NAN)),
-            );
-        });
+        py.allow_threads(|| self.inner.extend_slices_into(h, l, c, &mut self.outputs))
+            .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {

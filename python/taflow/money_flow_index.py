@@ -52,13 +52,7 @@ class MoneyFlowIndex:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _NativeMoneyFlowIndex(timeperiod)
-        if (
-            high is not None
-            or low is not None
-            or close is not None
-            or volume is not None
-        ):
-            self.extend(high, low, close, volume)
+        self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float
@@ -87,9 +81,9 @@ class MoneyFlowIndex:
     def extend(
         self,
         high: Any,
-        low: Any | None = None,
-        close: Any | None = None,
-        volume: Any | None = None,
+        low: Any,
+        close: Any,
+        volume: Any,
     ) -> "MoneyFlowIndex":
         """Append aligned input series to the native Rust state.
 
@@ -109,8 +103,6 @@ class MoneyFlowIndex:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        if low is None or close is None or volume is None:
-            raise ValueError("high, low, close, and volume must be provided together")
         self._state.extend(
             as_float64_series(high),
             as_float64_series(low),

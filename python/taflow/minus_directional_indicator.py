@@ -35,8 +35,7 @@ class MinusDirectionalIndicator:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        if high is not None or low is not None or close is not None:
-            self.extend(high, low, close)
+        self.extend(high, low, close)
 
     def append(self, h: float, l: float, c: float) -> "MinusDirectionalIndicator":
         """Append one observation or aligned bar to the native Rust state.
@@ -58,7 +57,7 @@ class MinusDirectionalIndicator:
         self._state.append(h, l, c)
         return self
 
-    def extend(self, high: Any, low: Any | None = None, close: Any | None = None) -> "MinusDirectionalIndicator":
+    def extend(self, high: Any, low: Any, close: Any) -> "MinusDirectionalIndicator":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -75,8 +74,6 @@ class MinusDirectionalIndicator:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        if low is None or close is None:
-            raise ValueError("high, low, and close must be provided together")
         self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
         )

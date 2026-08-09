@@ -2,38 +2,6 @@
 use super::directional::DirectionalMovement;
 use crate::error::TaResult;
 
-/// Compute the minus directional indicator result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn minus_directional_indicator(
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-    timeperiod: usize,
-) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch {
-            expected: high.len(),
-            got: low.len().min(close.len()),
-        });
-    }
-    let mut state = MinusDirectionalIndicator::new(timeperiod)?;
-    Ok(high
-        .iter()
-        .zip(low)
-        .zip(close)
-        .map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN))
-        .collect())
-}
 /// Persistent Rust state or aligned output type for `MinusDirectionalIndicator`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
@@ -65,6 +33,27 @@ impl MinusDirectionalIndicator {
             .append(high, low, close)
             .map(|v| v.minus_di);
         self.value
+    }
+
+    /// Append aligned HLC slices while preserving scalar state and warm-up.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if high.len() != low.len() || high.len() != close.len() {
+            return Err(crate::TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len().min(close.len()),
+            });
+        }
+        output.reserve(high.len());
+        for ((high, low), close) in high.iter().zip(low).zip(close) {
+            output.push(self.append(*high, *low, *close).unwrap_or(f64::NAN));
+        }
+        Ok(())
     }
     /// Computes or updates `value` through the native Rust kernel.
     ///

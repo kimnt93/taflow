@@ -36,8 +36,7 @@ class MinusDirectionalMovement:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        if high is not None or low is not None:
-            self.extend(high, low)
+        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "MinusDirectionalMovement":
         """Append one observation or aligned bar to the native Rust state.
@@ -57,7 +56,7 @@ class MinusDirectionalMovement:
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any | None = None) -> "MinusDirectionalMovement":
+    def extend(self, high: Any, low: Any) -> "MinusDirectionalMovement":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -72,8 +71,6 @@ class MinusDirectionalMovement:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        if low is None:
-            raise ValueError("high and low must be provided together")
         self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
 

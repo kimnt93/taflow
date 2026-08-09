@@ -234,9 +234,15 @@ pub use math_tanh::MathTanh;
 mod accumulation_distribution_helper;
 #[cfg(test)]
 mod math_tanh_test;
-mod mfi;
-mod minus_di;
-mod minus_dm;
+mod minus_directional_indicator;
+#[cfg(test)]
+mod minus_directional_indicator_test;
+mod minus_directional_movement;
+#[cfg(test)]
+mod minus_directional_movement_test;
+mod money_flow_index;
+#[cfg(test)]
+mod money_flow_index_test;
 mod moving_average_dispatcher;
 #[cfg(test)]
 mod moving_average_test;
@@ -475,16 +481,10 @@ pub(crate) use mama::mesa_adaptive_moving_average;
 pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
 pub(crate) use math_operator::rolling_sum;
-#[allow(unused_imports)]
-pub(crate) use mfi::money_flow_index;
-pub use mfi::MoneyFlowIndex;
-#[allow(unused_imports)]
-pub(crate) use minus_di::minus_directional_indicator;
-pub use minus_di::MinusDirectionalIndicator;
-#[allow(unused_imports)]
-pub(crate) use minus_dm::minus_directional_movement;
-pub use minus_dm::MinusDirectionalMovement;
+pub use minus_directional_indicator::MinusDirectionalIndicator;
+pub use minus_directional_movement::MinusDirectionalMovement;
 pub use momentum::Momentum;
+pub use money_flow_index::MoneyFlowIndex;
 pub use moving_average::MovingAverage;
 pub use moving_average_convergence_divergence::{
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue,

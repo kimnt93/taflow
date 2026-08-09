@@ -1,57 +1,6 @@
 //! Incremental Minus Directional Movement (-DM).
 use crate::error::{TaError, TaResult};
 
-/// Compute the minus directional movement result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn minus_directional_movement(
-    high: &[f64],
-    low: &[f64],
-    timeperiod: usize,
-) -> TaResult<Vec<f64>> {
-    let len = high.len();
-    if len != low.len() {
-        return Err(TaError::LengthMismatch {
-            expected: len,
-            got: low.len(),
-        });
-    }
-    if timeperiod < 1 || len < timeperiod {
-        return Err(TaError::InsufficientData {
-            need: timeperiod.max(1),
-            got: len,
-        });
-    }
-    let mut output = vec![0.0; len];
-    if timeperiod > 1 {
-        output[..timeperiod - 1].fill(f64::NAN);
-    }
-    let mut sum = 0.0;
-    for index in 1..timeperiod {
-        let up = high[index] - high[index - 1];
-        let down = low[index - 1] - low[index];
-        if down > up && down > 0.0 {
-            sum += down;
-        }
-    }
-    output[timeperiod - 1] = sum;
-    let period = timeperiod as f64;
-    for index in timeperiod..len {
-        let up = high[index] - high[index - 1];
-        let down = low[index - 1] - low[index];
-        sum = sum - sum / period + if down > up && down > 0.0 { down } else { 0.0 };
-        output[index] = sum;
-    }
-    Ok(output)
-}
 /// Persistent Rust state or aligned output type for `MinusDirectionalMovement`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
@@ -130,25 +79,5 @@ impl MinusDirectionalMovement {
         self.prev = None;
         self.sum = 0.0;
         self.v = None
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn matches_batch() {
-        let high: Vec<f64> = (0..40).map(|i| 100.0 + i as f64 * 0.1).collect();
-        let low: Vec<f64> = (0..40).map(|i| 98.0 - i as f64 * 0.3).collect();
-        let expected = crate::stream::minus_directional_movement(&high, &low, 14).unwrap();
-        let mut state = MinusDirectionalMovement::new(14).unwrap();
-
-        for ((&high, &low), expected) in high.iter().zip(&low).zip(&expected) {
-            match state.append(high, low) {
-                Some(actual) => assert!((actual - expected).abs() < 1e-12),
-                None => assert!(expected.is_nan()),
-            }
-        }
     }
 }
