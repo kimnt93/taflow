@@ -300,14 +300,14 @@ from .squeeze import Squeeze
 from .squeeze_pro import SqueezePro
 from .schaff_trend_cycle import SchaffTrendCycle
 from .vortex import Vortex
-from .kst import KnowSureThing
+from .know_sure_thing import KnowSureThing
 from .mass_index import MassIndex
 from .detrended_price_oscillator import DetrendedPriceOscillator
 from .chaikin_money_flow import ChaikinMoneyFlow
 from .volume_price_trend import VolumePriceTrend
 from .negative_volume_index import NegativeVolumeIndex
 from .positive_volume_index import PositiveVolumeIndex
-from .mcginley_dynamic import McGinleyDynamic
+from .mc_ginley_dynamic import McGinleyDynamic
 from .decay_linear import DecayLinear
 from .signed_power import SignedPower
 from .time_series_rank import TimeSeriesRank

@@ -1333,6 +1333,8 @@ mod kalman_hedge_ratio;
 #[cfg(test)]
 mod kalman_hedge_ratio_test;
 mod know_sure_thing;
+#[cfg(test)]
+mod know_sure_thing_test;
 mod ornstein_uhlenbeck_half_life;
 #[cfg(test)]
 mod ornstein_uhlenbeck_half_life_test;
@@ -1354,15 +1356,13 @@ mod squeeze_test;
 mod supertrend;
 #[cfg(test)]
 mod supertrend_test;
-mod vortex;
-#[cfg(test)]
-mod vortex_test;
-#[allow(unused_imports)]
-pub(crate) use know_sure_thing::know_sure_thing;
 mod swing_high_low;
 #[cfg(test)]
 mod swing_high_low_test;
 mod swing_highs_lows;
+mod vortex;
+#[cfg(test)]
+mod vortex_test;
 pub use swing_high_low::{SwingHighLow, SwingValue};
 pub use swing_highs_lows::SwingHighsLows;
 mod swing_high;
@@ -1398,6 +1398,9 @@ mod rolling_kurtosis;
 #[cfg(test)]
 mod rolling_kurtosis_test;
 pub use rolling_kurtosis::RollingKurtosis;
+mod aroon_oscillator;
+#[cfg(test)]
+mod aroon_oscillator_test;
 mod chaikin_money_flow;
 #[cfg(test)]
 mod chaikin_money_flow_test;
@@ -1412,7 +1415,9 @@ mod exponentially_weighted_variance;
 mod mass_index;
 #[cfg(test)]
 mod mass_index_test;
-mod mcginley_dynamic;
+mod mc_ginley_dynamic;
+#[cfg(test)]
+mod mc_ginley_dynamic_test;
 mod negative_volume_index;
 #[cfg(test)]
 mod negative_volume_index_test;
@@ -1432,11 +1437,6 @@ mod rolling_winsorize_test;
 mod volume_price_trend;
 #[cfg(test)]
 mod volume_price_trend_test;
-#[allow(unused_imports)]
-pub(crate) use mcginley_dynamic::mcginley_dynamic;
-mod aroon_oscillator;
-#[cfg(test)]
-mod aroon_oscillator_test;
 
 mod bar_relation;
 mod bars_since;
@@ -1563,7 +1563,7 @@ pub use chaikin_money_flow::ChaikinMoneyFlow;
 pub use cross::Cross;
 pub use detrended_price_oscillator::DetrendedPriceOscillator;
 pub use mass_index::MassIndex;
-pub use mcginley_dynamic::McGinleyDynamic;
+pub use mc_ginley_dynamic::McGinleyDynamic;
 pub use negative_volume_index::NegativeVolumeIndex;
 pub use normalized_average_true_range::NormalizedAverageTrueRange;
 pub use on_balance_volume::OnBalanceVolume;

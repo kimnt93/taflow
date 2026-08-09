@@ -383,7 +383,10 @@ mod tests {
             .map(|i| 100.0 + (i as f64 * 0.05).sin() * 6.0 + i as f64 * 0.01)
             .collect();
 
-        let (kst, signal) = know_sure_thing(&close, 10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
+        let mut batch_state = KnowSureThing::new(10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
+        let batch: Vec<_> = close.iter().map(|&value| batch_state.append(value)).collect();
+        let kst: Vec<f64> = batch.iter().map(|v| v.kst).collect();
+        let signal: Vec<f64> = batch.iter().map(|v| v.signal).collect();
         assert!(kst[..43].iter().all(|&v| v.is_nan()));
         assert!(signal[..43].iter().all(|&v| v.is_nan()));
         assert!(kst[44..].iter().all(|&v| v.is_finite()));

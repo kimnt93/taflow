@@ -10,7 +10,7 @@
     "python_exports": 300,
     "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 294,
+    "structure": 296,
     "talib_functions": 161
   },
   "rows": [
@@ -4285,7 +4285,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "kst",
+      "module": "know_sure_thing",
       "name": "KnowSureThing",
       "native_binding": true,
       "native_symbols": [
@@ -4390,7 +4390,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "mcginley_dynamic",
+      "module": "mc_ginley_dynamic",
       "name": "McGinleyDynamic",
       "native_binding": true,
       "native_symbols": [
