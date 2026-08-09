@@ -3,18 +3,55 @@
 These rules apply to the entire repository. They define the required shape for
 new indicators and for repairs to existing indicators.
 
-## One indicator, one state machine
+## One indicator, one class, one implementation
 
 - The canonical implementation is a persistent Rust state type in
   `crates/taflow-core/src/stream/`. Python is an adapter only; it must not
   implement indicator arithmetic, rolling windows, warm-up, or output repair.
-- One canonical TA class lives in one same-named Rust file and one same-named
-  Python file. The Rust module owns that indicator's state type, associated
-  multi-output value type, private bulk helper, and focused tests. Small helper
-  types used only by that indicator stay in the same file; helpers genuinely
-  shared by several indicators live in a narrowly named helper module.
-  Aggregation files such as `operator_states.rs` must not contain public TA
-  state classes, and `mod.rs` contains declarations and re-exports only.
+- Canonical class names must use complete descriptive words. Never shorten,
+  abbreviate, contract, or preserve an abbreviated external-library name in a
+  class name. For example, `RollingCorr`, `RollingCov`, `RollingStd`, and
+  `Var` are invalid; use `RollingCorrelation`, `RollingCovariance`,
+  `RollingStandardDeviation`, and `Variance`. An external short name such as
+  TA-Lib `CORREL` belongs only in oracle/alias metadata.
+- Implement each indicator exactly once, as its canonical CamelCase class/state.
+  For example, implement `VariablePeriodMovingAverage`; do not also implement,
+  retain, or export `fn variable_period_moving_average(...)` in Rust or
+  `def variable_period_moving_average(...)` in Python. This prohibition applies
+  even when the free function is described as a batch kernel, compatibility
+  helper, convenience wrapper, or test oracle. Put scalar, slice, and bulk
+  behavior on the class/state through inherent methods or the shared lifecycle
+  trait. Private associated methods are allowed when they support the class;
+  parallel free-function indicator implementations are not.
+- Derive the module filename mechanically from the full canonical class name
+  using snake_case; do not use abbreviations, TA-Lib aliases, or family buckets.
+  `VariablePeriodMovingAverage` therefore lives in
+  `crates/taflow-core/src/stream/variable_period_moving_average.rs` and
+  `python/taflow/variable_period_moving_average.py`.
+- Each canonical class must have its own implementation file. Do not place two
+  canonical indicator classes in one file, split one canonical class across
+  multiple implementation files, or define a canonical class in `mod.rs`,
+  `lib.rs`, `__init__.py`, an aggregation module, or a shared helper module.
+  Rust and Python must use the same full canonical class name and corresponding
+  snake_case filename.
+- Keep production implementation and tests in separate same-named files. The
+  Rust tests for the example above live in
+  `crates/taflow-core/src/stream/variable_period_moving_average_test.rs`; its
+  Python tests live in `tests/variable_period_moving_average_test.py`. An
+  indicator implementation file must not contain an inline `#[cfg(test)] mod
+  tests`, and a package/module initializer must not contain tests.
+- `mod.rs`, `lib.rs`, Python `__init__.py`, and equivalent aggregation files are
+  import surfaces only: module declarations, imports, and re-exports. They must
+  not contain indicator logic, class definitions, free-function wrappers,
+  tests, inline test helpers, or compatibility implementations. Rust test
+  modules may be declared from `mod.rs` with `#[cfg(test)] mod
+  variable_period_moving_average_test;`, but all test code stays in that test
+  file.
+- The Rust implementation module owns the class/state and its associated
+  multi-output value type. Small helper types used only by that class stay in
+  its implementation file; helpers genuinely shared by several classes live in
+  a narrowly named helper module. Aggregation files such as
+  `operator_states.rs` must not contain public TA state classes.
 - A state type must expose the same lifecycle:
   - `new(...) -> TaResult<Self>` for validated configuration;
   - `append(...)` for one chronological bar;
@@ -25,11 +62,11 @@ new indicators and for repairs to existing indicators.
 - Implement `StreamingIndicator` for single-input/single-output states. For
   multi-input or multi-output states, use equivalent inherent methods and a
   typed `*Value` struct rather than unlabelled internal tuples.
-- The public indicator surface is class/state-only. Batch kernels may exist as
-  private implementation details, but users construct the persistent state and
-  call its lifecycle; do not add or export a parallel free-function indicator
-  API. A private bulk kernel must delegate to the same state machine or be
-  bit-equivalent, and it must never become a second Python execution path.
+- The public and internal indicator surface is class/state-only. Users and
+  internal callers construct the persistent state and use its lifecycle. A
+  specialized bulk path, when justified, must be a method of that same state,
+  must leave the same post-run state as scalar replay, and must never become a
+  second implementation or Python execution path.
 - Warm-up belongs in Rust. Scalar warm-up is `None`; aligned histories contain
   `f64::NAN` at those positions. Batch, repeated `extend`, and scalar `append`
   must leave identical state and bitwise-identical histories.
@@ -57,7 +94,11 @@ new indicators and for repairs to existing indicators.
 
 - The public API is the canonical CamelCase class. TA-Lib names are metadata
   aliases/mappings (for example `MathSin` maps to TA-Lib `SIN`); do not expose
-  a second numerical implementation or a public snake-case batch function.
+  a second numerical implementation or any snake-case indicator function.
+- The same class-only rule applies inside Python: constructors, lifecycle
+  methods, converters, and bindings may delegate to the native state, but no
+  module-level function may calculate or wrap an indicator result. The canonical
+  batch call is `ClassName(...).compute()`.
 - Every indicator class exposes the same operations:
   `append`, `extend`, `value`, `compute`, `reset`, and `__len__`.
   `append`, `extend`, and `reset` mutate and return `self` for fluent use.
@@ -85,6 +126,13 @@ new indicators and for repairs to existing indicators.
 
 ## Correctness and source mapping
 
+- Compare implementations only through the public Python class API. The TAFlow
+  side of every external-oracle assertion must be produced by constructing the
+  canonical class and calling `.compute()` (plus its lifecycle methods for
+  invariance tests). Do not compare an external library against a Rust free
+  function, Python free function, private batch helper, or a duplicated local
+  formula. Rust tests establish state-machine behavior; Python-versus-reference
+  tests establish external numerical correctness.
 - Record both names whenever they differ: canonical TAFlow class/name and
   oracle name (for example `MathSin` ⇔ `SIN`, `RollingCov` ⇔ Polars
   `rolling_cov`). Never infer equivalence from similar names alone.
@@ -94,10 +142,13 @@ new indicators and for repairs to existing indicators.
   3. pandas;
   4. pandas-ta-classic;
   5. a pinned public GitHub implementation with license and commit/version.
-- Compare every output, NaN/warm-up placement, defaults, output ordering, and a
-  parameter matrix. Include random, constant, monotonic, repeated-extrema,
-  minimum-length, reset/replay, chunked, cold-start, and warmed-continuation
-  cases. Oracle import/errors are failures, never skipped self-checks.
+- For numerical correctness, compute actual values with
+  `CanonicalClass(...).compute()` and expected values with the external
+  reference library. Compare every output, NaN/warm-up placement, defaults,
+  output ordering, and a parameter matrix. Include random, constant, monotonic,
+  repeated-extrema, and minimum-length inputs. Test reset/replay, chunking,
+  cold-start, and warmed continuation separately through the same class
+  lifecycle. Oracle import/errors are failures, never skipped self-checks.
 - Mark a result `MATCH` only for numerical parity within the declared tolerance.
   Use `VARIANT` for a proven contract/definition difference and explain it.
   Native lifecycle equality is `INVARIANT`, not external correctness evidence.
@@ -116,9 +167,11 @@ new indicators and for repairs to existing indicators.
 
 ## Required gates
 
-Before declaring an indicator complete, run its focused Rust tests, canonical
-Python lifecycle audit, external oracle comparison, and focused full-protocol
-benchmark. Before repository-wide completion, run:
+Before declaring an indicator complete, run its separate
+`<class_name>_test.rs` Rust tests, separate `<class_name>_test.py` Python tests,
+canonical Python lifecycle audit, Python-class-versus-external-oracle
+comparison, and focused full-protocol benchmark. Before repository-wide
+completion, run:
 
 ```bash
 cargo test --workspace
