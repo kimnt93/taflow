@@ -113,17 +113,9 @@ from .indicators import MathAtan
 from .indicators import MathAtanh, MathCbrt, MathCeil
 from .indicators import MathCos
 from .indicators import MathCosh, MathCot, MathDegrees, MathExp, MathFloor
-from .math_ln import MathLn
-from .math_log10 import MathLog10
-from .math_log1p import MathLog1p
-from .math_radians import MathRadians
+from .indicators import MathLn, MathLog10, MathLog1p, MathRadians
 from .indicators import MathSin
-from .math_sinh import MathSinh
-from .math_sqrt import MathSqrt
-from .math_tan import MathTan
-from .math_tanh import MathTanh
-from .math_add import MathAdd
-from .math_subtract import MathSubtract
+from .indicators import MathSinh, MathSqrt, MathTan, MathTanh, MathAdd, MathSubtract
 from .math_multiply import MathMultiply
 from .math_divide import MathDivide
 from .indicators import (

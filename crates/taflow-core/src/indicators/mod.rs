@@ -87,6 +87,9 @@ mod math_acos_test;
 mod math_acosh;
 #[cfg(test)]
 mod math_acosh_test;
+mod math_add;
+#[cfg(test)]
+mod math_add_test;
 mod math_asin;
 #[cfg(test)]
 mod math_asin_test;
@@ -123,9 +126,36 @@ mod math_exp_test;
 mod math_floor;
 #[cfg(test)]
 mod math_floor_test;
+mod math_ln;
+#[cfg(test)]
+mod math_ln_test;
+mod math_log10;
+#[cfg(test)]
+mod math_log10_test;
+mod math_log1p;
+#[cfg(test)]
+mod math_log1p_test;
+mod math_radians;
+#[cfg(test)]
+mod math_radians_test;
 mod math_sin;
 #[cfg(test)]
 mod math_sin_test;
+mod math_sinh;
+#[cfg(test)]
+mod math_sinh_test;
+mod math_sqrt;
+#[cfg(test)]
+mod math_sqrt_test;
+mod math_subtract;
+#[cfg(test)]
+mod math_subtract_test;
+mod math_tan;
+#[cfg(test)]
+mod math_tan_test;
+mod math_tanh;
+#[cfg(test)]
+mod math_tanh_test;
 mod median_price;
 #[cfg(test)]
 mod median_price_test;
@@ -347,6 +377,7 @@ pub use log_return::LogReturn;
 pub use math_abs::MathAbs;
 pub use math_acos::MathAcos;
 pub use math_acosh::MathAcosh;
+pub use math_add::MathAdd;
 pub use math_asin::MathAsin;
 pub use math_asinh::MathAsinh;
 pub use math_atan::MathAtan;
@@ -359,7 +390,16 @@ pub use math_cot::MathCot;
 pub use math_degrees::MathDegrees;
 pub use math_exp::MathExp;
 pub use math_floor::MathFloor;
+pub use math_ln::MathLn;
+pub use math_log10::MathLog10;
+pub use math_log1p::MathLog1p;
+pub use math_radians::MathRadians;
 pub use math_sin::MathSin;
+pub use math_sinh::MathSinh;
+pub use math_sqrt::MathSqrt;
+pub use math_subtract::MathSubtract;
+pub use math_tan::MathTan;
+pub use math_tanh::MathTanh;
 pub use median_price::MedianPrice;
 pub use mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 pub use momentum::Momentum;

@@ -1,15 +1,15 @@
-//! Persistent pointwise `sinh` transform.
+//! Persistent pointwise `tanh` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `sinh` to each value without warm-up.
+/// Apply `tanh` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathSinh {
+pub struct MathTanh {
     value: Option<f64>,
 }
 
-impl MathSinh {
+impl MathTanh {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathSinh {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.sinh());
+        self.value = Some(input.tanh());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathSinh {
     }
 }
 
-impl StreamingIndicator for MathSinh {
+impl StreamingIndicator for MathTanh {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

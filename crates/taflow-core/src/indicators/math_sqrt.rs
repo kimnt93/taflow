@@ -1,15 +1,15 @@
-//! Persistent pointwise `ln` transform.
+//! Persistent pointwise `sqrt` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `ln` to each value without warm-up.
+/// Apply `sqrt` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathLn {
+pub struct MathSqrt {
     value: Option<f64>,
 }
 
-impl MathLn {
+impl MathSqrt {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathLn {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.ln());
+        self.value = Some(input.sqrt());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathLn {
     }
 }
 
-impl StreamingIndicator for MathLn {
+impl StreamingIndicator for MathSqrt {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

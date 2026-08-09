@@ -1,15 +1,15 @@
-//! Persistent pointwise `sqrt` transform.
+//! Persistent pointwise `radians` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `sqrt` to each value without warm-up.
+/// Apply `radians` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathSqrt {
+pub struct MathRadians {
     value: Option<f64>,
 }
 
-impl MathSqrt {
+impl MathRadians {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathSqrt {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.sqrt());
+        self.value = Some(input.to_radians());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathSqrt {
     }
 }
 
-impl StreamingIndicator for MathSqrt {
+impl StreamingIndicator for MathRadians {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

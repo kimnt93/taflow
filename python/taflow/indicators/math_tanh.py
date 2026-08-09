@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._math_state import MathUnaryState
-from ._native import MathTanh as _NativeMathTanh
+from .._math_state import MathUnaryState
+from .._native import MathTanh as _NativeMathTanh
 
 
 class MathTanh(MathUnaryState):

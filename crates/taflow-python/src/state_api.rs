@@ -197,15 +197,6 @@ macro_rules! unary_state_class {
     };
 }
 
-unary_state_class!(MathLn);
-unary_state_class!(MathLog10);
-unary_state_class!(MathLog1p);
-unary_state_class!(MathRadians);
-unary_state_class!(MathSinh);
-unary_state_class!(MathSqrt);
-unary_state_class!(MathTan);
-unary_state_class!(MathTanh);
-
 macro_rules! binary_math_state_class {
     ($class:ident) => {
         #[pyclass]
@@ -265,8 +256,6 @@ macro_rules! binary_math_state_class {
     };
 }
 
-binary_math_state_class!(MathAdd);
-binary_math_state_class!(MathSubtract);
 binary_math_state_class!(MathMultiply);
 binary_math_state_class!(MathDivide);
 

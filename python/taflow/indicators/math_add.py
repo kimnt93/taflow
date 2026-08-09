@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._math_state import MathBinaryState
-from ._native import MathAdd as _NativeMathAdd
+from .._math_state import MathBinaryState
+from .._native import MathAdd as _NativeMathAdd
 
 
 class MathAdd(MathBinaryState):

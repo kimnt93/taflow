@@ -41,6 +41,7 @@ pub(crate) mod tests_extrema_support {
 mod absolute_price_oscillator;
 #[cfg(test)]
 mod absolute_price_oscillator_test;
+pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
 mod bollinger_bands;
 #[cfg(test)]
@@ -261,8 +262,16 @@ mod intraday_momentum_index_test;
 mod kaufman_adaptive_moving_average;
 #[cfg(test)]
 mod kaufman_adaptive_moving_average_test;
-mod math_ln;
 mod math_operator;
+mod minus_directional_indicator;
+#[cfg(test)]
+mod minus_directional_indicator_test;
+mod minus_directional_movement;
+#[cfg(test)]
+mod minus_directional_movement_test;
+mod money_flow_index;
+#[cfg(test)]
+mod money_flow_index_test;
 mod moving_average;
 mod moving_average_convergence_divergence;
 mod moving_average_convergence_divergence_extended;
@@ -274,47 +283,6 @@ mod moving_average_convergence_divergence_fixed_test;
 mod moving_average_convergence_divergence_helpers;
 #[cfg(test)]
 mod moving_average_convergence_divergence_test;
-pub use math_ln::MathLn;
-#[cfg(test)]
-mod math_ln_test;
-mod math_log10;
-pub use math_log10::MathLog10;
-#[cfg(test)]
-mod math_log10_test;
-mod math_log1p;
-pub use math_log1p::MathLog1p;
-#[cfg(test)]
-mod math_log1p_test;
-mod math_radians;
-pub use math_radians::MathRadians;
-#[cfg(test)]
-mod math_radians_test;
-mod math_sinh;
-pub use math_sinh::MathSinh;
-#[cfg(test)]
-mod math_sinh_test;
-mod math_sqrt;
-pub use math_sqrt::MathSqrt;
-#[cfg(test)]
-mod math_sqrt_test;
-mod math_tan;
-pub use math_tan::MathTan;
-#[cfg(test)]
-mod math_tan_test;
-mod math_tanh;
-pub use math_tanh::MathTanh;
-pub(crate) mod accumulation_distribution_helper;
-#[cfg(test)]
-mod math_tanh_test;
-mod minus_directional_indicator;
-#[cfg(test)]
-mod minus_directional_indicator_test;
-mod minus_directional_movement;
-#[cfg(test)]
-mod minus_directional_movement_test;
-mod money_flow_index;
-#[cfg(test)]
-mod money_flow_index_test;
 pub(crate) mod moving_average_dispatcher;
 #[cfg(test)]
 mod moving_average_test;
@@ -541,15 +509,7 @@ pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
 pub use weighted_moving_average::WeightedMovingAverage;
 pub use window::Window;
 
-mod math_add;
-pub use math_add::MathAdd;
-#[cfg(test)]
-mod math_add_test;
-mod math_subtract;
-pub use math_subtract::MathSubtract;
 mod math_multiply;
-#[cfg(test)]
-mod math_subtract_test;
 pub use math_multiply::MathMultiply;
 mod math_divide;
 #[cfg(test)]

@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._math_state import MathUnaryState
-from ._native import MathSqrt as _NativeMathSqrt
+from .._math_state import MathUnaryState
+from .._native import MathSqrt as _NativeMathSqrt
 
 
 class MathSqrt(MathUnaryState):

@@ -1,15 +1,15 @@
-//! Persistent pointwise `radians` transform.
+//! Persistent pointwise `ln` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `radians` to each value without warm-up.
+/// Apply `ln` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathRadians {
+pub struct MathLn {
     value: Option<f64>,
 }
 
-impl MathRadians {
+impl MathLn {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathRadians {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.to_radians());
+        self.value = Some(input.ln());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathRadians {
     }
 }
 
-impl StreamingIndicator for MathRadians {
+impl StreamingIndicator for MathLn {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

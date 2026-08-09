@@ -1,15 +1,15 @@
-//! Persistent pointwise `tan` transform.
+//! Persistent pointwise `log10` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `tan` to each value without warm-up.
+/// Apply `log10` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathTan {
+pub struct MathLog10 {
     value: Option<f64>,
 }
 
-impl MathTan {
+impl MathLog10 {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathTan {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.tan());
+        self.value = Some(input.log10());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathTan {
     }
 }
 
-impl StreamingIndicator for MathTan {
+impl StreamingIndicator for MathLog10 {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

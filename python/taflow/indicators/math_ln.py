@@ -1,13 +1,13 @@
-"""Persistent pointwise radians transform."""
+"""Persistent pointwise ln transform."""
 
 from typing import Any
 
-from ._math_state import MathUnaryState
-from ._native import MathRadians as _NativeMathRadians
+from .._math_state import MathUnaryState
+from .._native import MathLn as _NativeMathLn
 
 
-class MathRadians(MathUnaryState):
-    """Apply pointwise radians in persistent Rust state.
+class MathLn(MathUnaryState):
+    """Apply pointwise ln in persistent Rust state.
 
     Parameters:
         _input: Required chronological values. Pass an empty series for a fresh
@@ -15,22 +15,22 @@ class MathRadians(MathUnaryState):
 
     The output is a same-length ``float64`` array with no rolling warm-up.
     Domain behavior follows IEEE 754. The independent correctness oracle is
-    ``np.radians``.
+    ``talib.LN``.
     """
 
-    _native_cls = _NativeMathRadians
+    _native_cls = _NativeMathLn
 
-    def append(self, _input: float) -> "MathRadians":
+    def append(self, _input: float) -> "MathLn":
         """Append one value and return this indicator."""
         super().append(_input)
         return self
 
-    def extend(self, _input: Any) -> "MathRadians":
+    def extend(self, _input: Any) -> "MathLn":
         """Append chronological values and return this indicator."""
         super().extend(_input)
         return self
 
-    def reset(self) -> "MathRadians":
+    def reset(self) -> "MathLn":
         """Restore fresh native state and return this indicator."""
         super().reset()
         return self

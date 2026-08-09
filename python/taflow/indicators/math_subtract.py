@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._math_state import MathBinaryState
-from ._native import MathSubtract as _NativeMathSubtract
+from .._math_state import MathBinaryState
+from .._native import MathSubtract as _NativeMathSubtract
 
 
 class MathSubtract(MathBinaryState):
