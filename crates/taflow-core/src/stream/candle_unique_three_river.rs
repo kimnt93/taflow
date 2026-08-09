@@ -129,15 +129,8 @@ impl CandleUniqueThreeRiver {
             }
             return Ok(());
         }
-        let scores = candle_unique_three_river(open, high, low, close)?;
-        output.extend_from_slice(&scores);
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
         }
         Ok(())
     }
@@ -156,93 +149,5 @@ impl CandleUniqueThreeRiver {
         self.body_long_sum = 0.0;
         self.body_short_sum = 0.0;
         self.value = None;
-    }
-}
-
-/// Compute the candle pattern signal for aligned OHLC bars.
-///
-/// # Parameters
-///
-/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
-///
-/// # Returns
-///
-/// A same-length vector containing -100, 0, or 100 pattern signals; bars
-/// Compute the candle unique three river result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_unique_three_river(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = BODY_SHORT.avg_period.max(BODY_LONG.avg_period) + 2;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut body_long_sum = 0.0;
-    let mut body_short_sum = 0.0;
-    let start = lookback;
-    for i in (start - 2 - BODY_LONG.avg_period)..(start - 2) {
-        body_long_sum += cr_realbody(open, high, low, close, i);
-    }
-    for i in (start - BODY_SHORT.avg_period)..start {
-        body_short_sum += cr_realbody(open, high, low, close, i);
-    }
-
-    for i in start..len {
-        output[i] = (candle_color(open[i-2], close[i-2]) == -1
-            && real_body(open[i-2], close[i-2]) > ca_realbody(BODY_LONG, body_long_sum, open, high, low, close, i-2)
-            // 2nd: black, higher close, open no higher than first open, lower low
-            && candle_color(open[i-1], close[i-1]) == -1
-            && close[i-1] > close[i-2]
-            && open[i-1] <= open[i-2]
-            && low[i-1] < low[i-2]
-            // 3rd: small white, open above second low
-            && candle_color(open[i], close[i]) == 1
-            && real_body(open[i], close[i]) < ca_realbody(BODY_SHORT, body_short_sum, open, high, low, close, i)
-            && open[i] > low[i-1]) as i32
-            * 100;
-        body_long_sum += cr_realbody(open, high, low, close, i - 2)
-            - cr_realbody(open, high, low, close, i - 2 - BODY_LONG.avg_period);
-        body_short_sum += cr_realbody(open, high, low, close, i)
-            - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let o: Vec<f64> = (0..45).map(|i| 100.0 + i as f64 * 0.2).collect();
-        let h: Vec<f64> = o.iter().map(|x| x + 2.0).collect();
-        let l: Vec<f64> = o.iter().map(|x| x - 2.0).collect();
-        let c: Vec<f64> = o
-            .iter()
-            .enumerate()
-            .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
-            .collect();
-        let e = crate::stream::candle_unique_three_river(&o, &h, &l, &c).unwrap();
-        let mut s = CandleUniqueThreeRiver::new();
-        for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
-        }
     }
 }

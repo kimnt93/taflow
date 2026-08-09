@@ -166,24 +166,36 @@ mod candle_on_neck;
 #[cfg(test)]
 mod candle_on_neck_test;
 mod candle_piercing;
+#[cfg(test)]
+mod candle_piercing_test;
 mod candle_rickshawman;
 #[cfg(test)]
 mod candle_rickshawman_test;
-mod candle_risefall3methods;
-mod candle_separatinglines;
-mod candle_shootingstar;
+mod candle_rise_fall_three_methods;
+#[cfg(test)]
+mod candle_rise_fall_three_methods_test;
+mod candle_separating_lines;
+#[cfg(test)]
+mod candle_separating_lines_test;
+mod candle_shooting_star;
+#[cfg(test)]
+mod candle_shooting_star_test;
 mod candle_short_line;
 #[cfg(test)]
 mod candle_short_line_test;
 mod candle_spinning_top;
 #[cfg(test)]
 mod candle_spinning_top_test;
-mod candle_stalledpattern;
+mod candle_stalled_pattern;
+#[cfg(test)]
+mod candle_stalled_pattern_test;
 mod candle_stick_sandwich;
 #[cfg(test)]
 mod candle_stick_sandwich_test;
 mod candle_takuri;
-mod candle_tasukigap;
+mod candle_tasuki_gap;
+#[cfg(test)]
+mod candle_tasuki_gap_test;
 mod candle_three_black_crows;
 #[cfg(test)]
 mod candle_three_black_crows_test;
@@ -203,12 +215,20 @@ mod candle_three_white_soldiers;
 #[cfg(test)]
 mod candle_three_white_soldiers_test;
 mod candle_thrusting;
-mod candle_tristar;
+#[cfg(test)]
+mod candle_thrusting_test;
+mod candle_tri_star;
+#[cfg(test)]
+mod candle_tri_star_test;
 mod candle_two_crows;
 #[cfg(test)]
 mod candle_two_crows_test;
-mod candle_unique3river;
-mod candle_upsidegap2crows;
+mod candle_unique_three_river;
+#[cfg(test)]
+mod candle_unique_three_river_test;
+mod candle_upside_gap_two_crows;
+#[cfg(test)]
+mod candle_upside_gap_two_crows_test;
 mod candle_xsidegap3methods;
 mod chande_momentum_oscillator;
 #[cfg(test)]
@@ -588,15 +608,15 @@ pub use candle_morning_star::CandleMorningStar;
 pub use candle_on_neck::CandleOnNeck;
 pub use candle_piercing::CandlePiercing;
 pub use candle_rickshawman::CandleRickshawman;
-pub use candle_risefall3methods::CandleRiseFallThreeMethods;
-pub use candle_separatinglines::CandleSeparatingLines;
-pub use candle_shootingstar::CandleShootingStar;
+pub use candle_rise_fall_three_methods::CandleRiseFallThreeMethods;
+pub use candle_separating_lines::CandleSeparatingLines;
+pub use candle_shooting_star::CandleShootingStar;
 pub use candle_short_line::CandleShortLine;
 pub use candle_spinning_top::CandleSpinningTop;
-pub use candle_stalledpattern::CandleStalledPattern;
+pub use candle_stalled_pattern::CandleStalledPattern;
 pub use candle_stick_sandwich::CandleStickSandwich;
 pub use candle_takuri::CandleTakuri;
-pub use candle_tasukigap::CandleTasukiGap;
+pub use candle_tasuki_gap::CandleTasukiGap;
 pub use candle_three_black_crows::CandleThreeBlackCrows;
 pub use candle_three_inside::CandleThreeInside;
 pub use candle_three_line_strike::CandleThreeLineStrike;
@@ -604,10 +624,10 @@ pub use candle_three_outside::CandleThreeOutside;
 pub use candle_three_stars_in_south::CandleThreeStarsInSouth;
 pub use candle_three_white_soldiers::CandleThreeWhiteSoldiers;
 pub use candle_thrusting::CandleThrusting;
-pub use candle_tristar::CandleTriStar;
+pub use candle_tri_star::CandleTriStar;
 pub use candle_two_crows::CandleTwoCrows;
-pub use candle_unique3river::CandleUniqueThreeRiver;
-pub use candle_upsidegap2crows::CandleUpsideGapTwoCrows;
+pub use candle_unique_three_river::CandleUniqueThreeRiver;
+pub use candle_upside_gap_two_crows::CandleUpsideGapTwoCrows;
 pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
@@ -829,26 +849,6 @@ mod signal_delay_test;
 mod smoothed_trend_channel_lifecycle_test;
 #[cfg(test)]
 mod value_when_test;
-#[allow(unused_imports)]
-pub(crate) use candle_piercing::candle_piercing;
-#[allow(unused_imports)]
-pub(crate) use candle_risefall3methods::candle_rise_fall_three_methods;
-#[allow(unused_imports)]
-pub(crate) use candle_separatinglines::candle_separating_lines;
-#[allow(unused_imports)]
-pub(crate) use candle_shootingstar::candle_shooting_star;
-#[allow(unused_imports)]
-pub(crate) use candle_stalledpattern::candle_stalled_pattern;
-#[allow(unused_imports)]
-pub(crate) use candle_tasukigap::candle_tasuki_gap;
-#[allow(unused_imports)]
-pub(crate) use candle_thrusting::candle_thrusting;
-#[allow(unused_imports)]
-pub(crate) use candle_tristar::candle_tri_star;
-#[allow(unused_imports)]
-pub(crate) use candle_unique3river::candle_unique_three_river;
-#[allow(unused_imports)]
-pub(crate) use candle_upsidegap2crows::candle_upside_gap_two_crows;
 #[allow(unused_imports)]
 pub(crate) use candle_xsidegap3methods::candle_xside_gap_three_methods;
 

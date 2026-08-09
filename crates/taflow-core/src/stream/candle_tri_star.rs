@@ -106,15 +106,8 @@ impl CandleTriStar {
             }
             return Ok(());
         }
-        let scores = candle_tri_star(open, high, low, close)?;
-        output.extend_from_slice(&scores);
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
         }
         Ok(())
     }
@@ -132,90 +125,5 @@ impl CandleTriStar {
         self.candles.clear();
         self.body_doji_sum = 0.0;
         self.value = None;
-    }
-}
-
-/// Compute the candle pattern signal for aligned OHLC bars.
-///
-/// # Parameters
-///
-/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
-///
-/// # Returns
-///
-/// A same-length vector containing -100, 0, or 100 pattern signals; bars
-/// Compute the candle tri star result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_tri_star(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = BODY_DOJI.avg_period + 2;
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut body_sum = 0.0;
-    let start = lookback;
-    for i in (start - 2 - BODY_DOJI.avg_period)..(start - 2) {
-        body_sum += cr_highlow(open, high, low, close, i);
-    }
-
-    for i in start..len {
-        let base = real_body(open[i - 2], close[i - 2])
-            <= ca_highlow(BODY_DOJI, body_sum, open, high, low, close, i - 2)
-            && real_body(open[i - 1], close[i - 1])
-                <= ca_highlow(BODY_DOJI, body_sum, open, high, low, close, i - 1)
-            && real_body(open[i], close[i])
-                <= ca_highlow(BODY_DOJI, body_sum, open, high, low, close, i);
-        // Bearish: 2nd gaps up
-        let bear = base
-            && real_body_gap_up(open, close, i - 1, i - 2)
-            && open[i].max(close[i]) < open[i - 1].max(close[i - 1]);
-        // Bullish: 2nd gaps down
-        let bull = base
-            && real_body_gap_down(open, close, i - 1, i - 2)
-            && open[i].min(close[i]) > open[i - 1].min(close[i - 1]);
-        output[i] = (bull as i32) * 100 - (bear as i32) * 100;
-        body_sum += cr_highlow(open, high, low, close, i - 2)
-            - cr_highlow(open, high, low, close, i - 2 - BODY_DOJI.avg_period);
-    }
-    Ok(output)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let o: Vec<f64> = (0..45).map(|i| 100.0 + i as f64 * 0.2).collect();
-        let h: Vec<f64> = o.iter().map(|x| x + 2.0).collect();
-        let l: Vec<f64> = o.iter().map(|x| x - 2.0).collect();
-        let c: Vec<f64> = o
-            .iter()
-            .enumerate()
-            .map(|(i, x)| x + if i % 3 == 0 { -1.0 } else { 1.0 })
-            .collect();
-        let e = crate::stream::candle_tri_star(&o, &h, &l, &c).unwrap();
-        let mut s = CandleTriStar::new();
-        for ((((&o, &h), &l), &c), &e) in o.iter().zip(&h).zip(&l).zip(&c).zip(&e) {
-            match s.append(o, h, l, c) {
-                Some(v) => assert_eq!(v, e),
-                None => assert_eq!(e, 0),
-            }
-        }
     }
 }

@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 153,
+    "complete": 163,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 181,
+    "structure": 191,
     "talib_functions": 161
   },
   "rows": [
@@ -1932,7 +1932,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "piercing",
+      "module": "candle_piercing",
       "name": "CandlePiercing",
       "native_binding": true,
       "native_symbols": [
@@ -1947,7 +1947,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "rise_fall_three_methods",
+      "module": "candle_rise_fall_three_methods",
       "name": "CandleRiseFallThreeMethods",
       "native_binding": true,
       "native_symbols": [
@@ -1962,7 +1962,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "separating_lines",
+      "module": "candle_separating_lines",
       "name": "CandleSeparatingLines",
       "native_binding": true,
       "native_symbols": [
@@ -1977,7 +1977,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "shooting_star",
+      "module": "candle_shooting_star",
       "name": "CandleShootingStar",
       "native_binding": true,
       "native_symbols": [
@@ -1992,7 +1992,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "stalled_pattern",
+      "module": "candle_stalled_pattern",
       "name": "CandleStalledPattern",
       "native_binding": true,
       "native_symbols": [
@@ -2007,7 +2007,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "tasuki_gap",
+      "module": "candle_tasuki_gap",
       "name": "CandleTasukiGap",
       "native_binding": true,
       "native_symbols": [
@@ -2022,7 +2022,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "thrusting",
+      "module": "candle_thrusting",
       "name": "CandleThrusting",
       "native_binding": true,
       "native_symbols": [
@@ -2037,7 +2037,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "tri_star",
+      "module": "candle_tri_star",
       "name": "CandleTriStar",
       "native_binding": true,
       "native_symbols": [
@@ -2052,7 +2052,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "unique_three_river",
+      "module": "candle_unique_three_river",
       "name": "CandleUniqueThreeRiver",
       "native_binding": true,
       "native_symbols": [
@@ -2067,7 +2067,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "upside_gap_two_crows",
+      "module": "candle_upside_gap_two_crows",
       "name": "CandleUpsideGapTwoCrows",
       "native_binding": true,
       "native_symbols": [
