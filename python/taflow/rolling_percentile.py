@@ -34,8 +34,7 @@ class RollingPercentile:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod, percentile)
-        if _input is not None:
-            self.extend(_input)
+        self.extend(_input)
 
     def append(self, _input: float) -> "RollingPercentile":
         """Append one observation or aligned bar to the native Rust state.
@@ -50,7 +49,7 @@ class RollingPercentile:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_input)
+        self._state.append(float(_input))
         return self
 
     def extend(self, _input: Any) -> "RollingPercentile":
@@ -80,7 +79,7 @@ class RollingPercentile:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns

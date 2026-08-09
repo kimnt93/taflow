@@ -463,83 +463,10 @@ pub(crate) fn tracked_index_rescan_into<const MAXIMUM: bool>(
     best_index
 }
 
-macro_rules! rolling_index_indicator {
-    ($name:ident, $inner:ident, $maximum:literal) => {
-        #[derive(Debug, Clone)]
-        pub struct $name {
-            extrema: $inner,
-            value: Option<f64>,
-        }
-
-        impl $name {
-            /// Computes or updates `new` through the native Rust kernel.
-            ///
-            /// Parameters are the typed series and configuration values in the signature.
-            ///
-            /// Returns the computed value, aligned history, or a validation error.
-            pub fn new(period: usize) -> TaResult<Self> {
-                Ok(Self {
-                    extrema: $inner::new(period)?,
-                    value: None,
-                })
-            }
-        }
-
-        impl StreamingIndicator for $name {
-            type Output = f64;
-
-            fn append(&mut self, input: f64) -> Option<f64> {
-                // Warm-up emits 0, never None, matching TA-Lib's 0-fill.
-                let index = self.extrema.append(input).unwrap_or(0);
-                self.value = Some(index as f64);
-                self.value
-            }
-
-            fn value(&self) -> Option<f64> {
-                self.value
-            }
-
-            fn reset(&mut self) {
-                self.extrema.reset();
-                self.value = None;
-            }
-
-            /// Bulk kernel: from an empty state, the TA-Lib tracked-candidate
-            /// rescan machine over the whole slice; otherwise per-bar
-            /// continuation. Outputs and post-run state are bit-identical to
-            /// per-bar [`Self::append`]; warm-up bars are `0.0`, not NaN.
-            fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
-                let period = self.extrema.period();
-                if self.extrema.count() != 0 || inputs.len() < period {
-                    output.reserve(inputs.len());
-                    output.extend(
-                        inputs
-                            .iter()
-                            .copied()
-                            .map(|input| self.append(input).unwrap_or(f64::NAN)),
-                    );
-                    return;
-                }
-                let start = output.len();
-                // TA-Lib fills the lookback with 0, not NaN; the kernel writes
-                // only the warmed tail.
-                output.resize(start + inputs.len(), 0.0);
-                let tracked =
-                    tracked_index_rescan_into::<$maximum>(inputs, period, &mut output[start..]);
-                self.extrema.rebuild_from_full_run(inputs, tracked);
-                self.value = output.last().copied();
-            }
-        }
-    };
-}
-
-rolling_index_indicator!(RollingArgmax, MonotonicArgmax, true);
-rolling_index_indicator!(RollingArgmin, MonotonicArgmin, false);
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::stream::{RollingMax, RollingMin};
+    use crate::stream::{RollingArgmax, RollingArgmin, RollingMax, RollingMin};
 
     /// Original two-deque implementation, kept verbatim as the reference
     /// oracle for the split monotonic states.

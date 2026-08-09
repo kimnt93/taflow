@@ -145,6 +145,14 @@ def pandas_oracles() -> dict[str, dict]:
             "kwargs": {"timeperiod": n, "quantile": 0.25},
             "inputs": ("close",),
             "oracle": lambda a: roll(a[0]).quantile(0.25).to_numpy()},
+        "rolling_percentile": {
+            "kwargs": {"timeperiod": n, "percentile": 50.0},
+            "inputs": ("close",),
+            "oracle": lambda a: roll(a[0]).quantile(0.50).to_numpy()},
+        "rolling_interquartile_range": {
+            "kwargs": {"timeperiod": n}, "inputs": ("close",),
+            "oracle": lambda a: (roll(a[0]).quantile(0.75)
+                                  - roll(a[0]).quantile(0.25)).to_numpy()},
         "rolling_skew": {
             "kwargs": {"timeperiod": n}, "inputs": ("close",),
             "oracle": lambda a: (roll(a[0]).skew() * (n - 2)

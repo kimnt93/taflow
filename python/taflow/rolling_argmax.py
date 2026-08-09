@@ -23,6 +23,11 @@ class RollingArgmax(UnaryStateAdapter):
 
     _native_cls = StatefulMaxindex
 
+    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
+        """Create the native maximum-index state and process ``_input``."""
+        self._state = self._native_cls(timeperiod)
+        self.extend(_input)
+
     def append(self, _input: float) -> "RollingArgmax":
         """Append one observation and return this indicator."""
         super().append(_input)

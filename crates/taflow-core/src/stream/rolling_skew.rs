@@ -1,155 +1,103 @@
-//! Batch implementation for `rolling_skew`.
+//! Stateful rolling rollingskew indicator.
 
-use super::operator_states::*;
-use super::*;
-use crate::error::{TaError, TaResult};
-use std::collections::VecDeque;
+use crate::error::TaResult;
 
-rolling_moment_operator!(RollingSkew, |n: f64, m2: f64, m3: f64, _m4: f64| {
-    if m2 > 0.0 {
-        n.sqrt() * m3 / m2.powf(1.5)
-    } else {
-        0.0
-    }
-});
+use super::operator_states::validate_period;
+use super::Window;
 
-/// Computes or updates `rolling_skew` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Compute the rolling skew result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn rolling_skew(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = RollingSkew::new(timeperiod)?;
-    Ok(input
-        .iter()
-        .map(|&value| state.append(value).unwrap_or(f64::NAN))
-        .collect())
+/// Persistent trailing rollingskew computed from a fixed-size moment window.
+#[derive(Debug, Clone)]
+pub struct RollingSkew {
+    values: Window,
+    timeperiod: usize,
+    nobs: usize,
+    mean: f64,
+    m2: f64,
+    m3: f64,
+    m4: f64,
+    value: Option<f64>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::collections::VecDeque;
-
-    /// Pre-optimization `rolling_moment_operator!` body (VecDeque window),
-    /// kept verbatim as oracle for the fixed-ring rewrite.
-    struct Reference {
-        values: VecDeque<f64>,
-        timeperiod: usize,
-        nobs: usize,
-        mean: f64,
-        m2: f64,
-        m3: f64,
-        m4: f64,
+impl RollingSkew {
+    /// Create a state with a positive trailing period.
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
+        Ok(Self {
+            values: Window::new(timeperiod)?,
+            timeperiod,
+            nobs: 0,
+            mean: 0.0,
+            m2: 0.0,
+            m3: 0.0,
+            m4: 0.0,
+            value: None,
+        })
     }
 
-    impl Reference {
-        fn new(timeperiod: usize) -> Self {
-            Self {
-                values: VecDeque::with_capacity(timeperiod),
-                timeperiod,
-                nobs: 0,
-                mean: 0.0,
-                m2: 0.0,
-                m3: 0.0,
-                m4: 0.0,
-            }
-        }
-
-        fn append(&mut self, input: f64) -> Option<f64> {
-            if self.values.len() == self.timeperiod {
-                let old = self.values.pop_front().expect("full moment window");
-                let n = (self.nobs - 1) as f64;
-                let delta = old - self.mean;
-                let delta_n = delta / n;
-                let term1 = delta_n * delta * (n + 1.0);
-                let old_m2 = self.m2;
-                let old_m3 = self.m3;
-                self.m4 += delta_n
-                    * (4.0 * old_m3 + delta_n * (6.0 * old_m2 - term1 * (n * n + 3.0 * n + 3.0)));
-                self.m3 = old_m3 - delta_n * (term1 * (n + 2.0) - 3.0 * old_m2);
-                self.m2 = old_m2 - term1;
-                self.mean -= delta_n;
-                self.nobs -= 1;
-            }
-            self.values.push_back(input);
-            let n_old = self.nobs as f64;
-            let n = n_old + 1.0;
-            let delta = input - self.mean;
+    /// Append one value and return the statistic after warm-up.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if let Some(old) = self.values.push(input) {
+            let n = (self.nobs - 1) as f64;
+            let delta = old - self.mean;
             let delta_n = delta / n;
-            let term1 = delta * delta_n * n_old;
+            let term1 = delta_n * delta * (n + 1.0);
             let old_m2 = self.m2;
             let old_m3 = self.m3;
             self.m4 += delta_n
-                * (-4.0 * old_m3 + delta_n * (6.0 * old_m2 + term1 * (n * n - 3.0 * n + 3.0)));
-            self.m3 += delta_n * (term1 * (n - 2.0) - 3.0 * old_m2);
-            self.m2 = old_m2 + term1;
-            self.mean += delta_n;
-            self.nobs += 1;
-            (self.nobs == self.timeperiod).then(|| {
-                let n = self.nobs as f64;
-                if self.m2 > 0.0 {
-                    n.sqrt() * self.m3 / self.m2.powf(1.5)
-                } else {
-                    0.0
-                }
-            })
+                * (4.0 * old_m3 + delta_n * (6.0 * old_m2 - term1 * (n * n + 3.0 * n + 3.0)));
+            self.m3 = old_m3 - delta_n * (term1 * (n + 2.0) - 3.0 * old_m2);
+            self.m2 = old_m2 - term1;
+            self.mean -= delta_n;
+            self.nobs -= 1;
         }
-    }
-
-    fn lcg_series(len: usize, seed: u64) -> Vec<f64> {
-        let mut state = seed;
-        (0..len)
-            .map(|_| {
-                state = state
-                    .wrapping_mul(6364136223846793005)
-                    .wrapping_add(1442695040888963407);
-                ((state >> 11) as f64 / (1u64 << 53) as f64) * 4.0 - 2.0
+        let n_old = self.nobs as f64;
+        let n = n_old + 1.0;
+        let delta = input - self.mean;
+        let delta_n = delta / n;
+        let term1 = delta * delta_n * n_old;
+        let old_m2 = self.m2;
+        let old_m3 = self.m3;
+        self.m4 +=
+            delta_n * (-4.0 * old_m3 + delta_n * (6.0 * old_m2 + term1 * (n * n - 3.0 * n + 3.0)));
+        self.m3 += delta_n * (term1 * (n - 2.0) - 3.0 * old_m2);
+        self.m2 = old_m2 + term1;
+        self.mean += delta_n;
+        self.nobs += 1;
+        self.value = if self.nobs == self.timeperiod {
+            Some(if self.m2 > 0.0 {
+                (self.nobs as f64).sqrt() * self.m3 / self.m2.powf(1.5)
+            } else {
+                0.0
             })
-            .collect()
+        } else {
+            None
+        };
+        self.value
     }
 
-    #[test]
-    fn matches_reference_bitwise_and_survives_chunking() {
-        let input = lcg_series(5_000, 0xA1_5EED_71);
-        for period in [2usize, 3, 5, 30, 252] {
-            let mut reference = Reference::new(period);
-            let expected: Vec<f64> = input
+    /// Extend a chronological slice and append aligned NaN warm-up values.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.extend(
+            input
                 .iter()
-                .map(|&v| reference.append(v).unwrap_or(f64::NAN))
-                .collect();
-            let mut state = RollingSkew::new(period).unwrap();
-            for (i, want) in expected.iter().enumerate() {
-                let got = state.append(input[i]).unwrap_or(f64::NAN);
-                assert_eq!(want.to_bits(), got.to_bits(), "p={period} bar {i}");
-            }
-            state.reset();
-            let mut fresh = Reference::new(period);
-            for &v in input.iter().take(512) {
-                let want = fresh.append(v).unwrap_or(f64::NAN);
-                let got = state.append(v).unwrap_or(f64::NAN);
-                assert_eq!(want.to_bits(), got.to_bits(), "p={period} post-reset");
-            }
-        }
+                .copied()
+                .map(|value| self.append(value).unwrap_or(f64::NAN)),
+        );
     }
 
-    #[test]
-    fn batch_matches_streaming() {
-        let input = lcg_series(1_000, 0xA2_5EED_72);
-        let batch = rolling_skew(&input, 30).unwrap();
-        let mut state = RollingSkew::new(30).unwrap();
-        for (i, value) in batch.iter().enumerate() {
-            let got = state.append(input[i]).unwrap_or(f64::NAN);
-            assert_eq!(value.to_bits(), got.to_bits());
-        }
+    /// Return the latest value, or None during warm-up.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Reset the state without reallocating its window.
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.nobs = 0;
+        self.mean = 0.0;
+        self.m2 = 0.0;
+        self.m3 = 0.0;
+        self.m4 = 0.0;
+        self.value = None;
     }
 }

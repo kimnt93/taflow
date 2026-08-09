@@ -1,6 +1,6 @@
 # External correctness oracles
 
-Bars: **2,000** | Matches: **204** | Documented variants: **38** | Failures: **0** | rtol=1e-08, atol=1e-10
+Bars: **2,000** | Matches: **206** | Documented variants: **38** | Failures: **0** | rtol=1e-08, atol=1e-10
 
 Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27, wickra 0.9.9
 
@@ -73,7 +73,9 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | Polars | `mean` | `mean` | MATCH | `2.274e-13` | 0 |  |
 | Polars | `median` | `median` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `min` | `min` | MATCH | `0.000e+00` | 0 |  |
-| Polars | `quantile` | `quantile` | MATCH | `0.000e+00` | 0 |  |
+| Polars | `rolling_interquartile_range` | `interquartile_range` | MATCH | `0.000e+00` | 0 |  |
+| Polars | `rolling_percentile` | `percentile` | MATCH | `0.000e+00` | 0 |  |
+| Polars | `rolling_quantile` | `quantile` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `sin` | `sin` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `skew` | `skew` | MATCH | `8.776e-08` | 0 | Polars raw-moment kernel tolerance after centering/scaling |
 | Polars | `sqrt` | `sqrt` | MATCH | `0.000e+00` | 0 |  |

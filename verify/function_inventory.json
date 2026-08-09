@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 172,
-    "correctness": 270,
+    "complete": 178,
+    "correctness": 272,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 293,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 615,
+    "rust_exports": 618,
     "smc_functions": 8,
-    "structure": 200,
+    "structure": 210,
     "talib_functions": 161
   },
   "rows": [
@@ -2281,7 +2281,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -2303,7 +2303,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "rolling_zscore",
+      "module": "rolling_z_score",
       "name": "RollingZScore",
       "native_binding": true,
       "native_symbols": [
@@ -2348,7 +2348,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "rolling_iqr",
+      "module": "rolling_interquartile_range",
       "name": "RollingInterquartileRange",
       "native_binding": true,
       "native_symbols": [

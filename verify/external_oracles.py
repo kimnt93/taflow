@@ -595,6 +595,12 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         "median": pl.col("close").rolling_median(n),
         "quantile": pl.col("close").rolling_quantile(
             q, interpolation="linear", window_size=n),
+        "percentile": pl.col("close").rolling_quantile(
+            0.5, interpolation="linear", window_size=n),
+        "interquartile_range": (
+            pl.col("close").rolling_quantile(0.75, interpolation="linear", window_size=n)
+            - pl.col("close").rolling_quantile(0.25, interpolation="linear", window_size=n)
+        ),
         "variance": pl.col("close").rolling_var(n, ddof=0),
         "stddev": pl.col("close").rolling_std(n, ddof=0),
         # Center/scale first: skew and kurtosis are invariant to this affine
@@ -632,6 +638,8 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         "mean": taflow.SimpleMovingAverage(close, timeperiod=n).compute(),
         "median": taflow.RollingMedian(close, n).compute(),
         "quantile": taflow.RollingQuantile(close, n, q).compute(),
+        "percentile": taflow.RollingPercentile(close, n, 50.0).compute(),
+        "interquartile_range": taflow.RollingInterquartileRange(close, n).compute(),
         "variance": taflow.RollingVariance(close, timeperiod=n).compute(),
         "stddev": taflow.RollingStandardDeviation(close, timeperiod=n).compute(),
         "skew": taflow.RollingSkew(standardized, n).compute(),
@@ -658,7 +666,12 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         tolerance = {"skew": 1e-6, "kurtosis": 1e-4}.get(name, ATOL)
         note = ("Polars raw-moment kernel tolerance after centering/scaling"
                 if name in {"skew", "kurtosis"} else "")
-        compare(rows, "Polars", name, name, value, oracle[name],
+        function_name = {
+            "quantile": "rolling_quantile",
+            "percentile": "rolling_percentile",
+            "interquartile_range": "rolling_interquartile_range",
+        }.get(name, name)
+        compare(rows, "Polars", function_name, name, value, oracle[name],
                 atol=tolerance, note=note)
 
 

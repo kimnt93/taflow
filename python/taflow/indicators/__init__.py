@@ -87,10 +87,10 @@ from ..rolling_mode import RollingMode
 from ..rolling_quantile import RollingQuantile
 from ..rolling_percentile import RollingPercentile
 from ..rolling_rank import RollingRank
-from ..rolling_zscore import RollingZScore
+from ..rolling_z_score import RollingZScore
 from ..rolling_skew import RollingSkew
 from ..rolling_kurtosis import RollingKurtosis
-from ..rolling_iqr import RollingInterquartileRange
+from ..rolling_interquartile_range import RollingInterquartileRange
 from ..rolling_cov import RollingCov
 from ..rolling_winsorize import RollingWinsorize
 from ..ewm_var import ExponentiallyWeightedVariance

@@ -2279,8 +2279,32 @@
     },
     {
       "oracle": "Polars",
-      "function": "quantile",
+      "function": "rolling_quantile",
       "output": "quantile",
+      "passed": true,
+      "max_abs_error": 0.0,
+      "nan_mismatches": 0,
+      "compared": 1987,
+      "note": "",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "Polars",
+      "function": "rolling_percentile",
+      "output": "percentile",
+      "passed": true,
+      "max_abs_error": 0.0,
+      "nan_mismatches": 0,
+      "compared": 1987,
+      "note": "",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "Polars",
+      "function": "rolling_interquartile_range",
+      "output": "interquartile_range",
       "passed": true,
       "max_abs_error": 0.0,
       "nan_mismatches": 0,

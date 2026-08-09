@@ -2,7 +2,7 @@
 
 One oracle is selected per indicator using: **TA-Lib > NumPy > Polars > pandas > pandas-ta-classic > pinned GitHub**. `VARIANT` is a documented semantic difference, not a failed comparison; `INVARIANT` rows have no external oracle.
 
-Matches: **346** | Documented variants: **38** | Self-invariant outputs: **0** | Failures: **0**
+Matches: **356** | Documented variants: **38** | Self-invariant outputs: **0** | Failures: **0**
 
 | TAFlow class ↔ oracle API | Output | Selected source | Version | Verdict | Max error | NaN | Note |
 |---|---|---|---|---:|---:|---:|---|
@@ -211,23 +211,31 @@ Matches: **346** | Documented variants: **38** | Self-invariant outputs: **0** |
 | `MathAtanh` ↔ `numpy.arctanh` | `all` | [NumPy](https://numpy.org/doc/stable/reference/ufuncs.html) | `2.4.6` | MATCH | `1.110e-16` | 0 | numpy.arctanh |
 | `MathCbrt` ↔ `numpy.cbrt` | `all` | [NumPy](https://numpy.org/doc/stable/reference/ufuncs.html) | `2.4.6` | MATCH | `6.661e-16` | 0 | numpy.cbrt |
 | `MathCeil` ↔ `CEIL` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathCeil` ↔ `Polars.ceil` | `ceil` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `MathCos` ↔ `COS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathCos` ↔ `Polars.cos` | `cos` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `MathCosh` ↔ `COSH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `MathCot` ↔ `numpy.tan reciprocal` | `all` | [NumPy](https://numpy.org/doc/stable/reference/ufuncs.html) | `2.4.6` | MATCH | `0.000e+00` | 0 | numpy.tan reciprocal |
 | `MathDegrees` ↔ `numpy.degrees` | `all` | [NumPy](https://numpy.org/doc/stable/reference/ufuncs.html) | `2.4.6` | MATCH | `0.000e+00` | 0 | numpy.degrees |
 | `MathDivide` ↔ `DIV` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `MathExp` ↔ `EXP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathExp` ↔ `Polars.exp` | `exp` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `4.441e-16` | 0 |  |
 | `MathFloor` ↔ `FLOOR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathFloor` ↔ `Polars.floor` | `floor` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `MathLn` ↔ `LN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathLn` ↔ `Polars.ln` | `ln` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `MathLog10` ↔ `LOG10` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `MathLog1p` ↔ `numpy.log1p` | `all` | [NumPy](https://numpy.org/doc/stable/reference/ufuncs.html) | `2.4.6` | MATCH | `0.000e+00` | 0 | numpy.log1p |
 | `MathMultiply` ↔ `MULT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `MathRadians` ↔ `numpy.radians` | `all` | [NumPy](https://numpy.org/doc/stable/reference/ufuncs.html) | `2.4.6` | MATCH | `0.000e+00` | 0 | numpy.radians |
 | `MathSin` ↔ `SIN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathSin` ↔ `Polars.sin` | `sin` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `MathSinh` ↔ `SINH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `MathSqrt` ↔ `SQRT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathSqrt` ↔ `Polars.sqrt` | `sqrt` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `MathSubtract` ↔ `SUB` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `MathTan` ↔ `TAN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathTan` ↔ `Polars.tan` | `tan` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `MathTanh` ↔ `TANH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `McGinleyDynamic` ↔ `pandas-ta-classic.mcginley` | `mcginley` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
 | `MedianPrice` ↔ `MEDPRICE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
@@ -298,6 +306,7 @@ Matches: **346** | Documented variants: **38** | Self-invariant outputs: **0** |
 | `RollingCov` ↔ `pandas.rolling_cov` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.282e-11` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingEntropy` ↔ `pandas.rolling_entropy` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `4.441e-16` | 0 | Series.rolling.apply/value_counts |
 | `RollingInformationRatio` ↔ `pandas.rolling_information_ratio` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `2.886e-11` | 0 | Rolling.mean/Rolling.std(ddof=0) |
+| `RollingInterquartileRange` ↔ `Polars.rolling_interquartile_range` | `interquartile_range` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `RollingKurtosis` ↔ `pandas.rolling_kurtosis` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.332e-15` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingLinearRegression` ↔ `LINEARREG` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.969e-13` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingLinearRegressionAngle` ↔ `LINEARREG_ANGLE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `4.924e-12` | 0 | external parity plus bitwise lifecycle invariance |
@@ -311,7 +320,8 @@ Matches: **346** | Documented variants: **38** | Self-invariant outputs: **0** |
 | `RollingMinMax` ↔ `MINMAX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMinMaxIndex` ↔ `MINMAXINDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingMode` ↔ `pandas.rolling_mode` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | Series.rolling.apply/value_counts |
-| `RollingQuantile` ↔ `pandas.rolling_quantile` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingPercentile` ↔ `Polars.rolling_percentile` | `percentile` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
+| `RollingQuantile` ↔ `Polars.rolling_quantile` | `quantile` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
 | `RollingRank` ↔ `pandas.rolling_rank` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | Series.rolling.apply |
 | `RollingSharpe` ↔ `pandas.rolling_sharpe` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `6.300e-09` | 0 | Rolling.mean/Rolling.std(ddof=0) |
 | `RollingSkew` ↔ `pandas.rolling_skew` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `8.882e-16` | 0 | external parity plus bitwise lifecycle invariance |

@@ -1,11 +1,11 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingQuantile;
+use taflow::stream::RollingPercentile;
 
 #[pyclass]
 pub struct RollingPercentileOperator {
-    inner: RollingQuantile,
+    inner: RollingPercentile,
     outputs: Vec<f64>,
 }
 #[pymethods]
@@ -13,7 +13,7 @@ impl RollingPercentileOperator {
     #[new]
     fn new(timeperiod: usize, percentile: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingQuantile::new(timeperiod, percentile / 100.0)
+            inner: RollingPercentile::new(timeperiod, percentile)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

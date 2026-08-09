@@ -31,8 +31,7 @@ class RollingRank:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        if _input is not None:
-            self.extend(_input)
+        self.extend(_input)
 
     def append(self, _input: float) -> "RollingRank":
         """Append one observation or aligned bar to the native Rust state.
@@ -47,7 +46,7 @@ class RollingRank:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_input)
+        self._state.append(float(_input))
         return self
 
     def extend(self, _input: Any) -> "RollingRank":
@@ -77,7 +76,7 @@ class RollingRank:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns

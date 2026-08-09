@@ -692,9 +692,10 @@ pub use rate_of_change_ratio::RateOfChangeRatio;
 pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
 pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlope, Tsf};
 pub use relative_momentum_index::RelativeMomentumIndex;
+pub use rolling_argmax::RollingArgmax;
+pub use rolling_argmin::RollingArgmin;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
-pub use rolling_extrema::{RollingArgmax, RollingArgmin};
 pub use rolling_max::RollingMax;
 pub use rolling_median::RollingMedian;
 pub use rolling_min::RollingMin;
@@ -756,17 +757,17 @@ pub use math_divide::MathDivide;
 #[cfg(test)]
 mod math_divide_test;
 mod rolling_argmax;
+#[cfg(test)]
+mod rolling_argmax_test;
+mod rolling_argmin;
+#[cfg(test)]
+mod rolling_argmin_test;
 mod rolling_max;
 #[cfg(test)]
 mod rolling_max_test;
-#[allow(unused_imports)]
-pub(crate) use rolling_argmax::rolling_argmax;
-mod rolling_argmin;
 mod rolling_min;
 #[cfg(test)]
 mod rolling_min_test;
-#[allow(unused_imports)]
-pub(crate) use rolling_argmin::rolling_argmin;
 mod rolling_minmax;
 #[allow(unused_imports)]
 pub(crate) use rolling_minmax::rolling_minmax;
@@ -972,8 +973,12 @@ mod tests {
         let mut sum_batch_state = RollingSum::new(period).unwrap();
         let mut sum_expected = Vec::new();
         sum_batch_state.extend_slice_into(&input, &mut sum_expected);
-        let maxindex_expected = crate::stream::rolling_argmax(&input, period).unwrap();
-        let minindex_expected = crate::stream::rolling_argmin(&input, period).unwrap();
+        let mut maxindex_expected_state = RollingArgmax::new(period).unwrap();
+        let mut maxindex_expected = Vec::new();
+        maxindex_expected_state.extend_slice_into(&input, &mut maxindex_expected);
+        let mut minindex_expected_state = RollingArgmin::new(period).unwrap();
+        let mut minindex_expected = Vec::new();
+        minindex_expected_state.extend_slice_into(&input, &mut minindex_expected);
         let (minmax_min, minmax_max) = crate::stream::rolling_minmax(&input, period).unwrap();
         let (minidx, maxidx) = crate::stream::rolling_minmax_index(&input, period).unwrap();
         let mut max = RollingMax::new(period).unwrap();
@@ -1307,30 +1312,30 @@ pub(crate) use know_sure_thing::know_sure_thing;
 mod swing_highs_lows;
 #[allow(unused_imports)]
 pub(crate) use swing_highs_lows::swing_highs_lows;
-mod rolling_quantile;
-#[allow(unused_imports)]
-pub(crate) use rolling_quantile::rolling_quantile;
 mod rolling_percentile;
-#[allow(unused_imports)]
-pub(crate) use rolling_percentile::rolling_percentile;
+#[cfg(test)]
+mod rolling_percentile_test;
+mod rolling_quantile;
+#[cfg(test)]
+mod rolling_quantile_test;
 mod rolling_rank;
-#[allow(unused_imports)]
-pub(crate) use rolling_rank::rolling_rank;
-mod rolling_zscore;
-#[allow(unused_imports)]
-pub(crate) use rolling_zscore::rolling_zscore;
+#[cfg(test)]
+mod rolling_rank_test;
 mod rolling_skew;
-#[allow(unused_imports)]
-pub(crate) use rolling_skew::rolling_skew;
+#[cfg(test)]
+mod rolling_skew_test;
+mod rolling_z_score;
+#[cfg(test)]
+mod rolling_z_score_test;
 pub use rolling_skew::RollingSkew;
 mod rolling_kurtosis;
-#[allow(unused_imports)]
-pub(crate) use rolling_kurtosis::rolling_kurtosis;
+#[cfg(test)]
+mod rolling_kurtosis_test;
 pub use rolling_kurtosis::RollingKurtosis;
-mod rolling_iqr;
-#[allow(unused_imports)]
-pub(crate) use rolling_iqr::rolling_iqr;
 mod rolling_cov;
+mod rolling_interquartile_range;
+#[cfg(test)]
+mod rolling_interquartile_range_test;
 #[allow(unused_imports)]
 pub(crate) use rolling_cov::rolling_cov;
 mod rolling_winsorize;
@@ -1373,9 +1378,6 @@ pub(crate) use positive_volume_index::positive_volume_index;
 mod mcginley_dynamic;
 #[allow(unused_imports)]
 pub(crate) use mcginley_dynamic::mcginley_dynamic;
-#[allow(unused_imports)]
-#[allow(unused_imports)]
-pub(crate) use rolling_mode::rolling_mode;
 mod aroon_oscillator;
 #[cfg(test)]
 mod aroon_oscillator_test;
@@ -1444,11 +1446,12 @@ pub use rolling_autocorr::RollingAutocorr;
 pub use rolling_cov::RollingCov;
 pub use rolling_entropy::RollingEntropy;
 pub use rolling_information_ratio::RollingInformationRatio;
-pub use rolling_iqr::RollingInterquartileRange;
+pub use rolling_interquartile_range::RollingInterquartileRange;
+pub use rolling_percentile::RollingPercentile;
 pub use rolling_quantile::RollingQuantile;
 pub use rolling_rank::RollingRank;
 pub use rolling_winsorize::RollingWinsorize;
-pub use rolling_zscore::RollingZScore;
+pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
 pub use session_extrema::{SessionExtrema, SessionExtremaValue};
 pub use sessions::{Sessions, SessionsValue};

@@ -92,7 +92,9 @@ def main() -> None:
         # class so both identities select the same evidence.
         from registry import resolve_class
         cls = resolve_class(row["function"])
-        key = canonical_snake_by_class.get(cls.__name__) if cls else row["function"]
+        key = canonical_snake_by_class.get(cls.__name__) if cls else None
+        if not key:
+            key = row["function"]
         external_by_function[key].append(row)
 
     selected: list[dict] = []
@@ -130,6 +132,40 @@ def main() -> None:
                              "error": float(item.get("max_abs_error", 0.0)),
                              "nan": int(item.get("nan_mismatches", 0)),
                              "note": item.get("error") or item.get("note", "")})
+
+    # Some canonical-only classes are not present in the legacy TA-Lib report
+    # but do have independent evidence from the external-oracle harness. Keep
+    # those rows in the priority-selected report instead of leaving their
+    # correctness blank in the checklist.
+    seen = {(row["class"], row["output"]) for row in selected}
+    extra_classes = {
+        "rolling_percentile": "RollingPercentile",
+        "rolling_interquartile_range": "RollingInterquartileRange",
+    }
+    for snake, evidence in external_by_function.items():
+        class_name = class_by_snake.get(snake) or extra_classes.get(snake)
+        if not class_name:
+            continue
+        source = min((item["oracle"] for item in evidence), key=lambda item: PRIORITY[item])
+        for item in (item for item in evidence if item["oracle"] == source):
+            if (class_name, item["output"]) in seen:
+                continue
+            verdict = ("MATCH" if item["passed"] else
+                       "VARIANT" if item.get("expected_difference") else "FAIL")
+            selected.append({
+                "class": class_name,
+                "snake": snake,
+                "oracle_api": API_NAMES.get(snake, f"{source}.{snake}"),
+                "output": item["output"],
+                "source": source,
+                "version": version(source, external_doc["versions"]),
+                "url": API_URLS.get(snake, URLS[source]),
+                "verdict": verdict,
+                "error": float(item.get("max_abs_error", 0.0)),
+                "nan": int(item.get("nan_mismatches", 0)),
+                "note": item.get("error") or item.get("note", ""),
+            })
+            seen.add((class_name, item["output"]))
 
     counts = {name: sum(r["verdict"] == name for r in selected)
               for name in ("MATCH", "VARIANT", "FAIL")}

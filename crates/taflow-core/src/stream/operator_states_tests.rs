@@ -136,7 +136,9 @@ mod tests {
         let mut median_state = RollingMedian::new(3).unwrap();
         let mut median = Vec::new();
         median_state.extend_slice_into(&input, &mut median);
-        let mode = rolling_mode(&input, 3).unwrap();
+        let mut mode_state = RollingMode::new(3).unwrap();
+        let mut mode = Vec::new();
+        mode_state.extend_slice_into(&input, &mut mode);
         assert!(median[0].is_nan() && median[1].is_nan());
         assert_eq!(&median[2..], &[2.0, 2.0, 2.0, 4.0]);
         assert!(mode[0].is_nan() && mode[1].is_nan());
@@ -153,14 +155,21 @@ mod tests {
     #[test]
     fn rolling_distribution_operators_match_definitions() {
         let input = vec![1.0, 4.0, 2.0, 8.0];
-        assert_eq!(rolling_quantile(&input, 3, 0.5).unwrap()[2..], [2.0, 4.0]);
-        assert_eq!(
-            rolling_percentile(&input, 3, 50.0).unwrap()[2..],
-            [2.0, 4.0]
-        );
-        assert_eq!(rolling_rank(&input, 3).unwrap()[2..], [2.0 / 3.0, 1.0]);
-        assert!((rolling_zscore(&input, 3).unwrap()[2] - (-0.2672612419)).abs() < 1e-9);
-        assert_eq!(rolling_iqr(&input, 3).unwrap()[2], 1.5);
+        let mut quantile = RollingQuantile::new(3, 0.5).unwrap();
+        let quantile_values: Vec<f64> = input.iter().map(|&value| quantile.append(value).unwrap_or(f64::NAN)).collect();
+        assert_eq!(quantile_values[2..], [2.0, 4.0]);
+        let mut percentile = RollingPercentile::new(3, 50.0).unwrap();
+        let percentile_values: Vec<f64> = input.iter().map(|&value| percentile.append(value).unwrap_or(f64::NAN)).collect();
+        assert_eq!(percentile_values[2..], [2.0, 4.0]);
+        let mut rank = RollingRank::new(3).unwrap();
+        let rank_values: Vec<f64> = input.iter().map(|&value| rank.append(value).unwrap_or(f64::NAN)).collect();
+        assert_eq!(rank_values[2..], [2.0 / 3.0, 1.0]);
+        let mut zscore = RollingZScore::new(3).unwrap();
+        let zscore_values: Vec<f64> = input.iter().map(|&value| zscore.append(value).unwrap_or(f64::NAN)).collect();
+        assert!((zscore_values[2] - (-0.2672612419)).abs() < 1e-9);
+        let mut iqr = RollingInterquartileRange::new(3).unwrap();
+        let iqr_values: Vec<f64> = input.iter().map(|&value| iqr.append(value).unwrap_or(f64::NAN)).collect();
+        assert_eq!(iqr_values[2], 1.5);
         assert!(
             (rolling_cov(&input, &[2.0, 8.0, 4.0, 16.0], 3).unwrap()[2] - 28.0 / 9.0).abs() < 1e-12
         );
@@ -180,11 +189,10 @@ mod tests {
                 .iter()
                 .map(|&x| x.to_bits())
                 .collect::<Vec<_>>(),
-            rolling_rank(&close, 3)
-                .unwrap()
-                .iter()
-                .map(|&x| x.to_bits())
-                .collect::<Vec<_>>()
+            {
+                let mut state = RollingRank::new(3).unwrap();
+                close.iter().map(|&value| state.append(value).unwrap_or(f64::NAN).to_bits()).collect::<Vec<_>>()
+            }
         );
         assert_eq!(
             decay_linear(&close, 3)
