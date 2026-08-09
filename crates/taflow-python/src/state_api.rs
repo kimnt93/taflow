@@ -7,10 +7,9 @@ use taflow::stream::{
     self, AverageDirectionalIndex, AverageDirectionalIndexRating,
     AverageTrueRange as CoreAverageTrueRange, DirectionalMovementIndex,
     DoubleExponentialMovingAverage, EvenBetterSinewave, ExponentialMovingAverage,
-    FastStochasticOscillator, IntradayMomentumIndex, KlingerVolumeOscillator,
-    MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
-    NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange, PivotPoints,
-    PremiumDiscount, RateOfChange as CoreRateOfChange,
+    FastStochasticOscillator, IntradayMomentumIndex, MesaAdaptiveMovingAverage,
+    Momentum as CoreMomentum, NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange,
+    OpeningRange, PivotPoints, PremiumDiscount, RateOfChange as CoreRateOfChange,
     RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
     RateOfChangeRatioPercent as CoreRateOfChangeRatioPercent, RollingMidpoint, RollingMidprice,
     SessionVolumeLevels, SimpleMovingAverage, SmoothedTrendChannel, StochasticOscillator,
@@ -200,14 +199,6 @@ pub struct StatefulSessionVolumeLevels {
     value_area_low: Vec<f64>,
 }
 
-/// Native state adapter for Klinger volume oscillator.
-#[pyclass]
-pub struct StatefulKlingerVolumeOscillator {
-    inner: KlingerVolumeOscillator,
-    oscillator: Vec<f64>,
-    signal: Vec<f64>,
-}
-
 /// Native state adapter for Tom DeMark Sequential setup counts.
 #[pyclass]
 pub struct StatefulTomDeMarkSequential {
@@ -344,68 +335,6 @@ impl StatefulTomDeMarkSequential {
         self.inner.reset();
         self.buys.clear();
         self.sells.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulKlingerVolumeOscillator {
-    #[new]
-    #[pyo3(signature = (fast=34, slow=55, signal=13))]
-    fn new(fast: usize, slow: usize, signal: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: KlingerVolumeOscillator::new(fast, slow, signal).map_err(py_value_error)?,
-            oscillator: Vec::new(),
-            signal: Vec::new(),
-        })
-    }
-    fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> (f64, f64) {
-        let value = self.inner.append(high, low, close, volume);
-        self.oscillator.push(value.0);
-        self.signal.push(value.1);
-        value
-    }
-    fn extend(
-        &mut self,
-        high: PyReadonlyArray1<f64>,
-        low: PyReadonlyArray1<f64>,
-        close: PyReadonlyArray1<f64>,
-        volume: PyReadonlyArray1<f64>,
-    ) -> PyResult<()> {
-        let (high, low, close, volume) = (
-            high.as_slice()?,
-            low.as_slice()?,
-            close.as_slice()?,
-            volume.as_slice()?,
-        );
-        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        for (((&high, &low), &close), &volume) in high.iter().zip(low).zip(close).zip(volume) {
-            self.append(high, low, close, volume);
-        }
-        Ok(())
-    }
-    fn compute<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
-        (
-            PyArray1::from_vec(py, self.oscillator.clone()),
-            PyArray1::from_vec(py, self.signal.clone()),
-        )
-    }
-    #[getter]
-    fn value(&self) -> Option<(f64, f64)> {
-        self.inner.value()
-    }
-    fn __len__(&self) -> usize {
-        self.oscillator.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.oscillator.clear();
-        self.signal.clear();
     }
 }
 

@@ -308,6 +308,8 @@ mod jurik_moving_average;
 #[cfg(test)]
 mod jurik_moving_average_test;
 mod klinger_volume_oscillator;
+#[cfg(test)]
+mod klinger_volume_oscillator_test;
 mod lag;
 #[cfg(test)]
 mod lag_test;
@@ -476,7 +478,7 @@ pub use jurik_moving_average::JurikMovingAverage;
 #[allow(unused_imports)]
 pub(crate) use kama::kaufman_adaptive_moving_average;
 pub use kama::KaufmanAdaptiveMovingAverage;
-pub use klinger_volume_oscillator::KlingerVolumeOscillator;
+pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
 pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
