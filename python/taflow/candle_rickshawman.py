@@ -1,13 +1,13 @@
-"""Persistent Gravestone CandleDoji candlestick recognition (CDLGRAVESTONEDOJI)."""
+"""Persistent Rickshaw Man candlestick recognition (CDLRICKSHAWMAN)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleGravestoneDoji as _Native
-from ._series import as_float64_series
+from ._native import CandleRickshawman as _Native
+from ._candle_ohlc import as_ohlc_arrays
 
 
-class CandleGravestoneDoji:
-    """Persistent Gravestone CandleDoji candlestick recognition (CDLGRAVESTONEDOJI).
+class CandleRickshawman:
+    """Persistent Rickshaw Man candlestick recognition (CDLRICKSHAWMAN).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleGravestoneDoji:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleGravestoneDoji":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleRickshawman":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -62,10 +62,10 @@ class CandleGravestoneDoji:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_open, high, low, close)
+        self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleGravestoneDoji":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleRickshawman":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,12 +84,7 @@ class CandleGravestoneDoji:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(
-            as_float64_series(_open),
-            as_float64_series(high),
-            as_float64_series(low),
-            as_float64_series(close),
-        )
+        self._state.extend(*as_ohlc_arrays(_open, high, low, close))
         return self
 
     def compute(self) -> np.ndarray:
@@ -103,7 +98,7 @@ class CandleGravestoneDoji:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> int | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -113,7 +108,11 @@ class CandleGravestoneDoji:
         """
         return self._state.value
 
-    def reset(self) -> "CandleGravestoneDoji":
+    def __len__(self) -> int:
+        """Return the number of processed OHLC bars."""
+        return len(self._state.compute())
+
+    def reset(self) -> "CandleRickshawman":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

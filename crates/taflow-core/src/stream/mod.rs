@@ -60,25 +60,35 @@ mod candle_abandonedbaby;
 mod candle_advanceblock;
 mod candle_belthold;
 mod candle_breakaway;
-mod candle_closingmarubozu;
+mod candle_closing_marubozu;
+#[cfg(test)]
+mod candle_closing_marubozu_test;
 mod candle_concealbabyswall;
 mod candle_counterattack;
 mod candle_darkcloudcover;
 mod candle_doji;
+#[cfg(test)]
+mod candle_doji_test;
 mod candle_dojistar;
-mod candle_dragonflydoji;
+mod candle_dragonfly_doji;
+#[cfg(test)]
+mod candle_dragonfly_doji_test;
 mod candle_engulfing;
 mod candle_eveningdojistar;
 mod candle_eveningstar;
 mod candle_gapsidesidewhite;
-mod candle_gravestonedoji;
+mod candle_gravestone_doji;
+#[cfg(test)]
+mod candle_gravestone_doji_test;
 mod candle_hammer;
 #[cfg(test)]
 mod candle_hammer_test;
 mod candle_hangingman;
 mod candle_harami;
 mod candle_haramicross;
-mod candle_highwave;
+mod candle_high_wave;
+#[cfg(test)]
+mod candle_high_wave_test;
 mod candle_hikkake;
 mod candle_hikkake_modified;
 #[cfg(test)]
@@ -92,9 +102,13 @@ mod candle_invertedhammer;
 mod candle_kicking;
 mod candle_kickingbylength;
 mod candle_ladderbottom;
-mod candle_longleggeddoji;
+mod candle_long_legged_doji;
+#[cfg(test)]
+mod candle_long_legged_doji_test;
 mod candle_longline;
 mod candle_marubozu;
+#[cfg(test)]
+mod candle_marubozu_test;
 mod candle_matchinglow;
 mod candle_mathold;
 mod candle_morningdojistar;
@@ -102,10 +116,14 @@ mod candle_morningstar;
 mod candle_onneck;
 mod candle_piercing;
 mod candle_rickshawman;
+#[cfg(test)]
+mod candle_rickshawman_test;
 mod candle_risefall3methods;
 mod candle_separatinglines;
 mod candle_shootingstar;
-mod candle_shortline;
+mod candle_short_line;
+#[cfg(test)]
+mod candle_short_line_test;
 mod candle_spinningtop;
 mod candle_stalledpattern;
 mod candle_stick_sandwich;
@@ -479,23 +497,23 @@ pub use candle_abandonedbaby::CandleAbandonedBaby;
 pub use candle_advanceblock::CandleAdvanceBlock;
 pub use candle_belthold::CandleBeltHold;
 pub use candle_breakaway::CandleBreakaway;
-pub use candle_closingmarubozu::CandleClosingMarubozu;
+pub use candle_closing_marubozu::CandleClosingMarubozu;
 pub use candle_concealbabyswall::CandleConcealBabySwall;
 pub use candle_counterattack::CandleCounterAttack;
 pub use candle_darkcloudcover::CandleDarkCloudCover;
 pub use candle_doji::CandleDoji;
 pub use candle_dojistar::CandleDojiStar;
-pub use candle_dragonflydoji::CandleDragonflyDoji;
+pub use candle_dragonfly_doji::CandleDragonflyDoji;
 pub use candle_engulfing::CandleEngulfing;
 pub use candle_eveningdojistar::CandleEveningDojiStar;
 pub use candle_eveningstar::CandleEveningStar;
 pub use candle_gapsidesidewhite::CandleGapSideSideWhite;
-pub use candle_gravestonedoji::CandleGravestoneDoji;
+pub use candle_gravestone_doji::CandleGravestoneDoji;
 pub use candle_hammer::CandleHammer;
 pub use candle_hangingman::CandleHangingMan;
 pub use candle_harami::CandleHarami;
 pub use candle_haramicross::CandleHaramiCross;
-pub use candle_highwave::CandleHighWave;
+pub use candle_high_wave::CandleHighWave;
 pub use candle_hikkake::CandleHikkake;
 pub use candle_hikkake_modified::CandleHikkakeModified;
 pub use candle_homingpigeon::CandleHomingPigeon;
@@ -505,7 +523,7 @@ pub use candle_invertedhammer::CandleInvertedHammer;
 pub use candle_kicking::CandleKicking;
 pub use candle_kickingbylength::CandleKickingByLength;
 pub use candle_ladderbottom::CandleLadderBottom;
-pub use candle_longleggeddoji::CandleLongLeggedDoji;
+pub use candle_long_legged_doji::CandleLongLeggedDoji;
 pub use candle_longline::CandleLongLine;
 pub use candle_marubozu::CandleMarubozu;
 pub use candle_matchinglow::CandleMatchingLow;
@@ -518,7 +536,7 @@ pub use candle_rickshawman::CandleRickshawman;
 pub use candle_risefall3methods::CandleRiseFallThreeMethods;
 pub use candle_separatinglines::CandleSeparatingLines;
 pub use candle_shootingstar::CandleShootingStar;
-pub use candle_shortline::CandleShortLine;
+pub use candle_short_line::CandleShortLine;
 pub use candle_spinningtop::CandleSpinningTop;
 pub use candle_stalledpattern::CandleStalledPattern;
 pub use candle_stick_sandwich::CandleStickSandwich;
@@ -766,19 +784,13 @@ pub(crate) use candle_belthold::candle_belt_hold;
 #[allow(unused_imports)]
 pub(crate) use candle_breakaway::candle_breakaway;
 #[allow(unused_imports)]
-pub(crate) use candle_closingmarubozu::candle_closing_marubozu;
-#[allow(unused_imports)]
 pub(crate) use candle_concealbabyswall::candle_conceal_baby_swall;
 #[allow(unused_imports)]
 pub(crate) use candle_counterattack::candle_counterattack;
 #[allow(unused_imports)]
 pub(crate) use candle_darkcloudcover::candle_dark_cloud_cover;
 #[allow(unused_imports)]
-pub(crate) use candle_doji::candle_doji;
-#[allow(unused_imports)]
 pub(crate) use candle_dojistar::candle_doji_star;
-#[allow(unused_imports)]
-pub(crate) use candle_dragonflydoji::candle_dragonfly_doji;
 #[allow(unused_imports)]
 pub(crate) use candle_engulfing::candle_engulfing;
 #[allow(unused_imports)]
@@ -788,15 +800,11 @@ pub(crate) use candle_eveningstar::candle_evening_star;
 #[allow(unused_imports)]
 pub(crate) use candle_gapsidesidewhite::candle_gap_side_side_white;
 #[allow(unused_imports)]
-pub(crate) use candle_gravestonedoji::candle_gravestone_doji;
-#[allow(unused_imports)]
 pub(crate) use candle_hangingman::candle_hanging_man;
 #[allow(unused_imports)]
 pub(crate) use candle_harami::candle_harami;
 #[allow(unused_imports)]
 pub(crate) use candle_haramicross::candle_harami_cross;
-#[allow(unused_imports)]
-pub(crate) use candle_highwave::candle_high_wave;
 #[allow(unused_imports)]
 pub(crate) use candle_homingpigeon::candle_homing_pigeon;
 #[allow(unused_imports)]
@@ -812,11 +820,7 @@ pub(crate) use candle_kickingbylength::candle_kicking_by_length;
 #[allow(unused_imports)]
 pub(crate) use candle_ladderbottom::candle_ladder_bottom;
 #[allow(unused_imports)]
-pub(crate) use candle_longleggeddoji::candle_long_legged_doji;
-#[allow(unused_imports)]
 pub(crate) use candle_longline::candle_long_line;
-#[allow(unused_imports)]
-pub(crate) use candle_marubozu::candle_marubozu;
 #[allow(unused_imports)]
 pub(crate) use candle_matchinglow::candle_matching_low;
 #[allow(unused_imports)]
@@ -830,21 +834,15 @@ pub(crate) use candle_onneck::candle_on_neck;
 #[allow(unused_imports)]
 pub(crate) use candle_piercing::candle_piercing;
 #[allow(unused_imports)]
-pub(crate) use candle_rickshawman::candle_rickshawman;
-#[allow(unused_imports)]
 pub(crate) use candle_risefall3methods::candle_rise_fall_three_methods;
 #[allow(unused_imports)]
 pub(crate) use candle_separatinglines::candle_separating_lines;
 #[allow(unused_imports)]
 pub(crate) use candle_shootingstar::candle_shooting_star;
 #[allow(unused_imports)]
-pub(crate) use candle_shortline::candle_short_line;
-#[allow(unused_imports)]
 pub(crate) use candle_spinningtop::candle_spinningtop;
 #[allow(unused_imports)]
 pub(crate) use candle_stalledpattern::candle_stalled_pattern;
-#[allow(unused_imports)]
-pub(crate) use candle_takuri::candle_takuri;
 #[allow(unused_imports)]
 pub(crate) use candle_tasukigap::candle_tasuki_gap;
 #[allow(unused_imports)]

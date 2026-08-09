@@ -1,16 +1,16 @@
 "Canonical namespace for persistent TAFlow indicators."
 
 from ..commodity_channel_index import CommodityChannelIndex
-from ..doji import CandleDoji
-from ..takuri import CandleTakuri
-from ..marubozu import CandleMarubozu
-from ..closing_marubozu import CandleClosingMarubozu
-from ..long_legged_doji import CandleLongLeggedDoji
-from ..rickshawman import CandleRickshawman
-from ..high_wave import CandleHighWave
-from ..dragonfly_doji import CandleDragonflyDoji
-from ..gravestone_doji import CandleGravestoneDoji
-from ..short_line import CandleShortLine
+from ..candle_doji import CandleDoji
+from ..candle_takuri import CandleTakuri
+from ..candle_marubozu import CandleMarubozu
+from ..candle_closing_marubozu import CandleClosingMarubozu
+from ..candle_long_legged_doji import CandleLongLeggedDoji
+from ..candle_rickshawman import CandleRickshawman
+from ..candle_high_wave import CandleHighWave
+from ..candle_dragonfly_doji import CandleDragonflyDoji
+from ..candle_gravestone_doji import CandleGravestoneDoji
+from ..candle_short_line import CandleShortLine
 from ..spinning_top import CandleSpinningTop
 from ..long_line import CandleLongLine
 from ..doji_star import CandleDojiStar

@@ -32,46 +32,6 @@ pub struct CandleShortLine {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn candle_short_line(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<i32>> {
-    let len = validate_ohlc(open, high, low, close)?;
-    let mut output = vec![0i32; len];
-    let lookback = BODY_SHORT.avg_period.max(SHADOW_SHORT.avg_period);
-    if len <= lookback {
-        return Ok(output);
-    }
-
-    let mut body_sum = 0.0;
-    let mut shadow_sum = 0.0;
-    let start = lookback;
-    for i in (start - BODY_SHORT.avg_period)..start {
-        body_sum += cr_realbody(open, high, low, close, i);
-    }
-    for i in (start - SHADOW_SHORT.avg_period)..start {
-        shadow_sum += cr_shadows(open, high, low, close, i);
-    }
-
-    for i in start..len {
-        output[i] = (real_body(open[i], close[i])
-            < ca_realbody(BODY_SHORT, body_sum, open, high, low, close, i)
-            && upper_shadow(open[i], high[i], close[i])
-                < ca_shadows(SHADOW_SHORT, shadow_sum, open, high, low, close, i)
-            && lower_shadow(open[i], low[i], close[i])
-                < ca_shadows(SHADOW_SHORT, shadow_sum, open, high, low, close, i))
-            as i32
-            * candle_color(open[i], close[i])
-            * 100;
-        body_sum += cr_realbody(open, high, low, close, i)
-            - cr_realbody(open, high, low, close, i - BODY_SHORT.avg_period);
-        shadow_sum += cr_shadows(open, high, low, close, i)
-            - cr_shadows(open, high, low, close, i - SHADOW_SHORT.avg_period);
-    }
-    Ok(output)
-}
 impl CandleShortLine {
     /// Computes or updates `new` through the native Rust kernel.
     ///
@@ -155,15 +115,8 @@ impl CandleShortLine {
             }
             return Ok(());
         }
-        let scores = candle_short_line(open, high, low, close)?;
-        output.extend_from_slice(&scores);
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
+        for i in 0..len {
+            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
         }
         Ok(())
     }

@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 113,
+    "complete": 123,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 141,
+    "structure": 151,
     "talib_functions": 161
   },
   "rows": [
@@ -1259,7 +1259,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "doji",
+      "module": "candle_doji",
       "name": "CandleDoji",
       "native_binding": true,
       "native_symbols": [
@@ -1274,7 +1274,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "takuri",
+      "module": "candle_takuri",
       "name": "CandleTakuri",
       "native_binding": true,
       "native_symbols": [
@@ -1289,7 +1289,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "marubozu",
+      "module": "candle_marubozu",
       "name": "CandleMarubozu",
       "native_binding": true,
       "native_symbols": [
@@ -1304,7 +1304,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "closing_marubozu",
+      "module": "candle_closing_marubozu",
       "name": "CandleClosingMarubozu",
       "native_binding": true,
       "native_symbols": [
@@ -1319,7 +1319,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "long_legged_doji",
+      "module": "candle_long_legged_doji",
       "name": "CandleLongLeggedDoji",
       "native_binding": true,
       "native_symbols": [
@@ -1334,7 +1334,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "rickshawman",
+      "module": "candle_rickshawman",
       "name": "CandleRickshawman",
       "native_binding": true,
       "native_symbols": [
@@ -1349,7 +1349,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "high_wave",
+      "module": "candle_high_wave",
       "name": "CandleHighWave",
       "native_binding": true,
       "native_symbols": [
@@ -1364,7 +1364,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "dragonfly_doji",
+      "module": "candle_dragonfly_doji",
       "name": "CandleDragonflyDoji",
       "native_binding": true,
       "native_symbols": [
@@ -1379,7 +1379,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "gravestone_doji",
+      "module": "candle_gravestone_doji",
       "name": "CandleGravestoneDoji",
       "native_binding": true,
       "native_symbols": [
@@ -1394,7 +1394,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "short_line",
+      "module": "candle_short_line",
       "name": "CandleShortLine",
       "native_binding": true,
       "native_symbols": [
