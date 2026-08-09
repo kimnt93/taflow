@@ -1,46 +1,11 @@
-//! Stateful and vectorized percentage rate of change.
+//! Persistent percentage rate-of-change state.
 
 use crate::TaResult;
 
-use super::{
-    lagged_common::{validate_rate_of_change, LaggedValue},
-    StreamingIndicator,
-};
-
-/// Compute the rate of change result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn rate_of_change(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    validate_rate_of_change(input, timeperiod)?;
-    let mut output = vec![f64::NAN; timeperiod];
-    output.extend(
-        input[timeperiod..]
-            .iter()
-            .zip(&input[..input.len() - timeperiod])
-            .map(|(&current, &previous)| {
-                if previous != 0.0 {
-                    (current - previous) / previous * 100.0
-                } else {
-                    0.0
-                }
-            }),
-    );
-    Ok(output)
-}
+use super::{lagged_common::LaggedValue, StreamingIndicator};
 
 /// Computes percentage rate of change incrementally.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RateOfChange`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct RateOfChange {
     lag: LaggedValue,
     value: Option<f64>,
@@ -54,11 +19,9 @@ impl RateOfChange {
             value: None,
         })
     }
-}
 
-impl StreamingIndicator for RateOfChange {
-    type Output = f64;
-    fn append(&mut self, input: f64) -> Option<f64> {
+    /// Appends one value and returns `100 * (current - previous) / previous`.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
         self.value = self.lag.append(input).map(|(current, previous)| {
             if previous != 0.0 {
                 (current - previous) / previous * 100.0
@@ -68,11 +31,38 @@ impl StreamingIndicator for RateOfChange {
         });
         self.value
     }
-    fn value(&self) -> Option<f64> {
+
+    /// Appends a slice and NaN-fills its aligned warm-up positions.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        output.extend(
+            input
+                .iter()
+                .map(|&value| self.append(value).unwrap_or(f64::NAN)),
+        );
+    }
+
+    /// Returns the latest percentage rate of change.
+    pub fn value(&self) -> Option<f64> {
         self.value
     }
-    fn reset(&mut self) {
+
+    /// Restores fresh-state behavior while retaining the allocated ring.
+    pub fn reset(&mut self) {
         self.lag.reset();
         self.value = None;
+    }
+}
+
+impl StreamingIndicator for RateOfChange {
+    type Output = f64;
+    fn append(&mut self, input: f64) -> Option<f64> {
+        Self::append(self, input)
+    }
+    fn value(&self) -> Option<f64> {
+        Self::value(self)
+    }
+    fn reset(&mut self) {
+        Self::reset(self);
     }
 }

@@ -51,20 +51,3 @@ impl LaggedValue {
         self.len = 0;
     }
 }
-
-pub(super) fn validate_rate_of_change(input: &[f64], timeperiod: usize) -> TaResult<()> {
-    if timeperiod == 0 {
-        return Err(crate::TaError::InvalidParameter {
-            name: "timeperiod",
-            value: "0".to_string(),
-            reason: "must be >= 1",
-        });
-    }
-    if input.len() <= timeperiod {
-        return Err(crate::TaError::InsufficientData {
-            need: timeperiod + 1,
-            got: input.len(),
-        });
-    }
-    Ok(())
-}

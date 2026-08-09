@@ -282,13 +282,14 @@ mod klinger_volume_oscillator;
 mod lag;
 #[cfg(test)]
 mod lag_test;
-mod lagged;
 mod lagged_common;
 mod laguerre_rsi;
 mod log_return;
 #[cfg(test)]
 mod log_return_test;
 mod momentum;
+#[cfg(test)]
+mod momentum_test;
 mod opening_range;
 mod operator_states;
 pub use operator_states::ActiveZoneList;
@@ -297,8 +298,16 @@ mod pivot_points;
 mod premium_discount;
 mod rate_of_change;
 mod rate_of_change_percent;
+#[cfg(test)]
+mod rate_of_change_percent_test;
 mod rate_of_change_ratio;
 mod rate_of_change_ratio_percent;
+#[cfg(test)]
+mod rate_of_change_ratio_percent_test;
+#[cfg(test)]
+mod rate_of_change_ratio_test;
+#[cfg(test)]
+mod rate_of_change_test;
 mod rmi;
 mod sar;
 mod sarext;
@@ -434,14 +443,6 @@ pub(crate) use kama::kaufman_adaptive_moving_average;
 pub use kama::KaufmanAdaptiveMovingAverage;
 pub use klinger_volume_oscillator::KlingerVolumeOscillator;
 pub use lag::Lag;
-#[allow(unused_imports)]
-pub(crate) use lagged::{
-    momentum, rate_of_change, rate_of_change_percent, rate_of_change_ratio,
-    rate_of_change_ratio_percent,
-};
-pub use lagged::{
-    Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent,
-};
 pub use laguerre_rsi::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
 #[allow(unused_imports)]
@@ -470,6 +471,7 @@ pub use minus_di::MinusDirectionalIndicator;
 #[allow(unused_imports)]
 pub(crate) use minus_dm::minus_directional_movement;
 pub use minus_dm::MinusDirectionalMovement;
+pub use momentum::Momentum;
 pub use opening_range::OpeningRange;
 pub use parabolic_moving_average_stop::ParabolicMovingAverageStop;
 pub use pivot_points::PivotPoints;
@@ -483,6 +485,10 @@ pub use plus_dm::PlusDirectionalMovement;
 pub(crate) use ppo::percentage_price_oscillator;
 pub use ppo::PercentagePriceOscillator;
 pub use premium_discount::PremiumDiscount;
+pub use rate_of_change::RateOfChange;
+pub use rate_of_change_percent::RateOfChangePercent;
+pub use rate_of_change_ratio::RateOfChangeRatio;
+pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
 pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlope, Tsf};
 pub use rmi::RelativeMomentumIndex;
 #[allow(unused_imports)]
@@ -807,11 +813,6 @@ mod tests {
         let midpoint_batch = rolling_midpoint(&input, 7).unwrap();
         let rsi_batch = relative_strength_index(&input, 14).unwrap();
         let cmo_batch = chande_momentum_oscillator(&input, 14).unwrap();
-        let mom_batch = momentum(&input, 7).unwrap();
-        let roc_batch = rate_of_change(&input, 7).unwrap();
-        let rocp_batch = rate_of_change_percent(&input, 7).unwrap();
-        let rocr_batch = rate_of_change_ratio(&input, 7).unwrap();
-        let rocr100_batch = rate_of_change_ratio_percent(&input, 7).unwrap();
         let mut sma = SimpleMovingAverage::new(7).unwrap();
         let mut ema = ExponentialMovingAverage::new(7).unwrap();
         let mut wma = WeightedMovingAverage::new(7).unwrap();
@@ -822,11 +823,6 @@ mod tests {
         let mut midpoint = RollingMidpoint::new(7).unwrap();
         let mut rsi = RelativeStrengthIndex::new(14).unwrap();
         let mut cmo = ChandeMomentumOscillator::new(14).unwrap();
-        let mut mom = Momentum::new(7).unwrap();
-        let mut roc = RateOfChange::new(7).unwrap();
-        let mut rocp = RateOfChangePercent::new(7).unwrap();
-        let mut rocr = RateOfChangeRatio::new(7).unwrap();
-        let mut rocr100 = RateOfChangeRatioPercent::new(7).unwrap();
 
         for index in 0..input.len() {
             let value = input[index];
@@ -840,11 +836,6 @@ mod tests {
             assert_optional_eq(midpoint.append(value), midpoint_batch[index]);
             assert_optional_eq(rsi.append(value), rsi_batch[index]);
             assert_optional_eq(cmo.append(value), cmo_batch[index]);
-            assert_optional_eq(mom.append(value), mom_batch[index]);
-            assert_optional_eq(roc.append(value), roc_batch[index]);
-            assert_optional_eq(rocp.append(value), rocp_batch[index]);
-            assert_optional_eq(rocr.append(value), rocr_batch[index]);
-            assert_optional_eq(rocr100.append(value), rocr100_batch[index]);
         }
     }
 

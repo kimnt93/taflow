@@ -1,40 +1,11 @@
-//! Stateful and vectorized momentum.
+//! Persistent momentum state.
 
-use crate::error::{TaError, TaResult};
+use crate::error::TaResult;
 
 use super::{lagged_common::LaggedValue, StreamingIndicator};
 
-/// Compute the momentum result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn momentum(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if timeperiod == 0 {
-        return Err(TaError::InvalidParameter {
-            name: "timeperiod",
-            value: "0".to_string(),
-            reason: "must be >= 1",
-        });
-    }
-    let mut state = Momentum::new(timeperiod)?;
-    Ok(input
-        .iter()
-        .map(|&value| state.append(value).unwrap_or(f64::NAN))
-        .collect())
-}
-
 /// Computes the causal difference from the value `period` bars earlier.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `Momentum`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct Momentum {
     lag: LaggedValue,
     value: Option<f64>,
@@ -48,12 +19,9 @@ impl Momentum {
             value: None,
         })
     }
-}
 
-impl StreamingIndicator for Momentum {
-    type Output = f64;
-
-    fn append(&mut self, input: f64) -> Option<f64> {
+    /// Appends one chronological value and returns the current momentum.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
         self.value = self
             .lag
             .append(input)
@@ -61,12 +29,40 @@ impl StreamingIndicator for Momentum {
         self.value
     }
 
-    fn value(&self) -> Option<f64> {
+    /// Appends a slice and NaN-fills its aligned warm-up positions.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        output.extend(
+            input
+                .iter()
+                .map(|&value| self.append(value).unwrap_or(f64::NAN)),
+        );
+    }
+
+    /// Returns the latest momentum, or `None` during warm-up.
+    pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    fn reset(&mut self) {
+    /// Restores fresh-state behavior while retaining the allocated ring.
+    pub fn reset(&mut self) {
         self.lag.reset();
         self.value = None;
+    }
+}
+
+impl StreamingIndicator for Momentum {
+    type Output = f64;
+
+    fn append(&mut self, input: f64) -> Option<f64> {
+        Self::append(self, input)
+    }
+
+    fn value(&self) -> Option<f64> {
+        Self::value(self)
+    }
+
+    fn reset(&mut self) {
+        Self::reset(self);
     }
 }

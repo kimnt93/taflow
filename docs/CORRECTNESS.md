@@ -423,17 +423,17 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | RollingMinMaxIndex | [TA-Lib: `MINMAXINDEX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.20× | 1.56× | 1.26× | 1.15× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.10× | 0.95× | 0.71× | 0.81× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.20× | 1.73× | 1.03× | 0.97× |
-| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.02× | 1.66× | 0.37× | 0.33× |
+| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.41× | 1.90× | 0.39× | 0.31× |
 | MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.40× | 4.77× | 1.65× | 1.06× |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.29× | 1.52× | 1.12× | 1.14× |
 | OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.93× | 1.61× | 1.00× | 0.87× |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.05× | 1.59× | 1.22× | 1.15× |
 | PlusDirectionalMovement | [TA-Lib: `PLUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.76× | 1.48× | 1.06× | 0.98× |
 | PercentagePriceOscillator | [TA-Lib: `PPO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.55× | 1.96× | 1.32× | 1.21× |
-| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.46× | 1.83× | 0.67× | 0.58× |
-| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.91× | 1.78× | 0.69× | 0.53× |
-| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.49× | 1.94× | 0.80× | 0.55× |
-| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.65× | 2.01× | 0.69× | 0.64× |
+| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.21× | 2.27× | 0.78× | 0.67× |
+| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.53× | 2.46× | 0.74× | 0.64× |
+| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.57× | 2.28× | 0.85× | 0.64× |
+| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.36× | 2.20× | 0.81× | 0.69× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.70× | 1.46× | 0.98× | 0.95× |
 | ParabolicSar | [TA-Lib: `SAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.65× | 0.77× | 0.59× | 0.55× |
 | ParabolicSarExtended | [TA-Lib: `SAREXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.05× | 0.92× | 0.58× | 0.55× |
@@ -777,7 +777,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.20× | 2.14× | 2.27× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.72× | 1.95× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.24× | 1.57× | 1.88× |
-| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.08× | 1.86× | 1.96× |
+| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.02× | 1.44× | 2.01× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.56× | 1.84× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.56× | 1.96× | 2.31× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.43× | 2.28× |
@@ -801,10 +801,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.25× | 1.80× | 2.01× |
-| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.49× | 1.53× | 1.88× |
-| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.13× | 1.95× | 1.99× |
-| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.95× | 2.00× | 1.95× |
+| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.59× | 1.93× | 2.02× |
+| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 2.13× | 1.93× |
+| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.27× | 1.55× | 2.08× |
+| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.97× | 1.88× | 2.09× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.92× | 2.13× | 1.92× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
@@ -1069,7 +1069,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.11× | 2.08× | 2.21× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.80× | 1.92× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.01× | 2.13× |
-| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 2.04× | 1.94× |
+| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.05× | 2.11× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.05× | 1.95× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.10× | 2.02× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.22× | 2.44× | 2.23× |
@@ -1093,10 +1093,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 2.03× | 1.89× |
-| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.99× | 1.87× |
-| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.03× | 2.01× |
-| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.02× | 1.91× |
+| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 2.02× | 1.97× |
+| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.17× | 2.14× |
+| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.92× | 2.04× |
+| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.05× | 1.99× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.97× | 1.97× | 2.13× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
@@ -1361,7 +1361,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.98× | 2.07× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 1.87× | 2.07× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 2.00× | 2.15× |
-| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.89× | 1.93× |
+| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.96× | 1.96× | 2.02× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.87× | 1.90× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.33× | 2.11× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.19× | 2.20× | 2.25× |
@@ -1385,10 +1385,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.82× | 1.91× |
-| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.95× | 1.93× |
-| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.85× | 1.89× |
-| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.14× | 1.86× | 2.04× |
+| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.03× | 2.01× |
+| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.96× | 1.96× |
+| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.03× | 2.03× |
+| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 2.07× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 1.71× | 1.95× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
@@ -1653,7 +1653,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MesaAdaptiveMovingAverage | [TA-Lib: `MAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.49× | 2.63× | 2.72× |
 | MinusDirectionalIndicator | [TA-Lib: `MINUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.65× | 1.93× | 1.99× |
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.96× | 2.11× |
-| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.98× | 1.86× |
+| Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.94× | 2.03× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 1.99× |
 | MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.95× | 1.96× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.07× | 2.47× | 2.37× |
@@ -1677,10 +1677,10 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | PositiveVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.positive_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | PremiumDiscount | [pandas: `pandas.premium_discount`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
-| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.89× | 1.87× |
-| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.85× | 1.90× |
-| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 1.84× | 1.94× |
-| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.83× | 1.89× |
+| RateOfChange | [TA-Lib: `ROC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.91× | 2.05× |
+| RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.00× | 1.95× |
+| RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.89× | 1.93× |
+| RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.75× | 1.89× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 2.08× | 2.10× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |

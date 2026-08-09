@@ -9,17 +9,19 @@ use taflow::stream::{
     DirectionalMovementIndex, DoubleExponentialMovingAverage, EvenBetterSinewave,
     ExponentialMovingAverage, FastStochasticOscillator, FibonacciRetracement, HeikinAshi,
     HilbertTransformTrendline, IntradayMomentumIndex, JurikMovingAverage, KlingerVolumeOscillator,
-    LaguerreRelativeStrengthIndex, MesaAdaptiveMovingAverage, Momentum,
+    LaguerreRelativeStrengthIndex, MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended,
     MovingAverageConvergenceDivergenceFixed,
     NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange,
-    ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange, RateOfChangePercent,
-    RateOfChangeRatio, RateOfChangeRatioPercent, RelativeMomentumIndex, RelativeStrengthIndex,
-    RollingMidpoint, RollingMidprice, SessionVolumeLevels, SimpleMovingAverage,
-    SmoothedTrendChannel, StochasticOscillator, StochasticRelativeStrengthIndex,
-    StreamingIndicator, TomDeMarkSequential, TriangularMovingAverage,
-    TripleExponentialMovingAverage, TrueRange as CoreTrueRange, VariableIndexDynamicAverage,
-    VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage, WeightedMovingAverage,
+    ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange as CoreRateOfChange,
+    RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
+    RateOfChangeRatioPercent as CoreRateOfChangeRatioPercent, RelativeMomentumIndex,
+    RelativeStrengthIndex, RollingMidpoint, RollingMidprice, SessionVolumeLevels,
+    SimpleMovingAverage, SmoothedTrendChannel, StochasticOscillator,
+    StochasticRelativeStrengthIndex, StreamingIndicator, TomDeMarkSequential,
+    TriangularMovingAverage, TripleExponentialMovingAverage, TrueRange as CoreTrueRange,
+    VariableIndexDynamicAverage, VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage,
+    WeightedMovingAverage,
 };
 use taflow::MaType;
 
@@ -96,11 +98,11 @@ macro_rules! scalar_state_class {
     };
 }
 
-scalar_state_class!(StatefulMom, Momentum, 10);
-scalar_state_class!(StatefulRoc, RateOfChange, 10);
-scalar_state_class!(StatefulRocp, RateOfChangePercent, 10);
-scalar_state_class!(StatefulRocr, RateOfChangeRatio, 10);
-scalar_state_class!(StatefulRocr100, RateOfChangeRatioPercent, 10);
+scalar_state_class!(Momentum, CoreMomentum, 14);
+scalar_state_class!(RateOfChange, CoreRateOfChange, 14);
+scalar_state_class!(RateOfChangePercent, CoreRateOfChangePercent, 14);
+scalar_state_class!(RateOfChangeRatio, CoreRateOfChangeRatio, 14);
+scalar_state_class!(RateOfChangeRatioPercent, CoreRateOfChangeRatioPercent, 14);
 scalar_state_class!(StatefulMidpoint, RollingMidpoint, 14);
 scalar_state_class!(StatefulMax, stream::RollingMax, 30);
 scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);

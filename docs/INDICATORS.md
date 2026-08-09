@@ -109,15 +109,15 @@ Correctness uses the highest-priority available external oracle in [../verify/SO
 | `MassIndex` | — | ema_period=9, sum_period=25 | `(high, low, ema_period, sum_period)` |
 | `MinusDirectionalIndicator` | MINUS_DI | timeperiod=14 | `(high, low, close, timeperiod)` |
 | `MinusDirectionalMovement` | MINUS_DM | timeperiod=14 | `(high, low, timeperiod)` |
-| `Momentum` | MOM | timeperiod=14 | `(_input, timeperiod)` |
+| `Momentum` | MOM | timeperiod=14 | `(values, timeperiod)` |
 | `ParabolicSar` | SAR | acceleration=0.02, maximum=0.2 | `(high, low, acceleration, maximum)` |
 | `ParabolicSarExtended` | SAREXT | start_value=0.0, offset_on_reverse=0.0, acceleration_init_long=0.02, acceleration_long=0.02, acceleration_max_long=0.2, acceleration_init_short=0.02, acceleration_short=0.02, acceleration_max_short=0.2 | `(high, low, start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short)` |
 | `PlusDirectionalIndicator` | PLUS_DI | timeperiod=14 | `(high, low, close, timeperiod)` |
 | `PlusDirectionalMovement` | PLUS_DM | timeperiod=14 | `(high, low, timeperiod)` |
-| `RateOfChange` | ROC | timeperiod=14 | `(_input, timeperiod)` |
-| `RateOfChangePercent` | ROCP | timeperiod=14 | `(_input, timeperiod)` |
-| `RateOfChangeRatio` | ROCR | timeperiod=14 | `(_input, timeperiod)` |
-| `RateOfChangeRatioPercent` | ROCR100 | timeperiod=14 | `(_input, timeperiod)` |
+| `RateOfChange` | ROC | timeperiod=14 | `(values, timeperiod)` |
+| `RateOfChangePercent` | ROCP | timeperiod=14 | `(values, timeperiod)` |
+| `RateOfChangeRatio` | ROCR | timeperiod=14 | `(values, timeperiod)` |
+| `RateOfChangeRatioPercent` | ROCR100 | timeperiod=14 | `(values, timeperiod)` |
 | `RelativeMomentumIndex` | — | length=14, mom=5 | `(close, length, mom)` |
 | `RelativeStrengthIndex` | RSI | timeperiod=14 | `(close, timeperiod)` |
 | `SchaffTrendCycle` | — | tclength=10, fast=12, slow=26, factor=0.5 | `(close, tclength, fast, slow, factor)` |

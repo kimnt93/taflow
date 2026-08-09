@@ -1,8 +1,14 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use taflow::stream::{
-    self, Accbands, Apo, Atr, Bbands, Dema, Ema, Imi, Ma, Macd, MacdFix, Mama, Midpoint, Midprice,
-    Mom, Natr, Ppo, Roc, Rocp, Rocr, Rocr100, Rsi, Sar, Sarext, Sma, Stoch, Stochf,
-    StreamingIndicator, Tema, Trange, Trima, Wma, T3,
+    self, AbsolutePriceOscillator, AccelerationBands, AverageTrueRange, BollingerBands,
+    DoubleExponentialMovingAverage, ExponentialMovingAverage, FastStochasticOscillator,
+    IntradayMomentumIndex, MesaAdaptiveMovingAverage, Momentum, MovingAverage,
+    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceFixed,
+    NormalizedAverageTrueRange, ParabolicSar, ParabolicSarExtended, PercentagePriceOscillator,
+    RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent,
+    RelativeStrengthIndex, RollingMidpoint, RollingMidprice, SimpleMovingAverage,
+    StochasticOscillator, StreamingIndicator, TriangularMovingAverage, TripleExponentialAverage,
+    TripleExponentialMovingAverage, TrueRange, WeightedMovingAverage,
 };
 use taflow::MaType;
 
@@ -20,7 +26,7 @@ fn append_benchmark(criterion: &mut Criterion) {
 
     group.bench_function(BenchmarkId::new("sma", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Sma::new(20).unwrap();
+            let mut state = SimpleMovingAverage::new(20).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -29,7 +35,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("ema", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Ema::new(20).unwrap();
+            let mut state = ExponentialMovingAverage::new(20).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -38,7 +44,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("wma", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Wma::new(20).unwrap();
+            let mut state = WeightedMovingAverage::new(20).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -47,7 +53,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("dema", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Dema::new(20).unwrap();
+            let mut state = DoubleExponentialMovingAverage::new(20).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -56,7 +62,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("tema", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Tema::new(20).unwrap();
+            let mut state = TripleExponentialMovingAverage::new(20).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -65,7 +71,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("trima", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Trima::new(20).unwrap();
+            let mut state = TriangularMovingAverage::new(20).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -74,7 +80,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("mama", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Mama::new(0.5, 0.05).unwrap();
+            let mut state = MesaAdaptiveMovingAverage::new(0.5, 0.05).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -83,7 +89,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("t3", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = T3::new(20, 0.7).unwrap();
+            let mut state = TripleExponentialAverage::new(20, 0.7).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -92,7 +98,8 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("apo_ema", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Apo::new(12, 26, MaType::Ema).unwrap();
+            let mut state =
+                AbsolutePriceOscillator::new(12, 26, MaType::ExponentialMovingAverage).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -101,7 +108,8 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("ppo_ema", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Ppo::new(12, 26, MaType::Ema).unwrap();
+            let mut state =
+                PercentagePriceOscillator::new(12, 26, MaType::ExponentialMovingAverage).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -110,7 +118,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("ma_ema", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Ma::new(20, MaType::Ema).unwrap();
+            let mut state = MovingAverage::new(20, MaType::ExponentialMovingAverage).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -119,7 +127,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("bbands_sma", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Bbands::new(20, 2.0, 2.0, MaType::Sma).unwrap();
+            let mut state = BollingerBands::new(20, 2.0, 2.0, MaType::SimpleMovingAverage).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -128,7 +136,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("accbands", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Accbands::new(20).unwrap();
+            let mut state = AccelerationBands::new(20).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
@@ -139,7 +147,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("sar", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Sar::default();
+            let mut state = ParabolicSar::default();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0);
             }
@@ -150,7 +158,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("sarext", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Sarext::default();
+            let mut state = ParabolicSarExtended::default();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0);
             }
@@ -161,7 +169,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("midpoint", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Midpoint::new(20).unwrap();
+            let mut state = RollingMidpoint::new(20).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -170,7 +178,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("midprice", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Midprice::new(20).unwrap();
+            let mut state = RollingMidprice::new(20).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0);
             }
@@ -181,7 +189,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("mom", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Mom::new(10).unwrap();
+            let mut state = Momentum::new(10).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -190,7 +198,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("roc", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Roc::new(10).unwrap();
+            let mut state = RateOfChange::new(10).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -199,7 +207,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("rocp", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Rocp::new(10).unwrap();
+            let mut state = RateOfChangePercent::new(10).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -208,7 +216,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("rocr", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Rocr::new(10).unwrap();
+            let mut state = RateOfChangeRatio::new(10).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -217,7 +225,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("rocr100", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Rocr100::new(10).unwrap();
+            let mut state = RateOfChangeRatioPercent::new(10).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -226,7 +234,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("rsi", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Rsi::new(14).unwrap();
+            let mut state = RelativeStrengthIndex::new(14).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -235,7 +243,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("atr", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Atr::new(14).unwrap();
+            let mut state = AverageTrueRange::new(14).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
@@ -246,7 +254,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("natr", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Natr::new(14).unwrap();
+            let mut state = NormalizedAverageTrueRange::new(14).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
@@ -257,7 +265,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("trange", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Trange::new();
+            let mut state = TrueRange::new().unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
@@ -268,7 +276,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("macd", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Macd::new(12, 26, 9).unwrap();
+            let mut state = MovingAverageConvergenceDivergence::new(12, 26, 9).unwrap();
             for value in warmup {
                 state.append(*value);
             }
@@ -279,7 +287,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("macdfix", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = MacdFix::new(9).unwrap();
+            let mut state = MovingAverageConvergenceDivergenceFixed::new(9).unwrap();
             for value in warmup {
                 state.append(*value);
             }
@@ -290,7 +298,8 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("stochf", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Stochf::new(5, 13, MaType::Sma).unwrap();
+            let mut state =
+                FastStochasticOscillator::new(5, 13, MaType::SimpleMovingAverage).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
@@ -301,7 +310,14 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("stoch", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Stoch::new(5, 13, MaType::Sma, 11, MaType::Sma).unwrap();
+            let mut state = StochasticOscillator::new(
+                5,
+                13,
+                MaType::SimpleMovingAverage,
+                11,
+                MaType::SimpleMovingAverage,
+            )
+            .unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
@@ -324,16 +340,16 @@ fn append_benchmark(criterion: &mut Criterion) {
             });
         };
     }
-    bench_periodic!("max", Max);
-    bench_periodic!("maxindex", Maxindex);
-    bench_periodic!("min", Min);
-    bench_periodic!("minindex", Minindex);
-    bench_periodic!("sum", Sum);
-    bench_periodic!("avgdev", Avgdev);
-    bench_periodic!("cmo", Cmo);
+    bench_periodic!("max", RollingMax);
+    bench_periodic!("maxindex", RollingArgmax);
+    bench_periodic!("min", RollingMin);
+    bench_periodic!("minindex", RollingArgmin);
+    bench_periodic!("sum", RollingSum);
+    bench_periodic!("avgdev", RollingAverageDeviation);
+    bench_periodic!("cmo", ChandeMomentumOscillator);
     group.bench_function(BenchmarkId::new("imi", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = Imi::new(14).unwrap();
+            let mut state = IntradayMomentumIndex::new(14).unwrap();
             for value in warmup {
                 state.append(*value - 0.2, *value);
             }
@@ -342,7 +358,7 @@ fn append_benchmark(criterion: &mut Criterion) {
             }
         })
     });
-    bench_periodic!("kama", Kama);
+    bench_periodic!("kama", KaufmanAdaptiveMovingAverage);
     bench_periodic!("linearreg", Linearreg);
     bench_periodic!("linearreg_slope", LinearregSlope);
     bench_periodic!("linearreg_intercept", LinearregIntercept);
@@ -350,7 +366,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     bench_periodic!("tsf", Tsf);
     group.bench_function(BenchmarkId::new("minmax", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Minmax::new(20).unwrap();
+            let mut state = stream::RollingMinmax::new(20).unwrap();
             for value in warmup {
                 state.append(*value);
             }
@@ -361,7 +377,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("minmaxindex", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Minmaxindex::new(20).unwrap();
+            let mut state = stream::RollingMinmaxIndex::new(20).unwrap();
             for value in warmup {
                 state.append(*value);
             }
@@ -372,7 +388,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("var", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Var::new(20, 1.0).unwrap();
+            let mut state = stream::RollingVariance::new(20, 1.0).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -381,7 +397,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("stddev", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Stddev::new(20, 2.0).unwrap();
+            let mut state = stream::RollingStandardDeviation::new(20, 2.0).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -390,7 +406,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("beta", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Beta::new(20).unwrap();
+            let mut state = stream::RollingBeta::new(20).unwrap();
             for value in warmup {
                 state.append(*value, *value * 1.2 + 0.5);
             }
@@ -401,7 +417,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("correl", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Correl::new(20).unwrap();
+            let mut state = stream::RollingCorrelation::new(20).unwrap();
             for value in warmup {
                 state.append(*value, *value * 1.2 + 0.5);
             }
@@ -478,7 +494,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("aroonosc", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Aroonosc::new(14).unwrap();
+            let mut state = stream::AroonOscillator::new(14).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0);
             }
@@ -492,7 +508,7 @@ fn append_benchmark(criterion: &mut Criterion) {
         ($name:literal, $state:ident) => {
             group.bench_function(BenchmarkId::new($name, updates.len()), |bench| {
                 bench.iter(|| {
-                    let mut state = stream::$state::new();
+                    let mut state = stream::$state::new().unwrap();
                     state.extend(warmup.iter().copied());
                     for value in updates {
                         black_box(state.append(*value));
@@ -530,7 +546,7 @@ fn append_benchmark(criterion: &mut Criterion) {
         ($name:literal, $state:ident) => {
             group.bench_function(BenchmarkId::new($name, updates.len()), |bench| {
                 bench.iter(|| {
-                    let mut state = stream::$state::new();
+                    let mut state = stream::$state::new().unwrap();
                     for value in warmup {
                         state.append(*value, *value + 1.0);
                     }
@@ -545,11 +561,11 @@ fn append_benchmark(criterion: &mut Criterion) {
     bench_binary!("sub", MathSubtract);
     bench_binary!("mult", MathMultiply);
     bench_binary!("div", MathDivide);
-    bench_binary!("medprice", Medprice);
+    bench_binary!("medprice", MedianPrice);
 
     group.bench_function(BenchmarkId::new("avgprice", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Avgprice::new();
+            let mut state = stream::AveragePrice::new().unwrap();
             for value in warmup {
                 state.append(*value, *value + 1.0, *value - 1.0, *value + 0.1);
             }
@@ -560,7 +576,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("typprice", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Typprice::new();
+            let mut state = stream::TypicalPrice::new().unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
@@ -571,7 +587,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("wclprice", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Wclprice::new();
+            let mut state = stream::WeightedClose::new().unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }

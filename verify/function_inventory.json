@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 184,
-    "complete": 49,
+    "complete": 54,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 602,
+    "rust_exports": 611,
     "smc_functions": 8,
-    "structure": 49,
+    "structure": 54,
     "talib_functions": 161
   },
   "rows": [
@@ -1093,10 +1093,11 @@
       "name": "Momentum",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMom"
+        "Momentum",
+        "_NativeMomentum"
       ],
       "pandas_ta_reference": true,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -1107,10 +1108,11 @@
       "name": "RateOfChange",
       "native_binding": true,
       "native_symbols": [
-        "StatefulRoc"
+        "RateOfChange",
+        "_NativeRateOfChange"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -1121,10 +1123,11 @@
       "name": "RateOfChangePercent",
       "native_binding": true,
       "native_symbols": [
-        "StatefulRocp"
+        "RateOfChangePercent",
+        "_NativeRateOfChangePercent"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -1135,10 +1138,11 @@
       "name": "RateOfChangeRatio",
       "native_binding": true,
       "native_symbols": [
-        "StatefulRocr"
+        "RateOfChangeRatio",
+        "_NativeRateOfChangeRatio"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -1149,10 +1153,11 @@
       "name": "RateOfChangeRatioPercent",
       "native_binding": true,
       "native_symbols": [
-        "StatefulRocr100"
+        "RateOfChangeRatioPercent",
+        "_NativeRateOfChangeRatioPercent"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4583,6 +4588,7 @@
         "MedianPrice",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
+        "Momentum",
         "MoneyFlowIndex",
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
@@ -4596,6 +4602,10 @@
         "PositionHoldOperator",
         "PositiveVolumeIndexOperator",
         "PreviousHighLowOperator",
+        "RateOfChange",
+        "RateOfChangePercent",
+        "RateOfChangeRatio",
+        "RateOfChangeRatioPercent",
         "RetracementsOperator",
         "RisingOperator",
         "RogersSatchellOperator",
@@ -4664,17 +4674,12 @@
         "StatefulMinindex",
         "StatefulMinmax",
         "StatefulMinmaxindex",
-        "StatefulMom",
         "StatefulOpeningRange",
         "StatefulParabolicMovingAverageStop",
         "StatefulPivotPoints",
         "StatefulPpo",
         "StatefulPremiumDiscount",
         "StatefulRelativeMomentumIndex",
-        "StatefulRoc",
-        "StatefulRocp",
-        "StatefulRocr",
-        "StatefulRocr100",
         "StatefulRsi",
         "StatefulSar",
         "StatefulSarext",
@@ -4889,6 +4894,7 @@
         "MedianPrice",
         "MinusDirectionalIndicator",
         "MinusDirectionalMovement",
+        "Momentum",
         "MoneyFlowIndex",
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
@@ -4902,6 +4908,10 @@
         "PositionHoldOperator",
         "PositiveVolumeIndexOperator",
         "PreviousHighLowOperator",
+        "RateOfChange",
+        "RateOfChangePercent",
+        "RateOfChangeRatio",
+        "RateOfChangeRatioPercent",
         "RetracementsOperator",
         "RisingOperator",
         "RogersSatchellOperator",
@@ -4970,17 +4980,12 @@
         "StatefulMinindex",
         "StatefulMinmax",
         "StatefulMinmaxindex",
-        "StatefulMom",
         "StatefulOpeningRange",
         "StatefulParabolicMovingAverageStop",
         "StatefulPivotPoints",
         "StatefulPpo",
         "StatefulPremiumDiscount",
         "StatefulRelativeMomentumIndex",
-        "StatefulRoc",
-        "StatefulRocp",
-        "StatefulRocr",
-        "StatefulRocr100",
         "StatefulRsi",
         "StatefulSar",
         "StatefulSarext",

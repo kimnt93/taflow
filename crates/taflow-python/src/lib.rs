@@ -208,11 +208,11 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulMidprice>()?;
     m.add_class::<state_api::StatefulRsi>()?;
     m.add_class::<state_api::StatefulImi>()?;
-    m.add_class::<state_api::StatefulMom>()?;
-    m.add_class::<state_api::StatefulRoc>()?;
-    m.add_class::<state_api::StatefulRocp>()?;
-    m.add_class::<state_api::StatefulRocr>()?;
-    m.add_class::<state_api::StatefulRocr100>()?;
+    m.add_class::<state_api::Momentum>()?;
+    m.add_class::<state_api::RateOfChange>()?;
+    m.add_class::<state_api::RateOfChangePercent>()?;
+    m.add_class::<state_api::RateOfChangeRatio>()?;
+    m.add_class::<state_api::RateOfChangeRatioPercent>()?;
     m.add_class::<state_api::StatefulMax>()?;
     m.add_class::<state_api::StatefulMaxindex>()?;
     m.add_class::<state_api::StatefulMin>()?;
