@@ -1,15 +1,15 @@
-//! Persistent pointwise `acosh` transform.
+//! Persistent pointwise `degrees` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `acosh` to each value without warm-up.
+/// Apply `degrees` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathAcosh {
+pub struct MathDegrees {
     value: Option<f64>,
 }
 
-impl MathAcosh {
+impl MathDegrees {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathAcosh {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.acosh());
+        self.value = Some(input.to_degrees());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathAcosh {
     }
 }
 
-impl StreamingIndicator for MathAcosh {
+impl StreamingIndicator for MathDegrees {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

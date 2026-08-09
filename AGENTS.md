@@ -6,7 +6,7 @@ new indicators and for repairs to existing indicators.
 ## One indicator, one class, one implementation
 
 - The canonical implementation is a persistent Rust state type in
-  `crates/taflow-core/src/stream/`. Python is an adapter only; it must not
+  `crates/taflow-core/src/indicators/`. Python is an adapter only; it must not
   implement indicator arithmetic, rolling windows, warm-up, or output repair.
 - Canonical class names must use complete descriptive words. Never shorten,
   abbreviate, contract, or preserve an abbreviated external-library name in a
@@ -26,7 +26,7 @@ new indicators and for repairs to existing indicators.
 - Derive the module filename mechanically from the full canonical class name
   using snake_case; do not use abbreviations, TA-Lib aliases, or family buckets.
   `VariablePeriodMovingAverage` therefore lives in
-  `crates/taflow-core/src/stream/variable_period_moving_average.rs` and
+  `crates/taflow-core/src/indicators/variable_period_moving_average.rs` and
   `python/taflow/variable_period_moving_average.py`.
 - Each canonical class must have its own implementation file. Do not place two
   canonical indicator classes in one file, split one canonical class across
@@ -36,7 +36,7 @@ new indicators and for repairs to existing indicators.
   snake_case filename.
 - Keep production implementation and tests in separate same-named files. The
   Rust tests for the example above live in
-  `crates/taflow-core/src/stream/variable_period_moving_average_test.rs`; its
+  `crates/taflow-core/src/indicators/variable_period_moving_average_test.rs`; its
   Python tests live in `tests/variable_period_moving_average_test.py`. An
   indicator implementation file must not contain an inline `#[cfg(test)] mod
   tests`, and a package/module initializer must not contain tests.
@@ -76,7 +76,7 @@ new indicators and for repairs to existing indicators.
 For a class named `VariablePeriodMovingAverage`, create or maintain this shape:
 
 ```text
-crates/taflow-core/src/stream/
+crates/taflow-core/src/indicators/
 ├── variable_period_moving_average.rs
 ├── variable_period_moving_average_test.rs
 └── mod.rs                                      # declarations/re-exports only
@@ -194,7 +194,7 @@ surface and all aliases instead of assuming the requested name is unused:
 ```bash
 rg -n "VariablePeriodMovingAverage|variable_period_moving_average|Mavp|MAVP" \
   crates python tests verify
-rg --files crates/taflow-core/src/stream python/taflow tests \
+rg --files crates/taflow-core/src/indicators python/taflow/indicators tests \
   | sort
 ```
 
@@ -232,8 +232,8 @@ rg -n "(fn|def) variable_period_moving_average" crates python tests verify
 
 # Tests must be in separate files; implementation/import files must contain no tests.
 rg -n "#\[cfg\(test\)\]|#\[test\]|def test_" \
-  crates/taflow-core/src/stream/variable_period_moving_average.rs \
-  python/taflow/variable_period_moving_average.py \
+  crates/taflow-core/src/indicators/variable_period_moving_average.rs \
+  python/taflow/indicators/variable_period_moving_average.py \
   python/taflow/__init__.py
 
 # Review every shortened/external alias occurrence; only metadata mappings may remain.

@@ -1,13 +1,13 @@
-"""Persistent pointwise asinh transform."""
+"""Persistent pointwise ceil transform."""
 
 from typing import Any
 
-from ._math_state import MathUnaryState
-from ._native import MathAsinh as _NativeMathAsinh
+from .._math_state import MathUnaryState
+from .._native import MathCeil as _NativeMathCeil
 
 
-class MathAsinh(MathUnaryState):
-    """Apply pointwise asinh in persistent Rust state.
+class MathCeil(MathUnaryState):
+    """Apply pointwise ceil in persistent Rust state.
 
     Parameters:
         _input: Required chronological values. Pass an empty series for a fresh
@@ -15,22 +15,22 @@ class MathAsinh(MathUnaryState):
 
     The output is a same-length ``float64`` array with no rolling warm-up.
     Domain behavior follows IEEE 754. The independent correctness oracle is
-    ``np.arcsinh``.
+    ``talib.CEIL``.
     """
 
-    _native_cls = _NativeMathAsinh
+    _native_cls = _NativeMathCeil
 
-    def append(self, _input: float) -> "MathAsinh":
+    def append(self, _input: float) -> "MathCeil":
         """Append one value and return this indicator."""
         super().append(_input)
         return self
 
-    def extend(self, _input: Any) -> "MathAsinh":
+    def extend(self, _input: Any) -> "MathCeil":
         """Append chronological values and return this indicator."""
         super().extend(_input)
         return self
 
-    def reset(self) -> "MathAsinh":
+    def reset(self) -> "MathCeil":
         """Restore fresh native state and return this indicator."""
         super().reset()
         return self

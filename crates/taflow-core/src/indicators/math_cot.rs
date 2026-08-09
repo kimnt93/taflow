@@ -1,15 +1,15 @@
-//! Persistent pointwise `exp` transform.
+//! Persistent pointwise `cot` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `exp` to each value without warm-up.
+/// Apply `cot` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathExp {
+pub struct MathCot {
     value: Option<f64>,
 }
 
-impl MathExp {
+impl MathCot {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathExp {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.exp());
+        self.value = Some(input.tan().recip());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathExp {
     }
 }
 
-impl StreamingIndicator for MathExp {
+impl StreamingIndicator for MathCot {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

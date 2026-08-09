@@ -1,15 +1,15 @@
-//! Persistent pointwise `cosh` transform.
+//! Persistent pointwise `floor` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `cosh` to each value without warm-up.
+/// Apply `floor` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathCosh {
+pub struct MathFloor {
     value: Option<f64>,
 }
 
-impl MathCosh {
+impl MathFloor {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathCosh {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.cosh());
+        self.value = Some(input.floor());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathCosh {
     }
 }
 
-impl StreamingIndicator for MathCosh {
+impl StreamingIndicator for MathFloor {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

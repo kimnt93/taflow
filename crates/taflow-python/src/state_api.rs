@@ -197,16 +197,6 @@ macro_rules! unary_state_class {
     };
 }
 
-unary_state_class!(MathAcosh);
-unary_state_class!(MathAsinh);
-unary_state_class!(MathAtanh);
-unary_state_class!(MathCbrt);
-unary_state_class!(MathCeil);
-unary_state_class!(MathCosh);
-unary_state_class!(MathCot);
-unary_state_class!(MathDegrees);
-unary_state_class!(MathExp);
-unary_state_class!(MathFloor);
 unary_state_class!(MathLn);
 unary_state_class!(MathLog10);
 unary_state_class!(MathLog1p);

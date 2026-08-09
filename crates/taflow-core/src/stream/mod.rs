@@ -261,7 +261,7 @@ mod intraday_momentum_index_test;
 mod kaufman_adaptive_moving_average;
 #[cfg(test)]
 mod kaufman_adaptive_moving_average_test;
-mod math_acosh;
+mod math_ln;
 mod math_operator;
 mod moving_average;
 mod moving_average_convergence_divergence;
@@ -274,46 +274,6 @@ mod moving_average_convergence_divergence_fixed_test;
 mod moving_average_convergence_divergence_helpers;
 #[cfg(test)]
 mod moving_average_convergence_divergence_test;
-pub use math_acosh::MathAcosh;
-#[cfg(test)]
-mod math_acosh_test;
-mod math_asinh;
-pub use math_asinh::MathAsinh;
-#[cfg(test)]
-mod math_asinh_test;
-mod math_atanh;
-pub use math_atanh::MathAtanh;
-#[cfg(test)]
-mod math_atanh_test;
-mod math_cbrt;
-pub use math_cbrt::MathCbrt;
-#[cfg(test)]
-mod math_cbrt_test;
-mod math_ceil;
-pub use math_ceil::MathCeil;
-#[cfg(test)]
-mod math_ceil_test;
-mod math_cosh;
-pub use math_cosh::MathCosh;
-#[cfg(test)]
-mod math_cosh_test;
-mod math_cot;
-pub use math_cot::MathCot;
-#[cfg(test)]
-mod math_cot_test;
-mod math_degrees;
-pub use math_degrees::MathDegrees;
-#[cfg(test)]
-mod math_degrees_test;
-mod math_exp;
-pub use math_exp::MathExp;
-#[cfg(test)]
-mod math_exp_test;
-mod math_floor;
-pub use math_floor::MathFloor;
-#[cfg(test)]
-mod math_floor_test;
-mod math_ln;
 pub use math_ln::MathLn;
 #[cfg(test)]
 mod math_ln_test;

@@ -1,15 +1,15 @@
-//! Persistent pointwise `floor` transform.
+//! Persistent pointwise `ceil` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `floor` to each value without warm-up.
+/// Apply `ceil` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathFloor {
+pub struct MathCeil {
     value: Option<f64>,
 }
 
-impl MathFloor {
+impl MathCeil {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathFloor {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.floor());
+        self.value = Some(input.ceil());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathFloor {
     }
 }
 
-impl StreamingIndicator for MathFloor {
+impl StreamingIndicator for MathCeil {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

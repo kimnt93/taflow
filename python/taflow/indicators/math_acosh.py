@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._math_state import MathUnaryState
-from ._native import MathAcosh as _NativeMathAcosh
+from .._math_state import MathUnaryState
+from .._native import MathAcosh as _NativeMathAcosh
 
 
 class MathAcosh(MathUnaryState):

@@ -106,19 +106,13 @@ from .indicators import PivotPoints
 from . import executions
 from . import op
 from .indicators import MathAbs, MathAcos
-from .math_acosh import MathAcosh
+from .indicators import MathAcosh
 from .indicators import MathAsin
-from .math_asinh import MathAsinh
+from .indicators import MathAsinh
 from .indicators import MathAtan
-from .math_atanh import MathAtanh
-from .math_cbrt import MathCbrt
-from .math_ceil import MathCeil
+from .indicators import MathAtanh, MathCbrt, MathCeil
 from .indicators import MathCos
-from .math_cosh import MathCosh
-from .math_cot import MathCot
-from .math_degrees import MathDegrees
-from .math_exp import MathExp
-from .math_floor import MathFloor
+from .indicators import MathCosh, MathCot, MathDegrees, MathExp, MathFloor
 from .math_ln import MathLn
 from .math_log10 import MathLog10
 from .math_log1p import MathLog1p

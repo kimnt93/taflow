@@ -1,15 +1,15 @@
-//! Persistent pointwise `asinh` transform.
+//! Persistent pointwise `cosh` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `asinh` to each value without warm-up.
+/// Apply `cosh` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathAsinh {
+pub struct MathCosh {
     value: Option<f64>,
 }
 
-impl MathAsinh {
+impl MathCosh {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathAsinh {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.asinh());
+        self.value = Some(input.cosh());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathAsinh {
     }
 }
 
-impl StreamingIndicator for MathAsinh {
+impl StreamingIndicator for MathCosh {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

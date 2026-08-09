@@ -171,15 +171,24 @@ from ..rising import Rising
 from ..falling import Falling
 from .math_abs import MathAbs
 from .math_acos import MathAcos
+from .math_acosh import MathAcosh
 from ..math_transform import (
-    MathAcosh, MathAsinh, MathAtanh, MathCbrt, MathCeil, MathCosh, MathCot,
-    MathDegrees, MathExp, MathFloor, MathLn, MathLog10, MathLog1p,
-    MathRadians, MathSinh, MathSqrt, MathTan, MathTanh, MathAdd, MathSubtract,
+    MathLn, MathLog10, MathLog1p, MathRadians, MathSinh, MathSqrt, MathTan,
+    MathTanh, MathAdd, MathSubtract,
     MathMultiply, MathDivide,
 )
+from .math_asinh import MathAsinh
+from .math_atanh import MathAtanh
 from .math_asin import MathAsin
 from .math_atan import MathAtan
+from .math_cbrt import MathCbrt
+from .math_ceil import MathCeil
 from .math_cos import MathCos
+from .math_cosh import MathCosh
+from .math_cot import MathCot
+from .math_degrees import MathDegrees
+from .math_exp import MathExp
+from .math_floor import MathFloor
 from .math_sin import MathSin
 from ..statistics import (
     MesaAdaptiveMovingAverage, RollingAverageDeviation, RollingMidpoint,
@@ -368,9 +377,19 @@ __all__ = [
     "RollingKurtosis",
     "MathAbs",
     "MathAcos",
+    "MathAcosh",
     "MathAsin",
+    "MathAsinh",
+    "MathAtanh",
     "MathAtan",
+    "MathCbrt",
+    "MathCeil",
     "MathCos",
+    "MathCosh",
+    "MathCot",
+    "MathDegrees",
+    "MathExp",
+    "MathFloor",
     "MathSin",
     "RollingInterquartileRange",
     "RollingCovariance",

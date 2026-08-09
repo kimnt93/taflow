@@ -1,13 +1,13 @@
-"""Persistent pointwise degrees transform."""
+"""Persistent pointwise exp transform."""
 
 from typing import Any
 
-from ._math_state import MathUnaryState
-from ._native import MathDegrees as _NativeMathDegrees
+from .._math_state import MathUnaryState
+from .._native import MathExp as _NativeMathExp
 
 
-class MathDegrees(MathUnaryState):
-    """Apply pointwise degrees in persistent Rust state.
+class MathExp(MathUnaryState):
+    """Apply pointwise exp in persistent Rust state.
 
     Parameters:
         _input: Required chronological values. Pass an empty series for a fresh
@@ -15,22 +15,22 @@ class MathDegrees(MathUnaryState):
 
     The output is a same-length ``float64`` array with no rolling warm-up.
     Domain behavior follows IEEE 754. The independent correctness oracle is
-    ``np.degrees``.
+    ``talib.EXP``.
     """
 
-    _native_cls = _NativeMathDegrees
+    _native_cls = _NativeMathExp
 
-    def append(self, _input: float) -> "MathDegrees":
+    def append(self, _input: float) -> "MathExp":
         """Append one value and return this indicator."""
         super().append(_input)
         return self
 
-    def extend(self, _input: Any) -> "MathDegrees":
+    def extend(self, _input: Any) -> "MathExp":
         """Append chronological values and return this indicator."""
         super().extend(_input)
         return self
 
-    def reset(self) -> "MathDegrees":
+    def reset(self) -> "MathExp":
         """Restore fresh native state and return this indicator."""
         super().reset()
         return self

@@ -1,15 +1,15 @@
-//! Persistent pointwise `cbrt` transform.
+//! Persistent pointwise `asinh` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `cbrt` to each value without warm-up.
+/// Apply `asinh` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathCbrt {
+pub struct MathAsinh {
     value: Option<f64>,
 }
 
-impl MathCbrt {
+impl MathAsinh {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathCbrt {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.cbrt());
+        self.value = Some(input.asinh());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathCbrt {
     }
 }
 
-impl StreamingIndicator for MathCbrt {
+impl StreamingIndicator for MathAsinh {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {

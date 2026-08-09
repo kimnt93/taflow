@@ -1,7 +1,7 @@
 //! Persistent pointwise `atanh` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
 /// Apply `atanh` to each value without warm-up.
 #[derive(Debug, Clone, Default)]

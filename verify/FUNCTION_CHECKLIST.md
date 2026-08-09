@@ -106,6 +106,16 @@ uses NumPy as its independent scalar oracle because TA-Lib exposes no ABS
 function. Generated rows may still show historical names; source scan is
 authoritative. Benchmark fields remain `TODO`; no benchmark command was run.
 
+The tenth structural batch migrated `MathAcosh`, `MathAsinh`, `MathAtanh`,
+`MathCbrt`, `MathCeil`, `MathCosh`, `MathCot`, `MathDegrees`, `MathExp`, and
+`MathFloor`. Their Rust implementations/tests, Python adapters, and PyO3
+bindings now use matching canonical files and exports; these classes were
+also removed from the grouped `state_api.rs` implementation. Rust lifecycle
+tests, the release PyO3 build, the full Python suite, interface audit, and ten
+NumPy external-oracle MATCH results passed. Generated rows may still show
+historical names; source scan is authoritative. Benchmark fields remain
+`TODO`; no benchmark command was run.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**

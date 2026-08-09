@@ -1,13 +1,13 @@
-"""Persistent pointwise cbrt transform."""
+"""Persistent pointwise floor transform."""
 
 from typing import Any
 
-from ._math_state import MathUnaryState
-from ._native import MathCbrt as _NativeMathCbrt
+from .._math_state import MathUnaryState
+from .._native import MathFloor as _NativeMathFloor
 
 
-class MathCbrt(MathUnaryState):
-    """Apply pointwise cbrt in persistent Rust state.
+class MathFloor(MathUnaryState):
+    """Apply pointwise floor in persistent Rust state.
 
     Parameters:
         _input: Required chronological values. Pass an empty series for a fresh
@@ -15,22 +15,22 @@ class MathCbrt(MathUnaryState):
 
     The output is a same-length ``float64`` array with no rolling warm-up.
     Domain behavior follows IEEE 754. The independent correctness oracle is
-    ``np.cbrt``.
+    ``talib.FLOOR``.
     """
 
-    _native_cls = _NativeMathCbrt
+    _native_cls = _NativeMathFloor
 
-    def append(self, _input: float) -> "MathCbrt":
+    def append(self, _input: float) -> "MathFloor":
         """Append one value and return this indicator."""
         super().append(_input)
         return self
 
-    def extend(self, _input: Any) -> "MathCbrt":
+    def extend(self, _input: Any) -> "MathFloor":
         """Append chronological values and return this indicator."""
         super().extend(_input)
         return self
 
-    def reset(self) -> "MathCbrt":
+    def reset(self) -> "MathFloor":
         """Restore fresh native state and return this indicator."""
         super().reset()
         return self

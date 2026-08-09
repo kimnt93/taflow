@@ -1,15 +1,15 @@
-//! Persistent pointwise `ceil` transform.
+//! Persistent pointwise `cbrt` transform.
 
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
-/// Apply `ceil` to each value without warm-up.
+/// Apply `cbrt` to each value without warm-up.
 #[derive(Debug, Clone, Default)]
-pub struct MathCeil {
+pub struct MathCbrt {
     value: Option<f64>,
 }
 
-impl MathCeil {
+impl MathCbrt {
     /// Create a fresh pointwise transform state.
     pub fn new() -> TaResult<Self> {
         Ok(Self::default())
@@ -17,7 +17,7 @@ impl MathCeil {
 
     /// Transform one chronological value.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = Some(input.ceil());
+        self.value = Some(input.cbrt());
         self.value
     }
 
@@ -41,7 +41,7 @@ impl MathCeil {
     }
 }
 
-impl StreamingIndicator for MathCeil {
+impl StreamingIndicator for MathCbrt {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<Self::Output> {
