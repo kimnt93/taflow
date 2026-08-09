@@ -705,12 +705,28 @@ pub(crate) use hilbert_transform_sine_wave::hilbert_transform_sine_wave;
 mod hilbert_transform_trend_mode;
 #[allow(unused_imports)]
 pub(crate) use hilbert_transform_trend_mode::hilbert_transform_trend_mode;
+#[cfg(test)]
+mod bars_since_test;
+#[cfg(test)]
+mod gap_down_test;
+#[cfg(test)]
+mod gap_up_test;
+#[cfg(test)]
+mod highest_since_test;
+#[cfg(test)]
+mod lowest_since_test;
+#[cfg(test)]
+mod outside_bar_test;
 mod rolling_midpoint;
 #[cfg(test)]
 mod rolling_midpoint_test;
 mod rolling_midprice;
 #[cfg(test)]
 mod rolling_midprice_test;
+#[cfg(test)]
+mod signal_delay_test;
+#[cfg(test)]
+mod value_when_test;
 #[allow(unused_imports)]
 pub(crate) use candle_2crows::candle_two_crows;
 #[allow(unused_imports)]
