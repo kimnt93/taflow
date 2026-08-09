@@ -4,6 +4,7 @@
 This complements ``verify.py`` (TA-Lib plus streaming/chunk invariance) with
 the three independent sources requested for extension indicators/operators:
 
+* NumPy for pointwise mathematical transforms;
 * pandas-ta-classic for modern technical indicators;
 * Polars expressions for rolling/EWM/cumulative/math operators;
 * smartmoneyconcepts for the SMC family, with explicit causal alignment.
@@ -104,6 +105,491 @@ def outputs(value) -> tuple[np.ndarray, ...]:
     return value if isinstance(value, tuple) else (value,)
 
 
+def run_numpy(data: dict[str, np.ndarray], rows: list[Result]) -> None:
+    """Exact pointwise comparisons against documented NumPy ufuncs."""
+    centered = (data["close2"] - 100.0) / 10.0
+    positive = np.abs(centered) + 1.0
+    unit = np.tanh(centered / 4.0)
+    log_domain = np.abs(centered)
+    angle = centered + 0.25
+
+    cases = {
+        "math_abs": (taflow.MathAbs(centered).compute(), np.abs(centered),
+                     "numpy.abs"),
+        "math_acosh": (taflow.MathAcosh(positive).compute(), np.arccosh(positive),
+                       "numpy.arccosh"),
+        "math_asinh": (taflow.MathAsinh(centered).compute(), np.arcsinh(centered),
+                       "numpy.arcsinh"),
+        "math_atanh": (taflow.MathAtanh(unit).compute(), np.arctanh(unit),
+                       "numpy.arctanh"),
+        "math_cbrt": (taflow.MathCbrt(centered).compute(), np.cbrt(centered),
+                      "numpy.cbrt"),
+        "math_cot": (taflow.MathCot(angle).compute(), 1.0 / np.tan(angle),
+                     "numpy.tan reciprocal"),
+        "math_degrees": (taflow.MathDegrees(angle).compute(), np.degrees(angle),
+                         "numpy.degrees"),
+        "math_log1p": (taflow.MathLog1p(log_domain).compute(), np.log1p(log_domain),
+                       "numpy.log1p"),
+        "math_radians": (taflow.MathRadians(angle).compute(), np.radians(angle),
+                         "numpy.radians"),
+        "signed_power": (
+            taflow.SignedPower(centered, exponent=2.0).compute(),
+            np.sign(centered) * np.abs(centered) ** 2.0,
+            "numpy.sign/numpy.abs/numpy.power",
+        ),
+    }
+    for function, (actual, expected, api) in cases.items():
+        compare(rows, "NumPy", function, "all", actual, expected, note=api)
+
+
+def run_pandas(data: dict[str, np.ndarray], rows: list[Result]) -> None:
+    """Independent causal operator comparisons built from pandas windows."""
+    n = 20
+    close = pd.Series(data["close"])
+    other = pd.Series(data["close2"])
+    high, low, volume = (pd.Series(data[key]) for key in ("high", "low", "volume"))
+    condition = close > other
+
+    def check(function: str, actual, expected, api: str, *, atol: float = ATOL) -> None:
+        compare(rows, "pandas", function, "all", actual, expected,
+                atol=atol, note=api)
+
+    check("lag", taflow.Lag(close, n).compute(), close.shift(n), "Series.shift")
+    check("signal_delay", taflow.SignalDelay(close, n).compute(), close.shift(n),
+          "Series.shift")
+    check("rolling_mode", taflow.RollingMode(close, n).compute(),
+          close.rolling(n).apply(lambda x: x.value_counts(sort=False).idxmax()),
+          "Series.rolling.apply/value_counts")
+    rank = close.rolling(n).apply(
+        lambda x: ((x.iloc[:-1] < x.iloc[-1]).sum()
+                   + (x == x.iloc[-1]).sum()) / len(x), raw=False)
+    check("rolling_rank", taflow.RollingRank(close, n).compute(), rank,
+          "Series.rolling.apply")
+    check("time_series_rank", taflow.TimeSeriesRank(close, n).compute(), rank,
+          "Series.rolling.apply")
+    winsor = close.rolling(n).apply(
+        lambda x: np.clip(x.iloc[-1], x.quantile(0.05), x.quantile(0.95)),
+        raw=False)
+    check("rolling_winsorize", taflow.RollingWinsorize(close, n).compute(), winsor,
+          "Series.rolling.quantile/numpy.clip")
+
+    ewm_left = close.ewm(span=n, adjust=False)
+    check("ewm_cov", taflow.ExponentiallyWeightedCovariance(close, other, n).compute(),
+          ewm_left.cov(other, bias=True), "ExponentialMovingWindow.cov(bias=True)",
+          atol=1e-9)
+    check("ewm_corr", taflow.ExponentiallyWeightedCorrelation(close, other, n).compute(),
+          ewm_left.corr(other).fillna(0.0), "ExponentialMovingWindow.corr", atol=1e-9)
+    check("ewm_sum", taflow.ExponentiallyWeightedSum(close, n).compute(),
+          close.ewm(span=n, adjust=True).sum(), "ExponentialMovingWindow.sum")
+
+    check("drawdown", taflow.Drawdown(close).compute(),
+          close / close.cummax() - 1.0, "Series.cummax")
+    mean = close.rolling(n).mean()
+    std = close.rolling(n).std(ddof=0)
+    check("rolling_sharpe", taflow.RollingSharpe(close, n).compute(),
+          (mean / std).where(std > 0, 0.0).where(mean.notna()),
+          "Rolling.mean/Rolling.std(ddof=0)", atol=1e-8)
+    sortino = close.rolling(n).apply(
+        lambda x: x.mean() / np.sqrt(np.mean(np.minimum(x, 0.0) ** 2))
+        if np.any(x < 0.0) else 0.0, raw=True)
+    check("rolling_sortino", taflow.RollingSortino(close, n).compute(), sortino,
+          "Series.rolling.apply")
+    calmar = close.rolling(n).apply(
+        lambda x: x.mean() / -np.min(x / np.maximum.accumulate(x) - 1.0)
+        if np.min(x / np.maximum.accumulate(x) - 1.0) < 0.0 else 0.0,
+        raw=True)
+    check("rolling_calmar", taflow.RollingCalmar(close, n).compute(), calmar,
+          "Series.rolling.apply")
+
+    check("rising", taflow.Rising(close, n).compute(),
+          (close > close.shift(n)).astype(float).where(close.shift(n).notna()),
+          "Series.shift comparison")
+    check("falling", taflow.Falling(close, n).compute(),
+          (close < close.shift(n)).astype(float).where(close.shift(n).notna()),
+          "Series.shift comparison")
+    relations = {
+        "higher_high": (taflow.HigherHigh(high, low).compute(), high > high.shift()),
+        "lower_low": (taflow.LowerLow(high, low).compute(), low < low.shift()),
+        "inside_bar": (taflow.InsideBar(high, low).compute(),
+                       (high < high.shift()) & (low > low.shift())),
+        "outside_bar": (taflow.OutsideBar(high, low).compute(),
+                        (high > high.shift()) & (low < low.shift())),
+        "gap_up": (taflow.GapUp(high, low).compute(), low > high.shift()),
+        "gap_down": (taflow.GapDown(high, low).compute(), high < low.shift()),
+    }
+    for function, (actual, expected) in relations.items():
+        check(function, actual, expected.astype(float).where(high.shift().notna()),
+              "Series.shift comparison")
+
+    groups = condition.astype(int).cumsum()
+    check("bars_since", taflow.BarsSince(condition).compute(),
+          condition.groupby(groups).cumcount().astype(float), "Series.groupby.cumcount")
+    check("value_when", taflow.ValueWhen(condition, close).compute(),
+          close.where(condition).ffill(), "Series.where/ffill")
+    check("highest_since", taflow.HighestSince(condition, close).compute(),
+          close.groupby(groups).cummax(), "Series.groupby.cummax")
+    check("lowest_since", taflow.LowestSince(condition, close).compute(),
+          close.groupby(groups).cummin(), "Series.groupby.cummin")
+
+    covariance = close.rolling(n).cov(other, ddof=0)
+    variance_x = close.rolling(n).var(ddof=0)
+    variance_benchmark = other.rolling(n).var(ddof=0)
+    beta = covariance / variance_x
+    check("hedge_ratio", taflow.HedgeRatio(close, other, n).compute(),
+          beta.where(variance_x > 0, 0.0).where(variance_x.notna()),
+          "Rolling.cov/Rolling.var(ddof=0)", atol=2e-9)
+    autocorr = close.rolling(n).apply(
+        lambda x: pd.Series(x[:-1]).corr(pd.Series(x[1:])), raw=True)
+    check("rolling_autocorr", taflow.RollingAutocorr(close, n).compute(), autocorr,
+          "Series.rolling.apply/Series.corr", atol=1e-9)
+    beta_benchmark = covariance / variance_benchmark
+    alpha = close.rolling(n).mean() - beta_benchmark * other.rolling(n).mean()
+    check("rolling_alpha", taflow.RollingAlpha(close, other, n).compute(), alpha,
+          "Rolling.cov/Rolling.var/Rolling.mean", atol=1e-9)
+    active = close - other
+    information = active.rolling(n).mean() / active.rolling(n).std(ddof=0)
+    check("rolling_information_ratio",
+          taflow.RollingInformationRatio(close, other, n).compute(), information,
+          "Rolling.mean/Rolling.std(ddof=0)", atol=1e-9)
+    entropy = close.round(1).rolling(n).apply(
+        lambda x: -(x.value_counts(normalize=True) *
+                    np.log(x.value_counts(normalize=True))).sum(), raw=False)
+    check("rolling_entropy", taflow.RollingEntropy(close.round(1), n).compute(), entropy,
+          "Series.rolling.apply/value_counts")
+
+    check("average_daily_dollar_value",
+          taflow.AverageDailyDollarValue(close, volume, n).compute(),
+          (close * volume).rolling(n).mean(), "Series.rolling.mean")
+    typical = (high + low + close) / 3.0
+    check("rolling_vwap",
+          taflow.RollingVolumeWeightedAveragePrice(high, low, close, volume, n).compute(),
+          (typical * volume).rolling(n).sum() / volume.rolling(n).sum(),
+          "Series.rolling.sum")
+    check("cumulative_count", taflow.CumulativeCount(close).compute(),
+          pd.Series(np.arange(1, len(close) + 1, dtype=float)), "Series.size/arange")
+    weights = np.arange(1, n + 1, dtype=float)
+    check("decay_linear", taflow.DecayLinear(close, n).compute(),
+          close.rolling(n).apply(lambda x: np.dot(x, weights) / weights.sum(), raw=True),
+          "Series.rolling.apply/numpy.dot")
+
+    # Published volatility and market-microstructure definitions, expressed
+    # independently with pandas rolling windows.
+    open_ = pd.Series(data["open"])
+    log_return = np.log(close / close.shift())
+    check("close_to_close_sigma", taflow.CloseToCloseSigma(close, n).compute(),
+          log_return.rolling(n).std(ddof=0), "Series.rolling.std(log returns)")
+    park_term = np.log(high / low) ** 2 / (4.0 * np.log(2.0))
+    check("parkinson", taflow.Parkinson(high, low, n).compute(),
+          np.sqrt(park_term.rolling(n).mean()), "Parkinson estimator via Rolling.mean")
+    gk_term = (0.5 * np.log(high / low) ** 2
+               - (2.0 * np.log(2.0) - 1.0) * np.log(close / open_) ** 2)
+    check("garman_klass", taflow.GarmanKlass(open_, high, low, close, n).compute(),
+          np.sqrt(gk_term.rolling(n).mean()), "Garman-Klass via Rolling.mean")
+    rs_term = (np.log(high / close) * np.log(high / open_)
+               + np.log(low / close) * np.log(low / open_))
+    check("rogers_satchell", taflow.RogersSatchell(open_, high, low, close, n).compute(),
+          np.sqrt(rs_term.rolling(n).mean()), "Rogers-Satchell via Rolling.mean")
+    overnight = np.log(open_ / close.shift()) ** 2
+    check("garman_klass_yang_zhang",
+          taflow.GarmanKlassYangZhang(open_, high, low, close, n).compute(),
+          np.sqrt((gk_term + overnight).rolling(n).mean()),
+          "Garman-Klass-Yang-Zhang via Rolling.mean")
+    k = 0.34 / (1.34 + (n + 1.0) / (n - 1.0))
+    yz = np.sqrt((overnight.rolling(n).mean()
+                  + k * (np.log(close / open_) ** 2).rolling(n).mean()
+                  + (1.0 - k) * rs_term.rolling(n).mean()).clip(lower=0.0))
+    check("yang_zhang", taflow.YangZhang(open_, high, low, close, n).compute(), yz,
+          "Yang-Zhang via Rolling.mean")
+
+    amihud = (close.pct_change(fill_method=None).abs() / (close * volume)).rolling(n).mean()
+    check("amihud", taflow.Amihud(close, volume, n).compute(), amihud,
+          "Series.pct_change/rolling.mean")
+    delta = close.diff()
+    previous_delta = delta.shift()
+    previous_delta.iloc[1] = 0.0
+    roll_cov = delta.rolling(n).cov(previous_delta, ddof=1)
+    check("roll_spread", taflow.RollSpread(close, n).compute(),
+          2.0 * np.sqrt((-roll_cov).clip(lower=0.0)),
+          "Series.diff/Rolling.cov(ddof=1)", atol=1e-8)
+
+    spread_values = np.full(len(close), np.nan)
+    x_values, y_values = close.to_numpy(), other.to_numpy()
+    for index in range(n - 1, len(close)):
+        xw = x_values[index - n + 1:index + 1]
+        yw = y_values[index - n + 1:index + 1]
+        vx = np.mean((xw - xw.mean()) ** 2)
+        beta_value = (np.mean((xw - xw.mean()) * (yw - yw.mean())) / vx
+                      if vx > 0 else 0.0)
+        window_spread = yw - beta_value * xw
+        spread_std = window_spread.std(ddof=0)
+        spread_values[index] = ((window_spread[-1] - window_spread.mean()) / spread_std
+                                if spread_std > 0 else 0.0)
+    check("spread_zscore", taflow.SpreadZScore(close, other, n).compute(), spread_values,
+          "numpy rolling OLS/z-score", atol=1e-8)
+
+    lagged = close.shift()
+    change = close.diff()
+    covariance_ou = change.rolling(n).cov(lagged, ddof=1)
+    variance_ou = lagged.rolling(n).var(ddof=1)
+    mean_reversion = -covariance_ou / variance_ou
+    half_life = (np.log(2.0) / mean_reversion).where(mean_reversion > 0.0)
+    check("ornstein_uhlenbeck_half_life",
+          taflow.OrnsteinUhlenbeckHalfLife(close, n).compute(), half_life,
+          "Rolling.cov/Rolling.var OU regression", atol=1e-8)
+
+    changes = close.diff().fillna(0.0).to_numpy()
+    cusum = np.zeros(len(close))
+    positive = negative = 0.0
+    for index, change_value in enumerate(changes):
+        positive = max(0.0, positive + change_value)
+        negative = max(0.0, negative - change_value)
+        if positive > 1.0:
+            positive, cusum[index] = 0.0, 1.0
+        elif negative > 1.0:
+            negative, cusum[index] = 0.0, -1.0
+    check("cumulative_sum_control_chart",
+          taflow.CumulativeSumControlChart(changes, 1.0).compute(), cusum,
+          "NumPy implementation of AFML CUSUM")
+
+    laguerre = np.empty(len(close))
+    stages = np.zeros(4)
+    gamma = 0.5
+    for index, price in enumerate(close):
+        a, b, c_stage, d = stages
+        l0 = (1.0 - gamma) * price + gamma * a
+        l1 = -gamma * l0 + a + gamma * b
+        l2 = -gamma * l1 + b + gamma * c_stage
+        l3 = -gamma * l2 + c_stage + gamma * d
+        up = max(l0 - l1, 0.0) + max(l1 - l2, 0.0) + max(l2 - l3, 0.0)
+        down = max(l1 - l0, 0.0) + max(l2 - l1, 0.0) + max(l3 - l2, 0.0)
+        stages[:] = (l0, l1, l2, l3)
+        laguerre[index] = up / (up + down) if up + down else 0.0
+    check("laguerre_rsi", taflow.LaguerreRelativeStrengthIndex(close, gamma).compute(),
+          laguerre, "NumPy Ehlers Laguerre recurrence")
+
+    average_high = high.rolling(10).mean()
+    average_low = low.rolling(10).mean()
+    ssl_low = np.full(len(close), np.nan)
+    ssl_high = np.full(len(close), np.nan)
+    side = 1
+    for index in range(9, len(close)):
+        if close.iloc[index] > average_high.iloc[index]:
+            side = 1
+        elif close.iloc[index] < average_low.iloc[index]:
+            side = -1
+        if side > 0:
+            ssl_low[index], ssl_high[index] = average_low.iloc[index], average_high.iloc[index]
+        else:
+            ssl_low[index], ssl_high[index] = average_high.iloc[index], average_low.iloc[index]
+    ssl_actual = taflow.SmoothedTrendChannel(high, low, close, 10).compute()
+    compare(rows, "pandas", "ssl_channel", "lower", ssl_actual[0], ssl_low,
+            note="Rolling.mean SSL recurrence")
+    compare(rows, "pandas", "ssl_channel", "upper", ssl_actual[1], ssl_high,
+            note="Rolling.mean SSL recurrence")
+
+    # Anchored and rolling level operators.
+    anchor = np.asarray(data["anchor"], dtype=bool)
+    typical_values = ((high + low + close) / 3.0).to_numpy()
+    volume_values = volume.to_numpy()
+    anchored = [np.empty(len(close)) for _ in range(3)]
+    weighted = weighted_square = total_volume = 0.0
+    for index, (price, bar_volume) in enumerate(zip(typical_values, volume_values)):
+        if anchor[index]:
+            weighted = weighted_square = total_volume = 0.0
+        weighted += price * bar_volume
+        weighted_square += price * price * bar_volume
+        total_volume += bar_volume
+        center = weighted / total_volume
+        deviation = np.sqrt(max(0.0, weighted_square / total_volume - center * center))
+        anchored[0][index], anchored[1][index], anchored[2][index] = (
+            center, center + deviation, center - deviation)
+    anchored_actual = taflow.AnchoredVolumeWeightedAveragePrice(
+        high, low, close, volume, anchor, 1.0).compute()
+    for output, actual, expected in zip(("vwap", "upper", "lower"),
+                                        anchored_actual, anchored, strict=True):
+        compare(rows, "pandas", "anchored_vwap", output, actual, expected,
+                atol=1e-8, note="pandas/NumPy anchored weighted moments")
+
+    fib_high = close.rolling(120, min_periods=1).max()
+    fib_low = close.rolling(120, min_periods=1).min()
+    fib_span = fib_high - fib_low
+    fib_actual = taflow.FibonacciRetracement(close, 120).compute()
+    for ratio, actual in zip((0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0),
+                             fib_actual, strict=True):
+        compare(rows, "pandas", "fibonacci_retracement", f"{ratio:g}", actual,
+                fib_high - fib_span * ratio, note="Rolling.min/Rolling.max")
+
+    premium_high = close.rolling(n, min_periods=1).max()
+    premium_low = close.rolling(n, min_periods=1).min()
+    equilibrium = (premium_high + premium_low) / 2.0
+    zone = pd.Series(np.select((close > equilibrium, close < equilibrium),
+                               (1.0, -1.0), default=0.0))
+    premium_actual = taflow.PremiumDiscount(close, n).compute()
+    compare(rows, "pandas", "premium_discount", "zone", premium_actual[0], zone,
+            note="Rolling.min/Rolling.max")
+    compare(rows, "pandas", "premium_discount", "equilibrium", premium_actual[1],
+            equilibrium, note="Rolling.min/Rolling.max")
+
+    pivot_expected = [np.full(len(close), np.nan) for _ in range(5)]
+    previous_high = previous_low = previous_close = None
+    for index in range(len(close)):
+        if anchor[index]:
+            if previous_high is not None:
+                pivot = (previous_high + previous_low + previous_close) / 3.0
+                bar_range = previous_high - previous_low
+                levels = (pivot, 2 * pivot - previous_low, 2 * pivot - previous_high,
+                          pivot - bar_range, pivot + bar_range)
+                for output, value in zip(pivot_expected, levels):
+                    output[index:] = value
+            previous_high, previous_low, previous_close = high[index], low[index], close[index]
+        else:
+            previous_high = max(previous_high, high[index])
+            previous_low = min(previous_low, low[index])
+            previous_close = close[index]
+    pivot_actual = taflow.PivotPoints(high, low, close, anchor).compute()
+    for name, actual, expected in zip(("pivot", "r1", "s1", "s2", "r2"),
+                                      pivot_actual, pivot_expected, strict=True):
+        compare(rows, "pandas", "pivot_points", name, actual, expected,
+                note="NumPy anchored OHLC pivot definition")
+
+    opening_expected = [np.empty(len(close)), np.empty(len(close)), np.empty(len(close))]
+    opening_count, opening_high, opening_low = 0, -np.inf, np.inf
+    for index in range(len(close)):
+        if anchor[index]:
+            opening_count, opening_high, opening_low = 0, -np.inf, np.inf
+        if opening_count < 30:
+            opening_high = max(opening_high, high[index])
+            opening_low = min(opening_low, low[index])
+            opening_count += 1
+        opening_expected[0][index] = opening_high
+        opening_expected[1][index] = opening_low
+        opening_expected[2][index] = (1.0 if close[index] > opening_high else
+                                      -1.0 if close[index] < opening_low else 0.0)
+    opening_actual = taflow.OpeningRange(high, low, close, anchor, 30).compute()
+    for name, actual, expected in zip(("high", "low", "breakout"), opening_actual,
+                                      opening_expected, strict=True):
+        compare(rows, "pandas", "opening_range", name, actual, expected,
+                note="NumPy anchored opening-range definition")
+
+    # Fixed-width fractional differentiation from AFML.
+    weights_fd = [1.0]
+    order, threshold = 0.5, 1e-5
+    while True:
+        index = len(weights_fd)
+        weight = -weights_fd[-1] * (order - index + 1.0) / index
+        if abs(weight) < threshold:
+            break
+        weights_fd.append(weight)
+    frac_expected = np.full(len(close), np.nan)
+    width = len(weights_fd)
+    for index in range(width - 1, len(close)):
+        window = close.to_numpy()[index - width + 1:index + 1]
+        frac_expected[index] = np.dot(weights_fd, window[::-1])
+    check("frac_diff", taflow.FracDiff(close, order, threshold).compute(), frac_expected,
+          "NumPy AFML fixed-width fractional differentiation", atol=1e-8)
+
+    # Wilder-smoothed Relative Momentum Index.
+    momentum, period = 5, 14
+    rmi_expected = np.full(len(close), np.nan)
+    gains = losses = 0.0
+    count = 0
+    close_values = close.to_numpy()
+    for index in range(momentum, len(close)):
+        movement = close_values[index] - close_values[index - momentum]
+        gain, loss = max(movement, 0.0), max(-movement, 0.0)
+        count += 1
+        if count <= period:
+            gains += gain
+            losses += loss
+            if count < period:
+                continue
+        else:
+            gains = (gains * (period - 1.0) + gain) / period
+            losses = (losses * (period - 1.0) + loss) / period
+        rmi_expected[index] = 50.0 if gains + losses == 0 else 100.0 * gains / (gains + losses)
+    check("rmi", taflow.RelativeMomentumIndex(close, period, momentum).compute(), rmi_expected,
+          "NumPy Wilder-smoothed momentum")
+
+    hurst = close.rolling(n).apply(
+        lambda x: (np.clip(
+            np.log((np.cumsum(x - x.mean()).max()
+                    - np.cumsum(x - x.mean()).min()) / x.std(ddof=0)) / np.log(len(x)),
+            0.0, 1.0)
+            if x.std(ddof=0) > 0.0 else 0.5), raw=True)
+    check("hurst", taflow.Hurst(close, n).compute(), hurst,
+          "pandas Rolling.apply rescaled-range estimator", atol=1e-8)
+    check("fractal_dimension", taflow.FractalDimension(close, n).compute(), 2.0 - hurst,
+          "two minus pandas rescaled-range Hurst", atol=1e-8)
+
+    # Independent two-state Kalman filter using NumPy scalar algebra.
+    alpha_value, beta_value = 0.0, 1.0
+    p_aa, p_ab, p_bb = 1.0, 0.0, 1.0
+    delta_k, observation_variance = 1e-4, 1e-3
+    kalman = [np.empty(len(close)) for _ in range(4)]
+    for index, (x_value, y_value) in enumerate(zip(close, other)):
+        predicted_aa, predicted_ab, predicted_bb = p_aa + delta_k, p_ab, p_bb + delta_k
+        innovation = y_value - (alpha_value + beta_value * x_value)
+        innovation_variance = (predicted_aa + 2.0 * predicted_ab * x_value
+                               + predicted_bb * x_value * x_value
+                               + observation_variance)
+        gain_alpha = (predicted_aa + predicted_ab * x_value) / innovation_variance
+        gain_beta = (predicted_ab + predicted_bb * x_value) / innovation_variance
+        alpha_value += gain_alpha * innovation
+        beta_value += gain_beta * innovation
+        p_aa = ((1.0 - gain_alpha) * predicted_aa
+                - gain_alpha * x_value * predicted_ab)
+        p_ab = ((1.0 - gain_alpha) * predicted_ab
+                - gain_alpha * x_value * predicted_bb)
+        p_bb = -gain_beta * predicted_ab + (1.0 - gain_beta * x_value) * predicted_bb
+        kalman[0][index], kalman[1][index] = beta_value, alpha_value
+        kalman[2][index], kalman[3][index] = innovation, np.sqrt(innovation_variance)
+    kalman_actual = taflow.KalmanHedgeRatio(
+        close, other, delta_k, observation_variance).compute()
+    compare(rows, "pandas", "kalman_hedge_ratio", "beta", kalman_actual, kalman[0],
+            atol=1e-9, note="NumPy two-state Kalman filter_update")
+
+    # Fixed-bin anchored volume profile.
+    bins, value_area = 24, 0.7
+    profile = [np.empty(len(close)) for _ in range(3)]
+    histogram = np.zeros(bins)
+    session_low = None
+    session_high = 0.0
+    step = 1.0
+    for index in range(len(close)):
+        if anchor[index] or session_low is None:
+            session_low = low.iloc[index]
+            session_high = high.iloc[index]
+            step = max((session_high - session_low) / bins, 1e-12)
+            histogram.fill(0.0)
+        session_low = min(session_low, low.iloc[index])
+        session_high = max(session_high, high.iloc[index])
+        bin_index = int(np.clip(int((close.iloc[index] - session_low) / step), 0, bins - 1))
+        histogram[bin_index] += volume.iloc[index]
+        poc = int(np.argmax(histogram))
+        target = histogram.sum() * value_area
+        left = right = poc
+        accumulated = histogram[poc]
+        while accumulated < target and (left > 0 or right + 1 < bins):
+            if left == 0:
+                right += 1
+            elif right + 1 == bins:
+                left -= 1
+            elif histogram[left - 1] >= histogram[right + 1]:
+                left -= 1
+            else:
+                right += 1
+            accumulated = histogram[left:right + 1].sum()
+        profile[0][index] = (poc + 0.5) * step + session_low
+        profile[1][index] = (right + 0.5) * step + session_low
+        profile[2][index] = (left + 0.5) * step + session_low
+    profile_actual = taflow.SessionVolumeLevels(
+        high, low, close, volume, anchor, bins, value_area).compute()
+    for name, actual, expected in zip(("poc", "vah", "val"), profile_actual,
+                                      profile, strict=True):
+        compare(rows, "pandas", "session_volume_levels", name, actual, expected,
+                atol=1e-8, note="NumPy fixed-bin anchored volume profile")
+
+
 def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
     """Exact overlap with Polars' documented expression semantics."""
     n = 14
@@ -139,7 +625,7 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         "cumulative_product": (pl.col("close") / 100.0).cum_prod(),
         "cumulative_minimum": pl.col("close").cum_min(),
         "cumulative_maximum": pl.col("close").cum_max(),
-        "abs": pl.col("other").sub(100.0).abs(),
+        "math_abs": pl.col("other").sub(100.0).abs(),
         "floor": pl.col("close").floor(),
         "ceil": pl.col("close").ceil(),
         "sqrt": pl.col("close").sqrt(),
@@ -170,7 +656,7 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         "cumulative_product": taflow.CumulativeProduct(close / 100.0).compute(),
         "cumulative_minimum": taflow.CumulativeMinimum(close).compute(),
         "cumulative_maximum": taflow.CumulativeMaximum(close).compute(),
-        "abs": taflow.MathAbs(other - 100.0).compute(),
+        "math_abs": taflow.MathAbs(other - 100.0).compute(),
         "floor": taflow.MathFloor(close).compute(),
         "ceil": taflow.MathCeil(close).compute(),
         "sqrt": taflow.MathSqrt(close).compute(),
@@ -200,6 +686,35 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
                             if isinstance(expected, pd.DataFrame) else (expected,))
         for name, got, want in zip(names, outputs(actual), expected_columns, strict=True):
             compare(rows, "pandas-ta-classic", function, name, got, want, **kwargs)
+
+    # These families intentionally pin TAFlow's causal/initialization
+    # convention. The pandas-ta result is still executed and quantified so a
+    # semantic difference remains visible instead of falling back to a native
+    # self-check.
+    variant = {
+        "expected_difference": True,
+        "note": "independently compared; documented initialization/formula convention differs",
+    }
+    many("arnaud_legoux_moving_average",
+         taflow.ArnaudLegouxMovingAverage(close, 10, 0.85, 6.0).compute(),
+         pta.alma(c, length=10, distribution_offset=0.85, sigma=6.0),
+         ("alma",), **variant)
+    many("true_strength_index", taflow.TrueStrengthIndex(close, 13, 25).compute(),
+         pta.tsi(c, fast=13, slow=25).iloc[:, 0], ("tsi",), **variant)
+    kc = pta.kc(h, l, c, length=20, scalar=2.0, mamode="ema", tr=True)
+    many("keltner_channels", taflow.KeltnerChannels(high, low, close, 20, 2.0).compute(),
+         kc.iloc[:, [2, 1, 0]], ("upper", "middle", "lower"), **variant)
+    many("chaikin_volatility", taflow.ChaikinVolatility(high, low, 10, 10).compute(),
+         pta.cvi(h, l, length=10), ("chaikin_volatility",), **variant)
+    many("ulcer_index", taflow.UlcerIndex(close, 14).compute(),
+         pta.ui(c, length=14), ("ulcer_index",), **variant)
+    many("ease_of_movement", taflow.EaseOfMovement(high, low, volume).compute(),
+         pta.eom(h, l, c, v, length=1), ("ease_of_movement",), **variant)
+    many("volume_price_trend", taflow.VolumePriceTrend(close, volume).compute(),
+         pta.pvt(c, v), ("volume_price_trend",), **variant)
+    many("parabolic_moving_average_stop",
+         taflow.ParabolicMovingAverageStop(high, low, close, 10, 3.0).compute()[0],
+         pta.pmax(h, l, c, length=10, multiplier=3.0), ("stop",), **variant)
 
     many("awesome_oscillator", taflow.AwesomeOscillator(high, low).compute(),
          pta.ao(h, l, fast=5, slow=34), ("ao",))
@@ -472,6 +987,23 @@ def run_smc(data: dict[str, np.ndarray], rows: list[Result]) -> None:
             _event_flags(reference_liquidity, "Liquidity", "Swept"),
             note=liquidity_note, expected_difference=True)
 
+    equal_actual = taflow.EqualHighsLows(
+        data["high"], data["low"], data["close"], eq_len=3,
+        atr_period=200, eq_threshold=0.1).compute()
+    equal_note = (
+        "SMC liquidity pools are the external equal-high/low analogue; "
+        "TAFlow emits causal ATR-thresholded confirmations"
+    )
+    compare(rows, "smartmoneyconcepts", "equal_highs_lows", "equal_high",
+            equal_actual[0], _event_values(reference_liquidity, "Liquidity", "End"),
+            note=equal_note, expected_difference=True)
+    compare(rows, "smartmoneyconcepts", "equal_highs_lows", "equal_low",
+            equal_actual[1], _event_values(reference_liquidity, "Liquidity", "End"),
+            note=equal_note, expected_difference=True)
+    compare(rows, "smartmoneyconcepts", "equal_highs_lows", "level",
+            equal_actual[2], _event_values(reference_liquidity, "Level", "End"),
+            note=equal_note, expected_difference=True)
+
     reference_retracements = smc.retracements(ohlcv.copy(), reference_swing)
     actual_retracements = taflow.Retracements(
         data["high"], data["low"], data["close"],
@@ -519,7 +1051,8 @@ def run_smc(data: dict[str, np.ndarray], rows: list[Result]) -> None:
 def package_versions() -> dict[str, str]:
     return {
         name: importlib.metadata.version(name)
-        for name in ("taflow", "pandas-ta-classic", "polars", "smartmoneyconcepts")
+        for name in ("taflow", "numpy", "pandas-ta-classic", "polars",
+                     "smartmoneyconcepts")
     }
 
 
@@ -552,13 +1085,15 @@ def write_report(rows: list[Result], report: Path, bars: int) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--bars", type=int, default=2_000)
-    parser.add_argument("--oracle", choices=("all", "pandas-ta", "polars", "smc"),
+    parser.add_argument("--oracle", choices=("all", "numpy", "pandas", "pandas-ta", "polars", "smc"),
                         default="all")
     parser.add_argument("--report", type=Path, default=HERE / "EXTERNAL_ORACLES.md")
     args = parser.parse_args()
     data = make_data(args.bars)
     rows: list[Result] = []
     runners = {
+        "numpy": run_numpy,
+        "pandas": run_pandas,
         "pandas-ta": run_pandas_ta,
         "polars": run_polars,
         "smc": run_smc,

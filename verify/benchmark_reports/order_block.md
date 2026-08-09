@@ -6,29 +6,29 @@ taflow class.extend over contiguous NumPy arrays; this exercises the compiled Ru
 
 ## Whole-vector performance
 
-| Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | TA-Lib ms | API speedup | Kernel speedup |
+| Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | Reference ms | API speedup | Kernel speedup |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1,000 | 0.085 | 11.70M | 0.084 | 11.84M | nan | — | — |
-| 10,000 | 1.139 | 8.78M | 0.918 | 10.89M | nan | — | — |
+| 1,000 | 0.084 | 11.92M | 0.082 | 12.17M | nan | — | — |
+| 10,000 | 0.878 | 11.39M | 0.892 | 11.21M | nan | — | — |
+| 100,000 | 9.330 | 10.72M | 9.004 | 11.11M | nan | — | — |
+| 1,000,000 | 109.978 | 9.09M | 101.415 | 9.86M | nan | — | — |
 
-## Warm-up
+## Fresh-state warm-up
 
-Construct + canonical extend over 1,500 bars: **0.131 ms**; native kernel **0.130 ms**.
-
-## Warmed continuation
-
-| Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | TA-Lib full µs | vs full | vs tail |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1,500 | 1 | 0.679 | 0.537 | 1.86M | nan | — | — |
-| 1,500 | 10 | 3.513 | 2.127 | 4.70M | nan | — | — |
-| 1,500 | 100 | 11.393 | 10.005 | 10.00M | nan | — | — |
-
-## Independent-stream threads
-
-| Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | TA-Lib vector/s |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 5.25M | 6.19M | 1.00× | 968.82K | 808.58K | 1.00× | — |
-| 2 | 10.41M | 10.17M | 1.64× | 991.42K | 887.52K | 1.10× | — |
+| Bars | Threads | TAFlow ms | Reference ms | Speedup |
+|---:|---:|---:|---:|---:|
+| 1 | 1 | 0.108 | nan | — |
+| 1 | 5 | 0.327 | nan | — |
+| 1 | 10 | 0.556 | nan | — |
+| 10 | 1 | 0.094 | nan | — |
+| 10 | 5 | 0.746 | nan | — |
+| 10 | 10 | 0.646 | nan | — |
+| 100 | 1 | 0.067 | nan | — |
+| 100 | 5 | 0.274 | nan | — |
+| 100 | 10 | 0.544 | nan | — |
+| 1,000 | 1 | 0.144 | nan | — |
+| 1,000 | 5 | 0.306 | nan | — |
+| 1,000 | 10 | 0.690 | nan | — |
 
 ---
 Times include Python conversion/binding overhead. Raw samples are retained in JSON.

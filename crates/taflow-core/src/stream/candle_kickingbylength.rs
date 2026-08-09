@@ -87,9 +87,9 @@ impl CandleKickingByLength {
                 && cur.upper() < vs_cur
                 && cur.lower() < vs_cur;
             let has_gap = base
-                && ((color_prev == -1 && color_cur == 1 && cur.o > prev.o)
-                    || (color_prev == 1 && color_cur == -1 && cur.o < prev.o));
-            let curr_longer = cur.body() >= prev.body();
+                && ((color_prev == -1 && color_cur == 1 && cur.l > prev.h)
+                    || (color_prev == 1 && color_cur == -1 && cur.h < prev.l));
+            let curr_longer = cur.body() > prev.body();
             let color = if curr_longer { color_cur } else { color_prev };
             Some(has_gap as i32 * color * 100)
         } else {
@@ -260,9 +260,9 @@ pub fn candle_kicking_by_length(
                 < ca_highlow(SHADOW_VERY_SHORT, shadow_sum[0], open, high, low, close, i)
         {
             // Gap check
-            let has_gap = (color_prev == -1 && color_curr == 1 && open[i] > open[i - 1])
-                || (color_prev == 1 && color_curr == -1 && open[i] < open[i - 1]);
-            let curr_longer = real_body(open[i], close[i]) >= real_body(open[i - 1], close[i - 1]);
+            let has_gap = (color_prev == -1 && color_curr == 1 && low[i] > high[i - 1])
+                || (color_prev == 1 && color_curr == -1 && high[i] < low[i - 1]);
+            let curr_longer = real_body(open[i], close[i]) > real_body(open[i - 1], close[i - 1]);
             // Branchless: select color based on which marubozu is longer
             let color = if curr_longer { color_curr } else { color_prev };
             output[i] = has_gap as i32 * color * 100;

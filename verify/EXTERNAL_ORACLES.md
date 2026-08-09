@@ -1,20 +1,33 @@
 # External correctness oracles
 
-Bars: **2,000** | Matches: **99** | Documented variants: **26** | Failures: **0** | rtol=1e-08, atol=1e-10
+Bars: **2,000** | Matches: **185** | Documented variants: **39** | Failures: **0** | rtol=1e-08, atol=1e-10
 
-Versions: taflow 0.1.2, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27
+Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27
 
 | Oracle | Function | Output | Verdict | Max error | NaN mismatches | Note |
 |---|---|---|---:|---:|---:|---|
+| pandas-ta-classic | `arnaud_legoux_moving_average` | `alma` | VARIANT | `5.611e+00` | 0 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `chaikin_volatility` | `chaikin_volatility` | VARIANT | `2.563e+00` | 9 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `ease_of_movement` | `ease_of_movement` | VARIANT | `4.531e+03` | 0 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `keltner_channels` | `lower` | VARIANT | `3.751e+00` | 20 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `keltner_channels` | `middle` | VARIANT | `4.587e-01` | 19 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `keltner_channels` | `upper` | VARIANT | `3.846e+00` | 20 | independently compared; documented initialization/formula convention differs |
 | pandas-ta-classic | `know_sure_thing` | `kst` | VARIANT | `1.824e+04` | 0 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
 | pandas-ta-classic | `know_sure_thing` | `signal` | VARIANT | `1.782e+04` | 8 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
 | pandas-ta-classic | `mass_index` | `mass` | VARIANT | `4.737e-02` | 0 | taflow follows bukosabino/ta EMA initialization |
 | pandas-ta-classic | `negative_volume_index` | `nvi` | VARIANT | `5.278e+02` | 0 | taflow uses the standard multiplicative index; pandas-ta uses a cumulative volume-weighted ROC |
+| pandas-ta-classic | `parabolic_moving_average_stop` | `stop` | VARIANT | `1.322e+01` | 9 | independently compared; documented initialization/formula convention differs |
 | pandas-ta-classic | `positive_volume_index` | `pvi` | VARIANT | `4.481e+02` | 0 | taflow uses the standard multiplicative index; pandas-ta uses a cumulative volume-weighted ROC |
+| pandas-ta-classic | `true_strength_index` | `tsi` | VARIANT | `7.286e+01` | 36 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `ulcer_index` | `ulcer_index` | VARIANT | `1.169e+01` | 13 | independently compared; documented initialization/formula convention differs |
+| pandas-ta-classic | `volume_price_trend` | `volume_price_trend` | VARIANT | `6.091e+07` | 0 | independently compared; documented initialization/formula convention differs |
 | smartmoneyconcepts | `break_of_structure_change_of_character` | `bos` | VARIANT | `0.000e+00` | 71 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
 | smartmoneyconcepts | `break_of_structure_change_of_character` | `broken` | VARIANT | `0.000e+00` | 101 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
 | smartmoneyconcepts | `break_of_structure_change_of_character` | `choch` | VARIANT | `0.000e+00` | 30 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
 | smartmoneyconcepts | `break_of_structure_change_of_character` | `level` | VARIANT | `0.000e+00` | 101 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
+| smartmoneyconcepts | `equal_highs_lows` | `equal_high` | VARIANT | `0.000e+00` | 43 | SMC liquidity pools are the external equal-high/low analogue; TAFlow emits causal ATR-thresholded confirmations |
+| smartmoneyconcepts | `equal_highs_lows` | `equal_low` | VARIANT | `0.000e+00` | 47 | SMC liquidity pools are the external equal-high/low analogue; TAFlow emits causal ATR-thresholded confirmations |
+| smartmoneyconcepts | `equal_highs_lows` | `level` | VARIANT | `0.000e+00` | 51 | SMC liquidity pools are the external equal-high/low analogue; TAFlow emits causal ATR-thresholded confirmations |
 | smartmoneyconcepts | `liquidity` | `level` | VARIANT | `1.500e+00` | 184 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
 | smartmoneyconcepts | `liquidity` | `liquidity` | VARIANT | `2.000e+00` | 125 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
 | smartmoneyconcepts | `liquidity` | `swept` | VARIANT | `0.000e+00` | 71 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
@@ -32,7 +45,16 @@ Versions: taflow 0.1.2, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconce
 | smartmoneyconcepts | `retracements` | `direction` | VARIANT | `2.000e+00` | 14 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
 | smartmoneyconcepts | `swing_highs_lows` | `level` | VARIANT | `0.000e+00` | 41 | package also removes markers retroactively; causal taflow cannot retract emitted events |
 | smartmoneyconcepts | `swing_highs_lows` | `signal` | VARIANT | `0.000e+00` | 41 | package also removes markers retroactively; causal taflow cannot retract emitted events |
-| Polars | `abs` | `abs` | MATCH | `0.000e+00` | 0 |  |
+| NumPy | `math_abs` | `all` | MATCH | `0.000e+00` | 0 | numpy.abs |
+| NumPy | `math_acosh` | `all` | MATCH | `0.000e+00` | 0 | numpy.arccosh |
+| NumPy | `math_asinh` | `all` | MATCH | `0.000e+00` | 0 | numpy.arcsinh |
+| NumPy | `math_atanh` | `all` | MATCH | `1.110e-16` | 0 | numpy.arctanh |
+| NumPy | `math_cbrt` | `all` | MATCH | `6.661e-16` | 0 | numpy.cbrt |
+| NumPy | `math_cot` | `all` | MATCH | `0.000e+00` | 0 | numpy.tan reciprocal |
+| NumPy | `math_degrees` | `all` | MATCH | `0.000e+00` | 0 | numpy.degrees |
+| NumPy | `math_log1p` | `all` | MATCH | `0.000e+00` | 0 | numpy.log1p |
+| NumPy | `math_radians` | `all` | MATCH | `0.000e+00` | 0 | numpy.radians |
+| NumPy | `signed_power` | `all` | MATCH | `0.000e+00` | 0 | numpy.sign/numpy.abs/numpy.power |
 | Polars | `ceil` | `ceil` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `correlation` | `correlation` | MATCH | `2.254e-11` | 0 |  |
 | Polars | `cos` | `cos` | MATCH | `0.000e+00` | 0 |  |
@@ -47,6 +69,7 @@ Versions: taflow 0.1.2, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconce
 | Polars | `floor` | `floor` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `kurtosis` | `kurtosis` | MATCH | `4.695e-05` | 0 | Polars raw-moment kernel tolerance after centering/scaling |
 | Polars | `ln` | `ln` | MATCH | `0.000e+00` | 0 |  |
+| Polars | `math_abs` | `math_abs` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `max` | `max` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `mean` | `mean` | MATCH | `2.274e-13` | 0 |  |
 | Polars | `median` | `median` | MATCH | `0.000e+00` | 0 |  |
@@ -59,6 +82,82 @@ Versions: taflow 0.1.2, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconce
 | Polars | `sum` | `sum` | MATCH | `3.070e-12` | 0 |  |
 | Polars | `tan` | `tan` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `variance` | `variance` | MATCH | `3.930e-11` | 0 |  |
+| pandas | `amihud` | `all` | MATCH | `2.895e-24` | 0 | Series.pct_change/rolling.mean |
+| pandas | `anchored_vwap` | `lower` | MATCH | `0.000e+00` | 0 | pandas/NumPy anchored weighted moments |
+| pandas | `anchored_vwap` | `upper` | MATCH | `0.000e+00` | 0 | pandas/NumPy anchored weighted moments |
+| pandas | `anchored_vwap` | `vwap` | MATCH | `0.000e+00` | 0 | pandas/NumPy anchored weighted moments |
+| pandas | `average_daily_dollar_value` | `all` | MATCH | `9.686e-08` | 0 | Series.rolling.mean |
+| pandas | `bars_since` | `all` | MATCH | `0.000e+00` | 0 | Series.groupby.cumcount |
+| pandas | `close_to_close_sigma` | `all` | MATCH | `4.857e-17` | 0 | Series.rolling.std(log returns) |
+| pandas | `cumulative_count` | `all` | MATCH | `0.000e+00` | 0 | Series.size/arange |
+| pandas | `cumulative_sum_control_chart` | `all` | MATCH | `0.000e+00` | 0 | NumPy implementation of AFML CUSUM |
+| pandas | `decay_linear` | `all` | MATCH | `2.103e-12` | 0 | Series.rolling.apply/numpy.dot |
+| pandas | `drawdown` | `all` | MATCH | `0.000e+00` | 0 | Series.cummax |
+| pandas | `ewm_corr` | `all` | MATCH | `1.265e-14` | 0 | ExponentialMovingWindow.corr |
+| pandas | `ewm_cov` | `all` | MATCH | `2.558e-13` | 0 | ExponentialMovingWindow.cov(bias=True) |
+| pandas | `ewm_sum` | `all` | MATCH | `0.000e+00` | 0 | ExponentialMovingWindow.sum |
+| pandas | `falling` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `fibonacci_retracement` | `0` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `fibonacci_retracement` | `0.236` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `fibonacci_retracement` | `0.382` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `fibonacci_retracement` | `0.5` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `fibonacci_retracement` | `0.618` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `fibonacci_retracement` | `0.786` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `fibonacci_retracement` | `1` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `frac_diff` | `all` | MATCH | `1.155e-13` | 0 | NumPy AFML fixed-width fractional differentiation |
+| pandas | `fractal_dimension` | `all` | MATCH | `1.399e-14` | 0 | two minus pandas rescaled-range Hurst |
+| pandas | `gap_down` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `gap_up` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `garman_klass` | `all` | MATCH | `1.995e-17` | 0 | Garman-Klass via Rolling.mean |
+| pandas | `garman_klass_yang_zhang` | `all` | MATCH | `2.429e-17` | 0 | Garman-Klass-Yang-Zhang via Rolling.mean |
+| pandas | `hedge_ratio` | `all` | MATCH | `1.353e-09` | 0 | Rolling.cov/Rolling.var(ddof=0) |
+| pandas | `higher_high` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `highest_since` | `all` | MATCH | `0.000e+00` | 0 | Series.groupby.cummax |
+| pandas | `hurst` | `all` | MATCH | `1.388e-14` | 0 | pandas Rolling.apply rescaled-range estimator |
+| pandas | `inside_bar` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `kalman_hedge_ratio` | `beta` | MATCH | `0.000e+00` | 0 | NumPy two-state Kalman filter_update |
+| pandas | `lag` | `all` | MATCH | `0.000e+00` | 0 | Series.shift |
+| pandas | `laguerre_rsi` | `all` | MATCH | `0.000e+00` | 0 | NumPy Ehlers Laguerre recurrence |
+| pandas | `lower_low` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `lowest_since` | `all` | MATCH | `0.000e+00` | 0 | Series.groupby.cummin |
+| pandas | `opening_range` | `breakout` | MATCH | `0.000e+00` | 0 | NumPy anchored opening-range definition |
+| pandas | `opening_range` | `high` | MATCH | `0.000e+00` | 0 | NumPy anchored opening-range definition |
+| pandas | `opening_range` | `low` | MATCH | `0.000e+00` | 0 | NumPy anchored opening-range definition |
+| pandas | `ornstein_uhlenbeck_half_life` | `all` | MATCH | `3.547e-09` | 0 | Rolling.cov/Rolling.var OU regression |
+| pandas | `outside_bar` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `parkinson` | `all` | MATCH | `2.602e-17` | 0 | Parkinson estimator via Rolling.mean |
+| pandas | `pivot_points` | `pivot` | MATCH | `0.000e+00` | 0 | NumPy anchored OHLC pivot definition |
+| pandas | `pivot_points` | `r1` | MATCH | `0.000e+00` | 0 | NumPy anchored OHLC pivot definition |
+| pandas | `pivot_points` | `r2` | MATCH | `0.000e+00` | 0 | NumPy anchored OHLC pivot definition |
+| pandas | `pivot_points` | `s1` | MATCH | `0.000e+00` | 0 | NumPy anchored OHLC pivot definition |
+| pandas | `pivot_points` | `s2` | MATCH | `0.000e+00` | 0 | NumPy anchored OHLC pivot definition |
+| pandas | `premium_discount` | `equilibrium` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `premium_discount` | `zone` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
+| pandas | `rising` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
+| pandas | `rmi` | `all` | MATCH | `0.000e+00` | 0 | NumPy Wilder-smoothed momentum |
+| pandas | `rogers_satchell` | `all` | MATCH | `1.821e-17` | 0 | Rogers-Satchell via Rolling.mean |
+| pandas | `roll_spread` | `all` | MATCH | `1.623e-14` | 0 | Series.diff/Rolling.cov(ddof=1) |
+| pandas | `rolling_alpha` | `all` | MATCH | `8.285e-10` | 0 | Rolling.cov/Rolling.var/Rolling.mean |
+| pandas | `rolling_autocorr` | `all` | MATCH | `6.661e-16` | 0 | Series.rolling.apply/Series.corr |
+| pandas | `rolling_calmar` | `all` | MATCH | `1.819e-12` | 0 | Series.rolling.apply |
+| pandas | `rolling_entropy` | `all` | MATCH | `4.441e-16` | 0 | Series.rolling.apply/value_counts |
+| pandas | `rolling_information_ratio` | `all` | MATCH | `2.886e-11` | 0 | Rolling.mean/Rolling.std(ddof=0) |
+| pandas | `rolling_mode` | `all` | MATCH | `0.000e+00` | 0 | Series.rolling.apply/value_counts |
+| pandas | `rolling_rank` | `all` | MATCH | `0.000e+00` | 0 | Series.rolling.apply |
+| pandas | `rolling_sharpe` | `all` | MATCH | `6.300e-09` | 0 | Rolling.mean/Rolling.std(ddof=0) |
+| pandas | `rolling_sortino` | `all` | MATCH | `0.000e+00` | 0 | Series.rolling.apply |
+| pandas | `rolling_vwap` | `all` | MATCH | `5.684e-14` | 0 | Series.rolling.sum |
+| pandas | `rolling_winsorize` | `all` | MATCH | `1.421e-14` | 0 | Series.rolling.quantile/numpy.clip |
+| pandas | `session_volume_levels` | `poc` | MATCH | `0.000e+00` | 0 | NumPy fixed-bin anchored volume profile |
+| pandas | `session_volume_levels` | `vah` | MATCH | `0.000e+00` | 0 | NumPy fixed-bin anchored volume profile |
+| pandas | `session_volume_levels` | `val` | MATCH | `0.000e+00` | 0 | NumPy fixed-bin anchored volume profile |
+| pandas | `signal_delay` | `all` | MATCH | `0.000e+00` | 0 | Series.shift |
+| pandas | `spread_zscore` | `all` | MATCH | `4.680e-14` | 0 | numpy rolling OLS/z-score |
+| pandas | `ssl_channel` | `lower` | MATCH | `1.137e-13` | 0 | Rolling.mean SSL recurrence |
+| pandas | `ssl_channel` | `upper` | MATCH | `1.279e-13` | 0 | Rolling.mean SSL recurrence |
+| pandas | `time_series_rank` | `all` | MATCH | `0.000e+00` | 0 | Series.rolling.apply |
+| pandas | `value_when` | `all` | MATCH | `0.000e+00` | 0 | Series.where/ffill |
+| pandas | `yang_zhang` | `all` | MATCH | `2.776e-17` | 0 | Yang-Zhang via Rolling.mean |
 | pandas-ta-classic | `awesome_oscillator` | `ao` | MATCH | `8.527e-14` | 0 |  |
 | pandas-ta-classic | `chaikin_money_flow` | `cmf` | MATCH | `3.993e-14` | 0 |  |
 | pandas-ta-classic | `crossover` | `crossover` | MATCH | `0.000e+00` | 0 |  |

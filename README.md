@@ -20,8 +20,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/functions-287-blue" alt="287 functions" />
   <img src="https://img.shields.io/badge/TA--Lib_parity-161-blue" alt="161 TA-Lib functions" />
-  <img src="https://img.shields.io/badge/correctness-287%2F287_MATCH-brightgreen" alt="287/287 match" />
-  <img src="https://img.shields.io/badge/vs_TA--Lib-1.55%C3%97_median-blue" alt="1.55x median vs TA-Lib" />
+  <img src="https://img.shields.io/badge/correctness-287%2F287_checked-brightgreen" alt="287/287 externally checked" />
+  <img src="https://img.shields.io/badge/vector_speedup-1.81%C3%97_mean-blue" alt="1.81x mean vector speedup at 10k bars" />
   <img src="https://img.shields.io/badge/unsafe-zero-brightgreen" alt="zero unsafe" />
   <img src="https://img.shields.io/badge/C_deps-zero-orange" alt="zero C deps" />
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT" />
@@ -208,29 +208,36 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 | [Streaming](docs/STREAMING.md) | Live updates, warm-up, backfill-then-stream, chunk invariance, `reset`, threading, per-tick cost |
 | [Pipelines](docs/PIPELINES.md) | Building causal graphs, expressions, evaluate-once semantics, custom nodes, when not to use one |
 | [Data in / out](docs/DATA.md) | Every accepted input container, output converters, dataframes, the adapter gateway, `RollingApply`, `SessionFlags` |
-| [Performance](docs/PERFORMANCE.md) | What was optimized and how, measured results, the bit-exactness contract, and which optimizations were rejected |
-| [Correctness report](verify/SOURCE_COMPARISON.md) | Priority-selected oracle, API mapping, version, and current result |
-| [Benchmarks](verify/benchmark_reports/BENCHMARK.md) | Throughput vs TA-Lib at 1k/10k/100k/1M bars |
+| [Correctness + performance](docs/CORRECTNESS.md) | External reference, correctness/error, vector speedup, and fresh-state warm-up matrices for every class |
+| [Optimization notes](docs/PERFORMANCE.md) | What was optimized, the bit-exactness contract, and which optimizations were rejected |
 
 ## Performance
 
-Measured 2026-08-09 on an Intel i7-10750H, Python 3.12, against C TA-Lib 0.7.1
-over identical contiguous arrays. **A stock portable build** — no
+Measured 2026-08-09 on an Intel i7-10750H, Python 3.12, against TA-Lib 0.7.1,
+NumPy 2.4.6, and Polars 1.43.2 over identical contiguous arrays. **A stock portable build** — no
 `target-cpu=native`, no platform-specific flags — because that is what
 `pip install` gives you. Correctness is checked before anything is timed.
 
-### Bulk throughput vs TA-Lib
+### Average vector speedup
 
-Across the 161 functions with a TA-Lib equivalent, at 10,000 bars:
+Across the 176 classes whose selected external reference has a direct vector
+timing adapter. Speedup is reference time divided by TAFlow native-kernel time.
 
-| | |
-|---|---|
-| Median | **1.55× TA-Lib** |
-| Mean | **1.81×** |
-| At or above parity | **150 of 161** |
+| 1k bars | 10k bars | 100k bars | 1m bars |
+|---:|---:|---:|---:|
+| **4.70×** | **1.81×** | **1.21×** | **1.13×** |
 
-The 126 extended operators have no TA-Lib counterpart; their median throughput
-is **85M bars/s**.
+### Average fresh-state warm-up speedup
+
+Each cell constructs and feeds independent states; columns are concurrent
+thread counts.
+
+| Bars | 1 thread | 5 threads | 10 threads |
+|---:|---:|---:|---:|
+| 1 | **1.33×** | **1.66×** | **1.89×** |
+| 10 | **1.79×** | **1.89×** | **1.88×** |
+| 100 | **1.77×** | **1.84×** | **1.86×** |
+| 1,000 | **1.71×** | **2.07×** | **2.09×** |
 
 ### Live updates — where the design pays off
 
@@ -258,10 +265,10 @@ make bench                   # all 287 functions, 1k/10k/100k/1M bars
 make bench ARGS="SMA MAX"    # a subset
 ```
 
-Per-function reports with raw timing samples land in
-[`verify/benchmark_reports/`](verify/benchmark_reports/BENCHMARK.md). Figures
-here are medians over repeated runs; individual functions vary by a few percent
-between runs, and rows near 1.0× can land on either side.
+The complete [correctness and performance report](docs/CORRECTNESS.md) contains
+all per-class matrices; raw repeated timing samples remain in
+[`verify/benchmark_reports/`](verify/benchmark_reports/). Figures here are
+arithmetic means; individual functions vary by a few percent between runs.
 
 `make build-native` builds with `-C target-cpu=native` for local measurement.
 It must never be shipped, since the resulting binary may use instructions that
@@ -271,10 +278,11 @@ are unavailable on older CPUs.
 
 Correctness is verified before performance is measured, on every run.
 
-- **Oracle verification** — every function is checked against TA-Lib (or
-  pandas, for rolling and EWM operators) on batch output, on a 9k-warm-up +
-  1k-live-append continuation, and for bitwise chunk invariance at chunk sizes
-  1, 10 and 1000. Current status: **287/287 MATCH** at the 10k-bar protocol.
+- **Oracle verification** — every function is checked against TA-Lib, NumPy,
+  pandas, pandas-ta-classic, Polars, or smartmoneyconcepts. Current status:
+  **287/287 externally checked**: 268 exact matches and 19 documented semantic
+  variants, with zero failures. The TA-Lib comparisons run at 100k bars; the
+  shared lifecycle gate also checks continuation and bitwise chunk invariance.
 - Four functions — VAR, STDDEV, CORREL and BETA — reproduce TA-Lib
   **bitwise**, byte for byte at 1M bars, by replicating its exact accumulation
   order.
@@ -287,8 +295,9 @@ make check                   # unit tests + oracle parity for all 287 functions
 make verify ARGS="EMA ATR"   # oracle parity for a subset
 ```
 
-See [docs/PERFORMANCE.md](docs/PERFORMANCE.md) for the optimization methods
-behind these numbers and the trade-offs that were rejected.
+See the unified [correctness and performance report](docs/CORRECTNESS.md) for
+every class and [docs/PERFORMANCE.md](docs/PERFORMANCE.md) for optimization
+methods and rejected trade-offs.
 
 ## Development
 
