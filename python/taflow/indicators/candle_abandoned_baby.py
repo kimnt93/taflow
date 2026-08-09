@@ -1,13 +1,13 @@
-"""Persistent Belt Hold recognition (CDLBELTHOLD)."""
+"""Persistent Abandoned Baby recognition (CDLABANDONEDBABY)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleBeltHold as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleAbandonedBaby as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleBeltHold:
-    """Persistent Belt Hold recognition (CDLBELTHOLD).
+class CandleAbandonedBaby:
+    """Persistent Abandoned Baby recognition (CDLABANDONEDBABY).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleBeltHold:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleBeltHold":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleAbandonedBaby":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleBeltHold:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleBeltHold":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleAbandonedBaby":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleBeltHold:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleBeltHold":
+    def reset(self) -> "CandleAbandonedBaby":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

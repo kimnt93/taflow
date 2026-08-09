@@ -752,6 +752,19 @@ oracle/lifecycle MATCH results passed. Generated rows may still show historical
 names; source scan is authoritative. Benchmark fields remain `TODO`; no
 benchmark command was run.
 
+The twelfth structural batch migrated `AbsolutePriceOscillator`,
+`ActiveZoneList`, `Amihud`, `AnchoredVolumeWeightedAveragePrice`,
+`AverageDailyDollarValue`, `BollingerBands`,
+`BreakOfStructureChangeOfCharacter`, `CandleAbandonedBaby`,
+`CandleAdvanceBlock`, and `CandleBeltHold`. Their Rust implementations and
+tests now live under `crates/taflow-core/src/indicators/`, Python adapters use
+matching files under `python/taflow/indicators/`, and PyO3 binding modules use
+canonical filenames. The release extension, workspace Rust tests, focused
+tests (including TA-Lib BBANDS/APO and pandas AVWAP references), full Python
+suite, interface audit, formatter, and diff checks passed. Generated rows may
+still lag; source scans are authoritative. Benchmark fields remain `TODO`;
+no benchmark command was run.
+
 ## TA compatibility
 
 TA-Lib is an external oracle only. TAFlow exports native-backed CamelCase classes directly from `taflow`; no TA-Lib compatibility package is shipped.

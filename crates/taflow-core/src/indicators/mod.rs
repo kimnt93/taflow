@@ -461,3 +461,49 @@ pub use volume_weighted_moving_average::VolumeWeightedMovingAverage;
 pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
+
+mod absolute_price_oscillator;
+#[cfg(test)]
+mod absolute_price_oscillator_test;
+mod active_zone_list;
+#[cfg(test)]
+mod active_zone_list_test;
+mod amihud;
+#[cfg(test)]
+mod amihud_test;
+mod anchored_volume_weighted_average_price;
+#[cfg(test)]
+mod anchored_volume_weighted_average_price_test;
+mod average_daily_dollar_value;
+#[cfg(test)]
+mod average_daily_dollar_value_test;
+mod bollinger_bands;
+#[cfg(test)]
+mod bollinger_bands_test;
+mod break_of_structure_change_of_character;
+#[cfg(test)]
+mod break_of_structure_change_of_character_test;
+mod candle_abandoned_baby;
+#[cfg(test)]
+mod candle_abandoned_baby_test;
+mod candle_advance_block;
+#[cfg(test)]
+mod candle_advance_block_test;
+mod candle_belt_hold;
+#[cfg(test)]
+mod candle_belt_hold_test;
+
+pub use absolute_price_oscillator::AbsolutePriceOscillator;
+pub use active_zone_list::ActiveZoneList;
+pub use amihud::Amihud;
+pub use anchored_volume_weighted_average_price::{
+    AnchoredVolumeWeightedAveragePrice, AnchoredVolumeWeightedAveragePriceValue,
+};
+pub use average_daily_dollar_value::AverageDailyDollarValue;
+pub use bollinger_bands::{BollingerBands, BollingerBandsValue};
+pub use break_of_structure_change_of_character::{
+    BreakOfStructureChangeOfCharacter, BreakOfStructureChangeOfCharacterValue,
+};
+pub use candle_abandoned_baby::CandleAbandonedBaby;
+pub use candle_advance_block::CandleAdvanceBlock;
+pub use candle_belt_hold::CandleBeltHold;

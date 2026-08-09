@@ -1,5 +1,5 @@
-use super::*;
 use crate::error::TaResult;
+use crate::stream::*;
 use std::collections::VecDeque;
 
 #[derive(Debug, Clone, Copy, PartialEq)]

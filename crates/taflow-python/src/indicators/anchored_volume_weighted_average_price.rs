@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::AnchoredVolumeWeightedAveragePrice as AnchoredVolumeWeightedAveragePriceState;
+use taflow::indicators::AnchoredVolumeWeightedAveragePrice as AnchoredVolumeWeightedAveragePriceState;
 
 /// Python boundary for the canonical Rust anchored VWAP state.
 #[pyclass]

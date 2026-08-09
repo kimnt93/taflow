@@ -9,7 +9,7 @@ use crate::error::TaResult;
 use crate::indicators::RollingStandardDeviation;
 use crate::ma_type::MaType;
 
-use super::{
+use crate::stream::{
     invalid_period, moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator, Window,
 };
 

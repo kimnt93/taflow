@@ -38,23 +38,8 @@ pub(crate) mod tests_extrema_support {
     }
 }
 
-mod absolute_price_oscillator;
-#[cfg(test)]
-mod absolute_price_oscillator_test;
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
-mod bollinger_bands;
-#[cfg(test)]
-mod bollinger_bands_test;
-mod candle_abandoned_baby;
-#[cfg(test)]
-mod candle_abandoned_baby_test;
-mod candle_advance_block;
-#[cfg(test)]
-mod candle_advance_block_test;
-mod candle_belt_hold;
-#[cfg(test)]
-mod candle_belt_hold_test;
 mod candle_breakaway;
 #[cfg(test)]
 mod candle_breakaway_test;
@@ -286,7 +271,7 @@ mod moving_average_convergence_divergence_test;
 pub(crate) mod moving_average_dispatcher;
 #[cfg(test)]
 mod moving_average_test;
-mod pattern;
+pub(crate) mod pattern;
 mod percentage_price_oscillator;
 #[cfg(test)]
 mod percentage_price_oscillator_test;
@@ -296,7 +281,7 @@ mod plus_directional_indicator_test;
 mod plus_directional_movement;
 #[cfg(test)]
 mod plus_directional_movement_test;
-mod price_transform;
+pub(crate) mod price_transform;
 pub(crate) mod regression;
 mod relative_strength_index;
 #[cfg(test)]
@@ -317,12 +302,9 @@ mod cumulative_minimum;
 mod cumulative_minimum_test;
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
-mod active_zone_list;
+mod fast_stochastic_oscillator;
 #[cfg(test)]
-mod active_zone_list_test;
-mod anchored_volume_weighted_average_price;
-#[cfg(test)]
-mod anchored_volume_weighted_average_price_test;
+mod fast_stochastic_oscillator_test;
 mod fibonacci_retracement;
 #[cfg(test)]
 mod fibonacci_retracement_test;
@@ -338,10 +320,6 @@ mod laguerre_relative_strength_index;
 #[cfg(test)]
 mod laguerre_relative_strength_index_test;
 pub(crate) mod operator_states;
-pub use active_zone_list::ActiveZoneList;
-mod fast_stochastic_oscillator;
-#[cfg(test)]
-mod fast_stochastic_oscillator_test;
 mod relative_momentum_index;
 #[cfg(test)]
 mod relative_momentum_index_test;
@@ -382,16 +360,7 @@ mod weighted_moving_average;
 mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
-pub use absolute_price_oscillator::AbsolutePriceOscillator;
-pub use anchored_volume_weighted_average_price::{
-    AnchoredVolumeWeightedAveragePrice, AnchoredVolumeWeightedAveragePriceValue,
-};
-
 #[allow(unused_imports)]
-pub use bollinger_bands::{BollingerBands, BollingerBandsValue};
-pub use candle_abandoned_baby::CandleAbandonedBaby;
-pub use candle_advance_block::CandleAdvanceBlock;
-pub use candle_belt_hold::CandleBeltHold;
 pub use candle_breakaway::CandleBreakaway;
 pub use candle_closing_marubozu::CandleClosingMarubozu;
 pub use candle_conceal_baby_swall::CandleConcealBabySwall;
@@ -848,9 +817,6 @@ mod tests {
         }
     }
 }
-mod break_of_structure_change_of_character;
-#[cfg(test)]
-mod break_of_structure_change_of_character_test;
 mod chaikin_volatility;
 #[cfg(test)]
 mod chaikin_volatility_test;
@@ -947,12 +913,6 @@ mod decay_linear;
 #[cfg(test)]
 mod decay_linear_test;
 pub use decay_linear::DecayLinear;
-mod amihud;
-#[cfg(test)]
-mod amihud_test;
-mod average_daily_dollar_value;
-#[cfg(test)]
-mod average_daily_dollar_value_test;
 mod cumulative_sum_control_chart;
 #[cfg(test)]
 mod cumulative_sum_control_chart_test;
@@ -1056,12 +1016,7 @@ mod lower_low_test;
 mod lowest_since;
 mod outside_bar;
 mod value_when;
-pub use amihud::Amihud;
-pub use average_daily_dollar_value::AverageDailyDollarValue;
 pub use bars_since::BarsSince;
-pub use break_of_structure_change_of_character::{
-    BreakOfStructureChangeOfCharacter, BreakOfStructureChangeOfCharacterValue,
-};
 pub use close_to_close_sigma::CloseToCloseSigma;
 pub use cumulative_sum_control_chart::CumulativeSumControlChart;
 pub use equal_highs_lows::{EqualHighsLows, EqualHighsLowsValue};

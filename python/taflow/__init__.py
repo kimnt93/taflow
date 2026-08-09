@@ -10,7 +10,7 @@ from .kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
 from .indicators import Aroon, AroonOscillator
 from .indicators import AccumulationDistribution, AccumulationDistributionOscillator
 from .indicators import BalanceOfPower, OnBalanceVolume
-from .absolute_price_oscillator import AbsolutePriceOscillator
+from .indicators.absolute_price_oscillator import AbsolutePriceOscillator
 from .percentage_price_oscillator import PercentagePriceOscillator
 from .chande_momentum_oscillator import ChandeMomentumOscillator
 from .indicators import Momentum
@@ -20,7 +20,7 @@ from .indicators import RateOfChangeRatio
 from .indicators import RateOfChangeRatioPercent
 from .indicators import WilliamsPercentR
 from .indicators import AverageDirectionalIndex, AverageDirectionalIndexRating
-from .bollinger_bands import BollingerBands
+from .indicators.bollinger_bands import BollingerBands
 from .commodity_channel_index import CommodityChannelIndex
 from .indicators import DirectionalMovementIndex
 from .candle_doji import CandleDoji
@@ -36,7 +36,7 @@ from .candle_short_line import CandleShortLine
 from .candle_spinning_top import CandleSpinningTop
 from .candle_long_line import CandleLongLine
 from .candle_doji_star import CandleDojiStar
-from .candle_belt_hold import CandleBeltHold
+from .indicators.candle_belt_hold import CandleBeltHold
 from .candle_engulfing import CandleEngulfing
 from .exponential_moving_average import ExponentialMovingAverage
 from .fast_stochastic_oscillator import FastStochasticOscillator
@@ -82,7 +82,7 @@ from .ultimate_oscillator import UltimateOscillator
 from .indicators import VariablePeriodMovingAverage
 from .heikin_ashi import HeikinAshi
 from .fibonacci_retracement import FibonacciRetracement
-from .anchored_volume_weighted_average_price import (
+from .indicators.anchored_volume_weighted_average_price import (
     AnchoredVolumeWeightedAveragePrice,
 )
 from .variable_index_dynamic_average import VariableIndexDynamicAverage
@@ -139,8 +139,8 @@ from .indicators import KlingerVolumeOscillator
 from .indicators import SessionVolumeLevels
 from .candle_up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
 from .candle_three_white_soldiers import CandleThreeWhiteSoldiers
-from .candle_abandoned_baby import CandleAbandonedBaby
-from .candle_advance_block import CandleAdvanceBlock
+from .indicators.candle_abandoned_baby import CandleAbandonedBaby
+from .indicators.candle_advance_block import CandleAdvanceBlock
 from .candle_breakaway import CandleBreakaway
 from .candle_conceal_baby_swall import CandleConcealBabySwall
 from .candle_counter_attack import CandleCounterAttack
@@ -241,11 +241,11 @@ from .retracements import Retracements
 from .session_extrema import SessionExtrema
 from .previous_high_low import PreviousHighLow
 from .sessions import Sessions
-from .active_zone_list import ActiveZoneList
+from .indicators.active_zone_list import ActiveZoneList
 from .fair_value_gap import FairValueGap
 from .donchian_channels import DonchianChannels
 from .swing_highs_lows import SwingHighsLows
-from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
+from .indicators.break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from .order_block import OrderBlock
 from .liquidity import Liquidity
 from .equal_highs_lows import EqualHighsLows
@@ -262,8 +262,8 @@ from .garman_klass import GarmanKlass
 from .rogers_satchell import RogersSatchell
 from .garman_klass_yang_zhang import GarmanKlassYangZhang
 from .yang_zhang import YangZhang
-from .average_daily_dollar_value import AverageDailyDollarValue
-from .amihud import Amihud
+from .indicators.average_daily_dollar_value import AverageDailyDollarValue
+from .indicators.amihud import Amihud
 from .roll_spread import RollSpread
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
 from .cumulative_sum_control_chart import CumulativeSumControlChart

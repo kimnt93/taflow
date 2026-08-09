@@ -1,6 +1,6 @@
 //! Incremental Belt Hold candlestick recognition (CDLBELTHOLD).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 /// Stateful CandleBeltHold candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.

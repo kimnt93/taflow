@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleAdvanceBlock as CandleAdvanceBlockState;
+use taflow::indicators::CandleAbandonedBaby as CandleAbandonedBabyState;
 #[pyclass]
-/// Stateful CandleAdvanceBlock candlestick recognizer.
+/// Stateful CandleAbandonedBaby candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleAdvanceBlock {
-    inner: CandleAdvanceBlockState,
+pub struct CandleAbandonedBaby {
+    inner: CandleAbandonedBabyState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleAdvanceBlock {
+impl CandleAbandonedBaby {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleAdvanceBlockState::new(),
+            inner: CandleAbandonedBabyState::new(),
             outputs: vec![],
         }
     }

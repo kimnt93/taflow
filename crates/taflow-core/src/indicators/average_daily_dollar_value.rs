@@ -1,22 +1,22 @@
-use super::operator_states::*;
-use crate::error::TaResult;
-
-pub struct Amihud {
-    mean: RollingMean,
-    previous_close: Option<f64>,
+pub struct AverageDailyDollarValue {
+    sum: f64,
+    window: VecDeque<f64>,
+    timeperiod: usize,
     value: Option<f64>,
 }
 
-impl Amihud {
+impl AverageDailyDollarValue {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new(timeperiod: usize) -> TaResult<Self> {
+        validate_period(timeperiod)?;
         Ok(Self {
-            mean: RollingMean::new(timeperiod)?,
-            previous_close: None,
+            sum: 0.0,
+            window: VecDeque::with_capacity(timeperiod),
+            timeperiod,
             value: None,
         })
     }
@@ -27,14 +27,17 @@ impl Amihud {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, close: f64, volume: f64) -> Option<f64> {
-        if let Some(previous_close) = self.previous_close.replace(close) {
-            let term = if close > 0.0 && previous_close > 0.0 && volume > 0.0 {
-                ((close - previous_close) / previous_close).abs() / (close * volume)
-            } else {
-                0.0
-            };
-            self.value = self.mean.append(term);
+        let term = close * volume;
+        if self.window.len() == self.timeperiod {
+            self.sum -= self.window.pop_front().expect("ring is full");
         }
+        self.window.push_back(term);
+        self.sum += term;
+        self.value = if self.window.len() == self.timeperiod {
+            Some(self.sum / self.timeperiod as f64)
+        } else {
+            None
+        };
         self.value
     }
 
@@ -49,8 +52,11 @@ impl Amihud {
 
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.mean.reset();
-        self.previous_close = None;
+        self.sum = 0.0;
+        self.window.clear();
         self.value = None;
     }
 }
+use crate::error::TaResult;
+use crate::stream::operator_states::validate_period;
+use std::collections::VecDeque;

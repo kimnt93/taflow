@@ -2,7 +2,7 @@
 
 from numpy.typing import NDArray
 
-from ._native import ActiveZoneListOperator as _Native
+from .._native import ActiveZoneListOperator as _Native
 
 
 class ActiveZoneList:

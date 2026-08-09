@@ -4,10 +4,10 @@ from typing import Any
 
 import numpy as np
 
-from ._native import (
+from .._native import (
     AnchoredVolumeWeightedAveragePrice as _NativeAnchoredVolumeWeightedAveragePrice,
 )
-from ._series import as_bool_series, as_float64_series
+from .._series import as_bool_series, as_float64_series
 
 
 class AnchoredVolumeWeightedAveragePrice:
