@@ -596,6 +596,9 @@ mod donchian_test;
 mod equal_highs_lows;
 #[cfg(test)]
 mod equal_highs_lows_test;
+mod fair_value_gap;
+#[cfg(test)]
+mod fair_value_gap_test;
 mod falling;
 #[cfg(test)]
 mod falling_test;
@@ -626,6 +629,7 @@ pub use cumulative_sum_control_chart::CumulativeSumControlChart;
 pub use detrended_price_oscillator::DetrendedPriceOscillator;
 pub use donchian::{Donchian, DonchianValue};
 pub use equal_highs_lows::EqualHighsLows;
+pub use fair_value_gap::{FairValueGap, FairValueGapValue};
 pub use falling::Falling;
 pub use fractal_dimension::FractalDimension;
 pub use keltner_channels::{KeltnerChannels, KeltnerValue};

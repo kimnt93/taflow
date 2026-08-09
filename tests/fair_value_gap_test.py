@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.fair_value_gap import FairValueGap
+from taflow import FairValueGap
 
 
 def test_fair_value_gap_lifecycle_and_reset():
@@ -10,4 +10,3 @@ def test_fair_value_gap_lifecycle_and_reset():
     assert len(state.compute()) == 4
     state.reset()
     assert state.value is None
-

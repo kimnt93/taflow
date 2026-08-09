@@ -230,7 +230,7 @@ from ..session import SessionExtrema
 from ..previous_high_low import PreviousHighLow
 from ..sessions import Sessions
 from .active_zone_list import ActiveZoneList
-from ..fvg import FairValueGap
+from .fair_value_gap import FairValueGap
 from ..swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from ..order_block import OrderBlock

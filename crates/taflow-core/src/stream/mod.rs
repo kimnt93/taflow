@@ -44,8 +44,8 @@ pub use crate::indicators::{
     Amihud, AverageDailyDollarValue, ChaikinMoneyFlow, ChaikinVolatility, ChandeMomentumOscillator,
     CloseToCloseSigma, CommodityChannelIndex, Cross, Crossover, Crossunder, CumulativeMaximum,
     CumulativeMinimum, CumulativeSumControlChart, DetrendedPriceOscillator, Donchian,
-    DonchianValue, EqualHighsLows, Falling, FractalDimension, HedgeRatio,
-    HilbertTransformDominantCyclePhase, KaufmanAdaptiveMovingAverage, KeltnerChannels,
+    DonchianValue, EqualHighsLows, FairValueGap, FairValueGapValue, Falling, FractalDimension,
+    HedgeRatio, HilbertTransformDominantCyclePhase, KaufmanAdaptiveMovingAverage, KeltnerChannels,
     KeltnerValue, KnowSureThing, MassIndex, Rising, UlcerIndex,
 };
 pub(crate) mod cycle;
@@ -533,9 +533,6 @@ mod tests {
 mod ease_of_movement;
 #[cfg(test)]
 mod ease_of_movement_test;
-mod fair_value_gap;
-#[cfg(test)]
-mod fair_value_gap_test;
 mod force_index;
 #[cfg(test)]
 mod force_index_test;
@@ -675,7 +672,6 @@ pub use bars_since::BarsSince;
 pub use ease_of_movement::EaseOfMovement;
 pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
 pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
-pub use fair_value_gap::{FairValueGap, FairValueGapValue};
 pub use force_index::ForceIndex;
 pub use frac_diff::FracDiff;
 pub use gap_down::GapDown;

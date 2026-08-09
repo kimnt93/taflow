@@ -56,6 +56,14 @@ Python tests, the full Python suite (591 passed, 2 skipped), and the 303/303
 interface audit passed. Benchmark fields remain `TODO`; no benchmark command
 was run.
 
+The twenty-seventh structural batch removed obsolete root compatibility
+modules (`adv`, `dpo`, `fvg`, `rolling_std`, `spread_zscore`, and `stc`),
+moved `FairValueGap` and its binding/core implementation to canonical
+same-named indicator files, and replaced adapter-side length bookkeeping with
+native length delegation. The FairValueGap lifecycle test, release extension,
+full Python suite (591 passed, 2 skipped), and 303/303 interface audit passed.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

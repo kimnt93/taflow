@@ -93,4 +93,8 @@ impl FairValueGapOperator {
         self.bottom.clear();
         self.mitigated.clear();
     }
+
+    fn __len__(&self) -> usize {
+        self.signal.len()
+    }
 }
