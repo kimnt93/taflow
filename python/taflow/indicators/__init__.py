@@ -41,7 +41,7 @@ from ..candle_three_stars_in_south import CandleThreeStarsInSouth
 from ..candle_three_outside import CandleThreeOutside
 from ..candle_two_crows import CandleTwoCrows
 from ..ultimate_oscillator import UltimateOscillator
-from ..up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
+from ..candle_up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
 from ..candle_three_white_soldiers import CandleThreeWhiteSoldiers
 from ..candle_abandoned_baby import CandleAbandonedBaby
 from ..candle_advance_block import CandleAdvanceBlock

@@ -1,4 +1,4 @@
-use super::imi::IntradayMomentumIndex;
+use super::intraday_momentum_index::IntradayMomentumIndex;
 
 #[test]
 fn reset_replay_matches() {

@@ -37,8 +37,8 @@ class CandleUpDownSideGapThreeMethods:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        if any(value is not None for value in (_open, high, low, close)):
-            self.extend(_open, high, low, close)
+        self._length = 0
+        self.extend(_open, high, low, close)
 
     def append(self, _open: float, high: float, low: float, close: float) -> "CandleUpDownSideGapThreeMethods":
         """Append one observation or aligned bar to the native Rust state.
@@ -59,7 +59,8 @@ class CandleUpDownSideGapThreeMethods:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_open, high, low, close)
+        self._state.append(float(_open), float(high), float(low), float(close))
+        self._length += 1
         return self
 
     def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleUpDownSideGapThreeMethods":
@@ -81,12 +82,16 @@ class CandleUpDownSideGapThreeMethods:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
+        open_array = as_float64_series(_open)
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        close_array = as_float64_series(close)
+        if len({len(array) for array in (open_array, high_array, low_array, close_array)}) != 1:
+            raise ValueError("open, high, low, and close must have equal lengths")
         self._state.extend(
-            as_float64_series(_open),
-            as_float64_series(high),
-            as_float64_series(low),
-            as_float64_series(close),
+            open_array, high_array, low_array, close_array
         )
+        self._length += len(open_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -100,7 +105,7 @@ class CandleUpDownSideGapThreeMethods:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> int | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -119,4 +124,9 @@ class CandleUpDownSideGapThreeMethods:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return self._length

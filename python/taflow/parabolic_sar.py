@@ -1,9 +1,11 @@
 """Descriptive stateful interface for Parabolic SAR."""
 
-from taflow._native import StatefulSar
 from typing import Any
 
 import numpy as np
+
+from ._native import StatefulSar
+from ._series import as_float64_series
 
 
 class ParabolicSar:
@@ -28,8 +30,7 @@ class ParabolicSar:
     ) -> None:
         """Create Parabolic SAR with optional aligned high/low history."""
         self._state = StatefulSar(acceleration, maximum)
-        if high is not None or low is not None:
-            self.extend(high, low)
+        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "ParabolicSar":
         """Append one observation or aligned bar to the native Rust state.
@@ -64,7 +65,11 @@ class ParabolicSar:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(high, low)
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        if len(high_array) != len(low_array):
+            raise ValueError("high and low must have equal lengths")
+        self._state.extend(high_array, low_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -77,7 +82,7 @@ class ParabolicSar:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns

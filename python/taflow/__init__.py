@@ -158,7 +158,7 @@ from .rolling_min_max import RollingMinMax
 from .rolling_min_max_index import RollingMinMaxIndex
 from .klinger_volume_oscillator import KlingerVolumeOscillator
 from .session_volume_levels import SessionVolumeLevels
-from .up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
+from .candle_up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
 from .candle_three_white_soldiers import CandleThreeWhiteSoldiers
 from .candle_abandoned_baby import CandleAbandonedBaby
 from .candle_advance_block import CandleAdvanceBlock

@@ -1,57 +1,5 @@
 //! Incremental Plus Directional Movement (+DM).
 use crate::error::{TaError, TaResult};
-
-/// Compute the plus directional movement result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn plus_directional_movement(
-    high: &[f64],
-    low: &[f64],
-    timeperiod: usize,
-) -> TaResult<Vec<f64>> {
-    let len = high.len();
-    if len != low.len() {
-        return Err(TaError::LengthMismatch {
-            expected: len,
-            got: low.len(),
-        });
-    }
-    if timeperiod < 1 || len < timeperiod {
-        return Err(TaError::InsufficientData {
-            need: timeperiod.max(1),
-            got: len,
-        });
-    }
-    let mut output = vec![0.0; len];
-    if timeperiod > 1 {
-        output[..timeperiod - 1].fill(f64::NAN);
-    }
-    let mut sum = 0.0;
-    for index in 1..timeperiod {
-        let up = high[index] - high[index - 1];
-        let down = low[index - 1] - low[index];
-        if up > down && up > 0.0 {
-            sum += up;
-        }
-    }
-    output[timeperiod - 1] = sum;
-    let period = timeperiod as f64;
-    for index in timeperiod..len {
-        let up = high[index] - high[index - 1];
-        let down = low[index - 1] - low[index];
-        sum = sum - sum / period + if up > down && up > 0.0 { up } else { 0.0 };
-        output[index] = sum;
-    }
-    Ok(output)
-}
 /// Persistent Rust state or aligned output type for `PlusDirectionalMovement`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
@@ -130,23 +78,5 @@ impl PlusDirectionalMovement {
         self.previous = None;
         self.sum = 0.0;
         self.value = None
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn matches_batch() {
-        let high: Vec<f64> = (0..40).map(|i| 100.0 + i as f64 * 0.3).collect();
-        let low: Vec<f64> = (0..40).map(|i| 98.0 + i as f64 * 0.1).collect();
-        let expected = crate::stream::plus_directional_movement(&high, &low, 14).unwrap();
-        let mut state = PlusDirectionalMovement::new(14).unwrap();
-        for ((&h, &l), expected) in high.iter().zip(&low).zip(&expected) {
-            match state.append(h, l) {
-                Some(actual) => assert!((actual - expected).abs() < 1e-12),
-                None => assert!(expected.is_nan()),
-            }
-        }
     }
 }

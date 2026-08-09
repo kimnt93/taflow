@@ -41,7 +41,9 @@ pub(crate) mod tests_extrema_support {
 mod absolute_price_oscillator;
 #[cfg(test)]
 mod absolute_price_oscillator_test;
-mod accbands;
+mod acceleration_bands;
+#[cfg(test)]
+mod acceleration_bands_test;
 mod aroon;
 mod aroon_rescan;
 #[cfg(test)]
@@ -226,10 +228,12 @@ mod candle_two_crows_test;
 mod candle_unique_three_river;
 #[cfg(test)]
 mod candle_unique_three_river_test;
+mod candle_up_down_side_gap_three_methods;
+#[cfg(test)]
+mod candle_up_down_side_gap_three_methods_test;
 mod candle_upside_gap_two_crows;
 #[cfg(test)]
 mod candle_upside_gap_two_crows_test;
-mod candle_xsidegap3methods;
 mod chande_momentum_oscillator;
 #[cfg(test)]
 mod chande_momentum_oscillator_test;
@@ -265,10 +269,10 @@ mod hilbert_transform_trend_mode_test;
 mod hilbert_transform_trendline;
 #[cfg(test)]
 mod hilbert_transform_trendline_test;
-mod imi;
-#[cfg(test)]
-mod imi_test;
 mod indicator;
+mod intraday_momentum_index;
+#[cfg(test)]
+mod intraday_momentum_index_test;
 mod kaufman_adaptive_moving_average;
 #[cfg(test)]
 mod kaufman_adaptive_moving_average_test;
@@ -398,8 +402,12 @@ mod pattern;
 mod percentage_price_oscillator;
 #[cfg(test)]
 mod percentage_price_oscillator_test;
-mod plus_di;
-mod plus_dm;
+mod plus_directional_indicator;
+#[cfg(test)]
+mod plus_directional_indicator_test;
+mod plus_directional_movement;
+#[cfg(test)]
+mod plus_directional_movement_test;
 mod price_transform;
 mod regression;
 mod relative_strength_index;
@@ -487,6 +495,12 @@ mod fast_stochastic_oscillator_test;
 mod parabolic_moving_average_stop;
 #[cfg(test)]
 mod parabolic_moving_average_stop_test;
+mod parabolic_sar;
+mod parabolic_sar_extended;
+#[cfg(test)]
+mod parabolic_sar_extended_test;
+#[cfg(test)]
+mod parabolic_sar_test;
 mod pivot_points;
 #[cfg(test)]
 mod pivot_points_test;
@@ -508,8 +522,6 @@ mod rate_of_change_test;
 mod relative_momentum_index;
 #[cfg(test)]
 mod relative_momentum_index_test;
-mod sar;
-mod sarext;
 mod session_volume_levels;
 #[cfg(test)]
 mod session_volume_levels_test;
@@ -555,9 +567,7 @@ mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 pub use absolute_price_oscillator::AbsolutePriceOscillator;
-#[allow(unused_imports)]
-pub(crate) use accbands::acceleration_bands;
-pub use accbands::{AccelerationBands, AccelerationBandsValue};
+pub use acceleration_bands::{AccelerationBands, AccelerationBandsValue};
 pub use anchored_volume_weighted_average_price::{
     AnchoredVolumeWeightedAveragePrice, AnchoredVolumeWeightedAveragePriceValue,
 };
@@ -627,8 +637,8 @@ pub use candle_thrusting::CandleThrusting;
 pub use candle_tri_star::CandleTriStar;
 pub use candle_two_crows::CandleTwoCrows;
 pub use candle_unique_three_river::CandleUniqueThreeRiver;
+pub use candle_up_down_side_gap_three_methods::CandleUpDownSideGapThreeMethods;
 pub use candle_upside_gap_two_crows::CandleUpsideGapTwoCrows;
-pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use directional_movement_index::DirectionalMovementIndex;
@@ -643,9 +653,9 @@ pub use hilbert_transform_phasor::{HilbertTransformPhasor, HilbertTransformPhaso
 pub use hilbert_transform_sine_wave::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
 pub use hilbert_transform_trend_mode::HilbertTransformTrendMode;
 pub use hilbert_transform_trendline::HilbertTransformTrendline;
-#[allow(unused_imports)]
-pub use imi::IntradayMomentumIndex;
 pub use indicator::StreamingIndicator;
+#[allow(unused_imports)]
+pub use intraday_momentum_index::IntradayMomentumIndex;
 pub use jurik_moving_average::JurikMovingAverage;
 pub use kaufman_adaptive_moving_average::KaufmanAdaptiveMovingAverage;
 pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
@@ -673,12 +683,8 @@ pub use parabolic_moving_average_stop::{
 #[allow(unused_imports)]
 pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use pivot_points::{PivotPoints, PivotPointsValue};
-#[allow(unused_imports)]
-pub(crate) use plus_di::plus_directional_indicator;
-pub use plus_di::PlusDirectionalIndicator;
-#[allow(unused_imports)]
-pub(crate) use plus_dm::plus_directional_movement;
-pub use plus_dm::PlusDirectionalMovement;
+pub use plus_directional_indicator::PlusDirectionalIndicator;
+pub use plus_directional_movement::PlusDirectionalMovement;
 pub use premium_discount::{PremiumDiscount, PremiumDiscountValue};
 pub use rate_of_change::RateOfChange;
 pub use rate_of_change_percent::RateOfChangePercent;
@@ -688,22 +694,20 @@ pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlo
 pub use relative_momentum_index::RelativeMomentumIndex;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
-pub use rolling_extrema::{RollingArgmax, RollingArgmin, RollingMax, RollingMin};
+pub use rolling_extrema::{RollingArgmax, RollingArgmin};
+pub use rolling_max::RollingMax;
 pub use rolling_median::RollingMedian;
+pub use rolling_min::RollingMin;
 pub use rolling_mode::RollingMode;
 pub use variable_period_moving_average::VariablePeriodMovingAverage;
 
 #[allow(unused_imports)]
 pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
+pub use parabolic_sar::ParabolicSar;
+pub use parabolic_sar_extended::ParabolicSarExtended;
 #[allow(unused_imports)]
 pub use relative_strength_index::RelativeStrengthIndex;
 pub use rolling_sum::RollingSum;
-#[allow(unused_imports)]
-pub(crate) use sar::parabolic_sar;
-pub use sar::ParabolicSar;
-#[allow(unused_imports)]
-pub(crate) use sarext::parabolic_sar_extended;
-pub use sarext::ParabolicSarExtended;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use simple_moving_average::SimpleMovingAverage;
 pub use smoothed_trend_channel::SmoothedTrendChannel;
@@ -751,16 +755,16 @@ mod math_multiply_test;
 pub use math_divide::MathDivide;
 #[cfg(test)]
 mod math_divide_test;
-mod rolling_max;
-#[allow(unused_imports)]
-pub(crate) use rolling_max::rolling_max;
 mod rolling_argmax;
+mod rolling_max;
+#[cfg(test)]
+mod rolling_max_test;
 #[allow(unused_imports)]
 pub(crate) use rolling_argmax::rolling_argmax;
-mod rolling_min;
-#[allow(unused_imports)]
-pub(crate) use rolling_min::rolling_min;
 mod rolling_argmin;
+mod rolling_min;
+#[cfg(test)]
+mod rolling_min_test;
 #[allow(unused_imports)]
 pub(crate) use rolling_argmin::rolling_argmin;
 mod rolling_minmax;
@@ -850,8 +854,6 @@ mod smoothed_trend_channel_lifecycle_test;
 #[cfg(test)]
 mod value_when_test;
 #[allow(unused_imports)]
-pub(crate) use candle_xsidegap3methods::candle_xside_gap_three_methods;
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -961,8 +963,12 @@ mod tests {
             4.0, 2.0, 2.0, 5.0, 3.0, 3.0, 5.0, 1.0, 1.0, 4.0, 4.0, 2.0, 6.0, 6.0, 0.0, 0.0, 5.0,
         ];
         let period = 4;
-        let max_expected = crate::stream::rolling_max(&input, period).unwrap();
-        let min_expected = crate::stream::rolling_min(&input, period).unwrap();
+        let mut max_expected_state = RollingMax::new(period).unwrap();
+        let mut max_expected = Vec::new();
+        max_expected_state.extend_slice_into(&input, &mut max_expected);
+        let mut min_expected_state = RollingMin::new(period).unwrap();
+        let mut min_expected = Vec::new();
+        min_expected_state.extend_slice_into(&input, &mut min_expected);
         let mut sum_batch_state = RollingSum::new(period).unwrap();
         let mut sum_expected = Vec::new();
         sum_batch_state.extend_slice_into(&input, &mut sum_expected);

@@ -488,7 +488,7 @@ check_pattern!(
     a
 );
 check_pattern!(
-    xside_gap_three_methods,
+    candle_up_down_side_gap_three_methods,
     candle_xside_gap_three_methods,
     CandleUpDownSideGapThreeMethods,
     a

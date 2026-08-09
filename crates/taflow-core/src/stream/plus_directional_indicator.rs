@@ -2,39 +2,6 @@
 use super::directional::DirectionalMovement;
 use crate::error::TaResult;
 
-/// Compute the plus directional indicator result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn plus_directional_indicator(
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-    timeperiod: usize,
-) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch {
-            expected: high.len(),
-            got: low.len().min(close.len()),
-        });
-    }
-    let mut state = PlusDirectionalIndicator::new(timeperiod)?;
-    Ok(high
-        .iter()
-        .zip(low)
-        .zip(close)
-        .map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN))
-        .collect())
-}
-
 /// Persistent Rust state or aligned output type for `PlusDirectionalIndicator`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
@@ -143,79 +110,5 @@ impl PlusDirectionalIndicator {
     pub fn reset(&mut self) {
         self.directional.reset();
         self.value = None;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn lcg_bars(n: usize, mut state: u64) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
-        let mut next = move || {
-            state = state
-                .wrapping_mul(6364136223846793005)
-                .wrapping_add(1442695040888963407);
-            (state >> 11) as f64 / (1u64 << 53) as f64
-        };
-        let mut high = Vec::with_capacity(n);
-        let mut low = Vec::with_capacity(n);
-        let mut close = Vec::with_capacity(n);
-        for _ in 0..n {
-            let base = 90.0 + next() * 20.0;
-            let up = next() * 2.0;
-            let down = next() * 2.0;
-            high.push(base + up);
-            low.push(base - down);
-            close.push(base + (up - down) * next());
-        }
-        (high, low, close)
-    }
-
-    fn assert_same_bits(actual: &[f64], expected: &[f64], label: &str) {
-        assert_eq!(actual.len(), expected.len(), "{label}: length");
-        for (i, (a, b)) in actual.iter().zip(expected).enumerate() {
-            assert_eq!(a.to_bits(), b.to_bits(), "{label}: bar {i}");
-        }
-    }
-
-    #[test]
-    fn bulk_is_bitwise_identical_to_per_bar_append() {
-        let (high, low, close) = lcg_bars(5_000, 0x5EED_9D10);
-        let (th, tl, tc) = lcg_bars(128, 0x7A11_9D10);
-        for period in [1usize, 2, 14, 30] {
-            let mut per_bar = PlusDirectionalIndicator::new(period).unwrap();
-            let reference: Vec<f64> = (0..high.len())
-                .map(|i| {
-                    per_bar
-                        .append(high[i], low[i], close[i])
-                        .unwrap_or(f64::NAN)
-                })
-                .collect();
-            let tail_reference: Vec<f64> = (0..th.len())
-                .map(|i| per_bar.append(th[i], tl[i], tc[i]).unwrap_or(f64::NAN))
-                .collect();
-
-            for chunk in [usize::MAX, 1, 7, 97] {
-                let mut state = PlusDirectionalIndicator::new(period).unwrap();
-                let mut out = Vec::new();
-                let mut start = 0;
-                while start < high.len() {
-                    let end = (start + chunk.min(high.len())).min(high.len());
-                    state.extend_slices_into(
-                        &high[start..end],
-                        &low[start..end],
-                        &close[start..end],
-                        &mut out,
-                    );
-                    start = end;
-                }
-                let label = format!("p{period} chunk {chunk}");
-                assert_same_bits(&out, &reference, &label);
-                let tail_out: Vec<f64> = (0..th.len())
-                    .map(|i| state.append(th[i], tl[i], tc[i]).unwrap_or(f64::NAN))
-                    .collect();
-                assert_same_bits(&tail_out, &tail_reference, &format!("{label} tail"));
-            }
-        }
     }
 }

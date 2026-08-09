@@ -20,6 +20,11 @@ class RollingMin(UnaryStateAdapter):
 
     _native_cls = StatefulMin
 
+    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
+        """Create the native rolling minimum state and process ``_input``."""
+        self._state = self._native_cls(timeperiod)
+        self.extend(_input)
+
     def append(self, _input: float) -> "RollingMin":
         """Append one observation and return this indicator."""
         super().append(_input)

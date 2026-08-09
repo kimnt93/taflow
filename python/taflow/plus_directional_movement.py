@@ -32,10 +32,10 @@ class PlusDirectionalMovement:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        if high is not None or low is not None:
-            self.extend(high, low)
+        self._length = 0
+        self.extend(high, low)
 
-    def append(self, h: float, l: float) -> "PlusDirectionalMovement":
+    def append(self, high: float, low: float) -> "PlusDirectionalMovement":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -50,10 +50,11 @@ class PlusDirectionalMovement:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(h, l)
+        self._state.append(float(high), float(low))
+        self._length += 1
         return self
 
-    def extend(self, high: Any, low: Any | None = None) -> "PlusDirectionalMovement":
+    def extend(self, high: Any, low: Any) -> "PlusDirectionalMovement":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -68,9 +69,12 @@ class PlusDirectionalMovement:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        if low is None:
-            raise ValueError("high and low must be provided together")
-        self._state.extend(as_float64_series(high), as_float64_series(low))
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        if len(high_array) != len(low_array):
+            raise ValueError("high and low must have equal lengths")
+        self._state.extend(high_array, low_array)
+        self._length += len(high_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -84,7 +88,7 @@ class PlusDirectionalMovement:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -103,4 +107,9 @@ class PlusDirectionalMovement:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return self._length

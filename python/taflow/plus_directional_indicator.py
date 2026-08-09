@@ -35,8 +35,8 @@ class PlusDirectionalIndicator:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        if high is not None or low is not None or close is not None:
-            self.extend(high, low, close)
+        self._length = 0
+        self.extend(high, low, close)
 
     def append(
         self, high: float, low: float, close: float
@@ -57,11 +57,12 @@ class PlusDirectionalIndicator:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(high, low, close)
+        self._state.append(float(high), float(low), float(close))
+        self._length += 1
         return self
 
     def extend(
-        self, high: Any, low: Any | None = None, close: Any | None = None
+        self, high: Any, low: Any, close: Any
     ) -> "PlusDirectionalIndicator":
         """Append aligned input series to the native Rust state.
 
@@ -79,11 +80,11 @@ class PlusDirectionalIndicator:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        if low is None or close is None:
-            raise ValueError("high, low, and close must be provided together")
-        self._state.extend(
-            as_float64_series(high), as_float64_series(low), as_float64_series(close)
-        )
+        arrays = tuple(as_float64_series(value) for value in (high, low, close))
+        if len({len(array) for array in arrays}) != 1:
+            raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(*arrays)
+        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -116,4 +117,9 @@ class PlusDirectionalIndicator:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return self._length

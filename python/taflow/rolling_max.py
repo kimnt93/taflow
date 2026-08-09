@@ -20,6 +20,11 @@ class RollingMax(UnaryStateAdapter):
 
     _native_cls = StatefulMax
 
+    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
+        """Create the native rolling maximum state and process ``_input``."""
+        self._state = self._native_cls(timeperiod)
+        self.extend(_input)
+
     def append(self, _input: float) -> "RollingMax":
         """Append one observation and return this indicator."""
         super().append(_input)

@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 163,
+    "complete": 172,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 293,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 613,
+    "rust_exports": 615,
     "smc_functions": 8,
-    "structure": 191,
+    "structure": 200,
     "talib_functions": 161
   },
   "rows": [
@@ -797,7 +797,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "up_down_side_gap_three_methods",
+      "module": "candle_up_down_side_gap_three_methods",
       "name": "CandleUpDownSideGapThreeMethods",
       "native_binding": true,
       "native_symbols": [

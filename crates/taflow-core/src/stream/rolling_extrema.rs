@@ -4,7 +4,7 @@ use std::collections::VecDeque;
 
 use crate::error::TaResult;
 
-use super::{invalid_period, vhgw, StreamingIndicator};
+use super::{invalid_period, StreamingIndicator};
 
 #[cfg(test)]
 use crate::stream::{RollingMinmax, RollingMinmaxIndex, RollingMinmaxIndexValue};
@@ -200,80 +200,6 @@ impl RollingExtrema {
         self.minimum.reset();
     }
 }
-
-macro_rules! rolling_extrema_indicator {
-    ($name:ident, $inner:ident, $bulk:path) => {
-        #[derive(Debug, Clone)]
-        pub struct $name {
-            extrema: $inner,
-            value: Option<f64>,
-        }
-
-        impl $name {
-            /// Computes or updates `new` through the native Rust kernel.
-            ///
-            /// Parameters are the typed series and configuration values in the signature.
-            ///
-            /// Returns the computed value, aligned history, or a validation error.
-            pub fn new(period: usize) -> TaResult<Self> {
-                Ok(Self {
-                    extrema: $inner::new(period)?,
-                    value: None,
-                })
-            }
-
-            /// Window length of the underlying monotonic tracker.
-            pub(crate) fn period(&self) -> usize {
-                self.extrema.period()
-            }
-
-            /// Observations consumed since construction/reset.
-            pub(crate) fn count(&self) -> usize {
-                self.extrema.count()
-            }
-        }
-
-        impl StreamingIndicator for $name {
-            type Output = f64;
-
-            fn append(&mut self, input: f64) -> Option<f64> {
-                self.value = self.extrema.append(input);
-                self.value
-            }
-
-            fn value(&self) -> Option<f64> {
-                self.value
-            }
-
-            fn reset(&mut self) {
-                self.extrema.reset();
-                self.value = None;
-            }
-
-            fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
-                let period = self.extrema.period();
-                if self.extrema.count() != 0 || inputs.len() < period {
-                    output.reserve(inputs.len());
-                    output.extend(
-                        inputs
-                            .iter()
-                            .copied()
-                            .map(|input| self.append(input).unwrap_or(f64::NAN)),
-                    );
-                    return;
-                }
-                let start = output.len();
-                output.resize(start + inputs.len(), f64::NAN);
-                $bulk(inputs, period, &mut output[start + period - 1..]);
-                self.extrema.rebuild_from_full_run(inputs);
-                self.value = output.last().copied();
-            }
-        }
-    };
-}
-
-rolling_extrema_indicator!(RollingMax, MonotonicMax, vhgw::sliding_max_into);
-rolling_extrema_indicator!(RollingMin, MonotonicMin, vhgw::sliding_min_into);
 
 /// TA-Lib-exact rolling argmax tracker.
 ///
@@ -613,6 +539,7 @@ rolling_index_indicator!(RollingArgmin, MonotonicArgmin, false);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::stream::{RollingMax, RollingMin};
 
     /// Original two-deque implementation, kept verbatim as the reference
     /// oracle for the split monotonic states.

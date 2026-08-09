@@ -1,94 +1,83 @@
-//! Batch implementation for `rolling_max`.
+//! Stateful trailing maximum indicator.
 
-use super::math_operator::*;
-use super::vhgw;
-use crate::error::{TaError, TaResult};
+use crate::error::TaResult;
 
-/// Compute the rolling max result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn rolling_max(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    validate_period(input, timeperiod)?;
-    let len = input.len();
-    let lookback = timeperiod - 1;
-    let mut output = vec![0.0_f64; len];
-    output[..lookback].fill(f64::NAN);
-    vhgw::sliding_max_into(input, timeperiod, &mut output[lookback..]);
-    Ok(output)
+use super::rolling_extrema::MonotonicMax;
+use super::{vhgw, StreamingIndicator};
+
+/// Persistent trailing maximum over a fixed number of observations.
+#[derive(Debug, Clone)]
+pub struct RollingMax {
+    extrema: MonotonicMax,
+    value: Option<f64>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::stream::tests_extrema_support::{datasets, periods_and_lengths};
-
-    /// Original track-and-rescan implementation, kept verbatim as oracle.
-    fn reference_rolling_max(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-        validate_period(input, timeperiod)?;
-        let len = input.len();
-        let lookback = timeperiod - 1;
-        let mut output = vec![0.0_f64; len];
-        output[..lookback].fill(f64::NAN);
-
-        let mut highest = input[0];
-        let mut highest_idx: usize = 0;
-        for j in 1..timeperiod {
-            if input[j] >= highest {
-                highest = input[j];
-                highest_idx = j;
-            }
-        }
-        output[lookback] = highest;
-
-        let mut trailing_idx = 1;
-        let mut today = timeperiod;
-
-        while today < len {
-            let v = input[today];
-            if highest_idx < trailing_idx {
-                highest = input[trailing_idx];
-                highest_idx = trailing_idx;
-                for (j, &val) in input[trailing_idx + 1..=today].iter().enumerate() {
-                    if val >= highest {
-                        highest = val;
-                        highest_idx = trailing_idx + 1 + j;
-                    }
-                }
-            } else if v >= highest {
-                highest_idx = today;
-                highest = v;
-            }
-            output[today] = highest;
-            trailing_idx += 1;
-            today += 1;
-        }
-        Ok(output)
+impl RollingMax {
+    /// Create a rolling maximum state with the supplied positive period.
+    pub fn new(period: usize) -> TaResult<Self> {
+        Ok(Self {
+            extrema: MonotonicMax::new(period)?,
+            value: None,
+        })
     }
 
-    #[test]
-    fn matches_reference_bitwise() {
-        for (period, len) in periods_and_lengths() {
-            for data in datasets(len) {
-                let expected = reference_rolling_max(&data, period);
-                let actual = rolling_max(&data, period);
-                match (expected, actual) {
-                    (Ok(expected), Ok(actual)) => {
-                        assert_eq!(expected.len(), actual.len());
-                        for (e, a) in expected.iter().zip(&actual) {
-                            assert_eq!(e.to_bits(), a.to_bits(), "p={period} len={len}");
-                        }
-                    }
-                    (Err(_), Err(_)) => {}
-                    _ => panic!("error parity mismatch p={period} len={len}"),
-                }
-            }
+    /// Append one observation and return the trailing maximum once warm-up completes.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        self.value = self.extrema.append(input);
+        self.value
+    }
+
+    pub(crate) fn period(&self) -> usize {
+        self.extrema.period()
+    }
+
+    pub(crate) fn count(&self) -> usize {
+        self.extrema.count()
+    }
+
+    /// Return the latest trailing maximum, or `None` during warm-up.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Reset the state without reallocating its bounded deque.
+    pub fn reset(&mut self) {
+        self.extrema.reset();
+        self.value = None;
+    }
+}
+
+impl StreamingIndicator for RollingMax {
+    type Output = f64;
+
+    fn append(&mut self, input: f64) -> Option<f64> {
+        Self::append(self, input)
+    }
+
+    fn value(&self) -> Option<f64> {
+        Self::value(self)
+    }
+
+    fn reset(&mut self) {
+        Self::reset(self);
+    }
+
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        let period = self.extrema.period();
+        if self.extrema.count() != 0 || inputs.len() < period {
+            output.reserve(inputs.len());
+            output.extend(
+                inputs
+                    .iter()
+                    .copied()
+                    .map(|input| self.append(input).unwrap_or(f64::NAN)),
+            );
+            return;
         }
+        let start = output.len();
+        output.resize(start + inputs.len(), f64::NAN);
+        vhgw::sliding_max_into(inputs, period, &mut output[start + period - 1..]);
+        self.extrema.rebuild_from_full_run(inputs);
+        self.value = output.last().copied();
     }
 }
