@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 184,
-    "complete": 39,
+    "complete": 41,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 602,
     "smc_functions": 8,
-    "structure": 39,
+    "structure": 41,
     "talib_functions": 161
   },
   "rows": [
@@ -1014,7 +1014,8 @@
       "name": "BalanceOfPower",
       "native_binding": true,
       "native_symbols": [
-        "StatefulBop"
+        "BalanceOfPower",
+        "_NativeBalanceOfPower"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -1028,7 +1029,8 @@
       "name": "OnBalanceVolume",
       "native_binding": true,
       "native_symbols": [
-        "StatefulObv"
+        "OnBalanceVolume",
+        "_NativeOnBalanceVolume"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4416,6 +4418,7 @@
         "AverageDailyDollarValueOperator",
         "AveragePrice",
         "AwesomeOscillatorOperator",
+        "BalanceOfPower",
         "BarsSinceOperator",
         "BreakOfStructureChangeOfCharacterOperator",
         "CandleAbandonedBaby",
@@ -4569,6 +4572,7 @@
         "MinusDirectionalMovement",
         "MoneyFlowIndex",
         "NegativeVolumeIndexOperator",
+        "OnBalanceVolume",
         "OrderBlockOperator",
         "OrnsteinUhlenbeckHalfLifeOperator",
         "OutsideBarOperator",
@@ -4621,7 +4625,6 @@
         "StatefulAvgdev",
         "StatefulBbands",
         "StatefulBeta",
-        "StatefulBop",
         "StatefulCmo",
         "StatefulCorrel",
         "StatefulDema",
@@ -4654,7 +4657,6 @@
         "StatefulMinmaxindex",
         "StatefulMom",
         "StatefulNatr",
-        "StatefulObv",
         "StatefulOpeningRange",
         "StatefulParabolicMovingAverageStop",
         "StatefulPivotPoints",
@@ -4722,6 +4724,7 @@
         "AverageDailyDollarValueOperator",
         "AveragePrice",
         "AwesomeOscillatorOperator",
+        "BalanceOfPower",
         "BarsSinceOperator",
         "BreakOfStructureChangeOfCharacterOperator",
         "CandleAbandonedBaby",
@@ -4875,6 +4878,7 @@
         "MinusDirectionalMovement",
         "MoneyFlowIndex",
         "NegativeVolumeIndexOperator",
+        "OnBalanceVolume",
         "OrderBlockOperator",
         "OrnsteinUhlenbeckHalfLifeOperator",
         "OutsideBarOperator",
@@ -4927,7 +4931,6 @@
         "StatefulAvgdev",
         "StatefulBbands",
         "StatefulBeta",
-        "StatefulBop",
         "StatefulCmo",
         "StatefulCorrel",
         "StatefulDema",
@@ -4960,7 +4963,6 @@
         "StatefulMinmaxindex",
         "StatefulMom",
         "StatefulNatr",
-        "StatefulObv",
         "StatefulOpeningRange",
         "StatefulParabolicMovingAverageStop",
         "StatefulPivotPoints",

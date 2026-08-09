@@ -1024,10 +1024,8 @@ mod tests {
         let ad_expected = accumulation_distribution(&high, &low, &close, &volumes).unwrap();
         let adosc_expected =
             accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
-        let obv_expected = on_balance_volume(&close, &volumes).unwrap();
         let mut ad = AccumulationDistribution::new();
         let mut adosc = AccumulationDistributionOscillator::new(3, 10).unwrap();
-        let mut obv = OnBalanceVolume::new();
         for index in 0..close.len() {
             assert_eq!(
                 ad.append(high[index], low[index], close[index], volumes[index]),
@@ -1036,10 +1034,6 @@ mod tests {
             assert_optional_eq(
                 adosc.append(high[index], low[index], close[index], volumes[index]),
                 adosc_expected[index],
-            );
-            assert_eq!(
-                obv.append(close[index], volumes[index]),
-                obv_expected[index]
             );
         }
     }
@@ -1069,19 +1063,13 @@ mod tests {
             low[index] = close[index];
         }
         let period = 14;
-        let bop_expected = balance_of_power(&open, &high, &low, &close).unwrap();
         let willr_expected = williams_percent_r(&high, &low, &close, period).unwrap();
         let (down_expected, up_expected) = crate::stream::aroon(&high, &low, period).unwrap();
         let osc_expected = crate::stream::aroon_oscillator(&high, &low, period).unwrap();
-        let mut bop = BalanceOfPower::new();
         let mut willr = WilliamsPercentR::new(period).unwrap();
         let mut aroon = Aroon::new(period).unwrap();
         let mut oscillator = AroonOscillator::new(period).unwrap();
         for index in 0..close.len() {
-            assert_eq!(
-                bop.append(open[index], high[index], low[index], close[index]),
-                bop_expected[index]
-            );
             assert_optional_eq(
                 willr.append(high[index], low[index], close[index]),
                 willr_expected[index],
@@ -1147,8 +1135,8 @@ mod tests {
     }
 }
 mod on_balance_volume;
-#[allow(unused_imports)]
-pub(crate) use on_balance_volume::on_balance_volume;
+#[cfg(test)]
+mod on_balance_volume_test;
 
 mod accumulation_distribution;
 #[allow(unused_imports)]
@@ -1157,8 +1145,8 @@ mod accumulation_distribution_oscillator;
 #[allow(unused_imports)]
 pub(crate) use accumulation_distribution_oscillator::accumulation_distribution_oscillator;
 mod balance_of_power;
-#[allow(unused_imports)]
-pub(crate) use balance_of_power::balance_of_power;
+#[cfg(test)]
+mod balance_of_power_test;
 mod williams_percent_r;
 #[allow(unused_imports)]
 pub(crate) use williams_percent_r::williams_percent_r;

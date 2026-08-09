@@ -94,7 +94,7 @@ Correctness uses the highest-priority available external oracle in [../verify/SO
 | `AverageDirectionalIndex` | ADX | period=14 | `(high, low, close, period)` |
 | `AverageDirectionalIndexRating` | ADXR | period=14 | `(high, low, close, period)` |
 | `AwesomeOscillator` | — | fast=5, slow=34 | `(high, low, fast, slow)` |
-| `BalanceOfPower` | BOP | — | `(_open, high, low, close)` |
+| `BalanceOfPower` | BOP | — | `(open, high, low, close)` |
 | `ChandeMomentumOscillator` | CMO | timeperiod=14 | `(_input, timeperiod)` |
 | `CommodityChannelIndex` | CCI | timeperiod=14, high_column='high', low_column='low', close_column='close' | `(high, low, close, timeperiod, high_column, low_column, close_column)` |
 | `Cross` | — | left, right | `(left, right)` |

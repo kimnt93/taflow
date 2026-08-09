@@ -317,7 +317,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.59× | 1.38× | 0.44× | 0.62× |
 | BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.00× | 2.57× | 1.40× | 1.01× |
 | RollingBeta | [TA-Lib: `BETA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.80× | 1.53× | 1.13× | 1.09× |
-| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.91× | 2.54× | 1.19× | 1.11× |
+| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.19× | 1.36× | 0.54× | 0.63× |
 | CommodityChannelIndex | [TA-Lib: `CCI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.20× | 1.17× | 0.95× | 1.10× |
 | CandleTwoCrows | [TA-Lib: `CDL2CROWS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.71× | 0.89× | 1.02× | 0.96× |
 | CandleThreeBlackCrows | [TA-Lib: `CDL3BLACKCROWS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.36× | 1.49× | 0.89× | 0.84× |
@@ -426,7 +426,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.02× | 1.66× | 0.37× | 0.33× |
 | MathMultiply | [TA-Lib: `MULT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.40× | 4.77× | 1.65× | 1.06× |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.86× | 1.39× | 0.93× | 0.96× |
-| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 7.98× | 1.63× | 0.90× | 0.83× |
+| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.93× | 1.61× | 1.00× | 0.87× |
 | PlusDirectionalIndicator | [TA-Lib: `PLUS_DI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.05× | 1.59× | 1.22× | 1.15× |
 | PlusDirectionalMovement | [TA-Lib: `PLUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.76× | 1.48× | 1.06× | 0.98× |
 | PercentagePriceOscillator | [TA-Lib: `PPO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.55× | 1.96× | 1.32× | 1.21× |
@@ -611,7 +611,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.73× | 1.94× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.57× | 1.66× | 1.92× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.43× | 1.63× | 1.71× |
+| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.06× | 1.53× | 1.83× |
 | BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 2.07× | 2.52× |
 | BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
@@ -785,7 +785,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.84× | 2.44× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.13× | 1.97× | 1.96× |
-| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.89× | 1.44× | 2.02× |
+| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.12× | 1.19× | 1.96× |
 | OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -903,7 +903,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 1.83× | 1.89× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.97× | 1.87× | 1.92× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 1.84× | 1.78× |
+| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.94× | 1.77× |
 | BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.24× | 2.38× | 2.52× |
 | BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
@@ -1077,7 +1077,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.10× | 1.99× | 2.25× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.90× | 1.84× |
-| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.85× | 1.99× |
+| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.89× | 2.01× |
 | OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1195,7 +1195,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.68× | 1.81× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.99× | 1.95× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.60× | 1.87× | 1.85× |
+| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.83× | 1.87× |
 | BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.41× | 2.42× | 2.44× |
 | BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
@@ -1369,7 +1369,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.12× | 2.28× | 2.25× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.90× | 1.95× |
-| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.98× | 1.95× |
+| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.89× | 1.89× |
 | OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1487,7 +1487,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AveragePrice | [TA-Lib: `AVGPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.78× | 1.79× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.93× | 1.98× |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 1.86× | 1.85× |
+| BalanceOfPower | [TA-Lib: `BOP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.78× | 1.76× |
 | BarsSince | [pandas: `pandas.bars_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | BollingerBands | [TA-Lib: `BBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.20× | 2.40× | 2.40× |
 | BreakOfStructureChangeOfCharacter | [smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
@@ -1661,7 +1661,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.50× | 2.41× |
 | NegativeVolumeIndex | [pandas-ta-classic: `pandas-ta-classic.negative_volume_index`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | NormalizedAverageTrueRange | [TA-Lib: `NATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 1.95× | 2.04× |
-| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.99× | 1.93× |
+| OnBalanceVolume | [TA-Lib: `OBV`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.95× | 1.89× |
 | OpeningRange | [pandas: `pandas.opening_range`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | OrderBlock | [smartmoneyconcepts: `smartmoneyconcepts.order_block`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | OrnsteinUhlenbeckHalfLife | [pandas: `pandas.ornstein_uhlenbeck_half_life`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |

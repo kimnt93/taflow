@@ -1,40 +1,9 @@
-//! Batch implementation for `on_balance_volume`.
+//! Persistent On-Balance Volume state.
 
-use super::volume_states::*;
 use crate::error::{TaError, TaResult};
 
-/// Compute the on balance volume result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `close` - Input series or configuration value.
-/// * `volume` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn on_balance_volume(close: &[f64], volume: &[f64]) -> TaResult<Vec<f64>> {
-    if close.len() != volume.len() {
-        return Err(crate::TaError::LengthMismatch {
-            expected: close.len(),
-            got: volume.len(),
-        });
-    }
-    let mut state = OnBalanceVolume::new();
-    Ok(close
-        .iter()
-        .zip(volume)
-        .map(|(&close, &volume)| state.append(close, volume))
-        .collect())
-}
-use super::*;
-
-/// Stateful on-balance volume.
+/// Accumulate volume according to consecutive closing-price direction.
 #[derive(Debug, Clone, Default)]
-/// Persistent Rust state or aligned output type for `OnBalanceVolume`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct OnBalanceVolume {
     previous_close: Option<f64>,
     total: f64,
@@ -42,20 +11,12 @@ pub struct OnBalanceVolume {
 }
 
 impl OnBalanceVolume {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new() -> Self {
-        Self::default()
+    /// Create a fresh On-Balance Volume state.
+    pub fn new() -> TaResult<Self> {
+        Ok(Self::default())
     }
 
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append one chronological close/volume pair.
     pub fn append(&mut self, close: f64, volume: f64) -> f64 {
         match self.previous_close.replace(close) {
             None => self.total = volume,
@@ -67,20 +28,32 @@ impl OnBalanceVolume {
         self.total
     }
 
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append aligned slices after validating lengths before mutation.
+    pub fn extend_slices_into(
+        &mut self,
+        close: &[f64],
+        volume: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if close.len() != volume.len() {
+            return Err(TaError::LengthMismatch {
+                expected: close.len(),
+                got: volume.len(),
+            });
+        }
+        output.reserve(close.len());
+        for index in 0..close.len() {
+            output.push(self.append(close[index], volume[index]));
+        }
+        Ok(())
+    }
+
+    /// Return the latest result, or `None` before the first pair.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Restore fresh-state behavior without reallocating.
     pub fn reset(&mut self) {
         self.previous_close = None;
         self.total = 0.0;

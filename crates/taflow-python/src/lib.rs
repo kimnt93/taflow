@@ -251,8 +251,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::StatefulAd>()?;
     m.add_class::<state_api::StatefulAdosc>()?;
-    m.add_class::<state_api::StatefulObv>()?;
-    m.add_class::<state_api::StatefulBop>()?;
+    m.add_class::<state_api::OnBalanceVolume>()?;
+    m.add_class::<state_api::BalanceOfPower>()?;
     m.add_class::<state_api::StatefulWillr>()?;
     m.add_class::<state_api::StatefulAroon>()?;
     m.add_class::<state_api::StatefulAroonosc>()?;

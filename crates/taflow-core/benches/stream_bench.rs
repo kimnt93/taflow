@@ -434,7 +434,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("obv", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Obv::new();
+            let mut state = stream::OnBalanceVolume::new().unwrap();
             for value in warmup {
                 state.append(*value, 1_000.0);
             }
@@ -445,7 +445,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("bop", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Bop::new();
+            let mut state = stream::BalanceOfPower::new().unwrap();
             for value in warmup {
                 state.append(*value - 0.1, *value + 1.0, *value - 1.0, *value);
             }

@@ -1,68 +1,20 @@
-//! Batch implementation for `balance_of_power`.
+//! Persistent Balance of Power state.
 
-use super::volume_states::*;
 use crate::error::{TaError, TaResult};
 
-/// Compute the balance of power result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn balance_of_power(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<Vec<f64>> {
-    if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch {
-            expected: open.len(),
-            got: high.len().min(low.len()).min(close.len()),
-        });
-    }
-    let mut state = BalanceOfPower::new();
-    Ok(open
-        .iter()
-        .zip(high)
-        .zip(low)
-        .zip(close)
-        .map(|(((&open, &high), &low), &close)| state.append(open, high, low, close))
-        .collect())
-}
-use super::*;
-
-/// Stateful balance of power.
+/// Measure close-to-open movement relative to the high-low range.
 #[derive(Debug, Clone, Default)]
-/// Persistent Rust state or aligned output type for `BalanceOfPower`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct BalanceOfPower {
     value: Option<f64>,
 }
 
 impl BalanceOfPower {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new() -> Self {
-        Self::default()
+    /// Create a fresh Balance of Power state.
+    pub fn new() -> TaResult<Self> {
+        Ok(Self::default())
     }
 
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append one chronological open/high/low/close tuple.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> f64 {
         let range = high - low;
         let value = if range > 0.0 {
@@ -74,20 +26,37 @@ impl BalanceOfPower {
         value
     }
 
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append aligned slices after validating every length before mutation.
+    pub fn extend_slices_into(
+        &mut self,
+        open: &[f64],
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let len = open.len();
+        for actual in [high.len(), low.len(), close.len()] {
+            if actual != len {
+                return Err(TaError::LengthMismatch {
+                    expected: len,
+                    got: actual,
+                });
+            }
+        }
+        output.reserve(len);
+        for index in 0..len {
+            output.push(self.append(open[index], high[index], low[index], close[index]));
+        }
+        Ok(())
+    }
+
+    /// Return the latest result, or `None` before the first tuple.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Restore fresh-state behavior without reallocating.
     pub fn reset(&mut self) {
         self.value = None;
     }

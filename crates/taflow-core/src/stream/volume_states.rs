@@ -6,8 +6,7 @@ use super::{invalid_period, vhgw, MonotonicMax, MonotonicMin};
 
 #[cfg(test)]
 use crate::stream::{
-    AccumulationDistribution, AccumulationDistributionOscillator, BalanceOfPower, OnBalanceVolume,
-    WilliamsPercentR,
+    AccumulationDistribution, AccumulationDistributionOscillator, WilliamsPercentR,
 };
 
 pub(crate) fn ad_increment(high: f64, low: f64, close: f64, volume: f64) -> f64 {

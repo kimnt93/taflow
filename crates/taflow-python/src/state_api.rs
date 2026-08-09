@@ -2021,19 +2021,19 @@ impl StatefulAdosc {
 }
 
 #[pyclass]
-pub struct StatefulObv {
+pub struct OnBalanceVolume {
     inner: stream::OnBalanceVolume,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulObv {
+impl OnBalanceVolume {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: stream::OnBalanceVolume::new(),
+    fn new() -> PyResult<Self> {
+        Ok(Self {
+            inner: stream::OnBalanceVolume::new().map_err(py_value_error)?,
             outputs: Vec::new(),
-        }
+        })
     }
 
     fn append(&mut self, close: f64, volume: f64) -> f64 {
@@ -2050,19 +2050,11 @@ impl StatefulObv {
     ) -> PyResult<()> {
         let close = close.as_slice()?;
         let volume = volume.as_slice()?;
-        if close.len() != volume.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            outputs.extend(
-                close
-                    .iter()
-                    .zip(volume)
-                    .map(|(&close, &volume)| self.inner.append(close, volume)),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(close, volume, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]
@@ -2085,19 +2077,19 @@ impl StatefulObv {
 }
 
 #[pyclass]
-pub struct StatefulBop {
+pub struct BalanceOfPower {
     inner: stream::BalanceOfPower,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulBop {
+impl BalanceOfPower {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: stream::BalanceOfPower::new(),
+    fn new() -> PyResult<Self> {
+        Ok(Self {
+            inner: stream::BalanceOfPower::new().map_err(py_value_error)?,
             outputs: Vec::new(),
-        }
+        })
     }
 
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> f64 {
@@ -2118,20 +2110,11 @@ impl StatefulBop {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
-        if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            outputs.extend(
-                open.iter()
-                    .zip(high)
-                    .zip(low)
-                    .zip(close)
-                    .map(|(((&o, &h), &l), &c)| self.inner.append(o, h, l, c)),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(open, high, low, close, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]
