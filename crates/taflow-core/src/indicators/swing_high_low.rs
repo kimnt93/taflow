@@ -1,6 +1,6 @@
-use super::operator_states::ContiguousWindow;
-use super::rolling_extrema::{MonotonicMax, MonotonicMin};
 use crate::error::TaResult;
+use crate::stream::operator_states::ContiguousWindow;
+use crate::stream::rolling_extrema::{MonotonicMax, MonotonicMin};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SwingValue {
@@ -17,11 +17,12 @@ pub struct SwingHighLow {
     center_lows: ContiguousWindow,
     bars_since: Option<usize>,
     value: Option<SwingValue>,
+    length: usize,
 }
 
 impl SwingHighLow {
     pub fn new(length: usize) -> TaResult<Self> {
-        super::operator_states::validate_period(length)?;
+        crate::stream::operator_states::validate_period(length)?;
         let capacity = length.saturating_mul(2).saturating_add(1);
         Ok(Self {
             high_extrema: MonotonicMax::new(capacity)?,
@@ -30,9 +31,11 @@ impl SwingHighLow {
             center_lows: ContiguousWindow::new(length + 1),
             bars_since: None,
             value: None,
+            length: 0,
         })
     }
     pub fn append(&mut self, high: f64, low: f64) -> Option<SwingValue> {
+        self.length += 1;
         let window_high = self.high_extrema.append(high);
         let window_low = self.low_extrema.append(low);
         self.center_highs.push(high);
@@ -74,5 +77,9 @@ impl SwingHighLow {
         self.center_lows.clear();
         self.bars_since = None;
         self.value = None;
+        self.length = 0;
+    }
+    pub fn len(&self) -> usize {
+        self.length
     }
 }

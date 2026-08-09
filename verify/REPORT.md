@@ -1,7 +1,7 @@
 # taflow correctness verification
 
 Date: 2026-08-10 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
-Environment: python 3.12.3, numpy 2.4.6, TA-Lib 0.7.1, taflow 0.1.2
+Environment: python 3.12.3, numpy 2.5.1, TA-Lib 0.7.1, taflow 0.1.2
 
 Summary: MATCH: 287
 
@@ -196,7 +196,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | cumulative_sum_control_chart | CumulativeSumControlChart | self | MATCH | — | yes | yes | — |
 | decay_linear | DecayLinear | self | MATCH | — | yes | yes | — |
 | detrended_price_oscillator | DetrendedPriceOscillator | self | MATCH | — | yes | yes | — |
-| donchian_channels | DonchianChannels | self | MATCH | — | yes | yes | — |
+| donchian | Donchian | self | MATCH | — | yes | yes | — |
 | drawdown | Drawdown | self | MATCH | — | yes | yes | — |
 | ease_of_movement | EaseOfMovement | self | MATCH | — | yes | yes | — |
 | equal_highs_lows | EqualHighsLows | self | MATCH | — | yes | yes | — |
@@ -290,7 +290,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | squeeze_pro | SqueezePro | self | MATCH | — | yes | yes | — |
 | ssl_channel | SmoothedTrendChannel | self | MATCH | — | yes | yes | — |
 | supertrend | Supertrend | self | MATCH | — | yes | yes | — |
-| swing_highs_lows | SwingHighsLows | self | MATCH | — | yes | yes | — |
+| swing_high_low | SwingHighLow | self | MATCH | — | yes | yes | — |
 | td_sequential | TomDeMarkSequential | self | MATCH | — | yes | yes | — |
 | time_series_rank | TimeSeriesRank | self | MATCH | — | yes | yes | — |
 | true_strength_index | TrueStrengthIndex | self | MATCH | — | yes | yes | — |

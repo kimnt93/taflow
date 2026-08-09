@@ -224,10 +224,10 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | williams_percent_r | williams_percent_r | WILLR |
 | [x] | math_add | math_add | ADD |
 | [x] | math_divide | math_divide | DIV |
-| [x] | rolling_max | rolling_max | MAX |
-| [x] | rolling_argmax | rolling_argmax | MAXINDEX |
-| [x] | rolling_min | rolling_min | MIN |
-| [x] | rolling_argmin | rolling_argmin | MININDEX |
+| [x] | rolling_maximum | rolling_maximum | MAX |
+| [x] | rolling_maximum_index | rolling_maximum_index | MAXINDEX |
+| [x] | rolling_minimum | rolling_minimum | MIN |
+| [x] | rolling_minimum_index | rolling_minimum_index | MININDEX |
 | [x] | rolling_min_max | rolling_min_max | MINMAX |
 | [x] | rolling_min_max_index | rolling_min_max_index | MINMAXINDEX |
 | [x] | math_multiply | math_multiply | MULT |
@@ -357,7 +357,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | awesome_oscillator | awesome_oscillator | _ |
 | [x] | fisher_transform | fisher_transform | _ |
 | [x] | keltner_channels | keltner_channels | _ |
-| [x] | donchian_channels | donchian_channels | _ |
+| [x] | donchian | donchian | _ |
 | [x] | chaikin_volatility | chaikin_volatility | _ |
 | [x] | ulcer_index | ulcer_index | _ |
 | [x] | rolling_vwap | rolling_vwap | _ |
@@ -378,7 +378,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | highest_since | highest_since | _ |
 | [x] | lowest_since | lowest_since | _ |
 | [x] | signal_delay | signal_delay | _ |
-| [x] | swing_highs_lows | swing_highs_lows | _ |
+| [x] | swing_high_low | swing_high_low | _ |
 | [x] | hedge_ratio | hedge_ratio | _ |
 | [x] | rolling_entropy | rolling_entropy | _ |
 | [x] | rolling_autocorr | rolling_autocorr | _ |

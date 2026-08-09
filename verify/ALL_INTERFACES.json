@@ -1012,14 +1012,6 @@
     "status": "PASS"
   },
   {
-    "name": "SwingHigh",
-    "status": "PASS"
-  },
-  {
-    "name": "SwingLow",
-    "status": "PASS"
-  },
-  {
     "name": "Retracements",
     "status": "PASS"
   },
@@ -1037,10 +1029,6 @@
   },
   {
     "name": "FairValueGap",
-    "status": "PASS"
-  },
-  {
-    "name": "SwingHighsLows",
     "status": "PASS"
   },
   {

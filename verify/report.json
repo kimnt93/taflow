@@ -1473,7 +1473,7 @@
  },
  {
   "function": "MAX",
-  "taflow_class": "RollingMax",
+  "taflow_class": "RollingMaximum",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
    "passed": true,
@@ -1496,7 +1496,7 @@
  },
  {
   "function": "MAXINDEX",
-  "taflow_class": "RollingArgmax",
+  "taflow_class": "RollingMaximumIndex",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
    "passed": true,
@@ -1519,7 +1519,7 @@
  },
  {
   "function": "MIN",
-  "taflow_class": "RollingMin",
+  "taflow_class": "RollingMinimum",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
    "passed": true,
@@ -1542,7 +1542,7 @@
  },
  {
   "function": "MININDEX",
-  "taflow_class": "RollingArgmin",
+  "taflow_class": "RollingMinimumIndex",
   "oracle": "TA-Lib",
   "batch_vs_oracle": {
    "passed": true,
@@ -4161,8 +4161,8 @@
   }
  },
  {
-  "function": "donchian_channels",
-  "taflow_class": "DonchianChannels",
+  "function": "donchian",
+  "taflow_class": "Donchian",
   "oracle": "self",
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -4392,8 +4392,8 @@
   }
  },
  {
-  "function": "swing_highs_lows",
-  "taflow_class": "SwingHighsLows",
+  "function": "swing_high_low",
+  "taflow_class": "SwingHighLow",
   "oracle": "self",
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {

@@ -48,7 +48,8 @@ pub use crate::indicators::{
     GapDown, GapUp, HedgeRatio, HigherHigh, HilbertTransformDominantCyclePhase, InsideBar,
     KaufmanAdaptiveMovingAverage, KeltnerChannels, KeltnerValue, KnowSureThing, LowerLow,
     MassIndex, NegativeVolumeIndex, OrderBlock, OrderBlockValue, OutsideBar, PositiveVolumeIndex,
-    Rising, RollingAlpha, RollingInformationRatio, SpreadZScore, UlcerIndex, VolumePriceTrend,
+    Rising, RollingAlpha, RollingInformationRatio, SpreadZScore, SwingHighLow, SwingValue,
+    UlcerIndex, VolumePriceTrend,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -574,6 +575,11 @@ mod decay_linear;
 #[cfg(test)]
 mod decay_linear_test;
 pub use decay_linear::DecayLinear;
+#[allow(unused_imports)]
+pub(crate) mod bar_relation;
+mod bars_since;
+mod exponentially_weighted_standard_deviation;
+mod exponentially_weighted_variance;
 mod frac_diff;
 #[cfg(test)]
 mod frac_diff_test;
@@ -586,6 +592,9 @@ mod ornstein_uhlenbeck_half_life_test;
 mod roll_spread;
 #[cfg(test)]
 mod roll_spread_test;
+mod rolling_z_score;
+#[cfg(test)]
+mod rolling_z_score_test;
 mod schaff_trend_cycle;
 #[cfg(test)]
 mod schaff_trend_cycle_test;
@@ -598,36 +607,11 @@ mod squeeze_test;
 mod supertrend;
 #[cfg(test)]
 mod supertrend_test;
-mod swing_high_low;
 #[cfg(test)]
-mod swing_high_low_test;
-mod swing_highs_lows;
+pub(crate) mod swing_highs_lows_test;
 mod vortex;
 #[cfg(test)]
 mod vortex_test;
-pub use swing_high_low::{SwingHighLow, SwingValue};
-pub use swing_highs_lows::SwingHighsLows;
-mod swing_high;
-#[cfg(test)]
-mod swing_high_test;
-mod swing_highs_lows_indicator;
-#[cfg(test)]
-mod swing_highs_lows_indicator_test;
-#[cfg(test)]
-pub(crate) mod swing_highs_lows_test;
-pub use swing_high::SwingHigh;
-mod swing_low;
-#[cfg(test)]
-mod swing_low_test;
-pub use swing_low::SwingLow;
-#[allow(unused_imports)]
-pub(crate) mod bar_relation;
-mod bars_since;
-mod exponentially_weighted_standard_deviation;
-mod exponentially_weighted_variance;
-mod rolling_z_score;
-#[cfg(test)]
-mod rolling_z_score_test;
 
 mod highest_since;
 

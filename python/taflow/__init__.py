@@ -234,16 +234,13 @@ from .indicators.lowest_since import LowestSince
 from .indicators.signal_delay import SignalDelay
 from .indicators.position_hold import PositionHold
 from .indicators.entry_exit import EntryExit
-from .swing_high_low import SwingHighLow
-from .swing_high import SwingHigh
-from .swing_low import SwingLow
+from .indicators.swing_high_low import SwingHighLow
 from .retracements import Retracements
 from .session_extrema import SessionExtrema
 from .previous_high_low import PreviousHighLow
 from .sessions import Sessions
 from .indicators.active_zone_list import ActiveZoneList
 from .indicators.fair_value_gap import FairValueGap
-from .swing_highs_lows import SwingHighsLows
 from .indicators.break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from .indicators.order_block import OrderBlock
 from .indicators.liquidity import Liquidity
@@ -504,15 +501,12 @@ __all__ = [
     "PositionHold",
     "EntryExit",
     "SwingHighLow",
-    "SwingHigh",
-    "SwingLow",
     "Retracements",
     "SessionExtrema",
     "PreviousHighLow",
     "Sessions",
     "ActiveZoneList",
     "FairValueGap",
-    "SwingHighsLows",
     "BreakOfStructureChangeOfCharacter",
     "OrderBlock",
     "Liquidity",

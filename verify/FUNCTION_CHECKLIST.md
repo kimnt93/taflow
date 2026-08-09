@@ -96,6 +96,16 @@ surfaces. The release extension, two focused Python tests, focused Rust test,
 full Python suite (591 passed, 2 skipped), and 303/303 interface audit passed.
 Benchmark fields remain `TODO`; no benchmark command was run.
 
+The thirty-second structural batch consolidated swing confirmation around the
+canonical `SwingHighLow` state. It migrated the Rust implementation, test,
+PyO3 binding, and Python adapter into their full-name indicator paths; removed
+the duplicate `SwingHigh`, `SwingLow`, and `SwingHighsLows` wrappers and tests;
+and updated retracement and oracle callers to use the canonical class. The Rust
+state now owns processed length, so the Python adapter delegates `__len__`
+without a duplicate counter. Focused Rust/Python tests, the full Python suite
+(588 passed, 2 skipped), and the interface audit passed at 300/300. Benchmark
+fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,
@@ -461,16 +471,12 @@ separate same-named Rust and Python tests exist, an independent source reports
 | [ ] | `PositionHold` | `position_hold` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `EntryExit` | `entry_exit` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `SwingHighLow` | `swing_high_low` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `SwingHigh` | `swing_high` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `SwingLow` | `swing_low` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `Retracements` | `retracements` | yes | yes | yes | yes | VARIANT | TODO |
 | [ ] | `SessionExtrema` | `session_extrema` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `PreviousHighLow` | `previous_high_low` | yes | yes | yes | yes | VARIANT | TODO |
 | [ ] | `Sessions` | `sessions` | yes | yes | yes | yes | MATCH | TODO |
 | [ ] | `ActiveZoneList` | `active_zone_list` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `FairValueGap` | `fair_value_gap` | yes | yes | yes | yes | MATCH | TODO |
-| [ ] | `DonchianChannels` | `donchian_channels` | yes | yes | yes | yes | MATCH | TODO |
-| [ ] | `SwingHighsLows` | `swing_highs_lows` | yes | yes | yes | yes | VARIANT | TODO |
 | [ ] | `BreakOfStructureChangeOfCharacter` | `break_of_structure_change_of_character` | yes | yes | yes | yes | VARIANT | TODO |
 | [ ] | `OrderBlock` | `order_block` | yes | yes | yes | yes | VARIANT | TODO |
 | [ ] | `Liquidity` | `liquidity` | yes | yes | yes | yes | VARIANT | TODO |
@@ -764,16 +770,12 @@ separate same-named Rust and Python tests exist, an independent source reports
 | implemented | `PositionHold` | class | `position_hold` | `PositionHoldOperator`, `_Native` | yes | `` | — | — |
 | implemented | `EntryExit` | class | `entry_exit` | `EntryExitOperator`, `_Native` | yes | `` | — | — |
 | implemented | `SwingHighLow` | class | `swing_high_low` | `SwingHighLowOperator`, `_Native` | yes | `` | — | — |
-| implemented | `SwingHigh` | class | `swing_high` | `SwingHighLowOperator` | yes | `` | — | — |
-| implemented | `SwingLow` | class | `swing_low` | `SwingHighLowOperator` | yes | `` | — | — |
 | implemented | `Retracements` | class | `retracements` | `RetracementsOperator`, `_Native` | yes | `` | — | yes |
 | implemented | `SessionExtrema` | class | `session_extrema` | `SessionExtremaOperator`, `_Native` | yes | `` | — | — |
 | implemented | `PreviousHighLow` | class | `previous_high_low` | `PreviousHighLowOperator`, `_Native` | yes | `` | — | — |
 | implemented | `Sessions` | class | `sessions` | `SessionsOperator`, `_Native` | yes | `` | — | yes |
 | implemented | `ActiveZoneList` | class | `active_zone_list` | `ActiveZoneListOperator`, `_Native` | yes | `` | — | — |
 | implemented | `FairValueGap` | class | `fair_value_gap` | `FairValueGapOperator`, `_Native` | yes | `` | — | — |
-| implemented | `DonchianChannels` | class | `donchian_channels` | `DonchianOperator` | yes | `` | — | — |
-| implemented | `SwingHighsLows` | class | `swing_highs_lows` | `SwingHighLowOperator` | yes | `` | — | — |
 | implemented | `BreakOfStructureChangeOfCharacter` | class | `break_of_structure_change_of_character` | `BreakOfStructureChangeOfCharacterOperator`, `_Native` | yes | `` | — | — |
 | implemented | `OrderBlock` | class | `order_block` | `OrderBlockOperator`, `_Native` | yes | `` | — | — |
 | implemented | `Liquidity` | class | `liquidity` | `LiquidityOperator`, `_Native` | yes | `` | — | yes |

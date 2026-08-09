@@ -36,7 +36,7 @@ API_NAMES = {
     "hull_moving_average": "pandas_ta_classic.hma",
     "volume_weighted_moving_average": "pandas_ta_classic.vwma",
     "zero_lag_exponential_moving_average": "pandas_ta_classic.zlma",
-    "donchian_channels": "pandas_ta_classic.donchian",
+    "donchian": "pandas_ta_classic.donchian",
     "fisher_transform": "pandas_ta_classic.fisher",
     "chaikin_money_flow": "pandas_ta_classic.cmf",
     "detrended_price_oscillator": "pandas_ta_classic.dpo",

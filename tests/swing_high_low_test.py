@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.swing import SwingHighLow
+from taflow import SwingHighLow
 
 
 def test_swing_high_low_lifecycle_and_reset():
@@ -9,4 +9,3 @@ def test_swing_high_low_lifecycle_and_reset():
     assert len(state.compute()) == 3
     state.reset()
     assert state.value is None
-

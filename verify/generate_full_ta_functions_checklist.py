@@ -45,7 +45,6 @@ def python_class_names() -> set[str]:
     # Public aliases created with imports rather than another class body.
     result.update(
         {
-            "DonchianChannels",
             "GapDown",
             "GapUp",
             "HigherHigh",
@@ -54,9 +53,6 @@ def python_class_names() -> set[str]:
             "LowerLow",
             "LowestSince",
             "OutsideBar",
-            "SwingHigh",
-            "SwingHighsLows",
-            "SwingLow",
             "ValueWhen",
         }
     )

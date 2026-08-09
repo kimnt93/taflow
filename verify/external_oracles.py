@@ -752,8 +752,6 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
     donchian = donchian.iloc[:, [2, 0, 1]]
     many("donchian", taflow.Donchian(high, low, 20).compute(),
          donchian, ("upper", "lower", "mid"))
-    many("donchian_channels", taflow.DonchianChannels(high, low, 20).compute(),
-         donchian, ("upper", "lower", "mid"))
     many("fisher_transform", taflow.FisherTransform(high, low, 10).compute(),
          pta.fisher(h, l, length=10).iloc[:, 0], ("fisher",))
     # pandas-ta-classic coerces lengths below 10 back to its default of 9.
@@ -928,7 +926,7 @@ def run_smc(data: dict[str, np.ndarray], rows: list[Result]) -> None:
 
     swing_length = 5
     reference_swing = smc.swing_highs_lows(ohlcv.copy(), swing_length=swing_length)
-    actual_swing = taflow.SwingHighsLows(
+    actual_swing = taflow.SwingHighLow(
         data["high"], data["low"], swing_length=swing_length).compute()
     # Synthetic endpoint markers and the final unconfirmable lookahead region
     # are package presentation artifacts, so compare only the confirmable core.

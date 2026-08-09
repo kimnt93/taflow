@@ -647,6 +647,9 @@ mod rolling_information_ratio_test;
 mod spread_z_score;
 #[cfg(test)]
 mod spread_z_score_test;
+mod swing_high_low;
+#[cfg(test)]
+mod swing_high_low_test;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
@@ -685,6 +688,7 @@ pub use rising::Rising;
 pub use rolling_alpha::RollingAlpha;
 pub use rolling_information_ratio::RollingInformationRatio;
 pub use spread_z_score::SpreadZScore;
+pub use swing_high_low::{SwingHighLow, SwingValue};
 pub use ulcer_index::UlcerIndex;
 pub use volume_price_trend::VolumePriceTrend;
 

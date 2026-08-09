@@ -1,5 +1,5 @@
-use super::swing_high_low::SwingHighLow;
 use crate::error::TaResult;
+use crate::indicators::SwingHighLow;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RetracementsValue {

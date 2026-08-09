@@ -227,9 +227,7 @@ from .lowest_since import LowestSince
 from .signal_delay import SignalDelay
 from .position_hold import PositionHold
 from .entry_exit import EntryExit
-from ..swing_high_low import SwingHighLow
-from ..swing_high import SwingHigh
-from ..swing_low import SwingLow
+from .swing_high_low import SwingHighLow
 from ..retracements import Retracements
 from ..session import SessionExtrema
 from ..previous_high_low import PreviousHighLow
@@ -239,7 +237,6 @@ from .fair_value_gap import FairValueGap
 from .volume_price_trend import VolumePriceTrend
 from .negative_volume_index import NegativeVolumeIndex
 from .positive_volume_index import PositiveVolumeIndex
-from ..swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from .order_block import OrderBlock
 from .liquidity import Liquidity
@@ -476,8 +473,6 @@ __all__ = [
     "PositionHold",
     "EntryExit",
     "SwingHighLow",
-    "SwingHigh",
-    "SwingLow",
     "Retracements",
     "SessionExtrema",
     "PreviousHighLow",
@@ -485,7 +480,6 @@ __all__ = [
     "ActiveZoneList",
     "FairValueGap",
     "RollingVolumeWeightedAveragePrice",
-    "SwingHighsLows",
     "BreakOfStructureChangeOfCharacter",
     "OrderBlock",
     "Liquidity",

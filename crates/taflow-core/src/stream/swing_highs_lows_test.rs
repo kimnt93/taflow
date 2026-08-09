@@ -1,4 +1,4 @@
-use super::swing_high_low::SwingHighLow;
+use crate::indicators::SwingHighLow;
 use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]

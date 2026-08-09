@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import SwingHighLowOperator as _Native
-from ._series import as_float64_series
+from .._native import SwingHighLowOperator as _Native
+from .._series import as_float64_series
 
 
 class SwingHighLow:
@@ -20,13 +20,11 @@ class SwingHighLow:
 
     def __init__(self, high: Any, low: Any, swing_length: int = 5) -> None:
         self._state = _Native(int(swing_length))
-        self._length = 0
         self.extend(high, low)
 
     def append(self, high: float, low: float) -> "SwingHighLow":
         """Append one high/low bar and return this adapter."""
         self._state.append(float(high), float(low))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any) -> "SwingHighLow":
@@ -35,7 +33,6 @@ class SwingHighLow:
         if len(arrays[0]) != len(arrays[1]):
             raise ValueError("high and low must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -50,12 +47,11 @@ class SwingHighLow:
     def reset(self) -> "SwingHighLow":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return len(self._state)
 
 
 __all__ = ["SwingHighLow"]

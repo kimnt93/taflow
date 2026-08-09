@@ -83,4 +83,8 @@ impl SwingHighLowOperator {
         self.level.clear();
         self.bars_since.clear();
     }
+
+    fn __len__(&self) -> usize {
+        self.inner.len()
+    }
 }
