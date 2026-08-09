@@ -152,6 +152,15 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
             gamma=spec.ctor_kwargs.get("gamma", 0.5),
         )
         return None if result is None else result.to_numpy()
+    if source == "pandas-ta-classic" and spec.snake == "jma":
+        import pandas as pd
+        import pandas_ta_classic as pta
+        result = pta.jma(
+            pd.Series(arrays[0]),
+            length=spec.ctor_kwargs.get("length", 7),
+            phase=spec.ctor_kwargs.get("phase", 0.0),
+        )
+        return None if result is None else result.to_numpy()
     if source == "Wickra" and spec.snake == "rmi":
         import wickra
         return np.asarray(wickra.RMI(

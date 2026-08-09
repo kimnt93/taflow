@@ -1,7 +1,7 @@
 {
   "counts": {
-    "benchmark": 190,
-    "complete": 70,
+    "benchmark": 191,
+    "complete": 71,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 610,
     "smc_functions": 8,
-    "structure": 70,
+    "structure": 71,
     "talib_functions": 161
   },
   "rows": [
@@ -657,11 +657,12 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "jma",
+      "module": "jurik_moving_average",
       "name": "JurikMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulJurikMovingAverage"
+        "JurikMovingAverage",
+        "_NativeJurikMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4563,6 +4564,7 @@
         "HurstOperator",
         "IchimokuOperator",
         "InsideBarOperator",
+        "JurikMovingAverage",
         "KalmanHedgeRatioOperator",
         "KeltnerChannelsOperator",
         "KnowSureThingOperator",
@@ -4672,7 +4674,6 @@
         "StatefulDx",
         "StatefulEvenBetterSinewave",
         "StatefulImi",
-        "StatefulJurikMovingAverage",
         "StatefulKama",
         "StatefulKlingerVolumeOscillator",
         "StatefulLinearreg",
@@ -4869,6 +4870,7 @@
         "HurstOperator",
         "IchimokuOperator",
         "InsideBarOperator",
+        "JurikMovingAverage",
         "KalmanHedgeRatioOperator",
         "KeltnerChannelsOperator",
         "KnowSureThingOperator",
@@ -4978,7 +4980,6 @@
         "StatefulDx",
         "StatefulEvenBetterSinewave",
         "StatefulImi",
-        "StatefulJurikMovingAverage",
         "StatefulKama",
         "StatefulKlingerVolumeOscillator",
         "StatefulLinearreg",

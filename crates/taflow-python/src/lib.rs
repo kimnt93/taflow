@@ -62,6 +62,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RelativeMomentumIndex>()?;
     m.add_class::<indicators::MovingAverage>()?;
     m.add_class::<indicators::HilbertTransformTrendline>()?;
+    m.add_class::<indicators::JurikMovingAverage>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergence>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergenceExtended>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergenceFixed>()?;
@@ -243,7 +244,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulTsf>()?;
     m.add_class::<state_api::StatefulCmo>()?;
     m.add_class::<state_api::StatefulEvenBetterSinewave>()?;
-    m.add_class::<state_api::StatefulJurikMovingAverage>()?;
     m.add_class::<state_api::StatefulSmoothedTrendChannel>()?;
     m.add_class::<state_api::StatefulPremiumDiscount>()?;
     m.add_class::<state_api::StatefulOpeningRange>()?;

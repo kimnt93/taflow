@@ -138,6 +138,7 @@ impl StreamingIndicator for JurikMovingAverage {
     fn value(&self) -> Option<f64> {
         self.value
     }
+
     fn reset(&mut self) {
         self.index = 0;
         self.upper_band = 0.0;
@@ -151,5 +152,14 @@ impl StreamingIndicator for JurikMovingAverage {
         self.volatility_sums.clear();
         self.volatility_sums_total = 0.0;
         self.value = None;
+    }
+}
+
+impl JurikMovingAverage {
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        for value in input {
+            output.push(self.append(*value).unwrap_or(f64::NAN));
+        }
     }
 }

@@ -104,7 +104,7 @@ from .weighted_moving_average import WeightedMovingAverage
 from .relative_strength_index import RelativeStrengthIndex
 from .relative_momentum_index import RelativeMomentumIndex
 from .ssl_channel import SmoothedTrendChannel
-from .jma import JurikMovingAverage
+from .jurik_moving_average import JurikMovingAverage
 from .pmax import ParabolicMovingAverageStop
 from .td_sequential import TomDeMarkSequential
 from .ebsw import EvenBetterSinewave

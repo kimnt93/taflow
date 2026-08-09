@@ -305,6 +305,8 @@ mod heikin_ashi;
 mod heikin_ashi_test;
 mod helpers;
 mod jurik_moving_average;
+#[cfg(test)]
+mod jurik_moving_average_test;
 mod klinger_volume_oscillator;
 mod lag;
 #[cfg(test)]

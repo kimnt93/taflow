@@ -510,7 +510,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | Hurst | [pandas: `pandas.hurst`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
+| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 218.92× | 236.38× | 203.40× | 256.39× |
 | KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
@@ -731,7 +731,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.17× | 2.09× | 2.12× |
-| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 1.46× | 1.94× | 1.85× |
 | KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.61× | 2.04× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1023,7 +1023,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.05× | 2.16× | 2.02× |
-| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 7.87× | 8.24× | 9.07× |
 | KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 1.90× | 1.87× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1315,7 +1315,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 2.05× | 1.93× |
-| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 33.20× | 60.19× | 42.58× |
 | KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.01× | 1.84× | 1.97× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1607,7 +1607,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Ichimoku | [pandas-ta-classic: `pandas-ta-classic.ichimoku`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | InsideBar | [pandas: `pandas.inside_bar`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | IntradayMomentumIndex | [TA-Lib: `IMI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.67× | 3.23× | 3.22× |
-| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| JurikMovingAverage | [pandas-ta-classic: `pandas-ta-classic.jma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 150.39× | 337.15× | 384.16× |
 | KalmanHedgeRatio | [pandas: `pandas.kalman_hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | KaufmanAdaptiveMovingAverage | [TA-Lib: `KAMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.84× | 2.02× | 1.86× |
 | KeltnerChannels | [pandas-ta-classic: `pandas-ta-classic.keltner_channels`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
