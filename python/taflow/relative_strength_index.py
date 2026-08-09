@@ -4,7 +4,7 @@ from typing import Any
 
 import numpy as np
 
-from ._native import StatefulRsi
+from ._native import RelativeStrengthIndex as _NativeRelativeStrengthIndex
 from ._series import as_float64_series
 
 
@@ -14,9 +14,21 @@ class RelativeStrengthIndex:
     Parameters
     ----------
     close : array-like
-        Initial close-price history.
+        Initial chronological close prices. Pass an empty series for a fresh
+        streaming state.
     timeperiod : int, default 14
-        Wilder smoothing period.
+        Wilder smoothing period, which must be at least two.
+
+    Notes
+    -----
+    Rust seeds average gain and loss from the first ``timeperiod`` price
+    changes, then applies Wilder's recurrence and returns an oscillator from
+    zero to one hundred. Scalar output is ``None`` through the first
+    ``timeperiod`` closes and ``compute`` stores NaN at those aligned
+    positions. Rust owns the recurrence, warm-up, bounded state, and output
+    history. The independent oracle/name mapping is
+    ``RelativeStrengthIndex`` to TA-Lib ``RSI``. ``append``, ``extend``, and
+    ``reset`` mutate and return this adapter.
     """
 
     def __init__(
@@ -38,9 +50,8 @@ class RelativeStrengthIndex:
         None
             The instance is initialized in place.
         """
-        self._state = StatefulRsi(timeperiod)
-        if close is not None:
-            self.extend(close)
+        self._state = _NativeRelativeStrengthIndex(timeperiod)
+        self.extend(close)
 
     def append(self, close: float) -> "RelativeStrengthIndex":
         """Append one close and update the native RSI state.
@@ -107,4 +118,8 @@ class RelativeStrengthIndex:
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed close prices."""
         return len(self._state)
+
+
+__all__ = ["RelativeStrengthIndex"]

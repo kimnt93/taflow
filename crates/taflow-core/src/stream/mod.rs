@@ -237,13 +237,15 @@ mod plus_dm;
 mod ppo;
 mod price_transform;
 mod regression;
+mod relative_strength_index;
+#[cfg(test)]
+mod relative_strength_index_test;
 mod rolling_extrema;
 mod rolling_median;
 mod rolling_mode;
 mod rolling_price;
 mod rolling_statistics;
 mod rolling_sum;
-mod rsi;
 mod session_flags;
 pub(crate) mod sorted_ring;
 mod statistic;
@@ -510,10 +512,9 @@ pub use rolling_median::RollingMedian;
 pub use rolling_mode::RollingMode;
 pub use variable_period_moving_average::VariablePeriodMovingAverage;
 
-pub use rolling_sum::RollingSum;
 #[allow(unused_imports)]
-pub(crate) use rsi::relative_strength_index;
-pub use rsi::RelativeStrengthIndex;
+pub use relative_strength_index::RelativeStrengthIndex;
+pub use rolling_sum::RollingSum;
 #[allow(unused_imports)]
 pub(crate) use sar::parabolic_sar;
 pub use sar::ParabolicSar;
@@ -823,7 +824,6 @@ mod tests {
         let trima_batch = triangular_moving_average(&input, 7).unwrap();
         let kama_batch = kaufman_adaptive_moving_average(&input, 7).unwrap();
         let midpoint_batch = rolling_midpoint(&input, 7).unwrap();
-        let rsi_batch = relative_strength_index(&input, 14).unwrap();
         let cmo_batch = chande_momentum_oscillator(&input, 14).unwrap();
         let mut sma = SimpleMovingAverage::new(7).unwrap();
         let mut ema = ExponentialMovingAverage::new(7).unwrap();
@@ -833,7 +833,6 @@ mod tests {
         let mut trima = TriangularMovingAverage::new(7).unwrap();
         let mut kama = KaufmanAdaptiveMovingAverage::new(7).unwrap();
         let mut midpoint = RollingMidpoint::new(7).unwrap();
-        let mut rsi = RelativeStrengthIndex::new(14).unwrap();
         let mut cmo = ChandeMomentumOscillator::new(14).unwrap();
 
         for index in 0..input.len() {
@@ -846,7 +845,6 @@ mod tests {
             assert_optional_eq(trima.append(value), trima_batch[index]);
             assert_optional_eq(kama.append(value), kama_batch[index]);
             assert_optional_eq(midpoint.append(value), midpoint_batch[index]);
-            assert_optional_eq(rsi.append(value), rsi_batch[index]);
             assert_optional_eq(cmo.append(value), cmo_batch[index]);
         }
     }

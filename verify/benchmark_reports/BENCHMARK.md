@@ -434,7 +434,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.53× | 2.46× | 0.74× | 0.64× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.57× | 2.28× | 0.85× | 0.64× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.36× | 2.20× | 0.81× | 0.69× |
-| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.70× | 1.46× | 0.98× | 0.95× |
+| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.85× | 1.13× | 0.86× | 0.75× |
 | ParabolicSar | [TA-Lib: `SAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.65× | 0.77× | 0.59× | 0.55× |
 | ParabolicSarExtended | [TA-Lib: `SAREXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.05× | 0.92× | 0.58× | 0.55× |
 | MathSin | [TA-Lib: `SIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.22× | 1.24× | 1.06× | 1.01× |
@@ -806,7 +806,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.27× | 1.55× | 2.08× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.97× | 1.88× | 2.09× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.92× | 2.13× | 1.92× |
+| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.10× | 2.01× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1098,7 +1098,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.92× | 2.04× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.05× | 1.99× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.97× | 1.97× | 2.13× |
+| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.91× | 1.99× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1390,7 +1390,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.03× | 2.03× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 2.07× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.93× | 1.71× | 1.95× |
+| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.04× | 1.89× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1682,7 +1682,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.89× | 1.93× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.75× | 1.89× |
 | RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 2.08× | 2.10× |
+| RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.04× | 2.07× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |

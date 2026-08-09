@@ -1,44 +1,10 @@
 //! Stateful Relative Strength Index.
-//!
-//! RSI retains Wilder's average gain and loss recurrence and uses TA-Lib's
-//! operation order and epsilon rule for deterministic composite indicators.
-
-use crate::error::{TaError, TaResult};
 
 use super::{invalid_period, StreamingIndicator};
+use crate::error::TaResult;
 
-/// Computes an aligned Wilder RSI vector using the same recurrence as the
-/// Compute the relative strength index result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn relative_strength_index(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if timeperiod < 2 {
-        return Err(TaError::InvalidParameter {
-            name: "timeperiod",
-            value: timeperiod.to_string(),
-            reason: "must be >= 2",
-        });
-    }
-    let mut state = RelativeStrengthIndex::new(timeperiod)?;
-    Ok(input
-        .iter()
-        .map(|&value| state.append(value).unwrap_or(f64::NAN))
-        .collect())
-}
-
-/// Incremental Wilder RSI with TA-Lib-compatible warm-up and rounding.
+/// Incremental Wilder Relative Strength Index with TA-Lib-compatible warm-up.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RelativeStrengthIndex`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct RelativeStrengthIndex {
     period: usize,
     previous_input: Option<f64>,
@@ -51,7 +17,7 @@ pub struct RelativeStrengthIndex {
 }
 
 impl RelativeStrengthIndex {
-    /// Creates an RSI state with a period of at least two bars.
+    /// Creates a state with a smoothing period of at least two changes.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -68,7 +34,8 @@ impl RelativeStrengthIndex {
         })
     }
 
-    fn rsi_value(&self) -> f64 {
+    #[inline]
+    fn current_value(&self) -> f64 {
         let sum = self.average_gain + self.average_loss;
         if sum.abs() < 1.0e-14 {
             0.0
@@ -82,10 +49,10 @@ impl StreamingIndicator for RelativeStrengthIndex {
     type Output = f64;
 
     fn append(&mut self, input: f64) -> Option<f64> {
-        let Some(previous) = self.previous_input.replace(input) else {
+        let Some(previous_input) = self.previous_input.replace(input) else {
             return None;
         };
-        let change = input - previous;
+        let change = input - previous_input;
         let (gain, loss) = if change > 0.0 {
             (change, 0.0)
         } else {
@@ -105,7 +72,7 @@ impl StreamingIndicator for RelativeStrengthIndex {
             self.average_gain = (self.average_gain * (period - 1.0) + gain) / period;
             self.average_loss = (self.average_loss * (period - 1.0) + loss) / period;
         }
-        self.value = Some(self.rsi_value());
+        self.value = Some(self.current_value());
         self.value
     }
 
@@ -121,5 +88,12 @@ impl StreamingIndicator for RelativeStrengthIndex {
         self.average_gain = 0.0;
         self.average_loss = 0.0;
         self.value = None;
+    }
+
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        output.reserve(inputs.len());
+        for &input in inputs {
+            output.push(self.append(input).unwrap_or(f64::NAN));
+        }
     }
 }

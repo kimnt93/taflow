@@ -58,6 +58,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::AnchoredVolumeWeightedAveragePrice>()?;
     m.add_class::<indicators::VariableIndexDynamicAverage>()?;
     m.add_class::<indicators::LaguerreRelativeStrengthIndex>()?;
+    m.add_class::<indicators::RelativeStrengthIndex>()?;
     m.add_class::<indicators::Lag>()?;
     m.add_class::<indicators::LogReturn>()?;
     m.add_class::<indicators::CumulativeSum>()?;
@@ -211,7 +212,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulTrima>()?;
     m.add_class::<state_api::StatefulMidpoint>()?;
     m.add_class::<state_api::StatefulMidprice>()?;
-    m.add_class::<state_api::StatefulRsi>()?;
     m.add_class::<state_api::StatefulImi>()?;
     m.add_class::<state_api::Momentum>()?;
     m.add_class::<state_api::RateOfChange>()?;

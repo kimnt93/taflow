@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 189,
-    "complete": 59,
+    "complete": 60,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 612,
     "smc_functions": 8,
-    "structure": 59,
+    "structure": 60,
     "talib_functions": 161
   },
   "rows": [
@@ -612,7 +612,8 @@
       "name": "RelativeStrengthIndex",
       "native_binding": true,
       "native_symbols": [
-        "StatefulRsi"
+        "RelativeStrengthIndex",
+        "_NativeRelativeStrengthIndex"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4615,6 +4616,7 @@
         "RateOfChangePercent",
         "RateOfChangeRatio",
         "RateOfChangeRatioPercent",
+        "RelativeStrengthIndex",
         "RetracementsOperator",
         "RisingOperator",
         "RogersSatchellOperator",
@@ -4685,7 +4687,6 @@
         "StatefulPpo",
         "StatefulPremiumDiscount",
         "StatefulRelativeMomentumIndex",
-        "StatefulRsi",
         "StatefulSar",
         "StatefulSarext",
         "StatefulSessionVolumeLevels",
@@ -4921,6 +4922,7 @@
         "RateOfChangePercent",
         "RateOfChangeRatio",
         "RateOfChangeRatioPercent",
+        "RelativeStrengthIndex",
         "RetracementsOperator",
         "RisingOperator",
         "RogersSatchellOperator",
@@ -4991,7 +4993,6 @@
         "StatefulPpo",
         "StatefulPremiumDiscount",
         "StatefulRelativeMomentumIndex",
-        "StatefulRsi",
         "StatefulSar",
         "StatefulSarext",
         "StatefulSessionVolumeLevels",

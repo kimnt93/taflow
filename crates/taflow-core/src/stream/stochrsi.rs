@@ -164,7 +164,9 @@ pub fn stochastic_relative_strength_index(
     fastd_period: usize,
     fastd_matype: MaType,
 ) -> TaResult<(Vec<f64>, Vec<f64>)> {
-    let rsi_values = crate::stream::relative_strength_index(input, timeperiod)?;
+    let mut relative_strength_index = RelativeStrengthIndex::new(timeperiod)?;
+    let mut rsi_values = Vec::with_capacity(input.len());
+    relative_strength_index.extend_slice_into(input, &mut rsi_values);
     let rsi_valid = &rsi_values[timeperiod..];
     let (stochastic_k, stochastic_d) = crate::stream::fast_stochastic_oscillator(
         rsi_valid,

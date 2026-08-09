@@ -95,7 +95,12 @@ fn bench_indicators(c: &mut Criterion) {
         b.iter(|| taflow::stream::exponential_moving_average(black_box(&close), 20));
     });
     group.bench_function("RSI_14", |b| {
-        b.iter(|| taflow::stream::relative_strength_index(black_box(&close), 14));
+        b.iter(|| {
+            let mut state = RelativeStrengthIndex::new(14).unwrap();
+            let mut output = Vec::with_capacity(close.len());
+            state.extend_slice_into(black_box(&close), &mut output);
+            black_box(output)
+        });
     });
     group.bench_function("BBANDS_20", |b| {
         b.iter(|| {
