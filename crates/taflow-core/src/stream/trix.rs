@@ -1,8 +1,44 @@
 //! Incremental Triple Exponential Average Rate of Change (TRIX).
 
+use multiversion::multiversion;
+
 use crate::error::TaResult;
 
 use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
+
+/// Steady-state kernel for the triple EMA cascade plus the ROC step.
+///
+/// Extracted from [`TripleExponentialRateOfChange::extend_slice_into`] so it
+/// can carry `#[multiversion]`; without runtime dispatch a portable build
+/// lowers each `mul_add` to a libm `fma()` call. `mul_add` is explicitly fused
+/// either way, so the dispatched variants are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn trix_steady_loop(
+    inputs: &[f64],
+    k: [f64; 3],
+    state: &mut [f64; 3],
+    output: &mut Vec<f64>,
+) -> Option<f64> {
+    let [k1, k2, k3] = k;
+    let [mut e1, mut e2, mut e3] = *state;
+    let mut last = None;
+    for &input in inputs {
+        e1 = k1.mul_add(input - e1, e1);
+        e2 = k2.mul_add(e1 - e2, e2);
+        let previous = e3;
+        e3 = k3.mul_add(e2 - e3, e3);
+        let value = if previous != 0.0 {
+            (e3 - previous) / previous * 100.0
+        } else {
+            0.0
+        };
+        output.push(value);
+        last = Some(value);
+    }
+    *state = [e1, e2, e3];
+    last
+}
 
 /// Persistent TRIX with a triple TA-Lib-seeded EMA cascade and O(1) updates.
 #[derive(Debug, Clone)]
@@ -57,32 +93,23 @@ impl StreamingIndicator for TripleExponentialRateOfChange {
             return;
         }
 
-        let k1 = self.ema1.smoothing();
-        let k2 = self.ema2.smoothing();
-        let k3 = self.ema3.smoothing();
-        let mut e1 = self.ema1.current().expect("warm EMA1");
-        let mut e2 = self.ema2.current().expect("warm EMA2");
-        let mut e3 = self.ema3.current().expect("warm EMA3");
-        let mut last = self.value;
-        for &input in &inputs[index..] {
-            e1 = k1.mul_add(input - e1, e1);
-            e2 = k2.mul_add(e1 - e2, e2);
-            let previous = e3;
-            e3 = k3.mul_add(e2 - e3, e3);
-            let value = if previous != 0.0 {
-                (e3 - previous) / previous * 100.0
-            } else {
-                0.0
-            };
-            output.push(value);
-            last = Some(value);
-        }
+        let k = [
+            self.ema1.smoothing(),
+            self.ema2.smoothing(),
+            self.ema3.smoothing(),
+        ];
+        let mut state = [
+            self.ema1.current().expect("warm EMA1"),
+            self.ema2.current().expect("warm EMA2"),
+            self.ema3.current().expect("warm EMA3"),
+        ];
+        let last = trix_steady_loop(&inputs[index..], k, &mut state, output).or(self.value);
 
         let appended = inputs.len() - index;
-        self.ema1.store_bulk_state(e1, appended);
-        self.ema2.store_bulk_state(e2, appended);
-        self.ema3.store_bulk_state(e3, appended);
-        self.previous_ema3 = Some(e3);
+        self.ema1.store_bulk_state(state[0], appended);
+        self.ema2.store_bulk_state(state[1], appended);
+        self.ema3.store_bulk_state(state[2], appended);
+        self.previous_ema3 = Some(state[2]);
         self.value = last;
     }
 
@@ -206,6 +233,12 @@ use crate::simd::sum_f64;
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
+/// Multiversioned: the EMA recurrences below are `mul_add`-bound and a
+/// portable build without runtime dispatch lowers each one to a libm
+/// `fma()` call. `mul_add` is explicitly fused either way, so the
+/// dispatched variants are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn triple_exponential_rate_of_change(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
     if timeperiod < 2 {
         return Err(TaError::InvalidParameter {

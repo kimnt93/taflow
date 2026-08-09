@@ -3,9 +3,46 @@
 //! TripleExponentialAverage cascades six TA-Lib-seeded exponential moving averages and combines the
 //! final four layers with coefficients derived from the volume factor.
 
+use multiversion::multiversion;
+
 use crate::error::{TaError, TaResult};
 
 use super::{ExponentialMovingAverage, StreamingIndicator};
+
+/// Steady-state kernel for the six fused EMA recurrences.
+///
+/// Split out of [`TripleExponentialAverage::extend_slice_into`] so it can carry
+/// `#[multiversion]`: the loop is `mul_add`-bound and a portable build without
+/// runtime dispatch lowers every `mul_add` to a libm `fma()` call. `mul_add` is
+/// an explicitly fused operation in both cases, so the dispatched FMA variant
+/// returns bit-identical results — only faster.
+#[allow(clippy::too_many_arguments)]
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn t3_steady_loop(
+    inputs: &[f64],
+    k: [f64; 6],
+    state: &mut [f64; 6],
+    coefficients: [f64; 4],
+    output: &mut Vec<f64>,
+) -> f64 {
+    let [k1, k2, k3, k4, k5, k6] = k;
+    let [c1, c2, c3, c4] = coefficients;
+    let [mut e1, mut e2, mut e3, mut e4, mut e5, mut e6] = *state;
+    let mut last = f64::NAN;
+    for &input in inputs {
+        e1 = k1.mul_add(input - e1, e1);
+        e2 = k2.mul_add(e1 - e2, e2);
+        e3 = k3.mul_add(e2 - e3, e3);
+        e4 = k4.mul_add(e3 - e4, e4);
+        e5 = k5.mul_add(e4 - e5, e5);
+        e6 = k6.mul_add(e5 - e6, e6);
+        last = c1 * e6 + c2 * e5 + c3 * e4 + c4 * e3;
+        output.push(last);
+    }
+    *state = [e1, e2, e3, e4, e5, e6];
+    last
+}
 
 /// Compute the triple exponential average result for the supplied aligned series.
 ///
@@ -97,38 +134,32 @@ impl StreamingIndicator for TripleExponentialAverage {
             return;
         }
 
-        let k1 = self.ema1.smoothing();
-        let k2 = self.ema2.smoothing();
-        let k3 = self.ema3.smoothing();
-        let k4 = self.ema4.smoothing();
-        let k5 = self.ema5.smoothing();
-        let k6 = self.ema6.smoothing();
-        let mut e1 = self.ema1.current().expect("warm EMA1");
-        let mut e2 = self.ema2.current().expect("warm EMA2");
-        let mut e3 = self.ema3.current().expect("warm EMA3");
-        let mut e4 = self.ema4.current().expect("warm EMA4");
-        let mut e5 = self.ema5.current().expect("warm EMA5");
-        let mut e6 = self.ema6.current().expect("warm EMA6");
-        let (c1, c2, c3, c4) = (self.c1, self.c2, self.c3, self.c4);
-        let mut last = f64::NAN;
-        for &input in &inputs[index..] {
-            e1 = k1.mul_add(input - e1, e1);
-            e2 = k2.mul_add(e1 - e2, e2);
-            e3 = k3.mul_add(e2 - e3, e3);
-            e4 = k4.mul_add(e3 - e4, e4);
-            e5 = k5.mul_add(e4 - e5, e5);
-            e6 = k6.mul_add(e5 - e6, e6);
-            last = c1 * e6 + c2 * e5 + c3 * e4 + c4 * e3;
-            output.push(last);
-        }
+        let k = [
+            self.ema1.smoothing(),
+            self.ema2.smoothing(),
+            self.ema3.smoothing(),
+            self.ema4.smoothing(),
+            self.ema5.smoothing(),
+            self.ema6.smoothing(),
+        ];
+        let mut state = [
+            self.ema1.current().expect("warm EMA1"),
+            self.ema2.current().expect("warm EMA2"),
+            self.ema3.current().expect("warm EMA3"),
+            self.ema4.current().expect("warm EMA4"),
+            self.ema5.current().expect("warm EMA5"),
+            self.ema6.current().expect("warm EMA6"),
+        ];
+        let coefficients = [self.c1, self.c2, self.c3, self.c4];
+        let last = t3_steady_loop(&inputs[index..], k, &mut state, coefficients, output);
 
         let appended = inputs.len() - index;
-        self.ema1.store_bulk_state(e1, appended);
-        self.ema2.store_bulk_state(e2, appended);
-        self.ema3.store_bulk_state(e3, appended);
-        self.ema4.store_bulk_state(e4, appended);
-        self.ema5.store_bulk_state(e5, appended);
-        self.ema6.store_bulk_state(e6, appended);
+        self.ema1.store_bulk_state(state[0], appended);
+        self.ema2.store_bulk_state(state[1], appended);
+        self.ema3.store_bulk_state(state[2], appended);
+        self.ema4.store_bulk_state(state[3], appended);
+        self.ema5.store_bulk_state(state[4], appended);
+        self.ema6.store_bulk_state(state[5], appended);
         self.value = Some(last);
     }
 

@@ -3,12 +3,56 @@
 //! KAMA adapts its smoothing constant from the ratio between net direction
 //! and total absolute movement over the configured lookback window.
 
+use multiversion::multiversion;
+
 use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator};
 
 const SLOW: f64 = 2.0 / 31.0;
 const FAST_MINUS_SLOW: f64 = 2.0 / 3.0 - SLOW;
+
+/// Steady-state kernel of [`KaufmanAdaptiveMovingAverage::extend_slice_into`].
+///
+/// Split into a free function so it can carry `#[multiversion]`: it runs two
+/// `mul_add`s per bar, which a portable build without runtime dispatch lowers
+/// to libm `fma()` calls. `mul_add` is explicitly fused in both cases, so the
+/// dispatched variants produce bit-identical output.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn kama_steady_loop(
+    inputs: &[f64],
+    prologue: usize,
+    period: usize,
+    volatility: &mut f64,
+    previous_kama: &mut Option<f64>,
+    output: &mut Vec<f64>,
+) {
+    let mut volatility_acc = *volatility;
+    let mut previous_kama_acc = *previous_kama;
+    for t in prologue..inputs.len() {
+        let input = inputs[t];
+        let change = (input - inputs[t - 1]).abs();
+        let evicted = (inputs[t - period] - inputs[t - period - 1]).abs();
+        volatility_acc -= evicted;
+        volatility_acc += change;
+
+        let oldest = inputs[t - period];
+        let direction = input - oldest;
+        let efficiency = if volatility_acc <= direction || volatility_acc.abs() < 1.0e-14 {
+            1.0
+        } else {
+            (direction / volatility_acc).abs()
+        };
+        let smoothing = efficiency.mul_add(FAST_MINUS_SLOW, SLOW);
+        let previous = previous_kama_acc.unwrap_or(inputs[t - 1]);
+        let next = (input - previous).mul_add(smoothing * smoothing, previous);
+        previous_kama_acc = Some(next);
+        output.push(next);
+    }
+    *volatility = volatility_acc;
+    *previous_kama = previous_kama_acc;
+}
 
 /// Compute the kaufman adaptive moving average result for the supplied aligned series.
 ///
@@ -185,26 +229,14 @@ impl StreamingIndicator for KaufmanAdaptiveMovingAverage {
         let mut volatility = self.volatility;
         let mut previous_kama = self.previous_kama;
         debug_assert_eq!(self.changes_len, period);
-        for t in prologue..inputs.len() {
-            let input = inputs[t];
-            let change = (input - inputs[t - 1]).abs();
-            let evicted = (inputs[t - period] - inputs[t - period - 1]).abs();
-            volatility -= evicted;
-            volatility += change;
-
-            let oldest = inputs[t - period];
-            let direction = input - oldest;
-            let efficiency = if volatility <= direction || volatility.abs() < 1.0e-14 {
-                1.0
-            } else {
-                (direction / volatility).abs()
-            };
-            let smoothing = efficiency.mul_add(FAST_MINUS_SLOW, SLOW);
-            let previous = previous_kama.unwrap_or(inputs[t - 1]);
-            let next = (input - previous).mul_add(smoothing * smoothing, previous);
-            previous_kama = Some(next);
-            output.push(next);
-        }
+        kama_steady_loop(
+            inputs,
+            prologue,
+            period,
+            &mut volatility,
+            &mut previous_kama,
+            output,
+        );
 
         // Exact state writeback: rings are normalized to chronological order,
         // which is behaviourally identical for every subsequent `append`.

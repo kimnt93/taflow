@@ -1,8 +1,27 @@
 //! Incremental Exponential Moving Average (EMA).
 
+use multiversion::multiversion;
+
 use crate::error::TaResult;
 
 use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
+
+/// Steady-state EMA recurrence used by [`ExponentialMovingAverage::extend_slice`].
+///
+/// A free function so it can carry `#[multiversion]`: a portable build without
+/// runtime dispatch lowers `mul_add` to a libm `fma()` call. `mul_add` is an
+/// explicitly fused operation in both cases, so the dispatched FMA variant
+/// returns bit-identical values.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn ema_steady_loop(inputs: &[f64], k: f64, seed: f64, outputs: &mut Vec<Option<f64>>) -> f64 {
+    let mut previous = seed;
+    for &input in inputs {
+        previous = k.mul_add(input - previous, previous);
+        outputs.push(Some(previous));
+    }
+    previous
+}
 
 /// Computes an aligned Exponential Moving Average vector using the stream
 /// Compute the exponential moving average result for the supplied aligned series.
@@ -97,11 +116,7 @@ impl ExponentialMovingAverage {
         let seed = crate::simd::sum_f64(&inputs[..self.period]) / self.period as f64;
         outputs.push(Some(seed));
 
-        let mut previous = seed;
-        for &input in &inputs[self.period..] {
-            previous = self.k.mul_add(input - previous, previous);
-            outputs.push(Some(previous));
-        }
+        let previous = ema_steady_loop(&inputs[self.period..], self.k, seed, &mut outputs);
 
         self.samples = inputs.len();
         self.value = Some(previous);

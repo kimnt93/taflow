@@ -3,8 +3,11 @@
 //! MACDFIX uses TA-Lib's fixed fast and slow smoothing constants (`0.15` and
 //! `0.075`) rather than the ordinary period-derived MACD constants.
 
+use multiversion::multiversion;
+
 use crate::error::{TaError, TaResult};
 
+use super::macd::macd_ema_steady_loop;
 use super::MovingAverageConvergenceDivergenceValue;
 
 /// Incremental MACDFIX with fixed 12/26 smoothing and configurable signal EMA.
@@ -136,30 +139,25 @@ impl MovingAverageConvergenceDivergenceFixed {
             return;
         }
 
-        let signal_k = self.signal_k;
-        let mut fast = self.fast_ema.expect("warm fast EMA");
-        let mut slow = self.slow_ema.expect("warm slow EMA");
-        let mut signal = self.signal_ema.expect("warm signal EMA");
-        let mut last = self.value;
-        for &input in &inputs[index..] {
-            fast = Self::FAST_K.mul_add(input - fast, fast);
-            slow = Self::SLOW_K.mul_add(input - slow, slow);
-            let macd = fast - slow;
-            signal = signal_k.mul_add(macd - signal, signal);
-            let histogram = macd - signal;
-            macd_out.push(macd);
-            signal_out.push(signal);
-            histogram_out.push(histogram);
-            last = Some(MovingAverageConvergenceDivergenceValue {
-                macd,
-                signal,
-                histogram,
-            });
-        }
+        let k = [Self::FAST_K, Self::SLOW_K, self.signal_k];
+        let mut state = [
+            self.fast_ema.expect("warm fast EMA"),
+            self.slow_ema.expect("warm slow EMA"),
+            self.signal_ema.expect("warm signal EMA"),
+        ];
+        let last = macd_ema_steady_loop(
+            &inputs[index..],
+            k,
+            &mut state,
+            macd_out,
+            signal_out,
+            histogram_out,
+        )
+        .or(self.value);
 
-        self.fast_ema = Some(fast);
-        self.slow_ema = Some(slow);
-        self.signal_ema = Some(signal);
+        self.fast_ema = Some(state[0]);
+        self.slow_ema = Some(state[1]);
+        self.signal_ema = Some(state[2]);
         self.signal_count += inputs.len() - index;
         self.value = last;
     }
@@ -295,6 +293,12 @@ mod tests {
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
+/// Multiversioned: the EMA recurrences below are `mul_add`-bound and a
+/// portable build without runtime dispatch lowers each one to a libm
+/// `fma()` call. `mul_add` is explicitly fused either way, so the
+/// dispatched variants are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn moving_average_convergence_divergence_fixed(
     input: &[f64],
     signalperiod: usize,

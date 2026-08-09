@@ -3,10 +3,39 @@
 //! APO subtracts a slow moving average from a fast moving average and supports
 //! all nine TA-Lib moving-average types with their native warm-up semantics.
 
+use multiversion::multiversion;
+
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
 use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
+
+/// Steady-state kernel for the fused fast/slow EMA legs.
+///
+/// Extracted from [`AbsolutePriceOscillator::extend_slice_into`] so it can
+/// carry `#[multiversion]`; a portable build without runtime dispatch lowers
+/// each `mul_add` to a libm `fma()` call. `mul_add` is explicitly fused in both
+/// cases, so the dispatched variants are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn apo_ema_steady_loop(
+    inputs: &[f64],
+    fast_k: f64,
+    slow_k: f64,
+    state: &mut (f64, f64),
+    output: &mut Vec<f64>,
+) -> f64 {
+    let (mut fast, mut slow) = *state;
+    let mut last = f64::NAN;
+    for &input in inputs {
+        fast = fast_k.mul_add(input - fast, fast);
+        slow = slow_k.mul_add(input - slow, slow);
+        last = fast - slow;
+        output.push(last);
+    }
+    *state = (fast, slow);
+    last
+}
 
 /// Compute the absolute price oscillator result for the supplied aligned series.
 ///
@@ -129,13 +158,10 @@ impl StreamingIndicator for AbsolutePriceOscillator {
                     let state = self.slow.as_ema_mut().expect("EMA slow state");
                     (state.smoothing(), state.current().expect("warm slow EMA"))
                 };
-                let mut last = f64::NAN;
-                for &input in &inputs[index..] {
-                    fast = fast_k.mul_add(input - fast, fast);
-                    slow = slow_k.mul_add(input - slow, slow);
-                    last = fast - slow;
-                    output.push(last);
-                }
+                let mut ema_state = (fast, slow);
+                let last =
+                    apo_ema_steady_loop(&inputs[index..], fast_k, slow_k, &mut ema_state, output);
+                (fast, slow) = ema_state;
                 let appended = inputs.len() - index;
                 self.fast
                     .as_ema_mut()

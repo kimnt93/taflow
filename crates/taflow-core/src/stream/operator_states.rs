@@ -4135,67 +4135,87 @@ impl SchaffTrendCycle {
         macd_out: &mut Vec<f64>,
         stoch_out: &mut Vec<f64>,
     ) {
-        stc_out.reserve(close.len());
-        macd_out.reserve(close.len());
-        stoch_out.reserve(close.len());
-        let mut index = 0;
-        // Warm-up prologue: per-bar appends until the slow EMA is seeded
-        // (the fast EMA warms no later than the slow one).
-        while index < close.len() && self.slow_ema.current().is_none() {
-            let value = self.append(close[index]);
-            stc_out.push(value.stc);
-            macd_out.push(value.macd);
-            stoch_out.push(value.stoch);
-            index += 1;
-        }
-        if index == close.len() {
-            return;
-        }
+        schaff_trend_cycle_bulk(self, close, stc_out, macd_out, stoch_out)
+    }
+}
 
-        let fast_k = self.fast_ema.smoothing();
-        let slow_k = self.slow_ema.smoothing();
-        let mut fast = self.fast_ema.current().expect("warm fast EMA");
-        let mut slow = self.slow_ema.current().expect("warm slow EMA");
-        let factor = self.factor;
-        let mut last = self.value;
-        for &close_value in &close[index..] {
-            fast = fast_k.mul_add(close_value - fast, fast);
-            slow = slow_k.mul_add(close_value - slow, slow);
-            let macd = fast - slow;
-
-            let lowest = self.xmacd_low.append(macd).unwrap_or(f64::NAN);
-            let highest = self.xmacd_high.append(macd).unwrap_or(f64::NAN);
-            let range = non_zero(highest - lowest);
-            if lowest > 0.0 {
-                self.stoch1 = 100.0 * ((macd - lowest) / range);
-            }
-            self.pf = round8(self.pf + factor * (self.stoch1 - self.pf));
-
-            let lowest_pf = self.pf_low.append(self.pf).unwrap_or(f64::NAN);
-            let highest_pf = self.pf_high.append(self.pf).unwrap_or(f64::NAN);
-            let range_pf = non_zero(highest_pf - lowest_pf);
-            if range_pf > 0.0 {
-                self.stoch2 = 100.0 * ((self.pf - lowest_pf) / range_pf);
-            }
-            self.pff = round8(self.pff + factor * (self.stoch2 - self.pff));
-
-            let value = SchaffTrendCycleValue {
-                stc: self.pff,
-                macd,
-                stoch: self.pf,
-            };
-            stc_out.push(value.stc);
-            macd_out.push(value.macd);
-            stoch_out.push(value.stoch);
-            last = Some(value);
-        }
-
-        let appended = close.len() - index;
-        self.fast_ema.store_bulk_state(fast, appended);
-        self.slow_ema.store_bulk_state(slow, appended);
-        self.value = last;
+/// Body of [`SchaffTrendCycle::extend_slices_into`].
+///
+/// A free function because `#[multiversion]` cannot annotate a method that
+/// takes `self`. The dispatch gets a hardware FMA for the two `mul_add` EMA
+/// steps instead of a libm `fma()` call per bar; `mul_add` is explicitly fused
+/// either way, so results are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion::multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn schaff_trend_cycle_bulk(
+    state: &mut SchaffTrendCycle,
+    close: &[f64],
+    stc_out: &mut Vec<f64>,
+    macd_out: &mut Vec<f64>,
+    stoch_out: &mut Vec<f64>,
+) {
+    stc_out.reserve(close.len());
+    macd_out.reserve(close.len());
+    stoch_out.reserve(close.len());
+    let mut index = 0;
+    // Warm-up prologue: per-bar appends until the slow EMA is seeded
+    // (the fast EMA warms no later than the slow one).
+    while index < close.len() && state.slow_ema.current().is_none() {
+        let value = state.append(close[index]);
+        stc_out.push(value.stc);
+        macd_out.push(value.macd);
+        stoch_out.push(value.stoch);
+        index += 1;
+    }
+    if index == close.len() {
+        return;
     }
 
+    let fast_k = state.fast_ema.smoothing();
+    let slow_k = state.slow_ema.smoothing();
+    let mut fast = state.fast_ema.current().expect("warm fast EMA");
+    let mut slow = state.slow_ema.current().expect("warm slow EMA");
+    let factor = state.factor;
+    let mut last = state.value;
+    for &close_value in &close[index..] {
+        fast = fast_k.mul_add(close_value - fast, fast);
+        slow = slow_k.mul_add(close_value - slow, slow);
+        let macd = fast - slow;
+
+        let lowest = state.xmacd_low.append(macd).unwrap_or(f64::NAN);
+        let highest = state.xmacd_high.append(macd).unwrap_or(f64::NAN);
+        let range = non_zero(highest - lowest);
+        if lowest > 0.0 {
+            state.stoch1 = 100.0 * ((macd - lowest) / range);
+        }
+        state.pf = round8(state.pf + factor * (state.stoch1 - state.pf));
+
+        let lowest_pf = state.pf_low.append(state.pf).unwrap_or(f64::NAN);
+        let highest_pf = state.pf_high.append(state.pf).unwrap_or(f64::NAN);
+        let range_pf = non_zero(highest_pf - lowest_pf);
+        if range_pf > 0.0 {
+            state.stoch2 = 100.0 * ((state.pf - lowest_pf) / range_pf);
+        }
+        state.pff = round8(state.pff + factor * (state.stoch2 - state.pff));
+
+        let value = SchaffTrendCycleValue {
+            stc: state.pff,
+            macd,
+            stoch: state.pf,
+        };
+        stc_out.push(value.stc);
+        macd_out.push(value.macd);
+        stoch_out.push(value.stoch);
+        last = Some(value);
+    }
+
+    let appended = close.len() - index;
+    state.fast_ema.store_bulk_state(fast, appended);
+    state.slow_ema.store_bulk_state(slow, appended);
+    state.value = last;
+}
+
+impl SchaffTrendCycle {
     /// Computes or updates `value` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.

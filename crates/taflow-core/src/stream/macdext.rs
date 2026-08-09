@@ -7,6 +7,7 @@
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
+use super::macd::macd_ema_steady_loop;
 use super::{
     moving_average::MovingAverageDispatcher, MovingAverageConvergenceDivergenceValue,
     StreamingIndicator,
@@ -135,22 +136,17 @@ impl MovingAverageConvergenceDivergenceExtended {
                     let state = self.signal.as_ema_mut().expect("EMA signal state");
                     (state.smoothing(), state.current().expect("warm signal EMA"))
                 };
-                let mut last = self.value;
-                for &input in &inputs[index..] {
-                    fast = fast_k.mul_add(input - fast, fast);
-                    slow = slow_k.mul_add(input - slow, slow);
-                    let macd = fast - slow;
-                    signal = signal_k.mul_add(macd - signal, signal);
-                    let histogram = macd - signal;
-                    macd_out.push(macd);
-                    signal_out.push(signal);
-                    histogram_out.push(histogram);
-                    last = Some(MovingAverageConvergenceDivergenceValue {
-                        macd,
-                        signal,
-                        histogram,
-                    });
-                }
+                let mut ema_state = [fast, slow, signal];
+                let last = macd_ema_steady_loop(
+                    &inputs[index..],
+                    [fast_k, slow_k, signal_k],
+                    &mut ema_state,
+                    macd_out,
+                    signal_out,
+                    histogram_out,
+                )
+                .or(self.value);
+                [fast, slow, signal] = ema_state;
                 let appended = inputs.len() - index;
                 self.fast
                     .as_ema_mut()

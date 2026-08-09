@@ -3,6 +3,8 @@
 //! The selected moving-average type controls only the middle band.  As in
 //! TA-Lib, both outer bands use population deviation around the rolling SMA.
 
+use multiversion::multiversion;
+
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
@@ -10,6 +12,59 @@ use super::{
     invalid_period, moving_average::MovingAverageDispatcher, RollingStandardDeviation,
     StreamingIndicator, Window,
 };
+
+/// Steady-state kernel of [`BollingerBands::extend_slices_into`].
+///
+/// Split out so it can carry `#[multiversion]`: the loop runs a `mul_add` per
+/// bar, which a portable build without runtime dispatch lowers to a libm
+/// `fma()` call. `mul_add` is explicitly fused either way, so the dispatched
+/// variants are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn bbands_steady_loop(
+    inputs: &[f64],
+    period: usize,
+    accumulators: [&mut f64; 3],
+    constants: [f64; 4],
+    upper_out: &mut Vec<f64>,
+    middle_out: &mut Vec<f64>,
+    lower_out: &mut Vec<f64>,
+) -> BollingerBandsValue {
+    let [sma_sum_out, moments_sum_out, moments_sum_squares_out] = accumulators;
+    let [period_f, inverse_period, deviations_up, deviations_down] = constants;
+    let mut sma_sum = *sma_sum_out;
+    let mut moments_sum = *moments_sum_out;
+    let mut moments_sum_squares = *moments_sum_squares_out;
+    let mut last = BollingerBandsValue {
+        upper: f64::NAN,
+        middle: f64::NAN,
+        lower: f64::NAN,
+    };
+    for i in period..inputs.len() {
+        let input = inputs[i];
+        let old = inputs[i - period];
+        sma_sum -= old;
+        sma_sum += input;
+        moments_sum += input - old;
+        moments_sum_squares += (input - old).mul_add(input + old, 0.0);
+        let middle = sma_sum / period_f;
+        let mean = moments_sum * inverse_period;
+        let variance = moments_sum_squares * inverse_period - mean * mean;
+        let deviation = variance.max(0.0).sqrt();
+        last = BollingerBandsValue {
+            upper: middle + deviations_up * deviation,
+            middle,
+            lower: middle - deviations_down * deviation,
+        };
+        upper_out.push(last.upper);
+        middle_out.push(last.middle);
+        lower_out.push(last.lower);
+    }
+    *sma_sum_out = sma_sum;
+    *moments_sum_out = moments_sum;
+    *moments_sum_squares_out = moments_sum_squares;
+    last
+}
 
 /// Computes aligned upper, middle, and lower Bollinger Band vectors.
 ///
@@ -232,31 +287,15 @@ impl BollingerBands {
         let period_f = core.period as f64;
         let inverse_period = core.inverse_period;
         let (deviations_up, deviations_down) = (self.deviations_up, self.deviations_down);
-        let mut last = BollingerBandsValue {
-            upper: f64::NAN,
-            middle: f64::NAN,
-            lower: f64::NAN,
-        };
-        for i in period..n {
-            let input = inputs[i];
-            let old = inputs[i - period];
-            sma_sum -= old;
-            sma_sum += input;
-            moments_sum += input - old;
-            moments_sum_squares += (input - old).mul_add(input + old, 0.0);
-            let middle = sma_sum / period_f;
-            let mean = moments_sum * inverse_period;
-            let variance = moments_sum_squares * inverse_period - mean * mean;
-            let deviation = variance.max(0.0).sqrt();
-            last = BollingerBandsValue {
-                upper: middle + deviations_up * deviation,
-                middle,
-                lower: middle - deviations_down * deviation,
-            };
-            upper_out.push(last.upper);
-            middle_out.push(last.middle);
-            lower_out.push(last.lower);
-        }
+        let last = bbands_steady_loop(
+            inputs,
+            period,
+            [&mut sma_sum, &mut moments_sum, &mut moments_sum_squares],
+            [period_f, inverse_period, deviations_up, deviations_down],
+            upper_out,
+            middle_out,
+            lower_out,
+        );
         core.sma_sum = sma_sum;
         core.moments_sum = moments_sum;
         core.moments_sum_squares = moments_sum_squares;

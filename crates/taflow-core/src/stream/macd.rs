@@ -3,6 +3,8 @@
 //! MACD aligns the fast EMA seed to the end of the slow EMA seed window, then
 //! seeds the signal EMA from the first `signal_period` MACD observations.
 
+use multiversion::multiversion;
+
 use crate::error::{TaError, TaResult};
 
 /// The three values produced by a warmed MACD state machine.
@@ -15,6 +17,45 @@ pub struct MovingAverageConvergenceDivergenceValue {
     pub macd: f64,
     pub signal: f64,
     pub histogram: f64,
+}
+
+/// Steady-state kernel shared by the MACD, MACDFIX and MACDEXT bulk paths:
+/// the fast, slow and signal EMA recurrences advanced in one loop.
+///
+/// It lives in a free function so it can carry `#[multiversion]` (a trait or
+/// inherent method cannot). Without runtime dispatch a portable build lowers
+/// every `mul_add` to a libm `fma()` call; `mul_add` is an explicitly fused
+/// operation either way, so the dispatched FMA variant is bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+pub(crate) fn macd_ema_steady_loop(
+    inputs: &[f64],
+    k: [f64; 3],
+    state: &mut [f64; 3],
+    macd_out: &mut Vec<f64>,
+    signal_out: &mut Vec<f64>,
+    histogram_out: &mut Vec<f64>,
+) -> Option<MovingAverageConvergenceDivergenceValue> {
+    let [fast_k, slow_k, signal_k] = k;
+    let [mut fast, mut slow, mut signal] = *state;
+    let mut last = None;
+    for &input in inputs {
+        fast = fast_k.mul_add(input - fast, fast);
+        slow = slow_k.mul_add(input - slow, slow);
+        let macd = fast - slow;
+        signal = signal_k.mul_add(macd - signal, signal);
+        let histogram = macd - signal;
+        macd_out.push(macd);
+        signal_out.push(signal);
+        histogram_out.push(histogram);
+        last = Some(MovingAverageConvergenceDivergenceValue {
+            macd,
+            signal,
+            histogram,
+        });
+    }
+    *state = [fast, slow, signal];
+    last
 }
 
 /// Stateful MACD matching the batch function's aligned EMA seeds.
@@ -153,30 +194,25 @@ impl MovingAverageConvergenceDivergence {
             return;
         }
 
-        let (fast_k, slow_k, signal_k) = (self.fast_k, self.slow_k, self.signal_k);
-        let mut fast = self.fast_ema.expect("warm fast EMA");
-        let mut slow = self.slow_ema.expect("warm slow EMA");
-        let mut signal = self.signal_ema.expect("warm signal EMA");
-        let mut last = self.value;
-        for &input in &inputs[index..] {
-            fast = fast_k.mul_add(input - fast, fast);
-            slow = slow_k.mul_add(input - slow, slow);
-            let macd = fast - slow;
-            signal = signal_k.mul_add(macd - signal, signal);
-            let histogram = macd - signal;
-            macd_out.push(macd);
-            signal_out.push(signal);
-            histogram_out.push(histogram);
-            last = Some(MovingAverageConvergenceDivergenceValue {
-                macd,
-                signal,
-                histogram,
-            });
-        }
+        let k = [self.fast_k, self.slow_k, self.signal_k];
+        let mut state = [
+            self.fast_ema.expect("warm fast EMA"),
+            self.slow_ema.expect("warm slow EMA"),
+            self.signal_ema.expect("warm signal EMA"),
+        ];
+        let last = macd_ema_steady_loop(
+            &inputs[index..],
+            k,
+            &mut state,
+            macd_out,
+            signal_out,
+            histogram_out,
+        )
+        .or(self.value);
 
-        self.fast_ema = Some(fast);
-        self.slow_ema = Some(slow);
-        self.signal_ema = Some(signal);
+        self.fast_ema = Some(state[0]);
+        self.slow_ema = Some(state[1]);
+        self.signal_ema = Some(state[2]);
         self.signal_count += inputs.len() - index;
         self.value = last;
     }
@@ -313,6 +349,12 @@ mod tests {
 /// # Returns
 ///
 /// Three aligned arrays containing MACD, signal, and histogram values.
+/// Multiversioned: the EMA recurrences below are `mul_add`-bound and a
+/// portable build without runtime dispatch lowers each one to a libm
+/// `fma()` call. `mul_add` is explicitly fused either way, so the
+/// dispatched variants are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
 pub fn moving_average_convergence_divergence(
     input: &[f64],
     fastperiod: usize,

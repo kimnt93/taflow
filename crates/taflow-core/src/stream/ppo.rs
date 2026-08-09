@@ -3,10 +3,39 @@
 //! PPO normalizes the distance between fast and slow moving averages by the
 //! slow average and supports all nine TA-Lib moving-average types.
 
+use multiversion::multiversion;
+
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
 use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
+
+/// Steady-state kernel for the fused fast/slow EMA legs.
+///
+/// Extracted from [`PercentagePriceOscillator::extend_slice_into`] so it can
+/// carry `#[multiversion]`; a portable build without runtime dispatch lowers
+/// each `mul_add` to a libm `fma()` call. `mul_add` is explicitly fused in both
+/// cases, so the dispatched variants are bit-identical.
+#[allow(unexpected_cfgs)]
+#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
+fn ppo_ema_steady_loop(
+    inputs: &[f64],
+    fast_k: f64,
+    slow_k: f64,
+    state: &mut (f64, f64),
+    output: &mut Vec<f64>,
+) -> Option<f64> {
+    let (mut fast, mut slow) = *state;
+    let mut last = None;
+    for &input in inputs {
+        fast = fast_k.mul_add(input - fast, fast);
+        slow = slow_k.mul_add(input - slow, slow);
+        last = (slow != 0.0).then_some((fast - slow) / slow * 100.0);
+        output.push(last.unwrap_or(f64::NAN));
+    }
+    *state = (fast, slow);
+    last
+}
 
 /// Compute the percentage price oscillator result for the supplied aligned series.
 ///
@@ -140,13 +169,10 @@ impl StreamingIndicator for PercentagePriceOscillator {
                     let state = self.slow.as_ema_mut().expect("EMA slow state");
                     (state.smoothing(), state.current().expect("warm slow EMA"))
                 };
-                let mut last = None;
-                for &input in &inputs[index..] {
-                    fast = fast_k.mul_add(input - fast, fast);
-                    slow = slow_k.mul_add(input - slow, slow);
-                    last = (slow != 0.0).then_some((fast - slow) / slow * 100.0);
-                    output.push(last.unwrap_or(f64::NAN));
-                }
+                let mut ema_state = (fast, slow);
+                let last =
+                    ppo_ema_steady_loop(&inputs[index..], fast_k, slow_k, &mut ema_state, output);
+                (fast, slow) = ema_state;
                 let appended = inputs.len() - index;
                 self.fast
                     .as_ema_mut()
