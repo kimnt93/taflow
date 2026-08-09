@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 
 from ._native import VwmaOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
@@ -23,13 +24,11 @@ class VolumeWeightedMovingAverage:
         self, price: Any, volume: Any, timeperiod: int = 10
     ) -> None:
         self._state = _Native(int(timeperiod))
-        self._length = 0
         self.extend(price, volume)
 
     def append(self, price: float, volume: float) -> "VolumeWeightedMovingAverage":
         """Append one price/volume pair and return this adapter."""
         self._state.append(float(price), float(volume))
-        self._length += 1
         return self
 
     def extend(
@@ -40,7 +39,6 @@ class VolumeWeightedMovingAverage:
         if len(arrays[0]) != len(arrays[1]):
             raise ValueError("price and volume must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -55,12 +53,11 @@ class VolumeWeightedMovingAverage:
     def reset(self) -> "VolumeWeightedMovingAverage":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed pairs."""
-        return self._length
+        return adapter_length(self)
 
 
 __all__ = ["VolumeWeightedMovingAverage"]

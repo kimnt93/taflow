@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 
 from ._native import AlmaOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
@@ -28,20 +29,17 @@ class ArnaudLegouxMovingAverage:
         sigma: float = 6.0,
     ) -> None:
         self._state = _Native(int(timeperiod), float(offset), float(sigma))
-        self._length = 0
         self.extend(_input)
 
     def append(self, _input: float) -> "ArnaudLegouxMovingAverage":
         """Append one observation and return this adapter."""
         self._state.append(float(_input))
-        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "ArnaudLegouxMovingAverage":
         """Append a chronological observation series and return this adapter."""
         values = as_float64_series(_input)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -56,12 +54,11 @@ class ArnaudLegouxMovingAverage:
     def reset(self) -> "ArnaudLegouxMovingAverage":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed observations."""
-        return self._length
+        return adapter_length(self)
 
 
 __all__ = ["ArnaudLegouxMovingAverage"]

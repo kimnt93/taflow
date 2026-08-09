@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 
 from ._native import AwesomeOscillatorOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
@@ -23,13 +24,11 @@ class AwesomeOscillator:
         self, high: Any, low: Any, fast: int = 5, slow: int = 34
     ) -> None:
         self._state = _Native(int(fast), int(slow))
-        self._length = 0
         self.extend(high, low)
 
     def append(self, high: float, low: float) -> "AwesomeOscillator":
         """Append one high/low bar and return this adapter."""
         self._state.append(float(high), float(low))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any) -> "AwesomeOscillator":
@@ -38,7 +37,6 @@ class AwesomeOscillator:
         if len(arrays[0]) != len(arrays[1]):
             raise ValueError("high and low must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -53,12 +51,11 @@ class AwesomeOscillator:
     def reset(self) -> "AwesomeOscillator":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
 
 
 __all__ = ["AwesomeOscillator"]
