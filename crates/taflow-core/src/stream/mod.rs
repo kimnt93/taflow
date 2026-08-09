@@ -38,15 +38,21 @@ pub(crate) mod tests_extrema_support {
     }
 }
 
+mod absolute_price_oscillator;
+#[cfg(test)]
+mod absolute_price_oscillator_test;
 mod accbands;
-mod adx;
 mod adxr;
-mod apo;
 mod aroon;
 mod aroon_rescan;
 #[cfg(test)]
 mod aroon_test;
-mod bbands;
+mod average_directional_index;
+#[cfg(test)]
+mod average_directional_index_test;
+mod bollinger_bands;
+#[cfg(test)]
+mod bollinger_bands_test;
 mod candle_2crows;
 mod candle_3blackcrows;
 mod candle_3inside;
@@ -257,9 +263,11 @@ mod moving_average_dispatcher;
 #[cfg(test)]
 mod moving_average_test;
 mod pattern;
+mod percentage_price_oscillator;
+#[cfg(test)]
+mod percentage_price_oscillator_test;
 mod plus_di;
 mod plus_dm;
-mod ppo;
 mod price_transform;
 mod regression;
 mod relative_strength_index;
@@ -267,6 +275,8 @@ mod relative_strength_index;
 mod relative_strength_index_test;
 mod rolling_extrema;
 mod rolling_median;
+#[cfg(test)]
+mod rolling_median_test;
 mod rolling_mode;
 mod rolling_price;
 mod rolling_statistics;
@@ -280,6 +290,8 @@ mod variable_period_moving_average_test;
 mod vhgw;
 pub use session_flags::session_flags;
 mod cumulative_count;
+#[cfg(test)]
+mod cumulative_count_test;
 mod cumulative_maximum;
 #[cfg(test)]
 mod cumulative_maximum_test;
@@ -293,7 +305,6 @@ mod cumulative_sum;
 #[cfg(test)]
 mod cumulative_sum_test;
 #[allow(unused_imports)]
-pub(crate) use cumulative_count::cumulative_count;
 pub use cumulative_count::CumulativeCount;
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
@@ -336,6 +347,9 @@ mod opening_range;
 mod opening_range_test;
 mod operator_states;
 pub use operator_states::ActiveZoneList;
+mod fast_stochastic_oscillator;
+#[cfg(test)]
+mod fast_stochastic_oscillator_test;
 mod parabolic_moving_average_stop;
 #[cfg(test)]
 mod parabolic_moving_average_stop_test;
@@ -369,9 +383,12 @@ mod simple_moving_average;
 mod smoothed_trend_channel;
 #[cfg(test)]
 mod smoothed_trend_channel_test;
-mod stoch;
-mod stochf;
-mod stochrsi;
+mod stochastic_oscillator;
+#[cfg(test)]
+mod stochastic_oscillator_test;
+mod stochastic_relative_strength_index;
+#[cfg(test)]
+mod stochastic_relative_strength_index_test;
 mod tom_de_mark_sequential;
 #[cfg(test)]
 mod tom_de_mark_sequential_test;
@@ -383,7 +400,9 @@ mod triple_exponential_moving_average;
 #[cfg(test)]
 mod triple_exponential_moving_average_test;
 mod trix;
-mod ultosc;
+mod ultimate_oscillator;
+#[cfg(test)]
+mod ultimate_oscillator_test;
 mod variable_index_dynamic_average;
 #[cfg(test)]
 mod variable_index_dynamic_average_test;
@@ -393,11 +412,10 @@ pub(crate) use helpers::invalid_period;
 mod weighted_moving_average;
 
 #[allow(unused_imports)]
+pub use absolute_price_oscillator::AbsolutePriceOscillator;
+#[allow(unused_imports)]
 pub(crate) use accbands::acceleration_bands;
 pub use accbands::{AccelerationBands, AccelerationBandsValue};
-#[allow(unused_imports)]
-pub(crate) use adx::average_directional_index;
-pub use adx::AverageDirectionalIndex;
 #[allow(unused_imports)]
 pub(crate) use adxr::average_directional_index_rating;
 pub use adxr::AverageDirectionalIndexRating;
@@ -405,12 +423,10 @@ pub use anchored_volume_weighted_average_price::{
     AnchoredVolumeWeightedAveragePrice, AnchoredVolumeWeightedAveragePriceValue,
 };
 #[allow(unused_imports)]
-pub(crate) use apo::absolute_price_oscillator;
-pub use apo::AbsolutePriceOscillator;
+pub use average_directional_index::AverageDirectionalIndex;
 
 #[allow(unused_imports)]
-pub(crate) use bbands::bollinger_bands;
-pub use bbands::{BollingerBands, BollingerBandsValue};
+pub use bollinger_bands::{BollingerBands, BollingerBandsValue};
 pub use candle_2crows::CandleTwoCrows;
 pub use candle_3blackcrows::CandleThreeBlackCrows;
 pub use candle_3inside::CandleThreeInside;
@@ -515,6 +531,8 @@ pub use opening_range::{OpeningRange, OpeningRangeValue};
 pub use parabolic_moving_average_stop::{
     ParabolicMovingAverageStop, ParabolicMovingAverageStopValue,
 };
+#[allow(unused_imports)]
+pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use pivot_points::{PivotPoints, PivotPointsValue};
 #[allow(unused_imports)]
 pub(crate) use plus_di::plus_directional_indicator;
@@ -522,9 +540,6 @@ pub use plus_di::PlusDirectionalIndicator;
 #[allow(unused_imports)]
 pub(crate) use plus_dm::plus_directional_movement;
 pub use plus_dm::PlusDirectionalMovement;
-#[allow(unused_imports)]
-pub(crate) use ppo::percentage_price_oscillator;
-pub use ppo::PercentagePriceOscillator;
 pub use premium_discount::{PremiumDiscount, PremiumDiscountValue};
 pub use rate_of_change::RateOfChange;
 pub use rate_of_change_percent::RateOfChangePercent;
@@ -540,6 +555,8 @@ pub use rolling_mode::RollingMode;
 pub use variable_period_moving_average::VariablePeriodMovingAverage;
 
 #[allow(unused_imports)]
+pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
+#[allow(unused_imports)]
 pub use relative_strength_index::RelativeStrengthIndex;
 pub use rolling_sum::RollingSum;
 #[allow(unused_imports)]
@@ -552,14 +569,11 @@ pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use simple_moving_average::SimpleMovingAverage;
 pub use smoothed_trend_channel::SmoothedTrendChannel;
 #[allow(unused_imports)]
-pub(crate) use stoch::stochastic_oscillator;
-pub use stoch::{StochasticOscillator, StochasticOscillatorValue};
+pub use stochastic_oscillator::{StochasticOscillator, StochasticOscillatorValue};
 #[allow(unused_imports)]
-pub(crate) use stochf::fast_stochastic_oscillator;
-pub use stochf::{FastStochasticOscillator, FastStochasticOscillatorValue};
-#[allow(unused_imports)]
-pub(crate) use stochrsi::stochastic_relative_strength_index;
-pub use stochrsi::{StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue};
+pub use stochastic_relative_strength_index::{
+    StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue,
+};
 pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
 pub use triangular_moving_average::TriangularMovingAverage;
 #[allow(unused_imports)]
@@ -570,8 +584,7 @@ pub use triple_exponential_moving_average::TripleExponentialMovingAverage;
 pub(crate) use trix::triple_exponential_rate_of_change;
 pub use trix::TripleExponentialRateOfChange;
 #[allow(unused_imports)]
-pub(crate) use ultosc::ultimate_oscillator;
-pub use ultosc::UltimateOscillator;
+pub use ultimate_oscillator::UltimateOscillator;
 pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
 pub use weighted_moving_average::WeightedMovingAverage;
 pub use window::Window;
@@ -1319,7 +1332,6 @@ mod mcginley_dynamic;
 #[allow(unused_imports)]
 pub(crate) use mcginley_dynamic::mcginley_dynamic;
 #[allow(unused_imports)]
-pub(crate) use rolling_median::rolling_median;
 #[allow(unused_imports)]
 pub(crate) use rolling_mode::rolling_mode;
 mod aroon_oscillator;

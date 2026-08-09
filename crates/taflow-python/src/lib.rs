@@ -14,6 +14,13 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Unified indicator objects. Each TA binding lives in its own module and
     // owns its accumulated outputs so compute() never replays prior input.
     m.add_class::<indicators::ExponentialMovingAverage>()?;
+    m.add_class::<indicators::AbsolutePriceOscillator>()?;
+    m.add_class::<indicators::PercentagePriceOscillator>()?;
+    m.add_class::<indicators::AverageDirectionalIndex>()?;
+    m.add_class::<indicators::BollingerBands>()?;
+    m.add_class::<indicators::FastStochasticOscillator>()?;
+    m.add_class::<indicators::StochasticOscillator>()?;
+    m.add_class::<indicators::StochasticRelativeStrengthIndex>()?;
     m.add_class::<indicators::SimpleMovingAverage>()?;
     m.add_class::<indicators::WeightedMovingAverage>()?;
     m.add_class::<indicators::DoubleExponentialMovingAverage>()?;
@@ -99,8 +106,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::LogReturn>()?;
     m.add_class::<indicators::CumulativeSum>()?;
     m.add_class::<indicators::CumulativeProduct>()?;
-    m.add_class::<indicators::CumulativeCountOperator>()?;
-    m.add_class::<indicators::RollingMedianOperator>()?;
+    m.add_class::<indicators::CumulativeCount>()?;
+    m.add_class::<indicators::RollingMedian>()?;
     m.add_class::<indicators::RollingModeOperator>()?;
     m.add_class::<indicators::RollingQuantileOperator>()?;
     m.add_class::<indicators::RollingPercentileOperator>()?;
@@ -296,16 +303,9 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::TrueRange>()?;
     m.add_class::<state_api::NormalizedAverageTrueRange>()?;
     m.add_class::<state_api::VariablePeriodMovingAverage>()?;
-    m.add_class::<state_api::StatefulAdx>()?;
     m.add_class::<state_api::StatefulAdxr>()?;
     m.add_class::<state_api::StatefulDx>()?;
-    m.add_class::<state_api::StatefulStoch>()?;
-    m.add_class::<state_api::StatefulStochf>()?;
-    m.add_class::<state_api::StatefulStochrsi>()?;
     m.add_class::<state_api::StatefulMama>()?;
-    m.add_class::<state_api::StatefulApo>()?;
-    m.add_class::<state_api::StatefulPpo>()?;
-    m.add_class::<state_api::StatefulBbands>()?;
     m.add_class::<state_api::StatefulAccbands>()?;
     m.add_class::<state_api::StatefulSar>()?;
     m.add_class::<state_api::StatefulSarext>()?;

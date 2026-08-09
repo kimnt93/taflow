@@ -133,7 +133,9 @@ mod tests {
     #[test]
     fn rolling_statistics_match_batch_and_reset() {
         let input = vec![1.0, 4.0, 2.0, 2.0, 9.0, 4.0];
-        let median = rolling_median(&input, 3).unwrap();
+        let mut median_state = RollingMedian::new(3).unwrap();
+        let mut median = Vec::new();
+        median_state.extend_slice_into(&input, &mut median);
         let mode = rolling_mode(&input, 3).unwrap();
         assert!(median[0].is_nan() && median[1].is_nan());
         assert_eq!(&median[2..], &[2.0, 2.0, 2.0, 4.0]);

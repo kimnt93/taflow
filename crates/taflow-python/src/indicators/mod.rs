@@ -1,12 +1,15 @@
 //! Unified Python indicator objects.
 
 mod abandoned_baby;
+mod absolute_price_oscillator;
 mod adv;
 mod advance_block;
 mod amihud;
 mod anchored_volume_weighted_average_price;
+mod average_directional_index;
 mod bar_helpers;
 mod belt_hold;
+mod bollinger_bands;
 mod bos_choch;
 mod breakaway;
 mod chande_momentum_oscillator;
@@ -42,6 +45,7 @@ mod ewm_var;
 mod exponential_moving_average;
 mod extended_momentum;
 mod extended_trend;
+mod fast_stochastic_oscillator;
 mod fibonacci_retracement;
 mod frac_diff;
 mod fvg;
@@ -107,6 +111,7 @@ mod opening_range;
 mod ou_half_life;
 mod parabolic_moving_average_stop;
 mod parkinson;
+mod percentage_price_oscillator;
 mod piercing;
 mod pivot_points;
 mod plus_directional_indicator;
@@ -166,6 +171,8 @@ mod stalled_pattern;
 mod state_helpers;
 mod stc;
 mod stick_sandwich;
+mod stochastic_oscillator;
+mod stochastic_relative_strength_index;
 mod supertrend;
 mod swing;
 mod takuri;
@@ -199,15 +206,18 @@ mod yang_zhang;
 mod zones;
 
 pub use abandoned_baby::CandleAbandonedBaby;
+pub use absolute_price_oscillator::AbsolutePriceOscillator;
 pub use adv::AverageDailyDollarValueOperator;
 pub use advance_block::CandleAdvanceBlock;
 pub use amihud::AmihudOperator;
 pub use anchored_volume_weighted_average_price::AnchoredVolumeWeightedAveragePrice;
+pub use average_directional_index::AverageDirectionalIndex;
 pub use bar_helpers::{
     GapDownOperator, GapUpOperator, HigherHighOperator, InsideBarOperator, LowerLowOperator,
     OutsideBarOperator,
 };
 pub use belt_hold::CandleBeltHold;
+pub use bollinger_bands::BollingerBands;
 pub use bos_choch::BreakOfStructureChangeOfCharacterOperator;
 pub use breakaway::CandleBreakaway;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
@@ -217,7 +227,7 @@ pub use cmf::ChaikinMoneyFlowOperator;
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use conceal_baby_swall::CandleConcealBabySwall;
 pub use counter_attack::CandleCounterAttack;
-pub use cumulative_count::CumulativeCountOperator;
+pub use cumulative_count::CumulativeCount;
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
 pub use cumulative_product::CumulativeProduct;
@@ -245,6 +255,7 @@ pub use extended_momentum::{
     AwesomeOscillatorOperator, FisherTransformOperator, TrueStrengthIndexOperator,
 };
 pub use extended_trend::{AlmaOperator, HmaOperator, VwmaOperator, ZlemaOperator};
+pub use fast_stochastic_oscillator::FastStochasticOscillator;
 pub use fibonacci_retracement::FibonacciRetracement;
 pub use frac_diff::FracDiffOperator;
 pub use fvg::FairValueGapOperator;
@@ -310,6 +321,7 @@ pub use opening_range::OpeningRange;
 pub use ou_half_life::OrnsteinUhlenbeckHalfLifeOperator;
 pub use parabolic_moving_average_stop::ParabolicMovingAverageStop;
 pub use parkinson::ParkinsonOperator;
+pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use piercing::CandlePiercing;
 pub use pivot_points::PivotPoints;
 pub use plus_directional_indicator::PlusDirectionalIndicator;
@@ -335,7 +347,7 @@ pub use rolling_cov::RollingCovOperator;
 pub use rolling_entropy::{RollingAutocorrOperator, RollingEntropyOperator};
 pub use rolling_iqr::RollingInterquartileRangeOperator;
 pub use rolling_kurtosis::RollingKurtosisOperator;
-pub use rolling_median::RollingMedianOperator;
+pub use rolling_median::RollingMedian;
 pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;
 pub use rolling_mode::RollingModeOperator;
@@ -374,6 +386,8 @@ pub use state_helpers::{
 };
 pub use stc::SchaffTrendCycleOperator;
 pub use stick_sandwich::CandleStickSandwich;
+pub use stochastic_oscillator::StochasticOscillator;
+pub use stochastic_relative_strength_index::StochasticRelativeStrengthIndex;
 pub use supertrend::SupertrendOperator;
 pub use swing::SwingHighLowOperator;
 pub use takuri::CandleTakuri;

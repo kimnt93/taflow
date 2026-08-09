@@ -257,7 +257,9 @@ pub fn average_directional_index_rating(
     close: &[f64],
     timeperiod: usize,
 ) -> TaResult<Vec<f64>> {
-    let adx_values = crate::stream::average_directional_index(high, low, close, timeperiod)?;
+    let mut adx_state = AverageDirectionalIndex::new(timeperiod)?;
+    let mut adx_values = Vec::new();
+    adx_state.extend_slices_into(high, low, close, &mut adx_values);
     let len = adx_values.len();
     let lookback = 3 * timeperiod - 2;
     let mut output = vec![f64::NAN; len];

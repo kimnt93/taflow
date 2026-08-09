@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::CumulativeCount;
+use taflow::stream::CumulativeCount as CumulativeCountState;
 
 /// Native persistent adapter for the one-based cumulative observation count.
 #[pyclass]
-pub struct CumulativeCountOperator {
-    inner: CumulativeCount,
+pub struct CumulativeCount {
+    inner: CumulativeCountState,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl CumulativeCountOperator {
+impl CumulativeCount {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CumulativeCount::new(),
+            inner: CumulativeCountState::new(),
             outputs: Vec::new(),
         }
     }
@@ -27,11 +27,7 @@ impl CumulativeCountOperator {
 
     fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
         let input = input.as_slice()?;
-        py.allow_threads(|| {
-            for &value in input {
-                self.append(value);
-            }
-        });
+        py.allow_threads(|| self.inner.extend_slice_into(input, &mut self.outputs));
         Ok(())
     }
 
@@ -47,5 +43,9 @@ impl CumulativeCountOperator {
     fn reset(&mut self) {
         self.inner.reset();
         self.outputs.clear();
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
     }
 }

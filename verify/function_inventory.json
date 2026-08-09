@@ -1,16 +1,16 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 71,
-    "correctness": 269,
+    "complete": 82,
+    "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
-    "native_state_classes": 294,
+    "native_state_classes": 293,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 610,
+    "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 71,
+    "structure": 91,
     "talib_functions": 161
   },
   "rows": [
@@ -186,7 +186,8 @@
       "name": "BollingerBands",
       "native_binding": true,
       "native_symbols": [
-        "StatefulBbands"
+        "BollingerBands",
+        "_NativeBollingerBands"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -215,7 +216,8 @@
       "name": "FastStochasticOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulStochf"
+        "FastStochasticOscillator",
+        "_NativeFastStochasticOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -364,7 +366,8 @@
       "name": "StochasticOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulStoch"
+        "StochasticOscillator",
+        "_NativeStochasticOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -378,10 +381,11 @@
       "name": "StochasticRelativeStrengthIndex",
       "native_binding": true,
       "native_symbols": [
-        "StatefulStochrsi"
+        "StochasticRelativeStrengthIndex",
+        "_NativeStochasticRelativeStrengthIndex"
       ],
       "pandas_ta_reference": false,
-      "rust_export": true,
+      "rust_export": false,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -513,7 +517,7 @@
       "native_binding": true,
       "native_symbols": [
         "UltimateOscillator",
-        "_Native"
+        "_NativeUltimateOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -643,11 +647,12 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ssl_channel",
+      "module": "smoothed_trend_channel",
       "name": "SmoothedTrendChannel",
       "native_binding": true,
       "native_symbols": [
-        "StatefulSmoothedTrendChannel"
+        "SmoothedTrendChannel",
+        "_NativeSmoothedTrendChannel"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -672,25 +677,27 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "pmax",
+      "module": "parabolic_moving_average_stop",
       "name": "ParabolicMovingAverageStop",
       "native_binding": true,
       "native_symbols": [
-        "StatefulParabolicMovingAverageStop"
+        "ParabolicMovingAverageStop",
+        "_NativeParabolicMovingAverageStop"
       ],
       "pandas_ta_reference": false,
-      "rust_export": true,
+      "rust_export": false,
       "smc_reference": false,
       "talib_alias": ""
     },
     {
       "exported": true,
       "kind": "class",
-      "module": "td_sequential",
+      "module": "tom_de_mark_sequential",
       "name": "TomDeMarkSequential",
       "native_binding": true,
       "native_symbols": [
-        "StatefulTomDeMarkSequential"
+        "TomDeMarkSequential",
+        "_NativeTomDeMarkSequential"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -700,11 +707,12 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ebsw",
+      "module": "even_better_sinewave",
       "name": "EvenBetterSinewave",
       "native_binding": true,
       "native_symbols": [
-        "StatefulEvenBetterSinewave"
+        "EvenBetterSinewave",
+        "_NativeEvenBetterSinewave"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -718,7 +726,8 @@
       "name": "PremiumDiscount",
       "native_binding": true,
       "native_symbols": [
-        "StatefulPremiumDiscount"
+        "PremiumDiscount",
+        "_NativePremiumDiscount"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -732,7 +741,8 @@
       "name": "OpeningRange",
       "native_binding": true,
       "native_symbols": [
-        "StatefulOpeningRange"
+        "OpeningRange",
+        "_NativeOpeningRange"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -746,7 +756,8 @@
       "name": "PivotPoints",
       "native_binding": true,
       "native_symbols": [
-        "StatefulPivotPoints"
+        "PivotPoints",
+        "_NativePivotPoints"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -760,7 +771,8 @@
       "name": "KlingerVolumeOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulKlingerVolumeOscillator"
+        "KlingerVolumeOscillator",
+        "_NativeKlingerVolumeOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -774,7 +786,8 @@
       "name": "SessionVolumeLevels",
       "native_binding": true,
       "native_symbols": [
-        "StatefulSessionVolumeLevels"
+        "SessionVolumeLevels",
+        "_NativeSessionVolumeLevels"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -803,7 +816,8 @@
       "name": "IntradayMomentumIndex",
       "native_binding": true,
       "native_symbols": [
-        "StatefulImi"
+        "IntradayMomentumIndex",
+        "_NativeIntradayMomentumIndex"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -846,7 +860,8 @@
       "name": "DoubleExponentialMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulDema"
+        "DoubleExponentialMovingAverage",
+        "_NativeDoubleExponentialMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -860,7 +875,8 @@
       "name": "KaufmanAdaptiveMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulKama"
+        "KaufmanAdaptiveMovingAverage",
+        "_NativeKaufmanAdaptiveMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -874,7 +890,8 @@
       "name": "SimpleMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulSma"
+        "SimpleMovingAverage",
+        "_NativeSimpleMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -918,7 +935,8 @@
       "name": "TriangularMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulTrima"
+        "TriangularMovingAverage",
+        "_NativeTriangularMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -932,7 +950,8 @@
       "name": "TripleExponentialMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulTema"
+        "TripleExponentialMovingAverage",
+        "_NativeTripleExponentialMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -946,7 +965,8 @@
       "name": "TripleExponentialAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulT3"
+        "TripleExponentialAverage",
+        "_NativeTripleExponentialAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -960,7 +980,8 @@
       "name": "WeightedMovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulWma"
+        "WeightedMovingAverage",
+        "_NativeWeightedMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -1064,7 +1085,8 @@
       "name": "AbsolutePriceOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulApo"
+        "AbsolutePriceOscillator",
+        "_NativeAbsolutePriceOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -1078,7 +1100,8 @@
       "name": "PercentagePriceOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulPpo"
+        "PercentagePriceOscillator",
+        "_NativePercentagePriceOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -1092,7 +1115,8 @@
       "name": "ChandeMomentumOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulCmo"
+        "ChandeMomentumOscillator",
+        "_NativeChandeMomentumOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -1196,7 +1220,8 @@
       "name": "AverageDirectionalIndex",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAdx"
+        "AverageDirectionalIndex",
+        "_NativeAverageDirectionalIndex"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2121,8 +2146,8 @@
       "name": "CumulativeCount",
       "native_binding": true,
       "native_symbols": [
-        "CumulativeCountOperator",
-        "_Native"
+        "CumulativeCount",
+        "_NativeCumulativeCount"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2136,8 +2161,8 @@
       "name": "RollingMedian",
       "native_binding": true,
       "native_symbols": [
-        "RollingMedianOperator",
-        "_Native"
+        "RollingMedian",
+        "_NativeRollingMedian"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2179,7 +2204,8 @@
       "name": "RollingSum",
       "native_binding": true,
       "native_symbols": [
-        "StatefulSum"
+        "RollingSum",
+        "_NativeRollingSum"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2371,7 +2397,8 @@
       "name": "RollingStandardDeviation",
       "native_binding": true,
       "native_symbols": [
-        "StatefulStddev"
+        "RollingStandardDeviation",
+        "_NativeRollingStandardDeviation"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2385,7 +2412,8 @@
       "name": "RollingAverageDeviation",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAvgdev"
+        "RollingAverageDeviation",
+        "_NativeRollingAverageDeviation"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2399,7 +2427,8 @@
       "name": "RollingMidpoint",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMidpoint"
+        "RollingMidpoint",
+        "_NativeRollingMidpoint"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2413,7 +2442,8 @@
       "name": "RollingMidprice",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMidprice"
+        "RollingMidprice",
+        "_NativeRollingMidprice"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -2427,7 +2457,8 @@
       "name": "RollingVariance",
       "native_binding": true,
       "native_symbols": [
-        "StatefulVar"
+        "RollingVariance",
+        "_NativeRollingVariance"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4395,7 +4426,7 @@
       "name": "DecayLinear",
       "native_binding": true,
       "native_symbols": [
-        "StatefulWma"
+        "WeightedMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4438,6 +4469,7 @@
       "name": "op",
       "native_binding": true,
       "native_symbols": [
+        "AbsolutePriceOscillator",
         "AccumulationDistribution",
         "AccumulationDistributionOscillator",
         "ActiveZoneListOperator",
@@ -4447,11 +4479,13 @@
         "Aroon",
         "AroonOscillator",
         "AverageDailyDollarValueOperator",
+        "AverageDirectionalIndex",
         "AveragePrice",
         "AverageTrueRange",
         "AwesomeOscillatorOperator",
         "BalanceOfPower",
         "BarsSinceOperator",
+        "BollingerBands",
         "BreakOfStructureChangeOfCharacterOperator",
         "CandleAbandonedBaby",
         "CandleAdvanceBlock",
@@ -4516,12 +4550,13 @@
         "CandleUpsideGapTwoCrows",
         "ChaikinMoneyFlowOperator",
         "ChaikinVolatilityOperator",
+        "ChandeMomentumOscillator",
         "CloseToCloseSigmaOperator",
         "CommodityChannelIndex",
         "CrossOperator",
         "CrossoverOperator",
         "CrossunderOperator",
-        "CumulativeCountOperator",
+        "CumulativeCount",
         "CumulativeMaximum",
         "CumulativeMinimum",
         "CumulativeProduct",
@@ -4529,10 +4564,12 @@
         "CumulativeSumControlChartOperator",
         "DetrendedPriceOscillatorOperator",
         "DonchianOperator",
+        "DoubleExponentialMovingAverage",
         "DrawdownOperator",
         "EaseOfMovementOperator",
         "EntryExitOperator",
         "EqualHighsLowsOperator",
+        "EvenBetterSinewave",
         "EwmCorrOperator",
         "EwmCovOperator",
         "EwmStdOperator",
@@ -4541,6 +4578,7 @@
         "ExponentialMovingAverage",
         "FairValueGapOperator",
         "FallingOperator",
+        "FastStochasticOscillator",
         "FibonacciRetracement",
         "FisherTransformOperator",
         "ForceIndexOperator",
@@ -4564,9 +4602,12 @@
         "HurstOperator",
         "IchimokuOperator",
         "InsideBarOperator",
+        "IntradayMomentumIndex",
         "JurikMovingAverage",
         "KalmanHedgeRatioOperator",
+        "KaufmanAdaptiveMovingAverage",
         "KeltnerChannelsOperator",
+        "KlingerVolumeOscillator",
         "KnowSureThingOperator",
         "Lag",
         "LaguerreRelativeStrengthIndex",
@@ -4616,14 +4657,19 @@
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
         "OnBalanceVolume",
+        "OpeningRange",
         "OrderBlockOperator",
         "OrnsteinUhlenbeckHalfLifeOperator",
         "OutsideBarOperator",
+        "ParabolicMovingAverageStop",
         "ParkinsonOperator",
+        "PercentagePriceOscillator",
+        "PivotPoints",
         "PlusDirectionalIndicator",
         "PlusDirectionalMovement",
         "PositionHoldOperator",
         "PositiveVolumeIndexOperator",
+        "PremiumDiscount",
         "PreviousHighLowOperator",
         "RateOfChange",
         "RateOfChangePercent",
@@ -4637,13 +4683,16 @@
         "RollSpreadOperator",
         "RollingAlphaOperator",
         "RollingAutocorrOperator",
+        "RollingAverageDeviation",
         "RollingCalmarOperator",
         "RollingCovOperator",
         "RollingEntropyOperator",
         "RollingInformationRatioOperator",
         "RollingInterquartileRangeOperator",
         "RollingKurtosisOperator",
-        "RollingMedianOperator",
+        "RollingMedian",
+        "RollingMidpoint",
+        "RollingMidprice",
         "RollingModeOperator",
         "RollingPercentileOperator",
         "RollingQuantileOperator",
@@ -4651,31 +4700,27 @@
         "RollingSharpeOperator",
         "RollingSkewOperator",
         "RollingSortinoOperator",
+        "RollingStandardDeviation",
+        "RollingSum",
+        "RollingVariance",
         "RollingWinsorizeOperator",
         "RollingZScoreOperator",
         "SchaffTrendCycleOperator",
         "SessionExtremaOperator",
+        "SessionVolumeLevels",
         "SessionsOperator",
         "SignalDelayOperator",
         "SignedPowerOperator",
+        "SimpleMovingAverage",
+        "SmoothedTrendChannel",
         "SpreadZScoreOperator",
         "SqueezeOperator",
         "SqueezeProOperator",
         "StatefulAccbands",
-        "StatefulAdx",
         "StatefulAdxr",
-        "StatefulApo",
-        "StatefulAvgdev",
-        "StatefulBbands",
         "StatefulBeta",
-        "StatefulCmo",
         "StatefulCorrel",
-        "StatefulDema",
         "StatefulDx",
-        "StatefulEvenBetterSinewave",
-        "StatefulImi",
-        "StatefulKama",
-        "StatefulKlingerVolumeOscillator",
         "StatefulLinearreg",
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
@@ -4683,36 +4728,21 @@
         "StatefulMama",
         "StatefulMax",
         "StatefulMaxindex",
-        "StatefulMidpoint",
-        "StatefulMidprice",
         "StatefulMin",
         "StatefulMinindex",
         "StatefulMinmax",
         "StatefulMinmaxindex",
-        "StatefulOpeningRange",
-        "StatefulParabolicMovingAverageStop",
-        "StatefulPivotPoints",
-        "StatefulPpo",
-        "StatefulPremiumDiscount",
         "StatefulSar",
         "StatefulSarext",
-        "StatefulSessionVolumeLevels",
-        "StatefulSma",
-        "StatefulSmoothedTrendChannel",
-        "StatefulStddev",
-        "StatefulStoch",
-        "StatefulStochf",
-        "StatefulStochrsi",
-        "StatefulSum",
-        "StatefulT3",
-        "StatefulTema",
-        "StatefulTomDeMarkSequential",
-        "StatefulTrima",
         "StatefulTsf",
-        "StatefulVar",
-        "StatefulWma",
+        "StochasticOscillator",
+        "StochasticRelativeStrengthIndex",
         "SupertrendOperator",
         "SwingHighLowOperator",
+        "TomDeMarkSequential",
+        "TriangularMovingAverage",
+        "TripleExponentialAverage",
+        "TripleExponentialMovingAverage",
         "TripleExponentialRateOfChange",
         "TrueRange",
         "TrueStrengthIndexOperator",
@@ -4727,6 +4757,7 @@
         "VwapOperator",
         "VwmaOperator",
         "WeightedClose",
+        "WeightedMovingAverage",
         "WilliamsPercentR",
         "YangZhangOperator",
         "ZlemaOperator",
@@ -4744,6 +4775,7 @@
       "name": "__version__",
       "native_binding": true,
       "native_symbols": [
+        "AbsolutePriceOscillator",
         "AccumulationDistribution",
         "AccumulationDistributionOscillator",
         "ActiveZoneListOperator",
@@ -4753,11 +4785,13 @@
         "Aroon",
         "AroonOscillator",
         "AverageDailyDollarValueOperator",
+        "AverageDirectionalIndex",
         "AveragePrice",
         "AverageTrueRange",
         "AwesomeOscillatorOperator",
         "BalanceOfPower",
         "BarsSinceOperator",
+        "BollingerBands",
         "BreakOfStructureChangeOfCharacterOperator",
         "CandleAbandonedBaby",
         "CandleAdvanceBlock",
@@ -4822,12 +4856,13 @@
         "CandleUpsideGapTwoCrows",
         "ChaikinMoneyFlowOperator",
         "ChaikinVolatilityOperator",
+        "ChandeMomentumOscillator",
         "CloseToCloseSigmaOperator",
         "CommodityChannelIndex",
         "CrossOperator",
         "CrossoverOperator",
         "CrossunderOperator",
-        "CumulativeCountOperator",
+        "CumulativeCount",
         "CumulativeMaximum",
         "CumulativeMinimum",
         "CumulativeProduct",
@@ -4835,10 +4870,12 @@
         "CumulativeSumControlChartOperator",
         "DetrendedPriceOscillatorOperator",
         "DonchianOperator",
+        "DoubleExponentialMovingAverage",
         "DrawdownOperator",
         "EaseOfMovementOperator",
         "EntryExitOperator",
         "EqualHighsLowsOperator",
+        "EvenBetterSinewave",
         "EwmCorrOperator",
         "EwmCovOperator",
         "EwmStdOperator",
@@ -4847,6 +4884,7 @@
         "ExponentialMovingAverage",
         "FairValueGapOperator",
         "FallingOperator",
+        "FastStochasticOscillator",
         "FibonacciRetracement",
         "FisherTransformOperator",
         "ForceIndexOperator",
@@ -4870,9 +4908,12 @@
         "HurstOperator",
         "IchimokuOperator",
         "InsideBarOperator",
+        "IntradayMomentumIndex",
         "JurikMovingAverage",
         "KalmanHedgeRatioOperator",
+        "KaufmanAdaptiveMovingAverage",
         "KeltnerChannelsOperator",
+        "KlingerVolumeOscillator",
         "KnowSureThingOperator",
         "Lag",
         "LaguerreRelativeStrengthIndex",
@@ -4922,14 +4963,19 @@
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
         "OnBalanceVolume",
+        "OpeningRange",
         "OrderBlockOperator",
         "OrnsteinUhlenbeckHalfLifeOperator",
         "OutsideBarOperator",
+        "ParabolicMovingAverageStop",
         "ParkinsonOperator",
+        "PercentagePriceOscillator",
+        "PivotPoints",
         "PlusDirectionalIndicator",
         "PlusDirectionalMovement",
         "PositionHoldOperator",
         "PositiveVolumeIndexOperator",
+        "PremiumDiscount",
         "PreviousHighLowOperator",
         "RateOfChange",
         "RateOfChangePercent",
@@ -4943,13 +4989,16 @@
         "RollSpreadOperator",
         "RollingAlphaOperator",
         "RollingAutocorrOperator",
+        "RollingAverageDeviation",
         "RollingCalmarOperator",
         "RollingCovOperator",
         "RollingEntropyOperator",
         "RollingInformationRatioOperator",
         "RollingInterquartileRangeOperator",
         "RollingKurtosisOperator",
-        "RollingMedianOperator",
+        "RollingMedian",
+        "RollingMidpoint",
+        "RollingMidprice",
         "RollingModeOperator",
         "RollingPercentileOperator",
         "RollingQuantileOperator",
@@ -4957,31 +5006,27 @@
         "RollingSharpeOperator",
         "RollingSkewOperator",
         "RollingSortinoOperator",
+        "RollingStandardDeviation",
+        "RollingSum",
+        "RollingVariance",
         "RollingWinsorizeOperator",
         "RollingZScoreOperator",
         "SchaffTrendCycleOperator",
         "SessionExtremaOperator",
+        "SessionVolumeLevels",
         "SessionsOperator",
         "SignalDelayOperator",
         "SignedPowerOperator",
+        "SimpleMovingAverage",
+        "SmoothedTrendChannel",
         "SpreadZScoreOperator",
         "SqueezeOperator",
         "SqueezeProOperator",
         "StatefulAccbands",
-        "StatefulAdx",
         "StatefulAdxr",
-        "StatefulApo",
-        "StatefulAvgdev",
-        "StatefulBbands",
         "StatefulBeta",
-        "StatefulCmo",
         "StatefulCorrel",
-        "StatefulDema",
         "StatefulDx",
-        "StatefulEvenBetterSinewave",
-        "StatefulImi",
-        "StatefulKama",
-        "StatefulKlingerVolumeOscillator",
         "StatefulLinearreg",
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
@@ -4989,36 +5034,21 @@
         "StatefulMama",
         "StatefulMax",
         "StatefulMaxindex",
-        "StatefulMidpoint",
-        "StatefulMidprice",
         "StatefulMin",
         "StatefulMinindex",
         "StatefulMinmax",
         "StatefulMinmaxindex",
-        "StatefulOpeningRange",
-        "StatefulParabolicMovingAverageStop",
-        "StatefulPivotPoints",
-        "StatefulPpo",
-        "StatefulPremiumDiscount",
         "StatefulSar",
         "StatefulSarext",
-        "StatefulSessionVolumeLevels",
-        "StatefulSma",
-        "StatefulSmoothedTrendChannel",
-        "StatefulStddev",
-        "StatefulStoch",
-        "StatefulStochf",
-        "StatefulStochrsi",
-        "StatefulSum",
-        "StatefulT3",
-        "StatefulTema",
-        "StatefulTomDeMarkSequential",
-        "StatefulTrima",
         "StatefulTsf",
-        "StatefulVar",
-        "StatefulWma",
+        "StochasticOscillator",
+        "StochasticRelativeStrengthIndex",
         "SupertrendOperator",
         "SwingHighLowOperator",
+        "TomDeMarkSequential",
+        "TriangularMovingAverage",
+        "TripleExponentialAverage",
+        "TripleExponentialMovingAverage",
         "TripleExponentialRateOfChange",
         "TrueRange",
         "TrueStrengthIndexOperator",
@@ -5033,6 +5063,7 @@
         "VwapOperator",
         "VwmaOperator",
         "WeightedClose",
+        "WeightedMovingAverage",
         "WilliamsPercentR",
         "YangZhangOperator",
         "ZlemaOperator",

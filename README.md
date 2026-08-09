@@ -213,6 +213,10 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 
 ## Performance
 
+The performance figures below are the last committed benchmark artifact. Per the
+current normalization pass, no benchmark was rerun; correctness and lifecycle
+checks were rerun after every refactor.
+
 Measured 2026-08-09 on an Intel i7-10750H, Python 3.12, against TA-Lib 0.7.1,
 NumPy 2.4.6, and Polars 1.43.2 over identical contiguous arrays. **A stock portable build** — no
 `target-cpu=native`, no platform-specific flags — because that is what
@@ -280,9 +284,10 @@ Correctness is verified before performance is measured, on every run.
 
 - **Oracle verification** — every function is checked against TA-Lib, NumPy,
   pandas, pandas-ta-classic, Polars, or smartmoneyconcepts. Current status:
-  **287/287 externally checked**: 268 exact matches and 19 documented semantic
-  variants, with zero failures. The TA-Lib comparisons run at 100k bars; the
-  shared lifecycle gate also checks continuation and bitwise chunk invariance.
+  **287/287 primary checks passed** with zero failures. The supplementary
+  external-oracle run reports **200 matches, 38 documented variants, and zero
+  failures**; the shared lifecycle gate checks continuation and bitwise chunk
+  invariance.
 - Four functions — VAR, STDDEV, CORREL and BETA — reproduce TA-Lib
   **bitwise**, byte for byte at 1M bars, by replicating its exact accumulation
   order.

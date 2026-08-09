@@ -1,123 +1,23 @@
-"""Descriptive stateful interface for Stochastic RSI."""
+"""Persistent stochastic RSI adapter."""
 
-from taflow._native import StatefulStochrsi
 from typing import Any
-
 import numpy as np
+from ._native import StochasticRelativeStrengthIndex as _NativeStochasticRelativeStrengthIndex
+from ._series import as_float64_series
 
 
 class StochasticRelativeStrengthIndex:
-    """Incrementally compute aligned stochastic-RSI fast %K and fast %D
+    """Compute stochastic RSI fast %K and %D in native Rust state."""
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
+    def __init__(self, _input: Any, time_period: int = 14, fast_k_period: int = 5,
+                 fast_d_period: int = 3, fast_d_average_type: int = 0) -> None:
+        self._state = _NativeStochasticRelativeStrengthIndex(time_period, fast_k_period, fast_d_period, fast_d_average_type)
+        self.extend(_input)
 
-    Returns
-    -------
-    StochasticRelativeStrengthIndex
-        A persistent native-backed indicator adapter.
-    """
-
-    def __init__(
-        self,
-        _input: Any,
-        time_period: object = 14,
-        fast_k_period: object = 5,
-        fast_d_period: object = 3,
-        fast_d_average_type: object = 0,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        time_period : object
-            Input parameter or configuration value for this operation.
-        fast_k_period : object
-            Input parameter or configuration value for this operation.
-        fast_d_period : object
-            Input parameter or configuration value for this operation.
-        fast_d_average_type : object
-            Input parameter or configuration value for this operation.
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = StatefulStochrsi(
-            time_period,
-            fast_k_period,
-            fast_d_period,
-            fast_d_average_type,
-        )
-        if _input is not None:
-            self.extend(_input)
-
-    def append(self, _input: object) -> "StochasticRelativeStrengthIndex":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(_input)
-        return self
-
-    def extend(self, _input: object) -> "StochasticRelativeStrengthIndex":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(_input)
-        return self
-
-    def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
-        return self._state.compute()
-
+    def append(self, _input: float) -> "StochasticRelativeStrengthIndex": self._state.append(float(_input)); return self
+    def extend(self, _input: Any) -> "StochasticRelativeStrengthIndex": self._state.extend(as_float64_series(_input)); return self
+    def compute(self) -> tuple[np.ndarray, np.ndarray]: return self._state.compute()
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> "StochasticRelativeStrengthIndex":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
-
-    def __len__(self) -> int:
-        return len(self._state)
+    def value(self) -> tuple[float, float] | None: return self._state.value
+    def reset(self) -> "StochasticRelativeStrengthIndex": self._state.reset(); return self
+    def __len__(self) -> int: return len(self._state)

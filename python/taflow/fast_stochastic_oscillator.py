@@ -1,112 +1,29 @@
-"""Descriptive stateful interface for the Fast Stochastic Oscillator."""
+"""Persistent fast stochastic oscillator adapter."""
 
-from taflow._native import StatefulStochf
 from typing import Any
 
 import numpy as np
 
+from ._native import FastStochasticOscillator as _NativeFastStochasticOscillator
+from ._series import as_float64_series
+
 
 class FastStochasticOscillator:
-    """Incrementally compute aligned fast %K and fast %D
+    """Compute fast %K and %D from aligned high, low, and close series."""
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
+    def __init__(self, high: Any, low: Any, close: Any, fast_k_period: int = 5,
+                 fast_d_period: int = 3, fast_d_average_type: int = 0) -> None:
+        self._state = _NativeFastStochasticOscillator(fast_k_period, fast_d_period, fast_d_average_type)
+        self.extend(high, low, close)
 
-    Returns
-    -------
-    FastStochasticOscillator
-        A persistent native-backed indicator adapter.
-    """
+    def append(self, high: float, low: float, close: float) -> "FastStochasticOscillator":
+        self._state.append(float(high), float(low), float(close)); return self
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        close: Any,
-        fast_k_period: int = 5,
-        fast_d_period: int = 3,
-        fast_d_average_type: int = 0,
-    ) -> None:
-        """Create fast stochastic with optional aligned OHLC history."""
-        self._state = StatefulStochf(
-            fast_k_period,
-            fast_d_period,
-            fast_d_average_type,
-        )
-        if any(value is not None for value in (high, low, close)):
-            self.extend(high, low, close)
+    def extend(self, high: Any, low: Any, close: Any) -> "FastStochasticOscillator":
+        self._state.extend(as_float64_series(high), as_float64_series(low), as_float64_series(close)); return self
 
-    def append(self, high: object, low: object, close: object) -> "FastStochasticOscillator":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(high, low, close)
-        return self
-
-    def extend(self, high: object, low: object, close: object) -> "FastStochasticOscillator":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(high, low, close)
-        return self
-
-    def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
-        return self._state.compute()
-
+    def compute(self) -> tuple[np.ndarray, np.ndarray]: return self._state.compute()
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        return self._state.value
-
-    def reset(self) -> "FastStochasticOscillator":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.reset()
-        return self
-
-    def __len__(self) -> int:
-        return len(self._state)
+    def value(self) -> tuple[float, float] | None: return self._state.value
+    def reset(self) -> "FastStochasticOscillator": self._state.reset(); return self
+    def __len__(self) -> int: return len(self._state)

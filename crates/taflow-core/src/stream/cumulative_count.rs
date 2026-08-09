@@ -1,10 +1,4 @@
-//! Causal cumulative observation count.
-
-/// Return the one-based cumulative count aligned with the input series.
-pub fn cumulative_count(input: &[f64]) -> Vec<f64> {
-    let mut state = CumulativeCount::new();
-    input.iter().map(|&value| state.append(value)).collect()
-}
+use super::StreamingIndicator;
 
 /// Persistent one-based count of processed observations.
 #[derive(Debug, Clone, Default)]
@@ -27,6 +21,12 @@ impl CumulativeCount {
         value
     }
 
+    /// Extends the state with an aligned slice.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        output.extend(input.iter().map(|&value| self.append(value)));
+    }
+
     /// Return the latest cumulative count.
     pub fn value(&self) -> Option<f64> {
         self.value
@@ -39,19 +39,22 @@ impl CumulativeCount {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl StreamingIndicator for CumulativeCount {
+    type Output = f64;
 
-    #[test]
-    fn batch_stream_and_reset_match() {
-        let input = [4.0, f64::NAN, 9.0];
-        assert_eq!(cumulative_count(&input), vec![1.0, 2.0, 3.0]);
-        let mut state = CumulativeCount::new();
-        assert_eq!(state.append(4.0), 1.0);
-        assert_eq!(state.append(f64::NAN), 2.0);
-        state.reset();
-        assert_eq!(state.value(), None);
-        assert_eq!(state.append(9.0), 1.0);
+    fn append(&mut self, input: f64) -> Option<f64> {
+        Some(Self::append(self, input))
+    }
+
+    fn value(&self) -> Option<f64> {
+        Self::value(self)
+    }
+
+    fn reset(&mut self) {
+        Self::reset(self);
+    }
+
+    fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        Self::extend_slice_into(self, input, output);
     }
 }
