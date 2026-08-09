@@ -288,9 +288,9 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::MathSubtract>()?;
     m.add_class::<state_api::MathMultiply>()?;
     m.add_class::<state_api::MathDivide>()?;
-    m.add_class::<state_api::StatefulAtr>()?;
-    m.add_class::<state_api::StatefulTrange>()?;
-    m.add_class::<state_api::StatefulNatr>()?;
+    m.add_class::<state_api::AverageTrueRange>()?;
+    m.add_class::<state_api::TrueRange>()?;
+    m.add_class::<state_api::NormalizedAverageTrueRange>()?;
     m.add_class::<state_api::StatefulMacd>()?;
     m.add_class::<state_api::StatefulMacdExt>()?;
     m.add_class::<state_api::VariablePeriodMovingAverage>()?;

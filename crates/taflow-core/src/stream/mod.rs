@@ -538,16 +538,16 @@ pub use window::Window;
 pub(crate) use wma::weighted_moving_average;
 pub use wma::WeightedMovingAverage;
 
-mod true_range;
-#[allow(unused_imports)]
-pub(crate) use true_range::true_range;
 mod average_true_range;
-#[allow(unused_imports)]
-pub(crate) use average_true_range::average_true_range;
-mod normalized_average_true_range;
-#[allow(unused_imports)]
-pub(crate) use normalized_average_true_range::normalized_average_true_range;
+#[cfg(test)]
+mod average_true_range_test;
 mod math_add;
+mod normalized_average_true_range;
+#[cfg(test)]
+mod normalized_average_true_range_test;
+mod true_range;
+#[cfg(test)]
+mod true_range_test;
 pub use math_add::MathAdd;
 #[cfg(test)]
 mod math_add_test;
@@ -1012,22 +1012,11 @@ mod tests {
         let close: Vec<f64> = (0..90)
             .map(|i| 100.0 + (i as f64 * 0.21).cos() * 4.0 + i as f64 * 0.1)
             .collect();
-        let high: Vec<f64> = close.iter().map(|v| v + 1.5).collect();
-        let low: Vec<f64> = close.iter().map(|v| v - 1.0).collect();
-        let atr_batch = average_true_range(&high, &low, &close, 14).unwrap();
-        let trange_batch = true_range(&high, &low, &close).unwrap();
-        let natr_batch = normalized_average_true_range(&high, &low, &close, 14).unwrap();
         let (macd_batch, signal_batch, histogram_batch) =
             crate::stream::moving_average_convergence_divergence(&close, 12, 26, 9).unwrap();
-        let mut atr = AverageTrueRange::new(14).unwrap();
-        let mut trange = TrueRange::new();
-        let mut natr = NormalizedAverageTrueRange::new(14).unwrap();
         let mut macd = MovingAverageConvergenceDivergence::new(12, 26, 9).unwrap();
 
         for i in 0..close.len() {
-            assert_optional_eq(atr.append(high[i], low[i], close[i]), atr_batch[i]);
-            assert_optional_eq(trange.append(high[i], low[i], close[i]), trange_batch[i]);
-            assert_optional_eq(natr.append(high[i], low[i], close[i]), natr_batch[i]);
             let actual = macd.append(close[i]);
             if macd_batch[i].is_nan() {
                 assert_eq!(actual, None);

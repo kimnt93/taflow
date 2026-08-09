@@ -152,7 +152,7 @@ Correctness uses the highest-priority available external oracle in [../verify/SO
 | `Squeeze` | — | bb_length=20, bb_std=2.0, kc_length=20, kc_scalar=1.5, mom_length=12, mom_smooth=6 | `(high, low, close, bb_length, bb_std, kc_length, kc_scalar, mom_length, mom_smooth)` |
 | `SqueezePro` | — | bb_length=20, bb_std=2.0, kc_length=20, kc_scalar_wide=2.0, kc_scalar_normal=1.5, kc_scalar_narrow=1.0, mom_length=12, mom_smooth=6 | `(high, low, close, bb_length, bb_std, kc_length, kc_scalar_wide, kc_scalar_normal, kc_scalar_narrow, mom_length, mom_smooth)` |
 | `Supertrend` | — | timeperiod=7, multiplier=3.0 | `(high, low, close, timeperiod, multiplier)` |
-| `TrueRange` | TRANGE | timeperiod=14 | `(high, low, close, timeperiod)` |
+| `TrueRange` | TRANGE | — | `(high, low, close)` |
 | `UlcerIndex` | — | timeperiod=14 | `(_input, timeperiod)` |
 | `YangZhang` | — | timeperiod=20 | `(_open, high, low, close, timeperiod)` |
 

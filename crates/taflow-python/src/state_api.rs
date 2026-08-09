@@ -5,19 +5,20 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use taflow::stream::{
     self, AnchoredVolumeWeightedAveragePrice, AverageDirectionalIndex,
-    AverageDirectionalIndexRating, AverageTrueRange, CommodityChannelIndex,
+    AverageDirectionalIndexRating, AverageTrueRange as CoreAverageTrueRange, CommodityChannelIndex,
     DirectionalMovementIndex, DoubleExponentialMovingAverage, EvenBetterSinewave,
     ExponentialMovingAverage, FastStochasticOscillator, FibonacciRetracement, HeikinAshi,
     HilbertTransformTrendline, IntradayMomentumIndex, JurikMovingAverage, KlingerVolumeOscillator,
     LaguerreRelativeStrengthIndex, MesaAdaptiveMovingAverage, Momentum,
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended,
-    MovingAverageConvergenceDivergenceFixed, NormalizedAverageTrueRange, OpeningRange,
+    MovingAverageConvergenceDivergenceFixed,
+    NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange,
     ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange, RateOfChangePercent,
     RateOfChangeRatio, RateOfChangeRatioPercent, RelativeMomentumIndex, RelativeStrengthIndex,
     RollingMidpoint, RollingMidprice, SessionVolumeLevels, SimpleMovingAverage,
     SmoothedTrendChannel, StochasticOscillator, StochasticRelativeStrengthIndex,
     StreamingIndicator, TomDeMarkSequential, TriangularMovingAverage,
-    TripleExponentialMovingAverage, TrueRange, VariableIndexDynamicAverage,
+    TripleExponentialMovingAverage, TrueRange as CoreTrueRange, VariableIndexDynamicAverage,
     VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage, WeightedMovingAverage,
 };
 use taflow::MaType;
@@ -3135,18 +3136,18 @@ impl StatefulRsi {
 }
 
 #[pyclass]
-pub struct StatefulAtr {
-    inner: AverageTrueRange,
+pub struct AverageTrueRange {
+    inner: CoreAverageTrueRange,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulAtr {
+impl AverageTrueRange {
     #[new]
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: AverageTrueRange::new(timeperiod).map_err(py_value_error)?,
+            inner: CoreAverageTrueRange::new(timeperiod).map_err(py_value_error)?,
             outputs: Vec::new(),
         })
     }
@@ -3165,22 +3166,11 @@ impl StatefulAtr {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
-        if high.len() != low.len() || high.len() != close.len() {
-            return Err(PyValueError::new_err(
-                "high, low, and close must have equal lengths",
-            ));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            extend_from_options(
-                outputs,
-                high.iter()
-                    .zip(low.iter())
-                    .zip(close.iter())
-                    .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(high, low, close, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]
@@ -3203,19 +3193,19 @@ impl StatefulAtr {
 }
 
 #[pyclass]
-pub struct StatefulTrange {
-    inner: TrueRange,
+pub struct TrueRange {
+    inner: CoreTrueRange,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulTrange {
+impl TrueRange {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: TrueRange::new(),
+    fn new() -> PyResult<Self> {
+        Ok(Self {
+            inner: CoreTrueRange::new().map_err(py_value_error)?,
             outputs: Vec::new(),
-        }
+        })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
@@ -3232,22 +3222,11 @@ impl StatefulTrange {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
-        if high.len() != low.len() || high.len() != close.len() {
-            return Err(PyValueError::new_err(
-                "high, low, and close must have equal lengths",
-            ));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            extend_from_options(
-                outputs,
-                high.iter()
-                    .zip(low)
-                    .zip(close)
-                    .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(high, low, close, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]
@@ -3269,18 +3248,18 @@ impl StatefulTrange {
 }
 
 #[pyclass]
-pub struct StatefulNatr {
-    inner: NormalizedAverageTrueRange,
+pub struct NormalizedAverageTrueRange {
+    inner: CoreNormalizedAverageTrueRange,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulNatr {
+impl NormalizedAverageTrueRange {
     #[new]
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: NormalizedAverageTrueRange::new(timeperiod).map_err(py_value_error)?,
+            inner: CoreNormalizedAverageTrueRange::new(timeperiod).map_err(py_value_error)?,
             outputs: Vec::new(),
         })
     }
@@ -3299,22 +3278,11 @@ impl StatefulNatr {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
-        if high.len() != low.len() || high.len() != close.len() {
-            return Err(PyValueError::new_err(
-                "high, low, and close must have equal lengths",
-            ));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            extend_from_options(
-                outputs,
-                high.iter()
-                    .zip(low)
-                    .zip(close)
-                    .map(|((&high, &low), &close)| self.inner.append(high, low, close)),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(high, low, close, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]

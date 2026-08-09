@@ -1,97 +1,78 @@
-//! Batch implementation for `normalized_average_true_range`.
+//! Persistent Normalized Average True Range state.
 
+use super::AverageTrueRange;
 use crate::error::{TaError, TaResult};
 
-/// Compute the normalized average true range result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn normalized_average_true_range(
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-    timeperiod: usize,
-) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() {
-        return Err(crate::TaError::LengthMismatch {
-            expected: high.len(),
-            got: low.len().min(close.len()),
-        });
-    }
-    let mut state = NormalizedAverageTrueRange::new(timeperiod)?;
-    Ok(high
-        .iter()
-        .zip(low)
-        .zip(close)
-        .map(|((high, low), close)| state.append(*high, *low, *close).unwrap_or(f64::NAN))
-        .collect())
-}
-use super::*;
-
-/// Stateful normalized ATR, matching `NATR = ATR / close * 100`.
+/// Scale Average True Range by the current close as a percentage.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `NormalizedAverageTrueRange`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct NormalizedAverageTrueRange {
-    atr: AverageTrueRange,
+    average_true_range: AverageTrueRange,
+    normalize: bool,
     value: Option<f64>,
 }
 
 impl NormalizedAverageTrueRange {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Create a normalized state with a positive Average True Range period.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
-            atr: AverageTrueRange::new(period)?,
+            average_true_range: AverageTrueRange::new(period)?,
+            normalize: period > 1,
             value: None,
         })
     }
 
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append one chronological high/low/close tuple.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.value = self.atr.append(high, low, close).map(|atr| {
-            if close == 0.0 {
-                0.0
-            } else {
-                atr / close * 100.0
-            }
-        });
+        self.value = self
+            .average_true_range
+            .append(high, low, close)
+            .map(|average_true_range| {
+                if !self.normalize {
+                    average_true_range
+                } else if close == 0.0 {
+                    0.0
+                } else {
+                    average_true_range / close * 100.0
+                }
+            });
         self.value
     }
 
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append aligned slices in scalar replay order with NaN warm-up.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let len = high.len();
+        for actual in [low.len(), close.len()] {
+            if actual != len {
+                return Err(TaError::LengthMismatch {
+                    expected: len,
+                    got: actual,
+                });
+            }
+        }
+        output.reserve(len);
+        for index in 0..len {
+            output.push(
+                self.append(high[index], low[index], close[index])
+                    .unwrap_or(f64::NAN),
+            );
+        }
+        Ok(())
+    }
+
+    /// Return the latest result, or `None` during warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Restore fresh-state behavior without reallocating.
     pub fn reset(&mut self) {
-        self.atr.reset();
+        self.average_true_range.reset();
         self.value = None;
     }
 }

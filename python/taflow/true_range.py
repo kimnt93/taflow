@@ -1,37 +1,51 @@
-"""Canonical True Range adapter."""
+"""Persistent True Range adapter."""
+
 from typing import Any
 
-from ._native import StatefulTrange
-from ._ohlc_state import OhlcStateAdapter
+import numpy as np
+
+from ._native import TrueRange as _NativeTrueRange
+from ._series import as_float64_series
 
 
-class TrueRange(OhlcStateAdapter):
-    """Compute true range from high, low, and previous close values
+class TrueRange:
+    """Compute max(high-low, |high-prev close|, |low-prev close|) in Rust.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    TrueRange
-        A persistent native-backed indicator adapter.
+    High, low, and close histories are required; pass three empty arrays for a
+    fresh state. The first output is NaN because no previous close exists. This
+    maps to TA-Lib ``TRANGE``.
     """
 
-    _native_cls = StatefulTrange
-    _period_required = False
+    def __init__(self, high: Any, low: Any, close: Any) -> None:
+        self._state = _NativeTrueRange()
+        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "TrueRange":
-        """Append one observation and return this indicator."""
-        super().append(high, low, close)
+        """Append one high/low/close tuple and return this indicator."""
+        self._state.append(float(high), float(low), float(close))
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "TrueRange":
-        """Append aligned histories and return this indicator."""
-        super().extend(high, low, close)
+        """Append aligned high, low, and close histories and return this indicator."""
+        self._state.extend(
+            as_float64_series(high), as_float64_series(low), as_float64_series(close)
+        )
         return self
 
+    def compute(self) -> np.ndarray:
+        """Return the aligned float64 history with first-bar NaN warm-up."""
+        return self._state.compute()
+
+    @property
+    def value(self) -> float | None:
+        """Return the latest value, or ``None`` before two bars are present."""
+        return self._state.value
+
     def reset(self) -> "TrueRange":
-        """Reset native state and return this indicator."""
-        super().reset()
+        """Restore fresh native state, clear history, and return this indicator."""
+        self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed tuples."""
+        return len(self._state)

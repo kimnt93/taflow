@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 184,
-    "complete": 46,
+    "complete": 49,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 602,
     "smc_functions": 8,
-    "structure": 46,
+    "structure": 49,
     "talib_functions": 161
   },
   "rows": [
@@ -818,7 +818,8 @@
       "name": "AverageTrueRange",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAtr"
+        "AverageTrueRange",
+        "_NativeAverageTrueRange"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -874,7 +875,8 @@
       "name": "NormalizedAverageTrueRange",
       "native_binding": true,
       "native_symbols": [
-        "StatefulNatr"
+        "NormalizedAverageTrueRange",
+        "_NativeNormalizedAverageTrueRange"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -888,7 +890,8 @@
       "name": "TrueRange",
       "native_binding": true,
       "native_symbols": [
-        "StatefulTrange"
+        "TrueRange",
+        "_NativeTrueRange"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4426,6 +4429,7 @@
         "AroonOscillator",
         "AverageDailyDollarValueOperator",
         "AveragePrice",
+        "AverageTrueRange",
         "AwesomeOscillatorOperator",
         "BalanceOfPower",
         "BarsSinceOperator",
@@ -4581,6 +4585,7 @@
         "MinusDirectionalMovement",
         "MoneyFlowIndex",
         "NegativeVolumeIndexOperator",
+        "NormalizedAverageTrueRange",
         "OnBalanceVolume",
         "OrderBlockOperator",
         "OrnsteinUhlenbeckHalfLifeOperator",
@@ -4626,7 +4631,6 @@
         "StatefulAdxr",
         "StatefulAnchoredVolumeWeightedAveragePrice",
         "StatefulApo",
-        "StatefulAtr",
         "StatefulAvgdev",
         "StatefulBbands",
         "StatefulBeta",
@@ -4661,7 +4665,6 @@
         "StatefulMinmax",
         "StatefulMinmaxindex",
         "StatefulMom",
-        "StatefulNatr",
         "StatefulOpeningRange",
         "StatefulParabolicMovingAverageStop",
         "StatefulPivotPoints",
@@ -4686,7 +4689,6 @@
         "StatefulT3",
         "StatefulTema",
         "StatefulTomDeMarkSequential",
-        "StatefulTrange",
         "StatefulTrima",
         "StatefulTsf",
         "StatefulVar",
@@ -4695,6 +4697,7 @@
         "SupertrendOperator",
         "SwingHighLowOperator",
         "TripleExponentialRateOfChange",
+        "TrueRange",
         "TrueStrengthIndexOperator",
         "TypicalPrice",
         "UlcerIndexOperator",
@@ -4732,6 +4735,7 @@
         "AroonOscillator",
         "AverageDailyDollarValueOperator",
         "AveragePrice",
+        "AverageTrueRange",
         "AwesomeOscillatorOperator",
         "BalanceOfPower",
         "BarsSinceOperator",
@@ -4887,6 +4891,7 @@
         "MinusDirectionalMovement",
         "MoneyFlowIndex",
         "NegativeVolumeIndexOperator",
+        "NormalizedAverageTrueRange",
         "OnBalanceVolume",
         "OrderBlockOperator",
         "OrnsteinUhlenbeckHalfLifeOperator",
@@ -4932,7 +4937,6 @@
         "StatefulAdxr",
         "StatefulAnchoredVolumeWeightedAveragePrice",
         "StatefulApo",
-        "StatefulAtr",
         "StatefulAvgdev",
         "StatefulBbands",
         "StatefulBeta",
@@ -4967,7 +4971,6 @@
         "StatefulMinmax",
         "StatefulMinmaxindex",
         "StatefulMom",
-        "StatefulNatr",
         "StatefulOpeningRange",
         "StatefulParabolicMovingAverageStop",
         "StatefulPivotPoints",
@@ -4992,7 +4995,6 @@
         "StatefulT3",
         "StatefulTema",
         "StatefulTomDeMarkSequential",
-        "StatefulTrange",
         "StatefulTrima",
         "StatefulTsf",
         "StatefulVar",
@@ -5001,6 +5003,7 @@
         "SupertrendOperator",
         "SwingHighLowOperator",
         "TripleExponentialRateOfChange",
+        "TrueRange",
         "TrueStrengthIndexOperator",
         "TypicalPrice",
         "UlcerIndexOperator",

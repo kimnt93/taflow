@@ -115,61 +115,6 @@ pub fn slice_min_with_index(data: &[f64]) -> (f64, usize) {
     (best, best_idx)
 }
 
-/// True Range: output[i] = max(h-l, |h-prev_close|, |l-prev_close|)
-/// for i in [start..len). `start` must be >= 1.
-#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
-pub fn true_range_simd(high: &[f64], low: &[f64], close: &[f64], output: &mut [f64], start: usize) {
-    let len = high.len();
-    for i in start..len {
-        let h = high[i];
-        let l = low[i];
-        let pc = close[i - 1];
-        let hl = h - l;
-        let hc = (h - pc).abs();
-        let lc = (l - pc).abs();
-        output[i] = hl.max(hc).max(lc);
-    }
-}
-
-/// Balance of Power: output[i] = (close-open)/(high-low), 0 when range <= 0.
-#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
-pub fn bop_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64], output: &mut [f64]) {
-    for i in 0..open.len() {
-        let range = high[i] - low[i];
-        output[i] = if range > 0.0 {
-            (close[i] - open[i]) / range
-        } else {
-            0.0
-        };
-    }
-}
-
-#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
-pub fn avgprice_simd(open: &[f64], high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    (0..open.len())
-        .map(|i| (open[i] + high[i] + low[i] + close[i]) / 4.0)
-        .collect()
-}
-
-#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
-pub fn medprice_simd(high: &[f64], low: &[f64]) -> Vec<f64> {
-    (0..high.len()).map(|i| (high[i] + low[i]) / 2.0).collect()
-}
-
-#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
-pub fn typprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    (0..high.len())
-        .map(|i| (high[i] + low[i] + close[i]) / 3.0)
-        .collect()
-}
-
-#[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
-pub fn wclprice_simd(high: &[f64], low: &[f64], close: &[f64]) -> Vec<f64> {
-    (0..high.len())
-        .map(|i| (high[i] + low[i] + 2.0 * close[i]) / 4.0)
-        .collect()
-}
-
 /// Offset subtraction: output[i] = input[i] - input[i-offset] for i in
 /// [offset..len). output[0..offset] is left untouched (caller sets NaN).
 #[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]

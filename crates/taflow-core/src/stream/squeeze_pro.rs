@@ -100,7 +100,7 @@ mod tests {
                 bb_dev: RollingStandardDeviation::new(bb_length, 1.0).unwrap(),
                 kc_basis: SimpleMovingAverage::new(kc_length).unwrap(),
                 tr_band: ReferenceTrBand::new(kc_length),
-                trange: TrueRange::new(),
+                trange: TrueRange::default(),
                 close_window: Window::new(mom_length).unwrap(),
                 mom_smooth_sma: SimpleMovingAverage::new(mom_smooth).unwrap(),
             }
@@ -312,7 +312,7 @@ impl SqueezePro {
                 .then(|| SimpleMovingAverage::new(kc_length))
                 .transpose()?,
             tr_band: SqueezeTrBand::new(kc_length)?,
-            trange: TrueRange::new(),
+            trange: TrueRange::default(),
             close_window: Window::new(mom_length)?,
             mom_smooth_sma: SimpleMovingAverage::new(mom_smooth)?,
             value: None,
