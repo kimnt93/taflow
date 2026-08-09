@@ -1,19 +1,22 @@
-"""Persistent causal rolling covariance operator."""
+"""Native-backed causal rolling covariance adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import RollingCovarianceOperator as _Native
 from ._series import as_float64_series
 
 
 class RollingCovariance:
-    """Population covariance over two required aligned trailing series.
+    """Compute population covariance over two aligned trailing series.
 
-    ``timeperiod`` defaults to 14. The first ``timeperiod - 1`` aligned
-    outputs are ``NaN``; ``append``, ``extend``, and ``reset`` mutate and
-    return this adapter, while ``value`` exposes the latest scalar result.
-    TAFlow's ``RollingCovariance`` is compared with pandas rolling covariance
-    using ``ddof=0``.
+    ``left`` and ``right`` are required equal-length chronological series and
+    may both be empty for a fresh stream. ``timeperiod`` defaults to 14; the
+    first ``timeperiod - 1`` outputs are NaN. ``compute`` returns one aligned
+    float array, ``value`` is the latest scalar or ``None`` during warm-up,
+    and lifecycle mutators return ``self``. The oracle is pandas rolling
+    covariance with ``ddof=0``.
     """
 
     def __init__(
@@ -36,7 +39,7 @@ class RollingCovariance:
         None
             The constructor initializes the native state and returns no value.
         """
-        self._state = _Native(timeperiod)
+        self._state = _Native(int(timeperiod))
         self._length = 0
         self.extend(left, right)
 
@@ -47,7 +50,7 @@ class RollingCovariance:
         return self
 
     def extend(self, left: Any, right: Any) -> "RollingCovariance":
-        """Append equal-length aligned ``left`` and ``right`` histories."""
+        """Append equal-length aligned histories and return this adapter."""
         left_array = as_float64_series(left)
         right_array = as_float64_series(right)
         if len(left_array) != len(right_array):
@@ -57,7 +60,7 @@ class RollingCovariance:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned population-covariance history as ``np.ndarray``."""
+        """Return the aligned population-covariance history."""
         return self._state.compute()
 
     @property

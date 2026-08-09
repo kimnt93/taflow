@@ -1,17 +1,23 @@
-"""Persistent causal rolling winsorization operator."""
+"""Native-backed causal rolling-winsorization adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import RollingWinsorizeOperator as _Native
 from ._series import as_float64_series
 
 
 class RollingWinsorize:
-    """Clip each value to lower and upper quantiles of a trailing window.
+    """Clip each latest value to trailing lower and upper quantiles.
 
-    ``timeperiod`` defaults to 14 and bounds default to 0.05 and 0.95. The
-    first ``timeperiod - 1`` outputs are ``NaN``; lifecycle methods are fluent
-    and all arithmetic remains in the native Rust state.
+    ``_input`` is the required chronological series and may be empty for a
+    fresh stream. ``timeperiod`` defaults to 14; ``lower`` and ``upper``
+    default to 0.05 and 0.95 and must satisfy ``0 <= lower <= upper <= 1``.
+    The first ``timeperiod - 1`` outputs are NaN. ``compute`` returns one
+    aligned float array, ``value`` is the latest clipped value or ``None``
+    during warm-up, and lifecycle mutators return ``self``. The oracle is
+    pandas rolling quantile plus ``numpy.clip``.
     """
 
     def __init__(
@@ -37,7 +43,7 @@ class RollingWinsorize:
         None
             The constructor initializes native state and returns no value.
         """
-        self._state = _Native(timeperiod, lower, upper)
+        self._state = _Native(int(timeperiod), float(lower), float(upper))
         self._length = 0
         self.extend(_input)
 
@@ -48,14 +54,14 @@ class RollingWinsorize:
         return self
 
     def extend(self, _input: Any) -> "RollingWinsorize":
-        """Append an input history and return this adapter."""
+        """Append a chronological input history and return this adapter."""
         values = as_float64_series(_input)
         self._state.extend(values)
         self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned winsorized history as ``np.ndarray``."""
+        """Return the aligned winsorized history."""
         return self._state.compute()
 
     @property
