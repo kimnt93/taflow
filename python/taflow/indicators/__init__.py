@@ -146,6 +146,16 @@ from .average_price import AveragePrice
 from .average_true_range import AverageTrueRange
 from .true_range import TrueRange
 from .normalized_average_true_range import NormalizedAverageTrueRange
+from .median_price import MedianPrice
+from .typical_price import TypicalPrice
+from .weighted_close import WeightedClose
+from .rolling_beta import RollingBeta
+from .rolling_correlation import RollingCorrelation
+from .rolling_linear_regression import RollingLinearRegression
+from .rolling_linear_regression_angle import RollingLinearRegressionAngle
+from .rolling_linear_regression_intercept import RollingLinearRegressionIntercept
+from .rolling_linear_regression_slope import RollingLinearRegressionSlope
+from .rolling_time_series_forecast import RollingTimeSeriesForecast
 from ..donchian import Donchian
 from ..ulcer_index import UlcerIndex
 from ..keltner_channels import KeltnerChannels
@@ -163,11 +173,8 @@ from ..math_transform import (
     MathAdd, MathSubtract, MathMultiply, MathDivide,
 )
 from ..statistics import (
-    MesaAdaptiveMovingAverage, RollingAverageDeviation, RollingBeta,
-    RollingCorrelation, RollingLinearRegression, RollingLinearRegressionAngle,
-    RollingLinearRegressionIntercept, RollingLinearRegressionSlope,
-    RollingMidpoint, RollingMidprice, RollingStandardDeviation,
-    RollingTimeSeriesForecast, RollingVariance,
+    MesaAdaptiveMovingAverage, RollingAverageDeviation, RollingMidpoint,
+    RollingMidprice, RollingStandardDeviation, RollingVariance,
     RollingMinMax, RollingMinMaxIndex,
 )
 from ..decay_linear import DecayLinear
@@ -237,6 +244,16 @@ __all__ = [
     "AverageTrueRange",
     "TrueRange",
     "NormalizedAverageTrueRange",
+    "MedianPrice",
+    "TypicalPrice",
+    "WeightedClose",
+    "RollingBeta",
+    "RollingCorrelation",
+    "RollingLinearRegression",
+    "RollingLinearRegressionAngle",
+    "RollingLinearRegressionIntercept",
+    "RollingLinearRegressionSlope",
+    "RollingTimeSeriesForecast",
     "ExponentialMovingAverage",
     "CandleDoji",
     "CandleTakuri",

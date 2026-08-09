@@ -1,6 +1,6 @@
-use super::regression::RegressionCore;
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::regression::RegressionCore;
+use crate::stream::StreamingIndicator;
 
 #[derive(Debug, Clone)]
 pub struct RollingTimeSeriesForecast {

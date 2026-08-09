@@ -85,23 +85,6 @@ scalar_state_class!(StatefulMax, stream::RollingMax, 30);
 scalar_state_class!(StatefulMaxindex, stream::RollingArgmax, 30);
 scalar_state_class!(StatefulMin, stream::RollingMin, 30);
 scalar_state_class!(StatefulMinindex, stream::RollingArgmin, 30);
-scalar_state_class!(StatefulLinearreg, stream::RollingLinearRegression, 14);
-scalar_state_class!(
-    StatefulLinearregSlope,
-    stream::RollingLinearRegressionSlope,
-    14
-);
-scalar_state_class!(
-    StatefulLinearregIntercept,
-    stream::RollingLinearRegressionIntercept,
-    14
-);
-scalar_state_class!(
-    StatefulLinearregAngle,
-    stream::RollingLinearRegressionAngle,
-    14
-);
-scalar_state_class!(StatefulTsf, stream::RollingTimeSeriesForecast, 14);
 
 macro_rules! deviation_state_class {
     ($class:ident, $inner:ident) => {
@@ -214,9 +197,6 @@ macro_rules! bivariate_statistic_class {
         }
     };
 }
-
-bivariate_statistic_class!(StatefulBeta, RollingBeta);
-bivariate_statistic_class!(StatefulCorrel, RollingCorrelation);
 
 macro_rules! unary_state_class {
     ($class:ident) => {
@@ -422,8 +402,6 @@ macro_rules! binary_state_class {
     };
 }
 
-binary_state_class!(MedianPrice);
-
 macro_rules! price3_state_class {
     ($class:ident) => {
         #[pyclass]
@@ -485,6 +463,3 @@ macro_rules! price3_state_class {
         }
     };
 }
-
-price3_state_class!(TypicalPrice);
-price3_state_class!(WeightedClose);

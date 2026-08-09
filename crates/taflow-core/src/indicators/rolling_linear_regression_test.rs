@@ -1,9 +1,9 @@
-use super::rolling_linear_regression_angle::RollingLinearRegressionAngle;
-use super::StreamingIndicator;
+use super::rolling_linear_regression::RollingLinearRegression;
+use crate::stream::StreamingIndicator;
 
 #[test]
 fn lifecycle_and_reset_are_causal() {
-    let mut state = RollingLinearRegressionAngle::new(3).unwrap();
+    let mut state = RollingLinearRegression::new(3).unwrap();
     assert!(state.append(1.0).is_none());
     assert!(state.append(2.0).is_none());
     assert!(state.append(3.0).is_some());

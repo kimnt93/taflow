@@ -5,9 +5,9 @@ use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator, Window};
 
 #[cfg(test)]
-use crate::stream::{
-    RollingAverageDeviation, RollingBeta, RollingCorrelation, RollingStandardDeviation,
-    RollingVariance,
+use crate::{
+    indicators::{RollingBeta, RollingCorrelation},
+    stream::{RollingAverageDeviation, RollingStandardDeviation, RollingVariance},
 };
 
 /// TA-Lib's `TA_STDDEV` collapses a variance below this threshold to zero
@@ -156,18 +156,18 @@ impl RollingMoments {
 
 /// TA-Lib rejects a correlation window when the variance product falls below
 /// this threshold (`TA_CORREL`); replicated verbatim.
-pub(super) const CORREL_DENOMINATOR_EPSILON: f64 = 0.00000000000001;
+pub(crate) const CORREL_DENOMINATOR_EPSILON: f64 = 0.00000000000001;
 
 /// TA-Lib's `TA_IS_ZERO` macro, used verbatim by `TA_BETA` for both the
 /// previous-price divisor and the regression denominator.
 #[inline]
-pub(super) fn ta_is_zero(value: f64) -> bool {
+pub(crate) fn ta_is_zero(value: f64) -> bool {
     (-0.00000001 < value) && (value < 0.00000001)
 }
 
 /// TA-Lib's `TA_BETA` percentage return, including its zero-price guard.
 #[inline]
-pub(super) fn beta_return(current: f64, previous: f64) -> f64 {
+pub(crate) fn beta_return(current: f64, previous: f64) -> f64 {
     if !ta_is_zero(previous) {
         (current - previous) / previous
     } else {

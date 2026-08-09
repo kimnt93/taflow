@@ -1,9 +1,8 @@
 //! Stateful implementation for `rolling_correlation`.
 
-use super::rolling_statistics::CORREL_DENOMINATOR_EPSILON;
-use super::rolling_statistics::*;
-use super::*;
 use crate::error::{TaError, TaResult};
+use crate::stream::rolling_statistics::CORREL_DENOMINATOR_EPSILON;
+use crate::stream::rolling_statistics::*;
 
 /// Stateful Pearson correlation over paired observations.
 #[derive(Debug, Clone)]

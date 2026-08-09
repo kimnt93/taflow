@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._native import MedianPrice as _NativeMedianPrice
-from ._price_state import HlPriceState
+from .._native import MedianPrice as _NativeMedianPrice
+from .._price_state import HlPriceState
 
 
 class MedianPrice(HlPriceState):

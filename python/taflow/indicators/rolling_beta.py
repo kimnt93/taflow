@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._bivariate_state import BivariateState
-from ._native import StatefulBeta
+from .._bivariate_state import BivariateState
+from .._native import RollingBeta as _NativeRollingBeta
 
 
 class RollingBeta(BivariateState):
@@ -12,7 +12,7 @@ class RollingBeta(BivariateState):
     ``timeperiod`` defaults to 5; history is NaN until warm-up completes.
     """
 
-    _native_cls = StatefulBeta
+    _native_cls = _NativeRollingBeta
 
     def append(self, input0: float, input1: float) -> "RollingBeta":
         """Append one aligned pair and return this indicator."""

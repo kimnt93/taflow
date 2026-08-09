@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._native import WeightedClose as _NativeWeightedClose
-from ._price_state import HlcPriceState
+from .._native import WeightedClose as _NativeWeightedClose
+from .._price_state import HlcPriceState
 
 
 class WeightedClose(HlcPriceState):

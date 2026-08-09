@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._unary_state import UnaryStateAdapter
-from ._native import StatefulTsf
+from .._unary_state import UnaryStateAdapter
+from .._native import RollingTimeSeriesForecast as _NativeRollingTimeSeriesForecast
 
 
 class RollingTimeSeriesForecast(UnaryStateAdapter):
@@ -13,7 +13,7 @@ class RollingTimeSeriesForecast(UnaryStateAdapter):
     until the trailing window is complete.
     """
 
-    _native_cls = StatefulTsf
+    _native_cls = _NativeRollingTimeSeriesForecast
 
     def append(self, _input: float) -> "RollingTimeSeriesForecast":
         """Append one value and return this indicator."""

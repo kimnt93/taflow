@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._unary_state import UnaryStateAdapter
-from ._native import StatefulLinearregAngle
+from .._unary_state import UnaryStateAdapter
+from .._native import RollingLinearRegressionAngle as _NativeRollingLinearRegressionAngle
 
 
 class RollingLinearRegressionAngle(UnaryStateAdapter):
@@ -13,7 +13,7 @@ class RollingLinearRegressionAngle(UnaryStateAdapter):
     until the trailing window is complete.
     """
 
-    _native_cls = StatefulLinearregAngle
+    _native_cls = _NativeRollingLinearRegressionAngle
 
     def append(self, _input: float) -> "RollingLinearRegressionAngle":
         """Append one value and return this indicator."""

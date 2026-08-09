@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._bivariate_state import BivariateState
-from ._native import StatefulCorrel
+from .._bivariate_state import BivariateState
+from .._native import RollingCorrelation as _NativeRollingCorrelation
 
 
 class RollingCorrelation(BivariateState):
@@ -12,7 +12,7 @@ class RollingCorrelation(BivariateState):
     ``timeperiod`` defaults to 5; history is NaN until warm-up completes.
     """
 
-    _native_cls = StatefulCorrel
+    _native_cls = _NativeRollingCorrelation
 
     def append(self, input0: float, input1: float) -> "RollingCorrelation":
         """Append one aligned pair and return this indicator."""

@@ -393,7 +393,7 @@ mod plus_directional_movement;
 #[cfg(test)]
 mod plus_directional_movement_test;
 mod price_transform;
-mod regression;
+pub(crate) mod regression;
 mod relative_strength_index;
 #[cfg(test)]
 mod relative_strength_index_test;
@@ -402,7 +402,7 @@ mod rolling_median;
 #[cfg(test)]
 mod rolling_median_test;
 mod rolling_price;
-mod rolling_statistics;
+pub(crate) mod rolling_statistics;
 mod rolling_sum;
 #[cfg(test)]
 mod rolling_sum_test;
@@ -589,14 +589,9 @@ pub use rolling_argmax::RollingArgmax;
 pub use rolling_argmin::RollingArgmin;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
-pub use rolling_linear_regression::RollingLinearRegression;
-pub use rolling_linear_regression_angle::RollingLinearRegressionAngle;
-pub use rolling_linear_regression_intercept::RollingLinearRegressionIntercept;
-pub use rolling_linear_regression_slope::RollingLinearRegressionSlope;
 pub use rolling_max::RollingMax;
 pub use rolling_median::RollingMedian;
 pub use rolling_min::RollingMin;
-pub use rolling_time_series_forecast::RollingTimeSeriesForecast;
 
 #[allow(unused_imports)]
 pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
@@ -637,30 +632,6 @@ mod math_divide;
 mod math_multiply_test;
 pub use math_divide::MathDivide;
 #[cfg(test)]
-mod math_divide_test;
-mod median_price;
-mod rolling_argmax;
-#[cfg(test)]
-mod rolling_argmax_test;
-mod rolling_argmin;
-#[cfg(test)]
-mod rolling_argmin_test;
-mod rolling_max;
-#[cfg(test)]
-mod rolling_max_test;
-mod rolling_min;
-#[cfg(test)]
-mod rolling_min_test;
-pub use median_price::MedianPrice;
-#[cfg(test)]
-mod median_price_test;
-mod typical_price;
-pub use typical_price::TypicalPrice;
-#[cfg(test)]
-mod typical_price_test;
-mod weighted_close;
-pub use weighted_close::WeightedClose;
-#[cfg(test)]
 mod bars_since_test;
 #[cfg(test)]
 mod cross_test;
@@ -687,43 +658,35 @@ mod keltner_channels_test;
 #[cfg(test)]
 mod lowest_since_test;
 #[cfg(test)]
+mod math_divide_test;
+#[cfg(test)]
 mod outside_bar_test;
 #[cfg(test)]
 mod position_hold_test;
+mod rolling_argmax;
+#[cfg(test)]
+mod rolling_argmax_test;
+mod rolling_argmin;
+#[cfg(test)]
+mod rolling_argmin_test;
 mod rolling_average_deviation;
 #[cfg(test)]
 mod rolling_average_deviation_test;
-mod rolling_beta;
+mod rolling_max;
 #[cfg(test)]
-mod rolling_beta_test;
-#[allow(unused_imports)]
-mod rolling_correlation;
-#[cfg(test)]
-mod rolling_correlation_test;
-mod rolling_linear_regression;
-mod rolling_linear_regression_angle;
-#[cfg(test)]
-mod rolling_linear_regression_angle_test;
-mod rolling_linear_regression_intercept;
-#[cfg(test)]
-mod rolling_linear_regression_intercept_test;
-mod rolling_linear_regression_slope;
-#[cfg(test)]
-mod rolling_linear_regression_slope_test;
-#[cfg(test)]
-mod rolling_linear_regression_test;
+mod rolling_max_test;
 mod rolling_midpoint;
 #[cfg(test)]
 mod rolling_midpoint_test;
 mod rolling_midprice;
 #[cfg(test)]
 mod rolling_midprice_test;
+mod rolling_min;
+#[cfg(test)]
+mod rolling_min_test;
 mod rolling_standard_deviation;
 #[cfg(test)]
 mod rolling_standard_deviation_test;
-mod rolling_time_series_forecast;
-#[cfg(test)]
-mod rolling_time_series_forecast_test;
 mod rolling_variance;
 #[cfg(test)]
 mod rolling_variance_test;
@@ -732,13 +695,16 @@ mod signal_delay_test;
 #[cfg(test)]
 #[cfg(test)]
 mod value_when_test;
-#[cfg(test)]
-mod weighted_close_test;
 #[allow(unused_imports)]
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::indicators::{RollingMinMax, RollingMinMaxIndex};
+    use crate::indicators::{
+        MedianPrice, RollingBeta, RollingCorrelation, RollingLinearRegression,
+        RollingLinearRegressionAngle, RollingLinearRegressionIntercept,
+        RollingLinearRegressionSlope, RollingMinMax, RollingMinMaxIndex, RollingTimeSeriesForecast,
+        TypicalPrice, WeightedClose,
+    };
 
     fn assert_optional_eq(actual: Option<f64>, expected: f64) {
         if expected.is_nan() {
@@ -1332,8 +1298,6 @@ pub use mc_ginley_dynamic::McGinleyDynamic;
 pub use negative_volume_index::NegativeVolumeIndex;
 pub use positive_volume_index::PositiveVolumeIndex;
 pub use rolling_average_deviation::RollingAverageDeviation;
-pub use rolling_beta::RollingBeta;
-pub use rolling_correlation::RollingCorrelation;
 pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;
 pub use rolling_standard_deviation::RollingStandardDeviation;

@@ -1,9 +1,8 @@
 //! Batch implementation for `rolling_beta`.
 
-use super::rolling_statistics::*;
-use super::rolling_statistics::{beta_return, ta_is_zero};
-use super::*;
 use crate::error::{TaError, TaResult};
+use crate::stream::rolling_statistics::*;
+use crate::stream::rolling_statistics::{beta_return, ta_is_zero};
 
 /// Stateful TA-Lib BETA over percentage returns of two input series.
 #[derive(Debug, Clone)]

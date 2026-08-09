@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._native import TypicalPrice as _NativeTypicalPrice
-from ._price_state import HlcPriceState
+from .._native import TypicalPrice as _NativeTypicalPrice
+from .._price_state import HlcPriceState
 
 
 class TypicalPrice(HlcPriceState):

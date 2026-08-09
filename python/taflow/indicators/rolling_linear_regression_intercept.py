@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._unary_state import UnaryStateAdapter
-from ._native import StatefulLinearregIntercept
+from .._unary_state import UnaryStateAdapter
+from .._native import RollingLinearRegressionIntercept as _NativeRollingLinearRegressionIntercept
 
 
 class RollingLinearRegressionIntercept(UnaryStateAdapter):
@@ -13,7 +13,7 @@ class RollingLinearRegressionIntercept(UnaryStateAdapter):
     until the trailing window is complete.
     """
 
-    _native_cls = StatefulLinearregIntercept
+    _native_cls = _NativeRollingLinearRegressionIntercept
 
     def append(self, _input: float) -> "RollingLinearRegressionIntercept":
         """Append one value and return this indicator."""

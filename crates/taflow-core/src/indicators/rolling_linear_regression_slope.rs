@@ -1,14 +1,14 @@
-use super::regression::RegressionCore;
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::regression::RegressionCore;
+use crate::stream::StreamingIndicator;
 
 #[derive(Debug, Clone)]
-pub struct RollingLinearRegressionIntercept {
+pub struct RollingLinearRegressionSlope {
     core: RegressionCore,
     value: Option<f64>,
 }
 
-impl RollingLinearRegressionIntercept {
+impl RollingLinearRegressionSlope {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             core: RegressionCore::new(period)?,
@@ -17,10 +17,10 @@ impl RollingLinearRegressionIntercept {
     }
 }
 
-impl StreamingIndicator for RollingLinearRegressionIntercept {
+impl StreamingIndicator for RollingLinearRegressionSlope {
     type Output = f64;
     fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self.core.append(input).map(|v| v.intercept);
+        self.value = self.core.append(input).map(|v| v.slope);
         self.value
     }
     fn value(&self) -> Option<f64> {
@@ -31,6 +31,6 @@ impl StreamingIndicator for RollingLinearRegressionIntercept {
         self.value = None;
     }
     fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
-        self.value = self.core.extend_map_into(inputs, output, |v| v.intercept);
+        self.value = self.core.extend_map_into(inputs, output, |v| v.slope);
     }
 }

@@ -78,6 +78,9 @@ mod lag_test;
 mod log_return;
 #[cfg(test)]
 mod log_return_test;
+mod median_price;
+#[cfg(test)]
+mod median_price_test;
 mod mesa_adaptive_moving_average;
 #[cfg(test)]
 mod mesa_adaptive_moving_average_test;
@@ -120,15 +123,33 @@ mod rate_of_change_ratio_percent_test;
 mod rate_of_change_ratio_test;
 #[cfg(test)]
 mod rate_of_change_test;
+mod rolling_beta;
+#[cfg(test)]
+mod rolling_beta_test;
 mod rolling_calmar;
 #[cfg(test)]
 mod rolling_calmar_test;
+mod rolling_correlation;
+#[cfg(test)]
+mod rolling_correlation_test;
 mod rolling_covariance;
 #[cfg(test)]
 mod rolling_covariance_test;
 mod rolling_interquartile_range;
 #[cfg(test)]
 mod rolling_interquartile_range_test;
+mod rolling_linear_regression;
+mod rolling_linear_regression_angle;
+#[cfg(test)]
+mod rolling_linear_regression_angle_test;
+mod rolling_linear_regression_intercept;
+#[cfg(test)]
+mod rolling_linear_regression_intercept_test;
+mod rolling_linear_regression_slope;
+#[cfg(test)]
+mod rolling_linear_regression_slope_test;
+#[cfg(test)]
+mod rolling_linear_regression_test;
 mod rolling_min_max;
 mod rolling_min_max_index;
 #[cfg(test)]
@@ -153,6 +174,9 @@ mod rolling_sharpe_test;
 mod rolling_sortino;
 #[cfg(test)]
 mod rolling_sortino_test;
+mod rolling_time_series_forecast;
+#[cfg(test)]
+mod rolling_time_series_forecast_test;
 mod rolling_winsorize;
 #[cfg(test)]
 mod rolling_winsorize_test;
@@ -171,12 +195,18 @@ mod true_range_test;
 mod true_strength_index;
 #[cfg(test)]
 mod true_strength_index_test;
+mod typical_price;
+#[cfg(test)]
+mod typical_price_test;
 mod variable_period_moving_average;
 #[cfg(test)]
 mod variable_period_moving_average_test;
 mod volume_weighted_moving_average;
 #[cfg(test)]
 mod volume_weighted_moving_average_test;
+mod weighted_close;
+#[cfg(test)]
+mod weighted_close_test;
 mod williams_percent_r;
 #[cfg(test)]
 mod williams_percent_r_test;
@@ -224,6 +254,7 @@ pub use hull_moving_average::HullMovingAverage;
 pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
 pub use lag::Lag;
 pub use log_return::LogReturn;
+pub use median_price::MedianPrice;
 pub use mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 pub use momentum::Momentum;
 pub use normalized_average_true_range::NormalizedAverageTrueRange;
@@ -240,9 +271,15 @@ pub use rate_of_change::RateOfChange;
 pub use rate_of_change_percent::RateOfChangePercent;
 pub use rate_of_change_ratio::RateOfChangeRatio;
 pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
+pub use rolling_beta::RollingBeta;
 pub use rolling_calmar::RollingCalmar;
+pub use rolling_correlation::RollingCorrelation;
 pub use rolling_covariance::RollingCovariance;
 pub use rolling_interquartile_range::RollingInterquartileRange;
+pub use rolling_linear_regression::RollingLinearRegression;
+pub use rolling_linear_regression_angle::RollingLinearRegressionAngle;
+pub use rolling_linear_regression_intercept::RollingLinearRegressionIntercept;
+pub use rolling_linear_regression_slope::RollingLinearRegressionSlope;
 pub use rolling_min_max::{RollingMinMax, RollingMinMaxValue};
 pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
 pub use rolling_mode::RollingMode;
@@ -251,13 +288,16 @@ pub use rolling_quantile::RollingQuantile;
 pub use rolling_rank::RollingRank;
 pub use rolling_sharpe::RollingSharpe;
 pub use rolling_sortino::RollingSortino;
+pub use rolling_time_series_forecast::RollingTimeSeriesForecast;
 pub use rolling_winsorize::RollingWinsorize;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use smoothed_trend_channel::SmoothedTrendChannel;
 pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
 pub use true_range::TrueRange;
 pub use true_strength_index::TrueStrengthIndex;
+pub use typical_price::TypicalPrice;
 pub use variable_period_moving_average::VariablePeriodMovingAverage;
 pub use volume_weighted_moving_average::VolumeWeightedMovingAverage;
+pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
