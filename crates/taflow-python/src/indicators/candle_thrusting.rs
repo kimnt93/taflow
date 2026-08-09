@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleUniqueThreeRiver as CandleUnique3River;
+use taflow::indicators::CandleThrusting as CandleThrustingState;
 #[pyclass]
-/// Stateful CandleUniqueThreeRiver candlestick recognizer.
+/// Stateful CandleThrusting candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleUniqueThreeRiver {
-    inner: CandleUnique3River,
+pub struct CandleThrusting {
+    inner: CandleThrustingState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleUniqueThreeRiver {
+impl CandleThrusting {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleUnique3River::new(),
+            inner: CandleThrustingState::new(),
             outputs: vec![],
         }
     }

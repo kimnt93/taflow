@@ -1,13 +1,13 @@
-"""Persistent Tri Star recognition (CDLTRISTAR)."""
+"""Persistent CandleThrusting recognition (CDLTHRUSTING)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleTriStar as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleThrusting as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleTriStar:
-    """Persistent Tri Star recognition (CDLTRISTAR).
+class CandleThrusting:
+    """Persistent CandleThrusting recognition (CDLTHRUSTING).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleTriStar:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleTriStar":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleThrusting":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleTriStar:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleTriStar":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleThrusting":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleTriStar:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleTriStar":
+    def reset(self) -> "CandleThrusting":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -1,27 +1,38 @@
-//! Incremental Upside/Downside Gap Three Methods recognition (CDLXSIDEGAP3METHODS).
-use super::pattern::*;
+//! Incremental Upside Gap Two Crows candlestick recognition (CDLUPSIDEGAP2CROWS).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
-    open: f64,
-    close: f64,
+    o: f64,
+    c: f64,
 }
-/// Incremental CDLXSIDEGAP3METHODS state.
-/// Persistent Rust state or aligned output type for `CandleUpDownSideGapThreeMethods`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct CandleUpDownSideGapThreeMethods {
+impl Candle {
+    fn body(self) -> f64 {
+        (self.c - self.o).abs()
+    }
+    fn color(self) -> i32 {
+        if self.c >= self.o {
+            1
+        } else {
+            -1
+        }
+    }
+}
+/// Stateful CandleUpsideGapTwoCrows candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleUpsideGapTwoCrows {
     candles: VecDeque<Candle>,
+    body_long_sum: f64,
+    body_short_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleUpDownSideGapThreeMethods {
+impl Default for CandleUpsideGapTwoCrows {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleUpDownSideGapThreeMethods {
+impl CandleUpsideGapTwoCrows {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -29,7 +40,9 @@ impl CandleUpDownSideGapThreeMethods {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(2),
+            candles: VecDeque::with_capacity(12),
+            body_long_sum: 0.0,
+            body_short_sum: 0.0,
             value: None,
         }
     }
@@ -38,35 +51,48 @@ impl CandleUpDownSideGapThreeMethods {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, open: f64, _high: f64, _low: f64, close: f64) -> Option<i32> {
-        let output = if self.candles.len() == 2 {
-            let first = self.candles[0];
-            let second = self.candles[1];
-            let first_color = if first.close >= first.open { 1 } else { -1 };
-            let second_color = if second.close >= second.open { 1 } else { -1 };
-            let current_color = if close >= open { 1 } else { -1 };
-            let base = first_color == second_color
-                && current_color != first_color
-                && open > second.open.min(second.close)
-                && open < second.open.max(second.close)
-                && close > first.open.min(first.close)
-                && close < first.open.max(first.close);
-            let bull = base
-                && first_color == 1
-                && second.open.min(second.close) > first.open.max(first.close);
-            let bear = base
-                && first_color == -1
-                && second.open.max(second.close) < first.open.min(first.close);
-            Some((bull as i32) * 100 - (bear as i32) * 100)
+    pub fn append(&mut self, o: f64, _h: f64, _l: f64, c: f64) -> Option<i32> {
+        let cur = Candle { o, c };
+        // Deque holds bars i-12..=i-1; bar j maps to index 12 - (i - j).
+        let value = if self.candles.len() == 12 {
+            let a = self.candles[10]; // bar i-2
+            let b = self.candles[11]; // bar i-1
+            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, a.o, a.c);
+            let short = ca_realbody_scalar(BODY_SHORT, self.body_short_sum, b.o, b.c);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
+            self.body_long_sum += cr_realbody_scalar(a.o, a.c)
+                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
+            self.body_short_sum += cr_realbody_scalar(b.o, b.c)
+                - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
+            Some(
+                (a.color() == 1
+                    && a.body() > long
+                    && b.color() == -1
+                    && b.body() <= short
+                    && b.o.min(b.c) > a.o.max(a.c)
+                    && cur.color() == -1
+                    && cur.o > b.o
+                    && cur.c < b.c
+                    && cur.c > a.c) as i32
+                    * -100,
+            )
         } else {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if i < 10 {
+                self.body_long_sum += cr_realbody_scalar(o, c);
+            }
+            if (1..11).contains(&i) {
+                self.body_short_sum += cr_realbody_scalar(o, c);
+            }
             None
         };
-        if self.candles.len() == 2 {
+        if self.candles.len() == 12 {
             self.candles.pop_front();
         }
-        self.candles.push_back(Candle { open, close });
-        self.value = output;
-        output
+        self.candles.push_back(cur);
+        self.value = value;
+        value
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
@@ -105,14 +131,6 @@ impl CandleUpDownSideGapThreeMethods {
         for i in 0..len {
             output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
         }
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
-        }
         Ok(())
     }
 
@@ -127,6 +145,8 @@ impl CandleUpDownSideGapThreeMethods {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
+        self.body_long_sum = 0.0;
+        self.body_short_sum = 0.0;
         self.value = None;
     }
 }

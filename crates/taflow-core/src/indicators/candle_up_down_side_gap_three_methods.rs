@@ -1,32 +1,27 @@
-//! Incremental Tri-Star candlestick recognition (CDLTRISTAR).
-use super::pattern::*;
+//! Incremental Upside/Downside Gap Three Methods recognition (CDLXSIDEGAP3METHODS).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
-    o: f64,
-    h: f64,
-    l: f64,
-    c: f64,
+    open: f64,
+    close: f64,
 }
-impl Candle {
-    fn body(self) -> f64 {
-        (self.c - self.o).abs()
-    }
-}
-/// Stateful CandleTriStar candle recognizer.
-/// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleTriStar {
+/// Incremental CDLXSIDEGAP3METHODS state.
+/// Persistent Rust state or aligned output type for `CandleUpDownSideGapThreeMethods`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct CandleUpDownSideGapThreeMethods {
     candles: VecDeque<Candle>,
-    body_doji_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleTriStar {
+impl Default for CandleUpDownSideGapThreeMethods {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleTriStar {
+impl CandleUpDownSideGapThreeMethods {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -34,8 +29,7 @@ impl CandleTriStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(12),
-            body_doji_sum: 0.0,
+            candles: VecDeque::with_capacity(2),
             value: None,
         }
     }
@@ -44,33 +38,35 @@ impl CandleTriStar {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
-        let cur = Candle { o, h, l, c };
-        // Deque holds bars i-12..=i-1; bar j maps to index 12 - (i - j).
-        let value = if self.candles.len() == 12 {
-            let a = self.candles[10]; // bar i-2
-            let b = self.candles[11]; // bar i-1
-            let doji = ca_highlow_scalar(BODY_DOJI, self.body_doji_sum, a.h, a.l);
-            // Slide the sum exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_doji_sum += cr_highlow_scalar(a.h, a.l)
-                - cr_highlow_scalar(self.candles[0].h, self.candles[0].l);
-            let base = a.body() <= doji && b.body() <= doji && cur.body() <= doji;
-            let bear = base && b.o.min(b.c) > a.o.max(a.c) && cur.o.max(cur.c) < b.o.max(b.c);
-            let bull = base && b.o.max(b.c) < a.o.min(a.c) && cur.o.min(cur.c) > b.o.min(b.c);
+    pub fn append(&mut self, open: f64, _high: f64, _low: f64, close: f64) -> Option<i32> {
+        let output = if self.candles.len() == 2 {
+            let first = self.candles[0];
+            let second = self.candles[1];
+            let first_color = if first.close >= first.open { 1 } else { -1 };
+            let second_color = if second.close >= second.open { 1 } else { -1 };
+            let current_color = if close >= open { 1 } else { -1 };
+            let base = first_color == second_color
+                && current_color != first_color
+                && open > second.open.min(second.close)
+                && open < second.open.max(second.close)
+                && close > first.open.min(first.close)
+                && close < first.open.max(first.close);
+            let bull = base
+                && first_color == 1
+                && second.open.min(second.close) > first.open.max(first.close);
+            let bear = base
+                && first_color == -1
+                && second.open.max(second.close) < first.open.min(first.close);
             Some((bull as i32) * 100 - (bear as i32) * 100)
         } else {
-            // Warm-up: seed the sum exactly like the batch prologue.
-            if self.candles.len() < 10 {
-                self.body_doji_sum += cr_highlow_scalar(h, l);
-            }
             None
         };
-        if self.candles.len() == 12 {
+        if self.candles.len() == 2 {
             self.candles.pop_front();
         }
-        self.candles.push_back(cur);
-        self.value = value;
-        value
+        self.candles.push_back(Candle { open, close });
+        self.value = output;
+        output
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
@@ -109,6 +105,14 @@ impl CandleTriStar {
         for i in 0..len {
             output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
         }
+        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
+        // bars at most (deepest candle window is 10-bar average + 4 offset), so
+        // replaying that tail from empty reproduces the full-run state exactly,
+        // including `value` (set by the final `append`).
+        let replay = len.min(BULK_REPLAY_BARS);
+        for i in (len - replay)..len {
+            self.append(open[i], high[i], low[i], close[i]);
+        }
         Ok(())
     }
 
@@ -123,7 +127,6 @@ impl CandleTriStar {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.body_doji_sum = 0.0;
         self.value = None;
     }
 }

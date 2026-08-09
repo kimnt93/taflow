@@ -75,9 +75,9 @@ from .triple_exponential_rate_of_change import TripleExponentialRateOfChange
 from .indicators.candle_three_black_crows import CandleThreeBlackCrows
 from .indicators.candle_three_inside import CandleThreeInside
 from .indicators.candle_three_line_strike import CandleThreeLineStrike
-from .candle_three_stars_in_south import CandleThreeStarsInSouth
+from .indicators.candle_three_stars_in_south import CandleThreeStarsInSouth
 from .indicators.candle_three_outside import CandleThreeOutside
-from .candle_two_crows import CandleTwoCrows
+from .indicators.candle_two_crows import CandleTwoCrows
 from .ultimate_oscillator import UltimateOscillator
 from .indicators import VariablePeriodMovingAverage
 from .heikin_ashi import HeikinAshi
@@ -137,8 +137,8 @@ from .indicators import (
 from .indicators import MesaAdaptiveMovingAverage, RollingMinMax, RollingMinMaxIndex
 from .indicators import KlingerVolumeOscillator
 from .indicators import SessionVolumeLevels
-from .candle_up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
-from .candle_three_white_soldiers import CandleThreeWhiteSoldiers
+from .indicators.candle_up_down_side_gap_three_methods import CandleUpDownSideGapThreeMethods
+from .indicators.candle_three_white_soldiers import CandleThreeWhiteSoldiers
 from .indicators.candle_abandoned_baby import CandleAbandonedBaby
 from .indicators.candle_advance_block import CandleAdvanceBlock
 from .indicators.candle_breakaway import CandleBreakaway
@@ -169,10 +169,10 @@ from .indicators.candle_separating_lines import CandleSeparatingLines
 from .indicators.candle_shooting_star import CandleShootingStar
 from .indicators.candle_stalled_pattern import CandleStalledPattern
 from .indicators.candle_tasuki_gap import CandleTasukiGap
-from .candle_thrusting import CandleThrusting
-from .candle_tri_star import CandleTriStar
-from .candle_unique_three_river import CandleUniqueThreeRiver
-from .candle_upside_gap_two_crows import CandleUpsideGapTwoCrows
+from .indicators.candle_thrusting import CandleThrusting
+from .indicators.candle_tri_star import CandleTriStar
+from .indicators.candle_unique_three_river import CandleUniqueThreeRiver
+from .indicators.candle_upside_gap_two_crows import CandleUpsideGapTwoCrows
 from .indicators import Lag
 from .indicators import LogReturn
 from .indicators import CumulativeSum

@@ -40,30 +40,6 @@ pub(crate) mod tests_extrema_support {
 
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
-mod candle_three_stars_in_south;
-#[cfg(test)]
-mod candle_three_stars_in_south_test;
-mod candle_three_white_soldiers;
-#[cfg(test)]
-mod candle_three_white_soldiers_test;
-mod candle_thrusting;
-#[cfg(test)]
-mod candle_thrusting_test;
-mod candle_tri_star;
-#[cfg(test)]
-mod candle_tri_star_test;
-mod candle_two_crows;
-#[cfg(test)]
-mod candle_two_crows_test;
-mod candle_unique_three_river;
-#[cfg(test)]
-mod candle_unique_three_river_test;
-mod candle_up_down_side_gap_three_methods;
-#[cfg(test)]
-mod candle_up_down_side_gap_three_methods_test;
-mod candle_upside_gap_two_crows;
-#[cfg(test)]
-mod candle_upside_gap_two_crows_test;
 mod chande_momentum_oscillator;
 #[cfg(test)]
 mod chande_momentum_oscillator_test;
@@ -217,14 +193,6 @@ mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use candle_three_stars_in_south::CandleThreeStarsInSouth;
-pub use candle_three_white_soldiers::CandleThreeWhiteSoldiers;
-pub use candle_thrusting::CandleThrusting;
-pub use candle_tri_star::CandleTriStar;
-pub use candle_two_crows::CandleTwoCrows;
-pub use candle_unique_three_river::CandleUniqueThreeRiver;
-pub use candle_up_down_side_gap_three_methods::CandleUpDownSideGapThreeMethods;
-pub use candle_upside_gap_two_crows::CandleUpsideGapTwoCrows;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;

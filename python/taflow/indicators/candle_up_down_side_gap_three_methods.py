@@ -1,13 +1,13 @@
-"""Persistent Upside Gap Two Crows recognition (CDLUPSIDEGAP2CROWS)."""
+"""Persistent Upside/Downside Gap Three Methods (CDLXSIDEGAP3METHODS)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleUpsideGapTwoCrows as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleUpDownSideGapThreeMethods as _Native
+from .._series import as_float64_series
 
 
-class CandleUpsideGapTwoCrows:
-    """Persistent Upside Gap Two Crows recognition (CDLUPSIDEGAP2CROWS).
+class CandleUpDownSideGapThreeMethods:
+    """Persistent Upside/Downside Gap Three Methods (CDLXSIDEGAP3METHODS).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,13 +37,10 @@ class CandleUpsideGapTwoCrows:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        (
-            self.extend(_open, high, low, close)
-            if any(x is not None for x in (_open, high, low, close))
-            else None
-        )
+        self._length = 0
+        self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleUpsideGapTwoCrows":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleUpDownSideGapThreeMethods":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -63,9 +60,10 @@ class CandleUpsideGapTwoCrows:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(_open), float(high), float(low), float(close))
+        self._length += 1
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleUpsideGapTwoCrows":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleUpDownSideGapThreeMethods":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,7 +82,16 @@ class CandleUpsideGapTwoCrows:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(*as_ohlc_arrays(_open, high, low, close))
+        open_array = as_float64_series(_open)
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        close_array = as_float64_series(close)
+        if len({len(array) for array in (open_array, high_array, low_array, close_array)}) != 1:
+            raise ValueError("open, high, low, and close must have equal lengths")
+        self._state.extend(
+            open_array, high_array, low_array, close_array
+        )
+        self._length += len(open_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -108,11 +115,7 @@ class CandleUpsideGapTwoCrows:
         """
         return self._state.value
 
-    def __len__(self) -> int:
-        """Return the number of processed OHLC bars."""
-        return len(self._state.compute())
-
-    def reset(self) -> "CandleUpsideGapTwoCrows":
+    def reset(self) -> "CandleUpDownSideGapThreeMethods":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -121,4 +124,9 @@ class CandleUpsideGapTwoCrows:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return self._length

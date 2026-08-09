@@ -1,6 +1,6 @@
 //! Incremental Three Stars In The South recognition (CDL3STARSINSOUTH).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {

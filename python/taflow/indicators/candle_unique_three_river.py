@@ -1,13 +1,13 @@
-"""Persistent Upside/Downside Gap Three Methods (CDLXSIDEGAP3METHODS)."""
+"""Persistent Unique Three River recognition (CDLUNIQUE3RIVER)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleUpDownSideGapThreeMethods as _Native
-from ._series import as_float64_series
+from .._native import CandleUniqueThreeRiver as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleUpDownSideGapThreeMethods:
-    """Persistent Upside/Downside Gap Three Methods (CDLXSIDEGAP3METHODS).
+class CandleUniqueThreeRiver:
+    """Persistent Unique Three River recognition (CDLUNIQUE3RIVER).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,10 +37,13 @@ class CandleUpDownSideGapThreeMethods:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self._length = 0
-        self.extend(_open, high, low, close)
+        (
+            self.extend(_open, high, low, close)
+            if any(x is not None for x in (_open, high, low, close))
+            else None
+        )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleUpDownSideGapThreeMethods":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleUniqueThreeRiver":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -60,10 +63,9 @@ class CandleUpDownSideGapThreeMethods:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(_open), float(high), float(low), float(close))
-        self._length += 1
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleUpDownSideGapThreeMethods":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleUniqueThreeRiver":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -82,16 +84,7 @@ class CandleUpDownSideGapThreeMethods:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        open_array = as_float64_series(_open)
-        high_array = as_float64_series(high)
-        low_array = as_float64_series(low)
-        close_array = as_float64_series(close)
-        if len({len(array) for array in (open_array, high_array, low_array, close_array)}) != 1:
-            raise ValueError("open, high, low, and close must have equal lengths")
-        self._state.extend(
-            open_array, high_array, low_array, close_array
-        )
-        self._length += len(open_array)
+        self._state.extend(*as_ohlc_arrays(_open, high, low, close))
         return self
 
     def compute(self) -> np.ndarray:
@@ -115,7 +108,11 @@ class CandleUpDownSideGapThreeMethods:
         """
         return self._state.value
 
-    def reset(self) -> "CandleUpDownSideGapThreeMethods":
+    def __len__(self) -> int:
+        """Return the number of processed OHLC bars."""
+        return len(self._state.compute())
+
+    def reset(self) -> "CandleUniqueThreeRiver":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -124,9 +121,4 @@ class CandleUpDownSideGapThreeMethods:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
-
-    def __len__(self) -> int:
-        """Return the number of processed bars."""
-        return self._length

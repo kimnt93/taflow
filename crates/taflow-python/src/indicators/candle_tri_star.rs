@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleUpsideGapTwoCrows as CandleUpsideGap2Crows;
+use taflow::indicators::CandleTriStar as CandleTriStarState;
 #[pyclass]
-/// Stateful CandleUpsideGapTwoCrows candlestick recognizer.
+/// Stateful CandleTriStar candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleUpsideGapTwoCrows {
-    inner: CandleUpsideGap2Crows,
+pub struct CandleTriStar {
+    inner: CandleTriStarState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleUpsideGapTwoCrows {
+impl CandleTriStar {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleUpsideGap2Crows::new(),
+            inner: CandleTriStarState::new(),
             outputs: vec![],
         }
     }
