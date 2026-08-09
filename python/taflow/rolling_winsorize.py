@@ -7,9 +7,12 @@ from ._series import as_float64_series
 
 
 class RollingWinsorize:
-    """Persistent causal rolling winsorization operator.
+    """Clip each value to lower and upper quantiles of a trailing window.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    ``timeperiod`` defaults to 14 and bounds default to 0.05 and 0.95. The
+    first ``timeperiod - 1`` outputs are ``NaN``; lifecycle methods are fluent
+    and all arithmetic remains in the native Rust state.
+    """
 
     def __init__(
         self,
@@ -18,88 +21,54 @@ class RollingWinsorize:
         lower: float = 0.05,
         upper: float = 0.95,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize native state and process the supplied input series.
 
         Parameters
         ----------
-        timeperiod : object
-            Trailing window length in bars.
-        lower : object
-            Lower clipping or quantile bound.
-        upper : object
-            Upper clipping or quantile bound.
-        _input : object
-            Input series or the current scalar observation.
+        _input : array-like
+            Input history to process in chronological order.
+        timeperiod : int, default=14
+            Number of observations in the trailing quantile window.
+        lower, upper : float, default=0.05, 0.95
+            Inclusive lower and upper quantile bounds.
 
         Returns
         -------
         None
-            The constructor initializes the adapter and returns no value.
+            The constructor initializes native state and returns no value.
         """
         self._state = _Native(timeperiod, lower, upper)
-        if _input is not None:
-            self.extend(_input)
+        self._length = 0
+        self.extend(_input)
 
     def append(self, _input: float) -> "RollingWinsorize":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(_input)
+        """Append one observation and return this adapter."""
+        self._state.append(float(_input))
+        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "RollingWinsorize":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(_input))
+        """Append an input history and return this adapter."""
+        values = as_float64_series(_input)
+        self._state.extend(values)
+        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned winsorized history as ``np.ndarray``."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> float | None:
+        """Return the latest clipped value, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "RollingWinsorize":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Reset native state and return this adapter."""
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return self._length

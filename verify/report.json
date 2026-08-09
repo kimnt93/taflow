@@ -3905,8 +3905,8 @@
   }
  },
  {
-  "function": "rolling_cov",
-  "taflow_class": "RollingCov",
+  "function": "rolling_covariance",
+  "taflow_class": "RollingCovariance",
   "oracle": "pandas",
   "batch_vs_oracle": {
    "passed": true,

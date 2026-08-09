@@ -1104,7 +1104,7 @@
       "compute_or_value": true
     },
     {
-      "name": "RollingCov",
+      "name": "RollingCovariance",
       "append": true,
       "extend": true,
       "reset": true,

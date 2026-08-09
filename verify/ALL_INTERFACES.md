@@ -171,7 +171,7 @@ Indicator invariant: constructor history == native `extend` history == one-bar `
 | `RollingSkew` | PASS |  |
 | `RollingKurtosis` | PASS |  |
 | `RollingInterquartileRange` | PASS |  |
-| `RollingCov` | PASS |  |
+| `RollingCovariance` | PASS |  |
 | `RollingWinsorize` | PASS |  |
 | `RollingStandardDeviation` | PASS |  |
 | `RollingAverageDeviation` | PASS |  |

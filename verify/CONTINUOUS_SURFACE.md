@@ -164,7 +164,7 @@
 | taflow | `RollingSkew` | PASS |
 | taflow | `RollingKurtosis` | PASS |
 | taflow | `RollingInterquartileRange` | PASS |
-| taflow | `RollingCov` | PASS |
+| taflow | `RollingCovariance` | PASS |
 | taflow | `RollingWinsorize` | PASS |
 | taflow | `RollingStandardDeviation` | PASS |
 | taflow | `RollingAverageDeviation` | PASS |

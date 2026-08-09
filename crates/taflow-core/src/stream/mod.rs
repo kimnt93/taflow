@@ -792,6 +792,14 @@ mod rolling_average_deviation;
 #[cfg(test)]
 mod rolling_average_deviation_test;
 mod rolling_beta;
+#[cfg(test)]
+mod rolling_beta_test;
+#[allow(unused_imports)]
+mod rolling_correlation;
+#[cfg(test)]
+mod rolling_correlation_test;
+#[allow(unused_imports)]
+mod rolling_linreg;
 mod rolling_standard_deviation;
 #[cfg(test)]
 mod rolling_standard_deviation_test;
@@ -800,12 +808,6 @@ mod rolling_variance;
 mod rolling_variance_test;
 #[cfg(test)]
 mod weighted_close_test;
-#[allow(unused_imports)]
-pub(crate) use rolling_beta::rolling_beta;
-mod rolling_corr;
-#[allow(unused_imports)]
-pub(crate) use rolling_corr::rolling_corr;
-mod rolling_linreg;
 #[allow(unused_imports)]
 pub(crate) use rolling_linreg::rolling_linreg;
 mod rolling_linreg_slope;
@@ -1058,8 +1060,16 @@ mod tests {
             .map(|(index, market)| market * 1.3 + (index as f64 * 0.29).cos() * 2.0)
             .collect();
         let period = 10;
-        let beta_expected = crate::stream::rolling_beta(&market, &asset, period).unwrap();
-        let correl_expected = crate::stream::rolling_corr(&market, &asset, period).unwrap();
+        let mut beta_expected_state = RollingBeta::new(period).unwrap();
+        let mut beta_expected = Vec::new();
+        beta_expected_state
+            .extend_slices_into(&market, &asset, &mut beta_expected)
+            .unwrap();
+        let mut correl_expected_state = RollingCorrelation::new(period).unwrap();
+        let mut correl_expected = Vec::new();
+        correl_expected_state
+            .extend_slices_into(&market, &asset, &mut correl_expected)
+            .unwrap();
         let mut beta = RollingBeta::new(period).unwrap();
         let mut correl = RollingCorrelation::new(period).unwrap();
         for index in 0..market.len() {
@@ -1332,16 +1342,18 @@ mod rolling_kurtosis;
 #[cfg(test)]
 mod rolling_kurtosis_test;
 pub use rolling_kurtosis::RollingKurtosis;
-mod rolling_cov;
+#[allow(unused_imports)]
+mod ewm_var;
+mod rolling_covariance;
+#[cfg(test)]
+mod rolling_covariance_test;
 mod rolling_interquartile_range;
 #[cfg(test)]
 mod rolling_interquartile_range_test;
 #[allow(unused_imports)]
-pub(crate) use rolling_cov::rolling_cov;
 mod rolling_winsorize;
-#[allow(unused_imports)]
-pub(crate) use rolling_winsorize::rolling_winsorize;
-mod ewm_var;
+#[cfg(test)]
+mod rolling_winsorize_test;
 #[allow(unused_imports)]
 pub(crate) use ewm_var::ewm_var;
 mod ewm_sum;
@@ -1443,7 +1455,7 @@ pub use rogers_satchell::RogersSatchell;
 pub use roll_spread::RollSpread;
 pub use rolling_alpha::RollingAlpha;
 pub use rolling_autocorr::RollingAutocorr;
-pub use rolling_cov::RollingCov;
+pub use rolling_covariance::RollingCovariance;
 pub use rolling_entropy::RollingEntropy;
 pub use rolling_information_ratio::RollingInformationRatio;
 pub use rolling_interquartile_range::RollingInterquartileRange;
@@ -1508,7 +1520,7 @@ pub use positive_volume_index::PositiveVolumeIndex;
 pub use rolling_average_deviation::RollingAverageDeviation;
 pub use rolling_beta::RollingBeta;
 pub use rolling_calmar::RollingCalmar;
-pub use rolling_corr::RollingCorrelation;
+pub use rolling_correlation::RollingCorrelation;
 pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;
 pub use rolling_minmax::{RollingMinmax, RollingMinmaxValue};

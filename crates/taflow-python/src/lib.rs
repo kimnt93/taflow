@@ -116,7 +116,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingSkewOperator>()?;
     m.add_class::<indicators::RollingKurtosisOperator>()?;
     m.add_class::<indicators::RollingInterquartileRangeOperator>()?;
-    m.add_class::<indicators::RollingCovOperator>()?;
+    m.add_class::<indicators::RollingCovarianceOperator>()?;
     m.add_class::<indicators::RollingWinsorizeOperator>()?;
     m.add_class::<indicators::EwmVarOperator>()?;
     m.add_class::<indicators::EwmSumOperator>()?;

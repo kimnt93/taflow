@@ -300,7 +300,7 @@
   },
   {
     "class": "RollingCorrelation",
-    "snake": "rolling_corr",
+    "snake": "rolling_correlation",
     "oracle_api": "CORREL",
     "output": "all",
     "source": "TA-Lib",
@@ -2236,9 +2236,9 @@
     "note": "external parity plus bitwise lifecycle invariance"
   },
   {
-    "class": "RollingCov",
-    "snake": "rolling_cov",
-    "oracle_api": "pandas.rolling_cov",
+    "class": "RollingCovariance",
+    "snake": "rolling_covariance",
+    "oracle_api": "pandas.rolling_covariance",
     "output": "all",
     "source": "pandas",
     "version": "3.0.5",

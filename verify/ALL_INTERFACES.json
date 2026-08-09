@@ -656,7 +656,7 @@
     "status": "PASS"
   },
   {
-    "name": "RollingCov",
+    "name": "RollingCovariance",
     "status": "PASS"
   },
   {

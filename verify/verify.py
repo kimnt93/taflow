@@ -171,7 +171,7 @@ def pandas_oracles() -> dict[str, dict]:
         "rolling_zscore": {
             "kwargs": {"timeperiod": n}, "inputs": ("close",),
             "oracle": lambda a: _fresh_window_zscore(a[0], n)},
-        "rolling_cov": {
+        "rolling_covariance": {
             "kwargs": {"timeperiod": n}, "inputs": ("close", "close2"),
             "oracle": lambda a: pd.Series(a[0]).rolling(n)
             .cov(pd.Series(a[1]), ddof=0).to_numpy()},

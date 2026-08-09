@@ -266,7 +266,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | rolling_alpha | RollingAlpha | self | MATCH | — | yes | yes | — |
 | rolling_autocorr | RollingAutocorr | self | MATCH | — | yes | yes | — |
 | rolling_calmar | RollingCalmar | self | MATCH | — | yes | yes | — |
-| rolling_cov | RollingCov | pandas | MATCH | pass (err 1.3e-11, nan 0) | yes | yes | pass (err 1.3e-11, nan 0) |
+| rolling_covariance | RollingCovariance | pandas | MATCH | pass (err 1.3e-11, nan 0) | yes | yes | pass (err 1.3e-11, nan 0) |
 | rolling_entropy | RollingEntropy | self | MATCH | — | yes | yes | — |
 | rolling_information_ratio | RollingInformationRatio | self | MATCH | — | yes | yes | — |
 | rolling_kurtosis | RollingKurtosis | pandas | MATCH | pass (err 1.3e-15, nan 0) | yes | yes | pass (err 1.3e-15, nan 0) |

@@ -1,18 +1,19 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingCov;
+use taflow::stream::RollingCovariance;
 #[pyclass]
-pub struct RollingCovOperator {
-    inner: RollingCov,
+pub struct RollingCovarianceOperator {
+    inner: RollingCovariance,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingCovOperator {
+impl RollingCovarianceOperator {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingCov::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: RollingCovariance::new(timeperiod)
+                .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

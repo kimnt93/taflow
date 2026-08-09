@@ -170,10 +170,16 @@ mod tests {
         let mut iqr = RollingInterquartileRange::new(3).unwrap();
         let iqr_values: Vec<f64> = input.iter().map(|&value| iqr.append(value).unwrap_or(f64::NAN)).collect();
         assert_eq!(iqr_values[2], 1.5);
-        assert!(
-            (rolling_cov(&input, &[2.0, 8.0, 4.0, 16.0], 3).unwrap()[2] - 28.0 / 9.0).abs() < 1e-12
-        );
-        assert_eq!(rolling_winsorize(&input, 3, 0.0, 0.5).unwrap()[2], 2.0);
+        let mut covariance = RollingCovariance::new(3).unwrap();
+        let covariance_value = input
+            .iter()
+            .zip([2.0, 8.0, 4.0, 16.0])
+            .map(|(&x, y)| covariance.append(x, y).unwrap_or(f64::NAN))
+            .collect::<Vec<_>>()[2];
+        assert!((covariance_value - 28.0 / 9.0).abs() < 1e-12);
+        let mut winsorize = RollingWinsorize::new(3, 0.0, 0.5).unwrap();
+        let winsorized = input.iter().map(|&value| winsorize.append(value).unwrap_or(f64::NAN)).collect::<Vec<_>>();
+        assert_eq!(winsorized[2], 2.0);
         assert_eq!(ewm_var(&input, 2).unwrap()[0], 0.0);
         assert_eq!(ewm_std(&input, 2).unwrap()[0], 0.0);
     }

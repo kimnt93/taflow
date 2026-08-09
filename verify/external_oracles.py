@@ -644,7 +644,7 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         "stddev": taflow.RollingStandardDeviation(close, timeperiod=n).compute(),
         "skew": taflow.RollingSkew(standardized, n).compute(),
         "kurtosis": taflow.RollingKurtosis(standardized, n).compute(),
-        "covariance": taflow.RollingCov(close, other, n).compute(),
+        "covariance": taflow.RollingCovariance(close, other, n).compute(),
         "correlation": taflow.RollingCorrelation(close, other, timeperiod=n).compute(),
         "ewm_variance": taflow.ExponentiallyWeightedVariance(close, n).compute(),
         "ewm_stddev": taflow.ExponentiallyWeightedStandardDeviation(close, n).compute(),

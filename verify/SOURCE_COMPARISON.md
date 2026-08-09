@@ -303,7 +303,7 @@ Matches: **356** | Documented variants: **38** | Self-invariant outputs: **0** |
 | `RollingBeta` ↔ `BETA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingCalmar` ↔ `pandas.rolling_calmar` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.819e-12` | 0 | Series.rolling.apply |
 | `RollingCorrelation` ↔ `CORREL` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
-| `RollingCov` ↔ `pandas.rolling_cov` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.282e-11` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingCovariance` ↔ `pandas.rolling_covariance` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.282e-11` | 0 | external parity plus bitwise lifecycle invariance |
 | `RollingEntropy` ↔ `pandas.rolling_entropy` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `4.441e-16` | 0 | Series.rolling.apply/value_counts |
 | `RollingInformationRatio` ↔ `pandas.rolling_information_ratio` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `2.886e-11` | 0 | Rolling.mean/Rolling.std(ddof=0) |
 | `RollingInterquartileRange` ↔ `Polars.rolling_interquartile_range` | `interquartile_range` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |

@@ -1,7 +1,7 @@
 {
   "counts": {
-    "benchmark": 191,
-    "complete": 178,
+    "benchmark": 190,
+    "complete": 180,
     "correctness": 272,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 618,
     "smc_functions": 8,
-    "structure": 210,
+    "structure": 214,
     "talib_functions": 161
   },
   "rows": [
@@ -2363,11 +2363,11 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "rolling_cov",
-      "name": "RollingCov",
+      "module": "rolling_covariance",
+      "name": "RollingCovariance",
       "native_binding": true,
       "native_symbols": [
-        "RollingCovOperator",
+        "RollingCovarianceOperator",
         "_Native"
       ],
       "pandas_ta_reference": false,
@@ -4685,7 +4685,7 @@
         "RollingAutocorrOperator",
         "RollingAverageDeviation",
         "RollingCalmarOperator",
-        "RollingCovOperator",
+        "RollingCovarianceOperator",
         "RollingEntropyOperator",
         "RollingInformationRatioOperator",
         "RollingInterquartileRangeOperator",
@@ -4991,7 +4991,7 @@
         "RollingAutocorrOperator",
         "RollingAverageDeviation",
         "RollingCalmarOperator",
-        "RollingCovOperator",
+        "RollingCovarianceOperator",
         "RollingEntropyOperator",
         "RollingInformationRatioOperator",
         "RollingInterquartileRangeOperator",

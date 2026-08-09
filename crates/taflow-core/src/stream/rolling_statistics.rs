@@ -618,7 +618,9 @@ mod tests {
         let x = lcg_series(5_000, 0x5EED_CBAF);
         let y = lcg_series(5_000, 0xC0FF_CBAF);
         for period in [2usize, 14, 30, 200, 256] {
-            let batch = crate::stream::rolling_corr(&x, &y, period).unwrap();
+            let mut batch_state = RollingCorrelation::new(period).unwrap();
+            let mut batch = Vec::new();
+            batch_state.extend_slices_into(&x, &y, &mut batch).unwrap();
             let mut state = RollingCorrelation::new(period).unwrap();
             let streaming: Vec<f64> = x
                 .iter()
@@ -638,7 +640,9 @@ mod tests {
         let x = lcg_series(5_000, 0x5EED_BE7A);
         let y = lcg_series(5_000, 0xC0FF_BE7A);
         for period in [2usize, 14, 30, 200, 256] {
-            let batch = crate::stream::rolling_beta(&x, &y, period).unwrap();
+            let mut batch_state = RollingBeta::new(period).unwrap();
+            let mut batch = Vec::new();
+            batch_state.extend_slices_into(&x, &y, &mut batch).unwrap();
             let mut state = RollingBeta::new(period).unwrap();
             let streaming: Vec<f64> = x
                 .iter()
@@ -952,7 +956,9 @@ mod tests {
                 &format!("CORREL TA-order bulk p{period}"),
             );
 
-            let batch = crate::stream::rolling_corr(&x, &y, period).unwrap();
+            let mut batch_state = RollingCorrelation::new(period).unwrap();
+            let mut batch = Vec::new();
+            batch_state.extend_slices_into(&x, &y, &mut batch).unwrap();
             assert_same_bits(
                 &batch,
                 &reference,
@@ -988,7 +994,9 @@ mod tests {
             }
             assert_same_bits(&bulk, &reference, &format!("BETA TA-order bulk p{period}"));
 
-            let batch = crate::stream::rolling_beta(&x, &y, period).unwrap();
+            let mut batch_state = RollingBeta::new(period).unwrap();
+            let mut batch = Vec::new();
+            batch_state.extend_slices_into(&x, &y, &mut batch).unwrap();
             assert_same_bits(
                 &batch,
                 &reference,

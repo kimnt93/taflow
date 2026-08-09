@@ -1,54 +1,24 @@
-//! Batch implementation for `rolling_cov`.
+//! Stateful implementation for `rolling_covariance`.
 
 use super::operator_states::*;
+use super::operator_states::*;
+use super::*;
 use super::*;
 use crate::error::{TaError, TaResult};
-
-/// Computes or updates `rolling_cov` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Compute the rolling cov result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input0` - Input series or configuration value.
-/// * `input1` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn rolling_cov(input0: &[f64], input1: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if input0.len() != input1.len() {
-        return Err(TaError::LengthMismatch {
-            expected: input0.len(),
-            got: input1.len(),
-        });
-    }
-    let mut state = RollingCov::new(timeperiod)?;
-    Ok(input0
-        .iter()
-        .zip(input1)
-        .map(|(&left, &right)| state.append(left, right).unwrap_or(f64::NAN))
-        .collect())
-}
-use super::operator_states::*;
-use super::*;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingCov`.
+/// Persistent Rust state for `RollingCovariance`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct RollingCov {
+pub struct RollingCovariance {
     values: VecDeque<(f64, f64)>,
     timeperiod: usize,
     value: Option<f64>,
 }
 
-impl RollingCov {
+impl RollingCovariance {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.

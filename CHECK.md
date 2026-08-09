@@ -117,10 +117,10 @@ the un-prefixed name does NOT exist (it would shadow Python builtins).
 | `RollingStandardDeviation` | `STDDEV` |
 | `RollingVariance` | `VAR` |
 | `rolling_avgdev` | `AVGDEV` |
-| `rolling_corr` | `CORREL` |
+| `rolling_correlation` | `CORREL` |
 | `rolling_beta` | `BETA` |
 | `rolling_linreg` (+ `_slope`, `_intercept`, `_angle`, `rolling_tsf`) | `LINEARREG` (+ variants, `TSF`) |
-| `rolling_median`, `rolling_quantile`, `rolling_rank`, `rolling_zscore`, `rolling_skew`, `rolling_kurtosis`, `rolling_cov`, … | — (no TA-Lib counterpart) |
+| `rolling_median`, `rolling_quantile`, `rolling_rank`, `rolling_zscore`, `rolling_skew`, `rolling_kurtosis`, `rolling_covariance`, … | — (no TA-Lib counterpart) |
 
 Moving averages keep their indicator names (`sma`, not `rolling_mean`) —
 they are named indicators, and `SMA`/`EMA`/… remain the talib aliases.
@@ -183,7 +183,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | true_range | true_range | TRANGE |
 | [x] | rolling_avgdev | rolling_avgdev | AVGDEV |
 | [x] | rolling_beta | rolling_beta | BETA |
-| [x] | rolling_corr | rolling_corr | CORREL |
+| [x] | rolling_correlation | rolling_correlation | CORREL |
 | [x] | rolling_linreg | rolling_linreg | LINEARREG |
 | [x] | rolling_linreg_angle | rolling_linreg_angle | LINEARREG_ANGLE |
 | [x] | rolling_linreg_intercept | rolling_linreg_intercept | LINEARREG_INTERCEPT |
@@ -337,7 +337,7 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_zscore | rolling_zscore | _ |
 | [x] | rolling_skew | rolling_skew | _ |
 | [x] | rolling_kurtosis | rolling_kurtosis | _ |
-| [x] | rolling_cov | rolling_cov | _ |
+| [x] | rolling_covariance | rolling_covariance | _ |
 | [x] | rolling_winsorize | rolling_winsorize | _ |
 | [x] | ewm_var | ewm_var | _ |
 | [x] | ewm_std | ewm_std | _ |

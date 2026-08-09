@@ -213,7 +213,7 @@ from .rolling_z_score import RollingZScore
 from .rolling_skew import RollingSkew
 from .rolling_kurtosis import RollingKurtosis
 from .rolling_interquartile_range import RollingInterquartileRange
-from .rolling_cov import RollingCov
+from .rolling_covariance import RollingCovariance
 from .rolling_winsorize import RollingWinsorize
 from .ewm_var import ExponentiallyWeightedVariance
 from .ewm_sum import ExponentiallyWeightedSum
@@ -471,7 +471,7 @@ __all__ = [
     "RollingSkew",
     "RollingKurtosis",
     "RollingInterquartileRange",
-    "RollingCov",
+    "RollingCovariance",
     "RollingWinsorize",
     "RollingStandardDeviation",
     "RollingAverageDeviation", "RollingMidpoint", "RollingMidprice",
