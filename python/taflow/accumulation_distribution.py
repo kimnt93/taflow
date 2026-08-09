@@ -1,36 +1,56 @@
-"""Canonical Accumulation/Distribution adapter."""
+"""Persistent Accumulation/Distribution adapter."""
+
 from typing import Any
 
-from ._native import StatefulAd
-from ._volume_state import OhlcvStateAdapter
+import numpy as np
+
+from ._native import AccumulationDistribution as _NativeAccumulationDistribution
+from ._series import as_float64_series
 
 
-class AccumulationDistribution(OhlcvStateAdapter):
-    """Compute cumulative Accumulation/Distribution through Rust
+class AccumulationDistribution:
+    """Accumulate close-location value multiplied by volume in Rust.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    AccumulationDistribution
-        A persistent native-backed indicator adapter.
+    For each bar the increment is
+    ``((close-low) - (high-close)) / (high-low) * volume``; a non-positive
+    range contributes zero. The constructor requires aligned chronological
+    high, low, close, and volume series. Pass four empty arrays for a fresh
+    streaming state. There is no warm-up. This maps to TA-Lib ``AD``.
     """
 
-    _native_cls = StatefulAd
+    def __init__(self, high: Any, low: Any, close: Any, volume: Any) -> None:
+        self._state = _NativeAccumulationDistribution()
+        self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> "AccumulationDistribution":
-        """Append one observation and return this indicator."""
-        super().append(high, low, close, volume)
+        """Append one high/low/close/volume tuple and return this indicator."""
+        self._state.append(float(high), float(low), float(close), float(volume))
         return self
 
     def extend(self, high: Any, low: Any, close: Any, volume: Any) -> "AccumulationDistribution":
-        """Append aligned histories and return this indicator."""
-        super().extend(high, low, close, volume)
+        """Append aligned price and volume histories and return this indicator."""
+        self._state.extend(
+            as_float64_series(high),
+            as_float64_series(low),
+            as_float64_series(close),
+            as_float64_series(volume),
+        )
         return self
 
+    def compute(self) -> np.ndarray:
+        """Return the complete aligned ``float64`` A/D history."""
+        return self._state.compute()
+
+    @property
+    def value(self) -> float | None:
+        """Return the latest value, or ``None`` before the first tuple."""
+        return self._state.value
+
     def reset(self) -> "AccumulationDistribution":
-        """Reset native state and return this indicator."""
-        super().reset()
+        """Restore fresh native state, clear history, and return this indicator."""
+        self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed tuples."""
+        return len(self._state)

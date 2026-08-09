@@ -1,72 +1,23 @@
-//! Batch implementation for `accumulation_distribution_oscillator`.
+//! Persistent Accumulation/Distribution Oscillator state.
 
-use super::volume_states::*;
+use super::accumulation_distribution_helper::money_flow_volume;
 use crate::error::{TaError, TaResult};
 
-/// Compute the accumulation distribution oscillator result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-/// * `volume` - Input series or configuration value.
-/// * `fastperiod` - Input series or configuration value.
-/// * `slowperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn accumulation_distribution_oscillator(
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-    volume: &[f64],
-    fastperiod: usize,
-    slowperiod: usize,
-) -> TaResult<Vec<f64>> {
-    if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
-        return Err(crate::TaError::LengthMismatch {
-            expected: high.len(),
-            got: low.len().min(close.len()).min(volume.len()),
-        });
-    }
-    let mut state = AccumulationDistributionOscillator::new(fastperiod, slowperiod)?;
-    Ok(high
-        .iter()
-        .zip(low)
-        .zip(close)
-        .zip(volume)
-        .map(|(((&high, &low), &close), &volume)| {
-            state.append(high, low, close, volume).unwrap_or(f64::NAN)
-        })
-        .collect())
-}
-use super::*;
-
-/// Stateful Chaikin A/D oscillator with first-value EMA seeds.
+/// Difference between fast and slow first-value-seeded EMAs of the A/D line.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `AccumulationDistributionOscillator`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct AccumulationDistributionOscillator {
     lookback: usize,
     index: usize,
-    fast_k: f64,
-    slow_k: f64,
-    ad: f64,
-    fast_ema: Option<f64>,
-    slow_ema: Option<f64>,
+    fast_smoothing: f64,
+    slow_smoothing: f64,
+    accumulation_distribution: f64,
+    fast_average: Option<f64>,
+    slow_average: Option<f64>,
     value: Option<f64>,
 }
 
 impl AccumulationDistributionOscillator {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Create an oscillator with TA-Lib-compatible periods and warm-up.
     pub fn new(fast_period: usize, slow_period: usize) -> TaResult<Self> {
         if fast_period < 2 || slow_period < 2 {
             return Err(TaError::InvalidParameter {
@@ -78,61 +29,83 @@ impl AccumulationDistributionOscillator {
         Ok(Self {
             lookback: fast_period.max(slow_period) - 1,
             index: 0,
-            fast_k: 2.0 / (fast_period as f64 + 1.0),
-            slow_k: 2.0 / (slow_period as f64 + 1.0),
-            ad: 0.0,
-            fast_ema: None,
-            slow_ema: None,
+            fast_smoothing: 2.0 / (fast_period as f64 + 1.0),
+            slow_smoothing: 2.0 / (slow_period as f64 + 1.0),
+            accumulation_distribution: 0.0,
+            fast_average: None,
+            slow_average: None,
             value: None,
         })
     }
 
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append one chronological high/low/close/volume tuple.
     pub fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
-        self.ad += ad_increment(high, low, close, volume);
-        match (self.fast_ema, self.slow_ema) {
+        self.accumulation_distribution += money_flow_volume(high, low, close, volume);
+        match (self.fast_average, self.slow_average) {
             (Some(fast), Some(slow)) => {
-                self.fast_ema = Some(self.fast_k.mul_add(self.ad - fast, fast));
-                self.slow_ema = Some(self.slow_k.mul_add(self.ad - slow, slow));
+                self.fast_average = Some(
+                    self.fast_smoothing
+                        .mul_add(self.accumulation_distribution - fast, fast),
+                );
+                self.slow_average = Some(
+                    self.slow_smoothing
+                        .mul_add(self.accumulation_distribution - slow, slow),
+                );
             }
             _ => {
-                self.fast_ema = Some(self.ad);
-                self.slow_ema = Some(self.ad);
+                self.fast_average = Some(self.accumulation_distribution);
+                self.slow_average = Some(self.accumulation_distribution);
             }
         }
         if self.index >= self.lookback {
             self.value = Some(
-                self.fast_ema.expect("fast EMA is initialized")
-                    - self.slow_ema.expect("slow EMA is initialized"),
+                self.fast_average.expect("fast average is initialized")
+                    - self.slow_average.expect("slow average is initialized"),
             );
         }
         self.index += 1;
         self.value
     }
 
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Append aligned slices in scalar replay order, NaN-filling warm-up.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        volume: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let len = high.len();
+        for actual in [low.len(), close.len(), volume.len()] {
+            if actual != len {
+                return Err(TaError::LengthMismatch {
+                    expected: len,
+                    got: actual,
+                });
+            }
+        }
+        output.reserve(len);
+        for index in 0..len {
+            output.push(
+                self.append(high[index], low[index], close[index], volume[index])
+                    .unwrap_or(f64::NAN),
+            );
+        }
+        Ok(())
+    }
+
+    /// Return the latest result, or `None` during warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
 
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Restore fresh-state behavior without reallocating.
     pub fn reset(&mut self) {
         self.index = 0;
-        self.ad = 0.0;
-        self.fast_ema = None;
-        self.slow_ema = None;
+        self.accumulation_distribution = 0.0;
+        self.fast_average = None;
+        self.slow_average = None;
         self.value = None;
     }
 }

@@ -1,48 +1,68 @@
-"""Canonical Accumulation/Distribution Oscillator adapter."""
+"""Persistent Accumulation/Distribution Oscillator adapter."""
+
 from typing import Any
 
-from ._native import StatefulAdosc
-from ._volume_state import OhlcvStateAdapter
+import numpy as np
+
+from ._native import AccumulationDistributionOscillator as _NativeAccumulationDistributionOscillator
+from ._series import as_float64_series
 
 
-class AccumulationDistributionOscillator(OhlcvStateAdapter):
-    """Compute the Accumulation/Distribution Oscillator through Rust
+class AccumulationDistributionOscillator:
+    """Compute fast minus slow EMA of the A/D line in persistent Rust state.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
-
-    Returns
-    -------
-    AccumulationDistributionOscillator
-        A persistent native-backed indicator adapter.
+    The constructor requires aligned chronological high, low, close, and volume
+    series. Pass four empty arrays for a fresh streaming state. ``fastperiod``
+    and ``slowperiod`` default to 3 and 10 and must both be at least 2. Outputs
+    are NaN for ``max(fastperiod, slowperiod) - 1`` warm-up bars. The definition
+    and first-value EMA seeds map to TA-Lib ``ADOSC``.
     """
-
-    _native_cls = StatefulAdosc
 
     def __init__(
         self,
-        high: object,
-        low: object,
-        close: object,
-        volume: object,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
         fastperiod: int = 3,
         slowperiod: int = 10,
     ) -> None:
-        """Create the oscillator with initial OHLCV history."""
-        super().__init__(high, low, close, volume, fastperiod, slowperiod)
+        self._state = _NativeAccumulationDistributionOscillator(fastperiod, slowperiod)
+        self.extend(high, low, close, volume)
 
-    def append(self, high: float, low: float, close: float, volume: float) -> "AccumulationDistributionOscillator":
-        """Append one observation and return this indicator."""
-        super().append(high, low, close, volume)
+    def append(
+        self, high: float, low: float, close: float, volume: float
+    ) -> "AccumulationDistributionOscillator":
+        """Append one high/low/close/volume tuple and return this indicator."""
+        self._state.append(float(high), float(low), float(close), float(volume))
         return self
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> "AccumulationDistributionOscillator":
-        """Append aligned histories and return this indicator."""
-        super().extend(high, low, close, volume)
+    def extend(
+        self, high: Any, low: Any, close: Any, volume: Any
+    ) -> "AccumulationDistributionOscillator":
+        """Append aligned price and volume histories and return this indicator."""
+        self._state.extend(
+            as_float64_series(high),
+            as_float64_series(low),
+            as_float64_series(close),
+            as_float64_series(volume),
+        )
         return self
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned ``float64`` oscillator history with NaN warm-up."""
+        return self._state.compute()
+
+    @property
+    def value(self) -> float | None:
+        """Return the latest value, or ``None`` during warm-up."""
+        return self._state.value
 
     def reset(self) -> "AccumulationDistributionOscillator":
-        """Reset native state and return this indicator."""
-        super().reset()
+        """Restore fresh native state, clear history, and return this indicator."""
+        self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed tuples."""
+        return len(self._state)

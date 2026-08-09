@@ -224,6 +224,7 @@ pub use math_tan::MathTan;
 mod math_tan_test;
 mod math_tanh;
 pub use math_tanh::MathTanh;
+mod accumulation_distribution_helper;
 #[cfg(test)]
 mod math_tanh_test;
 mod mfi;
@@ -250,7 +251,6 @@ mod variable_period_moving_average;
 #[cfg(test)]
 mod variable_period_moving_average_test;
 mod vhgw;
-mod volume_states;
 pub use session_flags::session_flags;
 mod cumulative_count;
 mod cumulative_maximum;
@@ -1008,37 +1008,6 @@ mod tests {
     }
 
     #[test]
-    fn volume_states_match_batch_for_every_bar() {
-        let close: Vec<f64> = (0..100)
-            .map(|index| 50.0 + index as f64 * 0.06 + (index as f64 * 0.25).sin() * 3.0)
-            .collect();
-        let mut high: Vec<f64> = close.iter().map(|value| value + 1.2).collect();
-        let mut low: Vec<f64> = close.iter().map(|value| value - 0.8).collect();
-        for index in (11..close.len()).step_by(19) {
-            high[index] = close[index];
-            low[index] = close[index];
-        }
-        let volumes: Vec<f64> = (0..close.len())
-            .map(|index| 1_000.0 + (index % 13) as f64 * 37.0)
-            .collect();
-        let ad_expected = accumulation_distribution(&high, &low, &close, &volumes).unwrap();
-        let adosc_expected =
-            accumulation_distribution_oscillator(&high, &low, &close, &volumes, 3, 10).unwrap();
-        let mut ad = AccumulationDistribution::new();
-        let mut adosc = AccumulationDistributionOscillator::new(3, 10).unwrap();
-        for index in 0..close.len() {
-            assert_eq!(
-                ad.append(high[index], low[index], close[index], volumes[index]),
-                ad_expected[index]
-            );
-            assert_optional_eq(
-                adosc.append(high[index], low[index], close[index], volumes[index]),
-                adosc_expected[index],
-            );
-        }
-    }
-
-    #[test]
     fn rolling_ohlc_momentum_states_match_batch_for_every_bar() {
         let close: Vec<f64> = (0..100)
             .map(|index| 70.0 + index as f64 * 0.04 + (index as f64 * 0.27).sin() * 4.0)
@@ -1063,17 +1032,11 @@ mod tests {
             low[index] = close[index];
         }
         let period = 14;
-        let willr_expected = williams_percent_r(&high, &low, &close, period).unwrap();
         let (down_expected, up_expected) = crate::stream::aroon(&high, &low, period).unwrap();
         let osc_expected = crate::stream::aroon_oscillator(&high, &low, period).unwrap();
-        let mut willr = WilliamsPercentR::new(period).unwrap();
         let mut aroon = Aroon::new(period).unwrap();
         let mut oscillator = AroonOscillator::new(period).unwrap();
         for index in 0..close.len() {
-            assert_optional_eq(
-                willr.append(high[index], low[index], close[index]),
-                willr_expected[index],
-            );
             match aroon.append(high[index], low[index]) {
                 Some(value) => {
                     assert_eq!(value.down, down_expected[index]);
@@ -1139,18 +1102,18 @@ mod on_balance_volume;
 mod on_balance_volume_test;
 
 mod accumulation_distribution;
-#[allow(unused_imports)]
-pub(crate) use accumulation_distribution::accumulation_distribution;
 mod accumulation_distribution_oscillator;
-#[allow(unused_imports)]
-pub(crate) use accumulation_distribution_oscillator::accumulation_distribution_oscillator;
+#[cfg(test)]
+mod accumulation_distribution_oscillator_test;
+#[cfg(test)]
+mod accumulation_distribution_test;
 mod balance_of_power;
 #[cfg(test)]
 mod balance_of_power_test;
-mod williams_percent_r;
-#[allow(unused_imports)]
-pub(crate) use williams_percent_r::williams_percent_r;
 mod drawdown;
+mod williams_percent_r;
+#[cfg(test)]
+mod williams_percent_r_test;
 #[allow(unused_imports)]
 pub(crate) use drawdown::drawdown;
 mod rolling_sharpe;

@@ -302,9 +302,9 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 |---|---|---:|---:|---:|---:|
 | AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.74× | 1.31× | 0.87× | 0.79× |
 | MathAcos | [TA-Lib: `ACOS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.39× | 1.28× | 1.03× | 1.00× |
-| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.61× | 2.21× | 1.15× | 1.02× |
+| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.96× | 1.19× | 0.52× | 0.56× |
 | MathAdd | [TA-Lib: `ADD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.50× | 4.81× | 1.64× | 1.04× |
-| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.03× | 0.77× | 0.39× | 0.39× |
+| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.09× | 0.74× | 0.37× | 0.37× |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.71× | 1.48× | 1.12× | 1.12× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.99× | 1.17× | 0.94× | 0.92× |
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.26× | 1.66× | 0.99× | 1.11× |
@@ -459,7 +459,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | UltimateOscillator | [TA-Lib: `ULTOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.05× | 1.45× | 1.21× | 1.10× |
 | RollingVariance | [TA-Lib: `VAR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.74× | 1.59× | 0.69× | 0.64× |
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.63× | 1.98× | 0.65× | 0.62× |
-| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.53× | 1.55× | 0.98× | 0.84× |
+| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.73× | 1.26× | 0.99× | 0.86× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.24× | 1.43× | 0.68× | 0.61× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
@@ -598,8 +598,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.55× | 1.91× |
 | AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.53× | 2.09× | 2.18× |
-| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.20× | 1.56× | 1.77× |
-| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.18× | 1.52× | 1.70× |
+| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.75× | 1.84× |
+| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 1.58× | 2.04× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -880,7 +880,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.07× | 1.60× | 1.89× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.93× | 1.76× | 2.12× |
-| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.27× | 1.37× | 1.99× |
+| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.98× | 1.60× | 2.02× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 
@@ -890,8 +890,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 2.02× | 1.95× |
 | AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.09× | 2.26× | 2.30× |
-| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.65× | 1.84× | 1.76× |
-| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.85× | 1.88× |
+| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.74× | 1.97× |
+| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.00× | 1.94× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1172,7 +1172,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.87× | 1.93× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 1.87× | 2.00× |
-| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.91× | 2.01× |
+| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.85× | 1.96× | 1.85× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 
@@ -1182,8 +1182,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.07× | 2.01× | 1.85× |
 | AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 2.20× | 2.18× |
-| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.77× | 1.81× |
-| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.86× | 1.98× |
+| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.80× | 1.76× |
+| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.98× | 1.89× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1464,7 +1464,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.85× | 1.96× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.07× | 2.03× |
-| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.84× | 1.93× |
+| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.94× | 1.78× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 
@@ -1474,8 +1474,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 |---|---|---:|---:|---:|
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.31× | 1.88× |
 | AccelerationBands | [TA-Lib: `ACCBANDS`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 2.04× | 2.18× |
-| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.71× | 1.74× | 1.73× |
-| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 1.82× | 1.89× |
+| AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.80× | 1.67× |
+| AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.91× | 1.90× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
@@ -1756,6 +1756,6 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Vortex | [pandas-ta-classic: `pandas-ta-classic.vortex`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | WeightedClose | [TA-Lib: `WCLPRICE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.91× | 1.89× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.64× | 2.04× | 1.82× |
-| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.86× | 2.00× |
+| WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 2.01× | 2.09× |
 | YangZhang | [pandas: `pandas.yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ZeroLagExponentialMovingAverage | [pandas-ta-classic: `pandas_ta_classic.zlma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |

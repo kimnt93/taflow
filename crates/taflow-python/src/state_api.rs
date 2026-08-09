@@ -1879,19 +1879,19 @@ bivariate_statistic_class!(StatefulBeta, RollingBeta);
 bivariate_statistic_class!(StatefulCorrel, RollingCorrelation);
 
 #[pyclass]
-pub struct StatefulAd {
+pub struct AccumulationDistribution {
     inner: stream::AccumulationDistribution,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulAd {
+impl AccumulationDistribution {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: stream::AccumulationDistribution::new(),
+    fn new() -> PyResult<Self> {
+        Ok(Self {
+            inner: stream::AccumulationDistribution::new().map_err(py_value_error)?,
             outputs: Vec::new(),
-        }
+        })
     }
 
     fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> f64 {
@@ -1912,20 +1912,11 @@ impl StatefulAd {
         let low = low.as_slice()?;
         let close = close.as_slice()?;
         let volume = volume.as_slice()?;
-        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            outputs.extend(
-                high.iter()
-                    .zip(low)
-                    .zip(close)
-                    .zip(volume)
-                    .map(|(((&h, &l), &c), &v)| self.inner.append(h, l, c, v)),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(high, low, close, volume, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]
@@ -1948,13 +1939,13 @@ impl StatefulAd {
 }
 
 #[pyclass]
-pub struct StatefulAdosc {
+pub struct AccumulationDistributionOscillator {
     inner: stream::AccumulationDistributionOscillator,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulAdosc {
+impl AccumulationDistributionOscillator {
     #[new]
     #[pyo3(signature = (fastperiod=3, slowperiod=10))]
     fn new(fastperiod: usize, slowperiod: usize) -> PyResult<Self> {
@@ -1984,21 +1975,11 @@ impl StatefulAdosc {
         let low = low.as_slice()?;
         let close = close.as_slice()?;
         let volume = volume.as_slice()?;
-        if high.len() != low.len() || high.len() != close.len() || high.len() != volume.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            extend_from_options(
-                outputs,
-                high.iter()
-                    .zip(low)
-                    .zip(close)
-                    .zip(volume)
-                    .map(|(((&h, &l), &c), &v)| self.inner.append(h, l, c, v)),
-            )
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(high, low, close, volume, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]
@@ -2137,13 +2118,13 @@ impl BalanceOfPower {
 }
 
 #[pyclass]
-pub struct StatefulWillr {
+pub struct WilliamsPercentR {
     inner: stream::WilliamsPercentR,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulWillr {
+impl WilliamsPercentR {
     #[new]
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
@@ -2167,16 +2148,11 @@ impl StatefulWillr {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
         let close = close.as_slice()?;
-        if high.len() != low.len() || high.len() != close.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
             self.inner
-                .extend_slices_into(high, low, close, outputs)
-                .expect("lengths validated above")
-        });
-        Ok(())
+                .extend_slices_into(high, low, close, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
 
     #[getter]

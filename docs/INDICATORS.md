@@ -160,7 +160,7 @@ Correctness uses the highest-priority available external oracle in [../verify/SO
 
 | Class | TA-Lib | Parameters | Constructor order |
 |---|---|---|---|
-| `AccumulationDistribution` | AD | parameters | `(high, low, close, volume, parameters)` |
+| `AccumulationDistribution` | AD | — | `(high, low, close, volume)` |
 | `AccumulationDistributionOscillator` | ADOSC | fastperiod=3, slowperiod=10 | `(high, low, close, volume, fastperiod, slowperiod)` |
 | `Amihud` | — | timeperiod=20 | `(close, volume, timeperiod)` |
 | `AnchoredVolumeWeightedAveragePrice` | — | anchor, stdev=1.0 | `(high, low, close, volume, anchor, stdev)` |

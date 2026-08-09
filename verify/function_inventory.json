@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 184,
-    "complete": 41,
+    "complete": 44,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 602,
     "smc_functions": 8,
-    "structure": 41,
+    "structure": 44,
     "talib_functions": 161
   },
   "rows": [
@@ -986,7 +986,8 @@
       "name": "AccumulationDistribution",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAd"
+        "AccumulationDistribution",
+        "_NativeAccumulationDistribution"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -1000,7 +1001,8 @@
       "name": "AccumulationDistributionOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAdosc"
+        "AccumulationDistributionOscillator",
+        "_NativeAccumulationDistributionOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -1156,7 +1158,8 @@
       "name": "WilliamsPercentR",
       "native_binding": true,
       "native_symbols": [
-        "StatefulWillr"
+        "WilliamsPercentR",
+        "_NativeWilliamsPercentR"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4412,6 +4415,8 @@
       "name": "op",
       "native_binding": true,
       "native_symbols": [
+        "AccumulationDistribution",
+        "AccumulationDistributionOscillator",
         "ActiveZoneListOperator",
         "AlmaOperator",
         "AmihudOperator",
@@ -4613,8 +4618,6 @@
         "SqueezeOperator",
         "SqueezeProOperator",
         "StatefulAccbands",
-        "StatefulAd",
-        "StatefulAdosc",
         "StatefulAdx",
         "StatefulAdxr",
         "StatefulAnchoredVolumeWeightedAveragePrice",
@@ -4686,7 +4689,6 @@
         "StatefulTsf",
         "StatefulVar",
         "StatefulVariableIndexDynamicAverage",
-        "StatefulWillr",
         "StatefulWma",
         "SupertrendOperator",
         "SwingHighLowOperator",
@@ -4702,6 +4704,7 @@
         "VwapOperator",
         "VwmaOperator",
         "WeightedClose",
+        "WilliamsPercentR",
         "YangZhangOperator",
         "ZlemaOperator",
         "session_flags_array"
@@ -4718,6 +4721,8 @@
       "name": "__version__",
       "native_binding": true,
       "native_symbols": [
+        "AccumulationDistribution",
+        "AccumulationDistributionOscillator",
         "ActiveZoneListOperator",
         "AlmaOperator",
         "AmihudOperator",
@@ -4919,8 +4924,6 @@
         "SqueezeOperator",
         "SqueezeProOperator",
         "StatefulAccbands",
-        "StatefulAd",
-        "StatefulAdosc",
         "StatefulAdx",
         "StatefulAdxr",
         "StatefulAnchoredVolumeWeightedAveragePrice",
@@ -4992,7 +4995,6 @@
         "StatefulTsf",
         "StatefulVar",
         "StatefulVariableIndexDynamicAverage",
-        "StatefulWillr",
         "StatefulWma",
         "SupertrendOperator",
         "SwingHighLowOperator",
@@ -5008,6 +5010,7 @@
         "VwapOperator",
         "VwmaOperator",
         "WeightedClose",
+        "WilliamsPercentR",
         "YangZhangOperator",
         "ZlemaOperator",
         "session_flags_array"

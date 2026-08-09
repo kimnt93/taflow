@@ -412,7 +412,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("ad", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Ad::new();
+            let mut state = stream::AccumulationDistribution::new().unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value + 0.2, 1_000.0);
             }
@@ -423,7 +423,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("adosc", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Adosc::new(3, 10).unwrap();
+            let mut state = stream::AccumulationDistributionOscillator::new(3, 10).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value + 0.2, 1_000.0);
             }
@@ -456,7 +456,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("willr", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::Willr::new(14).unwrap();
+            let mut state = stream::WilliamsPercentR::new(14).unwrap();
             for value in warmup {
                 state.append(*value + 1.0, *value - 1.0, *value);
             }
