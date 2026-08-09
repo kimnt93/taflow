@@ -9,7 +9,7 @@ use crate::ma_type::MaType;
 
 use super::macd::macd_ema_steady_loop;
 use super::{
-    moving_average::MovingAverageDispatcher, MovingAverageConvergenceDivergenceValue,
+    moving_average_dispatcher::MovingAverageDispatcher, MovingAverageConvergenceDivergenceValue,
     StreamingIndicator,
 };
 

@@ -124,13 +124,13 @@ mod ht_trendmode;
 mod imi;
 mod indicator;
 mod kama;
-mod ma;
 mod macd;
 mod macdext;
 mod macdfix;
 mod mama;
 mod math_abs;
 mod math_operator;
+mod moving_average;
 pub use math_abs::MathAbs;
 #[cfg(test)]
 mod math_abs_test;
@@ -230,7 +230,9 @@ mod math_tanh_test;
 mod mfi;
 mod minus_di;
 mod minus_dm;
-mod moving_average;
+mod moving_average_dispatcher;
+#[cfg(test)]
+mod moving_average_test;
 mod pattern;
 mod plus_di;
 mod plus_dm;
@@ -462,9 +464,6 @@ pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
 #[allow(unused_imports)]
-pub(crate) use ma::moving_average;
-pub use ma::MovingAverage;
-#[allow(unused_imports)]
 pub(crate) use macd::moving_average_convergence_divergence;
 pub use macd::{MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue};
 #[allow(unused_imports)]
@@ -488,6 +487,7 @@ pub use minus_di::MinusDirectionalIndicator;
 pub(crate) use minus_dm::minus_directional_movement;
 pub use minus_dm::MinusDirectionalMovement;
 pub use momentum::Momentum;
+pub use moving_average::MovingAverage;
 pub use opening_range::OpeningRange;
 pub use parabolic_moving_average_stop::ParabolicMovingAverageStop;
 pub use pivot_points::PivotPoints;

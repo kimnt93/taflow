@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 190,
-    "complete": 61,
+    "complete": 62,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 612,
     "smc_functions": 8,
-    "structure": 61,
+    "structure": 62,
     "talib_functions": 161
   },
   "rows": [
@@ -21,7 +21,8 @@
       "name": "MovingAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulMa"
+        "MovingAverage",
+        "_NativeMovingAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4601,6 +4602,7 @@
         "MinusDirectionalMovement",
         "Momentum",
         "MoneyFlowIndex",
+        "MovingAverage",
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
         "OnBalanceVolume",
@@ -4670,7 +4672,6 @@
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
         "StatefulLinearregSlope",
-        "StatefulMa",
         "StatefulMacd",
         "StatefulMacdExt",
         "StatefulMacdFix",
@@ -4907,6 +4908,7 @@
         "MinusDirectionalMovement",
         "Momentum",
         "MoneyFlowIndex",
+        "MovingAverage",
         "NegativeVolumeIndexOperator",
         "NormalizedAverageTrueRange",
         "OnBalanceVolume",
@@ -4976,7 +4978,6 @@
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
         "StatefulLinearregSlope",
-        "StatefulMa",
         "StatefulMacd",
         "StatefulMacdExt",
         "StatefulMacdFix",

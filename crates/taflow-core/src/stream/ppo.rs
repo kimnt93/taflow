@@ -8,7 +8,7 @@ use multiversion::multiversion;
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverageDispatcher, StreamingIndicator};
+use super::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
 
 /// Steady-state kernel for the fused fast/slow EMA legs.
 ///

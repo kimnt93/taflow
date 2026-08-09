@@ -1005,57 +1005,6 @@ oscillator_state_class!(StatefulApo, stream::AbsolutePriceOscillator);
 oscillator_state_class!(StatefulPpo, stream::PercentagePriceOscillator);
 
 #[pyclass]
-pub struct StatefulMa {
-    inner: stream::MovingAverage,
-    outputs: Vec<f64>,
-}
-
-#[pymethods]
-impl StatefulMa {
-    #[new]
-    #[pyo3(signature = (timeperiod=30, matype=0))]
-    fn new(timeperiod: usize, matype: i32) -> PyResult<Self> {
-        Ok(Self {
-            inner: stream::MovingAverage::new(
-                timeperiod,
-                MaType::try_from(matype).map_err(py_value_error)?,
-            )
-            .map_err(py_value_error)?,
-            outputs: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        push_option(&mut self.outputs, self.inner.append(input))
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| self.inner.extend_slice_into(input, outputs));
-        Ok(())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
-    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
-        to_py_array(py, self.outputs.clone())
-    }
-
-    fn __len__(&self) -> usize {
-        self.outputs.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.outputs.clear();
-    }
-}
-
-#[pyclass]
 pub struct StatefulBbands {
     inner: stream::BollingerBands,
     uppers: Vec<f64>,

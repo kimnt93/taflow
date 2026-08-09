@@ -6,7 +6,9 @@
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
-use super::{moving_average::MovingAverageDispatcher, RollingMax, RollingMin, StreamingIndicator};
+use super::{
+    moving_average_dispatcher::MovingAverageDispatcher, RollingMax, RollingMin, StreamingIndicator,
+};
 
 /// One aligned fast %K and fast %D observation.
 #[derive(Debug, Clone, Copy, PartialEq)]

@@ -1,97 +1,72 @@
-"""Descriptive stateful interface for a selectable moving average."""
+"""Native selectable moving-average adapter."""
 
-from taflow._native import StatefulMa
 from typing import Any
 
 import numpy as np
 
+from ._native import MovingAverage as _NativeMovingAverage
+from ._series import as_float64_series
+
 
 class MovingAverage:
-    """Incrementally compute any TA-Lib moving-average type
+    """Compute a TA-Lib-compatible selectable moving average.
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    values : array-like
+        Initial chronological input values. Pass an empty series for a fresh
+        state intended for later streaming.
+    timeperiod : int, default 30
+        Lookback period forwarded to the selected native moving-average state.
+    matype : int, default 0
+        TA-Lib ``MA_Type`` code: 0 SMA, 1 EMA, 2 WMA, 3 DEMA, 4 TEMA,
+        5 TRIMA, 6 KAMA, 7 MAMA, or 8 T3-like TripleExponentialAverage.
 
-    Returns
-    -------
-    MovingAverage
-        A persistent native-backed indicator adapter.
+    Notes
+    -----
+    Rust owns moving-average selection, recurrence, warm-up, and output
+    history. Scalar warm-up is ``None`` and aligned ``compute`` values are
+    ``NaN``. ``append``, ``extend``, and ``reset`` mutate and return this
+    adapter. The oracle/name mapping is ``MovingAverage`` to TA-Lib ``MA``.
     """
 
     def __init__(
         self,
         values: Any,
-        period: int = 30,
-        moving_average_type: int = 0,
+        timeperiod: int = 30,
+        matype: int = 0,
     ) -> None:
-        """Create a selectable moving average with initial values."""
-        self._state = StatefulMa(period, moving_average_type)
-        if values is not None:
-            self.extend(values)
+        """Create a selectable moving-average state and process ``values``."""
+        self._state = _NativeMovingAverage(timeperiod, matype)
+        self.extend(values)
 
     def append(self, value: float) -> "MovingAverage":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        value : object
-            Input value processed at each bar.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append one value and return this adapter for fluent chaining."""
         self._state.append(float(value))
         return self
 
     def extend(self, values: Any) -> "MovingAverage":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        values : object
-            Input values processed in chronological order.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(values)
+        """Append one-dimensional chronological values through Rust."""
+        self._state.extend(as_float64_series(values))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
+        """Return aligned selected moving-average history as float64."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> float | None:
+        """Return the latest selected moving-average value, or ``None`` warm-up."""
         return self._state.value
 
     def reset(self) -> "MovingAverage":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Reset native state and output history, returning this adapter."""
         self._state.reset()
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed values."""
         return len(self._state)
+
+
+__all__ = ["MovingAverage"]

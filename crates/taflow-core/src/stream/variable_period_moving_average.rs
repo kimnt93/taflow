@@ -3,7 +3,7 @@
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
-use super::moving_average::MovingAverageDispatcher;
+use super::moving_average_dispatcher::MovingAverageDispatcher;
 
 /// One configured moving-average state and the global bar where it starts.
 struct PeriodState {

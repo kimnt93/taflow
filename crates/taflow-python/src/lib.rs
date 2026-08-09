@@ -60,6 +60,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::LaguerreRelativeStrengthIndex>()?;
     m.add_class::<indicators::RelativeStrengthIndex>()?;
     m.add_class::<indicators::RelativeMomentumIndex>()?;
+    m.add_class::<indicators::MovingAverage>()?;
     m.add_class::<indicators::Lag>()?;
     m.add_class::<indicators::LogReturn>()?;
     m.add_class::<indicators::CumulativeSum>()?;
@@ -306,7 +307,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulT3>()?;
     m.add_class::<state_api::StatefulApo>()?;
     m.add_class::<state_api::StatefulPpo>()?;
-    m.add_class::<state_api::StatefulMa>()?;
     m.add_class::<state_api::StatefulBbands>()?;
     m.add_class::<state_api::StatefulAccbands>()?;
     m.add_class::<state_api::StatefulSar>()?;

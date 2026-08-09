@@ -405,7 +405,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | RollingLinearRegressionSlope | [TA-Lib: `LINEARREG_SLOPE`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.13× | 1.22× | 1.00× | 0.97× |
 | MathLn | [TA-Lib: `LN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.97× | 1.57× | 1.00× | 1.06× |
 | MathLog10 | [TA-Lib: `LOG10`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.49× | 1.32× | 1.02× | 0.88× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 6.19× | 1.22× | 0.52× | 0.46× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 8.18× | 2.43× | 1.11× | 0.95× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.99× | 5.33× | 4.27× | 4.38× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.45× | 1.11× | 0.79× | 0.84× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 9.87× | 4.96× | 4.10× | 4.33× |
@@ -779,7 +779,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.24× | 1.57× | 1.88× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.02× | 1.44× | 2.01× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 1.56× | 1.84× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.56× | 1.96× | 2.31× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.82× | 2.08× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.43× | 2.28× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.74× | 2.29× | 2.19× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.82× | 1.84× | 2.44× |
@@ -1071,7 +1071,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.01× | 2.13× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.05× | 2.11× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.05× | 1.95× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.10× | 2.02× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 2.01× | 2.11× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.22× | 2.44× | 2.23× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.19× | 2.37× | 2.24× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.10× | 1.99× | 2.25× |
@@ -1363,7 +1363,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 2.00× | 2.15× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.96× | 1.96× | 2.02× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.75× | 1.87× | 1.90× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.33× | 2.11× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.92× | 2.04× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.19× | 2.20× | 2.25× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.09× | 2.28× | 2.26× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.12× | 2.28× | 2.25× |
@@ -1655,7 +1655,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | MinusDirectionalMovement | [TA-Lib: `MINUS_DM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.96× | 2.11× |
 | Momentum | [TA-Lib: `MOM`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.94× | 2.03× |
 | MoneyFlowIndex | [TA-Lib: `MFI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 1.99× |
-| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.95× | 1.96× |
+| MovingAverage | [TA-Lib: `MA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.04× | 1.97× |
 | MovingAverageConvergenceDivergence | [TA-Lib: `MACD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.07× | 2.47× | 2.37× |
 | MovingAverageConvergenceDivergenceExtended | [TA-Lib: `MACDEXT`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.99× | 2.42× | 2.33× |
 | MovingAverageConvergenceDivergenceFixed | [TA-Lib: `MACDFIX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.86× | 2.50× | 2.41× |
