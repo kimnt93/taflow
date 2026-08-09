@@ -357,6 +357,8 @@ mod stochrsi;
 mod t3;
 mod tema;
 mod tom_de_mark_sequential;
+#[cfg(test)]
+mod tom_de_mark_sequential_test;
 mod trima;
 mod trix;
 mod ultosc;
@@ -554,7 +556,7 @@ pub use t3::TripleExponentialAverage;
 #[allow(unused_imports)]
 pub(crate) use tema::triple_exponential_moving_average;
 pub use tema::TripleExponentialMovingAverage;
-pub use tom_de_mark_sequential::TomDeMarkSequential;
+pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
 #[allow(unused_imports)]
 pub(crate) use trima::triangular_moving_average;
 pub use trima::TriangularMovingAverage;

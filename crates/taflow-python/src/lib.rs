@@ -64,6 +64,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::HilbertTransformTrendline>()?;
     m.add_class::<indicators::JurikMovingAverage>()?;
     m.add_class::<indicators::KlingerVolumeOscillator>()?;
+    m.add_class::<indicators::TomDeMarkSequential>()?;
     m.add_class::<indicators::ParabolicMovingAverageStop>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergence>()?;
     m.add_class::<indicators::MovingAverageConvergenceDivergenceExtended>()?;
@@ -250,7 +251,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulPremiumDiscount>()?;
     m.add_class::<state_api::StatefulOpeningRange>()?;
     m.add_class::<state_api::StatefulSessionVolumeLevels>()?;
-    m.add_class::<state_api::StatefulTomDeMarkSequential>()?;
     m.add_class::<state_api::StatefulPivotPoints>()?;
     m.add_class::<state_api::StatefulKama>()?;
     m.add_class::<state_api::AccumulationDistribution>()?;

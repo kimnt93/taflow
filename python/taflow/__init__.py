@@ -106,7 +106,7 @@ from .relative_momentum_index import RelativeMomentumIndex
 from .ssl_channel import SmoothedTrendChannel
 from .jurik_moving_average import JurikMovingAverage
 from .parabolic_moving_average_stop import ParabolicMovingAverageStop
-from .td_sequential import TomDeMarkSequential
+from .tom_de_mark_sequential import TomDeMarkSequential
 from .ebsw import EvenBetterSinewave
 from .premium_discount import PremiumDiscount
 from .opening_range import OpeningRange
