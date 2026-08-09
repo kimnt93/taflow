@@ -43,7 +43,7 @@ pub(crate) mod aroon_rescan;
 pub use crate::indicators::{
     ChaikinMoneyFlow, ChandeMomentumOscillator, CloseToCloseSigma, CommodityChannelIndex,
     CumulativeMaximum, CumulativeMinimum, CumulativeSumControlChart, DetrendedPriceOscillator,
-    EqualHighsLows, FractalDimension,
+    EqualHighsLows, FractalDimension, HilbertTransformDominantCyclePhase,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -53,21 +53,6 @@ mod double_exponential_moving_average_test;
 mod exponential_moving_average;
 #[cfg(test)]
 mod exponential_moving_average_test;
-mod hilbert_transform_dominant_cycle_period;
-#[cfg(test)]
-mod hilbert_transform_dominant_cycle_period_test;
-mod hilbert_transform_dominant_cycle_phase;
-#[cfg(test)]
-mod hilbert_transform_dominant_cycle_phase_test;
-mod hilbert_transform_phasor;
-#[cfg(test)]
-mod hilbert_transform_phasor_test;
-mod hilbert_transform_sine_wave;
-#[cfg(test)]
-mod hilbert_transform_sine_wave_test;
-mod hilbert_transform_trend_mode;
-#[cfg(test)]
-mod hilbert_transform_trend_mode_test;
 mod hilbert_transform_trendline;
 #[cfg(test)]
 mod hilbert_transform_trendline_test;
@@ -131,9 +116,6 @@ mod fast_stochastic_oscillator_test;
 mod fibonacci_retracement;
 #[cfg(test)]
 mod fibonacci_retracement_test;
-mod heikin_ashi;
-#[cfg(test)]
-mod heikin_ashi_test;
 mod helpers;
 mod jurik_moving_average;
 #[cfg(test)]
@@ -187,12 +169,6 @@ mod weighted_moving_average_test;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
-pub use heikin_ashi::{HeikinAshi, HeikinAshiValue};
-pub use hilbert_transform_dominant_cycle_period::HilbertTransformDominantCyclePeriod;
-pub use hilbert_transform_dominant_cycle_phase::HilbertTransformDominantCyclePhase;
-pub use hilbert_transform_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
-pub use hilbert_transform_sine_wave::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
-pub use hilbert_transform_trend_mode::HilbertTransformTrendMode;
 pub use hilbert_transform_trendline::HilbertTransformTrendline;
 pub use indicator::StreamingIndicator;
 #[allow(unused_imports)]
@@ -596,18 +572,6 @@ mod falling_test;
 mod force_index;
 #[cfg(test)]
 mod force_index_test;
-mod garman_klass;
-#[cfg(test)]
-mod garman_klass_test;
-mod garman_klass_yang_zhang;
-#[cfg(test)]
-mod garman_klass_yang_zhang_test;
-mod hedge_ratio;
-#[cfg(test)]
-mod hedge_ratio_test;
-pub(crate) mod hurst;
-#[cfg(test)]
-mod hurst_test;
 #[allow(unused_imports)]
 mod liquidity;
 #[cfg(test)]
@@ -769,12 +733,8 @@ pub use falling::Falling;
 pub use frac_diff::FracDiff;
 pub use gap_down::GapDown;
 pub use gap_up::GapUp;
-pub use garman_klass::GarmanKlass;
-pub use garman_klass_yang_zhang::GarmanKlassYangZhang;
-pub use hedge_ratio::HedgeRatio;
 pub use higher_high::HigherHigh;
 pub use highest_since::HighestSince;
-pub use hurst::Hurst;
 pub use ichimoku::{Ichimoku, IchimokuValue};
 pub use inside_bar::InsideBar;
 pub use kalman_hedge_ratio::KalmanHedgeRatio;

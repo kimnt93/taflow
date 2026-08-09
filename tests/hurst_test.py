@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.hurst import Hurst
+from taflow import Hurst
 
 
 def test_hurst_lifecycle_and_reset():
@@ -10,4 +10,3 @@ def test_hurst_lifecycle_and_reset():
     assert len(state) == 3
     state.reset()
     assert state.value is None
-

@@ -765,6 +765,17 @@ suite, interface audit, formatter, and diff checks passed. Generated rows may
 still lag; source scans are authoritative. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The twentieth structural batch migrated `GarmanKlass`,
+`GarmanKlassYangZhang`, `HedgeRatio`, `HeikinAshi`,
+`HilbertTransformDominantCyclePeriod`, `HilbertTransformDominantCyclePhase`,
+`HilbertTransformPhasor`, `HilbertTransformSineWave`,
+`HilbertTransformTrendMode`, and `Hurst`. Their Rust implementations/tests,
+Python adapters, and PyO3 bindings now use canonical one-indicator files and
+exports. The release extension, workspace Rust tests, focused tests, full
+Python suite, interface audit, formatter, and diff checks passed. Generated
+rows may still lag; source scans are authoritative. Benchmark fields remain
+`TODO`; no benchmark command was run.
+
 The nineteenth structural batch migrated `ChandeMomentumOscillator`,
 `CloseToCloseSigma`, `CommodityChannelIndex`, `CumulativeMaximum`,
 `CumulativeMinimum`, `ChaikinMoneyFlow`, `CumulativeSumControlChart`,

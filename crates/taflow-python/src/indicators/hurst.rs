@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{FractalDimension, Hurst};
+use taflow::indicators::{FractalDimension, Hurst};
 
 macro_rules! hurst_operator {
     ($name:ident, $inner:ty) => {

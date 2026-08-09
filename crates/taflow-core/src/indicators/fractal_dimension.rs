@@ -1,5 +1,5 @@
 use crate::error::TaResult;
-use crate::stream::hurst::Hurst;
+use crate::indicators::hurst::Hurst;
 
 #[derive(Debug, Clone)]
 /// Causal rolling fractal dimension defined as `2 - Hurst`.

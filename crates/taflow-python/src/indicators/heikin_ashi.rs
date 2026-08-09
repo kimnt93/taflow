@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::HeikinAshi as HeikinAshiState;
+use taflow::indicators::HeikinAshi as HeikinAshiState;
 
 /// Python boundary for the canonical Rust Heikin-Ashi state.
 #[pyclass]

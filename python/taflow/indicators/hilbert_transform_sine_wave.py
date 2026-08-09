@@ -1,14 +1,13 @@
-"""Persistent Hilbert Transform phasor components (HT_PHASOR)."""
+"""Persistent Hilbert Transform sine wave (HT_SINE)."""
 
 from typing import Any
 import numpy as np
+from .._native import HilbertTransformSineWave as _Native
+from .._series import as_float64_series
 
-from ._native import HilbertTransformPhasor as _Native
-from ._series import as_float64_series
 
-
-class HilbertTransformPhasor:
-    """Persistent Hilbert Transform phasor components (HT_PHASOR).
+class HilbertTransformSineWave:
+    """Persistent Hilbert Transform sine wave (HT_SINE).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
@@ -31,7 +30,7 @@ class HilbertTransformPhasor:
         self._state = _Native()
         self.extend(_input)
 
-    def append(self, value: float) -> "HilbertTransformPhasor":
+    def append(self, value: float) -> "HilbertTransformSineWave":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +46,7 @@ class HilbertTransformPhasor:
         self._state.append(float(value))
         return self
 
-    def extend(self, _input: Any) -> "HilbertTransformPhasor":
+    def extend(self, _input: Any) -> "HilbertTransformSineWave":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -88,7 +87,7 @@ class HilbertTransformPhasor:
         """Return the number of processed input bars."""
         return len(self._state.compute()[0])
 
-    def reset(self) -> "HilbertTransformPhasor":
+    def reset(self) -> "HilbertTransformSineWave":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

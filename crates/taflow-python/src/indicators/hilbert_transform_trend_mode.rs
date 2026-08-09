@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::HilbertTransformTrendMode as NativeHilbertTransformTrendMode;
+use taflow::indicators::HilbertTransformTrendMode as NativeHilbertTransformTrendMode;
 
 #[pyclass]
 pub struct HilbertTransformTrendMode {

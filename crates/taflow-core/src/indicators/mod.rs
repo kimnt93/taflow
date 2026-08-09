@@ -462,6 +462,48 @@ pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 
+mod garman_klass;
+#[cfg(test)]
+mod garman_klass_test;
+mod garman_klass_yang_zhang;
+#[cfg(test)]
+mod garman_klass_yang_zhang_test;
+mod hedge_ratio;
+#[cfg(test)]
+mod hedge_ratio_test;
+mod heikin_ashi;
+#[cfg(test)]
+mod heikin_ashi_test;
+mod hilbert_transform_dominant_cycle_period;
+#[cfg(test)]
+mod hilbert_transform_dominant_cycle_period_test;
+mod hilbert_transform_dominant_cycle_phase;
+#[cfg(test)]
+mod hilbert_transform_dominant_cycle_phase_test;
+mod hilbert_transform_phasor;
+#[cfg(test)]
+mod hilbert_transform_phasor_test;
+mod hilbert_transform_sine_wave;
+#[cfg(test)]
+mod hilbert_transform_sine_wave_test;
+mod hilbert_transform_trend_mode;
+#[cfg(test)]
+mod hilbert_transform_trend_mode_test;
+mod hurst;
+#[cfg(test)]
+mod hurst_test;
+
+pub use garman_klass::GarmanKlass;
+pub use garman_klass_yang_zhang::GarmanKlassYangZhang;
+pub use hedge_ratio::HedgeRatio;
+pub use heikin_ashi::HeikinAshi;
+pub use hilbert_transform_dominant_cycle_period::HilbertTransformDominantCyclePeriod;
+pub use hilbert_transform_dominant_cycle_phase::HilbertTransformDominantCyclePhase;
+pub use hilbert_transform_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
+pub use hilbert_transform_sine_wave::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
+pub use hilbert_transform_trend_mode::HilbertTransformTrendMode;
+pub use hurst::Hurst;
+
 mod chaikin_money_flow;
 #[cfg(test)]
 mod chaikin_money_flow_test;

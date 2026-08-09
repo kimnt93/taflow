@@ -1,7 +1,7 @@
 use crate::conversion::to_py_array;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::HilbertTransformDominantCyclePhase as NativeHilbertTransformDominantCyclePhase;
+use taflow::indicators::HilbertTransformDominantCyclePhase as NativeHilbertTransformDominantCyclePhase;
 
 #[pyclass]
 pub struct HilbertTransformDominantCyclePhase {

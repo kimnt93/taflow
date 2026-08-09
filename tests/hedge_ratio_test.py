@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.hedge_ratio import HedgeRatio
+from taflow import HedgeRatio
 
 
 def test_hedge_ratio_lifecycle_and_alignment():
@@ -10,4 +10,3 @@ def test_hedge_ratio_lifecycle_and_alignment():
     assert len(state) == 2
     state.reset()
     assert state.value is None
-

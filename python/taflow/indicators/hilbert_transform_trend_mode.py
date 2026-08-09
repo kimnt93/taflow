@@ -1,14 +1,13 @@
-"""Persistent Hilbert Transform dominant cycle period (HT_DCPERIOD)."""
+"""Persistent Hilbert Transform trend/cycle mode (HT_TRENDMODE)."""
 
 from typing import Any
 import numpy as np
+from .._native import HilbertTransformTrendMode as _Native
+from .._series import as_float64_series
 
-from ._native import HilbertTransformDominantCyclePeriod as _Native
-from ._series import as_float64_series
 
-
-class HilbertTransformDominantCyclePeriod:
-    """Persistent Hilbert Transform dominant cycle period (HT_DCPERIOD).
+class HilbertTransformTrendMode:
+    """Persistent Hilbert Transform trend/cycle mode (HT_TRENDMODE).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
@@ -31,7 +30,7 @@ class HilbertTransformDominantCyclePeriod:
         self._state = _Native()
         self.extend(_input)
 
-    def append(self, value: float) -> "HilbertTransformDominantCyclePeriod":
+    def append(self, value: float) -> "HilbertTransformTrendMode":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +46,7 @@ class HilbertTransformDominantCyclePeriod:
         self._state.append(float(value))
         return self
 
-    def extend(self, _input: Any) -> "HilbertTransformDominantCyclePeriod":
+    def extend(self, _input: Any) -> "HilbertTransformTrendMode":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -74,7 +73,7 @@ class HilbertTransformDominantCyclePeriod:
         return self._state.compute()
 
     @property
-    def value(self) -> float | None:
+    def value(self) -> int | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -88,7 +87,7 @@ class HilbertTransformDominantCyclePeriod:
         """Return the number of processed input bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "HilbertTransformDominantCyclePeriod":
+    def reset(self) -> "HilbertTransformTrendMode":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

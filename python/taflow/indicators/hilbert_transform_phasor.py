@@ -1,13 +1,14 @@
-"""Persistent Hilbert Transform trend/cycle mode (HT_TRENDMODE)."""
+"""Persistent Hilbert Transform phasor components (HT_PHASOR)."""
 
 from typing import Any
 import numpy as np
-from ._native import HilbertTransformTrendMode as _Native
-from ._series import as_float64_series
+
+from .._native import HilbertTransformPhasor as _Native
+from .._series import as_float64_series
 
 
-class HilbertTransformTrendMode:
-    """Persistent Hilbert Transform trend/cycle mode (HT_TRENDMODE).
+class HilbertTransformPhasor:
+    """Persistent Hilbert Transform phasor components (HT_PHASOR).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
@@ -30,7 +31,7 @@ class HilbertTransformTrendMode:
         self._state = _Native()
         self.extend(_input)
 
-    def append(self, value: float) -> "HilbertTransformTrendMode":
+    def append(self, value: float) -> "HilbertTransformPhasor":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -46,7 +47,7 @@ class HilbertTransformTrendMode:
         self._state.append(float(value))
         return self
 
-    def extend(self, _input: Any) -> "HilbertTransformTrendMode":
+    def extend(self, _input: Any) -> "HilbertTransformPhasor":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -62,7 +63,7 @@ class HilbertTransformTrendMode:
         self._state.extend(as_float64_series(_input))
         return self
 
-    def compute(self) -> np.ndarray:
+    def compute(self) -> tuple[np.ndarray, np.ndarray]:
         """Return the aligned output history as a NumPy array.
 
         Returns
@@ -73,7 +74,7 @@ class HilbertTransformTrendMode:
         return self._state.compute()
 
     @property
-    def value(self) -> int | None:
+    def value(self) -> tuple[float, float] | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -85,9 +86,9 @@ class HilbertTransformTrendMode:
 
     def __len__(self) -> int:
         """Return the number of processed input bars."""
-        return len(self._state.compute())
+        return len(self._state.compute()[0])
 
-    def reset(self) -> "HilbertTransformTrendMode":
+    def reset(self) -> "HilbertTransformPhasor":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
