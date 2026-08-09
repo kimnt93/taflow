@@ -57,6 +57,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::FibonacciRetracement>()?;
     m.add_class::<indicators::AnchoredVolumeWeightedAveragePrice>()?;
     m.add_class::<indicators::VariableIndexDynamicAverage>()?;
+    m.add_class::<indicators::LaguerreRelativeStrengthIndex>()?;
     m.add_class::<indicators::Lag>()?;
     m.add_class::<indicators::LogReturn>()?;
     m.add_class::<indicators::CumulativeSum>()?;
@@ -236,7 +237,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulTsf>()?;
     m.add_class::<state_api::StatefulCmo>()?;
     m.add_class::<state_api::StatefulRelativeMomentumIndex>()?;
-    m.add_class::<state_api::StatefulLaguerreRelativeStrengthIndex>()?;
     m.add_class::<state_api::StatefulEvenBetterSinewave>()?;
     m.add_class::<state_api::StatefulJurikMovingAverage>()?;
     m.add_class::<state_api::StatefulSmoothedTrendChannel>()?;

@@ -351,22 +351,6 @@ def run_pandas(data: dict[str, np.ndarray], rows: list[Result]) -> None:
           taflow.CumulativeSumControlChart(changes, 1.0).compute(), cusum,
           "NumPy implementation of AFML CUSUM")
 
-    laguerre = np.empty(len(close))
-    stages = np.zeros(4)
-    gamma = 0.5
-    for index, price in enumerate(close):
-        a, b, c_stage, d = stages
-        l0 = (1.0 - gamma) * price + gamma * a
-        l1 = -gamma * l0 + a + gamma * b
-        l2 = -gamma * l1 + b + gamma * c_stage
-        l3 = -gamma * l2 + c_stage + gamma * d
-        up = max(l0 - l1, 0.0) + max(l1 - l2, 0.0) + max(l2 - l3, 0.0)
-        down = max(l1 - l0, 0.0) + max(l2 - l1, 0.0) + max(l3 - l2, 0.0)
-        stages[:] = (l0, l1, l2, l3)
-        laguerre[index] = up / (up + down) if up + down else 0.0
-    check("laguerre_rsi", taflow.LaguerreRelativeStrengthIndex(close, gamma).compute(),
-          laguerre, "NumPy Ehlers Laguerre recurrence")
-
     average_high = high.rolling(10).mean()
     average_low = low.rolling(10).mean()
     ssl_low = np.full(len(close), np.nan)
@@ -782,6 +766,25 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
              taflow.VariableIndexDynamicAverage(values, 14).compute(),
              pta.vidya(pd.Series(values), length=14),
              (f"vidya[{case}]",), note="required source-shape matrix")
+    many("laguerre_relative_strength_index",
+         taflow.LaguerreRelativeStrengthIndex(close, 0.5).compute(),
+         pta.lrsi(c, length=14, gamma=0.5), ("lrsi",))
+    for gamma in (0.1, 0.25, 0.9):
+        many("laguerre_relative_strength_index",
+             taflow.LaguerreRelativeStrengthIndex(close, gamma).compute(),
+             pta.lrsi(c, length=14, gamma=gamma),
+             (f"lrsi[gamma={gamma}]",))
+    laguerre_cases = {
+        "constant": np.full(64, 42.0),
+        "monotonic": np.linspace(10.0, 90.0, 64),
+        "repeated": np.resize(np.array([10.0, 12.0, 12.0, 9.0, 9.0, 12.0]), 64),
+        "minimum": np.array([17.0]),
+    }
+    for case, values in laguerre_cases.items():
+        many("laguerre_relative_strength_index",
+             taflow.LaguerreRelativeStrengthIndex(values, 0.5).compute(),
+             pta.lrsi(pd.Series(values), length=1, gamma=0.5),
+             (f"lrsi[{case}]",), note="required source-shape matrix")
     many("jurik_moving_average", taflow.JurikMovingAverage(close, 7, 0).compute(),
          pta.jma(c, length=7, phase=0), ("jma",))
     for length, phase in ((1, 0), (2, -100), (7, 100), (21, 35)):

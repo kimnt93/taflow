@@ -289,7 +289,9 @@ mod lag;
 #[cfg(test)]
 mod lag_test;
 mod lagged_common;
-mod laguerre_rsi;
+mod laguerre_relative_strength_index;
+#[cfg(test)]
+mod laguerre_relative_strength_index_test;
 mod log_return;
 #[cfg(test)]
 mod log_return_test;
@@ -453,7 +455,7 @@ pub(crate) use kama::kaufman_adaptive_moving_average;
 pub use kama::KaufmanAdaptiveMovingAverage;
 pub use klinger_volume_oscillator::KlingerVolumeOscillator;
 pub use lag::Lag;
-pub use laguerre_rsi::LaguerreRelativeStrengthIndex;
+pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
 #[allow(unused_imports)]
 pub(crate) use ma::moving_average;

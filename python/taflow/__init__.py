@@ -93,7 +93,7 @@ from .anchored_volume_weighted_average_price import (
     AnchoredVolumeWeightedAveragePrice,
 )
 from .variable_index_dynamic_average import VariableIndexDynamicAverage
-from .laguerre_rsi import LaguerreRelativeStrengthIndex
+from .laguerre_relative_strength_index import LaguerreRelativeStrengthIndex
 from .simple_moving_average import SimpleMovingAverage
 from .normalized_average_true_range import NormalizedAverageTrueRange
 from .true_range import TrueRange

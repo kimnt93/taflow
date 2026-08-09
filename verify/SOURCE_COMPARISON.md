@@ -2,7 +2,7 @@
 
 One oracle is selected per indicator using: **TA-Lib > NumPy > Polars > pandas > pandas-ta-classic > pinned GitHub**. `VARIANT` is a documented semantic difference, not a failed comparison; `INVARIANT` rows have no external oracle.
 
-Matches: **335** | Documented variants: **39** | Self-invariant outputs: **0** | Failures: **0**
+Matches: **342** | Documented variants: **39** | Self-invariant outputs: **0** | Failures: **0**
 
 | TAFlow class ↔ oracle API | Output | Selected source | Version | Verdict | Max error | NaN | Note |
 |---|---|---|---|---:|---:|---:|---|
@@ -186,7 +186,14 @@ Matches: **335** | Documented variants: **39** | Self-invariant outputs: **0** |
 | `KnowSureThing` ↔ `pandas-ta-classic.know_sure_thing` | `kst` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `1.824e+04` | 0 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
 | `KnowSureThing` ↔ `pandas-ta-classic.know_sure_thing` | `signal` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `1.782e+04` | 8 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
 | `Lag` ↔ `pandas.lag` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | Series.shift |
-| `LaguerreRelativeStrengthIndex` ↔ `pandas.laguerre_rsi` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | NumPy Ehlers Laguerre recurrence |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi[constant]` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi[gamma=0.1]` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi[gamma=0.25]` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi[gamma=0.9]` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi[minimum]` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi[monotonic]` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| `LaguerreRelativeStrengthIndex` ↔ `pandas_ta_classic.lrsi` | `lrsi[repeated]` | [pandas-ta-classic](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
 | `Liquidity` ↔ `smartmoneyconcepts.liquidity` | `level` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `1.500e+00` | 184 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
 | `Liquidity` ↔ `smartmoneyconcepts.liquidity` | `liquidity` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `2.000e+00` | 125 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
 | `Liquidity` ↔ `smartmoneyconcepts.liquidity` | `swept` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 71 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |

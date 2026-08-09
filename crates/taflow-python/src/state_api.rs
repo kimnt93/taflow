@@ -8,9 +8,9 @@ use taflow::stream::{
     AverageTrueRange as CoreAverageTrueRange, CommodityChannelIndex, DirectionalMovementIndex,
     DoubleExponentialMovingAverage, EvenBetterSinewave, ExponentialMovingAverage,
     FastStochasticOscillator, HilbertTransformTrendline, IntradayMomentumIndex, JurikMovingAverage,
-    KlingerVolumeOscillator, LaguerreRelativeStrengthIndex, MesaAdaptiveMovingAverage,
-    Momentum as CoreMomentum, MovingAverageConvergenceDivergence,
-    MovingAverageConvergenceDivergenceExtended, MovingAverageConvergenceDivergenceFixed,
+    KlingerVolumeOscillator, MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
+    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended,
+    MovingAverageConvergenceDivergenceFixed,
     NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange,
     ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange as CoreRateOfChange,
     RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
@@ -119,13 +119,6 @@ scalar_state_class!(StatefulTsf, stream::Tsf, 14);
 #[pyclass]
 pub struct StatefulRelativeMomentumIndex {
     inner: RelativeMomentumIndex,
-    output: Vec<f64>,
-}
-
-/// Native state adapter for Laguerre Relative Strength Index.
-#[pyclass]
-pub struct StatefulLaguerreRelativeStrengthIndex {
-    inner: LaguerreRelativeStrengthIndex,
     output: Vec<f64>,
 }
 
@@ -756,44 +749,6 @@ impl StatefulEvenBetterSinewave {
     fn new(length: usize) -> PyResult<Self> {
         Ok(Self {
             inner: EvenBetterSinewave::new(length).map_err(py_value_error)?,
-            output: Vec::new(),
-        })
-    }
-    fn append(&mut self, input: f64) -> Option<f64> {
-        let value = self.inner.append(input);
-        self.output.push(value.unwrap_or(f64::NAN));
-        value
-    }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? {
-            self.append(value);
-        }
-        Ok(())
-    }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
-        PyArray1::from_vec(py, self.output.clone())
-    }
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-    fn __len__(&self) -> usize {
-        self.output.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.output.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulLaguerreRelativeStrengthIndex {
-    #[new]
-    #[pyo3(signature = (gamma=0.5))]
-    fn new(gamma: f64) -> PyResult<Self> {
-        Ok(Self {
-            inner: LaguerreRelativeStrengthIndex::new(gamma).map_err(py_value_error)?,
             output: Vec::new(),
         })
     }

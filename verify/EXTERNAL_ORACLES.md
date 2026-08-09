@@ -1,6 +1,6 @@
 # External correctness oracles
 
-Bars: **2,000** | Matches: **189** | Documented variants: **39** | Failures: **0** | rtol=1e-08, atol=1e-10
+Bars: **2,000** | Matches: **196** | Documented variants: **39** | Failures: **0** | rtol=1e-08, atol=1e-10
 
 Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27
 
@@ -117,7 +117,6 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas | `inside_bar` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
 | pandas | `kalman_hedge_ratio` | `beta` | MATCH | `0.000e+00` | 0 | NumPy two-state Kalman filter_update |
 | pandas | `lag` | `all` | MATCH | `0.000e+00` | 0 | Series.shift |
-| pandas | `laguerre_rsi` | `all` | MATCH | `0.000e+00` | 0 | NumPy Ehlers Laguerre recurrence |
 | pandas | `lower_low` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
 | pandas | `lowest_since` | `all` | MATCH | `0.000e+00` | 0 | Series.groupby.cummin |
 | pandas | `opening_range` | `breakout` | MATCH | `0.000e+00` | 0 | NumPy anchored opening-range definition |
@@ -191,6 +190,14 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas-ta-classic | `klinger_volume_oscillator` | `kvo[fast=5,slow=8,signal=3]` | MATCH | `2.910e-10` | 0 |  |
 | pandas-ta-classic | `klinger_volume_oscillator` | `signal` | MATCH | `1.914e-10` | 0 |  |
 | pandas-ta-classic | `klinger_volume_oscillator` | `signal[fast=5,slow=8,signal=3]` | MATCH | `2.146e-10` | 0 |  |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi` | MATCH | `0.000e+00` | 0 |  |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi[constant]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi[gamma=0.1]` | MATCH | `0.000e+00` | 0 |  |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi[gamma=0.25]` | MATCH | `0.000e+00` | 0 |  |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi[gamma=0.9]` | MATCH | `0.000e+00` | 0 |  |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi[minimum]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi[monotonic]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| pandas-ta-classic | `laguerre_relative_strength_index` | `lrsi[repeated]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
 | pandas-ta-classic | `log_return` | `log_return` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `mcginley_dynamic` | `mcginley` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `schaff_trend_cycle` | `macd` | MATCH | `7.105e-14` | 0 | stream-safe epsilon convention; documented tolerance 1e-5 |

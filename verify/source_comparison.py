@@ -39,6 +39,8 @@ API_NAMES = {
     "detrended_price_oscillator": "pandas_ta_classic.dpo",
     "mcginley_dynamic": "pandas_ta_classic.mcgd",
     "variable_index_dynamic_average": "pandas_ta_classic.vidya",
+    "laguerre_relative_strength_index": "pandas_ta_classic.lrsi",
+    "laguerre_rsi": "pandas_ta_classic.lrsi",
     "jurik_moving_average": "pandas_ta_classic.jma",
     "even_better_sinewave": "pandas_ta_classic.ebsw",
     "schaff_trend_cycle": "pandas_ta_classic.stc",
@@ -49,6 +51,10 @@ API_URLS = {
     "anchored_vwap": (
         "https://pandas.pydata.org/docs/reference/api/"
         "pandas.core.groupby.SeriesGroupBy.cumsum.html"
+    ),
+    "laguerre_rsi": (
+        "https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/"
+        "pandas_ta_classic/momentum/lrsi.py"
     ),
 }
 

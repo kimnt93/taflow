@@ -1,7 +1,7 @@
 {
   "counts": {
-    "benchmark": 188,
-    "complete": 58,
+    "benchmark": 189,
+    "complete": 59,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 612,
     "smc_functions": 8,
-    "structure": 58,
+    "structure": 59,
     "talib_functions": 161
   },
   "rows": [
@@ -593,11 +593,12 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "laguerre_rsi",
+      "module": "laguerre_relative_strength_index",
       "name": "LaguerreRelativeStrengthIndex",
       "native_binding": true,
       "native_symbols": [
-        "StatefulLaguerreRelativeStrengthIndex"
+        "LaguerreRelativeStrengthIndex",
+        "_NativeLaguerreRelativeStrengthIndex"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4558,6 +4559,7 @@
         "KeltnerChannelsOperator",
         "KnowSureThingOperator",
         "Lag",
+        "LaguerreRelativeStrengthIndex",
         "LiquidityOperator",
         "LogReturn",
         "LowerLowOperator",
@@ -4660,7 +4662,6 @@
         "StatefulJurikMovingAverage",
         "StatefulKama",
         "StatefulKlingerVolumeOscillator",
-        "StatefulLaguerreRelativeStrengthIndex",
         "StatefulLinearreg",
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",
@@ -4864,6 +4865,7 @@
         "KeltnerChannelsOperator",
         "KnowSureThingOperator",
         "Lag",
+        "LaguerreRelativeStrengthIndex",
         "LiquidityOperator",
         "LogReturn",
         "LowerLowOperator",
@@ -4966,7 +4968,6 @@
         "StatefulJurikMovingAverage",
         "StatefulKama",
         "StatefulKlingerVolumeOscillator",
-        "StatefulLaguerreRelativeStrengthIndex",
         "StatefulLinearreg",
         "StatefulLinearregAngle",
         "StatefulLinearregIntercept",

@@ -150,7 +150,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `2.910e-10` |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `1.824e+04` |
 | Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
-| LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | MATCH | `0.000e+00` |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `2.000e+00` |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | MATCH | `0.000e+00` |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
@@ -516,7 +516,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 11.76× | 2.61× | 0.48× | 0.38× |
-| LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 10.30× | 2.74× | 1.99× | 5.85× |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 21.32× | 3.07× | 0.95× | 1.22× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
@@ -738,7 +738,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 1.45× | 2.64× | 2.92× |
-| LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.28× | 3.71× | 3.26× |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 3.53× | 3.71× | 5.20× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1030,7 +1030,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.63× | 2.84× | 2.95× |
-| LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.13× | 3.48× | 3.28× |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.52× | 5.31× | 5.06× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1322,7 +1322,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.68× | 2.91× | 2.85× |
-| LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.29× | 3.42× | 3.07× |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.51× | 5.32× | 5.10× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1614,7 +1614,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | KlingerVolumeOscillator | [pandas-ta-classic: `pandas-ta-classic.kvo`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | KnowSureThing | [pandas-ta-classic: `pandas-ta-classic.know_sure_thing`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Lag | [pandas: `pandas.lag`](https://pandas.pydata.org/docs/reference/window.html) | 2.60× | 2.83× | 2.99× |
-| LaguerreRelativeStrengthIndex | [pandas: `pandas.laguerre_rsi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| LaguerreRelativeStrengthIndex | [pandas-ta-classic: `pandas_ta_classic.lrsi`](https://github.com/xgboosted/pandas-ta-classic/blob/0.6.52/pandas_ta_classic/momentum/lrsi.py) | 3.12× | 4.81× | 5.54× |
 | Liquidity | [smartmoneyconcepts: `smartmoneyconcepts.liquidity`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | LogReturn | [pandas-ta-classic: `pandas_ta_classic.log_return`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4.47× | 5.48× | 5.42× |
 | LowerLow | [pandas: `pandas.lower_low`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |

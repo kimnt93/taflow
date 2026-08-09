@@ -143,6 +143,15 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
             length=spec.ctor_kwargs.get("length", 14),
         )
         return None if result is None else result.to_numpy()
+    if source == "pandas-ta-classic" and spec.snake == "laguerre_rsi":
+        import pandas as pd
+        import pandas_ta_classic as pta
+        result = pta.lrsi(
+            pd.Series(arrays[0]),
+            length=1,
+            gamma=spec.ctor_kwargs.get("gamma", 0.5),
+        )
+        return None if result is None else result.to_numpy()
     raise KeyError(source)
 
 
