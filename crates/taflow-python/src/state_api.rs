@@ -6,10 +6,10 @@ use pyo3::prelude::*;
 use taflow::stream::{
     self, AverageDirectionalIndex, AverageDirectionalIndexRating,
     AverageTrueRange as CoreAverageTrueRange, DirectionalMovementIndex,
-    DoubleExponentialMovingAverage, EvenBetterSinewave, ExponentialMovingAverage,
-    FastStochasticOscillator, IntradayMomentumIndex, MesaAdaptiveMovingAverage,
-    Momentum as CoreMomentum, NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange,
-    OpeningRange, PivotPoints, PremiumDiscount, RateOfChange as CoreRateOfChange,
+    DoubleExponentialMovingAverage, ExponentialMovingAverage, FastStochasticOscillator,
+    IntradayMomentumIndex, MesaAdaptiveMovingAverage, Momentum as CoreMomentum,
+    NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange, PivotPoints,
+    PremiumDiscount, RateOfChange as CoreRateOfChange,
     RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
     RateOfChangeRatioPercent as CoreRateOfChangeRatioPercent, RollingMidpoint, RollingMidprice,
     SessionVolumeLevels, SimpleMovingAverage, SmoothedTrendChannel, StochasticOscillator,
@@ -111,13 +111,6 @@ scalar_state_class!(StatefulLinearregSlope, stream::LinearregSlope, 14);
 scalar_state_class!(StatefulLinearregIntercept, stream::LinearregIntercept, 14);
 scalar_state_class!(StatefulLinearregAngle, stream::LinearregAngle, 14);
 scalar_state_class!(StatefulTsf, stream::Tsf, 14);
-/// Native state adapter for Even Better Sinewave.
-#[pyclass]
-pub struct StatefulEvenBetterSinewave {
-    inner: EvenBetterSinewave,
-    output: Vec<f64>,
-}
-
 /// Native state adapter for SSL Channel.
 #[pyclass]
 pub struct StatefulSmoothedTrendChannel {
@@ -495,44 +488,6 @@ impl StatefulSmoothedTrendChannel {
         self.inner.reset();
         self.lower.clear();
         self.upper.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulEvenBetterSinewave {
-    #[new]
-    #[pyo3(signature = (length=40))]
-    fn new(length: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: EvenBetterSinewave::new(length).map_err(py_value_error)?,
-            output: Vec::new(),
-        })
-    }
-    fn append(&mut self, input: f64) -> Option<f64> {
-        let value = self.inner.append(input);
-        self.output.push(value.unwrap_or(f64::NAN));
-        value
-    }
-    fn extend(&mut self, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        for &value in input.as_slice()? {
-            self.append(value);
-        }
-        Ok(())
-    }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
-        PyArray1::from_vec(py, self.output.clone())
-    }
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-    fn __len__(&self) -> usize {
-        self.output.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.output.clear();
     }
 }
 

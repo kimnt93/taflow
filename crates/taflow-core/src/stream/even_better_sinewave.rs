@@ -51,6 +51,15 @@ impl EvenBetterSinewave {
             value: None,
         })
     }
+
+    /// Extends a close slice through the scalar recurrence.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.extend(
+            input
+                .iter()
+                .map(|&value| self.append(value).unwrap_or(f64::NAN)),
+        );
+    }
 }
 
 impl StreamingIndicator for EvenBetterSinewave {

@@ -297,6 +297,8 @@ mod anchored_volume_weighted_average_price;
 #[cfg(test)]
 mod anchored_volume_weighted_average_price_test;
 mod even_better_sinewave;
+#[cfg(test)]
+mod even_better_sinewave_test;
 mod fibonacci_retracement;
 #[cfg(test)]
 mod fibonacci_retracement_test;

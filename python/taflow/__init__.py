@@ -107,7 +107,7 @@ from .ssl_channel import SmoothedTrendChannel
 from .jurik_moving_average import JurikMovingAverage
 from .parabolic_moving_average_stop import ParabolicMovingAverageStop
 from .tom_de_mark_sequential import TomDeMarkSequential
-from .ebsw import EvenBetterSinewave
+from .even_better_sinewave import EvenBetterSinewave
 from .premium_discount import PremiumDiscount
 from .opening_range import OpeningRange
 from .pivot_points import PivotPoints
