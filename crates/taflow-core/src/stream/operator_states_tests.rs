@@ -127,7 +127,9 @@ mod tests {
     #[test]
     fn drawdown_batch_matches_definition() {
         let input = [2.0, 4.0, 1.0, 8.0, 2.0];
-        assert_eq!(drawdown(&input), vec![0.0, 0.0, -0.75, 0.0, -0.75]);
+        let mut drawdown_state = Drawdown::new();
+        let drawdown_values: Vec<f64> = input.iter().map(|&value| drawdown_state.append(value)).collect();
+        assert_eq!(drawdown_values, vec![0.0, 0.0, -0.75, 0.0, -0.75]);
     }
 
     #[test]

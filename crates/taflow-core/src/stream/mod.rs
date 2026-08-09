@@ -798,6 +798,8 @@ mod cross_test;
 #[cfg(test)]
 mod donchian_test;
 #[cfg(test)]
+mod drawdown_test;
+#[cfg(test)]
 mod entry_exit_test;
 #[cfg(test)]
 mod exponentially_weighted_correlation_test;
@@ -829,6 +831,8 @@ mod rolling_average_deviation_test;
 mod rolling_beta;
 #[cfg(test)]
 mod rolling_beta_test;
+#[cfg(test)]
+mod rolling_calmar_test;
 #[allow(unused_imports)]
 mod rolling_correlation;
 #[cfg(test)]
@@ -851,6 +855,10 @@ mod rolling_midpoint_test;
 mod rolling_midprice;
 #[cfg(test)]
 mod rolling_midprice_test;
+#[cfg(test)]
+mod rolling_sharpe_test;
+#[cfg(test)]
+mod rolling_sortino_test;
 mod rolling_standard_deviation;
 #[cfg(test)]
 mod rolling_standard_deviation_test;
@@ -1170,23 +1178,15 @@ mod balance_of_power;
 #[cfg(test)]
 mod balance_of_power_test;
 mod drawdown;
+mod rolling_sharpe;
 mod williams_percent_r;
 #[cfg(test)]
 mod williams_percent_r_test;
-#[allow(unused_imports)]
-pub(crate) use drawdown::drawdown;
-mod rolling_sharpe;
-#[allow(unused_imports)]
-pub(crate) use rolling_sharpe::rolling_sharpe;
 pub use rolling_sharpe::RollingSharpe;
 mod rolling_sortino;
-#[allow(unused_imports)]
-pub(crate) use rolling_sortino::rolling_sortino;
 pub use rolling_sortino::RollingSortino;
-mod rolling_calmar;
-#[allow(unused_imports)]
-pub(crate) use rolling_calmar::rolling_calmar;
 mod hull_moving_average;
+mod rolling_calmar;
 #[allow(unused_imports)]
 pub(crate) use hull_moving_average::hull_moving_average;
 mod volume_weighted_moving_average;

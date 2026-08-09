@@ -1,42 +1,53 @@
-//! Batch implementation for `rolling_sharpe`.
+//! Persistent rolling Sharpe ratio state.
 
-use super::operator_states::*;
-use super::*;
-use crate::error::{TaError, TaResult};
+use crate::error::TaResult;
 use std::collections::VecDeque;
 
-rolling_risk_operator!(RollingSharpe, |values: &VecDeque<f64>| {
-    let average = mean(values);
-    let variance = values
-        .iter()
-        .map(|&value| (value - average).powi(2))
-        .sum::<f64>()
-        / values.len() as f64;
-    if variance > 0.0 {
-        average / variance.sqrt()
-    } else {
-        0.0
-    }
-});
+#[derive(Debug, Clone)]
+pub struct RollingSharpe {
+    values: VecDeque<f64>,
+    timeperiod: usize,
+    value: Option<f64>,
+}
 
-/// Computes or updates `rolling_sharpe` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Compute the rolling sharpe result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn rolling_sharpe(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = RollingSharpe::new(timeperiod)?;
-    Ok(input
-        .iter()
-        .map(|&value| state.append(value).unwrap_or(f64::NAN))
-        .collect())
+impl RollingSharpe {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        super::operator_states::validate_period(timeperiod)?;
+        Ok(Self {
+            values: VecDeque::with_capacity(timeperiod),
+            timeperiod,
+            value: None,
+        })
+    }
+
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.timeperiod {
+            self.values.pop_front();
+        }
+        self.values.push_back(input);
+        self.value = (self.values.len() == self.timeperiod).then(|| {
+            let average = self.values.iter().sum::<f64>() / self.timeperiod as f64;
+            let variance = self
+                .values
+                .iter()
+                .map(|&value| (value - average).powi(2))
+                .sum::<f64>()
+                / self.timeperiod as f64;
+            if variance > 0.0 {
+                average / variance.sqrt()
+            } else {
+                0.0
+            }
+        });
+        self.value
+    }
+
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
+    }
 }

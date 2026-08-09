@@ -655,64 +655,6 @@ pub(crate) fn ewm_alpha(timeperiod: usize) -> TaResult<f64> {
     Ok(2.0 / (timeperiod as f64 + 1.0))
 }
 
-macro_rules! rolling_risk_operator {
-    ($name:ident, $formula:expr) => {
-        #[derive(Debug, Clone)]
-        pub struct $name {
-            values: VecDeque<f64>,
-            timeperiod: usize,
-            value: Option<f64>,
-        }
-        impl $name {
-            /// Computes or updates `new` through the native Rust kernel.
-            ///
-            /// Parameters are the typed series and configuration values in the signature.
-            ///
-            /// Returns the computed value, aligned history, or a validation error.
-            pub fn new(timeperiod: usize) -> TaResult<Self> {
-                validate_period(timeperiod)?;
-                Ok(Self {
-                    values: VecDeque::with_capacity(timeperiod),
-                    timeperiod,
-                    value: None,
-                })
-            }
-            /// Append one causal observation and return the latest result.
-            ///
-            pub fn append(&mut self, input: f64) -> Option<f64> {
-                if self.values.len() == self.timeperiod {
-                    self.values.pop_front();
-                }
-                self.values.push_back(input);
-                self.value = if self.values.len() == self.timeperiod {
-                    Some($formula(&self.values))
-                } else {
-                    None
-                };
-                self.value
-            }
-            /// Computes or updates `value` through the native Rust kernel.
-            ///
-            /// Parameters are the typed series and configuration values in the signature.
-            ///
-            /// Returns the computed value, aligned history, or a validation error.
-            pub fn value(&self) -> Option<f64> {
-                self.value
-            }
-            /// Reset the persistent state and clear the latest value.
-            pub fn reset(&mut self) {
-                self.values.clear();
-                self.value = None;
-            }
-        }
-    };
-}
-pub(crate) use rolling_risk_operator;
-
-pub(crate) fn mean(values: &VecDeque<f64>) -> f64 {
-    values.iter().sum::<f64>() / values.len() as f64
-}
-
 pub(crate) fn weighted_mean(values: &VecDeque<f64>) -> f64 {
     let denominator = (values.len() * (values.len() + 1) / 2) as f64;
     values
