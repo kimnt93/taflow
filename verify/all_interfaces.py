@@ -1,8 +1,9 @@
-"""Self-consistency checks for every public taflow indicator adapter.
+"""Lifecycle and self-consistency checks for every public indicator adapter.
 
 This complements ``verify.py``: TA-Lib functions use an external oracle there,
-while this pass exercises the extended canonical API and checks that a full
-constructor history is identical to a native state's ``extend`` history.
+while this pass exercises the canonical state API and checks that constructor,
+bulk, and scalar histories are identical.  It also enforces the documented
+fluent lifecycle so interface drift is visible in the generated report.
 """
 from __future__ import annotations
 
@@ -69,8 +70,9 @@ def kwargs_for(callable_: object, arrays: bool) -> dict[str, object]:
     for p in inspect.signature(callable_).parameters.values():
         if p.kind in (p.VAR_POSITIONAL, p.VAR_KEYWORD):
             continue
-        if arrays and p.name in ARRAYS:
-            result[p.name] = ARRAYS[p.name]
+        if p.name in ARRAYS:
+            value = ARRAYS[p.name]
+            result[p.name] = value if arrays else value[:0]
         elif p.default is inspect.Parameter.empty:
             result[p.name] = scalar(p.name, p.default)
     return result
@@ -94,6 +96,20 @@ def output(obj: object) -> object:
     if hasattr(obj, "value"):
         return obj.value
     raise TypeError("adapter has neither compute() nor value")
+
+
+def require_fluent(result: object, owner: object, operation: str) -> None:
+    if result is not owner:
+        raise TypeError(f"{operation}() must return self")
+
+
+def require_length(obj: object, expected: int) -> None:
+    try:
+        actual = len(obj)  # type: ignore[arg-type]
+    except TypeError as exc:
+        raise TypeError("indicator has no __len__()") from exc
+    if actual != expected:
+        raise AssertionError(f"len(indicator) is {actual}, expected {expected}")
 
 
 def main() -> None:
@@ -124,10 +140,17 @@ def main() -> None:
         try:
             full = cls(**kwargs_for(cls, arrays=True))
             expected = output(full)
+            require_length(full, N)
             if not hasattr(full, "extend"):
                 raise TypeError("indicator has no extend()")
             state = cls(**kwargs_for(cls, arrays=False))
-            state.extend(**kwargs_for(state.extend, arrays=True))
+            require_length(state, 0)
+            require_fluent(
+                state.extend(**kwargs_for(state.extend, arrays=True)),
+                state,
+                "extend",
+            )
+            require_length(state, N)
             actual = output(state)
             if not equal(expected, actual):
                 raise AssertionError("constructor history differs from native extend history")
@@ -140,9 +163,12 @@ def main() -> None:
                         continue
                     value = periods if parameter.name == "period" else ARRAYS.get(parameter.name)
                     row_kwargs[parameter.name] = value[index] if isinstance(value, np.ndarray) else scalar(parameter.name, parameter.default)
-                live.append(**row_kwargs)
+                require_fluent(live.append(**row_kwargs), live, "append")
+                require_length(live, index + 1)
             if not equal(expected, output(live)):
                 raise AssertionError("constructor history differs from one-bar append history")
+            require_fluent(live.reset(), live, "reset")
+            require_length(live, 0)
             rows.append({"name": name, "status": "PASS"})
         except Exception as exc:  # report every interface; one failure must not hide others
             rows.append({"name": name, "status": "FAIL", "error": f"{type(exc).__name__}: {exc}"})
@@ -153,7 +179,7 @@ def main() -> None:
     markdown = [
         "# Canonical taflow interface correctness",
         "",
-        "Indicator oracle: constructor history == native `extend` history == one-bar `append` history; helper functions also receive smoke checks.",
+        "Indicator invariant: constructor history == native `extend` history == one-bar `append` history. Stateful adapters must also provide fluent `append`, `extend`, and `reset`, plus an exact `len()`. Helper functions receive smoke checks.",
         "",
         f"- Passed: **{passed}**",
         f"- Failed: **{failed}**",

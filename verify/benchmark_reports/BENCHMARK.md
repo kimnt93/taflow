@@ -2,292 +2,294 @@
 
 Generated 2026-08-09 from 287 functions.
 
-| Canonical class | TA-Lib | Correctness | Largest vector bars/s | Speedup | Append µs | 4T vector scaling |
+Reference ratios use the same priority-selected correctness source. A dash means that source is not timed by this harness.
+
+| Canonical class | Selected reference | Correctness | Largest vector bars/s | Reference ratio | Append µs | 4T vector scaling |
 |---|---|---|---:|---:|---:|---:|
-| AccelerationBands | ACCBANDS | MATCH | 68.80M | 0.80× | 0.335 | 3.17× |
-| MathAcos | ACOS | MATCH | 126.81M | 0.85× | 0.159 | 2.81× |
-| AccumulationDistribution | AD | MATCH | 551.01M | 1.04× | 0.256 | 3.09× |
-| MathAdd | ADD | MATCH | 1.31G | 1.07× | 0.187 | 2.17× |
-| AccumulationDistributionOscillator | ADOSC | MATCH | 142.81M | 0.42× | 0.251 | 3.76× |
-| AverageDirectionalIndex | ADX | MATCH | 125.69M | 1.12× | 0.212 | 3.23× |
-| AverageDirectionalIndexRating | ADXR | MATCH | 98.40M | 0.95× | 0.226 | 3.88× |
-| AbsolutePriceOscillator | APO | MATCH | 237.14M | 1.08× | 0.151 | 3.64× |
-| Aroon | AROON | MATCH | 78.16M | 0.84× | 0.276 | 3.48× |
-| AroonOscillator | AROONOSC | MATCH | 85.97M | 0.85× | 0.219 | 3.62× |
-| MathAsin | ASIN | MATCH | 131.16M | 0.81× | 0.168 | 3.07× |
-| MathAtan | ATAN | MATCH | 142.19M | 0.83× | 0.167 | 3.32× |
-| AverageTrueRange | ATR | MATCH | 188.84M | 1.14× | 0.223 | 3.86× |
-| RollingAverageDeviation | AVGDEV | MATCH | 62.40M | 0.86× | 0.167 | 3.62× |
-| AveragePrice | AVGPRICE | MATCH | 684.45M | 1.00× | 0.235 | 3.63× |
-| BollingerBands | BBANDS | MATCH | 140.73M | 1.35× | 0.265 | 2.54× |
-| RollingBeta | BETA | MATCH | 207.45M | 1.14× | 0.176 | 3.34× |
-| BalanceOfPower | BOP | MATCH | 557.25M | 0.98× | 0.259 | 3.01× |
-| CommodityChannelIndex | CCI | MATCH | 52.05M | 1.06× | 0.225 | 3.06× |
-| CandleTwoCrows | CDL2CROWS | MATCH | 114.42M | 0.95× | 0.273 | 3.73× |
-| CandleThreeBlackCrows | CDL3BLACKCROWS | MATCH | 139.59M | 0.83× | 0.289 | 3.36× |
-| CandleThreeInside | CDL3INSIDE | MATCH | 99.44M | 1.00× | 0.302 | 3.61× |
-| CandleThreeLineStrike | CDL3LINESTRIKE | MATCH | 122.11M | 0.94× | 0.275 | 3.43× |
-| CandleThreeOutside | CDL3OUTSIDE | MATCH | 136.24M | 0.73× | 0.256 | 3.73× |
-| CandleThreeStarsInSouth | CDL3STARSINSOUTH | MATCH | 147.12M | 1.22× | 0.252 | 3.88× |
-| CandleThreeWhiteSoldiers | CDL3WHITESOLDIERS | MATCH | 116.26M | 1.75× | 0.283 | 3.75× |
-| CandleAbandonedBaby | CDLABANDONEDBABY | MATCH | 95.53M | 0.98× | 0.277 | 3.47× |
-| CandleAdvanceBlock | CDLADVANCEBLOCK | MISMATCH | 111.36M | 2.14× | 0.281 | 3.89× |
-| CandleBeltHold | CDLBELTHOLD | MATCH | 99.52M | 1.02× | 0.268 | 3.68× |
-| CandleBreakaway | CDLBREAKAWAY | MATCH | 113.24M | 0.74× | 0.285 | 3.75× |
-| CandleClosingMarubozu | CDLCLOSINGMARUBOZU | MATCH | 99.04M | 0.99× | 0.280 | 3.37× |
-| CandleConcealBabySwall | CDLCONCEALBABYSWALL | MATCH | 171.21M | 1.06× | 0.262 | 3.47× |
-| CandleCounterAttack | CDLCOUNTERATTACK | MATCH | 105.63M | 1.14× | 0.263 | 3.91× |
-| CandleDarkCloudCover | CDLDARKCLOUDCOVER | MATCH | 117.22M | 0.92× | 0.263 | 3.44× |
-| CandleDoji | CDLDOJI | MATCH | 334.26M | 0.85× | 0.267 | 2.84× |
-| CandleDojiStar | CDLDOJISTAR | MATCH | 92.84M | 0.97× | 0.276 | 3.70× |
-| CandleDragonflyDoji | CDLDRAGONFLYDOJI | MATCH | 166.83M | 1.18× | 0.251 | 3.06× |
-| CandleEngulfing | CDLENGULFING | MATCH | 145.55M | 0.77× | 0.246 | 3.46× |
-| CandleEveningDojiStar | CDLEVENINGDOJISTAR | MATCH | 108.83M | 0.93× | 0.270 | 3.92× |
-| CandleEveningStar | CDLEVENINGSTAR | MATCH | 115.59M | 0.95× | 0.277 | 3.85× |
-| CandleGapSideSideWhite | CDLGAPSIDESIDEWHITE | MISMATCH | 144.21M | 2.72× | 0.266 | 3.66× |
-| CandleGravestoneDoji | CDLGRAVESTONEDOJI | MATCH | 169.62M | 1.28× | 0.279 | 3.71× |
-| CandleHammer | CDLHAMMER | MATCH | 78.28M | 1.11× | 0.264 | 3.68× |
-| CandleHangingMan | CDLHANGINGMAN | MATCH | 79.31M | 1.11× | 0.270 | 3.79× |
-| CandleHarami | CDLHARAMI | MATCH | 101.75M | 1.14× | 0.266 | 3.50× |
-| CandleHaramiCross | CDLHARAMICROSS | MATCH | 92.35M | 0.99× | 0.282 | 3.54× |
-| CandleHighWave | CDLHIGHWAVE | MATCH | 85.79M | 1.09× | 0.270 | 3.64× |
-| CandleHikkake | CDLHIKKAKE | MATCH | 173.44M | 0.81× | 0.276 | 3.84× |
-| CandleHikkakeModified | CDLHIKKAKEMOD | MATCH | 172.90M | 0.92× | 0.299 | 4.17× |
-| CandleHomingPigeon | CDLHOMINGPIGEON | MATCH | 154.22M | 1.11× | 0.260 | 3.60× |
-| CandleIdenticalThreeCrows | CDLIDENTICAL3CROWS | MATCH | 132.54M | 1.17× | 0.263 | 3.82× |
-| CandleInNeck | CDLINNECK | MATCH | 106.48M | 1.00× | 0.277 | 3.56× |
-| CandleInvertedHammer | CDLINVERTEDHAMMER | MATCH | 78.63M | 1.09× | 0.273 | 3.68× |
-| CandleKicking | CDLKICKING | MISMATCH | 100.40M | 1.49× | 0.277 | 3.54× |
-| CandleKickingByLength | CDLKICKINGBYLENGTH | MISMATCH | 93.96M | 1.37× | 0.286 | 3.32× |
-| CandleLadderBottom | CDLLADDERBOTTOM | MATCH | 163.72M | 0.92× | 0.258 | 3.34× |
-| CandleLongLeggedDoji | CDLLONGLEGGEDDOJI | MATCH | 178.97M | 1.15× | 0.254 | 3.42× |
-| CandleLongLine | CDLLONGLINE | MATCH | 87.72M | 1.24× | 0.258 | 3.75× |
-| CandleMarubozu | CDLMARUBOZU | MATCH | 97.47M | 1.02× | 0.263 | 3.59× |
-| CandleMatchingLow | CDLMATCHINGLOW | MATCH | 191.93M | 1.24× | 0.273 | 3.86× |
-| CandleMatHold | CDLMATHOLD | MATCH | 101.62M | 0.85× | 0.278 | 3.38× |
-| CandleMorningDojiStar | CDLMORNINGDOJISTAR | MATCH | 113.29M | 0.94× | 0.260 | 3.87× |
-| CandleMorningStar | CDLMORNINGSTAR | MATCH | 113.96M | 0.90× | 0.259 | 3.40× |
-| CandleOnNeck | CDLONNECK | MATCH | 104.65M | 0.96× | 0.269 | 3.61× |
-| CandlePiercing | CDLPIERCING | MATCH | 112.27M | 1.05× | 0.266 | 3.74× |
-| CandleRickshawman | CDLRICKSHAWMAN | MATCH | 131.05M | 1.27× | 0.273 | 3.38× |
-| CandleRiseFallThreeMethods | CDLRISEFALL3METHODS | MATCH | 98.10M | 0.98× | 0.280 | 3.94× |
-| CandleSeparatingLines | CDLSEPARATINGLINES | MATCH | 132.99M | 1.28× | 0.271 | 3.57× |
-| CandleShootingStar | CDLSHOOTINGSTAR | MATCH | 85.10M | 1.11× | 0.262 | 3.86× |
-| CandleShortLine | CDLSHORTLINE | MATCH | 76.14M | 1.28× | 0.259 | 3.51× |
-| CandleSpinningTop | CDLSPINNINGTOP | MATCH | 99.38M | 0.97× | 0.269 | 3.60× |
-| CandleStalledPattern | CDLSTALLEDPATTERN | MATCH | 117.73M | 1.59× | 0.274 | 3.07× |
-| CandleStickSandwich | CDLSTICKSANDWICH | MATCH | 188.36M | 1.16× | 0.268 | 4.11× |
-| CandleTakuri | CDLTAKURI | MATCH | 157.78M | 1.27× | 0.284 | 3.75× |
-| CandleTasukiGap | CDLTASUKIGAP | MATCH | 118.81M | 1.73× | 0.285 | 3.77× |
-| CandleThrusting | CDLTHRUSTING | MATCH | 111.66M | 1.01× | 0.273 | 3.82× |
-| CandleTriStar | CDLTRISTAR | MATCH | 172.45M | 1.04× | 0.254 | 3.48× |
-| CandleUniqueThreeRiver | CDLUNIQUE3RIVER | MATCH | 110.84M | 0.63× | 0.275 | 3.78× |
-| CandleUpsideGapTwoCrows | CDLUPSIDEGAP2CROWS | MATCH | 112.90M | 1.05× | 0.257 | 3.72× |
-| CandleUpDownSideGapThreeMethods | CDLXSIDEGAP3METHODS | MATCH | 83.36M | 0.48× | 0.278 | 3.56× |
-| MathCeil | CEIL | MATCH | 321.71M | 0.46× | 0.142 | 2.48× |
-| ChandeMomentumOscillator | CMO | MATCH | 191.87M | 1.06× | 0.151 | 3.04× |
-| RollingCorrelation | CORREL | MATCH | 218.21M | 1.18× | 0.188 | 3.19× |
-| MathCos | COS | MATCH | 66.50M | 0.94× | 0.184 | 3.53× |
-| MathCosh | COSH | MATCH | 146.20M | 0.80× | 0.162 | 3.21× |
-| DoubleExponentialMovingAverage | DEMA | MATCH | 196.62M | 1.26× | 0.147 | 3.74× |
-| MathDivide | DIV | MATCH | 1.27G | 1.05× | 0.182 | 2.15× |
-| DirectionalMovementIndex | DX | MATCH | 98.82M | 0.88× | 0.230 | 3.50× |
-| ExponentialMovingAverage | EMA | MATCH | 337.48M | 0.93× | 0.155 | 3.02× |
-| MathExp | EXP | MATCH | 185.98M | 0.81× | 0.165 | 2.91× |
-| MathFloor | FLOOR | MATCH | 318.78M | 0.47× | 0.157 | 2.40× |
-| HilbertTransformDominantCyclePeriod | HT_DCPERIOD | MATCH | 22.90M | 0.96× | 0.174 | 3.67× |
-| HilbertTransformDominantCyclePhase | HT_DCPHASE | MATCH | 10.30M | 4.28× | 0.248 | 3.74× |
-| HilbertTransformPhasor | HT_PHASOR | MATCH | 22.78M | 0.96× | 0.213 | 3.81× |
-| HilbertTransformSineWave | HT_SINE | MATCH | 7.52M | 3.35× | 0.319 | 3.30× |
-| HilbertTransformTrendline | HT_TRENDLINE | MATCH | 14.27M | 0.82× | 0.221 | 3.63× |
-| HilbertTransformTrendMode | HT_TRENDMODE | MATCH | 5.82M | 3.41× | 0.349 | 3.43× |
-| IntradayMomentumIndex | IMI | MATCH | 81.17M | 4.66× | 0.183 | 3.00× |
-| KaufmanAdaptiveMovingAverage | KAMA | MATCH | 339.97M | 0.99× | 0.148 | 3.83× |
-| RollingLinearRegression | LINEARREG | MATCH | 81.53M | 0.97× | 0.165 | 3.76× |
-| RollingLinearRegressionAngle | LINEARREG_ANGLE | MATCH | 47.78M | 0.98× | 0.171 | 3.81× |
-| RollingLinearRegressionIntercept | LINEARREG_INTERCEPT | MATCH | 75.32M | 0.90× | 0.163 | 3.47× |
-| RollingLinearRegressionSlope | LINEARREG_SLOPE | MATCH | 98.20M | 0.98× | 0.172 | 3.74× |
-| MathLn | LN | MATCH | 192.15M | 0.78× | 0.151 | 2.85× |
-| MathLog10 | LOG10 | MATCH | 114.04M | 0.87× | 0.167 | 3.35× |
-| MovingAverage | MA | MATCH | 242.12M | 0.46× | 0.153 | 3.61× |
-| MovingAverageConvergenceDivergence | MACD | MATCH | 432.92M | 7.77× | 0.253 | 2.16× |
-| MovingAverageConvergenceDivergenceExtended | MACDEXT | MATCH | 111.00M | 1.69× | 0.277 | 3.67× |
-| MovingAverageConvergenceDivergenceFixed | MACDFIX | MATCH | 433.09M | 7.60× | 0.254 | 2.61× |
-| MesaAdaptiveMovingAverage | MAMA | MATCH | 18.65M | 0.94× | 0.271 | 2.87× |
-| VariablePeriodMovingAverage | MAVP | MATCH | 9.16M | 0.84× | 0.310 | 3.73× |
-| RollingMax | MAX | MATCH | 279.02M | 1.32× | 0.167 | 3.21× |
-| RollingArgmax | MAXINDEX | MATCH | 190.03M | 1.25× | 0.164 | 2.95× |
-| MedianPrice | MEDPRICE | MATCH | 1.30G | 1.08× | 0.169 | 2.49× |
-| MoneyFlowIndex | MFI | MATCH | 158.79M | 1.38× | 0.272 | 2.93× |
-| RollingMidpoint | MIDPOINT | MATCH | 120.57M | 0.80× | 0.173 | 2.90× |
-| RollingMidprice | MIDPRICE | MATCH | 119.61M | 0.82× | 0.194 | 3.00× |
-| RollingMin | MIN | MATCH | 290.74M | 1.37× | 0.176 | 3.27× |
-| RollingArgmin | MININDEX | MATCH | 196.60M | 1.28× | 0.158 | 3.59× |
-| RollingMinMax | MINMAX | MATCH | 138.42M | 1.10× | 0.247 | 2.35× |
-| RollingMinMaxIndex | MINMAXINDEX | MATCH | 97.54M | 1.13× | 0.250 | 3.57× |
-| MinusDirectionalIndicator | MINUS_DI | MATCH | 104.48M | 0.68× | 0.215 | 3.40× |
-| MinusDirectionalMovement | MINUS_DM | MATCH | 205.02M | 1.00× | 0.178 | 3.62× |
-| Momentum | MOM | MATCH | 560.98M | 0.32× | 0.143 | 3.23× |
-| MathMultiply | MULT | MATCH | 1.25G | 1.04× | 0.175 | 2.33× |
-| NormalizedAverageTrueRange | NATR | MATCH | 154.82M | 0.96× | 0.218 | 3.57× |
-| OnBalanceVolume | OBV | MATCH | 231.09M | 0.84× | 0.173 | 3.58× |
-| PlusDirectionalIndicator | PLUS_DI | MATCH | 173.18M | 1.13× | 0.212 | 3.29× |
-| PlusDirectionalMovement | PLUS_DM | MATCH | 194.70M | 0.94× | 0.178 | 3.76× |
-| PercentagePriceOscillator | PPO | MATCH | 253.95M | 1.26× | 0.166 | 3.19× |
-| RateOfChange | ROC | MATCH | 524.57M | 0.58× | 0.142 | 3.66× |
-| RateOfChangePercent | ROCP | MATCH | 556.70M | 0.59× | 0.143 | 2.55× |
-| RateOfChangeRatio | ROCR | MATCH | 542.30M | 0.58× | 0.157 | 2.95× |
-| RateOfChangeRatioPercent | ROCR100 | MATCH | 528.12M | 0.58× | 0.171 | 2.87× |
-| RelativeStrengthIndex | RSI | MATCH | 173.72M | 0.93× | 0.168 | 3.62× |
-| ParabolicSar | SAR | MATCH | 95.10M | 0.57× | 0.183 | 3.64× |
-| ParabolicSarExtended | SAREXT | MATCH | 93.49M | 0.56× | 0.188 | 3.71× |
-| MathSin | SIN | MATCH | 61.89M | 0.92× | 0.165 | 3.71× |
-| MathSinh | SINH | MATCH | 135.67M | 0.88× | 0.169 | 3.69× |
-| SimpleMovingAverage | SMA | MATCH | 512.00M | 0.98× | 0.153 | 3.03× |
-| MathSqrt | SQRT | MATCH | 399.40M | 0.57× | 0.146 | 2.25× |
-| RollingStandardDeviation | STDDEV | MATCH | 263.11M | 0.74× | 0.159 | 3.39× |
-| StochasticOscillator | STOCH | MATCH | 67.24M | 0.79× | 0.322 | 2.99× |
-| FastStochasticOscillator | STOCHF | MATCH | 62.08M | 0.64× | 0.321 | 3.66× |
-| StochasticRelativeStrengthIndex | STOCHRSI | MATCH | 32.57M | 0.49× | 0.268 | 3.50× |
-| MathSubtract | SUB | MATCH | 1.24G | 1.05× | 0.163 | 2.21× |
-| RollingSum | SUM | MATCH | 333.86M | 0.62× | 0.192 | 3.17× |
-| TripleExponentialAverage | T3 | MATCH | 294.25M | 1.21× | 0.167 | 3.76× |
-| MathTan | TAN | MATCH | 49.80M | 0.95× | 0.170 | 3.21× |
-| MathTanh | TANH | MATCH | 250.99M | 0.68× | 0.150 | 3.19× |
-| TripleExponentialMovingAverage | TEMA | MATCH | 109.43M | 1.01× | 0.157 | 3.62× |
-| TrueRange | TRANGE | MATCH | 640.44M | 0.80× | 0.233 | 2.71× |
-| TriangularMovingAverage | TRIMA | MATCH | 244.61M | 0.70× | 0.158 | 3.65× |
-| TripleExponentialRateOfChange | TRIX | MATCH | 460.72M | 4.13× | 0.145 | 3.26× |
-| RollingTimeSeriesForecast | TSF | MATCH | 79.39M | 1.00× | 0.171 | 2.85× |
-| TypicalPrice | TYPPRICE | MATCH | 897.28M | 1.04× | 0.219 | 2.31× |
-| UltimateOscillator | ULTOSC | MATCH | 76.24M | 1.10× | 0.244 | 3.76× |
-| RollingVariance | VAR | MATCH | 292.77M | 0.62× | 0.149 | 2.49× |
-| WeightedClose | WCLPRICE | MATCH | 888.61M | 1.03× | 0.219 | 2.54× |
-| WilliamsPercentR | WILLR | MATCH | 112.13M | 0.89× | 0.233 | 3.61× |
-| WeightedMovingAverage | WMA | MATCH | 289.95M | 0.58× | 0.145 | 3.64× |
-| Amihud | — | MATCH | 149.99M | — | 0.184 | 3.79× |
-| AnchoredVolumeWeightedAveragePrice | — | MATCH | 84.12M | — | 0.409 | 0.97× |
-| ArnaudLegouxMovingAverage | — | MATCH | 100.93M | — | 0.167 | 3.59× |
-| AverageDailyDollarValue | — | MATCH | 209.51M | — | 0.182 | 3.55× |
-| AwesomeOscillator | — | MATCH | 44.73M | — | 0.215 | 3.05× |
-| BarsSince | — | MATCH | 449.81M | — | 0.240 | 3.43× |
-| BreakOfStructureChangeOfCharacter | — | MATCH | 24.54M | — | 0.310 | 2.73× |
-| ChaikinMoneyFlow | — | MATCH | 164.09M | — | 0.255 | 0.99× |
-| ChaikinVolatility | — | MATCH | 175.27M | — | 0.199 | 3.29× |
-| CloseToCloseSigma | — | MATCH | 57.82M | — | 0.171 | 1.63× |
-| Crossover | — | MATCH | 333.58M | — | 0.183 | 1.66× |
-| Crossunder | — | MATCH | 321.81M | — | 0.183 | 3.28× |
-| CumulativeCount | — | MATCH | 512.35M | — | 0.146 | 3.83× |
-| CumulativeMaximum | — | MATCH | 269.95M | — | 0.150 | 3.87× |
-| CumulativeMinimum | — | MATCH | 266.07M | — | 0.150 | 3.36× |
-| CumulativeProduct | — | MATCH | 439.23M | — | 0.152 | 3.23× |
-| CumulativeSum | — | MATCH | 431.73M | — | 0.139 | 2.54× |
-| CumulativeSumControlChart | — | MATCH | 299.44M | — | 0.140 | 3.83× |
-| DecayLinear | — | MATCH | 311.82M | — | 0.167 | 4.26× |
-| DetrendedPriceOscillator | — | MATCH | 230.63M | — | 0.160 | 3.07× |
-| Donchian | — | MATCH | 111.20M | — | 0.354 | 2.38× |
-| Drawdown | — | MATCH | 260.26M | — | 0.162 | 3.95× |
-| EaseOfMovement | — | MATCH | 337.39M | — | 0.213 | 3.35× |
-| EqualHighsLows | — | MATCH | 22.89M | — | 0.310 | 3.02× |
-| EvenBetterSinewave | — | MATCH | 51.70M | — | 0.150 | 0.95× |
-| ExponentiallyWeightedCorrelation | — | MATCH | 194.85M | — | 0.191 | 2.75× |
-| ExponentiallyWeightedCovariance | — | MATCH | 219.32M | — | 0.182 | 2.29× |
-| ExponentiallyWeightedStandardDeviation | — | MATCH | 251.39M | — | 0.159 | 2.16× |
-| ExponentiallyWeightedVariance | — | MATCH | 247.34M | — | 0.145 | 0.99× |
-| ExponentiallyWeightedSum | — | MATCH | 317.37M | — | 0.255 | 3.12× |
-| FairValueGap | — | MATCH | 58.89M | — | 0.291 | 2.80× |
-| Falling | — | MATCH | 231.81M | — | 0.147 | 3.41× |
-| FibonacciRetracement | — | MATCH | 23.31M | — | 0.229 | 0.94× |
-| FisherTransform | — | MATCH | 27.22M | — | 0.220 | 3.62× |
-| ForceIndex | — | MATCH | 362.95M | — | 0.196 | 3.00× |
-| FracDiff | — | MATCH | 1.26M | — | 0.933 | 3.77× |
-| FractalDimension | — | MATCH | 18.73M | — | 0.206 | 2.90× |
-| GapDown | — | MATCH | 354.84M | — | 0.177 | 3.23× |
-| GapUp | — | MATCH | 359.01M | — | 0.171 | 3.43× |
-| GarmanKlass | — | MATCH | 67.53M | — | 0.251 | 3.77× |
-| GarmanKlassYangZhang | — | MATCH | 49.78M | — | 0.276 | 2.81× |
-| HedgeRatio | — | MATCH | 28.61M | — | 0.207 | 3.83× |
-| HeikinAshi | — | MATCH | 48.14M | — | 0.278 | 0.87× |
-| HigherHigh | — | MATCH | 367.54M | — | 0.173 | 3.65× |
-| HighestSince | — | MATCH | 299.01M | — | 0.262 | 2.91× |
-| HullMovingAverage | — | MATCH | 67.41M | — | 0.162 | 2.45× |
-| Hurst | — | MATCH | 18.83M | — | 0.195 | 2.68× |
-| Ichimoku | — | MATCH | 11.11M | — | 0.406 | 3.68× |
-| InsideBar | — | MATCH | 362.01M | — | 0.173 | 3.09× |
-| JurikMovingAverage | — | MATCH | 11.34M | — | 0.242 | 0.81× |
-| KalmanHedgeRatio | — | MATCH | 71.97M | — | 0.177 | 3.70× |
-| KeltnerChannels | — | MATCH | 108.77M | — | 0.250 | 2.87× |
-| KnowSureThing | — | MATCH | 68.79M | — | 0.276 | 3.91× |
-| KlingerVolumeOscillator | — | MATCH | 66.74M | — | 0.285 | 1.00× |
-| Lag | — | MATCH | 344.84M | — | 0.158 | 1.45× |
-| LaguerreRelativeStrengthIndex | — | MATCH | 127.18M | — | 0.147 | 1.01× |
-| Liquidity | — | MATCH | 22.50M | — | 0.277 | 1.78× |
-| LogReturn | — | MATCH | 113.56M | — | 0.161 | 2.30× |
-| LowerLow | — | MATCH | 362.01M | — | 0.188 | 2.90× |
-| LowestSince | — | MATCH | 305.83M | — | 0.261 | 3.57× |
-| MassIndex | — | MATCH | 173.30M | — | 0.189 | 1.12× |
-| MathAbs | — | MATCH | 480.80M | — | 0.151 | 1.41× |
-| MathAcosh | — | MATCH | 96.55M | — | 0.153 | 3.39× |
-| MathAsinh | — | MATCH | 86.93M | — | 0.163 | 3.17× |
-| MathAtanh | — | MATCH | 195.24M | — | 0.151 | 2.62× |
-| MathCbrt | — | MATCH | 58.48M | — | 0.175 | 3.44× |
-| MathCot | — | MATCH | 47.63M | — | 0.185 | 3.61× |
-| MathDegrees | — | MATCH | 469.39M | — | 0.139 | 1.30× |
-| MathLog1p | — | MATCH | 120.80M | — | 0.153 | 3.29× |
-| MathRadians | — | MATCH | 465.60M | — | 0.133 | 1.62× |
-| McGinleyDynamic | — | MATCH | 82.95M | — | 0.138 | 3.78× |
-| NegativeVolumeIndex | — | MATCH | 172.83M | — | 0.189 | 1.40× |
-| OpeningRange | — | MATCH | 156.65M | — | 0.411 | 0.98× |
-| OrderBlock | — | MATCH | 11.65M | — | 0.398 | 2.94× |
-| OrnsteinUhlenbeckHalfLife | — | MATCH | 22.76M | — | 0.185 | 2.87× |
-| OutsideBar | — | MATCH | 366.04M | — | 0.187 | 2.87× |
-| Parkinson | — | MATCH | 78.95M | — | 0.191 | 3.23× |
-| PivotPoints | — | MATCH | 44.10M | — | 0.389 | 0.98× |
-| ParabolicMovingAverageStop | — | MATCH | 56.80M | — | 0.271 | 1.00× |
-| PositiveVolumeIndex | — | MATCH | 180.60M | — | 0.183 | 3.96× |
-| PremiumDiscount | — | MATCH | 38.10M | — | 0.203 | 0.89× |
-| PreviousHighLow | — | MATCH | 110.61M | — | 0.365 | 2.15× |
-| Retracements | — | MATCH | 24.89M | — | 0.312 | 3.27× |
-| Rising | — | MATCH | 243.03M | — | 0.162 | 3.43× |
-| RelativeMomentumIndex | — | MATCH | 157.40M | — | 0.152 | 2.16× |
-| RogersSatchell | — | MATCH | 37.12M | — | 0.290 | 3.67× |
-| RollSpread | — | MATCH | 23.78M | — | 0.198 | 2.86× |
-| RollingAlpha | — | MATCH | 27.31M | — | 0.204 | 3.72× |
-| RollingAutocorr | — | MATCH | 19.44M | — | 0.197 | 3.66× |
-| RollingCalmar | — | MATCH | 52.19M | — | 0.158 | 2.02× |
-| RollingCov | — | MATCH | 55.51M | — | 0.202 | 2.17× |
-| RollingEntropy | — | MATCH | 1.48M | — | 0.842 | 3.74× |
-| RollingInformationRatio | — | MATCH | 32.45M | — | 0.215 | 2.43× |
-| RollingKurtosis | — | MATCH | 64.95M | — | 0.163 | 3.01× |
-| RollingMedian | — | MATCH | 32.20M | — | 0.174 | 3.42× |
-| RollingMode | — | MATCH | 10.43M | — | 0.247 | 3.62× |
-| RollingQuantile | — | MATCH | 25.23M | — | 0.191 | 3.78× |
-| RollingRank | — | MATCH | 81.15M | — | 0.164 | 2.48× |
-| RollingSharpe | — | MATCH | 56.97M | — | 0.177 | 2.75× |
-| RollingSkew | — | MATCH | 31.92M | — | 0.179 | 2.49× |
-| RollingSortino | — | MATCH | 87.84M | — | 0.309 | 3.65× |
-| RollingVolumeWeightedAveragePrice | — | MATCH | 47.39M | — | 0.275 | 3.63× |
-| RollingWinsorize | — | MATCH | 20.64M | — | 0.210 | 3.35× |
-| RollingZScore | — | MATCH | 57.84M | — | 0.165 | 3.62× |
-| SchaffTrendCycle | — | MATCH | 16.30M | — | 0.370 | 3.67× |
-| SessionVolumeLevels | — | MATCH | 20.40M | — | 0.446 | 0.94× |
-| Sessions | — | MATCH | 129.44M | — | 0.345 | 3.05× |
-| SignalDelay | — | MATCH | 320.50M | — | 0.150 | 4.19× |
-| SignedPower | — | MATCH | 60.74M | — | 0.165 | 3.77× |
-| SpreadZScore | — | MATCH | 11.68M | — | 0.251 | 3.74× |
-| Squeeze | — | MATCH | 21.68M | — | 0.274 | 3.53× |
-| SqueezePro | — | MATCH | 17.58M | — | 0.303 | 3.21× |
-| SmoothedTrendChannel | — | MATCH | 76.02M | — | 0.260 | 0.95× |
-| Supertrend | — | MATCH | 39.50M | — | 0.275 | 2.06× |
-| SwingHighLow | — | MATCH | 28.01M | — | 0.270 | 3.55× |
-| TomDeMarkSequential | — | MATCH | 178.66M | — | 0.165 | 0.98× |
-| TimeSeriesRank | — | MATCH | 76.72M | — | 0.171 | 2.40× |
-| TrueStrengthIndex | — | MATCH | 185.35M | — | 0.154 | 4.10× |
-| UlcerIndex | — | MATCH | 25.27M | — | 0.203 | 3.76× |
-| ValueWhen | — | MATCH | 572.77M | — | 0.264 | 3.87× |
-| VariableIndexDynamicAverage | — | MATCH | 90.48M | — | 0.162 | 3.62× |
-| VolumePriceTrend | — | MATCH | 372.68M | — | 0.178 | 3.15× |
-| VolumeWeightedMovingAverage | — | MATCH | 106.50M | — | 0.191 | 1.88× |
-| Vortex | — | MATCH | 62.47M | — | 0.255 | 2.22× |
-| YangZhang | — | MATCH | 23.09M | — | 0.285 | 3.64× |
-| ZeroLagExponentialMovingAverage | — | MATCH | 223.40M | — | 0.162 | 3.41× |
+| AccelerationBands | TA-Lib: `ACCBANDS` | MATCH | 114.32M | 1.29× | 0.278 | 1.41× |
+| MathAcos | TA-Lib: `ACOS` | MATCH | 125.37M | 1.67× | 0.173 | 1.30× |
+| AccumulationDistribution | TA-Lib: `AD` | MATCH | 544.38M | 2.18× | 0.264 | 0.87× |
+| MathAdd | TA-Lib: `ADD` | MATCH | 937.64M | 3.21× | 0.193 | 1.54× |
+| AccumulationDistributionOscillator | TA-Lib: `ADOSC` | MATCH | 126.22M | 0.82× | 0.278 | 1.28× |
+| AverageDirectionalIndex | TA-Lib: `ADX` | MATCH | 114.49M | 1.35× | 0.241 | 1.13× |
+| AverageDirectionalIndexRating | TA-Lib: `ADXR` | MATCH | 92.64M | 1.11× | 0.306 | 1.43× |
+| AbsolutePriceOscillator | TA-Lib: `APO` | MATCH | 222.43M | 1.68× | 0.171 | 1.27× |
+| Aroon | TA-Lib: `AROON` | MATCH | 79.03M | 1.15× | 0.270 | 1.12× |
+| AroonOscillator | TA-Lib: `AROONOSC` | MATCH | 87.29M | 1.16× | 0.241 | 0.89× |
+| MathAsin | TA-Lib: `ASIN` | MATCH | 139.23M | 1.23× | 0.181 | 2.69× |
+| MathAtan | TA-Lib: `ATAN` | MATCH | 149.24M | 1.23× | 0.170 | 0.89× |
+| AverageTrueRange | TA-Lib: `ATR` | MATCH | 186.31M | 1.60× | 0.234 | 1.50× |
+| RollingAverageDeviation | TA-Lib: `AVGDEV` | MATCH | 62.42M | 1.07× | 0.190 | 2.23× |
+| AveragePrice | TA-Lib: `AVGPRICE` | MATCH | 871.29M | 3.15× | 0.251 | 2.05× |
+| BollingerBands | TA-Lib: `BBANDS` | MATCH | 258.74M | 2.56× | 0.226 | 1.22× |
+| RollingBeta | TA-Lib: `BETA` | MATCH | 192.59M | 1.67× | 0.206 | 2.80× |
+| BalanceOfPower | TA-Lib: `BOP` | MATCH | 613.81M | 2.30× | 0.255 | 1.13× |
+| CommodityChannelIndex | TA-Lib: `CCI` | MATCH | 52.89M | 1.28× | 0.247 | 1.85× |
+| CandleTwoCrows | TA-Lib: `CDL2CROWS` | MATCH | 165.77M | 1.81× | 0.276 | 1.22× |
+| CandleThreeBlackCrows | TA-Lib: `CDL3BLACKCROWS` | MATCH | 183.92M | 1.52× | 0.276 | 0.94× |
+| CandleThreeInside | TA-Lib: `CDL3INSIDE` | MATCH | 111.29M | 1.48× | 0.276 | 1.26× |
+| CandleThreeLineStrike | TA-Lib: `CDL3LINESTRIKE` | MATCH | 140.12M | 1.48× | 0.432 | 1.20× |
+| CandleThreeOutside | TA-Lib: `CDL3OUTSIDE` | MATCH | 158.12M | 1.27× | 0.264 | 1.16× |
+| CandleThreeStarsInSouth | TA-Lib: `CDL3STARSINSOUTH` | MATCH | 161.14M | 1.83× | 0.272 | 2.01× |
+| CandleThreeWhiteSoldiers | TA-Lib: `CDL3WHITESOLDIERS` | MATCH | 122.70M | 2.25× | 0.280 | 3.01× |
+| CandleAbandonedBaby | TA-Lib: `CDLABANDONEDBABY` | MATCH | 102.31M | 1.35× | 0.350 | 1.09× |
+| CandleAdvanceBlock | TA-Lib: `CDLADVANCEBLOCK` | MATCH | 115.72M | 3.42× | 0.297 | 2.22× |
+| CandleBeltHold | TA-Lib: `CDLBELTHOLD` | MATCH | 110.86M | 1.40× | 0.270 | 0.96× |
+| CandleBreakaway | TA-Lib: `CDLBREAKAWAY` | MATCH | 140.99M | 1.18× | 0.273 | 1.28× |
+| CandleClosingMarubozu | TA-Lib: `CDLCLOSINGMARUBOZU` | MATCH | 112.15M | 1.46× | 0.282 | 1.38× |
+| CandleConcealBabySwall | TA-Lib: `CDLCONCEALBABYSWALL` | MATCH | 203.17M | 2.22× | 0.269 | 1.45× |
+| CandleCounterAttack | TA-Lib: `CDLCOUNTERATTACK` | MATCH | 135.94M | 1.87× | 0.284 | 1.26× |
+| CandleDarkCloudCover | TA-Lib: `CDLDARKCLOUDCOVER` | MATCH | 126.51M | 1.94× | 0.282 | 1.19× |
+| CandleDoji | TA-Lib: `CDLDOJI` | MATCH | 296.66M | 1.71× | 0.435 | 1.23× |
+| CandleDojiStar | TA-Lib: `CDLDOJISTAR` | MATCH | 93.66M | 1.32× | 0.304 | 1.63× |
+| CandleDragonflyDoji | TA-Lib: `CDLDRAGONFLYDOJI` | MATCH | 203.01M | 2.11× | 0.270 | 1.35× |
+| CandleEngulfing | TA-Lib: `CDLENGULFING` | MATCH | 156.29M | 1.50× | 0.656 | 0.93× |
+| CandleEveningDojiStar | TA-Lib: `CDLEVENINGDOJISTAR` | MATCH | 71.81M | 1.50× | 0.654 | 1.35× |
+| CandleEveningStar | TA-Lib: `CDLEVENINGSTAR` | MATCH | 65.73M | 1.37× | 0.339 | 1.38× |
+| CandleGapSideSideWhite | TA-Lib: `CDLGAPSIDESIDEWHITE` | MATCH | 183.51M | 4.51× | 0.291 | 1.08× |
+| CandleGravestoneDoji | TA-Lib: `CDLGRAVESTONEDOJI` | MATCH | 187.22M | 1.91× | 0.555 | 1.77× |
+| CandleHammer | TA-Lib: `CDLHAMMER` | MATCH | 94.11M | 1.57× | 0.268 | 1.86× |
+| CandleHangingMan | TA-Lib: `CDLHANGINGMAN` | MATCH | 83.57M | 1.46× | 0.445 | 1.97× |
+| CandleHarami | TA-Lib: `CDLHARAMI` | MATCH | 112.07M | 1.71× | 0.301 | 1.14× |
+| CandleHaramiCross | TA-Lib: `CDLHARAMICROSS` | MATCH | 109.51M | 1.57× | 0.279 | 1.70× |
+| CandleHighWave | TA-Lib: `CDLHIGHWAVE` | MATCH | 87.06M | 1.42× | 0.286 | 1.27× |
+| CandleHikkake | TA-Lib: `CDLHIKKAKE` | MATCH | 184.12M | 1.36× | 0.332 | 1.28× |
+| CandleHikkakeModified | TA-Lib: `CDLHIKKAKEMOD` | MATCH | 162.73M | 1.38× | 0.269 | 2.09× |
+| CandleHomingPigeon | TA-Lib: `CDLHOMINGPIGEON` | MATCH | 172.24M | 1.90× | 0.334 | 1.22× |
+| CandleIdenticalThreeCrows | TA-Lib: `CDLIDENTICAL3CROWS` | MATCH | 128.08M | 1.57× | 0.280 | 2.01× |
+| CandleInNeck | TA-Lib: `CDLINNECK` | MATCH | 146.97M | 1.80× | 0.282 | 2.39× |
+| CandleInvertedHammer | TA-Lib: `CDLINVERTEDHAMMER` | MATCH | 80.57M | 1.48× | 0.280 | 1.57× |
+| CandleKicking | TA-Lib: `CDLKICKING` | MATCH | 116.57M | 2.07× | 0.277 | 1.10× |
+| CandleKickingByLength | TA-Lib: `CDLKICKINGBYLENGTH` | MATCH | 124.61M | 2.23× | 0.281 | 1.09× |
+| CandleLadderBottom | TA-Lib: `CDLLADDERBOTTOM` | MATCH | 168.84M | 1.41× | 0.270 | 1.61× |
+| CandleLongLeggedDoji | TA-Lib: `CDLLONGLEGGEDDOJI` | MATCH | 196.49M | 1.82× | 0.281 | 1.31× |
+| CandleLongLine | TA-Lib: `CDLLONGLINE` | MATCH | 90.47M | 1.61× | 0.291 | 1.41× |
+| CandleMarubozu | TA-Lib: `CDLMARUBOZU` | MATCH | 104.81M | 1.40× | 0.361 | 1.73× |
+| CandleMatchingLow | TA-Lib: `CDLMATCHINGLOW` | MATCH | 226.99M | 2.02× | 0.264 | 1.07× |
+| CandleMatHold | TA-Lib: `CDLMATHOLD` | MATCH | 95.62M | 1.12× | 0.276 | 1.39× |
+| CandleMorningDojiStar | TA-Lib: `CDLMORNINGDOJISTAR` | MATCH | 118.72M | 1.42× | 0.268 | 2.20× |
+| CandleMorningStar | TA-Lib: `CDLMORNINGSTAR` | MATCH | 127.83M | 1.41× | 0.270 | 1.43× |
+| CandleOnNeck | TA-Lib: `CDLONNECK` | MATCH | 160.88M | 2.03× | 0.272 | 1.04× |
+| CandlePiercing | TA-Lib: `CDLPIERCING` | MATCH | 130.27M | 1.58× | 0.276 | 1.00× |
+| CandleRickshawman | TA-Lib: `CDLRICKSHAWMAN` | MATCH | 162.09M | 2.02× | 0.324 | 1.54× |
+| CandleRiseFallThreeMethods | TA-Lib: `CDLRISEFALL3METHODS` | MATCH | 105.56M | 1.22× | 0.278 | 1.29× |
+| CandleSeparatingLines | TA-Lib: `CDLSEPARATINGLINES` | MATCH | 140.91M | 1.76× | 0.278 | 1.22× |
+| CandleShootingStar | TA-Lib: `CDLSHOOTINGSTAR` | MATCH | 99.29M | 1.68× | 0.272 | 2.02× |
+| CandleShortLine | TA-Lib: `CDLSHORTLINE` | MATCH | 70.00M | 1.45× | 0.304 | 1.20× |
+| CandleSpinningTop | TA-Lib: `CDLSPINNINGTOP` | MATCH | 97.26M | 1.22× | 0.325 | 1.56× |
+| CandleStalledPattern | TA-Lib: `CDLSTALLEDPATTERN` | MATCH | 102.12M | 1.75× | 0.286 | 1.33× |
+| CandleStickSandwich | TA-Lib: `CDLSTICKSANDWICH` | MATCH | 254.36M | 2.21× | 0.292 | 1.08× |
+| CandleTakuri | TA-Lib: `CDLTAKURI` | MATCH | 195.17M | 2.11× | 0.267 | 1.62× |
+| CandleTasukiGap | TA-Lib: `CDLTASUKIGAP` | MATCH | 72.26M | 1.30× | 0.270 | 1.95× |
+| CandleThrusting | TA-Lib: `CDLTHRUSTING` | MATCH | 138.36M | 1.59× | 0.267 | 1.44× |
+| CandleTriStar | TA-Lib: `CDLTRISTAR` | MATCH | 217.85M | 1.88× | 0.261 | 1.91× |
+| CandleUniqueThreeRiver | TA-Lib: `CDLUNIQUE3RIVER` | MATCH | 176.41M | 1.35× | 0.331 | 1.21× |
+| CandleUpsideGapTwoCrows | TA-Lib: `CDLUPSIDEGAP2CROWS` | MATCH | 120.78M | 1.40× | 0.269 | 1.78× |
+| CandleUpDownSideGapThreeMethods | TA-Lib: `CDLXSIDEGAP3METHODS` | MATCH | 90.04M | 0.78× | 0.260 | 2.43× |
+| MathCeil | TA-Lib: `CEIL` | MATCH | 361.68M | 1.44× | 0.297 | 1.74× |
+| ChandeMomentumOscillator | TA-Lib: `CMO` | MATCH | 174.42M | 1.58× | 0.165 | 1.39× |
+| RollingCorrelation | TA-Lib: `CORREL` | MATCH | 204.73M | 1.84× | 0.205 | 1.45× |
+| MathCos | TA-Lib: `COS` | MATCH | 65.25M | 1.55× | 0.181 | 3.11× |
+| MathCosh | TA-Lib: `COSH` | MATCH | 118.70M | 0.99× | 0.171 | 1.38× |
+| DoubleExponentialMovingAverage | TA-Lib: `DEMA` | MATCH | 127.48M | 1.18× | 0.165 | 1.92× |
+| MathDivide | TA-Lib: `DIV` | MATCH | 1.23G | 4.17× | 0.196 | 1.19× |
+| DirectionalMovementIndex | TA-Lib: `DX` | MATCH | 103.27M | 1.18× | 0.252 | 1.63× |
+| ExponentialMovingAverage | TA-Lib: `EMA` | MATCH | 363.66M | 2.17× | 0.164 | 1.86× |
+| MathExp | TA-Lib: `EXP` | MATCH | 195.51M | 1.36× | 0.168 | 1.13× |
+| MathFloor | TA-Lib: `FLOOR` | MATCH | 351.68M | 1.48× | 0.163 | 1.17× |
+| HilbertTransformDominantCyclePeriod | TA-Lib: `HT_DCPERIOD` | MATCH | 22.91M | 1.03× | 0.217 | 1.74× |
+| HilbertTransformDominantCyclePhase | TA-Lib: `HT_DCPHASE` | MATCH | 10.17M | 4.30× | 0.271 | 1.86× |
+| HilbertTransformPhasor | TA-Lib: `HT_PHASOR` | MATCH | 22.04M | 1.00× | 0.224 | 1.53× |
+| HilbertTransformSineWave | TA-Lib: `HT_SINE` | MATCH | 7.60M | 3.37× | 0.633 | 2.13× |
+| HilbertTransformTrendline | TA-Lib: `HT_TRENDLINE` | MATCH | 13.84M | 0.85× | 0.244 | 1.54× |
+| HilbertTransformTrendMode | TA-Lib: `HT_TRENDMODE` | MATCH | 6.11M | 2.91× | 0.334 | 1.73× |
+| IntradayMomentumIndex | TA-Lib: `IMI` | MATCH | 78.31M | 4.64× | 0.203 | 1.38× |
+| KaufmanAdaptiveMovingAverage | TA-Lib: `KAMA` | MATCH | 296.89M | 1.86× | 0.178 | 1.22× |
+| RollingLinearRegression | TA-Lib: `LINEARREG` | MATCH | 75.02M | 1.53× | 0.188 | 1.67× |
+| RollingLinearRegressionAngle | TA-Lib: `LINEARREG_ANGLE` | MATCH | 46.58M | 1.11× | 0.200 | 1.19× |
+| RollingLinearRegressionIntercept | TA-Lib: `LINEARREG_INTERCEPT` | MATCH | 79.75M | 1.21× | 0.230 | 1.49× |
+| RollingLinearRegressionSlope | TA-Lib: `LINEARREG_SLOPE` | MATCH | 92.92M | 1.17× | 0.194 | 1.64× |
+| MathLn | TA-Lib: `LN` | MATCH | 196.07M | 1.33× | 0.214 | 1.22× |
+| MathLog10 | TA-Lib: `LOG10` | MATCH | 119.07M | 1.25× | 0.172 | 1.57× |
+| MovingAverage | TA-Lib: `MA` | MATCH | 227.31M | 1.31× | 0.172 | 1.33× |
+| MovingAverageConvergenceDivergence | TA-Lib: `MACD` | MATCH | 391.83M | 5.46× | 0.288 | 1.72× |
+| MovingAverageConvergenceDivergenceExtended | TA-Lib: `MACDEXT` | MATCH | 105.52M | 1.19× | 0.213 | 1.24× |
+| MovingAverageConvergenceDivergenceFixed | TA-Lib: `MACDFIX` | MATCH | 393.49M | 5.12× | 0.210 | 1.68× |
+| MesaAdaptiveMovingAverage | TA-Lib: `MAMA` | MATCH | 17.15M | 0.95× | 0.258 | 1.99× |
+| VariablePeriodMovingAverage | TA-Lib: `MAVP` | MATCH | 7.98M | 0.67× | 0.335 | 2.30× |
+| RollingMax | TA-Lib: `MAX` | MATCH | 238.55M | 2.37× | 0.198 | 1.16× |
+| RollingArgmax | TA-Lib: `MAXINDEX` | MATCH | 197.82M | 1.83× | 0.179 | 1.57× |
+| MedianPrice | TA-Lib: `MEDPRICE` | MATCH | 1.44G | 4.69× | 0.196 | 1.36× |
+| MoneyFlowIndex | TA-Lib: `MFI` | MATCH | 170.77M | 1.83× | 0.283 | 1.18× |
+| RollingMidpoint | TA-Lib: `MIDPOINT` | MATCH | 124.84M | 1.25× | 0.195 | 3.19× |
+| RollingMidprice | TA-Lib: `MIDPRICE` | MATCH | 123.73M | 1.33× | 0.237 | 1.51× |
+| RollingMin | TA-Lib: `MIN` | MATCH | 306.67M | 2.35× | 0.175 | 1.02× |
+| RollingArgmin | TA-Lib: `MININDEX` | MATCH | 193.36M | 1.79× | 0.230 | 1.18× |
+| RollingMinMax | TA-Lib: `MINMAX` | MATCH | 136.75M | 1.59× | 0.224 | 3.31× |
+| RollingMinMaxIndex | TA-Lib: `MINMAXINDEX` | MATCH | 99.26M | 1.47× | 0.238 | 1.32× |
+| MinusDirectionalIndicator | TA-Lib: `MINUS_DI` | MATCH | 106.50M | 1.02× | 0.231 | 1.67× |
+| MinusDirectionalMovement | TA-Lib: `MINUS_DM` | MATCH | 185.58M | 1.56× | 0.193 | 0.84× |
+| Momentum | TA-Lib: `MOM` | MATCH | 514.95M | 1.79× | 0.161 | 2.26× |
+| MathMultiply | TA-Lib: `MULT` | MATCH | 1.41G | 4.71× | 0.195 | 2.08× |
+| NormalizedAverageTrueRange | TA-Lib: `NATR` | MATCH | 152.48M | 1.33× | 0.236 | 1.45× |
+| OnBalanceVolume | TA-Lib: `OBV` | MATCH | 256.07M | 1.69× | 0.202 | 1.15× |
+| PlusDirectionalIndicator | TA-Lib: `PLUS_DI` | MATCH | 163.04M | 1.54× | 0.243 | 1.96× |
+| PlusDirectionalMovement | TA-Lib: `PLUS_DM` | MATCH | 178.80M | 1.41× | 0.203 | 1.39× |
+| PercentagePriceOscillator | TA-Lib: `PPO` | MATCH | 235.96M | 1.87× | 0.176 | 1.17× |
+| RateOfChange | TA-Lib: `ROC` | MATCH | 473.18M | 1.86× | 0.166 | 0.96× |
+| RateOfChangePercent | TA-Lib: `ROCP` | MATCH | 490.58M | 2.03× | 0.168 | 1.30× |
+| RateOfChangeRatio | TA-Lib: `ROCR` | MATCH | 510.98M | 2.06× | 0.169 | 1.35× |
+| RateOfChangeRatioPercent | TA-Lib: `ROCR100` | MATCH | 471.61M | 1.95× | 0.160 | 1.06× |
+| RelativeStrengthIndex | TA-Lib: `RSI` | MATCH | 166.84M | 1.39× | 0.172 | 1.66× |
+| ParabolicSar | TA-Lib: `SAR` | MATCH | 88.11M | 0.83× | 0.206 | 1.33× |
+| ParabolicSarExtended | TA-Lib: `SAREXT` | MATCH | 89.26M | 0.88× | 0.209 | 1.90× |
+| MathSin | TA-Lib: `SIN` | MATCH | 65.06M | 1.13× | 0.296 | 2.47× |
+| MathSinh | TA-Lib: `SINH` | MATCH | 137.19M | 1.24× | 0.181 | 1.49× |
+| SimpleMovingAverage | TA-Lib: `SMA` | MATCH | 445.03M | 2.65× | 0.184 | 1.49× |
+| MathSqrt | TA-Lib: `SQRT` | MATCH | 437.97M | 1.74× | 0.176 | 2.20× |
+| RollingStandardDeviation | TA-Lib: `STDDEV` | MATCH | 241.33M | 1.74× | 0.169 | 2.38× |
+| StochasticOscillator | TA-Lib: `STOCH` | MATCH | 73.29M | 1.18× | 0.302 | 1.16× |
+| FastStochasticOscillator | TA-Lib: `STOCHF` | MATCH | 63.54M | 0.92× | 0.299 | 0.92× |
+| StochasticRelativeStrengthIndex | TA-Lib: `STOCHRSI` | MATCH | 45.56M | 0.91× | 0.233 | 1.94× |
+| MathSubtract | TA-Lib: `SUB` | MATCH | 1.45G | 4.95× | 0.190 | 0.84× |
+| RollingSum | TA-Lib: `SUM` | MATCH | 306.96M | 1.70× | 0.161 | 1.33× |
+| TripleExponentialAverage | TA-Lib: `T3` | MATCH | 246.70M | 1.95× | 0.188 | 1.14× |
+| MathTan | TA-Lib: `TAN` | MATCH | 50.14M | 1.13× | 0.189 | 1.48× |
+| MathTanh | TA-Lib: `TANH` | MATCH | 273.13M | 1.50× | 0.162 | 1.36× |
+| TripleExponentialMovingAverage | TA-Lib: `TEMA` | MATCH | 103.35M | 1.21× | 0.220 | 2.06× |
+| TrueRange | TA-Lib: `TRANGE` | MATCH | 603.60M | 1.99× | 0.232 | 1.58× |
+| TriangularMovingAverage | TA-Lib: `TRIMA` | MATCH | 237.74M | 1.46× | 0.176 | 1.49× |
+| TripleExponentialRateOfChange | TA-Lib: `TRIX` | MATCH | 402.67M | 4.69× | 0.175 | 1.29× |
+| RollingTimeSeriesForecast | TA-Lib: `TSF` | MATCH | 77.48M | 1.22× | 0.185 | 1.18× |
+| TypicalPrice | TA-Lib: `TYPPRICE` | MATCH | 1.11G | 3.98× | 0.245 | 1.01× |
+| UltimateOscillator | TA-Lib: `ULTOSC` | MATCH | 75.31M | 1.33× | 0.255 | 1.46× |
+| RollingVariance | TA-Lib: `VAR` | MATCH | 290.95M | 1.65× | 0.166 | 0.90× |
+| WeightedClose | TA-Lib: `WCLPRICE` | MATCH | 1.12G | 3.77× | 0.252 | 1.73× |
+| WilliamsPercentR | TA-Lib: `WILLR` | MATCH | 118.60M | 1.37× | 0.251 | 1.04× |
+| WeightedMovingAverage | TA-Lib: `WMA` | MATCH | 285.05M | 1.69× | 0.166 | 2.59× |
+| Amihud | self: `self.amihud` | MATCH | 153.45M | — | 0.200 | 1.00× |
+| AnchoredVolumeWeightedAveragePrice | self: `self.anchored_vwap` | MATCH | 85.20M | — | 0.511 | 1.00× |
+| ArnaudLegouxMovingAverage | self: `self.arnaud_legoux_moving_average` | MATCH | 70.78M | — | 0.171 | 1.40× |
+| AverageDailyDollarValue | self: `self.average_daily_dollar_value` | MATCH | 206.95M | — | 0.200 | 1.71× |
+| AwesomeOscillator | pandas-ta-classic: `pandas_ta_classic.ao` | MATCH | 28.13M | — | 0.233 | 1.79× |
+| BarsSince | self: `self.bars_since` | MATCH | 355.72M | — | 0.329 | 3.42× |
+| BreakOfStructureChangeOfCharacter | smartmoneyconcepts: `smartmoneyconcepts.break_of_structure_change_of_character` | VARIANT | 22.69M | — | 0.339 | 2.25× |
+| ChaikinMoneyFlow | pandas-ta-classic: `pandas_ta_classic.cmf` | MATCH | 133.01M | — | 0.285 | 1.83× |
+| ChaikinVolatility | self: `self.chaikin_volatility` | MATCH | 164.22M | — | 0.206 | 1.73× |
+| CloseToCloseSigma | self: `self.close_to_close_sigma` | MATCH | 52.10M | — | 0.190 | 1.57× |
+| Crossover | pandas-ta-classic: `pandas-ta-classic.crossover` | MATCH | 301.30M | — | 0.201 | 2.21× |
+| Crossunder | pandas-ta-classic: `pandas-ta-classic.crossunder` | MATCH | 276.65M | — | 0.233 | 1.19× |
+| CumulativeCount | self: `self.cumulative_count` | MATCH | 480.54M | — | 0.161 | 1.53× |
+| CumulativeMaximum | Polars: `Polars.cumulative_maximum` | MATCH | 220.74M | — | 0.162 | 0.95× |
+| CumulativeMinimum | Polars: `Polars.cumulative_minimum` | MATCH | 216.17M | — | 0.166 | 1.89× |
+| CumulativeProduct | Polars: `Polars.cumulative_product` | MATCH | 414.32M | — | 0.161 | 1.78× |
+| CumulativeSum | Polars: `Polars.cumulative_sum` | MATCH | 377.28M | — | 0.159 | 1.05× |
+| CumulativeSumControlChart | self: `self.cumulative_sum_control_chart` | MATCH | 278.97M | — | 0.158 | 1.77× |
+| DecayLinear | self: `self.decay_linear` | MATCH | 265.65M | — | 0.234 | 1.11× |
+| DetrendedPriceOscillator | pandas-ta-classic: `pandas_ta_classic.dpo` | MATCH | 186.09M | — | 0.171 | 1.07× |
+| DonchianChannels | pandas-ta-classic: `pandas_ta_classic.donchian` | MATCH | 115.16M | — | 0.285 | 1.03× |
+| Drawdown | self: `self.drawdown` | MATCH | 230.96M | — | 0.180 | 1.22× |
+| EaseOfMovement | self: `self.ease_of_movement` | MATCH | 313.02M | — | 0.256 | 1.28× |
+| EqualHighsLows | self: `self.equal_highs_lows` | MATCH | 19.96M | — | 0.366 | 2.07× |
+| EvenBetterSinewave | pandas-ta-classic: `pandas_ta_classic.ebsw` | MATCH | 49.02M | — | 0.173 | 1.45× |
+| ExponentiallyWeightedCorrelation | self: `self.ewm_corr` | MATCH | 137.20M | — | 0.197 | 1.56× |
+| ExponentiallyWeightedCovariance | self: `self.ewm_cov` | MATCH | 183.53M | — | 0.203 | 1.49× |
+| ExponentiallyWeightedStandardDeviation | pandas: `pandas.ewm_std` | MATCH | 197.77M | — | 0.227 | 1.47× |
+| ExponentiallyWeightedVariance | pandas: `pandas.ewm_var` | MATCH | 199.19M | — | 0.207 | 2.08× |
+| ExponentiallyWeightedSum | self: `self.exponentially_weighted_sum` | MATCH | 284.55M | — | 0.159 | 1.30× |
+| FairValueGap | smartmoneyconcepts: `smartmoneyconcepts.fair_value_gap` | MATCH | 87.07M | — | 0.309 | 1.05× |
+| Falling | self: `self.falling` | MATCH | 205.07M | — | 0.176 | 1.10× |
+| FibonacciRetracement | self: `self.fib_retracement` | MATCH | 34.17M | — | 0.282 | 1.21× |
+| FisherTransform | pandas-ta-classic: `pandas_ta_classic.fisher` | MATCH | 25.63M | — | 0.367 | 2.04× |
+| ForceIndex | pandas-ta-classic: `pandas_ta_classic.efi` | MATCH | 304.48M | — | 0.206 | 1.31× |
+| FracDiff | self: `self.frac_diff` | MATCH | 1.41M | — | 0.958 | 2.06× |
+| FractalDimension | self: `self.fractal_dimension` | MATCH | 17.04M | — | 0.234 | 2.51× |
+| GapDown | self: `self.gap_down` | MATCH | 308.62M | — | 0.195 | 1.96× |
+| GapUp | self: `self.gap_up` | MATCH | 333.92M | — | 0.202 | 1.30× |
+| GarmanKlass | self: `self.garman_klass` | MATCH | 45.77M | — | 0.293 | 1.41× |
+| GarmanKlassYangZhang | self: `self.garman_klass_yang_zhang` | MATCH | 41.81M | — | 0.348 | 1.63× |
+| HedgeRatio | self: `self.hedge_ratio` | MATCH | 25.67M | — | 0.256 | 2.05× |
+| HeikinAshi | pandas-ta-classic: `pandas-ta-classic.heikin_ashi` | MATCH | 82.66M | — | 0.417 | 1.33× |
+| HigherHigh | self: `self.higher_high` | MATCH | 343.93M | — | 0.200 | 1.49× |
+| HighestSince | self: `self.highest_since` | MATCH | 273.69M | — | 0.314 | 1.29× |
+| HullMovingAverage | pandas-ta-classic: `pandas_ta_classic.hma` | MATCH | 46.87M | — | 0.185 | 2.08× |
+| Hurst | self: `self.hurst` | MATCH | 13.23M | — | 0.236 | 1.83× |
+| Ichimoku | pandas-ta-classic: `pandas-ta-classic.ichimoku` | MATCH | 10.62M | — | 0.403 | 1.50× |
+| InsideBar | self: `self.inside_bar` | MATCH | 341.68M | — | 0.203 | 1.46× |
+| JurikMovingAverage | self: `self.jma` | MATCH | 11.04M | — | 0.254 | 1.26× |
+| KalmanHedgeRatio | self: `self.kalman_hedge_ratio` | MATCH | 71.36M | — | 0.193 | 1.54× |
+| KeltnerChannels | self: `self.keltner_channels` | MATCH | 110.87M | — | 0.304 | 1.68× |
+| KnowSureThing | pandas-ta-classic: `pandas-ta-classic.know_sure_thing` | VARIANT | 48.40M | — | 0.284 | 1.23× |
+| KlingerVolumeOscillator | self: `self.kvo` | MATCH | 98.99M | — | 0.302 | 1.29× |
+| Lag | self: `self.lag` | MATCH | 310.90M | — | 0.210 | 1.42× |
+| LaguerreRelativeStrengthIndex | self: `self.laguerre_rsi` | MATCH | 120.25M | — | 0.338 | 0.93× |
+| Liquidity | smartmoneyconcepts: `smartmoneyconcepts.liquidity` | VARIANT | 22.84M | — | 0.296 | 1.66× |
+| LogReturn | pandas-ta-classic: `pandas_ta_classic.log_return` | MATCH | 124.88M | — | 0.165 | 0.84× |
+| LowerLow | self: `self.lower_low` | MATCH | 294.47M | — | 0.199 | 1.25× |
+| LowestSince | self: `self.lowest_since` | MATCH | 251.95M | — | 0.295 | 1.57× |
+| MassIndex | pandas-ta-classic: `pandas-ta-classic.mass_index` | VARIANT | 150.46M | — | 0.220 | 0.88× |
+| MathAbs | self: `self.math_abs` | MATCH | 766.89M | — | 0.210 | 2.64× |
+| MathAcosh | self: `self.math_acosh` | MATCH | 90.12M | — | 0.176 | 2.40× |
+| MathAsinh | self: `self.math_asinh` | MATCH | 85.33M | — | 0.176 | 1.33× |
+| MathAtanh | self: `self.math_atanh` | MATCH | 184.95M | — | 0.172 | 1.86× |
+| MathCbrt | self: `self.math_cbrt` | MATCH | 54.12M | — | 0.180 | 1.31× |
+| MathCot | self: `self.math_cot` | MATCH | 48.33M | — | 0.188 | 1.39× |
+| MathDegrees | self: `self.math_degrees` | MATCH | 790.15M | — | 0.160 | 1.42× |
+| MathLog1p | self: `self.math_log1p` | MATCH | 122.65M | — | 0.171 | 1.23× |
+| MathRadians | self: `self.math_radians` | MATCH | 754.21M | — | 0.161 | 1.49× |
+| McGinleyDynamic | self: `self.mcginley` | MATCH | 69.55M | — | 0.164 | 1.32× |
+| NegativeVolumeIndex | pandas-ta-classic: `pandas-ta-classic.negative_volume_index` | VARIANT | 168.08M | — | 0.209 | 1.41× |
+| OpeningRange | self: `self.opening_range` | MATCH | 143.52M | — | 0.433 | 1.19× |
+| OrderBlock | smartmoneyconcepts: `smartmoneyconcepts.order_block` | VARIANT | 10.89M | — | 0.537 | 1.64× |
+| OrnsteinUhlenbeckHalfLife | self: `self.ornstein_uhlenbeck_half_life` | MATCH | 21.82M | — | 0.205 | 2.51× |
+| OutsideBar | self: `self.outside_bar` | MATCH | 303.84M | — | 0.282 | 1.43× |
+| Parkinson | self: `self.parkinson` | MATCH | 70.34M | — | 0.211 | 1.31× |
+| PivotPoints | self: `self.pivot_points` | MATCH | 101.35M | — | 0.461 | 1.82× |
+| ParabolicMovingAverageStop | self: `self.pmax` | MATCH | 50.26M | — | 0.358 | 1.06× |
+| PositiveVolumeIndex | pandas-ta-classic: `pandas-ta-classic.positive_volume_index` | VARIANT | 154.36M | — | 0.229 | 1.24× |
+| PremiumDiscount | self: `self.premium_discount` | MATCH | 36.46M | — | 0.244 | 1.16× |
+| PreviousHighLow | smartmoneyconcepts: `smartmoneyconcepts.previous_high_low` | VARIANT | 97.17M | — | 0.436 | 1.46× |
+| Retracements | smartmoneyconcepts: `smartmoneyconcepts.retracements` | VARIANT | 17.85M | — | 0.340 | 1.76× |
+| Rising | self: `self.rising` | MATCH | 203.50M | — | 0.171 | 1.18× |
+| RelativeMomentumIndex | self: `self.rmi` | MATCH | 137.81M | — | 0.189 | 1.42× |
+| RogersSatchell | self: `self.rogers_satchell` | MATCH | 31.80M | — | 0.575 | 1.85× |
+| RollSpread | self: `self.roll_spread` | MATCH | 22.86M | — | 0.213 | 1.62× |
+| RollingAlpha | self: `self.rolling_alpha` | MATCH | 23.97M | — | 0.245 | 1.34× |
+| RollingAutocorr | self: `self.rolling_autocorr` | MATCH | 18.07M | — | 0.225 | 1.29× |
+| RollingCalmar | self: `self.rolling_calmar` | MATCH | 21.91M | — | 0.207 | 1.20× |
+| RollingCov | pandas: `pandas.rolling_cov` | MATCH | 30.46M | — | 0.230 | 1.46× |
+| RollingEntropy | self: `self.rolling_entropy` | MATCH | 1.34M | — | 0.855 | 1.82× |
+| RollingInformationRatio | self: `self.rolling_information_ratio` | MATCH | 29.57M | — | 0.240 | 2.31× |
+| RollingKurtosis | pandas: `pandas.rolling_kurtosis` | MATCH | 55.95M | — | 0.176 | 2.49× |
+| RollingMedian | pandas: `pandas.rolling_median` | MATCH | 25.53M | — | 0.194 | 1.29× |
+| RollingMode | self: `self.rolling_mode` | MATCH | 4.75M | — | 0.367 | 1.88× |
+| RollingQuantile | pandas: `pandas.rolling_quantile` | MATCH | 20.72M | — | 0.216 | 1.37× |
+| RollingRank | self: `self.rolling_rank` | MATCH | 61.40M | — | 0.183 | 1.56× |
+| RollingSharpe | self: `self.rolling_sharpe` | MATCH | 33.13M | — | 0.216 | 1.34× |
+| RollingSkew | pandas: `pandas.rolling_skew` | MATCH | 31.95M | — | 0.200 | 1.54× |
+| RollingSortino | self: `self.rolling_sortino` | MATCH | 52.76M | — | 0.187 | 1.91× |
+| RollingVolumeWeightedAveragePrice | self: `self.rolling_vwap` | MATCH | 44.05M | — | 0.318 | 1.18× |
+| RollingWinsorize | self: `self.rolling_winsorize` | MATCH | 16.67M | — | 0.222 | 2.44× |
+| RollingZScore | pandas: `pandas.rolling_zscore` | MATCH | 35.32M | — | 0.190 | 1.81× |
+| SchaffTrendCycle | pandas-ta-classic: `pandas_ta_classic.stc` | MATCH | 15.78M | — | 0.279 | 2.12× |
+| SessionVolumeLevels | self: `self.session_volume_levels` | MATCH | 17.78M | — | 0.545 | 0.93× |
+| Sessions | smartmoneyconcepts: `smartmoneyconcepts.sessions` | MATCH | 128.92M | — | 0.406 | 1.20× |
+| SignalDelay | self: `self.signal_delay` | MATCH | 238.86M | — | 0.180 | 1.33× |
+| SignedPower | self: `self.signed_power` | MATCH | 495.19M | — | 0.167 | 1.33× |
+| SpreadZScore | self: `self.spread_zscore` | MATCH | 11.64M | — | 0.278 | 1.59× |
+| Squeeze | pandas-ta-classic: `pandas-ta-classic.squeeze` | MATCH | 25.72M | — | 0.369 | 1.66× |
+| SqueezePro | pandas-ta-classic: `pandas-ta-classic.squeeze_pro` | MATCH | 21.83M | — | 0.326 | 1.76× |
+| SmoothedTrendChannel | self: `self.ssl_channel` | MATCH | 68.75M | — | 0.299 | 1.03× |
+| Supertrend | pandas-ta-classic: `pandas-ta-classic.supertrend` | MATCH | 45.94M | — | 0.333 | 1.54× |
+| SwingHighsLows | smartmoneyconcepts: `smartmoneyconcepts.swing_highs_lows` | VARIANT | 25.56M | — | 0.379 | 1.56× |
+| TomDeMarkSequential | self: `self.td_sequential` | MATCH | 155.69M | — | 0.265 | 1.45× |
+| TimeSeriesRank | self: `self.time_series_rank` | MATCH | 55.64M | — | 0.200 | 2.64× |
+| TrueStrengthIndex | self: `self.true_strength_index` | MATCH | 183.31M | — | 0.316 | 1.54× |
+| UlcerIndex | self: `self.ulcer_index` | MATCH | 22.80M | — | 0.238 | 1.39× |
+| ValueWhen | self: `self.value_when` | MATCH | 417.72M | — | 0.295 | 1.08× |
+| VariableIndexDynamicAverage | self: `self.vidya` | MATCH | 84.11M | — | 0.189 | 1.40× |
+| VolumePriceTrend | self: `self.volume_price_trend` | MATCH | 339.93M | — | 0.197 | 2.62× |
+| VolumeWeightedMovingAverage | pandas-ta-classic: `pandas_ta_classic.vwma` | MATCH | 77.74M | — | 0.207 | 1.09× |
+| Vortex | pandas-ta-classic: `pandas-ta-classic.vortex` | MATCH | 85.52M | — | 0.278 | 1.99× |
+| YangZhang | self: `self.yang_zhang` | MATCH | 21.42M | — | 0.486 | 1.84× |
+| ZeroLagExponentialMovingAverage | pandas-ta-classic: `pandas_ta_classic.zlma` | MATCH | 189.30M | — | 0.171 | 1.20× |

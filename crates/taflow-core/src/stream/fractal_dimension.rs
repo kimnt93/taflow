@@ -1,6 +1,7 @@
 //! Batch implementation for `fractal_dimension`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `fractal_dimension` through the native Rust kernel.

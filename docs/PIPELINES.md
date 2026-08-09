@@ -44,9 +44,9 @@ pipe = TAPipeline()
 # Node handles are named apart from the data arrays so the two never collide.
 high_s, low_s, close_s = pipe.source("high"), pipe.source("low"), pipe.source("close")
 
-fast = pipe.indicator("fast", ExponentialMovingAverage(timeperiod=12), close_s)
-slow = pipe.indicator("slow", ExponentialMovingAverage(timeperiod=26), close_s)
-atr  = pipe.indicator("atr",  AverageTrueRange(timeperiod=14), high_s, low_s, close_s)
+fast = pipe.indicator("fast", ExponentialMovingAverage([], timeperiod=12), close_s)
+slow = pipe.indicator("slow", ExponentialMovingAverage([], timeperiod=26), close_s)
+atr  = pipe.indicator("atr",  AverageTrueRange([], [], [], timeperiod=14), high_s, low_s, close_s)
 
 pipe.output("macd", pipe.expression("macd", fast - slow))
 pipe.output("normalized", pipe.expression("normalized", (fast - slow) / atr))
@@ -74,8 +74,8 @@ dependency order, from already-computed values. They hold no state.
 An indicator can consume another indicator's output directly:
 
 ```python
-ema      = pipe.indicator("ema", ExponentialMovingAverage(timeperiod=5), close_s)
-smoothed = pipe.indicator("smoothed", SimpleMovingAverage(timeperiod=7), ema)
+ema      = pipe.indicator("ema", ExponentialMovingAverage([], timeperiod=5), close_s)
+smoothed = pipe.indicator("smoothed", SimpleMovingAverage([], timeperiod=7), ema)
 ```
 
 > **Chaining currently propagates warm-up NaN, and that is destructive.**
@@ -83,7 +83,7 @@ smoothed = pipe.indicator("smoothed", SimpleMovingAverage(timeperiod=7), ema)
 > into the downstream indicator, and a sum-based state (SMA, VAR, STDDEV,
 > anything keeping a running total) never recovers: the accumulator does
 > `sum += new - old`, so once it is `NaN` it stays `NaN` for the rest of the
-> stream. `SimpleMovingAverage(timeperiod=7)` fed a 5-period EMA over 200 bars
+> stream. `SimpleMovingAverage([], timeperiod=7)` fed a 5-period EMA over 200 bars
 > returns **200 NaNs**, not 11.
 >
 > Until this is addressed, chain only onto states that tolerate `NaN` (the
@@ -154,8 +154,8 @@ create but never wire to an output — directly or as a dependency of one — is
 never stepped and stays at bar zero:
 
 ```python
-used   = pipe.indicator("used", SimpleMovingAverage(timeperiod=5), close_s)
-unused = pipe.indicator("unused", SimpleMovingAverage(timeperiod=5), close_s)
+used   = pipe.indicator("used", SimpleMovingAverage([], timeperiod=5), close_s)
+unused = pipe.indicator("unused", SimpleMovingAverage([], timeperiod=5), close_s)
 pipe.output("used", used)
 
 pipe.extend({"high": high, "low": low, "close": close})

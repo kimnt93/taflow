@@ -7,14 +7,15 @@ from ._series import as_float64_series
 
 
 class CumulativeProduct:
-    """Stateful CumulativeProduct indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent cumulative product operator.
 
-    def __init__(self, _input: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        _input: Any,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -30,7 +31,7 @@ class CumulativeProduct:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: float) -> object:
+    def append(self, _input: float) -> "CumulativeProduct":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -46,7 +47,7 @@ class CumulativeProduct:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any) -> object:
+    def extend(self, _input: Any) -> "CumulativeProduct":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -83,7 +84,7 @@ class CumulativeProduct:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "CumulativeProduct":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

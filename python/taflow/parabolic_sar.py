@@ -21,10 +21,10 @@ class ParabolicSar:
 
     def __init__(
         self,
+        high: Any,
+        low: Any,
         acceleration: float = 0.02,
         maximum: float = 0.2,
-        high: Any | None = None,
-        low: Any | None = None,
     ) -> None:
         """Create Parabolic SAR with optional aligned high/low history."""
         self._state = StatefulSar(acceleration, maximum)
@@ -68,13 +68,12 @@ class ParabolicSar:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned Parabolic SAR values
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property

@@ -169,3 +169,104 @@ mod tests {
         }
     }
 }
+use super::rolling_price::*;
+use super::*;
+
+/// Stateful midpoint of rolling high maxima and low minima.
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingMidprice`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollingMidprice {
+    highs: MonotonicMax,
+    lows: MonotonicMin,
+    value: Option<f64>,
+}
+
+impl RollingMidprice {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        Ok(Self {
+            highs: MonotonicMax::new(period)?,
+            lows: MonotonicMin::new(period)?,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+        let maximum = self.highs.append(high);
+        let minimum = self.lows.append(low);
+        self.value = maximum.zip(minimum).map(|(high, low)| (high + low) * 0.5);
+        self.value
+    }
+
+    /// Bulk kernel: one vHGW max pass over `high` and one vHGW min pass over
+    /// `low`, midpoint applied in place. The trailing `period` inputs are
+    /// replayed to rebuild the monotonic deques, so outputs and post-run state
+    /// are bit-identical to per-bar [`Self::append`]; warm-up bars are NaN.
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        if high.len() != low.len() {
+            return Err(TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len(),
+            });
+        }
+        let n = high.len();
+        let period = self.highs.period();
+        if self.highs.count() != 0 || n < period {
+            output.reserve(n);
+            for index in 0..n {
+                output.push(self.append(high[index], low[index]).unwrap_or(f64::NAN));
+            }
+            return Ok(());
+        }
+        let start = output.len();
+        output.resize(start + n, f64::NAN);
+        let warm = start + period - 1;
+        let mut lowest = vec![0.0_f64; n - (period - 1)];
+        vhgw::sliding_max_into(high, period, &mut output[warm..]);
+        vhgw::sliding_min_into(low, period, &mut lowest);
+        for (slot, &minimum) in output[warm..].iter_mut().zip(&lowest) {
+            *slot = (*slot + minimum) * 0.5;
+        }
+        self.highs.rebuild_from_full_run(high);
+        self.lows.rebuild_from_full_run(low);
+        self.value = output.last().copied();
+        Ok(())
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn reset(&mut self) {
+        self.highs.reset();
+        self.lows.reset();
+        self.value = None;
+    }
+}

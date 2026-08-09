@@ -4,6 +4,12 @@ use crate::error::TaResult;
 
 use super::{invalid_period, StreamingIndicator, Window};
 
+#[cfg(test)]
+use crate::stream::{
+    RollingAverageDeviation, RollingBeta, RollingCorrelation, RollingStandardDeviation,
+    RollingVariance,
+};
+
 /// TA-Lib's `TA_STDDEV` collapses a variance below this threshold to zero
 /// instead of taking its square root; replicated verbatim.
 pub(super) const STDDEV_VARIANCE_EPSILON: f64 = 0.00000000000001;
@@ -48,7 +54,7 @@ pub(super) fn stddev_from_variance(variance: f64, nbdev: f64) -> f64 {
 /// Note: no `mul_add` here — TA-Lib uses a plain multiply followed by a
 /// separate add, and fusing them changes the low bits.
 #[derive(Debug, Clone)]
-struct RollingMoments {
+pub(crate) struct RollingMoments {
     period: usize,
     period_f: f64,
     /// The `period - 1` most recent inputs; a push evicts TA-Lib's trailing bar.
@@ -58,7 +64,7 @@ struct RollingMoments {
 }
 
 impl RollingMoments {
-    fn new(period: usize) -> TaResult<Self> {
+    pub(crate) fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
         }
@@ -71,7 +77,7 @@ impl RollingMoments {
         })
     }
 
-    fn append(&mut self, input: f64) -> Option<f64> {
+    pub(crate) fn append(&mut self, input: f64) -> Option<f64> {
         self.sum += input;
         self.sum_squares += input * input;
         let variance = self.window.is_full().then(|| {
@@ -86,7 +92,7 @@ impl RollingMoments {
         variance
     }
 
-    fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         self.window.clear();
         self.sum = 0.0;
         self.sum_squares = 0.0;
@@ -98,7 +104,7 @@ impl RollingMoments {
     /// Uses exactly the same arithmetic in exactly the same order as
     /// [`Self::append`], so outputs and post-run state are bit-identical to
     /// per-bar appends for any chunking. Returns the last emitted value.
-    fn extend_map_into(
+    pub(crate) fn extend_map_into(
         &mut self,
         inputs: &[f64],
         output: &mut Vec<f64>,
@@ -148,225 +154,6 @@ impl RollingMoments {
     }
 }
 
-/// Stateful population variance. TA-Lib accepts but ignores `nbdev` for VAR.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingVariance`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingVariance {
-    moments: RollingMoments,
-    value: Option<f64>,
-}
-
-impl RollingVariance {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(period: usize, _nbdev: f64) -> TaResult<Self> {
-        Ok(Self {
-            moments: RollingMoments::new(period)?,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for RollingVariance {
-    type Output = f64;
-
-    /// Bulk kernel: slice-recurrence sliding moments, bit-identical to
-    /// per-bar [`Self::append`] in outputs and post-run state.
-    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
-        if inputs.is_empty() {
-            return;
-        }
-        self.value = self
-            .moments
-            .extend_map_into(inputs, output, |variance| variance);
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.value = self.moments.append(input);
-        self.value
-    }
-
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.moments.reset();
-        self.value = None;
-    }
-}
-
-/// Stateful population standard deviation multiplied by `nbdev`.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingStandardDeviation`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingStandardDeviation {
-    moments: RollingMoments,
-    nbdev: f64,
-    value: Option<f64>,
-}
-
-impl RollingStandardDeviation {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(period: usize, nbdev: f64) -> TaResult<Self> {
-        Ok(Self {
-            moments: RollingMoments::new(period)?,
-            nbdev,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for RollingStandardDeviation {
-    type Output = f64;
-
-    /// Bulk kernel: slice-recurrence sliding moments, bit-identical to
-    /// per-bar [`Self::append`] in outputs and post-run state.
-    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
-        if inputs.is_empty() {
-            return;
-        }
-        let nbdev = self.nbdev;
-        self.value = self.moments.extend_map_into(inputs, output, |variance| {
-            stddev_from_variance(variance, nbdev)
-        });
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        let nbdev = self.nbdev;
-        self.value = self
-            .moments
-            .append(input)
-            .map(|variance| stddev_from_variance(variance, nbdev));
-        self.value
-    }
-
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.moments.reset();
-        self.value = None;
-    }
-}
-
-/// Stateful average absolute deviation with TA-Lib's newest-to-oldest summation order.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingAverageDeviation`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingAverageDeviation {
-    period: usize,
-    window: Window,
-    value: Option<f64>,
-}
-
-impl RollingAverageDeviation {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(period: usize) -> TaResult<Self> {
-        if period < 2 {
-            return Err(invalid_period("timeperiod", period, 2));
-        }
-        Ok(Self {
-            period,
-            window: Window::new(period)?,
-            value: None,
-        })
-    }
-}
-
-impl StreamingIndicator for RollingAverageDeviation {
-    type Output = f64;
-
-    /// Bulk kernel: the O(period) mean + deviation rescans are inherent to
-    /// TA-Lib's AVGDEV semantics (newest-to-oldest summation order), but here
-    /// they run over the contiguous input slice instead of the ring iterator.
-    /// Bit-identical to per-bar [`Self::append`] in outputs and state.
-    ///
-    /// Note: maintaining an incremental running sum for the mean would change
-    /// the summation order (and therefore low bits) versus the per-window
-    /// newest-to-oldest rescan, so the rescan is kept.
-    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
-        let period = self.period;
-        let n = inputs.len();
-        output.reserve(n);
-        // Warm-up prologue: from index period-1 onward the ring contents are
-        // exactly the trailing input-slice window, regardless of prior state.
-        let prologue = n.min(period - 1);
-        for &input in &inputs[..prologue] {
-            output.push(self.append(input).unwrap_or(f64::NAN));
-        }
-        if n < period {
-            return;
-        }
-        let period_f = period as f64;
-        let mut last = f64::NAN;
-        for i in (period - 1)..n {
-            let window = &inputs[i + 1 - period..=i];
-            // Newest-to-oldest, exactly like `window.iter().rev()` in append.
-            let mut sum = 0.0;
-            for &value in window.iter().rev() {
-                sum += value;
-            }
-            let mean = sum / period_f;
-            let mut deviation = 0.0;
-            for &value in window.iter().rev() {
-                deviation += (value - mean).abs();
-            }
-            last = deviation / period_f;
-            output.push(last);
-        }
-        self.value = Some(last);
-        // Rebuild the ring so subsequent appends continue bit-identically.
-        self.window.clear();
-        for &input in &inputs[n - period..] {
-            self.window.push(input);
-        }
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.window.push(input);
-        self.value = self.window.is_full().then(|| {
-            let period = self.period as f64;
-            let mean = self.window.iter().rev().sum::<f64>() / period;
-            self.window
-                .iter()
-                .rev()
-                .map(|value| (*value - mean).abs())
-                .sum::<f64>()
-                / period
-        });
-        self.value
-    }
-
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.window.clear();
-        self.value = None;
-    }
-}
-
 /// TA-Lib rejects a correlation window when the variance product falls below
 /// this threshold (`TA_CORREL`); replicated verbatim.
 pub(super) const CORREL_DENOMINATOR_EPSILON: f64 = 0.00000000000001;
@@ -394,7 +181,7 @@ pub(super) fn beta_return(current: f64, previous: f64) -> f64 {
 /// interleaved buffer costs one cache line and one index computation per bar
 /// where two parallel [`Window`]s cost two of each.
 #[derive(Debug, Clone)]
-struct PairRing {
+pub(crate) struct PairRing {
     /// `2 * capacity` slots, laid out `x0, y0, x1, y1, …`.
     buf: Box<[f64]>,
     /// Slot index (always even) of the oldest pair.
@@ -405,7 +192,7 @@ struct PairRing {
 }
 
 impl PairRing {
-    fn new(capacity: usize) -> TaResult<Self> {
+    pub(crate) fn new(capacity: usize) -> TaResult<Self> {
         if capacity == 0 {
             return Err(invalid_period("capacity", capacity, 1));
         }
@@ -419,7 +206,7 @@ impl PairRing {
 
     /// Appends `(x, y)`, returning the pair evicted from a full ring.
     #[inline]
-    fn push(&mut self, x: f64, y: f64) -> Option<(f64, f64)> {
+    pub(crate) fn push(&mut self, x: f64, y: f64) -> Option<(f64, f64)> {
         let slots = self.buf.len();
         if self.len == self.capacity {
             let head = self.head;
@@ -442,12 +229,12 @@ impl PairRing {
     }
 
     #[inline]
-    fn is_full(&self) -> bool {
+    pub(crate) fn is_full(&self) -> bool {
         self.len == self.capacity
     }
 
     #[inline]
-    fn clear(&mut self) {
+    pub(crate) fn clear(&mut self) {
         self.head = 0;
         self.len = 0;
     }
@@ -455,12 +242,12 @@ impl PairRing {
 
 /// The five sliding sums `TA_CORREL` maintains.
 #[derive(Debug, Clone, Copy)]
-struct PairMoments {
-    sx: f64,
-    sy: f64,
-    sxx: f64,
-    syy: f64,
-    sxy: f64,
+pub(crate) struct PairMoments {
+    pub(crate) sx: f64,
+    pub(crate) sy: f64,
+    pub(crate) sxx: f64,
+    pub(crate) syy: f64,
+    pub(crate) sxy: f64,
 }
 
 impl PairMoments {
@@ -479,7 +266,7 @@ impl PairMoments {
 /// denominator; the forms are algebraically equal but not numerically, and
 /// matching C exactly is what keeps near-zero correlations bit-identical.
 #[inline]
-fn correl_of(sx: f64, sy: f64, sxx: f64, syy: f64, sxy: f64, period: f64) -> f64 {
+pub(crate) fn correl_of(sx: f64, sy: f64, sxx: f64, syy: f64, sxy: f64, period: f64) -> f64 {
     let numerator = sxy - ((sx * sy) / period);
     let denominator = (sxx - ((sx * sx) / period)) * (syy - ((sy * sy) / period));
     if !(denominator < CORREL_DENOMINATOR_EPSILON) {
@@ -517,14 +304,14 @@ fn correl_of(sx: f64, sy: f64, sxx: f64, syy: f64, sxy: f64, period: f64) -> f64
 /// Note: no `mul_add` anywhere — TA-Lib multiplies then adds separately, and
 /// contracting the pair changes the low bits.
 #[derive(Debug, Clone)]
-struct RollingPairMoments {
-    period: usize,
-    window: PairRing,
-    moments: PairMoments,
+pub(crate) struct RollingPairMoments {
+    pub(crate) period: usize,
+    pub(crate) window: PairRing,
+    pub(crate) moments: PairMoments,
 }
 
 impl RollingPairMoments {
-    fn new(period: usize) -> TaResult<Self> {
+    pub(crate) fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
         }
@@ -536,7 +323,7 @@ impl RollingPairMoments {
     }
 
     #[inline]
-    fn append(&mut self, x: f64, y: f64) -> Option<PairMoments> {
+    pub(crate) fn append(&mut self, x: f64, y: f64) -> Option<PairMoments> {
         let m = &mut self.moments;
         if let Some((trailing_x, trailing_y)) = self.window.push(x, y) {
             // "Remove trailing values", in TA_CORREL's statement order.
@@ -555,7 +342,7 @@ impl RollingPairMoments {
         self.window.is_full().then_some(self.moments)
     }
 
-    fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         self.window.clear();
         self.moments = PairMoments::ZERO;
     }
@@ -563,11 +350,11 @@ impl RollingPairMoments {
 
 /// The four sliding sums `TA_BETA` maintains over the two return series.
 #[derive(Debug, Clone, Copy)]
-struct ReturnMoments {
-    sx: f64,
-    sy: f64,
-    sxx: f64,
-    sxy: f64,
+pub(crate) struct ReturnMoments {
+    pub(crate) sx: f64,
+    pub(crate) sy: f64,
+    pub(crate) sxx: f64,
+    pub(crate) sxy: f64,
 }
 
 impl ReturnMoments {
@@ -581,7 +368,7 @@ impl ReturnMoments {
 
 /// TA-Lib's `TA_BETA` emit expression.
 #[inline]
-fn beta_of(sx: f64, sy: f64, sxx: f64, sxy: f64, period: f64) -> f64 {
+pub(crate) fn beta_of(sx: f64, sy: f64, sxx: f64, sxy: f64, period: f64) -> f64 {
     let denominator = (period * sxx) - (sx * sx);
     if !ta_is_zero(denominator) {
         ((period * sxy) - (sx * sy)) / denominator
@@ -602,14 +389,14 @@ fn beta_of(sx: f64, sy: f64, sxx: f64, sxy: f64, period: f64) -> f64 {
 /// recent returns", so the rings only need `period - 1` slots and their
 /// eviction is TA-Lib's `trailingIdx` return.
 #[derive(Debug, Clone)]
-struct RollingReturnMoments {
-    period: usize,
-    window: PairRing,
-    moments: ReturnMoments,
+pub(crate) struct RollingReturnMoments {
+    pub(crate) period: usize,
+    pub(crate) window: PairRing,
+    pub(crate) moments: ReturnMoments,
 }
 
 impl RollingReturnMoments {
-    fn new(period: usize) -> TaResult<Self> {
+    pub(crate) fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
         }
@@ -621,7 +408,7 @@ impl RollingReturnMoments {
     }
 
     #[inline]
-    fn append(&mut self, x: f64, y: f64) -> Option<ReturnMoments> {
+    pub(crate) fn append(&mut self, x: f64, y: f64) -> Option<ReturnMoments> {
         let m = &mut self.moments;
         // "Add new values", in TA_BETA's statement order.
         m.sxx += x * x;
@@ -641,292 +428,9 @@ impl RollingReturnMoments {
         emitted
     }
 
-    fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         self.window.clear();
         self.moments = ReturnMoments::ZERO;
-    }
-}
-
-/// Stateful Pearson correlation over paired observations.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingCorrelation`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingCorrelation {
-    period: f64,
-    moments: RollingPairMoments,
-    value: Option<f64>,
-}
-
-impl RollingCorrelation {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(period: usize) -> TaResult<Self> {
-        Ok(Self {
-            period: period as f64,
-            moments: RollingPairMoments::new(period)?,
-            value: None,
-        })
-    }
-
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
-        let period = self.period;
-        self.value = self
-            .moments
-            .append(x, y)
-            .map(|m| correl_of(m.sx, m.sy, m.sxx, m.syy, m.sxy, period));
-        self.value
-    }
-
-    /// Bulk kernel: `TA_CORREL`'s remove-trailing / add-new / emit recurrence
-    /// indexing the input slices directly. Bit-identical to per-bar
-    /// [`Self::append`] in outputs and post-run state.
-    pub fn extend_slices_into(
-        &mut self,
-        input0: &[f64],
-        input1: &[f64],
-        output: &mut Vec<f64>,
-    ) -> TaResult<()> {
-        if input0.len() != input1.len() {
-            return Err(crate::TaError::LengthMismatch {
-                expected: input0.len(),
-                got: input1.len(),
-            });
-        }
-        let period = self.moments.period;
-        let n = input0.len();
-        output.reserve(n);
-        // Warm-up prologue: after `period` appends the pair ring holds exactly
-        // the first `period` slice pairs, regardless of prior state.
-        let prologue = n.min(period);
-        for i in 0..prologue {
-            output.push(self.append(input0[i], input1[i]).unwrap_or(f64::NAN));
-        }
-        if n <= period {
-            return Ok(());
-        }
-        // Branch-free steady loop: identical arithmetic in identical order to
-        // `RollingPairMoments::append`, but every access is a zipped slice
-        // iterator, so there is no ring traffic and no bounds check. The
-        // `TrustedLen` `extend` writes each result straight into the output's
-        // spare capacity — a `resize` prologue would cost a second full pass
-        // over the buffer just to pre-fill it.
-        let period_f = self.period;
-        let mut m = self.moments.moments;
-        let steady = n - period;
-        output.extend(
-            input0[period..]
-                .iter()
-                .zip(&input1[period..])
-                .zip(&input0[..steady])
-                .zip(&input1[..steady])
-                .map(|(((&x, &y), &tx), &ty)| {
-                    // "Remove trailing values", "add new values", then emit.
-                    m.sx -= tx;
-                    m.sxx -= tx * tx;
-                    m.sxy -= tx * ty;
-                    m.sy -= ty;
-                    m.syy -= ty * ty;
-                    m.sx += x;
-                    m.sxx += x * x;
-                    m.sxy += x * y;
-                    m.sy += y;
-                    m.syy += y * y;
-                    correl_of(m.sx, m.sy, m.sxx, m.syy, m.sxy, period_f)
-                }),
-        );
-        self.moments.moments = m;
-        self.value = output.last().copied();
-        // Rebuild the pair ring so subsequent appends continue bit-identically.
-        self.moments.window.clear();
-        for i in n - period..n {
-            self.moments.window.push(input0[i], input1[i]);
-        }
-        Ok(())
-    }
-
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn reset(&mut self) {
-        self.moments.reset();
-        self.value = None;
-    }
-}
-
-/// Stateful TA-Lib BETA over percentage returns of two input series.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingBeta`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingBeta {
-    period: f64,
-    previous: Option<(f64, f64)>,
-    returns: RollingReturnMoments,
-    value: Option<f64>,
-}
-
-impl RollingBeta {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(period: usize) -> TaResult<Self> {
-        Ok(Self {
-            period: period as f64,
-            previous: None,
-            returns: RollingReturnMoments::new(period)?,
-            value: None,
-        })
-    }
-
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, input0: f64, input1: f64) -> Option<f64> {
-        let Some((previous0, previous1)) = self.previous.replace((input0, input1)) else {
-            return None;
-        };
-        let x = beta_return(input0, previous0);
-        let y = beta_return(input1, previous1);
-        let period = self.period;
-        self.value = self
-            .returns
-            .append(x, y)
-            .map(|m| beta_of(m.sx, m.sy, m.sxx, m.sxy, period));
-        self.value
-    }
-
-    /// Bulk kernel: `TA_BETA`'s add-new / emit / remove-trailing recurrence
-    /// over returns recomputed straight from the input slices — exactly what
-    /// the C loop does through its `trailingLastPrice` cursors, so no return
-    /// series is materialized and no ring is touched inside the loop.
-    /// Bit-identical to per-bar [`Self::append`] in outputs and post-run state.
-    pub fn extend_slices_into(
-        &mut self,
-        input0: &[f64],
-        input1: &[f64],
-        output: &mut Vec<f64>,
-    ) -> TaResult<()> {
-        if input0.len() != input1.len() {
-            return Err(crate::TaError::LengthMismatch {
-                expected: input0.len(),
-                got: input1.len(),
-            });
-        }
-        let period = self.returns.period;
-        let n = input0.len();
-        output.reserve(n);
-        // Warm-up prologue: after `period` appends the retained ring holds
-        // exactly the `period - 1` returns of `inputs[..period]`, and
-        // `previous` is `inputs[period - 1]` — regardless of prior state.
-        let prologue = n.min(period);
-        for i in 0..prologue {
-            output.push(self.append(input0[i], input1[i]).unwrap_or(f64::NAN));
-        }
-        if n <= period {
-            return Ok(());
-        }
-        // Branch-free steady loop over eight zipped slices: per series, the
-        // incoming bar and its predecessor (the new return) and the trailing
-        // bar and its predecessor (the return leaving the window). Output slot
-        // `k` is bar `i = k + period`. The `TrustedLen` `extend` writes into
-        // the output's spare capacity without a pre-fill pass.
-        let period_f = self.period;
-        let mut m = self.returns.moments;
-        let steady = n - period;
-        let series0 = input0[period..]
-            .iter()
-            .zip(&input0[period - 1..n - 1])
-            .zip(&input0[1..steady + 1])
-            .zip(&input0[..steady]);
-        let series1 = input1[period..]
-            .iter()
-            .zip(&input1[period - 1..n - 1])
-            .zip(&input1[1..steady + 1])
-            .zip(&input1[..steady]);
-        output.extend(series0.zip(series1).map(
-            |(
-                (((&new0, &previous0), &trailing0), &trailing_previous0),
-                (((&new1, &previous1), &trailing1), &trailing_previous1),
-            )| {
-                let x = beta_return(new0, previous0);
-                let y = beta_return(new1, previous1);
-                m.sxx += x * x;
-                m.sxy += x * y;
-                m.sx += x;
-                m.sy += y;
-
-                // TA-Lib reads the trailing return before writing the output.
-                let tx = beta_return(trailing0, trailing_previous0);
-                let ty = beta_return(trailing1, trailing_previous1);
-
-                let out = beta_of(m.sx, m.sy, m.sxx, m.sxy, period_f);
-
-                m.sxx -= tx * tx;
-                m.sxy -= tx * ty;
-                m.sx -= tx;
-                m.sy -= ty;
-                out
-            },
-        ));
-        self.returns.moments = m;
-        self.value = output.last().copied();
-        // Rebuild the retained ring (the `period - 1` most recent returns) and
-        // `previous`, so subsequent appends continue bit-identically.
-        self.returns.window.clear();
-        for i in n - period + 1..n {
-            self.returns.window.push(
-                beta_return(input0[i], input0[i - 1]),
-                beta_return(input1[i], input1[i - 1]),
-            );
-        }
-        self.previous = Some((input0[n - 1], input1[n - 1]));
-        Ok(())
-    }
-
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn reset(&mut self) {
-        self.previous = None;
-        self.returns.reset();
-        self.value = None;
     }
 }
 

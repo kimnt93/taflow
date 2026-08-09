@@ -7,16 +7,17 @@ from ._series import as_float64_series
 
 
 class ExponentiallyWeightedCovariance:
-    """Stateful ExponentiallyWeightedCovariance indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent exponentially weighted covariance.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `left`, `right`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, timeperiod: int, left: Any | None = None, right: Any | None = None
+        self,
+        left: Any,
+        right: Any,
+        timeperiod: int = 14,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -35,7 +36,7 @@ class ExponentiallyWeightedCovariance:
         self._state = _Native(timeperiod)
         self.extend(left, right) if left is not None or right is not None else None
 
-    def append(self, left: float, right: float) -> object:
+    def append(self, left: float, right: float) -> "ExponentiallyWeightedCovariance":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -53,7 +54,7 @@ class ExponentiallyWeightedCovariance:
         self._state.append(left, right)
         return self
 
-    def extend(self, left: Any, right: Any) -> object:
+    def extend(self, left: Any, right: Any) -> "ExponentiallyWeightedCovariance":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -92,7 +93,7 @@ class ExponentiallyWeightedCovariance:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "ExponentiallyWeightedCovariance":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -7,14 +7,15 @@ from ._series import as_float64_series
 
 
 class Drawdown:
-    """Stateful Drawdown indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent percentage drawdown from the running maximum.
 
-    def __init__(self, _input: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        _input: Any,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -29,7 +30,7 @@ class Drawdown:
         self._state = _Native()
         self.extend(_input) if _input is not None else None
 
-    def append(self, _input: float) -> object:
+    def append(self, _input: float) -> "Drawdown":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -45,7 +46,7 @@ class Drawdown:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any) -> object:
+    def extend(self, _input: Any) -> "Drawdown":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -82,7 +83,7 @@ class Drawdown:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "Drawdown":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

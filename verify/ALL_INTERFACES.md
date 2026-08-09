@@ -1,6 +1,6 @@
 # Canonical taflow interface correctness
 
-Indicator oracle: constructor history == native `extend` history == one-bar `append` history; helper functions also receive smoke checks.
+Indicator invariant: constructor history == native `extend` history == one-bar `append` history. Stateful adapters must also provide fluent `append`, `extend`, and `reset`, plus an exact `len()`. Helper functions receive smoke checks.
 
 - Passed: **305**
 - Failed: **0**

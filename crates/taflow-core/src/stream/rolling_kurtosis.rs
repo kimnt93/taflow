@@ -1,7 +1,17 @@
 //! Batch implementation for `rolling_kurtosis`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
+use std::collections::VecDeque;
+
+rolling_moment_operator!(RollingKurtosis, |n: f64, m2: f64, _m3: f64, m4: f64| {
+    if m2 > 0.0 {
+        n * m4 / m2.powi(2) - 3.0
+    } else {
+        0.0
+    }
+});
 
 /// Computes or updates `rolling_kurtosis` through the native Rust kernel.
 ///

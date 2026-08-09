@@ -1,6 +1,7 @@
 //! Batch implementation for `awesome_oscillator`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Compute the Awesome Oscillator from aligned high and low prices.
@@ -124,5 +125,70 @@ mod tests {
             let got = state.append(high[i], low[i]).unwrap_or(f64::NAN);
             assert_eq!(value.to_bits(), got.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `AwesomeOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct AwesomeOscillator {
+    fast: usize,
+    slow: usize,
+    values: ContiguousWindow,
+    value: Option<f64>,
+}
+
+impl AwesomeOscillator {
+    /// Create a new empty state.
+    ///
+    pub fn new(fast: usize, slow: usize) -> TaResult<Self> {
+        validate_period(fast)?;
+        validate_period(slow)?;
+        if fast > slow {
+            return Err(TaError::InvalidParameter {
+                name: "fast/slow",
+                value: format!("{fast}/{slow}"),
+                reason: "fast must be <= slow",
+            });
+        }
+        Ok(Self {
+            fast,
+            slow,
+            values: ContiguousWindow::new(slow),
+            value: None,
+        })
+    }
+    /// Append one causal observation and return the latest result.
+    ///
+    /// Both means read one contiguous ring slice (the fast leg is the tail of
+    /// the slow window), so the two SMAs share a single pass over the same
+    /// cache lines. The summation orders are unchanged — the fast sum still
+    /// runs newest → oldest and the slow sum oldest → newest — because
+    /// reassociating either one moves the low bits of the difference.
+    pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+        self.values.push((high + low) * 0.5);
+        self.value = self.values.is_full().then(|| {
+            let window = self.values.window();
+            let fast = window[self.slow - self.fast..].iter().rev().sum::<f64>() / self.fast as f64;
+            let slow = window.iter().sum::<f64>() / self.slow as f64;
+            fast - slow
+        });
+        self.value
+    }
+    /// Return the latest computed result, if warm-up is complete.
+    ///
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+    /// Reset the state and clear its accumulated history.
+    ///
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
     }
 }

@@ -4,7 +4,7 @@ use super::rolling_rank::rolling_rank;
 use crate::error::TaResult;
 
 /// Canonical WorldQuant name for the existing causal rolling-rank state.
-pub type TimeSeriesRank = super::operator_states::RollingRank;
+pub type TimeSeriesRank = super::RollingRank;
 
 /// WorldQuant Alpha101 time-series rank: the rank of the current value within
 /// the trailing `d`-bar window as a fraction in `(0, 1]`. Shares the rolling

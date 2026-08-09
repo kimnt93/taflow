@@ -19,13 +19,16 @@ class HilbertTransformTrendline:
         A persistent native-backed indicator adapter.
     """
 
-    def __init__(self, _input: Any | None = None) -> None:
-        """Create the trendline with an optional initial price series."""
+    def __init__(
+        self,
+        _input: Any,
+    ) -> None:
+        """Create the trendline with an initial price series."""
         self._state = StatefulHtTrendline()
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: object) -> object:
+    def append(self, _input: object) -> "HilbertTransformTrendline":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -41,7 +44,7 @@ class HilbertTransformTrendline:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: object) -> object:
+    def extend(self, _input: object) -> "HilbertTransformTrendline":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -58,13 +61,12 @@ class HilbertTransformTrendline:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
@@ -78,7 +80,7 @@ class HilbertTransformTrendline:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "HilbertTransformTrendline":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

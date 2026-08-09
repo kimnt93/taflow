@@ -7,19 +7,17 @@ from ._series import as_float64_series
 
 
 class PreviousHighLow:
-    """Stateful PreviousHighLow indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Causal prior-higher-timeframe high/low tracking with break flags.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `new_session`, `high`, `low`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        new_session: Any | None = None,
-        high: Any | None = None,
-        low: Any | None = None,
+        new_session: Any,
+        high: Any,
+        low: Any,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -42,7 +40,7 @@ class PreviousHighLow:
             else None
         )
 
-    def append(self, new_session: bool, high: float, low: float) -> object:
+    def append(self, new_session: bool, high: float, low: float) -> "PreviousHighLow":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -62,7 +60,7 @@ class PreviousHighLow:
         self._state.append(new_session, high, low)
         return self
 
-    def extend(self, new_session: Any, high: Any, low: Any) -> object:
+    def extend(self, new_session: Any, high: Any, low: Any) -> "PreviousHighLow":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -107,7 +105,7 @@ class PreviousHighLow:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "PreviousHighLow":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

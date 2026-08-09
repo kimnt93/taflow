@@ -181,7 +181,10 @@ macro_rules! check_pattern {
         fn $test() {
             for seed in SEEDS {
                 let (o, h, l, c) = gen_ohlc(seed, BARS);
-                let expected = s::$batch(&o, &h, &l, &c $(, $pen)?).unwrap();
+                let mut expected_state = s::$state::new();
+                let expected: Vec<i32> = (0..BARS)
+                    .map(|i| expected_state.append(o[i], h[i], l[i], c[i]).unwrap_or(0))
+                    .collect();
                 assert_eq!(expected.len(), BARS);
                 let mut state = s::$state::new();
                 for pass in 0..2 {

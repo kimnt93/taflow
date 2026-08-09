@@ -18,3 +18,18 @@ class AveragePrice(OhlcPriceState):
     """
 
     _native_cls = StatefulAvgprice
+
+    def append(self, _open: object, high: object, low: object, close: object) -> "AveragePrice":
+        """Append one observation and return this indicator."""
+        super().append(_open, high, low, close)
+        return self
+
+    def extend(self, _open: object, high: object, low: object, close: object) -> "AveragePrice":
+        """Append aligned histories and return this indicator."""
+        super().extend(_open, high, low, close)
+        return self
+
+    def reset(self) -> "AveragePrice":
+        """Reset native state and return this indicator."""
+        super().reset()
+        return self

@@ -15,76 +15,75 @@ class SignalDelay:
     ----------
     timeperiod : int
         Number of bars to delay.
-    _input : array-like, optional
+    _input : array-like
         Initial input history.
     """
 
-    def __init__(self, timeperiod: int, _input: Any | None = None) -> None:
-        """Create the delay state and optionally process input history."""
+    def __init__(
+        self,
+        _input: Any,
+        timeperiod: int = 1,
+    ) -> None:
+        """Create the delay state and process input history."""
         self._state = SignalDelayOperator(timeperiod)
         if _input is not None:
             self.extend(_input)
 
     def append(self, _input: float) -> "SignalDelay":
-        """Append one value and update the native delayed result
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _input : float
+            Current input.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        SignalDelay
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(_input)
         return self
 
     def extend(self, _input: Any) -> "SignalDelay":
-        """Process an aligned input series in native Rust
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        _input : Any
+            Chronological input series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        SignalDelay
+            This indicator, for fluent chaining."""
         self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned delayed series
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest delayed value
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
     def reset(self) -> "SignalDelay":
-        """Reset the native state and accumulated history
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        SignalDelay
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self

@@ -7,14 +7,16 @@ from ._series import as_float64_series
 
 
 class RollingInterquartileRange:
-    """Stateful RollingInterquartileRange indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent causal rolling interquartile-range operator.
 
-    def __init__(self, timeperiod: int, _input: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        _input: Any,
+        timeperiod: int = 14,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -31,7 +33,7 @@ class RollingInterquartileRange:
         self._state = _Native(timeperiod)
         self.extend(_input) if _input is not None else None
 
-    def append(self, _input: float) -> object:
+    def append(self, _input: float) -> "RollingInterquartileRange":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +49,7 @@ class RollingInterquartileRange:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any) -> object:
+    def extend(self, _input: Any) -> "RollingInterquartileRange":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,7 +86,7 @@ class RollingInterquartileRange:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "RollingInterquartileRange":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

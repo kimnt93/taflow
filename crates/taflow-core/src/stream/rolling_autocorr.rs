@@ -1,6 +1,7 @@
 //! Batch implementation for `rolling_autocorr`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `rolling_autocorr` through the native Rust kernel.
@@ -143,5 +144,111 @@ mod tests {
             let from_fresh = fresh.append(value).unwrap_or(f64::NAN);
             assert_eq!(after_reset.to_bits(), from_fresh.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollingAutocorr`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollingAutocorr {
+    values: VecDeque<f64>,
+    period: usize,
+    /// Reusable contiguous scratch copy of the window; fixed-size, so the
+    /// per-bar refresh is two `copy_from_slice` memcpys with no allocation,
+    /// capacity check or length bookkeeping.
+    scratch: Box<[f64]>,
+    value: Option<f64>,
+}
+
+impl RollingAutocorr {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        if period < 2 {
+            return Err(TaError::InvalidParameter {
+                name: "timeperiod",
+                value: period.to_string(),
+                reason: "must be >= 2",
+            });
+        }
+        Ok(Self {
+            values: VecDeque::with_capacity(period),
+            period,
+            scratch: vec![0.0; period].into_boxed_slice(),
+            value: None,
+        })
+    }
+
+    /// Lag-one Pearson autocorrelation over the rolling window.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        if self.values.len() == self.period {
+            self.values.pop_front();
+        }
+        self.values.push_back(input);
+        if self.values.len() < self.period {
+            self.value = None;
+            return None;
+        }
+        // Copy the window into a contiguous scratch buffer (pure memcpy, the
+        // buffer is preallocated) so the lagged scans below index plain
+        // slices. Every accumulator adds the same terms in the same order as
+        // the original take/skip iterator passes, so results are bit-identical.
+        let (front, back) = self.values.as_slices();
+        self.scratch[..front.len()].copy_from_slice(front);
+        self.scratch[front.len()..].copy_from_slice(back);
+        let window = &self.scratch[..];
+        let period = self.period;
+        let left = &window[..period - 1];
+        let right = &window[1..];
+        let left_n = (period - 1) as f64;
+        let mut left_sum = 0.0;
+        for &value in left {
+            left_sum += value;
+        }
+        let mut right_sum = 0.0;
+        for &value in right {
+            right_sum += value;
+        }
+        let left_mean = left_sum / left_n;
+        let right_mean = right_sum / left_n;
+        let mut left_variance = 0.0;
+        let mut right_variance = 0.0;
+        let mut covariance = 0.0;
+        for index in 0..period - 1 {
+            let left_delta = left[index] - left_mean;
+            let right_delta = right[index] - right_mean;
+            left_variance += left_delta * left_delta;
+            right_variance += right_delta * right_delta;
+            covariance += left_delta * right_delta;
+        }
+        let result = if left_variance == 0.0 || right_variance == 0.0 {
+            0.0
+        } else {
+            covariance / (left_variance * right_variance).sqrt()
+        };
+        self.value = Some(result);
+        self.value
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
     }
 }

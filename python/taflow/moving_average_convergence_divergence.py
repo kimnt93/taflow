@@ -13,10 +13,10 @@ class MovingAverageConvergenceDivergence:
 
     def __init__(
         self,
+        _input: Any,
         fast_period: int = 12,
         slow_period: int = 26,
         signal_period: int = 9,
-        _input: Any | None = None,
     ) -> None:
         self._state = StatefulMacd(fast_period, slow_period, signal_period)
         if _input is not None:

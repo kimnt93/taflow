@@ -188,3 +188,75 @@ mod tests {
         }
     }
 }
+use super::aroon_true_range::*;
+use super::*;
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `AroonOscillator`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct AroonOscillator {
+    aroon: Aroon,
+    value: Option<f64>,
+}
+
+impl AroonOscillator {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        Ok(Self {
+            aroon: Aroon::new(period)?,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, high: f64, low: f64) -> Option<f64> {
+        self.value = self
+            .aroon
+            .append(high, low)
+            .map(|value| value.up - value.down);
+        self.value
+    }
+
+    /// Bulk kernel: one fused Aroon rescan pass that forms `up - down` in
+    /// registers — no intermediate down/up buffers, no second pass.
+    /// Bit-identical to per-bar [`Self::append`].
+    pub fn extend_slices_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        self.aroon.extend_oscillator_into(high, low, output)?;
+        self.value = self.aroon.value().map(|value| value.up - value.down);
+        Ok(())
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Computes or updates `reset` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn reset(&mut self) {
+        self.aroon.reset();
+        self.value = None;
+    }
+}

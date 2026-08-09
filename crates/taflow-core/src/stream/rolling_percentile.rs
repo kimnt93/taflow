@@ -2,6 +2,7 @@
 
 use super::operator_states::*;
 use super::rolling_quantile::rolling_quantile;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `rolling_percentile` through the native Rust kernel.

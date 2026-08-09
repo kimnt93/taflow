@@ -9,20 +9,18 @@ from ._series import as_float64_series
 
 
 class MassIndex:
-    """Stateful MassIndex indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Mass Index (Dorsey EMA-ratio alignment).
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
+        high: Any,
+        low: Any,
         ema_period: object = 9,
         sum_period: object = 25,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -43,7 +41,7 @@ class MassIndex:
         self._state = _Native(ema_period, sum_period)
         self.extend(high, low) if high is not None or low is not None else None
 
-    def append(self, high: float, low: float) -> object:
+    def append(self, high: float, low: float) -> "MassIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -61,7 +59,7 @@ class MassIndex:
         self._state.append(high, low)
         return self
 
-    def extend(self, high: Any, low: Any) -> object:
+    def extend(self, high: Any, low: Any) -> "MassIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -100,7 +98,7 @@ class MassIndex:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "MassIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

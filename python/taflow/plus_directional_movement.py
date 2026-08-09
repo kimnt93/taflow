@@ -5,16 +5,17 @@ from ._series import as_float64_series
 
 
 class PlusDirectionalMovement:
-    """Stateful PlusDirectionalMovement indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Plus Directional Movement
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, high: Any | None = None, low: Any | None = None, timeperiod: int = 14
+        self,
+        high: Any,
+        low: Any,
+        timeperiod: int = 14,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -34,7 +35,7 @@ class PlusDirectionalMovement:
         if high is not None or low is not None:
             self.extend(high, low)
 
-    def append(self, h: float, l: float) -> object:
+    def append(self, h: float, l: float) -> "PlusDirectionalMovement":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -52,7 +53,7 @@ class PlusDirectionalMovement:
         self._state.append(h, l)
         return self
 
-    def extend(self, high: Any, low: Any | None = None) -> object:
+    def extend(self, high: Any, low: Any | None = None) -> "PlusDirectionalMovement":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -93,7 +94,7 @@ class PlusDirectionalMovement:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "PlusDirectionalMovement":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

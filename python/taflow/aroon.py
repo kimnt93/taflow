@@ -13,7 +13,7 @@ class Aroon:
 
     Parameters
     ----------
-    high, low : array-like, optional
+    high, low : array-like
         Initial aligned high and low histories.
     timeperiod : int, default 14
         Lookback period.
@@ -21,76 +21,75 @@ class Aroon:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
+        high: Any,
+        low: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Create an Aroon state and optionally process initial prices."""
+        """Create an Aroon state and process initial prices."""
         self._state = StatefulAroon(timeperiod)
         if high is not None or low is not None:
             self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Aroon":
-        """Append one high/low bar and update the native state
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : float
+            Current high price.
+        low : float
+            Current low price.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Aroon
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(float(high), float(low))
         return self
 
     def extend(self, high: Any, low: Any) -> "Aroon":
-        """Append aligned high and low histories to the native state
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : Any
+            Chronological high price series.
+        low : Any
+            Chronological low price series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Aroon
+            This indicator, for fluent chaining."""
         self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray]:
-        """Return aligned down and up Aroon histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> tuple[float, float] | None:
-        """Return the latest down/up pair, or ``None`` during warm-up
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
     def reset(self) -> "Aroon":
-        """Reset native state and accumulated output history
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Aroon
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self
 

@@ -20,9 +20,12 @@ class MovingAverage:
     """
 
     def __init__(
-        self, period: int = 30, moving_average_type: int = 0, values: Any | None = None
+        self,
+        values: Any,
+        period: int = 30,
+        moving_average_type: int = 0,
     ) -> None:
-        """Create a selectable moving average with optional initial values."""
+        """Create a selectable moving average with initial values."""
         self._state = StatefulMa(period, moving_average_type)
         if values is not None:
             self.extend(values)
@@ -60,13 +63,12 @@ class MovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned moving-average history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property

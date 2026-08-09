@@ -1,6 +1,7 @@
 //! Batch implementation for `hedge_ratio`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Compute the hedge ratio result for the supplied aligned series.
@@ -145,5 +146,101 @@ mod tests {
             let from_fresh = fresh.append(x[bar], y[bar]).unwrap_or(f64::NAN);
             assert_eq!(after_reset.to_bits(), from_fresh.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `HedgeRatio`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct HedgeRatio {
+    values: VecDeque<(f64, f64)>,
+    period: usize,
+    value: Option<f64>,
+}
+
+impl HedgeRatio {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self {
+            values: VecDeque::with_capacity(period),
+            period,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
+        if self.values.len() == self.period {
+            self.values.pop_front();
+        }
+        self.values.push_back((x, y));
+        self.value = if self.values.len() == self.period {
+            let n = self.period as f64;
+            // Contiguous two-slice scans with fused accumulators: each
+            // accumulator adds the same terms in the same order as the
+            // original per-quantity passes, so results are bit-identical.
+            let (front, back) = self.values.as_slices();
+            let mut sum_x = 0.0;
+            let mut sum_y = 0.0;
+            for &(x, y) in front {
+                sum_x += x;
+                sum_y += y;
+            }
+            for &(x, y) in back {
+                sum_x += x;
+                sum_y += y;
+            }
+            let mean_x = sum_x / n;
+            let mean_y = sum_y / n;
+            let mut covariance = 0.0;
+            let mut variance = 0.0;
+            for &(x, y) in front {
+                let delta_x = x - mean_x;
+                covariance += delta_x * (y - mean_y);
+                variance += delta_x * delta_x;
+            }
+            for &(x, y) in back {
+                let delta_x = x - mean_x;
+                covariance += delta_x * (y - mean_y);
+                variance += delta_x * delta_x;
+            }
+            Some(if variance > 0.0 {
+                covariance / variance
+            } else {
+                0.0
+            })
+        } else {
+            None
+        };
+        self.value
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
     }
 }

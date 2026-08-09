@@ -7,16 +7,17 @@ from ._series import as_float64_series
 
 
 class SpreadZScore:
-    """Stateful SpreadZScore indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Pairs-trading z-score of the rolling OLS spread ``y - beta*x``.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `x`, `y`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, x: Any | None = None, y: Any | None = None, timeperiod: int = 20
+        self,
+        x: Any,
+        y: Any,
+        timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -36,7 +37,7 @@ class SpreadZScore:
         if x is not None or y is not None:
             self.extend(x, y)
 
-    def append(self, x: float, y: float) -> object:
+    def append(self, x: float, y: float) -> "SpreadZScore":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -54,7 +55,7 @@ class SpreadZScore:
         self._state.append(x, y)
         return self
 
-    def extend(self, x: Any, y: Any) -> object:
+    def extend(self, x: Any, y: Any) -> "SpreadZScore":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -93,7 +94,7 @@ class SpreadZScore:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "SpreadZScore":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

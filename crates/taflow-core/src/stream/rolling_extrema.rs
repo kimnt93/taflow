@@ -6,6 +6,9 @@ use crate::error::TaResult;
 
 use super::{invalid_period, vhgw, StreamingIndicator};
 
+#[cfg(test)]
+use crate::stream::{RollingMinmax, RollingMinmaxIndex, RollingMinmaxIndexValue};
+
 /// Single-sided monotonic deque tracking the rolling maximum.
 ///
 /// Newest-wins on equal values (`<=` pop), matching the max side of the
@@ -272,123 +275,6 @@ macro_rules! rolling_extrema_indicator {
 rolling_extrema_indicator!(RollingMax, MonotonicMax, vhgw::sliding_max_into);
 rolling_extrema_indicator!(RollingMin, MonotonicMin, vhgw::sliding_min_into);
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-/// Persistent Rust state or aligned output type for `RollingMinmaxValue`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingMinmaxValue {
-    pub minimum: f64,
-    pub maximum: f64,
-}
-
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingMinmax`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingMinmax {
-    extrema: RollingExtrema,
-    value: Option<RollingMinmaxValue>,
-}
-
-impl RollingMinmax {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(period: usize) -> TaResult<Self> {
-        Ok(Self {
-            extrema: RollingExtrema::new(period)?,
-            value: None,
-        })
-    }
-
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, input: f64) -> Option<RollingMinmaxValue> {
-        self.value = self
-            .extrema
-            .append(input)
-            .map(|(maximum, minimum)| RollingMinmaxValue { minimum, maximum });
-        self.value
-    }
-
-    /// Bulk kernel: two vHGW comparison-only passes over the whole slice when
-    /// the state is still empty, then the trailing `period` inputs are replayed
-    /// to rebuild the monotonic deques. Outputs and post-run state are
-    /// bit-identical to per-bar [`Self::append`]; warm-up bars are NaN.
-    pub fn extend_slices_into(
-        &mut self,
-        inputs: &[f64],
-        min_out: &mut Vec<f64>,
-        max_out: &mut Vec<f64>,
-    ) {
-        let period = self.extrema.period();
-        if self.extrema.count() != 0 || inputs.len() < period {
-            min_out.reserve(inputs.len());
-            max_out.reserve(inputs.len());
-            for &input in inputs {
-                match self.append(input) {
-                    Some(value) => {
-                        min_out.push(value.minimum);
-                        max_out.push(value.maximum);
-                    }
-                    None => {
-                        min_out.push(f64::NAN);
-                        max_out.push(f64::NAN);
-                    }
-                }
-            }
-            return;
-        }
-        let min_start = min_out.len();
-        let max_start = max_out.len();
-        min_out.resize(min_start + inputs.len(), f64::NAN);
-        max_out.resize(max_start + inputs.len(), f64::NAN);
-        vhgw::sliding_max_into(inputs, period, &mut max_out[max_start + period - 1..]);
-        vhgw::sliding_min_into(inputs, period, &mut min_out[min_start + period - 1..]);
-        self.extrema.rebuild_from_full_run(inputs);
-        self.value = Some(RollingMinmaxValue {
-            minimum: *min_out.last().expect("at least one warmed bar"),
-            maximum: *max_out.last().expect("at least one warmed bar"),
-        });
-    }
-
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<RollingMinmaxValue> {
-        self.value
-    }
-
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn reset(&mut self) {
-        self.extrema.reset();
-        self.value = None;
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-/// Persistent Rust state or aligned output type for `RollingMinmaxIndexValue`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingMinmaxIndexValue {
-    pub minimum: usize,
-    pub maximum: usize,
-}
-
 /// TA-Lib-exact rolling argmax tracker.
 ///
 /// TA-Lib's MAXINDEX tie behavior is path dependent: an incoming value equal
@@ -592,7 +478,7 @@ impl MonotonicArgmin {
 /// untouched, so callers pre-fill them with TA-Lib's `0.0`. Returns the final
 /// tracked index, which seeds the streaming state's candidate.
 #[inline]
-fn tracked_index_rescan_into<const MAXIMUM: bool>(
+pub(crate) fn tracked_index_rescan_into<const MAXIMUM: bool>(
     input: &[f64],
     period: usize,
     out: &mut [f64],
@@ -723,99 +609,6 @@ macro_rules! rolling_index_indicator {
 
 rolling_index_indicator!(RollingArgmax, MonotonicArgmax, true);
 rolling_index_indicator!(RollingArgmin, MonotonicArgmin, false);
-
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingMinmaxIndex`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
-pub struct RollingMinmaxIndex {
-    maximum: MonotonicArgmax,
-    minimum: MonotonicArgmin,
-    value: Option<RollingMinmaxIndexValue>,
-}
-
-impl RollingMinmaxIndex {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(period: usize) -> TaResult<Self> {
-        Ok(Self {
-            maximum: MonotonicArgmax::new(period)?,
-            minimum: MonotonicArgmin::new(period)?,
-            value: None,
-        })
-    }
-
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, input: f64) -> RollingMinmaxIndexValue {
-        let maximum = self.maximum.append(input).unwrap_or(0);
-        let minimum = self.minimum.append(input).unwrap_or(0);
-        let value = RollingMinmaxIndexValue { minimum, maximum };
-        self.value = Some(value);
-        value
-    }
-
-    /// Bulk kernel: drives the two TA-Lib-exact tracked-candidate machines in
-    /// one tight loop, writing directly into the output caches.
-    ///
-    /// No vHGW shortcut here: TA-Lib's index tie rule is path dependent (a
-    /// newest-wins fast path plus an earliest-wins rescan on eviction), so the
-    /// only bit-exact route is the state machine itself. Warm-up emits `0.0`.
-    ///
-    /// From an empty state each side runs one [`tracked_index_rescan_into`]
-    /// pass straight into its output cache — no per-bar deque traffic, no
-    /// `Option`, no intermediate value struct.
-    pub fn extend_slices_into(
-        &mut self,
-        inputs: &[f64],
-        min_out: &mut Vec<f64>,
-        max_out: &mut Vec<f64>,
-    ) {
-        let period = self.maximum.period();
-        if self.maximum.count() != 0 || inputs.len() < period {
-            min_out.reserve(inputs.len());
-            max_out.reserve(inputs.len());
-            for &input in inputs {
-                let value = self.append(input);
-                min_out.push(value.minimum as f64);
-                max_out.push(value.maximum as f64);
-            }
-            return;
-        }
-        let min_start = min_out.len();
-        let max_start = max_out.len();
-        min_out.resize(min_start + inputs.len(), 0.0);
-        max_out.resize(max_start + inputs.len(), 0.0);
-        let maximum = tracked_index_rescan_into::<true>(inputs, period, &mut max_out[max_start..]);
-        let minimum = tracked_index_rescan_into::<false>(inputs, period, &mut min_out[min_start..]);
-        self.maximum.rebuild_from_full_run(inputs, maximum);
-        self.minimum.rebuild_from_full_run(inputs, minimum);
-        self.value = Some(RollingMinmaxIndexValue { minimum, maximum });
-    }
-
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn value(&self) -> Option<RollingMinmaxIndexValue> {
-        self.value
-    }
-
-    /// Computes or updates `reset` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn reset(&mut self) {
-        self.maximum.reset();
-        self.minimum.reset();
-        self.value = None;
-    }
-}
 
 #[cfg(test)]
 mod tests {

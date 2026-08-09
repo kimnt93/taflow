@@ -21,11 +21,11 @@ class VariablePeriodMovingAverage:
 
     def __init__(
         self,
+        _input: Any,
+        periods: Any,
         min_period: int = 2,
         max_period: int = 30,
         average_type: int = 0,
-        _input: Any | None = None,
-        periods: Any | None = None,
     ) -> None:
         """Create MAVP with optional values and per-bar periods."""
         self._state = StatefulMavp(min_period, max_period, average_type)
@@ -72,13 +72,12 @@ class VariablePeriodMovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned variable-period moving-average values
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property

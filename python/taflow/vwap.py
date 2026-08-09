@@ -7,21 +7,19 @@ from ._series import as_float64_series
 
 
 class RollingVolumeWeightedAveragePrice:
-    """Stateful RollingVolumeWeightedAveragePrice indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent rolling volume-weighted average price.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`, `volume`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
-        volume: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -51,7 +49,7 @@ class RollingVolumeWeightedAveragePrice:
             else None
         )
 
-    def append(self, high: float, low: float, close: float, volume: float) -> object:
+    def append(self, high: float, low: float, close: float, volume: float) -> "RollingVolumeWeightedAveragePrice":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -73,7 +71,7 @@ class RollingVolumeWeightedAveragePrice:
         self._state.append(high, low, close, volume)
         return self
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
+    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> "RollingVolumeWeightedAveragePrice":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -121,7 +119,7 @@ class RollingVolumeWeightedAveragePrice:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "RollingVolumeWeightedAveragePrice":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

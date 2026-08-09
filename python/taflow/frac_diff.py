@@ -7,14 +7,15 @@ from ._series import as_float64_series
 
 
 class FracDiff:
-    """Stateful FracDiff indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Fractionally-differentiated series (AFML ch. 5, fixed-width window).
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, _input: Any | None = None, d: float = 0.5, threshold: float = 1e-5
+        self,
+        _input: Any,
+        d: float = 0.5,
+        threshold: float = 1e-05,
     ) -> None:
         """Create fractional differencing with optional _input history.
 
@@ -24,7 +25,7 @@ class FracDiff:
         self._state = _Native(d, threshold)
         self.extend(_input) if _input is not None else None
 
-    def append(self, _input: float) -> object:
+    def append(self, _input: float) -> "FracDiff":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -40,7 +41,7 @@ class FracDiff:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any) -> object:
+    def extend(self, _input: Any) -> "FracDiff":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -77,7 +78,7 @@ class FracDiff:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "FracDiff":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

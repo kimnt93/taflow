@@ -13,18 +13,22 @@ class RelativeStrengthIndex:
 
     Parameters
     ----------
-    close : array-like, optional
+    close : array-like
         Initial close-price history.
     timeperiod : int, default 14
         Wilder smoothing period.
     """
 
-    def __init__(self, close: Any | None = None, timeperiod: int = 14) -> None:
-        """Create an RSI state and optionally process initial closes.
+    def __init__(
+        self,
+        close: Any,
+        timeperiod: int = 14,
+    ) -> None:
+        """Create an RSI state and process initial closes.
 
         Parameters
         ----------
-        close : array-like, optional
+        close : array-like
             Initial close-price history.
         timeperiod : int, default 14
             Wilder smoothing period.

@@ -21,13 +21,13 @@ class StochasticRelativeStrengthIndex:
 
     def __init__(
         self,
+        _input: Any,
         time_period: object = 14,
         fast_k_period: object = 5,
         fast_d_period: object = 3,
         fast_d_average_type: object = 0,
-        _input: Any | None = None,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -56,7 +56,7 @@ class StochasticRelativeStrengthIndex:
         if _input is not None:
             self.extend(_input)
 
-    def append(self, _input: object) -> object:
+    def append(self, _input: object) -> "StochasticRelativeStrengthIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -72,7 +72,7 @@ class StochasticRelativeStrengthIndex:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: object) -> object:
+    def extend(self, _input: object) -> "StochasticRelativeStrengthIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -89,13 +89,12 @@ class StochasticRelativeStrengthIndex:
         return self
 
     def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the aligned native output histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
@@ -109,7 +108,7 @@ class StochasticRelativeStrengthIndex:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "StochasticRelativeStrengthIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

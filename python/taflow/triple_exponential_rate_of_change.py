@@ -7,14 +7,16 @@ from ._series import as_float64_series
 
 
 class TripleExponentialRateOfChange:
-    """Stateful TripleExponentialRateOfChange indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Triple Exponential Rate of Change (TRIX).
 
-    def __init__(self, _input: Any | None = None, timeperiod: int = 30) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        _input: Any,
+        timeperiod: int = 30,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------

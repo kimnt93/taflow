@@ -21,12 +21,12 @@ class FastStochasticOscillator:
 
     def __init__(
         self,
+        high: Any,
+        low: Any,
+        close: Any,
         fast_k_period: int = 5,
         fast_d_period: int = 3,
         fast_d_average_type: int = 0,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
     ) -> None:
         """Create fast stochastic with optional aligned OHLC history."""
         self._state = StatefulStochf(
@@ -37,7 +37,7 @@ class FastStochasticOscillator:
         if any(value is not None for value in (high, low, close)):
             self.extend(high, low, close)
 
-    def append(self, high: object, low: object, close: object) -> object:
+    def append(self, high: object, low: object, close: object) -> "FastStochasticOscillator":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -57,7 +57,7 @@ class FastStochasticOscillator:
         self._state.append(high, low, close)
         return self
 
-    def extend(self, high: object, low: object, close: object) -> object:
+    def extend(self, high: object, low: object, close: object) -> "FastStochasticOscillator":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -78,13 +78,12 @@ class FastStochasticOscillator:
         return self
 
     def compute(self) -> tuple[np.ndarray, ...]:
-        """Return the aligned native output histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
@@ -98,7 +97,7 @@ class FastStochasticOscillator:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "FastStochasticOscillator":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

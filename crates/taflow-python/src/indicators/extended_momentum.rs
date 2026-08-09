@@ -34,6 +34,9 @@ impl TrueStrengthIndexOperator {
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
         PyArray1::from_vec(py, self.outputs.clone())
     }
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
     #[getter]
     fn value(&self) -> Option<f64> {
         self.inner.value()
@@ -131,6 +134,9 @@ impl FisherTransformOperator {
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
         PyArray1::from_vec(py, self.outputs.clone())
+    }
+    fn __len__(&self) -> usize {
+        self.outputs.len()
     }
     #[getter]
     fn value(&self) -> Option<f64> {

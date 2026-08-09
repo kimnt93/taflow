@@ -7,21 +7,19 @@ from ._series import as_float64_series
 
 
 class RogersSatchell:
-    """Stateful RogersSatchell indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Rolling mean of ``ln(H/C)ln(H/O) + ln(L/C)ln(L/O)`` (Rogers-Satchell).
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        _open: Any | None = None,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        _open: Any,
+        high: Any,
+        low: Any,
+        close: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -48,7 +46,7 @@ class RogersSatchell:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> object:
+    def append(self, _open: float, high: float, low: float, close: float) -> "RogersSatchell":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -70,7 +68,7 @@ class RogersSatchell:
         self._state.append(_open, high, low, close)
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "RogersSatchell":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -118,7 +116,7 @@ class RogersSatchell:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "RogersSatchell":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

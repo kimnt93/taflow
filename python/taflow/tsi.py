@@ -7,16 +7,17 @@ from ._series import as_float64_series
 
 
 class TrueStrengthIndex:
-    """Stateful TrueStrengthIndex indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent True Strength Index.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
-        self, fast: int = 13, slow: int = 25, _input: Any | None = None
+        self,
+        _input: Any,
+        fast: int = 13,
+        slow: int = 25,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -35,7 +36,7 @@ class TrueStrengthIndex:
         self._state = _Native(fast, slow)
         self.extend(_input) if _input is not None else None
 
-    def append(self, _input: float) -> object:
+    def append(self, _input: float) -> "TrueStrengthIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -51,7 +52,7 @@ class TrueStrengthIndex:
         self._state.append(_input)
         return self
 
-    def extend(self, _input: Any) -> object:
+    def extend(self, _input: Any) -> "TrueStrengthIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -88,7 +89,7 @@ class TrueStrengthIndex:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "TrueStrengthIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

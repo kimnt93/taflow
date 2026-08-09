@@ -11,7 +11,10 @@ from ._series import as_float64_series
 class CumulativeCount:
     """Emit the one-based number of observations processed at each bar."""
 
-    def __init__(self, _input: Any | None = None) -> None:
+    def __init__(
+        self,
+        _input: Any,
+    ) -> None:
         self._state = _Native()
         if _input is not None:
             self.extend(_input)

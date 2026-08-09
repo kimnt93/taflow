@@ -1,7 +1,23 @@
 //! Batch implementation for `rolling_sortino`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
+use std::collections::VecDeque;
+
+rolling_risk_operator!(RollingSortino, |values: &VecDeque<f64>| {
+    let average = mean(values);
+    let downside = values
+        .iter()
+        .map(|&value| value.min(0.0).powi(2))
+        .sum::<f64>()
+        / values.len() as f64;
+    if downside > 0.0 {
+        average / downside.sqrt()
+    } else {
+        0.0
+    }
+});
 
 /// Computes or updates `rolling_sortino` through the native Rust kernel.
 ///

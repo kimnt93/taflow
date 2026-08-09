@@ -12,14 +12,18 @@ class FibonacciRetracement:
 
     Parameters
     ----------
-    close : array-like, optional
+    close : array-like
         Initial aligned close history.
     window : int, default 120
         Rolling range used to determine high and low anchors.
     """
 
-    def __init__(self, close: Any | None = None, window: int = 120) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    def __init__(
+        self,
+        close: Any,
+        window: int = 120,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -37,65 +41,61 @@ class FibonacciRetracement:
         if close is not None:
             self.extend(close)
 
-    def append(self, close: float) -> object:
-        """Process one close and return seven retracement levels
+    def append(self, close: float) -> "FibonacciRetracement":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        close : float
+            Current close price.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
-        return self._state.append(float(close))
+        FibonacciRetracement
+            This indicator, for fluent chaining; read `value` for the result."""
+        self._state.append(float(close))
+        return self
 
-    def extend(self, close: Any) -> object:
-        """Process an aligned close history and return this indicator
+    def extend(self, close: Any) -> "FibonacciRetracement":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        close : Any
+            Chronological close price series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        FibonacciRetracement
+            This indicator, for fluent chaining."""
         self._state.extend(np.asarray(close, dtype=np.float64))
         return self
 
     def compute(self) -> object:
-        """Return seven aligned retracement level histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest seven retracement levels
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Clear rolling history and level output
+    def reset(self) -> "FibonacciRetracement":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        FibonacciRetracement
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self

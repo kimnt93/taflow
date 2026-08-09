@@ -156,16 +156,16 @@ def run_polars(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         "min": taflow.RollingMin(close, timeperiod=n).compute(),
         "max": taflow.RollingMax(close, timeperiod=n).compute(),
         "mean": taflow.SimpleMovingAverage(close, timeperiod=n).compute(),
-        "median": taflow.RollingMedian(n, close).compute(),
-        "quantile": taflow.RollingQuantile(n, q, close).compute(),
+        "median": taflow.RollingMedian(close, n).compute(),
+        "quantile": taflow.RollingQuantile(close, n, q).compute(),
         "variance": taflow.RollingVariance(close, timeperiod=n).compute(),
         "stddev": taflow.RollingStandardDeviation(close, timeperiod=n).compute(),
-        "skew": taflow.RollingSkew(n, standardized).compute(),
-        "kurtosis": taflow.RollingKurtosis(n, standardized).compute(),
-        "covariance": taflow.RollingCov(n, close, other).compute(),
+        "skew": taflow.RollingSkew(standardized, n).compute(),
+        "kurtosis": taflow.RollingKurtosis(standardized, n).compute(),
+        "covariance": taflow.RollingCov(close, other, n).compute(),
         "correlation": taflow.RollingCorrelation(close, other, timeperiod=n).compute(),
-        "ewm_variance": taflow.ExponentiallyWeightedVariance(n, close).compute(),
-        "ewm_stddev": taflow.ExponentiallyWeightedStandardDeviation(n, close).compute(),
+        "ewm_variance": taflow.ExponentiallyWeightedVariance(close, n).compute(),
+        "ewm_stddev": taflow.ExponentiallyWeightedStandardDeviation(close, n).compute(),
         "cumulative_sum": taflow.CumulativeSum(close).compute(),
         "cumulative_product": taflow.CumulativeProduct(close / 100.0).compute(),
         "cumulative_minimum": taflow.CumulativeMinimum(close).compute(),
@@ -203,7 +203,7 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
 
     many("awesome_oscillator", taflow.AwesomeOscillator(high, low).compute(),
          pta.ao(h, l, fast=5, slow=34), ("ao",))
-    many("log_return", taflow.LogReturn(1, close).compute(),
+    many("log_return", taflow.LogReturn(close, 1).compute(),
          pta.log_return(c, length=1), ("log_return",))
     many("force_index", taflow.ForceIndex(close, volume).compute(),
          pta.efi(c, v, length=1, mamode="ema"), ("force_index",),
@@ -212,18 +212,18 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
          pta.cross(c, c2, above=True), ("crossover",))
     many("crossunder", taflow.Crossunder(close, data["close2"]).compute(),
          pta.cross(c, c2, above=False), ("crossunder",))
-    many("hull_moving_average", taflow.HullMovingAverage(10, close).compute(),
+    many("hull_moving_average", taflow.HullMovingAverage(close, 10).compute(),
          pta.hma(c, length=10), ("hma",))
     many("volume_weighted_moving_average",
-         taflow.VolumeWeightedMovingAverage(10, close, volume).compute(),
+         taflow.VolumeWeightedMovingAverage(close, volume, 10).compute(),
          pta.vwma(c, v, length=10), ("vwma",))
     many("zero_lag_exponential_moving_average",
-         taflow.ZeroLagExponentialMovingAverage(10, close).compute(),
+         taflow.ZeroLagExponentialMovingAverage(close, 10).compute(),
          pta.zlma(c, length=10, mamode="ema", talib=False), ("zlema",),
          note="force pandas-ta's native EMA; TA-Lib rejects leading ZLMA NaNs")
     for length in (1, 2, 21):
         many("zero_lag_exponential_moving_average",
-             taflow.ZeroLagExponentialMovingAverage(length, close).compute(),
+             taflow.ZeroLagExponentialMovingAverage(close, length).compute(),
              pta.zlma(c, length=length, mamode="ema", talib=False),
              (f"zlema[length={length}]",),
              note="parameter matrix; force pandas-ta's native EMA")

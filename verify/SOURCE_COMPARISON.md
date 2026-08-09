@@ -1,378 +1,345 @@
-# Source-labelled correctness comparison
+# Priority-selected correctness sources
 
-Generated from `report.json` and `EXTERNAL_ORACLES.json` by `source_comparison.py`. `INVARIANT` means native lifecycle self-consistency, not external numerical validation.
+One oracle is selected per indicator using: **TA-Lib > Polars > pandas > pandas-ta-classic > pinned GitHub**. `VARIANT` is a documented semantic difference, not a failed comparison; `INVARIANT` rows have no external oracle.
 
-Matches: **268** | Documented variants: **26** | Self-invariant only: **76** | Failures: **0**
+Matches: **311** | Documented variants: **26** | Self-invariant outputs: **82** | Failures: **0**
 
-| Python | Function | Output | Source | Verdict | Max error | NaN mismatches | Note |
+| TAFlow class ↔ oracle API | Output | Selected source | Version | Verdict | Max error | NaN | Note |
 |---|---|---|---|---:|---:|---:|---|
-| `Amihud` | `amihud` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `AnchoredVolumeWeightedAveragePrice` | `anchored_vwap` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `ArnaudLegouxMovingAverage` | `arnaud_legoux_moving_average` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `AverageDailyDollarValue` | `average_daily_dollar_value` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `BarsSince` | `bars_since` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `ChaikinVolatility` | `chaikin_volatility` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `CloseToCloseSigma` | `close_to_close_sigma` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `CumulativeCount` | `cumulative_count` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `CumulativeSumControlChart` | `cumulative_sum_control_chart` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `DecayLinear` | `decay_linear` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `Drawdown` | `drawdown` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `EaseOfMovement` | `ease_of_movement` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `EqualHighsLows` | `equal_highs_lows` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `ExponentiallyWeightedCorrelation` | `ewm_corr` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `ExponentiallyWeightedCovariance` | `ewm_cov` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `ExponentiallyWeightedSum` | `exponentially_weighted_sum` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `Falling` | `falling` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `FibonacciRetracement` | `fib_retracement` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `FracDiff` | `frac_diff` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `FractalDimension` | `fractal_dimension` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `GapDown` | `gap_down` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `GapUp` | `gap_up` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `GarmanKlass` | `garman_klass` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `GarmanKlassYangZhang` | `garman_klass_yang_zhang` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `HedgeRatio` | `hedge_ratio` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `HigherHigh` | `higher_high` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `HighestSince` | `highest_since` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `Hurst` | `hurst` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `InsideBar` | `inside_bar` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `KalmanHedgeRatio` | `kalman_hedge_ratio` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `KeltnerChannels` | `keltner_channels` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `Lag` | `lag` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `LaguerreRelativeStrengthIndex` | `laguerre_rsi` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `LowerLow` | `lower_low` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `LowestSince` | `lowest_since` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathAcosh` | `math_acosh` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathAsinh` | `math_asinh` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathAtanh` | `math_atanh` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathCbrt` | `math_cbrt` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathCot` | `math_cot` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathDegrees` | `math_degrees` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathLog1p` | `math_log1p` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `MathRadians` | `math_radians` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `OpeningRange` | `opening_range` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `OrnsteinUhlenbeckHalfLife` | `ornstein_uhlenbeck_half_life` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `OutsideBar` | `outside_bar` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `Parkinson` | `parkinson` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `PivotPoints` | `pivot_points` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `ParabolicMovingAverageStop` | `pmax` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `PremiumDiscount` | `premium_discount` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `Rising` | `rising` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RelativeMomentumIndex` | `rmi` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RogersSatchell` | `rogers_satchell` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollSpread` | `roll_spread` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingAlpha` | `rolling_alpha` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingAutocorr` | `rolling_autocorr` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingCalmar` | `rolling_calmar` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingEntropy` | `rolling_entropy` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingInformationRatio` | `rolling_information_ratio` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingMode` | `rolling_mode` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingRank` | `rolling_rank` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingSharpe` | `rolling_sharpe` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingSortino` | `rolling_sortino` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingVolumeWeightedAveragePrice` | `rolling_vwap` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `RollingWinsorize` | `rolling_winsorize` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `SessionVolumeLevels` | `session_volume_levels` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `SignalDelay` | `signal_delay` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `SignedPower` | `signed_power` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `SpreadZScore` | `spread_zscore` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `SmoothedTrendChannel` | `ssl_channel` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `TimeSeriesRank` | `time_series_rank` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `TrueStrengthIndex` | `true_strength_index` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `UlcerIndex` | `ulcer_index` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `ValueWhen` | `value_when` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `VolumePriceTrend` | `volume_price_trend` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `YangZhang` | `yang_zhang` | `all` | self | INVARIANT | `0.000e+00` | 0 | native batch/append/chunk consistency only; no external oracle |
-| `abs` | `abs` | `abs` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `ceil` | `ceil` | `ceil` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `correlation` | `correlation` | `correlation` | Polars | MATCH | `2.254e-11` | 0 |  |
-| `cos` | `cos` | `cos` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `covariance` | `covariance` | `covariance` | Polars | MATCH | `5.835e-12` | 0 |  |
-| `cumulative_maximum` | `cumulative_maximum` | `cumulative_maximum` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `cumulative_minimum` | `cumulative_minimum` | `cumulative_minimum` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `cumulative_product` | `cumulative_product` | `cumulative_product` | Polars | MATCH | `7.105e-15` | 0 |  |
-| `cumulative_sum` | `cumulative_sum` | `cumulative_sum` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `ewm_stddev` | `ewm_stddev` | `ewm_stddev` | Polars | MATCH | `1.776e-15` | 0 |  |
-| `ewm_variance` | `ewm_variance` | `ewm_variance` | Polars | MATCH | `1.066e-14` | 0 |  |
-| `exp` | `exp` | `exp` | Polars | MATCH | `4.441e-16` | 0 |  |
-| `floor` | `floor` | `floor` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `kurtosis` | `kurtosis` | `kurtosis` | Polars | MATCH | `4.695e-05` | 0 | Polars raw-moment kernel tolerance after centering/scaling |
-| `ln` | `ln` | `ln` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `max` | `max` | `max` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `mean` | `mean` | `mean` | Polars | MATCH | `2.274e-13` | 0 |  |
-| `median` | `median` | `median` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `min` | `min` | `min` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `quantile` | `quantile` | `quantile` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `sin` | `sin` | `sin` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `skew` | `skew` | `skew` | Polars | MATCH | `8.776e-08` | 0 | Polars raw-moment kernel tolerance after centering/scaling |
-| `sqrt` | `sqrt` | `sqrt` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `stddev` | `stddev` | `stddev` | Polars | MATCH | `2.402e-11` | 0 |  |
-| `sum` | `sum` | `sum` | Polars | MATCH | `3.070e-12` | 0 |  |
-| `tan` | `tan` | `tan` | Polars | MATCH | `0.000e+00` | 0 |  |
-| `variance` | `variance` | `variance` | Polars | MATCH | `3.930e-11` | 0 |  |
-| `AccelerationBands` | `ACCBANDS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathAcos` | `ACOS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AccumulationDistribution` | `AD` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathAdd` | `ADD` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AccumulationDistributionOscillator` | `ADOSC` | `all` | TA-Lib | MATCH | `1.490e-08` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AverageDirectionalIndex` | `ADX` | `all` | TA-Lib | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AverageDirectionalIndexRating` | `ADXR` | `all` | TA-Lib | MATCH | `2.132e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AbsolutePriceOscillator` | `APO` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `Aroon` | `AROON` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AroonOscillator` | `AROONOSC` | `all` | TA-Lib | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathAsin` | `ASIN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathAtan` | `ATAN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AverageTrueRange` | `ATR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingAverageDeviation` | `AVGDEV` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `AveragePrice` | `AVGPRICE` | `all` | TA-Lib | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `BollingerBands` | `BBANDS` | `all` | TA-Lib | MATCH | `7.927e-10` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingBeta` | `BETA` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `BalanceOfPower` | `BOP` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CommodityChannelIndex` | `CCI` | `all` | TA-Lib | MATCH | `1.387e-11` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleTwoCrows` | `CDL2CROWS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleThreeBlackCrows` | `CDL3BLACKCROWS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleThreeInside` | `CDL3INSIDE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleThreeLineStrike` | `CDL3LINESTRIKE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleThreeOutside` | `CDL3OUTSIDE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleThreeStarsInSouth` | `CDL3STARSINSOUTH` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleThreeWhiteSoldiers` | `CDL3WHITESOLDIERS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleAbandonedBaby` | `CDLABANDONEDBABY` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleAdvanceBlock` | `CDLADVANCEBLOCK` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleBeltHold` | `CDLBELTHOLD` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleBreakaway` | `CDLBREAKAWAY` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleClosingMarubozu` | `CDLCLOSINGMARUBOZU` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleConcealBabySwall` | `CDLCONCEALBABYSWALL` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleCounterAttack` | `CDLCOUNTERATTACK` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleDarkCloudCover` | `CDLDARKCLOUDCOVER` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleDoji` | `CDLDOJI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleDojiStar` | `CDLDOJISTAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleDragonflyDoji` | `CDLDRAGONFLYDOJI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleEngulfing` | `CDLENGULFING` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleEveningDojiStar` | `CDLEVENINGDOJISTAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleEveningStar` | `CDLEVENINGSTAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleGapSideSideWhite` | `CDLGAPSIDESIDEWHITE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleGravestoneDoji` | `CDLGRAVESTONEDOJI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHammer` | `CDLHAMMER` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHangingMan` | `CDLHANGINGMAN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHarami` | `CDLHARAMI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHaramiCross` | `CDLHARAMICROSS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHighWave` | `CDLHIGHWAVE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHikkake` | `CDLHIKKAKE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHikkakeModified` | `CDLHIKKAKEMOD` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleHomingPigeon` | `CDLHOMINGPIGEON` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleIdenticalThreeCrows` | `CDLIDENTICAL3CROWS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleInNeck` | `CDLINNECK` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleInvertedHammer` | `CDLINVERTEDHAMMER` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleKicking` | `CDLKICKING` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleKickingByLength` | `CDLKICKINGBYLENGTH` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleLadderBottom` | `CDLLADDERBOTTOM` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleLongLeggedDoji` | `CDLLONGLEGGEDDOJI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleLongLine` | `CDLLONGLINE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleMarubozu` | `CDLMARUBOZU` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleMatchingLow` | `CDLMATCHINGLOW` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleMatHold` | `CDLMATHOLD` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleMorningDojiStar` | `CDLMORNINGDOJISTAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleMorningStar` | `CDLMORNINGSTAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleOnNeck` | `CDLONNECK` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandlePiercing` | `CDLPIERCING` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleRickshawman` | `CDLRICKSHAWMAN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleRiseFallThreeMethods` | `CDLRISEFALL3METHODS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleSeparatingLines` | `CDLSEPARATINGLINES` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleShootingStar` | `CDLSHOOTINGSTAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleShortLine` | `CDLSHORTLINE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleSpinningTop` | `CDLSPINNINGTOP` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleStalledPattern` | `CDLSTALLEDPATTERN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleStickSandwich` | `CDLSTICKSANDWICH` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleTakuri` | `CDLTAKURI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleTasukiGap` | `CDLTASUKIGAP` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleThrusting` | `CDLTHRUSTING` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleTriStar` | `CDLTRISTAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleUniqueThreeRiver` | `CDLUNIQUE3RIVER` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleUpsideGapTwoCrows` | `CDLUPSIDEGAP2CROWS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `CandleUpDownSideGapThreeMethods` | `CDLXSIDEGAP3METHODS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathCeil` | `CEIL` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `ChandeMomentumOscillator` | `CMO` | `all` | TA-Lib | MATCH | `6.817e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingCorrelation` | `CORREL` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathCos` | `COS` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathCosh` | `COSH` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `DoubleExponentialMovingAverage` | `DEMA` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathDivide` | `DIV` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `DirectionalMovementIndex` | `DX` | `all` | TA-Lib | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `ExponentialMovingAverage` | `EMA` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathExp` | `EXP` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathFloor` | `FLOOR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `HilbertTransformDominantCyclePeriod` | `HT_DCPERIOD` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `HilbertTransformDominantCyclePhase` | `HT_DCPHASE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `HilbertTransformPhasor` | `HT_PHASOR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `HilbertTransformSineWave` | `HT_SINE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `HilbertTransformTrendline` | `HT_TRENDLINE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `HilbertTransformTrendMode` | `HT_TRENDMODE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `IntradayMomentumIndex` | `IMI` | `all` | TA-Lib | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `KaufmanAdaptiveMovingAverage` | `KAMA` | `all` | TA-Lib | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingLinearRegression` | `LINEARREG` | `all` | TA-Lib | MATCH | `5.969e-13` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingLinearRegressionAngle` | `LINEARREG_ANGLE` | `all` | TA-Lib | MATCH | `4.924e-12` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingLinearRegressionIntercept` | `LINEARREG_INTERCEPT` | `all` | TA-Lib | MATCH | `5.969e-13` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingLinearRegressionSlope` | `LINEARREG_SLOPE` | `all` | TA-Lib | MATCH | `9.137e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathLn` | `LN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathLog10` | `LOG10` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MovingAverage` | `MA` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MovingAverageConvergenceDivergence` | `MACD` | `all` | TA-Lib | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MovingAverageConvergenceDivergenceExtended` | `MACDEXT` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MovingAverageConvergenceDivergenceFixed` | `MACDFIX` | `all` | TA-Lib | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MesaAdaptiveMovingAverage` | `MAMA` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `VariablePeriodMovingAverage` | `MAVP` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingMax` | `MAX` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingArgmax` | `MAXINDEX` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MedianPrice` | `MEDPRICE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MoneyFlowIndex` | `MFI` | `all` | TA-Lib | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingMidpoint` | `MIDPOINT` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingMidprice` | `MIDPRICE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingMin` | `MIN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingArgmin` | `MININDEX` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingMinMax` | `MINMAX` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingMinMaxIndex` | `MINMAXINDEX` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MinusDirectionalIndicator` | `MINUS_DI` | `all` | TA-Lib | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MinusDirectionalMovement` | `MINUS_DM` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `Momentum` | `MOM` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathMultiply` | `MULT` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `NormalizedAverageTrueRange` | `NATR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `OnBalanceVolume` | `OBV` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `PlusDirectionalIndicator` | `PLUS_DI` | `all` | TA-Lib | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `PlusDirectionalMovement` | `PLUS_DM` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `PercentagePriceOscillator` | `PPO` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RateOfChange` | `ROC` | `all` | TA-Lib | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RateOfChangePercent` | `ROCP` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RateOfChangeRatio` | `ROCR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RateOfChangeRatioPercent` | `ROCR100` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RelativeStrengthIndex` | `RSI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `ParabolicSar` | `SAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `ParabolicSarExtended` | `SAREXT` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathSin` | `SIN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathSinh` | `SINH` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `SimpleMovingAverage` | `SMA` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathSqrt` | `SQRT` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingStandardDeviation` | `STDDEV` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `StochasticOscillator` | `STOCH` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `FastStochasticOscillator` | `STOCHF` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `StochasticRelativeStrengthIndex` | `STOCHRSI` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathSubtract` | `SUB` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingSum` | `SUM` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `TripleExponentialAverage` | `T3` | `all` | TA-Lib | MATCH | `5.684e-13` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathTan` | `TAN` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `MathTanh` | `TANH` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `TripleExponentialMovingAverage` | `TEMA` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `TrueRange` | `TRANGE` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `TriangularMovingAverage` | `TRIMA` | `all` | TA-Lib | MATCH | `6.821e-13` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `TripleExponentialRateOfChange` | `TRIX` | `all` | TA-Lib | MATCH | `1.110e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingTimeSeriesForecast` | `TSF` | `all` | TA-Lib | MATCH | `6.821e-13` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `TypicalPrice` | `TYPPRICE` | `all` | TA-Lib | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `UltimateOscillator` | `ULTOSC` | `all` | TA-Lib | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingVariance` | `VAR` | `all` | TA-Lib | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `WeightedClose` | `WCLPRICE` | `all` | TA-Lib | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `WilliamsPercentR` | `WILLR` | `all` | TA-Lib | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `WeightedMovingAverage` | `WMA` | `all` | TA-Lib | MATCH | `1.857e-10` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `ExponentiallyWeightedStandardDeviation` | `ewm_std` | `all` | pandas | MATCH | `7.816e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `ExponentiallyWeightedVariance` | `ewm_var` | `all` | pandas | MATCH | `1.904e-12` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingCov` | `rolling_cov` | `all` | pandas | MATCH | `1.282e-11` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingKurtosis` | `rolling_kurtosis` | `all` | pandas | MATCH | `1.332e-15` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingMedian` | `rolling_median` | `all` | pandas | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingQuantile` | `rolling_quantile` | `all` | pandas | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingSkew` | `rolling_skew` | `all` | pandas | MATCH | `8.882e-16` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `RollingZScore` | `rolling_zscore` | `all` | pandas | MATCH | `4.771e-14` | 0 | external parity plus bitwise lifecycle/chunk invariance |
-| `awesome_oscillator` | `awesome_oscillator` | `ao` | pandas-ta-classic | MATCH | `8.527e-14` | 0 |  |
-| `chaikin_money_flow` | `chaikin_money_flow` | `cmf` | pandas-ta-classic | MATCH | `3.993e-14` | 0 |  |
-| `crossover` | `crossover` | `crossover` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `crossunder` | `crossunder` | `crossunder` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `detrended_price_oscillator` | `detrended_price_oscillator` | `dpo` | pandas-ta-classic | MATCH | `1.137e-13` | 0 |  |
-| `donchian_channels` | `donchian_channels` | `lower` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `donchian_channels` | `donchian_channels` | `mid` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `donchian_channels` | `donchian_channels` | `upper` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `even_better_sinewave` | `even_better_sinewave` | `ebsw` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `even_better_sinewave` | `even_better_sinewave` | `ebsw[length=60]` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `fisher_transform` | `fisher_transform` | `fisher` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `fisher_transform` | `fisher_transform` | `fisher[length=11]` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `fisher_transform` | `fisher_transform` | `fisher[length=21]` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `force_index` | `force_index` | `force_index` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | taflow exposes the unsmoothed one-bar force; pandas-ta EFI length=1 |
-| `heikin_ashi` | `heikin_ashi` | `close` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `heikin_ashi` | `heikin_ashi` | `high` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `heikin_ashi` | `heikin_ashi` | `low` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `heikin_ashi` | `heikin_ashi` | `open` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `hull_moving_average` | `hull_moving_average` | `hma` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `ichimoku` | `ichimoku` | `chikou` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
-| `ichimoku` | `ichimoku` | `kijun` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
-| `ichimoku` | `ichimoku` | `span_a` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
-| `ichimoku` | `ichimoku` | `span_b` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
-| `ichimoku` | `ichimoku` | `tenkan` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
-| `jurik_moving_average` | `jurik_moving_average` | `jma` | pandas-ta-classic | MATCH | `2.842e-14` | 0 |  |
-| `jurik_moving_average` | `jurik_moving_average` | `jma[length=1,phase=0]` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `jurik_moving_average` | `jurik_moving_average` | `jma[length=2,phase=-100]` | pandas-ta-classic | MATCH | `1.421e-14` | 0 |  |
-| `jurik_moving_average` | `jurik_moving_average` | `jma[length=21,phase=35]` | pandas-ta-classic | MATCH | `2.842e-14` | 0 |  |
-| `jurik_moving_average` | `jurik_moving_average` | `jma[length=7,phase=100]` | pandas-ta-classic | MATCH | `4.263e-14` | 0 |  |
-| `klinger_volume_oscillator` | `klinger_volume_oscillator` | `kvo` | pandas-ta-classic | MATCH | `2.183e-10` | 0 |  |
-| `klinger_volume_oscillator` | `klinger_volume_oscillator` | `kvo[fast=5,slow=8,signal=3]` | pandas-ta-classic | MATCH | `2.910e-10` | 0 |  |
-| `klinger_volume_oscillator` | `klinger_volume_oscillator` | `signal` | pandas-ta-classic | MATCH | `1.914e-10` | 0 |  |
-| `klinger_volume_oscillator` | `klinger_volume_oscillator` | `signal[fast=5,slow=8,signal=3]` | pandas-ta-classic | MATCH | `2.146e-10` | 0 |  |
-| `log_return` | `log_return` | `log_return` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `mcginley_dynamic` | `mcginley_dynamic` | `mcginley` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `schaff_trend_cycle` | `schaff_trend_cycle` | `macd` | pandas-ta-classic | MATCH | `7.105e-14` | 0 | stream-safe epsilon convention; documented tolerance 1e-5 |
-| `schaff_trend_cycle` | `schaff_trend_cycle` | `stc` | pandas-ta-classic | MATCH | `1.000e-08` | 0 | stream-safe epsilon convention; documented tolerance 1e-5 |
-| `schaff_trend_cycle` | `schaff_trend_cycle` | `stochastic` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | stream-safe epsilon convention; documented tolerance 1e-5 |
-| `squeeze` | `squeeze` | `momentum` | pandas-ta-classic | MATCH | `3.553e-15` | 0 |  |
-| `squeeze` | `squeeze` | `no` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `squeeze` | `squeeze` | `off` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `squeeze` | `squeeze` | `on` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `squeeze_pro` | `squeeze_pro` | `momentum` | pandas-ta-classic | MATCH | `3.553e-15` | 0 |  |
-| `squeeze_pro` | `squeeze_pro` | `no` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `squeeze_pro` | `squeeze_pro` | `off` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `squeeze_pro` | `squeeze_pro` | `on_narrow` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `squeeze_pro` | `squeeze_pro` | `on_normal` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `squeeze_pro` | `squeeze_pro` | `on_wide` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `supertrend` | `supertrend` | `direction` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
-| `supertrend` | `supertrend` | `long` | pandas-ta-classic | MATCH | `1.421e-14` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
-| `supertrend` | `supertrend` | `short` | pandas-ta-classic | MATCH | `1.421e-14` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
-| `supertrend` | `supertrend` | `trend` | pandas-ta-classic | MATCH | `1.421e-14` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
-| `tom_de_mark_sequential` | `tom_de_mark_sequential` | `buy` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | pandas-ta columns reordered and capped at the DeMark setup count of nine |
-| `tom_de_mark_sequential` | `tom_de_mark_sequential` | `sell` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | pandas-ta columns reordered and capped at the DeMark setup count of nine |
-| `variable_index_dynamic_average` | `variable_index_dynamic_average` | `vidya` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `variable_index_dynamic_average` | `variable_index_dynamic_average` | `vidya[length=1]` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `variable_index_dynamic_average` | `variable_index_dynamic_average` | `vidya[length=2]` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `variable_index_dynamic_average` | `variable_index_dynamic_average` | `vidya[length=30]` | pandas-ta-classic | MATCH | `1.421e-14` | 0 |  |
-| `volume_weighted_moving_average` | `volume_weighted_moving_average` | `vwma` | pandas-ta-classic | MATCH | `5.684e-14` | 0 |  |
-| `vortex` | `vortex` | `minus` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `vortex` | `vortex` | `plus` | pandas-ta-classic | MATCH | `0.000e+00` | 0 |  |
-| `zero_lag_exponential_moving_average` | `zero_lag_exponential_moving_average` | `zlema` | pandas-ta-classic | MATCH | `7.105e-14` | 0 | force pandas-ta's native EMA; TA-Lib rejects leading ZLMA NaNs |
-| `zero_lag_exponential_moving_average` | `zero_lag_exponential_moving_average` | `zlema[length=1]` | pandas-ta-classic | MATCH | `0.000e+00` | 0 | parameter matrix; force pandas-ta's native EMA |
-| `zero_lag_exponential_moving_average` | `zero_lag_exponential_moving_average` | `zlema[length=21]` | pandas-ta-classic | MATCH | `7.105e-14` | 0 | parameter matrix; force pandas-ta's native EMA |
-| `zero_lag_exponential_moving_average` | `zero_lag_exponential_moving_average` | `zlema[length=2]` | pandas-ta-classic | MATCH | `1.421e-14` | 0 | parameter matrix; force pandas-ta's native EMA |
-| `fair_value_gap` | `fair_value_gap` | `bottom` | smartmoneyconcepts | MATCH | `0.000e+00` | 0 | package marker at middle candle; shifted to causal detection bar |
-| `fair_value_gap` | `fair_value_gap` | `fvg` | smartmoneyconcepts | MATCH | `0.000e+00` | 0 | package marker at middle candle; shifted to causal detection bar |
-| `fair_value_gap` | `fair_value_gap` | `mitigated` | smartmoneyconcepts | MATCH | `0.000e+00` | 0 | package future index converted to flag at mitigation bar |
-| `fair_value_gap` | `fair_value_gap` | `top` | smartmoneyconcepts | MATCH | `0.000e+00` | 0 | package marker at middle candle; shifted to causal detection bar |
-| `sessions` | `sessions` | `active` | smartmoneyconcepts | MATCH | `0.000e+00` | 0 | all-day custom session; boundaries passed as flags |
-| `sessions` | `sessions` | `high` | smartmoneyconcepts | MATCH | `3.589e-06` | 0 | all-day custom session; boundaries passed as flags |
-| `sessions` | `sessions` | `low` | smartmoneyconcepts | MATCH | `3.808e-06` | 0 | all-day custom session; boundaries passed as flags |
-| `know_sure_thing` | `know_sure_thing` | `kst` | pandas-ta-classic | VARIANT | `1.824e+04` | 0 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
-| `know_sure_thing` | `know_sure_thing` | `signal` | pandas-ta-classic | VARIANT | `1.782e+04` | 8 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
-| `mass_index` | `mass_index` | `mass` | pandas-ta-classic | VARIANT | `4.737e-02` | 0 | taflow follows bukosabino/ta EMA initialization |
-| `negative_volume_index` | `negative_volume_index` | `nvi` | pandas-ta-classic | VARIANT | `5.278e+02` | 0 | taflow uses the standard multiplicative index; pandas-ta uses a cumulative volume-weighted ROC |
-| `positive_volume_index` | `positive_volume_index` | `pvi` | pandas-ta-classic | VARIANT | `4.481e+02` | 0 | taflow uses the standard multiplicative index; pandas-ta uses a cumulative volume-weighted ROC |
-| `break_of_structure_change_of_character` | `break_of_structure_change_of_character` | `bos` | smartmoneyconcepts | VARIANT | `0.000e+00` | 71 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
-| `break_of_structure_change_of_character` | `break_of_structure_change_of_character` | `broken` | smartmoneyconcepts | VARIANT | `0.000e+00` | 101 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
-| `break_of_structure_change_of_character` | `break_of_structure_change_of_character` | `choch` | smartmoneyconcepts | VARIANT | `0.000e+00` | 30 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
-| `break_of_structure_change_of_character` | `break_of_structure_change_of_character` | `level` | smartmoneyconcepts | VARIANT | `0.000e+00` | 101 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
-| `liquidity` | `liquidity` | `level` | smartmoneyconcepts | VARIANT | `1.500e+00` | 184 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
-| `liquidity` | `liquidity` | `liquidity` | smartmoneyconcepts | VARIANT | `2.000e+00` | 125 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
-| `liquidity` | `liquidity` | `swept` | smartmoneyconcepts | VARIANT | `0.000e+00` | 71 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
-| `order_block` | `order_block` | `bottom` | smartmoneyconcepts | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
-| `order_block` | `order_block` | `mitigated` | smartmoneyconcepts | VARIANT | `0.000e+00` | 117 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
-| `order_block` | `order_block` | `ob` | smartmoneyconcepts | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
-| `order_block` | `order_block` | `ob_volume` | smartmoneyconcepts | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
-| `order_block` | `order_block` | `top` | smartmoneyconcepts | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
-| `previous_high_low` | `previous_high_low` | `broken_high` | smartmoneyconcepts | VARIANT | `1.000e+00` | 989 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
-| `previous_high_low` | `previous_high_low` | `broken_low` | smartmoneyconcepts | VARIANT | `1.000e+00` | 987 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
-| `previous_high_low` | `previous_high_low` | `previous_high` | smartmoneyconcepts | VARIANT | `4.564e+01` | 96 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
-| `previous_high_low` | `previous_high_low` | `previous_low` | smartmoneyconcepts | VARIANT | `3.688e+01` | 96 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
-| `retracements` | `retracements` | `current_retracement_pct` | smartmoneyconcepts | VARIANT | `6.093e+02` | 60 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
-| `retracements` | `retracements` | `deepest_retracement_pct` | smartmoneyconcepts | VARIANT | `6.093e+02` | 60 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
-| `retracements` | `retracements` | `direction` | smartmoneyconcepts | VARIANT | `2.000e+00` | 14 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
-| `swing_highs_lows` | `swing_highs_lows` | `level` | smartmoneyconcepts | VARIANT | `0.000e+00` | 41 | package also removes markers retroactively; causal taflow cannot retract emitted events |
-| `swing_highs_lows` | `swing_highs_lows` | `signal` | smartmoneyconcepts | VARIANT | `0.000e+00` | 41 | package also removes markers retroactively; causal taflow cannot retract emitted events |
+| `AbsolutePriceOscillator` ↔ `APO` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `AccelerationBands` ↔ `ACCBANDS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `AccumulationDistribution` ↔ `AD` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `AccumulationDistributionOscillator` ↔ `ADOSC` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.490e-08` | 0 | external parity plus bitwise lifecycle invariance |
+| `Amihud` ↔ `self.amihud` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `AnchoredVolumeWeightedAveragePrice` ↔ `self.anchored_vwap` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ArnaudLegouxMovingAverage` ↔ `self.arnaud_legoux_moving_average` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `Aroon` ↔ `AROON` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `AroonOscillator` ↔ `AROONOSC` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `AverageDailyDollarValue` ↔ `self.average_daily_dollar_value` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `AverageDirectionalIndex` ↔ `ADX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `AverageDirectionalIndexRating` ↔ `ADXR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `2.132e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `AveragePrice` ↔ `AVGPRICE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `AverageTrueRange` ↔ `ATR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `AwesomeOscillator` ↔ `pandas_ta_classic.ao` | `ao` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `8.527e-14` | 0 |  |
+| `BalanceOfPower` ↔ `BOP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `BarsSince` ↔ `self.bars_since` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `BollingerBands` ↔ `BBANDS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `7.927e-10` | 0 | external parity plus bitwise lifecycle invariance |
+| `BreakOfStructureChangeOfCharacter` ↔ `smartmoneyconcepts.break_of_structure_change_of_character` | `bos` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 71 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
+| `BreakOfStructureChangeOfCharacter` ↔ `smartmoneyconcepts.break_of_structure_change_of_character` | `broken` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 101 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
+| `BreakOfStructureChangeOfCharacter` ↔ `smartmoneyconcepts.break_of_structure_change_of_character` | `choch` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 30 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
+| `BreakOfStructureChangeOfCharacter` ↔ `smartmoneyconcepts.break_of_structure_change_of_character` | `level` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 101 | package retrospectively keeps only broken structures at their pivot; taflow emits causal setup and break events and cannot retract history |
+| `CandleAbandonedBaby` ↔ `CDLABANDONEDBABY` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleAdvanceBlock` ↔ `CDLADVANCEBLOCK` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleBeltHold` ↔ `CDLBELTHOLD` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleBreakaway` ↔ `CDLBREAKAWAY` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleClosingMarubozu` ↔ `CDLCLOSINGMARUBOZU` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleConcealBabySwall` ↔ `CDLCONCEALBABYSWALL` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleCounterAttack` ↔ `CDLCOUNTERATTACK` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleDarkCloudCover` ↔ `CDLDARKCLOUDCOVER` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleDoji` ↔ `CDLDOJI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleDojiStar` ↔ `CDLDOJISTAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleDragonflyDoji` ↔ `CDLDRAGONFLYDOJI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleEngulfing` ↔ `CDLENGULFING` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleEveningDojiStar` ↔ `CDLEVENINGDOJISTAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleEveningStar` ↔ `CDLEVENINGSTAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleGapSideSideWhite` ↔ `CDLGAPSIDESIDEWHITE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleGravestoneDoji` ↔ `CDLGRAVESTONEDOJI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHammer` ↔ `CDLHAMMER` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHangingMan` ↔ `CDLHANGINGMAN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHarami` ↔ `CDLHARAMI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHaramiCross` ↔ `CDLHARAMICROSS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHighWave` ↔ `CDLHIGHWAVE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHikkake` ↔ `CDLHIKKAKE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHikkakeModified` ↔ `CDLHIKKAKEMOD` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleHomingPigeon` ↔ `CDLHOMINGPIGEON` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleIdenticalThreeCrows` ↔ `CDLIDENTICAL3CROWS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleInNeck` ↔ `CDLINNECK` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleInvertedHammer` ↔ `CDLINVERTEDHAMMER` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleKicking` ↔ `CDLKICKING` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleKickingByLength` ↔ `CDLKICKINGBYLENGTH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleLadderBottom` ↔ `CDLLADDERBOTTOM` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleLongLeggedDoji` ↔ `CDLLONGLEGGEDDOJI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleLongLine` ↔ `CDLLONGLINE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleMarubozu` ↔ `CDLMARUBOZU` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleMatHold` ↔ `CDLMATHOLD` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleMatchingLow` ↔ `CDLMATCHINGLOW` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleMorningDojiStar` ↔ `CDLMORNINGDOJISTAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleMorningStar` ↔ `CDLMORNINGSTAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleOnNeck` ↔ `CDLONNECK` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandlePiercing` ↔ `CDLPIERCING` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleRickshawman` ↔ `CDLRICKSHAWMAN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleRiseFallThreeMethods` ↔ `CDLRISEFALL3METHODS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleSeparatingLines` ↔ `CDLSEPARATINGLINES` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleShootingStar` ↔ `CDLSHOOTINGSTAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleShortLine` ↔ `CDLSHORTLINE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleSpinningTop` ↔ `CDLSPINNINGTOP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleStalledPattern` ↔ `CDLSTALLEDPATTERN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleStickSandwich` ↔ `CDLSTICKSANDWICH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleTakuri` ↔ `CDLTAKURI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleTasukiGap` ↔ `CDLTASUKIGAP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleThreeBlackCrows` ↔ `CDL3BLACKCROWS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleThreeInside` ↔ `CDL3INSIDE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleThreeLineStrike` ↔ `CDL3LINESTRIKE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleThreeOutside` ↔ `CDL3OUTSIDE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleThreeStarsInSouth` ↔ `CDL3STARSINSOUTH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleThreeWhiteSoldiers` ↔ `CDL3WHITESOLDIERS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleThrusting` ↔ `CDLTHRUSTING` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleTriStar` ↔ `CDLTRISTAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleTwoCrows` ↔ `CDL2CROWS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleUniqueThreeRiver` ↔ `CDLUNIQUE3RIVER` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleUpDownSideGapThreeMethods` ↔ `CDLXSIDEGAP3METHODS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `CandleUpsideGapTwoCrows` ↔ `CDLUPSIDEGAP2CROWS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `ChaikinMoneyFlow` ↔ `pandas_ta_classic.cmf` | `cmf` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `3.993e-14` | 0 |  |
+| `ChaikinVolatility` ↔ `self.chaikin_volatility` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ChandeMomentumOscillator` ↔ `CMO` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `6.817e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `CloseToCloseSigma` ↔ `self.close_to_close_sigma` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `CommodityChannelIndex` ↔ `CCI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.387e-11` | 0 | external parity plus bitwise lifecycle invariance |
+| `Crossover` ↔ `pandas-ta-classic.crossover` | `crossover` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `Crossunder` ↔ `pandas-ta-classic.crossunder` | `crossunder` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `CumulativeCount` ↔ `self.cumulative_count` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `CumulativeMaximum` ↔ `Polars.cumulative_maximum` | `cumulative_maximum` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
+| `CumulativeMinimum` ↔ `Polars.cumulative_minimum` | `cumulative_minimum` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
+| `CumulativeProduct` ↔ `Polars.cumulative_product` | `cumulative_product` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `7.105e-15` | 0 |  |
+| `CumulativeSum` ↔ `Polars.cumulative_sum` | `cumulative_sum` | [Polars](https://docs.pola.rs/api/python/stable/reference/expressions/index.html) | `1.43.2` | MATCH | `0.000e+00` | 0 |  |
+| `CumulativeSumControlChart` ↔ `self.cumulative_sum_control_chart` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `DecayLinear` ↔ `self.decay_linear` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `DetrendedPriceOscillator` ↔ `pandas_ta_classic.dpo` | `dpo` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `1.137e-13` | 0 |  |
+| `DirectionalMovementIndex` ↔ `DX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `DonchianChannels` ↔ `pandas_ta_classic.donchian` | `lower` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `DonchianChannels` ↔ `pandas_ta_classic.donchian` | `mid` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `DonchianChannels` ↔ `pandas_ta_classic.donchian` | `upper` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `DoubleExponentialMovingAverage` ↔ `DEMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `Drawdown` ↔ `self.drawdown` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `EaseOfMovement` ↔ `self.ease_of_movement` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `EqualHighsLows` ↔ `self.equal_highs_lows` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `EvenBetterSinewave` ↔ `pandas_ta_classic.ebsw` | `ebsw` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `EvenBetterSinewave` ↔ `pandas_ta_classic.ebsw` | `ebsw[length=60]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `ExponentialMovingAverage` ↔ `EMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `ExponentiallyWeightedCorrelation` ↔ `self.ewm_corr` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ExponentiallyWeightedCovariance` ↔ `self.ewm_cov` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ExponentiallyWeightedStandardDeviation` ↔ `pandas.ewm_std` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `7.816e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `ExponentiallyWeightedSum` ↔ `self.exponentially_weighted_sum` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ExponentiallyWeightedVariance` ↔ `pandas.ewm_var` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.904e-12` | 0 | external parity plus bitwise lifecycle invariance |
+| `FairValueGap` ↔ `smartmoneyconcepts.fair_value_gap` | `bottom` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | MATCH | `0.000e+00` | 0 | package marker at middle candle; shifted to causal detection bar |
+| `FairValueGap` ↔ `smartmoneyconcepts.fair_value_gap` | `fvg` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | MATCH | `0.000e+00` | 0 | package marker at middle candle; shifted to causal detection bar |
+| `FairValueGap` ↔ `smartmoneyconcepts.fair_value_gap` | `mitigated` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | MATCH | `0.000e+00` | 0 | package future index converted to flag at mitigation bar |
+| `FairValueGap` ↔ `smartmoneyconcepts.fair_value_gap` | `top` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | MATCH | `0.000e+00` | 0 | package marker at middle candle; shifted to causal detection bar |
+| `Falling` ↔ `self.falling` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `FastStochasticOscillator` ↔ `STOCHF` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `FibonacciRetracement` ↔ `self.fib_retracement` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `FisherTransform` ↔ `pandas_ta_classic.fisher` | `fisher` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `FisherTransform` ↔ `pandas_ta_classic.fisher` | `fisher[length=11]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `FisherTransform` ↔ `pandas_ta_classic.fisher` | `fisher[length=21]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `ForceIndex` ↔ `pandas_ta_classic.efi` | `force_index` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | taflow exposes the unsmoothed one-bar force; pandas-ta EFI length=1 |
+| `FracDiff` ↔ `self.frac_diff` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `FractalDimension` ↔ `self.fractal_dimension` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `GapDown` ↔ `self.gap_down` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `GapUp` ↔ `self.gap_up` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `GarmanKlass` ↔ `self.garman_klass` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `GarmanKlassYangZhang` ↔ `self.garman_klass_yang_zhang` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `HedgeRatio` ↔ `self.hedge_ratio` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `HeikinAshi` ↔ `pandas-ta-classic.heikin_ashi` | `close` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `HeikinAshi` ↔ `pandas-ta-classic.heikin_ashi` | `high` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `HeikinAshi` ↔ `pandas-ta-classic.heikin_ashi` | `low` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `HeikinAshi` ↔ `pandas-ta-classic.heikin_ashi` | `open` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `HigherHigh` ↔ `self.higher_high` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `HighestSince` ↔ `self.highest_since` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `HilbertTransformDominantCyclePeriod` ↔ `HT_DCPERIOD` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `HilbertTransformDominantCyclePhase` ↔ `HT_DCPHASE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `HilbertTransformPhasor` ↔ `HT_PHASOR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `HilbertTransformSineWave` ↔ `HT_SINE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `HilbertTransformTrendMode` ↔ `HT_TRENDMODE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `HilbertTransformTrendline` ↔ `HT_TRENDLINE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `HullMovingAverage` ↔ `pandas_ta_classic.hma` | `hma` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `Hurst` ↔ `self.hurst` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `Ichimoku` ↔ `pandas-ta-classic.ichimoku` | `chikou` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
+| `Ichimoku` ↔ `pandas-ta-classic.ichimoku` | `kijun` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
+| `Ichimoku` ↔ `pandas-ta-classic.ichimoku` | `span_a` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
+| `Ichimoku` ↔ `pandas-ta-classic.ichimoku` | `span_b` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
+| `Ichimoku` ↔ `pandas-ta-classic.ichimoku` | `tenkan` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | causal alignment; plotting displacement removed |
+| `InsideBar` ↔ `self.inside_bar` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `IntradayMomentumIndex` ↔ `IMI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `JurikMovingAverage` ↔ `self.jma` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `KalmanHedgeRatio` ↔ `self.kalman_hedge_ratio` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `KaufmanAdaptiveMovingAverage` ↔ `KAMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `KeltnerChannels` ↔ `self.keltner_channels` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `KlingerVolumeOscillator` ↔ `self.kvo` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `KnowSureThing` ↔ `pandas-ta-classic.know_sure_thing` | `kst` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `1.824e+04` | 0 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
+| `KnowSureThing` ↔ `pandas-ta-classic.know_sure_thing` | `signal` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `1.782e+04` | 8 | taflow follows the bukosabino/ta KST scaling; pandas-ta multiplies by an extra 100 |
+| `Lag` ↔ `self.lag` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `LaguerreRelativeStrengthIndex` ↔ `self.laguerre_rsi` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `Liquidity` ↔ `smartmoneyconcepts.liquidity` | `level` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `1.500e+00` | 184 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
+| `Liquidity` ↔ `smartmoneyconcepts.liquidity` | `liquidity` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `2.000e+00` | 125 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
+| `Liquidity` ↔ `smartmoneyconcepts.liquidity` | `swept` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 71 | package uses full-series range and retroactive group starts; taflow uses causal level-relative tolerance and emits second-touch/sweep events |
+| `LogReturn` ↔ `pandas_ta_classic.log_return` | `log_return` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `LowerLow` ↔ `self.lower_low` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `LowestSince` ↔ `self.lowest_since` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MassIndex` ↔ `pandas-ta-classic.mass_index` | `mass` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `4.737e-02` | 0 | taflow follows bukosabino/ta EMA initialization |
+| `MathAbs` ↔ `self.math_abs` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathAcos` ↔ `ACOS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathAcosh` ↔ `self.math_acosh` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathAdd` ↔ `ADD` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathAsin` ↔ `ASIN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathAsinh` ↔ `self.math_asinh` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathAtan` ↔ `ATAN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathAtanh` ↔ `self.math_atanh` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathCbrt` ↔ `self.math_cbrt` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathCeil` ↔ `CEIL` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathCos` ↔ `COS` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathCosh` ↔ `COSH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathCot` ↔ `self.math_cot` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathDegrees` ↔ `self.math_degrees` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathDivide` ↔ `DIV` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathExp` ↔ `EXP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathFloor` ↔ `FLOOR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathLn` ↔ `LN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathLog10` ↔ `LOG10` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathLog1p` ↔ `self.math_log1p` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathMultiply` ↔ `MULT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathRadians` ↔ `self.math_radians` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MathSin` ↔ `SIN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathSinh` ↔ `SINH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathSqrt` ↔ `SQRT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathSubtract` ↔ `SUB` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathTan` ↔ `TAN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MathTanh` ↔ `TANH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `McGinleyDynamic` ↔ `self.mcginley` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `MedianPrice` ↔ `MEDPRICE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MesaAdaptiveMovingAverage` ↔ `MAMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MinusDirectionalIndicator` ↔ `MINUS_DI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `MinusDirectionalMovement` ↔ `MINUS_DM` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `Momentum` ↔ `MOM` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MoneyFlowIndex` ↔ `MFI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `MovingAverage` ↔ `MA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MovingAverageConvergenceDivergence` ↔ `MACD` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `MovingAverageConvergenceDivergenceExtended` ↔ `MACDEXT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `MovingAverageConvergenceDivergenceFixed` ↔ `MACDFIX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `NegativeVolumeIndex` ↔ `pandas-ta-classic.negative_volume_index` | `nvi` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `5.278e+02` | 0 | taflow uses the standard multiplicative index; pandas-ta uses a cumulative volume-weighted ROC |
+| `NormalizedAverageTrueRange` ↔ `NATR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `OnBalanceVolume` ↔ `OBV` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `OpeningRange` ↔ `self.opening_range` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `OrderBlock` ↔ `smartmoneyconcepts.order_block` | `bottom` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
+| `OrderBlock` ↔ `smartmoneyconcepts.order_block` | `mitigated` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 117 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
+| `OrderBlock` ↔ `smartmoneyconcepts.order_block` | `ob` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
+| `OrderBlock` ↔ `smartmoneyconcepts.order_block` | `ob_volume` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
+| `OrderBlock` ↔ `smartmoneyconcepts.order_block` | `top` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 170 | different published definitions: package retroactively marks and deletes historical blocks; taflow is causal, dual-pivot, and ATR-filtered |
+| `OrnsteinUhlenbeckHalfLife` ↔ `self.ornstein_uhlenbeck_half_life` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `OutsideBar` ↔ `self.outside_bar` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ParabolicMovingAverageStop` ↔ `self.pmax` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ParabolicSar` ↔ `SAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `ParabolicSarExtended` ↔ `SAREXT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `Parkinson` ↔ `self.parkinson` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `PercentagePriceOscillator` ↔ `PPO` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `PivotPoints` ↔ `self.pivot_points` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `PlusDirectionalIndicator` ↔ `PLUS_DI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `PlusDirectionalMovement` ↔ `PLUS_DM` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `PositiveVolumeIndex` ↔ `pandas-ta-classic.positive_volume_index` | `pvi` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `4.481e+02` | 0 | taflow uses the standard multiplicative index; pandas-ta uses a cumulative volume-weighted ROC |
+| `PremiumDiscount` ↔ `self.premium_discount` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `PreviousHighLow` ↔ `smartmoneyconcepts.previous_high_low` | `broken_high` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `1.000e+00` | 989 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
+| `PreviousHighLow` ↔ `smartmoneyconcepts.previous_high_low` | `broken_low` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `1.000e+00` | 987 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
+| `PreviousHighLow` ↔ `smartmoneyconcepts.previous_high_low` | `previous_high` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `4.564e+01` | 96 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
+| `PreviousHighLow` ↔ `smartmoneyconcepts.previous_high_low` | `previous_low` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `3.688e+01` | 96 | SMC 0.0.27 selects periods_before-2 (two-day lag); taflow exposes the immediately previous day |
+| `RateOfChange` ↔ `ROC` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `RateOfChangePercent` ↔ `ROCP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RateOfChangeRatio` ↔ `ROCR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RateOfChangeRatioPercent` ↔ `ROCR100` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RelativeMomentumIndex` ↔ `self.rmi` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RelativeStrengthIndex` ↔ `RSI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `Retracements` ↔ `smartmoneyconcepts.retracements` | `current_retracement_pct` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `6.093e+02` | 60 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
+| `Retracements` ↔ `smartmoneyconcepts.retracements` | `deepest_retracement_pct` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `6.093e+02` | 60 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
+| `Retracements` ↔ `smartmoneyconcepts.retracements` | `direction` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `2.000e+00` | 14 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
+| `Rising` ↔ `self.rising` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RogersSatchell` ↔ `self.rogers_satchell` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollSpread` ↔ `self.roll_spread` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingAlpha` ↔ `self.rolling_alpha` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingArgmax` ↔ `MAXINDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingArgmin` ↔ `MININDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingAutocorr` ↔ `self.rolling_autocorr` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingAverageDeviation` ↔ `AVGDEV` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingBeta` ↔ `BETA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingCalmar` ↔ `self.rolling_calmar` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingCorrelation` ↔ `CORREL` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingCov` ↔ `pandas.rolling_cov` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.282e-11` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingEntropy` ↔ `self.rolling_entropy` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingInformationRatio` ↔ `self.rolling_information_ratio` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingKurtosis` ↔ `pandas.rolling_kurtosis` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `1.332e-15` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingLinearRegression` ↔ `LINEARREG` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.969e-13` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingLinearRegressionAngle` ↔ `LINEARREG_ANGLE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `4.924e-12` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingLinearRegressionIntercept` ↔ `LINEARREG_INTERCEPT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.969e-13` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingLinearRegressionSlope` ↔ `LINEARREG_SLOPE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `9.137e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMax` ↔ `MAX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMedian` ↔ `pandas.rolling_median` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMidpoint` ↔ `MIDPOINT` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMidprice` ↔ `MIDPRICE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMin` ↔ `MIN` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMinMax` ↔ `MINMAX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMinMaxIndex` ↔ `MINMAXINDEX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingMode` ↔ `self.rolling_mode` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingQuantile` ↔ `pandas.rolling_quantile` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingRank` ↔ `self.rolling_rank` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingSharpe` ↔ `self.rolling_sharpe` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingSkew` ↔ `pandas.rolling_skew` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `8.882e-16` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingSortino` ↔ `self.rolling_sortino` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingStandardDeviation` ↔ `STDDEV` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingSum` ↔ `SUM` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingTimeSeriesForecast` ↔ `TSF` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `6.821e-13` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingVariance` ↔ `VAR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `RollingVolumeWeightedAveragePrice` ↔ `self.rolling_vwap` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingWinsorize` ↔ `self.rolling_winsorize` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `RollingZScore` ↔ `pandas.rolling_zscore` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `4.771e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `SchaffTrendCycle` ↔ `pandas_ta_classic.stc` | `macd` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `7.105e-14` | 0 | stream-safe epsilon convention; documented tolerance 1e-5 |
+| `SchaffTrendCycle` ↔ `pandas_ta_classic.stc` | `stc` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `1.000e-08` | 0 | stream-safe epsilon convention; documented tolerance 1e-5 |
+| `SchaffTrendCycle` ↔ `pandas_ta_classic.stc` | `stochastic` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | stream-safe epsilon convention; documented tolerance 1e-5 |
+| `SessionVolumeLevels` ↔ `self.session_volume_levels` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `Sessions` ↔ `smartmoneyconcepts.sessions` | `active` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | MATCH | `0.000e+00` | 0 | all-day custom session; boundaries passed as flags |
+| `Sessions` ↔ `smartmoneyconcepts.sessions` | `high` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | MATCH | `3.589e-06` | 0 | all-day custom session; boundaries passed as flags |
+| `Sessions` ↔ `smartmoneyconcepts.sessions` | `low` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | MATCH | `3.808e-06` | 0 | all-day custom session; boundaries passed as flags |
+| `SignalDelay` ↔ `self.signal_delay` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `SignedPower` ↔ `self.signed_power` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `SimpleMovingAverage` ↔ `SMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `SmoothedTrendChannel` ↔ `self.ssl_channel` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `SpreadZScore` ↔ `self.spread_zscore` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `Squeeze` ↔ `pandas-ta-classic.squeeze` | `momentum` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `3.553e-15` | 0 |  |
+| `Squeeze` ↔ `pandas-ta-classic.squeeze` | `no` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `Squeeze` ↔ `pandas-ta-classic.squeeze` | `off` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `Squeeze` ↔ `pandas-ta-classic.squeeze` | `on` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `SqueezePro` ↔ `pandas-ta-classic.squeeze_pro` | `momentum` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `3.553e-15` | 0 |  |
+| `SqueezePro` ↔ `pandas-ta-classic.squeeze_pro` | `no` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `SqueezePro` ↔ `pandas-ta-classic.squeeze_pro` | `off` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `SqueezePro` ↔ `pandas-ta-classic.squeeze_pro` | `on_narrow` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `SqueezePro` ↔ `pandas-ta-classic.squeeze_pro` | `on_normal` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `SqueezePro` ↔ `pandas-ta-classic.squeeze_pro` | `on_wide` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `StochasticOscillator` ↔ `STOCH` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `StochasticRelativeStrengthIndex` ↔ `STOCHRSI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `Supertrend` ↔ `pandas-ta-classic.supertrend` | `direction` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
+| `Supertrend` ↔ `pandas-ta-classic.supertrend` | `long` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `1.421e-14` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
+| `Supertrend` ↔ `pandas-ta-classic.supertrend` | `short` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `1.421e-14` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
+| `Supertrend` ↔ `pandas-ta-classic.supertrend` | `trend` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `1.421e-14` | 0 | pandas-ta seeds pre-ATR rows; compare from length-1 |
+| `SwingHighsLows` ↔ `smartmoneyconcepts.swing_highs_lows` | `level` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 41 | package also removes markers retroactively; causal taflow cannot retract emitted events |
+| `SwingHighsLows` ↔ `smartmoneyconcepts.swing_highs_lows` | `signal` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `0.000e+00` | 41 | package also removes markers retroactively; causal taflow cannot retract emitted events |
+| `TimeSeriesRank` ↔ `self.time_series_rank` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `TomDeMarkSequential` ↔ `self.td_sequential` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `TriangularMovingAverage` ↔ `TRIMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `6.821e-13` | 0 | external parity plus bitwise lifecycle invariance |
+| `TripleExponentialAverage` ↔ `T3` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.684e-13` | 0 | external parity plus bitwise lifecycle invariance |
+| `TripleExponentialMovingAverage` ↔ `TEMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `TripleExponentialRateOfChange` ↔ `TRIX` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.110e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `TrueRange` ↔ `TRANGE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `TrueStrengthIndex` ↔ `self.true_strength_index` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `TypicalPrice` ↔ `TYPPRICE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `UlcerIndex` ↔ `self.ulcer_index` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `UltimateOscillator` ↔ `ULTOSC` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `ValueWhen` ↔ `self.value_when` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `VariableIndexDynamicAverage` ↔ `self.vidya` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `VariablePeriodMovingAverage` ↔ `MAVP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
+| `VolumePriceTrend` ↔ `self.volume_price_trend` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `VolumeWeightedMovingAverage` ↔ `pandas_ta_classic.vwma` | `vwma` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `5.684e-14` | 0 |  |
+| `Vortex` ↔ `pandas-ta-classic.vortex` | `minus` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `Vortex` ↔ `pandas-ta-classic.vortex` | `plus` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `WeightedClose` ↔ `WCLPRICE` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `5.684e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `WeightedMovingAverage` ↔ `WMA` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.857e-10` | 0 | external parity plus bitwise lifecycle invariance |
+| `WilliamsPercentR` ↔ `WILLR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `2.842e-14` | 0 | external parity plus bitwise lifecycle invariance |
+| `YangZhang` ↔ `self.yang_zhang` | `all` | native invariant | `repository invariant` | INVARIANT | `0.000e+00` | 0 | cold/warm/chunk/reset invariant; no external oracle |
+| `ZeroLagExponentialMovingAverage` ↔ `pandas_ta_classic.zlma` | `zlema` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `7.105e-14` | 0 | force pandas-ta's native EMA; TA-Lib rejects leading ZLMA NaNs |
+| `ZeroLagExponentialMovingAverage` ↔ `pandas_ta_classic.zlma` | `zlema[length=1]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | parameter matrix; force pandas-ta's native EMA |
+| `ZeroLagExponentialMovingAverage` ↔ `pandas_ta_classic.zlma` | `zlema[length=21]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `7.105e-14` | 0 | parameter matrix; force pandas-ta's native EMA |
+| `ZeroLagExponentialMovingAverage` ↔ `pandas_ta_classic.zlma` | `zlema[length=2]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `1.421e-14` | 0 | parameter matrix; force pandas-ta's native EMA |

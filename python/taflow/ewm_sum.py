@@ -15,7 +15,11 @@ class ExponentiallyWeightedSum:
     ``sum_t = x_t + (1 - alpha) * sum_(t-1)``.
     """
 
-    def __init__(self, timeperiod: int, _input: Any | None = None) -> None:
+    def __init__(
+        self,
+        _input: Any,
+        timeperiod: int = 14,
+    ) -> None:
         self._state = _Native(timeperiod)
         if _input is not None:
             self.extend(_input)

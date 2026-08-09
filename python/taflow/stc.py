@@ -7,21 +7,19 @@ from ._series import as_float64_series
 
 
 class SchaffTrendCycle:
-    """Stateful SchaffTrendCycle indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Schaff Trend Cycle (pandas-ta classic alignment).
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        close: Any | None = None,
+        close: Any,
         tclength: int = 10,
         fast: int = 12,
         slow: int = 26,
         factor: float = 0.5,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -44,7 +42,7 @@ class SchaffTrendCycle:
         self._state = _Native(tclength, fast, slow, factor)
         self.extend(close) if close is not None else None
 
-    def append(self, close: float) -> object:
+    def append(self, close: float) -> "SchaffTrendCycle":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -60,7 +58,7 @@ class SchaffTrendCycle:
         self._state.append(close)
         return self
 
-    def extend(self, close: Any) -> object:
+    def extend(self, close: Any) -> "SchaffTrendCycle":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -97,7 +95,7 @@ class SchaffTrendCycle:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "SchaffTrendCycle":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

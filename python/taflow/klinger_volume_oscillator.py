@@ -12,7 +12,7 @@ class KlingerVolumeOscillator:
 
     Parameters
     ----------
-    high, low, close, volume : array-like, optional
+    high, low, close, volume : array-like
         Initial aligned OHLCV history.
     fast, slow, signal : int, default 34, 55, 13
         EMA periods for force, baseline, and signal smoothing.
@@ -20,15 +20,15 @@ class KlingerVolumeOscillator:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
-        volume: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
         fast: int = 34,
         slow: int = 55,
         signal: int = 13,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -56,34 +56,45 @@ class KlingerVolumeOscillator:
         if close is not None:
             self.extend(high, low, close, volume)
 
-    def append(self, high: float, low: float, close: float, volume: float) -> object:
-        """Process one OHLCV bar and return oscillator and signal values
+    def append(self, high: float, low: float, close: float, volume: float) -> "KlingerVolumeOscillator":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : float
+            Current high price.
+        low : float
+            Current low price.
+        close : float
+            Current close price.
+        volume : float
+            Current volume.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
-        return self._state.append(float(high), float(low), float(close), float(volume))
+        KlingerVolumeOscillator
+            This indicator, for fluent chaining; read `value` for the result."""
+        self._state.append(float(high), float(low), float(close), float(volume))
+        return self
 
-    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> object:
-        """Process aligned OHLCV history and return this indicator
+    def extend(self, high: Any, low: Any, close: Any, volume: Any) -> "KlingerVolumeOscillator":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : Any
+            Chronological high price series.
+        low : Any
+            Chronological low price series.
+        close : Any
+            Chronological close price series.
+        volume : Any
+            Chronological volume series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        KlingerVolumeOscillator
+            This indicator, for fluent chaining."""
         self._state.extend(
             np.asarray(high, dtype=np.float64),
             np.asarray(low, dtype=np.float64),
@@ -93,33 +104,30 @@ class KlingerVolumeOscillator:
         return self
 
     def compute(self) -> object:
-        """Return oscillator and signal histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest oscillator and signal pair
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Clear EMA state and accumulated output
+    def reset(self) -> "KlingerVolumeOscillator":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        KlingerVolumeOscillator
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self

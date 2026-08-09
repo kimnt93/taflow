@@ -25,12 +25,12 @@ class OhlcStateAdapter:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Create the native state and optionally process initial OHLC data."""
+        """Create the native state and process initial OHLC data."""
         if self._period_required:
             self._state = self._native_cls(timeperiod)
         else:
@@ -38,69 +38,72 @@ class OhlcStateAdapter:
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
-    def append(self, high: float, low: float, close: float) -> object:
-        """Append one OHLC bar and update the native state
+    def append(self, high: float, low: float, close: float) -> "Self":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : float
+            Current high price.
+        low : float
+            Current low price.
+        close : float
+            Current close price.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining; read `value` for the result."""
         self._state.append(float(high), float(low), float(close))
         return self
 
-    def extend(self, high: Any, low: Any, close: Any) -> object:
-        """Append aligned high, low, and close histories to native state
+    def extend(self, high: Any, low: Any, close: Any) -> "Self":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : Any
+            Chronological high price series.
+        low : Any
+            Chronological low price series.
+        close : Any
+            Chronological close price series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining."""
         self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
         )
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest native output, or ``None`` during warm-up
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Reset native state and accumulated output history
+    def reset(self) -> "Self":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        Self
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self
 

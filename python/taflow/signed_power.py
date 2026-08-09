@@ -11,7 +11,11 @@ from ._series import as_float64_series
 class SignedPower:
     """Compute ``sign(x) * abs(x) ** exponent`` for an aligned series."""
 
-    def __init__(self, exponent: float, _input: Any | None = None) -> None:
+    def __init__(
+        self,
+        _input: Any,
+        exponent: float = 2.0,
+    ) -> None:
         self._state = _Native(float(exponent))
         if _input is not None:
             self.extend(_input)

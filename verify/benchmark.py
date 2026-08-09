@@ -450,9 +450,16 @@ def run_spec(spec: Spec, args, data: dict, env: dict) -> dict:
 
 
 def aggregate(reports: list[dict]) -> str:
+    selected_path = Path(__file__).parent / "SOURCE_COMPARISON.json"
+    selected_rows = json.loads(selected_path.read_text()) if selected_path.exists() else []
+    selected_by_class = {}
+    for row in selected_rows:
+        selected_by_class.setdefault(row["class"], row)
     lines = ["# TAFlow verification benchmark", "",
              f"Generated {date.today().isoformat()} from {len(reports)} functions.", "",
-             "| Canonical class | TA-Lib | Correctness | Largest vector bars/s | Speedup | Append µs | 4T vector scaling |",
+             "Reference ratios use the same priority-selected correctness source. "
+             "A dash means that source is not timed by this harness.", "",
+             "| Canonical class | Selected reference | Correctness | Largest vector bars/s | Reference ratio | Append µs | 4T vector scaling |",
              "|---|---|---|---:|---:|---:|---:|"]
     for report in reports:
         vector = (report.get("vector") or [None])[-1]
@@ -460,15 +467,19 @@ def aggregate(reports: list[dict]) -> str:
                              if r["chunk"] == 1), None)
         threaded = (report.get("threads") or [None])[-1]
         check = report.get("correctness")
+        selected = selected_by_class.get(report["canonical_class"], {})
+        selected_source = selected.get("source", "self")
+        selected_api = selected.get("oracle_api", "native invariant")
         speedup = (f"{vector['speedup_kernel']:.2f}×"
-                   if vector and "speedup_kernel" in vector else "—")
+                   if selected_source == "TA-Lib" and vector and
+                   "speedup_kernel" in vector else "—")
         append_us = (f"{continuation['taflow_native_continue']['mean_call_us']:.3f}"
                      if continuation else "—")
         scaling = (f"{threaded['taflow_vector_scaling']:.2f}×"
                    if threaded else "—")
         lines.append(
-            f"| {report['canonical_class']} | {report.get('talib_name') or '—'} | "
-            f"{verdict(check) if check else ('ERROR' if report.get('error') else '—')} | "
+            f"| {report['canonical_class']} | {selected_source}: `{selected_api}` | "
+            f"{selected.get('verdict') or (verdict(check) if check else ('ERROR' if report.get('error') else '—'))} | "
             f"{fmt_rate(vector['taflow_native_kernel']['bars_per_second']) if vector else '—'} | "
             f"{speedup} | {append_us} | {scaling} |")
     return "\n".join(lines) + "\n"

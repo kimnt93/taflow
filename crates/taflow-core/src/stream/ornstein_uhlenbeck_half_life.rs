@@ -1,6 +1,7 @@
 //! Batch implementation for `ornstein_uhlenbeck_half_life`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes the Ornstein-Uhlenbeck mean-reversion half-life.
@@ -171,5 +172,79 @@ mod tests {
             let from_fresh = fresh.append(price).unwrap_or(f64::NAN);
             assert_eq!(after_reset.to_bits(), from_fresh.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+/// OU half-life: `−ln(2)/λ` where `λ` is the slope of `Δp` on lagged `p`.
+/// `λ ≥ 0` yields `NaN`.
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `OrnsteinUhlenbeckHalfLife`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct OrnsteinUhlenbeckHalfLife {
+    moments: RollingPairMoments,
+    previous_price: Option<f64>,
+    value: Option<f64>,
+}
+
+impl OrnsteinUhlenbeckHalfLife {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self {
+            moments: RollingPairMoments::new(timeperiod)?,
+            previous_price: None,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, price: f64) -> Option<f64> {
+        if let Some(previous_price) = self.previous_price.replace(price) {
+            let delta = price - previous_price;
+            let _ = self.moments.append(delta, previous_price);
+        }
+        self.value = if let Some(cov) = self.moments.value() {
+            // `var_y` is computed inside `RollingPairMoments::append` from the
+            // same window with the same summation order as the scans this
+            // replaced, so the result is bit-identical.
+            let var_y = self.moments.var_y;
+            if var_y > 0.0 {
+                let lambda = -cov / var_y;
+                (lambda > 0.0).then_some(2.0f64.ln() / lambda)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        self.value
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.moments.reset();
+        self.previous_price = None;
+        self.value = None;
     }
 }

@@ -1,7 +1,17 @@
 //! Batch implementation for `rolling_skew`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
+use std::collections::VecDeque;
+
+rolling_moment_operator!(RollingSkew, |n: f64, m2: f64, m3: f64, _m4: f64| {
+    if m2 > 0.0 {
+        n.sqrt() * m3 / m2.powf(1.5)
+    } else {
+        0.0
+    }
+});
 
 /// Computes or updates `rolling_skew` through the native Rust kernel.
 ///

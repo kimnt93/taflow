@@ -25,12 +25,12 @@ class ExponentialMovingAverage:
 
     def __init__(
         self,
-        _input: Any | None = None,
+        _input: Any,
         timeperiod: int = 30,
         *,
         column: str | None = None,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -87,25 +87,23 @@ class ExponentialMovingAverage:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return every aligned result accumulated by this object
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
 
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest warm value without materializing history
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
 
         return self._state.value
 

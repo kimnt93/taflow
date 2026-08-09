@@ -1,4 +1,4 @@
-# SwingHighLow benchmark
+# SwingHighsLows benchmark
 
 Correctness: **MATCH**.
 
@@ -8,30 +8,27 @@ taflow class.extend over contiguous NumPy arrays; this exercises the compiled Ru
 
 | Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | TA-Lib ms | API speedup | Kernel speedup |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1,000 | 0.037 | 27.22M | 0.033 | 30.14M | nan | — | — |
-| 10,000 | 0.394 | 25.36M | 0.363 | 27.55M | nan | — | — |
-| 100,000 | 3.718 | 26.89M | 3.515 | 28.45M | nan | — | — |
-| 1,000,000 | 49.067 | 20.38M | 35.699 | 28.01M | nan | — | — |
+| 1,000 | 0.039 | 25.62M | 0.037 | 26.96M | nan | — | — |
+| 10,000 | 0.399 | 25.05M | 0.391 | 25.56M | nan | — | — |
 
 ## Warm-up
 
-Construct + canonical extend over 100,000 bars: **3.774 ms**; native kernel **3.495 ms**.
+Construct + canonical extend over 1,500 bars: **0.057 ms**; native kernel **0.058 ms**.
 
 ## Warmed continuation
 
 | Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | TA-Lib full µs | vs full | vs tail |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 100,000 | 1 | 0.319 | 0.270 | 3.70M | nan | — | — |
-| 100,000 | 10 | 1.828 | 1.077 | 9.29M | nan | — | — |
-| 100,000 | 1,000 | 41.388 | 36.173 | 27.64M | nan | — | — |
+| 1,500 | 1 | 0.413 | 0.379 | 2.64M | nan | — | — |
+| 1,500 | 10 | 2.017 | 1.124 | 8.89M | nan | — | — |
+| 1,500 | 100 | 6.025 | 5.042 | 19.83M | nan | — | — |
 
 ## Independent-stream threads
 
 | Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | TA-Lib vector/s |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 24.26M | 26.29M | 1.00× | 2.53M | 2.49M | 1.00× | — |
-| 2 | 44.95M | 50.18M | 1.91× | 2.30M | 2.46M | 0.99× | — |
-| 4 | 75.01M | 93.42M | 3.55× | 2.23M | 2.32M | 0.93× | — |
+| 1 | 7.64M | 9.86M | 1.00× | 788.54K | 689.08K | 1.00× | — |
+| 2 | 11.65M | 15.43M | 1.56× | 1.12M | 1.31M | 1.90× | — |
 
 ---
 Times include Python conversion/binding overhead. Raw samples are retained in JSON.

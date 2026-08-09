@@ -25,16 +25,16 @@ class CommodityChannelIndex:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
         timeperiod: int = 14,
         *,
-        high_column: str = "high",
-        low_column: str = "low",
-        close_column: str = "close",
+        high_column: str = 'high',
+        low_column: str = 'low',
+        close_column: str = 'close',
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -137,13 +137,12 @@ class CommodityChannelIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return every aligned CCI result accumulated by this object
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
 
         return self._state.compute()
 

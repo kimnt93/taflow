@@ -7,14 +7,16 @@ from ._series import as_float64_series
 
 
 class CumulativeSumControlChart:
-    """Stateful CumulativeSumControlChart indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """CUSUM drift-detection accumulator on a change series.
 
-    def __init__(self, change: Any | None = None, threshold: float = 1.0) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `change`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        change: Any,
+        threshold: float = 1.0,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -31,7 +33,7 @@ class CumulativeSumControlChart:
         self._state = _Native(threshold)
         self.extend(change) if change is not None else None
 
-    def append(self, change: float) -> object:
+    def append(self, change: float) -> "CumulativeSumControlChart":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +49,7 @@ class CumulativeSumControlChart:
         self._state.append(change)
         return self
 
-    def extend(self, change: Any) -> object:
+    def extend(self, change: Any) -> "CumulativeSumControlChart":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,7 +86,7 @@ class CumulativeSumControlChart:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "CumulativeSumControlChart":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

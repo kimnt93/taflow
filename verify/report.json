@@ -3830,7 +3830,7 @@
  },
  {
   "function": "donchian_channels",
-  "taflow_class": "Donchian",
+  "taflow_class": "DonchianChannels",
   "oracle": "self",
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -4061,7 +4061,7 @@
  },
  {
   "function": "swing_highs_lows",
-  "taflow_class": "SwingHighLow",
+  "taflow_class": "SwingHighsLows",
   "oracle": "self",
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {

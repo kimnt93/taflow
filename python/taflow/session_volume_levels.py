@@ -12,7 +12,7 @@ class SessionVolumeLevels:
 
     Parameters
     ----------
-    high, low, close, volume : array-like, optional
+    high, low, close, volume : array-like
         Initial aligned OHLCV history.
     anchor : array-like of bool, optional
         Session-boundary flags for the initial history.
@@ -24,15 +24,15 @@ class SessionVolumeLevels:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
-        volume: Any | None = None,
-        anchor: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
+        volume: Any,
+        anchor: Any,
         bins: int = 24,
         value_area: float = 0.7,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -62,38 +62,53 @@ class SessionVolumeLevels:
 
     def append(
         self, high: float, low: float, close: float, volume: float, anchor: bool = False
-    ) -> object:
-        """Process one OHLCV bar and return profile levels
+    ) -> "SessionVolumeLevels":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : float
+            Current high price.
+        low : float
+            Current low price.
+        close : float
+            Current close price.
+        volume : float
+            Current volume.
+        anchor : bool
+            Current anchor-reset flag.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
-        return self._state.append(
+        SessionVolumeLevels
+            This indicator, for fluent chaining; read `value` for the result."""
+        self._state.append(
             float(high), float(low), float(close), float(volume), bool(anchor)
         )
+        return self
 
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any, anchor: Any | None = None
-    ) -> object:
-        """Process aligned OHLCV history and return this indicator
+    ) -> "SessionVolumeLevels":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : Any
+            Chronological high price series.
+        low : Any
+            Chronological low price series.
+        close : Any
+            Chronological close price series.
+        volume : Any
+            Chronological volume series.
+        anchor : Any | None
+            Chronological anchor-reset flag series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        SessionVolumeLevels
+            This indicator, for fluent chaining."""
         close_array = np.asarray(close, dtype=np.float64)
         if anchor is None:
             anchor = np.zeros(close_array.shape, dtype=np.bool_)
@@ -107,33 +122,30 @@ class SessionVolumeLevels:
         return self
 
     def compute(self) -> object:
-        """Return point-of-control, value-area-high, and value-area-low histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest profile-level tuple
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Clear profile histogram and session state
+    def reset(self) -> "SessionVolumeLevels":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        SessionVolumeLevels
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self

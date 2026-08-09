@@ -20,14 +20,17 @@ class IntradayMomentumIndex:
     """
 
     def __init__(
-        self, period: int = 14, _open: Any | None = None, close: Any | None = None
+        self,
+        _open: Any,
+        close: Any,
+        period: int = 14,
     ) -> None:
         """Create IMI with an optional aligned _open/close history."""
         self._state = StatefulImi(period)
         if _open is not None or close is not None:
             self.extend(_open, close)
 
-    def append(self, _open: object, close: object) -> object:
+    def append(self, _open: object, close: object) -> "IntradayMomentumIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -45,7 +48,7 @@ class IntradayMomentumIndex:
         self._state.append(_open, close)
         return self
 
-    def extend(self, _open: object, close: object) -> object:
+    def extend(self, _open: object, close: object) -> "IntradayMomentumIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -64,13 +67,12 @@ class IntradayMomentumIndex:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned native output history
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
@@ -84,7 +86,7 @@ class IntradayMomentumIndex:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "IntradayMomentumIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

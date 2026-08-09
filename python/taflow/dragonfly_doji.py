@@ -7,20 +7,18 @@ from ._series import as_float64_series
 
 
 class CandleDragonflyDoji:
-    """Stateful CandleDragonflyDoji indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Dragonfly CandleDoji candlestick recognition (CDLDRAGONFLYDOJI).
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        _open: Any | None = None,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        _open: Any,
+        high: Any,
+        low: Any,
+        close: Any,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -45,7 +43,7 @@ class CandleDragonflyDoji:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> object:
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleDragonflyDoji":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -67,7 +65,7 @@ class CandleDragonflyDoji:
         self._state.append(_open, high, low, close)
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> object:
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleDragonflyDoji":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -115,7 +113,7 @@ class CandleDragonflyDoji:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "CandleDragonflyDoji":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

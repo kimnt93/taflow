@@ -1,6 +1,7 @@
 //! Batch implementation for `ulcer_index`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Compute the causal ulcer index for an aligned price series.
@@ -113,5 +114,72 @@ mod tests {
             let got = state.append(input[i]).unwrap_or(f64::NAN);
             assert_eq!(value.to_bits(), got.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `UlcerIndex`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct UlcerIndex {
+    values: ContiguousWindow,
+    period: usize,
+    value: Option<f64>,
+}
+
+impl UlcerIndex {
+    /// Create a new empty state.
+    ///
+    pub fn new(period: usize) -> TaResult<Self> {
+        validate_period(period)?;
+        Ok(Self {
+            values: ContiguousWindow::new(period),
+            period,
+            value: None,
+        })
+    }
+    /// Append one causal observation and return the latest result.
+    ///
+    /// The drawdown peak is a *prefix* maximum inside the window, so every
+    /// squared-drawdown term is re-derived when the window slides: neither a
+    /// rolling-window max structure nor a sliding sum can reproduce this
+    /// series. The scan therefore stays O(period), but over one contiguous
+    /// ring slice instead of a deque, preserving the summation order exactly.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        self.values.push(input);
+        self.value = self.values.is_full().then(|| {
+            let mut peak = f64::NEG_INFINITY;
+            let sum = self
+                .values
+                .window()
+                .iter()
+                .map(|&v| {
+                    peak = peak.max(v);
+                    let drawdown = if peak != 0.0 {
+                        100.0 * (v - peak) / peak
+                    } else {
+                        0.0
+                    };
+                    drawdown * drawdown
+                })
+                .sum::<f64>();
+            (sum / self.period as f64).sqrt()
+        });
+        self.value
+    }
+    /// Return the latest computed result, if warm-up is complete.
+    ///
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+    /// Reset the state and clear its accumulated history.
+    ///
+    pub fn reset(&mut self) {
+        self.values.clear();
+        self.value = None;
     }
 }

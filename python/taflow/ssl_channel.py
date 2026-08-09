@@ -12,7 +12,7 @@ class SmoothedTrendChannel:
 
     Parameters
     ----------
-    high, low, close : array-like, optional
+    high, low, close : array-like
         Initial aligned OHLC history.
     length : int, default 10
         Rolling average period.
@@ -20,12 +20,12 @@ class SmoothedTrendChannel:
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
         length: int = 10,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -47,34 +47,41 @@ class SmoothedTrendChannel:
         if high is not None or low is not None or close is not None:
             self.extend(high, low, close)
 
-    def append(self, high: float, low: float, close: float) -> object:
-        """Process one OHLC bar and return lower/upper channel values
+    def append(self, high: float, low: float, close: float) -> "SmoothedTrendChannel":
+        """Append one chronological observation to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : float
+            Current high price.
+        low : float
+            Current low price.
+        close : float
+            Current close price.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
-        return self._state.append(float(high), float(low), float(close))
+        SmoothedTrendChannel
+            This indicator, for fluent chaining; read `value` for the result."""
+        self._state.append(float(high), float(low), float(close))
+        return self
 
-    def extend(self, high: Any, low: Any, close: Any) -> object:
-        """Process aligned OHLC history and return this indicator
+    def extend(self, high: Any, low: Any, close: Any) -> "SmoothedTrendChannel":
+        """Append aligned chronological histories to the native Rust state.
 
         Parameters
         ----------
-        values : object
-            Input values or the aligned result container.
+        high : Any
+            Chronological high price series.
+        low : Any
+            Chronological low price series.
+        close : Any
+            Chronological close price series.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        SmoothedTrendChannel
+            This indicator, for fluent chaining."""
         self._state.extend(
             np.asarray(high, dtype=np.float64),
             np.asarray(low, dtype=np.float64),
@@ -83,33 +90,30 @@ class SmoothedTrendChannel:
         return self
 
     def compute(self) -> object:
-        """Return lower and upper channel histories
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property
     def value(self) -> object:
-        """Return the latest channel pair, or ``None`` if not warm
+        """Return the latest Rust result.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        float, tuple, or None
+            Latest output, or None while scalar warm-up is incomplete."""
         return self._state.value
 
-    def reset(self) -> object:
-        """Clear state and accumulated channel history
+    def reset(self) -> "SmoothedTrendChannel":
+        """Restore fresh-state behavior and clear output history.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        SmoothedTrendChannel
+            This indicator, for fluent chaining."""
         self._state.reset()
         return self

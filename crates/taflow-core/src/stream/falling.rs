@@ -1,7 +1,11 @@
 //! Batch implementation for `falling`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
+use std::collections::VecDeque;
+
+direction_operator!(Falling, |current: f64, previous: f64| current < previous);
 
 /// Compute the causal falling predicate over an aligned input series.
 ///

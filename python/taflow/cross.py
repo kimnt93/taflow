@@ -5,14 +5,16 @@ from ._series import as_float64_series
 
 
 class Cross:
-    """Stateful Cross indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Cross
 
-    def __init__(self, left: Any | None = None, right: Any | None = None) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `left`, `right`. Warm-up positions are represented by `NaN` in history."""
+
+    def __init__(
+        self,
+        left: Any,
+        right: Any,
+    ) -> None:
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -29,7 +31,7 @@ class Cross:
         self._state = _Native()
         self.extend(left, right) if left is not None or right is not None else None
 
-    def append(self, left: float, right: float) -> object:
+    def append(self, left: float, right: float) -> "Cross":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -47,7 +49,7 @@ class Cross:
         self._state.append(left, right)
         return self
 
-    def extend(self, left: Any, right: Any) -> object:
+    def extend(self, left: Any, right: Any) -> "Cross":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -86,7 +88,7 @@ class Cross:
         """
         return self._state.value
 
-    def reset(self) -> object:
+    def reset(self) -> "Cross":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -1,6 +1,7 @@
 //! Batch implementation for `roll_spread`.
 
 use super::operator_states::*;
+use super::*;
 use crate::error::{TaError, TaResult};
 
 /// Computes or updates `roll_spread` through the native Rust kernel.
@@ -143,5 +144,76 @@ mod tests {
             let from_fresh = fresh.append(price).unwrap_or(f64::NAN);
             assert_eq!(after_reset.to_bits(), from_fresh.to_bits());
         }
+    }
+}
+use super::operator_states::*;
+use super::*;
+use std::collections::{HashMap, HashSet, VecDeque};
+
+/// Roll spread estimate: `2√max(0, −cov(Δp_t, Δp_{t−1}))`.
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `RollSpread`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct RollSpread {
+    previous_price: Option<f64>,
+    delta_previous: Option<f64>,
+    moments: RollingPairMoments,
+    value: Option<f64>,
+}
+
+impl RollSpread {
+    /// Computes or updates `new` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
+        Ok(Self {
+            previous_price: None,
+            delta_previous: None,
+            moments: RollingPairMoments::new(timeperiod)?,
+            value: None,
+        })
+    }
+
+    /// Computes or updates `append` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn append(&mut self, price: f64) -> Option<f64> {
+        let delta = if let Some(previous_price) = self.previous_price.replace(price) {
+            price - previous_price
+        } else {
+            0.0
+        };
+        if let Some(delta_previous) = self.delta_previous {
+            let _ = self.moments.append(delta, delta_previous);
+        }
+        self.delta_previous = Some(delta);
+        self.value = self
+            .moments
+            .value()
+            .map(|cov| 2.0 * (0.0f64 - cov).max(0.0).sqrt());
+        self.value
+    }
+
+    /// Computes or updates `value` through the native Rust kernel.
+    ///
+    /// Parameters are the typed series and configuration values in the signature.
+    ///
+    /// Returns the computed value, aligned history, or a validation error.
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
+    /// Reset the persistent state and clear the latest value.
+    pub fn reset(&mut self) {
+        self.previous_price = None;
+        self.delta_previous = None;
+        self.moments.reset();
+        self.value = None;
     }
 }

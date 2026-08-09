@@ -7,22 +7,20 @@ from ._series import as_float64_series
 
 
 class UltimateOscillator:
-    """Stateful UltimateOscillator indicator.
-    Parameters are documented by the constructor signature; scalar
-    ``append`` returns the current value and ``compute`` returns
-    the aligned history with NaN warm-up where applicable.
-    """
+    """Persistent Ultimate Oscillator.
+
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        high: Any | None = None,
-        low: Any | None = None,
-        close: Any | None = None,
+        high: Any,
+        low: Any,
+        close: Any,
         timeperiod1: int = 7,
         timeperiod2: int = 14,
         timeperiod3: int = 28,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------

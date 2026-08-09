@@ -21,6 +21,8 @@ class ParabolicSarExtended:
 
     def __init__(
         self,
+        high: Any,
+        low: Any,
         start_value: object = 0.0,
         offset_on_reverse: object = 0.0,
         acceleration_init_long: object = 0.02,
@@ -29,10 +31,8 @@ class ParabolicSarExtended:
         acceleration_init_short: object = 0.02,
         acceleration_short: object = 0.02,
         acceleration_max_short: object = 0.2,
-        high: Any | None = None,
-        low: Any | None = None,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
@@ -112,13 +112,12 @@ class ParabolicSarExtended:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return aligned extended Parabolic SAR values
+        """Return the complete aligned history produced by Rust.
 
         Returns
         -------
-        object
-            Updated state, converted values, or aligned output.
-        """
+        numpy.ndarray or tuple of numpy.ndarray
+            One output per processed bar, including NaN warm-up positions."""
         return self._state.compute()
 
     @property

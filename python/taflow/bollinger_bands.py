@@ -21,13 +21,13 @@ class BollingerBands:
 
     def __init__(
         self,
+        values: Any,
         period: object = 5,
         deviations_up: object = 2.0,
         deviations_down: object = 2.0,
         moving_average_type: object = 0,
-        values: Any | None = None,
     ) -> None:
-        """Initialize this adapter and optionally process the supplied input series.
+        """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
