@@ -1,136 +1,29 @@
-"""Native opening-range breakout interface."""
-
+"""Canonical native-backed OpeningRange adapter."""
 from typing import Any
-
 import numpy as np
-
-from ._native import StatefulOpeningRange
+from ._native import OpeningRange as _NativeOpeningRange
+from ._series import as_float64_series, as_bool_series
 
 
 class OpeningRange:
-    """Track session opening high/low levels and breakout direction.
+    """Compute anchored opening high/low and breakout direction."""
+    def __init__(self, high: Any, low: Any, close: Any, anchor: Any, bars: int = 30) -> None:
+        self._state = _NativeOpeningRange(bars)
+        self.extend(high, low, close, anchor)
 
-    Parameters
-    ----------
-    high, low, close : array-like
-        Initial aligned OHLC history.
-    anchor : array-like of bool, optional
-        Session-boundary flags for the initial history.
-    bars : int, default 30
-        Number of bars used to form each opening range.
-    """
+    def append(self, high: float, low: float, close: float, anchor: bool) -> "OpeningRange":
+        self._state.append(float(high), float(low), float(close), bool(anchor)); return self
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        close: Any,
-        anchor: Any,
-        bars: int = 30,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
+    def extend(self, high: Any, low: Any, close: Any, anchor: Any) -> "OpeningRange":
+        arrays = (as_float64_series(high), as_float64_series(low), as_float64_series(close), as_bool_series(anchor))
+        if len({len(array) for array in arrays}) != 1: raise ValueError("inputs must have equal lengths")
+        self._state.extend(*arrays); return self
 
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-        anchor : object
-            Boolean series marking reset or anchor bars.
-        bars : object
-            Number of bars in the opening range.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = StatefulOpeningRange(bars)
-        if high is not None or low is not None or close is not None:
-            self.extend(high, low, close, anchor)
-
-    def append(
-        self, high: float, low: float, close: float, anchor: bool = False
-    ) -> "OpeningRange":
-        """Append one chronological observation to the native Rust state.
-
-        Parameters
-        ----------
-        high : float
-            Current high price.
-        low : float
-            Current low price.
-        close : float
-            Current close price.
-        anchor : bool
-            Current anchor-reset flag.
-
-        Returns
-        -------
-        OpeningRange
-            This indicator, for fluent chaining; read `value` for the result."""
-        self._state.append(float(high), float(low), float(close), bool(anchor))
-        return self
-
-    def extend(
-        self, high: Any, low: Any, close: Any, anchor: Any | None = None
-    ) -> "OpeningRange":
-        """Append aligned chronological histories to the native Rust state.
-
-        Parameters
-        ----------
-        high : Any
-            Chronological high price series.
-        low : Any
-            Chronological low price series.
-        close : Any
-            Chronological close price series.
-        anchor : Any | None
-            Chronological anchor-reset flag series.
-
-        Returns
-        -------
-        OpeningRange
-            This indicator, for fluent chaining."""
-        close_array = np.asarray(close, dtype=np.float64)
-        if anchor is None:
-            anchor = np.zeros(close_array.shape, dtype=np.bool_)
-        self._state.extend(
-            np.asarray(high, dtype=np.float64),
-            np.asarray(low, dtype=np.float64),
-            close_array,
-            np.asarray(anchor, dtype=np.bool_),
-        )
-        return self
-
-    def compute(self) -> object:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
-        return self._state.compute()
-
+    def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]: return self._state.compute()
     @property
-    def value(self) -> object:
-        """Return the latest Rust result.
+    def value(self) -> tuple[float, float, int] | None: return self._state.value
+    def reset(self) -> "OpeningRange": self._state.reset(); return self
+    def __len__(self) -> int: return len(self._state)
 
-        Returns
-        -------
-        float, tuple, or None
-            Latest output, or None while scalar warm-up is incomplete."""
-        return self._state.value
 
-    def reset(self) -> "OpeningRange":
-        """Restore fresh-state behavior and clear output history.
-
-        Returns
-        -------
-        OpeningRange
-            This indicator, for fluent chaining."""
-        self._state.reset()
-        return self
+__all__ = ["OpeningRange"]

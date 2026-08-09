@@ -1,17 +1,21 @@
 //! Stateful opening range and breakout flags.
 
 /// Opening range high/low and current breakout direction.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct OpeningRangeValue {
+    pub high: f64,
+    pub low: f64,
+    pub breakout: i32,
+}
+
+/// Persistent opening-range state.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `OpeningRange`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct OpeningRange {
     bars: usize,
     count: usize,
     high: f64,
     low: f64,
-    value: Option<(f64, f64, i32)>,
+    value: Option<OpeningRangeValue>,
 }
 
 impl OpeningRange {
@@ -27,7 +31,7 @@ impl OpeningRange {
     }
 
     /// Appends a bar, optionally beginning a new session.
-    pub fn append(&mut self, high: f64, low: f64, close: f64, anchor: bool) -> (f64, f64, i32) {
+    pub fn append(&mut self, high: f64, low: f64, close: f64, anchor: bool) -> OpeningRangeValue {
         if anchor {
             self.count = 0;
             self.high = f64::NEG_INFINITY;
@@ -45,12 +49,42 @@ impl OpeningRange {
         } else {
             0
         };
-        self.value = Some((self.high, self.low, breakout));
-        (self.high, self.low, breakout)
+        let value = OpeningRangeValue {
+            high: self.high,
+            low: self.low,
+            breakout,
+        };
+        self.value = Some(value);
+        value
+    }
+
+    pub fn extend_slice_into(
+        &mut self,
+        high: &[f64],
+        low: &[f64],
+        close: &[f64],
+        anchor: &[bool],
+        output_high: &mut Vec<f64>,
+        output_low: &mut Vec<f64>,
+        breakout: &mut Vec<i32>,
+    ) -> Result<(), crate::error::TaError> {
+        if high.len() != low.len() || high.len() != close.len() || high.len() != anchor.len() {
+            return Err(crate::error::TaError::LengthMismatch {
+                expected: high.len(),
+                got: low.len().max(close.len()).max(anchor.len()),
+            });
+        }
+        for (((&high, &low), &close), &anchor) in high.iter().zip(low).zip(close).zip(anchor) {
+            let value = self.append(high, low, close, anchor);
+            output_high.push(value.high);
+            output_low.push(value.low);
+            breakout.push(value.breakout);
+        }
+        Ok(())
     }
 
     /// Returns the latest opening range values.
-    pub fn value(&self) -> Option<(f64, f64, i32)> {
+    pub fn value(&self) -> Option<OpeningRangeValue> {
         self.value
     }
     /// Clears the current session and output.

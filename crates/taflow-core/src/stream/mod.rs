@@ -326,13 +326,19 @@ mod momentum;
 #[cfg(test)]
 mod momentum_test;
 mod opening_range;
+#[cfg(test)]
+mod opening_range_test;
 mod operator_states;
 pub use operator_states::ActiveZoneList;
 mod parabolic_moving_average_stop;
 #[cfg(test)]
 mod parabolic_moving_average_stop_test;
 mod pivot_points;
+#[cfg(test)]
+mod pivot_points_test;
 mod premium_discount;
+#[cfg(test)]
+mod premium_discount_test;
 mod rate_of_change;
 mod rate_of_change_percent;
 #[cfg(test)]
@@ -351,6 +357,8 @@ mod relative_momentum_index_test;
 mod sar;
 mod sarext;
 mod session_volume_levels;
+#[cfg(test)]
+mod session_volume_levels_test;
 mod sma;
 mod ssl_channel;
 mod stoch;
@@ -501,11 +509,11 @@ pub use moving_average_convergence_divergence::{
 };
 pub use moving_average_convergence_divergence_extended::MovingAverageConvergenceDivergenceExtended;
 pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDivergenceFixed;
-pub use opening_range::OpeningRange;
+pub use opening_range::{OpeningRange, OpeningRangeValue};
 pub use parabolic_moving_average_stop::{
     ParabolicMovingAverageStop, ParabolicMovingAverageStopValue,
 };
-pub use pivot_points::PivotPoints;
+pub use pivot_points::{PivotPoints, PivotPointsValue};
 #[allow(unused_imports)]
 pub(crate) use plus_di::plus_directional_indicator;
 pub use plus_di::PlusDirectionalIndicator;
@@ -515,7 +523,7 @@ pub use plus_dm::PlusDirectionalMovement;
 #[allow(unused_imports)]
 pub(crate) use ppo::percentage_price_oscillator;
 pub use ppo::PercentagePriceOscillator;
-pub use premium_discount::PremiumDiscount;
+pub use premium_discount::{PremiumDiscount, PremiumDiscountValue};
 pub use rate_of_change::RateOfChange;
 pub use rate_of_change_percent::RateOfChangePercent;
 pub use rate_of_change_ratio::RateOfChangeRatio;
@@ -538,7 +546,7 @@ pub use sar::ParabolicSar;
 #[allow(unused_imports)]
 pub(crate) use sarext::parabolic_sar_extended;
 pub use sarext::ParabolicSarExtended;
-pub use session_volume_levels::SessionVolumeLevels;
+pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 #[allow(unused_imports)]
 pub(crate) use sma::simple_moving_average;
 pub use sma::SimpleMovingAverage;
