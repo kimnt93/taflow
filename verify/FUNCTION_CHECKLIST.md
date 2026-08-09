@@ -215,6 +215,13 @@ Their canonical tests remain beside `SmoothedTrendChannel` and `SwingHighLow`
 under `crates/taflow-core/src/indicators/`. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The forty-fifth verification refresh recorded the current canonical surface:
+293 stateful classes pass the style audit with zero issues, source comparison
+reports 393 outputs with zero failures, and the TA-Lib verification reports
+287/287 matches. Generated source/style reports were refreshed to remove
+historical duplicate names. Benchmark fields remain `TODO`; no benchmark
+command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,
