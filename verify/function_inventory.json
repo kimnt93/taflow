@@ -10,7 +10,7 @@
     "python_exports": 300,
     "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 266,
+    "structure": 267,
     "talib_functions": 161
   },
   "rows": [
@@ -4315,7 +4315,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "dpo",
+      "module": "detrended_price_oscillator",
       "name": "DetrendedPriceOscillator",
       "native_binding": true,
       "native_symbols": [

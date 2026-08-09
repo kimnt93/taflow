@@ -793,7 +793,11 @@ mod tests {
         let input: Vec<f64> = (0..100)
             .map(|i| i as f64 + (i as f64 * 0.2).sin())
             .collect();
-        let batch = detrended_price_oscillator(&input, 20).unwrap();
+        let mut batch_state = DetrendedPriceOscillator::new(20).unwrap();
+        let batch: Vec<f64> = input
+            .iter()
+            .map(|&value| batch_state.append(value).unwrap_or(f64::NAN))
+            .collect();
         let mut state = DetrendedPriceOscillator::new(20).unwrap();
         let replayed: Vec<f64> = input
             .iter()

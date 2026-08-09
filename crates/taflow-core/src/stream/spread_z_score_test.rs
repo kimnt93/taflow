@@ -1,4 +1,4 @@
-use super::spread_zscore::SpreadZScore;
+use super::spread_z_score::SpreadZScore;
 
 #[test]
 fn reset_replays_identically() {

@@ -302,7 +302,7 @@ from .schaff_trend_cycle import SchaffTrendCycle
 from .vortex import Vortex
 from .kst import KnowSureThing
 from .mass_index import MassIndex
-from .dpo import DetrendedPriceOscillator
+from .detrended_price_oscillator import DetrendedPriceOscillator
 from .cmf import ChaikinMoneyFlow
 from .vpt import VolumePriceTrend
 from .nvi import NegativeVolumeIndex

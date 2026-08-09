@@ -1411,10 +1411,10 @@ mod rolling_winsorize;
 mod rolling_winsorize_test;
 #[allow(unused_imports)]
 pub(crate) use mass_index::mass_index;
-mod detrended_price_oscillator;
-#[allow(unused_imports)]
-pub(crate) use detrended_price_oscillator::detrended_price_oscillator;
 mod chaikin_money_flow;
+mod detrended_price_oscillator;
+#[cfg(test)]
+mod detrended_price_oscillator_test;
 #[allow(unused_imports)]
 pub(crate) use chaikin_money_flow::chaikin_money_flow;
 mod volume_price_trend;
