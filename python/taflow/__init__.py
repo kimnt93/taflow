@@ -226,9 +226,9 @@ from .drawdown import Drawdown
 from .rolling_sharpe import RollingSharpe
 from .rolling_sortino import RollingSortino
 from .rolling_calmar import RollingCalmar
-from .hma import HullMovingAverage
-from .vwma import VolumeWeightedMovingAverage
-from .zlema import ZeroLagExponentialMovingAverage
+from .hull_moving_average import HullMovingAverage
+from .volume_weighted_moving_average import VolumeWeightedMovingAverage
+from .zero_lag_exponential_moving_average import ZeroLagExponentialMovingAverage
 from .alma import ArnaudLegouxMovingAverage
 from .tsi import TrueStrengthIndex
 from .awesome_oscillator import AwesomeOscillator

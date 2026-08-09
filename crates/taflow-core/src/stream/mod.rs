@@ -1185,17 +1185,17 @@ mod williams_percent_r_test;
 pub use rolling_sharpe::RollingSharpe;
 mod rolling_sortino;
 pub use rolling_sortino::RollingSortino;
-mod hull_moving_average;
-mod rolling_calmar;
-#[allow(unused_imports)]
-pub(crate) use hull_moving_average::hull_moving_average;
-mod volume_weighted_moving_average;
-#[allow(unused_imports)]
-pub(crate) use volume_weighted_moving_average::volume_weighted_moving_average;
-mod zero_lag_exponential_moving_average;
-#[allow(unused_imports)]
-pub(crate) use zero_lag_exponential_moving_average::zero_lag_exponential_moving_average;
 mod arnaud_legoux_moving_average;
+mod hull_moving_average;
+#[cfg(test)]
+mod hull_moving_average_test;
+mod rolling_calmar;
+mod volume_weighted_moving_average;
+#[cfg(test)]
+mod volume_weighted_moving_average_test;
+mod zero_lag_exponential_moving_average;
+#[cfg(test)]
+mod zero_lag_exponential_moving_average_test;
 #[allow(unused_imports)]
 pub(crate) use arnaud_legoux_moving_average::arnaud_legoux_moving_average;
 mod true_strength_index;

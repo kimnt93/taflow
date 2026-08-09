@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 622,
     "smc_functions": 8,
-    "structure": 230,
+    "structure": 233,
     "talib_functions": 161
   },
   "rows": [
@@ -3193,7 +3193,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "hma",
+      "module": "hull_moving_average",
       "name": "HullMovingAverage",
       "native_binding": true,
       "native_symbols": [
@@ -3208,7 +3208,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "vwma",
+      "module": "volume_weighted_moving_average",
       "name": "VolumeWeightedMovingAverage",
       "native_binding": true,
       "native_symbols": [
@@ -3223,7 +3223,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "zlema",
+      "module": "zero_lag_exponential_moving_average",
       "name": "ZeroLagExponentialMovingAverage",
       "native_binding": true,
       "native_symbols": [
