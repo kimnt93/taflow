@@ -1044,10 +1044,6 @@
     "status": "PASS"
   },
   {
-    "name": "RollingVolumeWeightedAveragePrice",
-    "status": "PASS"
-  },
-  {
     "name": "SwingHighsLows",
     "status": "PASS"
   },

@@ -2,15 +2,15 @@
   "counts": {
     "benchmark": 190,
     "complete": 189,
-    "correctness": 272,
-    "indicators": 299,
+    "correctness": 271,
+    "indicators": 298,
     "native_functions": 0,
     "native_state_classes": 293,
     "pandas_ta_symbols": 427,
-    "python_exports": 301,
-    "rust_exports": 624,
+    "python_exports": 300,
+    "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 249,
+    "structure": 257,
     "talib_functions": 161
   },
   "rows": [
@@ -3433,7 +3433,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "vwap",
+      "module": "rolling_volume_weighted_average_price",
       "name": "RollingVolumeWeightedAveragePrice",
       "native_binding": true,
       "native_symbols": [
@@ -3660,7 +3660,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "swing",
+      "module": "swing_high_low",
       "name": "SwingHighLow",
       "native_binding": true,
       "native_symbols": [
@@ -3682,7 +3682,7 @@
         "SwingHighLowOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3696,7 +3696,7 @@
         "SwingHighLowOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -3718,14 +3718,12 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "session",
+      "module": "session_extrema",
       "name": "SessionExtrema",
       "native_binding": true,
       "native_symbols": [
         "SessionExtremaOperator",
-        "_Native",
-        "session_flags_array",
-        "_native_session_flags"
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -3780,7 +3778,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "fvg",
+      "module": "fair_value_gap",
       "name": "FairValueGap",
       "native_binding": true,
       "native_symbols": [
@@ -3802,21 +3800,6 @@
         "DonchianOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
-      "smc_reference": false,
-      "talib_alias": ""
-    },
-    {
-      "exported": true,
-      "kind": "class",
-      "module": "vwap",
-      "name": "RollingVolumeWeightedAveragePrice",
-      "native_binding": true,
-      "native_symbols": [
-        "VwapOperator",
-        "_Native"
-      ],
-      "pandas_ta_reference": false,
       "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
@@ -3831,7 +3814,7 @@
         "SwingHighLowOperator"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4760,8 +4743,7 @@
         "WeightedMovingAverage",
         "WilliamsPercentR",
         "YangZhangOperator",
-        "ZlemaOperator",
-        "session_flags_array"
+        "ZlemaOperator"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,
@@ -5066,8 +5048,7 @@
         "WeightedMovingAverage",
         "WilliamsPercentR",
         "YangZhangOperator",
-        "ZlemaOperator",
-        "session_flags_array"
+        "ZlemaOperator"
       ],
       "pandas_ta_reference": false,
       "rust_export": false,

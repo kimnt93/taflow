@@ -1211,12 +1211,6 @@ pub use fisher_transform::FisherTransform;
 mod chaikin_volatility;
 #[cfg(test)]
 mod chaikin_volatility_test;
-mod rolling_volume_weighted_average_price;
-mod ulcer_index;
-#[cfg(test)]
-mod ulcer_index_test;
-#[allow(unused_imports)]
-pub(crate) use rolling_volume_weighted_average_price::rolling_volume_weighted_average_price;
 mod ease_of_movement;
 #[cfg(test)]
 mod ease_of_movement_test;
@@ -1245,18 +1239,24 @@ mod rolling_entropy;
 #[cfg(test)]
 mod rolling_entropy_test;
 mod rolling_information_ratio;
+mod rolling_volume_weighted_average_price;
+#[cfg(test)]
+mod rolling_volume_weighted_average_price_test;
+mod ulcer_index;
+#[cfg(test)]
+mod ulcer_index_test;
 #[allow(unused_imports)]
 pub(crate) use rolling_information_ratio::rolling_information_ratio;
+mod break_of_structure_change_of_character;
+mod fair_value_gap;
+#[cfg(test)]
+mod fair_value_gap_test;
 mod hedge_ratio;
 #[cfg(test)]
 mod hedge_ratio_test;
 mod session_extrema;
-#[allow(unused_imports)]
-pub(crate) use session_extrema::session_extrema;
-mod fair_value_gap;
-#[allow(unused_imports)]
-pub(crate) use fair_value_gap::fair_value_gap;
-mod break_of_structure_change_of_character;
+#[cfg(test)]
+mod session_extrema_test;
 #[allow(unused_imports)]
 pub(crate) use break_of_structure_change_of_character::break_of_structure_change_of_character;
 mod order_block;
@@ -1265,19 +1265,19 @@ pub(crate) use order_block::order_block;
 mod liquidity;
 #[allow(unused_imports)]
 pub(crate) use liquidity::liquidity;
-mod equal_highs_lows;
-#[allow(unused_imports)]
-pub(crate) use equal_highs_lows::equal_highs_lows;
-mod previous_high_low;
-#[allow(unused_imports)]
-pub(crate) use previous_high_low::previous_high_low;
-mod sessions;
-#[allow(unused_imports)]
-pub(crate) use sessions::sessions;
-mod retracements;
-#[allow(unused_imports)]
-pub(crate) use retracements::retracements;
 mod close_to_close_sigma;
+mod equal_highs_lows;
+#[cfg(test)]
+mod equal_highs_lows_test;
+mod previous_high_low;
+#[cfg(test)]
+mod previous_high_low_test;
+mod retracements;
+#[cfg(test)]
+mod retracements_test;
+mod sessions;
+#[cfg(test)]
+mod sessions_test;
 #[allow(unused_imports)]
 pub(crate) use close_to_close_sigma::close_to_close_sigma;
 mod parkinson;
@@ -1352,9 +1352,23 @@ pub(crate) use vortex::vortex;
 mod know_sure_thing;
 #[allow(unused_imports)]
 pub(crate) use know_sure_thing::know_sure_thing;
+mod swing_high_low;
 mod swing_highs_lows;
-#[allow(unused_imports)]
-pub(crate) use swing_highs_lows::swing_highs_lows;
+pub use swing_high_low::{SwingHighLow, SwingValue};
+mod swing_highs_lows_indicator;
+#[cfg(test)]
+mod swing_highs_lows_indicator_test;
+#[cfg(test)]
+mod swing_highs_lows_test;
+pub use swing_highs_lows_indicator::SwingHighsLows;
+mod swing_high;
+#[cfg(test)]
+mod swing_high_test;
+pub use swing_high::SwingHigh;
+mod swing_low;
+#[cfg(test)]
+mod swing_low_test;
+pub use swing_low::SwingLow;
 mod rolling_percentile;
 #[cfg(test)]
 mod rolling_percentile_test;
@@ -1496,7 +1510,6 @@ pub use spread_zscore::SpreadZScore;
 pub use squeeze::{Squeeze, SqueezeValue};
 pub use squeeze_pro::{SqueezePro, SqueezeProValue};
 pub use supertrend::{Supertrend, SupertrendValue};
-pub use swing_highs_lows::{SwingHighLow, SwingValue};
 pub use true_strength_index::TrueStrengthIndex;
 pub use value_when::ValueWhen;
 pub use volume_weighted_moving_average::VolumeWeightedMovingAverage;
@@ -1505,6 +1518,10 @@ pub use yang_zhang::YangZhang;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 mod donchian;
 pub use donchian::{Donchian, DonchianValue};
+mod donchian_channels;
+#[cfg(test)]
+mod donchian_channels_test;
+pub use donchian_channels::DonchianChannels;
 pub use ulcer_index::UlcerIndex;
 mod keltner_channels;
 pub use chaikin_volatility::ChaikinVolatility;

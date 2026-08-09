@@ -37,11 +37,8 @@ class Retracements:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(swing_length)
-        (
-            self.extend(high, low, close)
-            if any(value is not None for value in (high, low, close))
-            else None
-        )
+        self._length = 0
+        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Retracements":
         """Append one observation or aligned bar to the native Rust state.
@@ -60,7 +57,8 @@ class Retracements:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(high, low, close)
+        self._state.append(float(high), float(low), float(close))
+        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "Retracements":
@@ -80,9 +78,13 @@ class Retracements:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(
-            as_float64_series(high), as_float64_series(low), as_float64_series(close)
-        )
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        close_array = as_float64_series(close)
+        if not (high_array.shape == low_array.shape == close_array.shape):
+            raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(high_array, low_array, close_array)
+        self._length += len(high_array)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -96,7 +98,7 @@ class Retracements:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> tuple[float, float, float] | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -115,4 +117,9 @@ class Retracements:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return self._length

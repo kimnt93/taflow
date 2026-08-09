@@ -1,49 +1,13 @@
-//! Batch implementation for `fair_value_gap`.
+use std::collections::VecDeque;
 
-use super::operator_states::*;
-use super::*;
-use crate::error::{TaError, TaResult};
-
-/// Computes the causal fair value gap series.
-/// Parameters: aligned input slices followed by indicator parameters.
-/// Returns: an aligned series, with NaN during warm-up, or a parameter error.
-pub fn fair_value_gap(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-) -> TaResult<(Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> {
-    if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
-        return Err(TaError::LengthMismatch {
-            expected: open.len(),
-            got: high.len().max(low.len()).max(close.len()),
-        });
-    }
-    let mut state = FairValueGap::new();
-    let mut signal = Vec::with_capacity(open.len());
-    let mut top = Vec::with_capacity(open.len());
-    let mut bottom = Vec::with_capacity(open.len());
-    let mut mitigated = Vec::with_capacity(open.len());
-    for (((&open, &high), &low), &close) in open.iter().zip(high).zip(low).zip(close) {
-        let value = state
-            .append(open, high, low, close)
-            .expect("FVG always emits an aligned value");
-        signal.push(value.signal);
-        top.push(value.top);
-        bottom.push(value.bottom);
-        mitigated.push(value.mitigated);
-    }
-    Ok((signal, top, bottom, mitigated))
+#[derive(Debug, Clone, Copy)]
+struct FvgZone {
+    direction: f64,
+    top: f64,
+    bottom: f64,
 }
-use super::operator_states::*;
-use super::*;
-use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-/// Persistent Rust state or aligned output type for `FairValueGapValue`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct FairValueGapValue {
     pub signal: f64,
     pub top: f64,
@@ -51,12 +15,8 @@ pub struct FairValueGapValue {
     pub mitigated: f64,
 }
 
-/// Causal fair-value-gap detection with directional mitigation events.
 #[derive(Debug, Clone, Default)]
-/// Persistent Rust state or aligned output type for `FairValueGap`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
+/// Causal fair-value-gap detection with directional mitigation events.
 pub struct FairValueGap {
     bars: VecDeque<(f64, f64, f64, f64)>,
     zones: Vec<FvgZone>,
@@ -64,17 +24,10 @@ pub struct FairValueGap {
 }
 
 impl FairValueGap {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Append one causal observation and return the latest result.
-    ///
     pub fn append(
         &mut self,
         open: f64,
@@ -82,9 +35,6 @@ impl FairValueGap {
         low: f64,
         close: f64,
     ) -> Option<FairValueGapValue> {
-        // smartmoneyconcepts starts looking for mitigation one bar after the
-        // causal detection bar.  Scan existing zones before adding a newly
-        // detected one so a gap cannot mitigate itself on its birth bar.
         let mut mitigated = f64::NAN;
         self.zones.retain(|zone| {
             let filled = (zone.direction > 0.0 && low <= zone.top)
@@ -136,16 +86,10 @@ impl FairValueGap {
         Some(value)
     }
 
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
     pub fn value(&self) -> Option<FairValueGapValue> {
         self.value
     }
 
-    /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.bars.clear();
         self.zones.clear();

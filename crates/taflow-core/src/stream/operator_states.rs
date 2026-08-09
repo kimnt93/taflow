@@ -50,13 +50,6 @@ pub struct ActiveZoneList {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct FvgZone {
-    pub(crate) direction: f64,
-    pub(crate) top: f64,
-    pub(crate) bottom: f64,
-}
-
-#[derive(Debug, Clone, Copy)]
 pub(crate) struct ObZone {
     pub(crate) direction: f64,
     pub(crate) top: f64,

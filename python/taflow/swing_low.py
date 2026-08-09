@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from .swing import SwingHighLow
+from .swing_high_low import SwingHighLow
 
 
 class SwingLow(SwingHighLow):

@@ -242,7 +242,7 @@ from .crossunder import Crossunder
 from .cross import Cross
 from .rising import Rising
 from .falling import Falling
-from .vwap import RollingVolumeWeightedAveragePrice
+from .rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
 from .force_index import ForceIndex
 from .ease_of_movement import EaseOfMovement
 from .higher_high import HigherHigh
@@ -258,17 +258,16 @@ from .lowest_since import LowestSince
 from .signal_delay import SignalDelay
 from .position_hold import PositionHold
 from .entry_exit import EntryExit
-from .swing import SwingHighLow
+from .swing_high_low import SwingHighLow
 from .swing_high import SwingHigh
 from .swing_low import SwingLow
 from .retracements import Retracements
-from .session import SessionExtrema
+from .session_extrema import SessionExtrema
 from .previous_high_low import PreviousHighLow
 from .sessions import Sessions
 from .zones import ActiveZoneList
-from .fvg import FairValueGap
+from .fair_value_gap import FairValueGap
 from .donchian_channels import DonchianChannels
-from .rolling_vwap import RollingVolumeWeightedAveragePrice
 from .swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
 from .ob import OrderBlock
@@ -539,7 +538,6 @@ __all__ = [
     "ActiveZoneList",
     "FairValueGap",
     "DonchianChannels",
-    "RollingVolumeWeightedAveragePrice",
     "SwingHighsLows",
     "BreakOfStructureChangeOfCharacter",
     "OrderBlock",
