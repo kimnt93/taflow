@@ -46,8 +46,10 @@ def as_tuple(result) -> tuple:
     return result if isinstance(result, tuple) else (result,)
 
 
-def compare(actual, expected) -> dict:
+def compare(actual, expected, actual_indices: tuple[int, ...] | None = None) -> dict:
     actuals, expecteds = as_tuple(actual), as_tuple(expected)
+    if actual_indices is not None:
+        actuals = tuple(actuals[index] for index in actual_indices)
     if len(actuals) != len(expecteds):
         return {"passed": False,
                 "error": f"output arity {len(actuals)} != {len(expecteds)}"}
@@ -195,7 +197,8 @@ def _fresh_window_zscore(values: np.ndarray, period: int) -> np.ndarray:
 # ---------------------------------------------------------------------------
 
 def verify_function(spec: Spec, data: dict, bars: int, split: int,
-                    oracle_fn=None) -> dict:
+                    oracle_fn=None,
+                    actual_indices: tuple[int, ...] | None = None) -> dict:
     row: dict = {"function": spec.talib_name or spec.snake,
                  "taflow_class": spec.cls.__name__ if spec.cls else None,
                  "oracle": "TA-Lib" if spec.talib_name else
@@ -221,7 +224,7 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
     except Exception as exc:
         return {**row, "error": f"taflow batch failed: {exc}"}
     if expected is not None:
-        row["batch_vs_oracle"] = compare(batch, expected)
+        row["batch_vs_oracle"] = compare(batch, expected, actual_indices)
 
     try:
         stitched = continue_series(spec, arrays, split)
@@ -234,7 +237,7 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
         for chunk in CHUNK_SIZES
     }
     if expected is not None:
-        row["continue_vs_oracle"] = compare(stitched, expected)
+        row["continue_vs_oracle"] = compare(stitched, expected, actual_indices)
     return row
 
 

@@ -702,7 +702,7 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
          pta.pvt(c, v), ("volume_price_trend",), **variant)
     many("parabolic_moving_average_stop",
          taflow.ParabolicMovingAverageStop(high, low, close, 10, 3.0).compute()[0],
-         pta.pmax(h, l, c, length=10, multiplier=3.0), ("stop",), **variant)
+         pta.pmax(h, l, c, length=10, multiplier=3.0), ("stop",))
 
     many("awesome_oscillator", taflow.AwesomeOscillator(high, low).compute(),
          pta.ao(h, l, fast=5, slow=34), ("ao",))

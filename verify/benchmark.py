@@ -152,6 +152,17 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
             gamma=spec.ctor_kwargs.get("gamma", 0.5),
         )
         return None if result is None else result.to_numpy()
+    if source == "pandas-ta-classic" and spec.snake == "pmax":
+        import pandas as pd
+        import pandas_ta_classic as pta
+        result = pta.pmax(
+            pd.Series(arrays[0]),
+            pd.Series(arrays[1]),
+            pd.Series(arrays[2]),
+            length=spec.ctor_kwargs.get("length", 10),
+            multiplier=spec.ctor_kwargs.get("multiplier", 3.0),
+        )
+        return None if result is None else result.to_numpy()
     if source == "pandas-ta-classic" and spec.snake == "jma":
         import pandas as pd
         import pandas_ta_classic as pta
@@ -617,9 +628,12 @@ def run_spec(spec: Spec, args, data: dict, env: dict) -> dict:
         report["correctness"] = verify_function(
             check_spec, data, args.correctness_bars,
             min(args.continue_base, args.correctness_bars - 1),
-            oracle_fn=oracle_fn)
+            oracle_fn=oracle_fn,
+            actual_indices=(0,) if spec.snake == "pmax" else None)
         if oracle_fn and reference:
             report["correctness"]["oracle"] = reference["source"]
+            if spec.snake == "pmax":
+                report["correctness"]["oracle_output"] = "stop (output 0)"
     if "vector" in scenarios:
         report["vector"] = vector_rows(spec, data, args.sizes, args.repeats)
     if "warmup" in scenarios:

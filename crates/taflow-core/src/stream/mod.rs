@@ -325,6 +325,8 @@ mod opening_range;
 mod operator_states;
 pub use operator_states::ActiveZoneList;
 mod parabolic_moving_average_stop;
+#[cfg(test)]
+mod parabolic_moving_average_stop_test;
 mod pivot_points;
 mod premium_discount;
 mod rate_of_change;
@@ -494,7 +496,9 @@ pub use moving_average_convergence_divergence::{
 pub use moving_average_convergence_divergence_extended::MovingAverageConvergenceDivergenceExtended;
 pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDivergenceFixed;
 pub use opening_range::OpeningRange;
-pub use parabolic_moving_average_stop::ParabolicMovingAverageStop;
+pub use parabolic_moving_average_stop::{
+    ParabolicMovingAverageStop, ParabolicMovingAverageStopValue,
+};
 pub use pivot_points::PivotPoints;
 #[allow(unused_imports)]
 pub(crate) use plus_di::plus_directional_indicator;
