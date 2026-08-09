@@ -270,7 +270,7 @@ from .fair_value_gap import FairValueGap
 from .donchian_channels import DonchianChannels
 from .swing_highs_lows import SwingHighsLows
 from .break_of_structure_change_of_character import BreakOfStructureChangeOfCharacter
-from .ob import OrderBlock
+from .order_block import OrderBlock
 from .liquidity import Liquidity
 from .equal_highs_lows import EqualHighsLows
 from .hedge_ratio import HedgeRatio

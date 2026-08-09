@@ -10,7 +10,7 @@
     "python_exports": 300,
     "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 277,
+    "structure": 287,
     "talib_functions": 161
   },
   "rows": [
@@ -3836,7 +3836,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "ob",
+      "module": "order_block",
       "name": "OrderBlock",
       "native_binding": true,
       "native_symbols": [

@@ -1213,12 +1213,21 @@ mod zero_lag_exponential_moving_average;
 mod zero_lag_exponential_moving_average_test;
 pub use fisher_transform::FisherTransform;
 mod break_of_structure_change_of_character;
+#[cfg(test)]
+mod break_of_structure_change_of_character_test;
 mod chaikin_volatility;
 #[cfg(test)]
 mod chaikin_volatility_test;
+#[allow(unused_imports)]
+mod close_to_close_sigma;
+#[cfg(test)]
+mod close_to_close_sigma_test;
 mod ease_of_movement;
 #[cfg(test)]
 mod ease_of_movement_test;
+mod equal_highs_lows;
+#[cfg(test)]
+mod equal_highs_lows_test;
 mod fair_value_gap;
 #[cfg(test)]
 mod fair_value_gap_test;
@@ -1231,15 +1240,41 @@ mod force_index_test;
 mod fractal_dimension;
 #[cfg(test)]
 mod fractal_dimension_test;
+mod garman_klass;
+#[cfg(test)]
+mod garman_klass_test;
+mod garman_klass_yang_zhang;
+#[cfg(test)]
+mod garman_klass_yang_zhang_test;
 mod hedge_ratio;
 #[cfg(test)]
 mod hedge_ratio_test;
 mod hurst;
 #[cfg(test)]
 mod hurst_test;
+#[allow(unused_imports)]
+mod liquidity;
+#[cfg(test)]
+mod liquidity_test;
+#[allow(unused_imports)]
+mod order_block;
+#[cfg(test)]
+mod order_block_test;
+mod parkinson;
+#[cfg(test)]
+mod parkinson_test;
+mod previous_high_low;
+#[cfg(test)]
+mod previous_high_low_test;
+mod retracements;
+#[cfg(test)]
+mod retracements_test;
 mod rising;
 #[cfg(test)]
 mod rising_test;
+mod rogers_satchell;
+#[cfg(test)]
+mod rogers_satchell_test;
 mod rolling_alpha;
 #[cfg(test)]
 mod rolling_alpha_test;
@@ -1258,45 +1293,13 @@ mod rolling_volume_weighted_average_price_test;
 mod session_extrema;
 #[cfg(test)]
 mod session_extrema_test;
-mod ulcer_index;
-#[cfg(test)]
-mod ulcer_index_test;
-#[allow(unused_imports)]
-pub(crate) use break_of_structure_change_of_character::break_of_structure_change_of_character;
-mod order_block;
-#[allow(unused_imports)]
-pub(crate) use order_block::order_block;
-mod liquidity;
-#[allow(unused_imports)]
-pub(crate) use liquidity::liquidity;
-mod close_to_close_sigma;
-#[cfg(test)]
-mod close_to_close_sigma_test;
-mod equal_highs_lows;
-#[cfg(test)]
-mod equal_highs_lows_test;
-mod garman_klass;
-#[cfg(test)]
-mod garman_klass_test;
-mod garman_klass_yang_zhang;
-#[cfg(test)]
-mod garman_klass_yang_zhang_test;
-mod parkinson;
-#[cfg(test)]
-mod parkinson_test;
-mod previous_high_low;
-#[cfg(test)]
-mod previous_high_low_test;
-mod retracements;
-#[cfg(test)]
-mod retracements_test;
-mod rogers_satchell;
-#[cfg(test)]
-mod rogers_satchell_test;
 mod sessions;
 #[cfg(test)]
 mod sessions_test;
 mod time_series_rank;
+mod ulcer_index;
+#[cfg(test)]
+mod ulcer_index_test;
 mod yang_zhang;
 #[cfg(test)]
 mod yang_zhang_test;
@@ -1318,38 +1321,38 @@ mod average_daily_dollar_value;
 #[cfg(test)]
 mod average_daily_dollar_value_test;
 mod cumulative_sum_control_chart;
+#[cfg(test)]
+mod cumulative_sum_control_chart_test;
+mod frac_diff;
+#[cfg(test)]
+mod frac_diff_test;
+mod ichimoku;
+#[cfg(test)]
+mod ichimoku_test;
+mod kalman_hedge_ratio;
+#[cfg(test)]
+mod kalman_hedge_ratio_test;
 mod ornstein_uhlenbeck_half_life;
 #[cfg(test)]
 mod ornstein_uhlenbeck_half_life_test;
 mod roll_spread;
 #[cfg(test)]
 mod roll_spread_test;
-#[allow(unused_imports)]
-pub(crate) use cumulative_sum_control_chart::cumulative_sum_control_chart;
-mod frac_diff;
-mod spread_z_score;
-#[cfg(test)]
-mod spread_z_score_test;
-#[allow(unused_imports)]
-pub(crate) use frac_diff::frac_diff;
-mod kalman_hedge_ratio;
-#[allow(unused_imports)]
-pub(crate) use kalman_hedge_ratio::kalman_hedge_ratio;
-mod supertrend;
-#[allow(unused_imports)]
-pub(crate) use supertrend::supertrend;
-mod ichimoku;
-#[allow(unused_imports)]
-pub(crate) use ichimoku::ichimoku;
-mod squeeze;
-#[allow(unused_imports)]
-pub(crate) use squeeze::squeeze;
-mod squeeze_pro;
-#[allow(unused_imports)]
-pub(crate) use squeeze_pro::squeeze_pro;
 mod schaff_trend_cycle;
 #[cfg(test)]
 mod schaff_trend_cycle_test;
+mod spread_z_score;
+#[cfg(test)]
+mod spread_z_score_test;
+mod squeeze;
+mod squeeze_pro;
+#[cfg(test)]
+mod squeeze_pro_test;
+#[cfg(test)]
+mod squeeze_test;
+mod supertrend;
+#[cfg(test)]
+mod supertrend_test;
 mod vortex;
 #[allow(unused_imports)]
 pub(crate) use vortex::vortex;
