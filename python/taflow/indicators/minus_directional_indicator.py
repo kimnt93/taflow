@@ -1,29 +1,33 @@
-"""Persistent exponentially weighted standard deviation."""
-
 from typing import Any
 import numpy as np
-from ._native import ExponentiallyWeightedStandardDeviationOperator as _Native
-from ._series import as_float64_series
+from .._native import MinusDirectionalIndicator as _Native
+from .._series import as_float64_series
 
 
-class ExponentiallyWeightedStandardDeviation:
-    """Persistent exponentially weighted standard deviation.
+class MinusDirectionalIndicator:
+    """Minus Directional Indicator
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
-        _input: Any,
+        high: Any,
+        low: Any,
+        close: Any,
         timeperiod: int = 14,
     ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
+        high : object
+            High-price series or the current bar high.
+        low : object
+            Low-price series or the current bar low.
+        close : object
+            Close-price series or the current bar close.
         timeperiod : object
             Trailing window length in bars.
-        _input : object
-            Input series or the current scalar observation.
 
         Returns
         -------
@@ -31,42 +35,48 @@ class ExponentiallyWeightedStandardDeviation:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
-        self.extend(_input)
+        self.extend(high, low, close)
 
-    def append(self, _input: float) -> "ExponentiallyWeightedStandardDeviation":
+    def append(self, h: float, l: float, c: float) -> "MinusDirectionalIndicator":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
+        h : object
+            Input parameter or configuration value for this operation.
+        l : object
+            Input parameter or configuration value for this operation.
+        c : object
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(_input))
-        self._length += 1
+        self._state.append(h, l, c)
         return self
 
-    def extend(self, _input: Any) -> "ExponentiallyWeightedStandardDeviation":
+    def extend(self, high: Any, low: Any, close: Any) -> "MinusDirectionalIndicator":
         """Append aligned input series to the native Rust state.
 
         Parameters
         ----------
-        _input : object
-            Input series or the current scalar observation.
+        high : object
+            Input parameter or configuration value for this operation.
+        low : object
+            Input parameter or configuration value for this operation.
+        close : object
+            Input parameter or configuration value for this operation.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        values = as_float64_series(_input)
-        self._state.extend(values)
-        self._length += len(values)
+        self._state.extend(
+            as_float64_series(high), as_float64_series(low), as_float64_series(close)
+        )
         return self
 
     def compute(self) -> np.ndarray:
@@ -80,7 +90,7 @@ class ExponentiallyWeightedStandardDeviation:
         return self._state.compute()
 
     @property
-    def value(self) -> float | None:
+    def value(self) -> object:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -90,11 +100,7 @@ class ExponentiallyWeightedStandardDeviation:
         """
         return self._state.value
 
-    def __len__(self) -> int:
-        """Return the number of observations consumed by this state."""
-        return self._length
-
-    def reset(self) -> "ExponentiallyWeightedStandardDeviation":
+    def reset(self) -> "MinusDirectionalIndicator":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -103,5 +109,4 @@ class ExponentiallyWeightedStandardDeviation:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self

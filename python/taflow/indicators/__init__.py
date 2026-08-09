@@ -19,6 +19,11 @@ from .relative_momentum_index import RelativeMomentumIndex
 from .commodity_channel_index import CommodityChannelIndex
 from .cumulative_count import CumulativeCount
 from .even_better_sinewave import EvenBetterSinewave
+from .exponentially_weighted_standard_deviation import ExponentiallyWeightedStandardDeviation
+from .exponentially_weighted_variance import ExponentiallyWeightedVariance
+from .fast_stochastic_oscillator import FastStochasticOscillator
+from .fibonacci_retracement import FibonacciRetracement
+from .frac_diff import FracDiff
 from .klinger_volume_oscillator import KlingerVolumeOscillator
 from .opening_range import OpeningRange
 from .parabolic_moving_average_stop import ParabolicMovingAverageStop
@@ -52,12 +57,15 @@ from .hilbert_transform_dominant_cycle_phase import HilbertTransformDominantCycl
 from .hilbert_transform_phasor import HilbertTransformPhasor
 from .hilbert_transform_sine_wave import HilbertTransformSineWave
 from .hilbert_transform_trend_mode import HilbertTransformTrendMode
-from ..minus_directional_indicator import MinusDirectionalIndicator
-from ..minus_directional_movement import MinusDirectionalMovement
+from .minus_directional_indicator import MinusDirectionalIndicator
+from .minus_directional_movement import MinusDirectionalMovement
 from ..plus_directional_indicator import PlusDirectionalIndicator
 from ..plus_directional_movement import PlusDirectionalMovement
 from ..triple_exponential_rate_of_change import TripleExponentialRateOfChange
 from .candle_stick_sandwich import CandleStickSandwich
+from .moving_average_convergence_divergence import MovingAverageConvergenceDivergence
+from .moving_average_convergence_divergence_extended import MovingAverageConvergenceDivergenceExtended
+from .moving_average_convergence_divergence_fixed import MovingAverageConvergenceDivergenceFixed
 from .candle_three_black_crows import CandleThreeBlackCrows
 from .candle_three_inside import CandleThreeInside
 from .candle_three_line_strike import CandleThreeLineStrike
@@ -122,9 +130,7 @@ from .rolling_kurtosis import RollingKurtosis
 from .rolling_interquartile_range import RollingInterquartileRange
 from .rolling_covariance import RollingCovariance
 from .rolling_winsorize import RollingWinsorize
-from ..exponentially_weighted_variance import ExponentiallyWeightedVariance
 from .exponentially_weighted_sum import ExponentiallyWeightedSum
-from ..exponentially_weighted_standard_deviation import ExponentiallyWeightedStandardDeviation
 from .exponentially_weighted_covariance import ExponentiallyWeightedCovariance
 from .exponentially_weighted_correlation import ExponentiallyWeightedCorrelation
 from .cumulative_maximum import CumulativeMaximum
@@ -513,4 +519,10 @@ __all__ = [
     "DecayLinear",
     "SignedPower",
     "TimeSeriesRank",
+    "FastStochasticOscillator",
+    "FibonacciRetracement",
+    "FracDiff",
+    "MovingAverageConvergenceDivergence",
+    "MovingAverageConvergenceDivergenceExtended",
+    "MovingAverageConvergenceDivergenceFixed",
 ]

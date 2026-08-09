@@ -116,6 +116,17 @@ state ownership unchanged. Their 132 focused Python tests and the 300/300
 interface audit passed. Benchmark fields remain `TODO`; no benchmark command
 was run.
 
+The thirty-fourth structural batch moved ten more root-level Python adapters
+into `python/taflow/indicators/`: `ExponentiallyWeightedStandardDeviation`,
+`ExponentiallyWeightedVariance`, `FastStochasticOscillator`,
+`FibonacciRetracement`, `FracDiff`, `MinusDirectionalIndicator`,
+`MinusDirectionalMovement`, `MovingAverageConvergenceDivergence`,
+`MovingAverageConvergenceDivergenceExtended`, and
+`MovingAverageConvergenceDivergenceFixed`. Top-level exports now resolve
+through the canonical indicator package. Their 16 focused Python tests and the
+300/300 interface audit passed. Benchmark fields remain `TODO`; no benchmark
+command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

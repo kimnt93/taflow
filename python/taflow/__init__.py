@@ -39,7 +39,7 @@ from .indicators.candle_doji_star import CandleDojiStar
 from .indicators.candle_belt_hold import CandleBeltHold
 from .indicators.candle_engulfing import CandleEngulfing
 from .indicators import ExponentialMovingAverage
-from .fast_stochastic_oscillator import FastStochasticOscillator
+from .indicators import FastStochasticOscillator
 from .indicators import HilbertTransformTrendline
 from .indicators.candle_hikkake import CandleHikkake
 from .indicators.candle_hikkake_modified import CandleHikkakeModified
@@ -51,18 +51,17 @@ from .indicators.hilbert_transform_sine_wave import HilbertTransformSineWave
 from .indicators.hilbert_transform_trend_mode import HilbertTransformTrendMode
 from .indicators.intraday_momentum_index import IntradayMomentumIndex
 from .indicators import MovingAverage
-from .minus_directional_indicator import MinusDirectionalIndicator
-from .minus_directional_movement import MinusDirectionalMovement
+from .indicators import MinusDirectionalIndicator, MinusDirectionalMovement
 from .indicators import MoneyFlowIndex
 from .indicators import AveragePrice
 from .indicators import MedianPrice, TypicalPrice, WeightedClose
-from .moving_average_convergence_divergence_fixed import (
+from .indicators.moving_average_convergence_divergence_fixed import (
     MovingAverageConvergenceDivergenceFixed,
 )
-from .moving_average_convergence_divergence import (
+from .indicators.moving_average_convergence_divergence import (
     MovingAverageConvergenceDivergence,
 )
-from .moving_average_convergence_divergence_extended import (
+from .indicators.moving_average_convergence_divergence_extended import (
     MovingAverageConvergenceDivergenceExtended,
 )
 from .indicators import ParabolicSar, ParabolicSarExtended
@@ -81,7 +80,7 @@ from .indicators.candle_two_crows import CandleTwoCrows
 from .ultimate_oscillator import UltimateOscillator
 from .indicators import VariablePeriodMovingAverage
 from .indicators.heikin_ashi import HeikinAshi
-from .fibonacci_retracement import FibonacciRetracement
+from .indicators import FibonacciRetracement
 from .indicators.anchored_volume_weighted_average_price import (
     AnchoredVolumeWeightedAveragePrice,
 )
@@ -191,9 +190,9 @@ from .indicators import RollingSkew, RollingKurtosis
 from .indicators import RollingInterquartileRange
 from .indicators import RollingCovariance
 from .indicators import RollingWinsorize
-from .exponentially_weighted_variance import ExponentiallyWeightedVariance
+from .indicators import ExponentiallyWeightedVariance
 from .indicators import ExponentiallyWeightedSum
-from .exponentially_weighted_standard_deviation import ExponentiallyWeightedStandardDeviation
+from .indicators import ExponentiallyWeightedStandardDeviation
 from .indicators import ExponentiallyWeightedCovariance
 from .indicators import ExponentiallyWeightedCorrelation
 from .indicators.cumulative_maximum import CumulativeMaximum
@@ -264,7 +263,7 @@ from .roll_spread import RollSpread
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
 from .indicators.cumulative_sum_control_chart import CumulativeSumControlChart
 from .indicators.spread_z_score import SpreadZScore
-from .frac_diff import FracDiff
+from .indicators import FracDiff
 from .indicators.kalman_hedge_ratio import KalmanHedgeRatio
 from .supertrend import Supertrend
 from .indicators import Ichimoku
