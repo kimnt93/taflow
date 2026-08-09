@@ -367,11 +367,13 @@ mod stoch;
 mod stochf;
 mod stochrsi;
 mod t3;
-mod tema;
 mod tom_de_mark_sequential;
 #[cfg(test)]
 mod tom_de_mark_sequential_test;
 mod trima;
+mod triple_exponential_moving_average;
+#[cfg(test)]
+mod triple_exponential_moving_average_test;
 mod trix;
 mod ultosc;
 mod variable_index_dynamic_average;
@@ -564,13 +566,12 @@ pub use stochrsi::{StochasticRelativeStrengthIndex, StochasticRelativeStrengthIn
 #[allow(unused_imports)]
 pub(crate) use t3::triple_exponential_average;
 pub use t3::TripleExponentialAverage;
-#[allow(unused_imports)]
-pub(crate) use tema::triple_exponential_moving_average;
-pub use tema::TripleExponentialMovingAverage;
 pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
 #[allow(unused_imports)]
 pub(crate) use trima::triangular_moving_average;
 pub use trima::TriangularMovingAverage;
+#[allow(unused_imports)]
+pub use triple_exponential_moving_average::TripleExponentialMovingAverage;
 #[allow(unused_imports)]
 pub(crate) use trix::triple_exponential_rate_of_change;
 pub use trix::TripleExponentialRateOfChange;
@@ -846,7 +847,9 @@ mod tests {
         let ema_batch = exponential_moving_average(&input, 7).unwrap();
         let wma_batch = weighted_moving_average(&input, 7).unwrap();
         let dema_batch = double_exponential_moving_average(&input, 7).unwrap();
-        let tema_batch = triple_exponential_moving_average(&input, 7).unwrap();
+        let mut tema_batch_state = TripleExponentialMovingAverage::new(7).unwrap();
+        let mut tema_batch = Vec::new();
+        tema_batch_state.extend_slice_into(&input, &mut tema_batch);
         let trima_batch = triangular_moving_average(&input, 7).unwrap();
         let kama_batch = kaufman_adaptive_moving_average(&input, 7).unwrap();
         let midpoint_batch = rolling_midpoint(&input, 7).unwrap();

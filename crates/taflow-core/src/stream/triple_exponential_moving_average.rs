@@ -4,30 +4,8 @@ use crate::error::TaResult;
 
 use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
-/// Compute the triple exponential moving average result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `input` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn triple_exponential_moving_average(input: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    let mut state = TripleExponentialMovingAverage::new(timeperiod)?;
-    Ok(input
-        .iter()
-        .map(|&value| state.append(value).unwrap_or(f64::NAN))
-        .collect())
-}
-
 /// Stateful triple EMA composed from the shared EMA primitive.
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `TripleExponentialMovingAverage`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct TripleExponentialMovingAverage {
     ema1: ExponentialMovingAverage,
     ema2: ExponentialMovingAverage,
@@ -36,11 +14,7 @@ pub struct TripleExponentialMovingAverage {
 }
 
 impl TripleExponentialMovingAverage {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+    /// Creates a TEMA state with the requested EMA period.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 2 {
             return Err(invalid_period("timeperiod", period, 2));
@@ -51,6 +25,17 @@ impl TripleExponentialMovingAverage {
             ema3: ExponentialMovingAverage::new(period)?,
             value: None,
         })
+    }
+
+    /// Extends the state with a borrowed slice and appends aligned output.
+    pub fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        output.reserve(inputs.len());
+        output.extend(
+            inputs
+                .iter()
+                .copied()
+                .map(|input| self.append(input).unwrap_or(f64::NAN)),
+        );
     }
 }
 

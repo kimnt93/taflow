@@ -61,6 +61,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RelativeStrengthIndex>()?;
     m.add_class::<indicators::RelativeMomentumIndex>()?;
     m.add_class::<indicators::MovingAverage>()?;
+    m.add_class::<indicators::TripleExponentialMovingAverage>()?;
     m.add_class::<indicators::HilbertTransformTrendline>()?;
     m.add_class::<indicators::JurikMovingAverage>()?;
     m.add_class::<indicators::EvenBetterSinewave>()?;
@@ -224,7 +225,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulEma>()?;
     m.add_class::<state_api::StatefulWma>()?;
     m.add_class::<state_api::StatefulDema>()?;
-    m.add_class::<state_api::StatefulTema>()?;
     m.add_class::<state_api::StatefulTrima>()?;
     m.add_class::<state_api::StatefulMidpoint>()?;
     m.add_class::<state_api::StatefulMidprice>()?;
