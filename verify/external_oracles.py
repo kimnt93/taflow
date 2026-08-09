@@ -7,6 +7,7 @@ the three independent sources requested for extension indicators/operators:
 * NumPy for pointwise mathematical transforms;
 * pandas-ta-classic for modern technical indicators;
 * Polars expressions for rolling/EWM/cumulative/math operators;
+* Wickra for the Wilder-seeded Relative Momentum Index;
 * smartmoneyconcepts for the SMC family, with explicit causal alignment.
 
 Every comparison is named and reported.  Import/oracle failures are errors;
@@ -140,6 +141,28 @@ def run_numpy(data: dict[str, np.ndarray], rows: list[Result]) -> None:
     }
     for function, (actual, expected, api) in cases.items():
         compare(rows, "NumPy", function, "all", actual, expected, note=api)
+
+
+def run_wickra(data: dict[str, np.ndarray], rows: list[Result]) -> None:
+    """Compare RMI with Wickra's independently compiled Wilder state."""
+    import wickra
+
+    close = data["close"]
+    cases = ((14, 5), (1, 1), (3, 2), (30, 12))
+    for period, momentum in cases:
+        actual = taflow.RelativeMomentumIndex(close, period, momentum).compute()
+        expected = np.asarray(wickra.RMI(period, momentum).batch(close.tolist()))
+        compare(
+            rows,
+            "Wickra",
+            "relative_momentum_index",
+            f"period={period},momentum={momentum}",
+            actual,
+            expected,
+            rtol=0.0,
+            atol=2e-12,
+            note="wickra.RMI Wilder-seeded state; version 0.9.9",
+        )
 
 
 def run_pandas(data: dict[str, np.ndarray], rows: list[Result]) -> None:
@@ -474,28 +497,6 @@ def run_pandas(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         frac_expected[index] = np.dot(weights_fd, window[::-1])
     check("frac_diff", taflow.FracDiff(close, order, threshold).compute(), frac_expected,
           "NumPy AFML fixed-width fractional differentiation", atol=1e-8)
-
-    # Wilder-smoothed Relative Momentum Index.
-    momentum, period = 5, 14
-    rmi_expected = np.full(len(close), np.nan)
-    gains = losses = 0.0
-    count = 0
-    close_values = close.to_numpy()
-    for index in range(momentum, len(close)):
-        movement = close_values[index] - close_values[index - momentum]
-        gain, loss = max(movement, 0.0), max(-movement, 0.0)
-        count += 1
-        if count <= period:
-            gains += gain
-            losses += loss
-            if count < period:
-                continue
-        else:
-            gains = (gains * (period - 1.0) + gain) / period
-            losses = (losses * (period - 1.0) + loss) / period
-        rmi_expected[index] = 50.0 if gains + losses == 0 else 100.0 * gains / (gains + losses)
-    check("rmi", taflow.RelativeMomentumIndex(close, period, momentum).compute(), rmi_expected,
-          "NumPy Wilder-smoothed momentum")
 
     hurst = close.rolling(n).apply(
         lambda x: (np.clip(
@@ -1069,7 +1070,7 @@ def package_versions() -> dict[str, str]:
     return {
         name: importlib.metadata.version(name)
         for name in ("taflow", "numpy", "pandas-ta-classic", "polars",
-                     "smartmoneyconcepts")
+                     "smartmoneyconcepts", "wickra")
     }
 
 
@@ -1102,7 +1103,7 @@ def write_report(rows: list[Result], report: Path, bars: int) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--bars", type=int, default=2_000)
-    parser.add_argument("--oracle", choices=("all", "numpy", "pandas", "pandas-ta", "polars", "smc"),
+    parser.add_argument("--oracle", choices=("all", "numpy", "wickra", "pandas", "pandas-ta", "polars", "smc"),
                         default="all")
     parser.add_argument("--report", type=Path, default=HERE / "EXTERNAL_ORACLES.md")
     args = parser.parse_args()
@@ -1110,6 +1111,7 @@ def main() -> int:
     rows: list[Result] = []
     runners = {
         "numpy": run_numpy,
+        "wickra": run_wickra,
         "pandas": run_pandas,
         "pandas-ta": run_pandas_ta,
         "polars": run_polars,

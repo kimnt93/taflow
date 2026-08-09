@@ -5,7 +5,8 @@
     "numpy": "2.4.6",
     "pandas-ta-classic": "0.6.52",
     "polars": "1.43.2",
-    "smartmoneyconcepts": "0.0.27"
+    "smartmoneyconcepts": "0.0.27",
+    "wickra": "0.9.9"
   },
   "rows": [
     {
@@ -125,6 +126,54 @@
       "nan_mismatches": 0,
       "compared": 2000,
       "note": "numpy.sign/numpy.abs/numpy.power",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "Wickra",
+      "function": "relative_momentum_index",
+      "output": "period=14,momentum=5",
+      "passed": true,
+      "max_abs_error": 1.4210854715202004e-14,
+      "nan_mismatches": 0,
+      "compared": 1982,
+      "note": "wickra.RMI Wilder-seeded state; version 0.9.9",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "Wickra",
+      "function": "relative_momentum_index",
+      "output": "period=1,momentum=1",
+      "passed": true,
+      "max_abs_error": 1.4210854715202004e-14,
+      "nan_mismatches": 0,
+      "compared": 1999,
+      "note": "wickra.RMI Wilder-seeded state; version 0.9.9",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "Wickra",
+      "function": "relative_momentum_index",
+      "output": "period=3,momentum=2",
+      "passed": true,
+      "max_abs_error": 1.4210854715202004e-14,
+      "nan_mismatches": 0,
+      "compared": 1996,
+      "note": "wickra.RMI Wilder-seeded state; version 0.9.9",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "Wickra",
+      "function": "relative_momentum_index",
+      "output": "period=30,momentum=12",
+      "passed": true,
+      "max_abs_error": 1.4210854715202004e-14,
+      "nan_mismatches": 0,
+      "compared": 1959,
+      "note": "wickra.RMI Wilder-seeded state; version 0.9.9",
       "error": null,
       "expected_difference": false
     },
@@ -941,18 +990,6 @@
       "nan_mismatches": 0,
       "compared": 1074,
       "note": "NumPy AFML fixed-width fractional differentiation",
-      "error": null,
-      "expected_difference": false
-    },
-    {
-      "oracle": "pandas",
-      "function": "rmi",
-      "output": "all",
-      "passed": true,
-      "max_abs_error": 0.0,
-      "nan_mismatches": 0,
-      "compared": 1982,
-      "note": "NumPy Wilder-smoothed momentum",
       "error": null,
       "expected_difference": false
     },

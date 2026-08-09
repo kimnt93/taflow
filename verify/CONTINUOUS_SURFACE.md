@@ -1,8 +1,8 @@
 # Continuous-update surface audit
 
-- Root exports: **285**
-- Root indicator classes: **282**
-- Root classes with append/extend/reset/compute-or-value: **282**
+- Root exports: **301**
+- Root indicator classes: **298**
+- Root classes with append/extend/reset/compute-or-value: **298**
 - Native one-shot functions still compiled: **0**
 
 | Layer | Name | Lifecycle |
@@ -16,6 +16,7 @@
 | taflow | `TypicalPrice` | PASS |
 | taflow | `WeightedClose` | PASS |
 | taflow | `MovingAverageConvergenceDivergenceFixed` | PASS |
+| taflow | `MovingAverageConvergenceDivergence` | PASS |
 | taflow | `MovingAverageConvergenceDivergenceExtended` | PASS |
 | taflow | `BollingerBands` | PASS |
 | taflow | `CommodityChannelIndex` | PASS |
@@ -69,6 +70,7 @@
 | taflow | `TrueRange` | PASS |
 | taflow | `TriangularMovingAverage` | PASS |
 | taflow | `TripleExponentialMovingAverage` | PASS |
+| taflow | `TripleExponentialAverage` | PASS |
 | taflow | `WeightedMovingAverage` | PASS |
 | taflow | `Aroon` | PASS |
 | taflow | `AroonOscillator` | PASS |
@@ -147,6 +149,7 @@
 | taflow | `LogReturn` | PASS |
 | taflow | `CumulativeSum` | PASS |
 | taflow | `CumulativeProduct` | PASS |
+| taflow | `CumulativeCount` | PASS |
 | taflow | `RollingMedian` | PASS |
 | taflow | `RollingMin` | PASS |
 | taflow | `RollingMax` | PASS |
@@ -178,16 +181,25 @@
 | taflow | `MesaAdaptiveMovingAverage` | PASS |
 | taflow | `RollingMinMax` | PASS |
 | taflow | `RollingMinMaxIndex` | PASS |
+| taflow | `MathAbs` | PASS |
 | taflow | `MathAcos` | PASS |
+| taflow | `MathAcosh` | PASS |
 | taflow | `MathAsin` | PASS |
+| taflow | `MathAsinh` | PASS |
 | taflow | `MathAtan` | PASS |
+| taflow | `MathAtanh` | PASS |
+| taflow | `MathCbrt` | PASS |
 | taflow | `MathCeil` | PASS |
 | taflow | `MathCos` | PASS |
 | taflow | `MathCosh` | PASS |
+| taflow | `MathCot` | PASS |
+| taflow | `MathDegrees` | PASS |
 | taflow | `MathExp` | PASS |
 | taflow | `MathFloor` | PASS |
 | taflow | `MathLn` | PASS |
 | taflow | `MathLog10` | PASS |
+| taflow | `MathLog1p` | PASS |
+| taflow | `MathRadians` | PASS |
 | taflow | `MathSin` | PASS |
 | taflow | `MathSinh` | PASS |
 | taflow | `MathSqrt` | PASS |
@@ -198,6 +210,7 @@
 | taflow | `MathMultiply` | PASS |
 | taflow | `MathDivide` | PASS |
 | taflow | `ExponentiallyWeightedVariance` | PASS |
+| taflow | `ExponentiallyWeightedSum` | PASS |
 | taflow | `ExponentiallyWeightedStandardDeviation` | PASS |
 | taflow | `ExponentiallyWeightedCovariance` | PASS |
 | taflow | `ExponentiallyWeightedCorrelation` | PASS |
@@ -289,3 +302,6 @@
 | taflow | `NegativeVolumeIndex` | PASS |
 | taflow | `PositiveVolumeIndex` | PASS |
 | taflow | `McGinleyDynamic` | PASS |
+| taflow | `DecayLinear` | PASS |
+| taflow | `SignedPower` | PASS |
+| taflow | `TimeSeriesRank` | PASS |

@@ -16,6 +16,7 @@ extra-oracles = [
     "pandas-ta-classic",
     "polars",
     "smartmoneyconcepts>=0.0.27",
+    "wickra>=0.9.9",
 ]
 
 [tool.uv.sources]

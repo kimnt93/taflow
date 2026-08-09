@@ -2,7 +2,7 @@
 
 One oracle is selected per indicator using: **TA-Lib > NumPy > Polars > pandas > pandas-ta-classic > pinned GitHub**. `VARIANT` is a documented semantic difference, not a failed comparison; `INVARIANT` rows have no external oracle.
 
-Matches: **342** | Documented variants: **39** | Self-invariant outputs: **0** | Failures: **0**
+Matches: **345** | Documented variants: **39** | Self-invariant outputs: **0** | Failures: **0**
 
 | TAFlow class ↔ oracle API | Output | Selected source | Version | Verdict | Max error | NaN | Note |
 |---|---|---|---|---:|---:|---:|---|
@@ -276,7 +276,10 @@ Matches: **342** | Documented variants: **39** | Self-invariant outputs: **0** |
 | `RateOfChangePercent` ↔ `ROCP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RateOfChangeRatio` ↔ `ROCR` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `RateOfChangeRatioPercent` ↔ `ROCR100` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
-| `RelativeMomentumIndex` ↔ `pandas.rmi` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | NumPy Wilder-smoothed momentum |
+| `RelativeMomentumIndex` ↔ `wickra.RMI` | `period=1,momentum=1` | [Wickra](https://docs.wickra.org/Indicators/Indicator-Rmi) | `0.9.9` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
+| `RelativeMomentumIndex` ↔ `wickra.RMI` | `period=14,momentum=5` | [Wickra](https://docs.wickra.org/Indicators/Indicator-Rmi) | `0.9.9` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
+| `RelativeMomentumIndex` ↔ `wickra.RMI` | `period=3,momentum=2` | [Wickra](https://docs.wickra.org/Indicators/Indicator-Rmi) | `0.9.9` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
+| `RelativeMomentumIndex` ↔ `wickra.RMI` | `period=30,momentum=12` | [Wickra](https://docs.wickra.org/Indicators/Indicator-Rmi) | `0.9.9` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
 | `RelativeStrengthIndex` ↔ `RSI` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `Retracements` ↔ `smartmoneyconcepts.retracements` | `current_retracement_pct` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `6.093e+02` | 60 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |
 | `Retracements` ↔ `smartmoneyconcepts.retracements` | `deepest_retracement_pct` | [smartmoneyconcepts](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | `0.0.27 @ 1b62fd6c` | VARIANT | `6.093e+02` | 60 | package is lookahead-aligned, rounded, and uses candle extremes; taflow confirms swings causally and measures the current close |

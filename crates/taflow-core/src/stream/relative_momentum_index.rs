@@ -61,6 +61,9 @@ impl StreamingIndicator for RelativeMomentumIndex {
             if self.count < self.period {
                 return None;
             }
+            let period = self.period as f64;
+            self.up /= period;
+            self.down /= period;
         } else {
             let period = self.period as f64;
             self.up = (self.up * (period - 1.0) + gain) / period;
@@ -86,19 +89,11 @@ impl StreamingIndicator for RelativeMomentumIndex {
         self.down = 0.0;
         self.value = None;
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn monotonic_input_warms_and_reaches_hundred() {
-        let mut state = RelativeMomentumIndex::new(3, 2).unwrap();
-        let values: Vec<_> = (1..=12).map(|value| state.append(value as f64)).collect();
-        assert!(values[..4].iter().all(Option::is_none));
-        assert!(values[4..]
-            .iter()
-            .all(|value| matches!(value, Some(v) if (*v - 100.0).abs() < 1e-12)));
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        output.reserve(inputs.len());
+        for &input in inputs {
+            output.push(self.append(input).unwrap_or(f64::NAN));
+        }
     }
 }

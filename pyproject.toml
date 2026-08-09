@@ -28,6 +28,7 @@ dev = [
     "polars>=0.20",
     "pytest>=8",
     "ta-lib>=0.6",
+    "wickra>=0.9.9",
 ]
 
 [tool.maturin]

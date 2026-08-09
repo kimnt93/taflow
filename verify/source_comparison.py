@@ -12,7 +12,8 @@ from registry import build_registry
 
 HERE = Path(__file__).parent
 PRIORITY = {"TA-Lib": 1, "NumPy": 2, "Polars": 3, "pandas": 4,
-            "pandas-ta-classic": 5, "smartmoneyconcepts": 6, "self": 99}
+            "pandas-ta-classic": 5, "Wickra": 6, "smartmoneyconcepts": 7,
+            "self": 99}
 URLS = {
     "TA-Lib": "https://ta-lib.github.io/ta-lib-python/funcs.html",
     "NumPy": "https://numpy.org/doc/stable/reference/ufuncs.html",
@@ -20,10 +21,12 @@ URLS = {
     "pandas": "https://pandas.pydata.org/docs/reference/window.html",
     "pandas-ta-classic": "https://xgboosted.github.io/pandas-ta-classic/indicators.html",
     "smartmoneyconcepts": "https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6",
+    "Wickra": "https://docs.wickra.org/Indicators/Indicator-Rmi",
     "self": "",
 }
 PACKAGES = {"TA-Lib": "TA-Lib", "NumPy": "numpy", "Polars": "polars", "pandas": "pandas",
             "pandas-ta-classic": "pandas-ta-classic",
+            "Wickra": "wickra",
             "smartmoneyconcepts": "smartmoneyconcepts"}
 API_NAMES = {
     "anchored_vwap": "pandas.core.groupby.SeriesGroupBy.cumsum",
@@ -46,6 +49,7 @@ API_NAMES = {
     "schaff_trend_cycle": "pandas_ta_classic.stc",
     "klinger_volume_oscillator": "pandas_ta_classic.kvo",
     "tom_de_mark_sequential": "pandas_ta_classic.td_seq",
+    "rmi": "wickra.RMI",
 }
 API_URLS = {
     "anchored_vwap": (

@@ -217,7 +217,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
-| RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | MATCH | `1.421e-14` |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | VARIANT | `6.093e+02` |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
@@ -545,7 +545,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | PreviousHighLow | [smartmoneyconcepts: `smartmoneyconcepts.previous_high_low`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 3.44× | 4.32× | 4.08× | 6.84× |
 | RogersSatchell | [pandas: `pandas.rogers_satchell`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | RollSpread | [pandas: `pandas.roll_spread`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | RollingAlpha | [pandas: `pandas.rolling_alpha`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
@@ -805,7 +805,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.62× | 2.13× | 1.93× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.27× | 1.55× | 2.08× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 0.97× | 1.88× | 2.09× |
-| RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 0.85× | 0.83× | 0.98× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.76× | 2.10× | 2.01× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1097,7 +1097,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.17× | 2.14× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.92× | 2.04× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.05× | 1.99× |
-| RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 0.96× | 0.95× | 0.98× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.77× | 1.91× | 1.99× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1389,7 +1389,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.96× | 1.96× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 2.03× | 2.03× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.87× | 1.99× | 2.07× |
-| RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 1.06× | 1.01× | 1.08× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.04× | 1.89× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
@@ -1681,7 +1681,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | RateOfChangePercent | [TA-Lib: `ROCP`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 2.00× | 1.95× |
 | RateOfChangeRatio | [TA-Lib: `ROCR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 1.89× | 1.93× |
 | RateOfChangeRatioPercent | [TA-Lib: `ROCR100`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.75× | 1.89× |
-| RelativeMomentumIndex | [pandas: `pandas.rmi`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| RelativeMomentumIndex | [Wickra: `wickra.RMI`](https://docs.wickra.org/Indicators/Indicator-Rmi) | 1.41× | 1.66× | 1.57× |
 | RelativeStrengthIndex | [TA-Lib: `RSI`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 2.04× | 2.07× |
 | Retracements | [smartmoneyconcepts: `smartmoneyconcepts.retracements`](https://github.com/joshyattridge/smart-money-concepts/tree/1b62fd6c41e1f508e7ed76831a039fa4c82d42f6) | — | — | — |
 | Rising | [pandas: `pandas.rising`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |

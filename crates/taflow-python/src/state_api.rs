@@ -14,11 +14,10 @@ use taflow::stream::{
     NormalizedAverageTrueRange as CoreNormalizedAverageTrueRange, OpeningRange,
     ParabolicMovingAverageStop, PivotPoints, PremiumDiscount, RateOfChange as CoreRateOfChange,
     RateOfChangePercent as CoreRateOfChangePercent, RateOfChangeRatio as CoreRateOfChangeRatio,
-    RateOfChangeRatioPercent as CoreRateOfChangeRatioPercent, RelativeMomentumIndex,
-    RollingMidpoint, RollingMidprice, SessionVolumeLevels, SimpleMovingAverage,
-    SmoothedTrendChannel, StochasticOscillator, StochasticRelativeStrengthIndex,
-    StreamingIndicator, TomDeMarkSequential, TriangularMovingAverage,
-    TripleExponentialMovingAverage, TrueRange as CoreTrueRange,
+    RateOfChangeRatioPercent as CoreRateOfChangeRatioPercent, RollingMidpoint, RollingMidprice,
+    SessionVolumeLevels, SimpleMovingAverage, SmoothedTrendChannel, StochasticOscillator,
+    StochasticRelativeStrengthIndex, StreamingIndicator, TomDeMarkSequential,
+    TriangularMovingAverage, TripleExponentialMovingAverage, TrueRange as CoreTrueRange,
     VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage, WeightedMovingAverage,
 };
 use taflow::MaType;
@@ -115,13 +114,6 @@ scalar_state_class!(StatefulLinearregSlope, stream::LinearregSlope, 14);
 scalar_state_class!(StatefulLinearregIntercept, stream::LinearregIntercept, 14);
 scalar_state_class!(StatefulLinearregAngle, stream::LinearregAngle, 14);
 scalar_state_class!(StatefulTsf, stream::Tsf, 14);
-/// Native state adapter for the two-parameter Relative Momentum Index.
-#[pyclass]
-pub struct StatefulRelativeMomentumIndex {
-    inner: RelativeMomentumIndex,
-    output: Vec<f64>,
-}
-
 /// Native state adapter for Even Better Sinewave.
 #[pyclass]
 pub struct StatefulEvenBetterSinewave {
@@ -770,54 +762,6 @@ impl StatefulEvenBetterSinewave {
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
-    fn __len__(&self) -> usize {
-        self.output.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.output.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulRelativeMomentumIndex {
-    #[new]
-    #[pyo3(signature = (timeperiod=14, momentum=5))]
-    fn new(timeperiod: usize, momentum: usize) -> PyResult<Self> {
-        Ok(Self {
-            inner: RelativeMomentumIndex::new(timeperiod, momentum).map_err(py_value_error)?,
-            output: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        let value = self.inner.append(input);
-        self.output.push(value.unwrap_or(f64::NAN));
-        value
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let output = &mut self.output;
-        py.allow_threads(|| {
-            output.reserve(input.len());
-            for &value in input {
-                output.push(self.inner.append(value).unwrap_or(f64::NAN));
-            }
-        });
-        Ok(())
-    }
-
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
-        PyArray1::from_vec(py, self.output.clone())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
     fn __len__(&self) -> usize {
         self.output.len()
     }

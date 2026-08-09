@@ -152,12 +152,18 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
             gamma=spec.ctor_kwargs.get("gamma", 0.5),
         )
         return None if result is None else result.to_numpy()
+    if source == "Wickra" and spec.snake == "rmi":
+        import wickra
+        return np.asarray(wickra.RMI(
+            spec.ctor_kwargs.get("timeperiod", 14),
+            spec.ctor_kwargs.get("momentum", 5),
+        ).batch(arrays[0].tolist()))
     raise KeyError(source)
 
 
 def has_timed_reference(reference: dict) -> bool:
     return reference.get("source") in {
-        "TA-Lib", "NumPy", "Polars", "pandas", "pandas-ta-classic"
+        "TA-Lib", "NumPy", "Polars", "pandas", "pandas-ta-classic", "Wickra"
     }
 
 

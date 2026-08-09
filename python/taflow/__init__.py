@@ -102,7 +102,7 @@ from .triple_exponential_moving_average import TripleExponentialMovingAverage
 from .triple_exponential_average import TripleExponentialAverage
 from .weighted_moving_average import WeightedMovingAverage
 from .relative_strength_index import RelativeStrengthIndex
-from .rmi import RelativeMomentumIndex
+from .relative_momentum_index import RelativeMomentumIndex
 from .ssl_channel import SmoothedTrendChannel
 from .jma import JurikMovingAverage
 from .pmax import ParabolicMovingAverageStop

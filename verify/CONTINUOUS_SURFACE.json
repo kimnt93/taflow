@@ -1,7 +1,7 @@
 {
-  "root_exports": 285,
-  "root_indicators": 282,
-  "root_indicators_with_lifecycle": 282,
+  "root_exports": 301,
+  "root_indicators": 298,
+  "root_indicators_with_lifecycle": 298,
   "native_one_shot_functions": [],
   "rows": [
     {
@@ -62,6 +62,13 @@
     },
     {
       "name": "MovingAverageConvergenceDivergenceFixed",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MovingAverageConvergenceDivergence",
       "append": true,
       "extend": true,
       "reset": true,
@@ -433,6 +440,13 @@
     },
     {
       "name": "TripleExponentialMovingAverage",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TripleExponentialAverage",
       "append": true,
       "extend": true,
       "reset": true,
@@ -985,6 +999,13 @@
       "compute_or_value": true
     },
     {
+      "name": "CumulativeCount",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
       "name": "RollingMedian",
       "append": true,
       "extend": true,
@@ -1202,7 +1223,21 @@
       "compute_or_value": true
     },
     {
+      "name": "MathAbs",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
       "name": "MathAcos",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathAcosh",
       "append": true,
       "extend": true,
       "reset": true,
@@ -1216,7 +1251,28 @@
       "compute_or_value": true
     },
     {
+      "name": "MathAsinh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
       "name": "MathAtan",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathAtanh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathCbrt",
       "append": true,
       "extend": true,
       "reset": true,
@@ -1238,6 +1294,20 @@
     },
     {
       "name": "MathCosh",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathCot",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathDegrees",
       "append": true,
       "extend": true,
       "reset": true,
@@ -1266,6 +1336,20 @@
     },
     {
       "name": "MathLog10",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathLog1p",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "MathRadians",
       "append": true,
       "extend": true,
       "reset": true,
@@ -1336,6 +1420,13 @@
     },
     {
       "name": "ExponentiallyWeightedVariance",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "ExponentiallyWeightedSum",
       "append": true,
       "extend": true,
       "reset": true,
@@ -1973,6 +2064,27 @@
     },
     {
       "name": "McGinleyDynamic",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "DecayLinear",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "SignedPower",
+      "append": true,
+      "extend": true,
+      "reset": true,
+      "compute_or_value": true
+    },
+    {
+      "name": "TimeSeriesRank",
       "append": true,
       "extend": true,
       "reset": true,

@@ -1,8 +1,8 @@
 # External correctness oracles
 
-Bars: **2,000** | Matches: **196** | Documented variants: **39** | Failures: **0** | rtol=1e-08, atol=1e-10
+Bars: **2,000** | Matches: **199** | Documented variants: **39** | Failures: **0** | rtol=1e-08, atol=1e-10
 
-Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27
+Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27, wickra 0.9.9
 
 | Oracle | Function | Output | Verdict | Max error | NaN mismatches | Note |
 |---|---|---|---:|---:|---:|---|
@@ -82,6 +82,10 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | Polars | `sum` | `sum` | MATCH | `3.070e-12` | 0 |  |
 | Polars | `tan` | `tan` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `variance` | `variance` | MATCH | `3.930e-11` | 0 |  |
+| Wickra | `relative_momentum_index` | `period=1,momentum=1` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
+| Wickra | `relative_momentum_index` | `period=14,momentum=5` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
+| Wickra | `relative_momentum_index` | `period=3,momentum=2` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
+| Wickra | `relative_momentum_index` | `period=30,momentum=12` | MATCH | `1.421e-14` | 0 | wickra.RMI Wilder-seeded state; version 0.9.9 |
 | pandas | `amihud` | `all` | MATCH | `2.895e-24` | 0 | Series.pct_change/rolling.mean |
 | pandas | `anchored_vwap` | `lower` | MATCH | `1.062e-11` | 0 | pandas grouped cumulative weighted moments |
 | pandas | `anchored_vwap` | `upper` | MATCH | `1.062e-11` | 0 | pandas grouped cumulative weighted moments |
@@ -133,7 +137,6 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas | `premium_discount` | `equilibrium` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
 | pandas | `premium_discount` | `zone` | MATCH | `0.000e+00` | 0 | Rolling.min/Rolling.max |
 | pandas | `rising` | `all` | MATCH | `0.000e+00` | 0 | Series.shift comparison |
-| pandas | `rmi` | `all` | MATCH | `0.000e+00` | 0 | NumPy Wilder-smoothed momentum |
 | pandas | `rogers_satchell` | `all` | MATCH | `1.821e-17` | 0 | Rogers-Satchell via Rolling.mean |
 | pandas | `roll_spread` | `all` | MATCH | `1.623e-14` | 0 | Series.diff/Rolling.cov(ddof=1) |
 | pandas | `rolling_alpha` | `all` | MATCH | `8.285e-10` | 0 | Rolling.cov/Rolling.var/Rolling.mean |

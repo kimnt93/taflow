@@ -238,6 +238,7 @@ dev = [
     { name = "polars", specifier = ">=0.20" },
     { name = "pytest", specifier = ">=8" },
     { name = "ta-lib", specifier = ">=0.6" },
+    { name = "wickra", specifier = ">=0.9.9" },
 ]
 
 [[package]]
@@ -256,6 +257,7 @@ extra-oracles = [
     { name = "pandas-ta-classic" },
     { name = "polars" },
     { name = "smartmoneyconcepts" },
+    { name = "wickra" },
 ]
 
 [package.metadata]
@@ -267,6 +269,7 @@ requires-dist = [
     { name = "smartmoneyconcepts", marker = "extra == 'extra-oracles'", specifier = ">=0.0.27" },
     { name = "ta-lib", specifier = ">=0.6" },
     { name = "taflow", editable = "../" },
+    { name = "wickra", marker = "extra == 'extra-oracles'", specifier = ">=0.9.9" },
 ]
 provides-extras = ["extra-oracles"]
 
@@ -277,4 +280,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/92/ff/5a28bdfd8c3ebec42564ac7d0e54ca3db65044a9314a97f9564fa7a1e926/tzdata-2026.3.tar.gz", hash = "sha256:4a1518b8993086a7982523e071643f3c0e5f213e75b21318e78bcabfff9d1415", size = 198674, upload-time = "2026-07-10T08:50:37.887Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e5/6d/b53b99a9f2766d095985947a5782f1702cabb129a34f7a802d7197af832f/tzdata-2026.3-py2.py3-none-any.whl", hash = "sha256:dc096730c87af6cab1b171c9d532be840741ff5d459015e7f6947bd7d7e54931", size = 348168, upload-time = "2026-07-10T08:50:36.46Z" },
+]
+
+[[package]]
+name = "wickra"
+version = "0.9.9"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ca/b0/d3edbcdcd560f6712f62fbc282e62032fc36d6b2ea0ca0b6bfed8075bf2a/wickra-0.9.9.tar.gz", hash = "sha256:dd9f2aedf30ea952f2042fe299908794a7d93fded4f226598b23ad51fcfcba4d", size = 1027044, upload-time = "2026-06-29T22:05:58.569Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/85/8cff80a4c573614c1856af44830cd924c5cd74259ad5180bd1a319908f3d/wickra-0.9.9-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:ab28a3c7832a1ca84dffe79ba8bc3563f913e78427fbd9440c7d6f5f74d90673", size = 1980510, upload-time = "2026-06-29T22:05:47.98Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/a0/0f064d9ec1a129a0d5662ebae373e7523187ef652f95382af1b9d9973804/wickra-0.9.9-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:ee45ed0b88f19013f545d2c135297176ad64db6ef07f9dbe8b03839026419f1a", size = 1741395, upload-time = "2026-06-29T22:05:49.359Z" },
+    { url = "https://files.pythonhosted.org/packages/35/f5/408c0748663f21a9350c4e63ae2ca483508a8e845f9232ce37b87c3153bd/wickra-0.9.9-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d264c547f4ac44269aaa66d5f707f439d15c571e2b30ac5af7c70988fe031b4b", size = 4062396, upload-time = "2026-06-29T22:05:50.773Z" },
+    { url = "https://files.pythonhosted.org/packages/28/97/b2964e0f8d0316f27251258138f29ce77a2d23b8f2747618618d1a6468ad/wickra-0.9.9-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:031fe8be352b944438a9d27ae5e40999d5b349f7a895200c57414253975c80e4", size = 4168848, upload-time = "2026-06-29T22:05:52.153Z" },
+    { url = "https://files.pythonhosted.org/packages/01/9a/7eccf798e5b407459ab8e6ddc5c7ea428e1617cf68c4c17f18b274a13706/wickra-0.9.9-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:e08deb43a0af6d4ceb9e63550c17883efb88aa8af339b478d0a8890912eb5777", size = 4441147, upload-time = "2026-06-29T22:05:53.532Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/3a/7f2f2f5fea08fb1bd0d1ea7cf6d1793bfe15bae095e4ab5491be98eb2815/wickra-0.9.9-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:8d1f1b74948f57230e653c5381be1c8662c52d2f294d793ee5dd2274984ef895", size = 4409779, upload-time = "2026-06-29T22:05:54.831Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/c0/59d30f2703124e63268521a28fee15318e5ee67ab51f763e0725472937b6/wickra-0.9.9-cp39-abi3-win_amd64.whl", hash = "sha256:bc158a26f42673036657f4e7c5ef7d25985b8980201c74c67ebc988a83bce8ce", size = 1911958, upload-time = "2026-06-29T22:05:56.132Z" },
+    { url = "https://files.pythonhosted.org/packages/50/65/7a3e4c8001b0b4ed1754d8cc3094af1645ec46d492de12ad7f57ffa1c1ba/wickra-0.9.9-cp39-abi3-win_arm64.whl", hash = "sha256:61f808f1ea46e7b4ad1e9d51ae0764e3f752c008b599b7d7ad320d54a4cb4b1c", size = 1647848, upload-time = "2026-06-29T22:05:57.256Z" },
 ]

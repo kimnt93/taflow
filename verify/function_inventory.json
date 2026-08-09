@@ -1,7 +1,7 @@
 {
   "counts": {
-    "benchmark": 189,
-    "complete": 60,
+    "benchmark": 190,
+    "complete": 61,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 612,
     "smc_functions": 8,
-    "structure": 60,
+    "structure": 61,
     "talib_functions": 161
   },
   "rows": [
@@ -623,11 +623,12 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "rmi",
+      "module": "relative_momentum_index",
       "name": "RelativeMomentumIndex",
       "native_binding": true,
       "native_symbols": [
-        "StatefulRelativeMomentumIndex"
+        "RelativeMomentumIndex",
+        "_NativeRelativeMomentumIndex"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4616,6 +4617,7 @@
         "RateOfChangePercent",
         "RateOfChangeRatio",
         "RateOfChangeRatioPercent",
+        "RelativeMomentumIndex",
         "RelativeStrengthIndex",
         "RetracementsOperator",
         "RisingOperator",
@@ -4686,7 +4688,6 @@
         "StatefulPivotPoints",
         "StatefulPpo",
         "StatefulPremiumDiscount",
-        "StatefulRelativeMomentumIndex",
         "StatefulSar",
         "StatefulSarext",
         "StatefulSessionVolumeLevels",
@@ -4922,6 +4923,7 @@
         "RateOfChangePercent",
         "RateOfChangeRatio",
         "RateOfChangeRatioPercent",
+        "RelativeMomentumIndex",
         "RelativeStrengthIndex",
         "RetracementsOperator",
         "RisingOperator",
@@ -4992,7 +4994,6 @@
         "StatefulPivotPoints",
         "StatefulPpo",
         "StatefulPremiumDiscount",
-        "StatefulRelativeMomentumIndex",
         "StatefulSar",
         "StatefulSarext",
         "StatefulSessionVolumeLevels",

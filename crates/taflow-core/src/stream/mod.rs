@@ -318,7 +318,9 @@ mod rate_of_change_ratio_percent_test;
 mod rate_of_change_ratio_test;
 #[cfg(test)]
 mod rate_of_change_test;
-mod rmi;
+mod relative_momentum_index;
+#[cfg(test)]
+mod relative_momentum_index_test;
 mod sar;
 mod sarext;
 mod session_volume_levels;
@@ -504,7 +506,7 @@ pub use rate_of_change_percent::RateOfChangePercent;
 pub use rate_of_change_ratio::RateOfChangeRatio;
 pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
 pub use regression::{Linearreg, LinearregAngle, LinearregIntercept, LinearregSlope, Tsf};
-pub use rmi::RelativeMomentumIndex;
+pub use relative_momentum_index::RelativeMomentumIndex;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 pub use rolling_extrema::{RollingArgmax, RollingArgmin, RollingMax, RollingMin};
