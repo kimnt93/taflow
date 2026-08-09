@@ -1,7 +1,7 @@
 //! Causal exponentially weighted moving sum.
 
-use super::operator_states::ewm_alpha;
 use crate::error::TaResult;
+use crate::stream::ewm_alpha;
 
 /// Persistent exponentially weighted sum with recurrence
 /// `sum_t = x_t + (1 - alpha) * sum_(t-1)`.

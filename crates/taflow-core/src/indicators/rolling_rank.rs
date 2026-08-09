@@ -1,37 +1,31 @@
-//! Batch implementation for `rolling_quantile`.
+//! Batch implementation for `rolling_rank`.
 
-use super::operator_states::*;
-use super::operator_states::*;
-use super::*;
-use super::*;
 use crate::error::{TaError, TaResult};
-use std::collections::{HashMap, HashSet, VecDeque};
+use crate::stream::validate_period;
+use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RollingQuantile`.
+/// Persistent Rust state or aligned output type for `RollingRank`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct RollingQuantile {
-    pub(crate) window: super::sorted_ring::SortedRing,
+pub struct RollingRank {
+    values: VecDeque<f64>,
     timeperiod: usize,
-    quantile: f64,
     value: Option<f64>,
 }
 
-impl RollingQuantile {
+impl RollingRank {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(timeperiod: usize, quantile: f64) -> TaResult<Self> {
+    pub fn new(timeperiod: usize) -> TaResult<Self> {
         validate_period(timeperiod)?;
-        validate_quantile(quantile)?;
         Ok(Self {
-            window: super::sorted_ring::SortedRing::new(timeperiod),
+            values: VecDeque::with_capacity(timeperiod),
             timeperiod,
-            quantile,
             value: None,
         })
     }
@@ -40,22 +34,29 @@ impl RollingQuantile {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    ///
-    /// The window is a shared sorted ring; the interpolation arithmetic is
-    /// unchanged from the per-bar full-sort implementation, so outputs stay
-    /// bit-identical.
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        self.window.push(input);
-        self.value = if self.window.is_full() {
-            let sorted = self.window.sorted();
-            let position = self.quantile * (self.timeperiod - 1) as f64;
-            let lower = position.floor() as usize;
-            let upper = position.ceil() as usize;
-            Some(sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower as f64))
+        if self.values.len() == self.timeperiod {
+            self.values.pop_front();
+        }
+        self.values.push_back(input);
+        self.value = if self.values.len() == self.timeperiod {
+            let less = self.values.iter().filter(|&&value| value < input).count();
+            let equal = self.values.iter().filter(|&&value| value == input).count();
+            Some((less as f64 + equal as f64) / self.timeperiod as f64)
         } else {
             None
         };
         self.value
+    }
+
+    /// Extend the state with a chronological slice and aligned NaN warm-up.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.extend(
+            input
+                .iter()
+                .copied()
+                .map(|value| self.append(value).unwrap_or(f64::NAN)),
+        );
     }
     /// Computes or updates `value` through the native Rust kernel.
     ///
@@ -67,7 +68,7 @@ impl RollingQuantile {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.window.clear();
+        self.values.clear();
         self.value = None;
     }
 }

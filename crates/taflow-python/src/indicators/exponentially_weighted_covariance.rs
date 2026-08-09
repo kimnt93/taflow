@@ -1,18 +1,18 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::ExponentiallyWeightedCovariance;
+use taflow::indicators::ExponentiallyWeightedCovariance as State;
 #[pyclass]
-pub struct ExponentiallyWeightedCovarianceOperator {
-    inner: ExponentiallyWeightedCovariance,
+pub struct ExponentiallyWeightedCovariance {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl ExponentiallyWeightedCovarianceOperator {
+impl ExponentiallyWeightedCovariance {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: ExponentiallyWeightedCovariance::new(timeperiod)
+            inner: State::new(timeperiod)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

@@ -19,6 +19,15 @@ file under `crates/taflow-python/src/indicators/`. Focused Rust (10 tests),
 Python (14 tests), and PyO3 compilation checks passed. Benchmark fields remain
 `TODO` intentionally; no benchmark command was run.
 
+The next structural batch migrated `RollingMode`, `RollingPercentile`,
+`RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
+`RollingWinsorize`, `ExponentiallyWeightedSum`,
+`ExponentiallyWeightedCovariance`, `ExponentiallyWeightedCorrelation`, and
+`Drawdown`; `RollingQuantile` was migrated with them as a required canonical
+dependency. Focused Rust/Python lifecycle tests passed, and the
+pandas-ta-classic external-oracle run reported 82 matches, 14 documented
+variants, and 0 failures. Benchmark fields remain `TODO`.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**

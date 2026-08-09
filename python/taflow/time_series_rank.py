@@ -1,7 +1,7 @@
 """Canonical native-backed time-series-rank adapter."""
 from typing import Any
 import numpy as np
-from ._native import RollingRankOperator as _Native
+from ._native import RollingRank as _Native
 from ._series import as_float64_series
 
 

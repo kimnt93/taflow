@@ -1,17 +1,17 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::Drawdown;
+use taflow::indicators::Drawdown as State;
 #[pyclass]
-pub struct DrawdownOperator {
-    inner: Drawdown,
+pub struct Drawdown {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl DrawdownOperator {
+impl Drawdown {
     #[new]
     fn new() -> Self {
         Self {
-            inner: Drawdown::new(),
+            inner: State::new(),
             outputs: Vec::new(),
         }
     }

@@ -1,26 +1,24 @@
-"""Persistent exponentially weighted correlation."""
+"""Persistent exponentially weighted covariance."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import ExponentiallyWeightedCorrelationOperator as _Native
-from ._adapter_protocol import adapter_length
-from ._series import as_float64_series
+from .._native import ExponentiallyWeightedCovariance as _Native
+from .._adapter_protocol import adapter_length
+from .._series import as_float64_series
 
 
-class ExponentiallyWeightedCorrelation:
-    """Compute causal exponentially weighted correlation.
+class ExponentiallyWeightedCovariance:
+    """Compute causal exponentially weighted population covariance.
 
     ``left`` and ``right`` are required equal-length chronological series and
     may both be empty for a fresh stream. ``timeperiod`` defaults to 14 and is
-    interpreted as a pandas EWM span. Rust owns paired means, variances,
-    covariance, zero-variance handling, and aligned history. ``compute``
-    returns one float array; ``value`` is the latest correlation or ``None``
-    before the first pair. Lifecycle mutators return ``self`` and reject length
-    mismatches before mutation. The oracle is pandas
-    ``ExponentialMovingWindow.corr`` with its initial undefined value mapped to
-    zero by the TAFlow contract.
+    interpreted as a pandas EWM span. Rust owns the paired recurrence and
+    aligned history; ``compute`` returns one float array and ``value`` is the
+    latest covariance or ``None`` before the first pair. Lifecycle mutators
+    return ``self`` and reject length mismatches before mutation. The oracle is
+    pandas ``ExponentialMovingWindow.cov(bias=True)``.
     """
 
     def __init__(
@@ -48,7 +46,7 @@ class ExponentiallyWeightedCorrelation:
         self._state = _Native(int(timeperiod))
         self.extend(left, right)
 
-    def append(self, left: float, right: float) -> "ExponentiallyWeightedCorrelation":
+    def append(self, left: float, right: float) -> "ExponentiallyWeightedCovariance":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -66,7 +64,7 @@ class ExponentiallyWeightedCorrelation:
         self._state.append(float(left), float(right))
         return self
 
-    def extend(self, left: Any, right: Any) -> "ExponentiallyWeightedCorrelation":
+    def extend(self, left: Any, right: Any) -> "ExponentiallyWeightedCovariance":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -113,7 +111,7 @@ class ExponentiallyWeightedCorrelation:
         """Return the number of paired observations consumed by this state."""
         return adapter_length(self)
 
-    def reset(self) -> "ExponentiallyWeightedCorrelation":
+    def reset(self) -> "ExponentiallyWeightedCovariance":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -125,4 +123,4 @@ class ExponentiallyWeightedCorrelation:
         return self
 
 
-__all__ = ["ExponentiallyWeightedCorrelation"]
+__all__ = ["ExponentiallyWeightedCovariance"]

@@ -1,6 +1,6 @@
 //! Stateful exponentially weighted correlation.
 
-use super::exponentially_weighted_covariance::ExponentiallyWeightedCovariance;
+use super::ExponentiallyWeightedCovariance;
 use crate::error::TaResult;
 
 #[derive(Debug, Clone)]

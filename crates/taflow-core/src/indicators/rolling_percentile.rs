@@ -2,7 +2,8 @@
 
 use crate::error::{TaError, TaResult};
 
-use super::{RollingQuantile, StreamingIndicator};
+use super::RollingQuantile;
+use crate::stream::StreamingIndicator;
 
 /// Persistent trailing percentile, expressed on a 0–100 scale.
 #[derive(Debug, Clone)]

@@ -1,19 +1,19 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingRank;
+use taflow::indicators::RollingRank as State;
 
 #[pyclass]
-pub struct RollingRankOperator {
-    inner: RollingRank,
+pub struct RollingRank {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingRankOperator {
+impl RollingRank {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingRank::new(timeperiod)
+            inner: State::new(timeperiod)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

@@ -3,9 +3,21 @@
 mod cumulative_count;
 #[cfg(test)]
 mod cumulative_count_test;
+mod drawdown;
+#[cfg(test)]
+mod drawdown_test;
 mod even_better_sinewave;
 #[cfg(test)]
 mod even_better_sinewave_test;
+mod exponentially_weighted_correlation;
+#[cfg(test)]
+mod exponentially_weighted_correlation_test;
+mod exponentially_weighted_covariance;
+#[cfg(test)]
+mod exponentially_weighted_covariance_test;
+mod exponentially_weighted_sum;
+#[cfg(test)]
+mod exponentially_weighted_sum_test;
 mod klinger_volume_oscillator;
 #[cfg(test)]
 mod klinger_volume_oscillator_test;
@@ -21,6 +33,27 @@ mod pivot_points_test;
 mod premium_discount;
 #[cfg(test)]
 mod premium_discount_test;
+mod rolling_covariance;
+#[cfg(test)]
+mod rolling_covariance_test;
+mod rolling_interquartile_range;
+#[cfg(test)]
+mod rolling_interquartile_range_test;
+mod rolling_mode;
+#[cfg(test)]
+mod rolling_mode_test;
+mod rolling_percentile;
+#[cfg(test)]
+mod rolling_percentile_test;
+mod rolling_quantile;
+#[cfg(test)]
+mod rolling_quantile_test;
+mod rolling_rank;
+#[cfg(test)]
+mod rolling_rank_test;
+mod rolling_winsorize;
+#[cfg(test)]
+mod rolling_winsorize_test;
 mod session_volume_levels;
 #[cfg(test)]
 mod session_volume_levels_test;
@@ -46,7 +79,11 @@ pub(crate) fn invalid_period(name: &'static str, period: usize, minimum: usize) 
 }
 
 pub use cumulative_count::CumulativeCount;
+pub use drawdown::Drawdown;
 pub use even_better_sinewave::EvenBetterSinewave;
+pub use exponentially_weighted_correlation::ExponentiallyWeightedCorrelation;
+pub use exponentially_weighted_covariance::ExponentiallyWeightedCovariance;
+pub use exponentially_weighted_sum::ExponentiallyWeightedSum;
 pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
 pub use opening_range::{OpeningRange, OpeningRangeValue};
 pub use parabolic_moving_average_stop::{
@@ -54,6 +91,13 @@ pub use parabolic_moving_average_stop::{
 };
 pub use pivot_points::{PivotPoints, PivotPointsValue};
 pub use premium_discount::{PremiumDiscount, PremiumDiscountValue};
+pub use rolling_covariance::RollingCovariance;
+pub use rolling_interquartile_range::RollingInterquartileRange;
+pub use rolling_mode::RollingMode;
+pub use rolling_percentile::RollingPercentile;
+pub use rolling_quantile::RollingQuantile;
+pub use rolling_rank::RollingRank;
+pub use rolling_winsorize::RollingWinsorize;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use smoothed_trend_channel::SmoothedTrendChannel;
 pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};

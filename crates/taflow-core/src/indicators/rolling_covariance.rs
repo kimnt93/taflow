@@ -1,11 +1,8 @@
 //! Stateful implementation for `rolling_covariance`.
 
-use super::operator_states::*;
-use super::operator_states::*;
-use super::*;
-use super::*;
 use crate::error::{TaError, TaResult};
-use std::collections::{HashMap, HashSet, VecDeque};
+use crate::stream::validate_period;
+use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state for `RollingCovariance`.

@@ -1,33 +1,30 @@
-"""Persistent percentage drawdown from the running maximum."""
+"""Persistent causal rolling quantile operator."""
 
 from typing import Any
-
 import numpy as np
-
-from ._native import DrawdownOperator as _Native
-from ._adapter_protocol import adapter_length
-from ._series import as_float64_series
+from .._native import RollingQuantile as _Native
+from .._series import as_float64_series
 
 
-class Drawdown:
-    """Compute percentage drawdown from the causal running maximum.
+class RollingQuantile:
+    """Persistent causal rolling quantile operator.
 
-    ``_input`` is the required chronological series and may be empty for a
-    fresh stream. Each output is ``input / running_maximum - 1`` (or zero when
-    the running maximum is zero), so ``compute`` returns one aligned float
-    array and ``value`` is the latest scalar or ``None`` before the first bar.
-    Lifecycle mutators return ``self``. The independent oracle is pandas
-    ``Series.cummax``.
-    """
+    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
     def __init__(
         self,
         _input: Any,
+        timeperiod: int = 14,
+        quantile: float = 0.5,
     ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
         ----------
+        timeperiod : object
+            Trailing window length in bars.
+        quantile : object
+            Requested trailing quantile.
         _input : object
             Input series or the current scalar observation.
 
@@ -36,10 +33,10 @@ class Drawdown:
         None
             The constructor initializes the adapter and returns no value.
         """
-        self._state = _Native()
+        self._state = _Native(timeperiod, quantile)
         self.extend(_input)
 
-    def append(self, _input: float) -> "Drawdown":
+    def append(self, _input: float) -> "RollingQuantile":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -55,7 +52,7 @@ class Drawdown:
         self._state.append(float(_input))
         return self
 
-    def extend(self, _input: Any) -> "Drawdown":
+    def extend(self, _input: Any) -> "RollingQuantile":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -68,8 +65,7 @@ class Drawdown:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        values = as_float64_series(_input)
-        self._state.extend(values)
+        self._state.extend(as_float64_series(_input))
         return self
 
     def compute(self) -> np.ndarray:
@@ -93,11 +89,7 @@ class Drawdown:
         """
         return self._state.value
 
-    def __len__(self) -> int:
-        """Return the number of observations consumed by this state."""
-        return adapter_length(self)
-
-    def reset(self) -> "Drawdown":
+    def reset(self) -> "RollingQuantile":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
@@ -107,6 +99,3 @@ class Drawdown:
         """
         self._state.reset()
         return self
-
-
-__all__ = ["Drawdown"]

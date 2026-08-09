@@ -1,19 +1,19 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingQuantile;
+use taflow::indicators::RollingQuantile as State;
 
 #[pyclass]
-pub struct RollingQuantileOperator {
-    inner: RollingQuantile,
+pub struct RollingQuantile {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingQuantileOperator {
+impl RollingQuantile {
     #[new]
     fn new(timeperiod: usize, quantile: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingQuantile::new(timeperiod, quantile)
+            inner: State::new(timeperiod, quantile)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

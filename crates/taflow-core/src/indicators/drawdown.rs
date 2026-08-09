@@ -1,6 +1,6 @@
 //! Persistent percentage drawdown state.
 
-use super::cumulative_maximum::CumulativeMaximum;
+use crate::stream::CumulativeMaximum;
 
 #[derive(Debug, Clone)]
 pub struct Drawdown {

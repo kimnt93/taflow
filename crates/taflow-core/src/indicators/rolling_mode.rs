@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use super::operator_states::validate_period;
+use crate::stream::validate_period;
 use crate::TaResult;
 
 /// Map key with the semantics of `f64` equality: `-0.0` and `+0.0` share a

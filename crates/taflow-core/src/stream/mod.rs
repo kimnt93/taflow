@@ -419,7 +419,6 @@ mod rolling_extrema;
 mod rolling_median;
 #[cfg(test)]
 mod rolling_median_test;
-mod rolling_mode;
 mod rolling_price;
 mod rolling_statistics;
 mod rolling_sum;
@@ -534,6 +533,7 @@ mod variable_index_dynamic_average_test;
 mod window;
 #[allow(unused_imports)]
 pub(crate) use helpers::invalid_period;
+pub(crate) use operator_states::{ewm_alpha, validate_period, validate_quantile};
 mod weighted_moving_average;
 #[cfg(test)]
 mod weighted_moving_average_test;
@@ -665,7 +665,6 @@ pub use rolling_linear_regression_slope::RollingLinearRegressionSlope;
 pub use rolling_max::RollingMax;
 pub use rolling_median::RollingMedian;
 pub use rolling_min::RollingMin;
-pub use rolling_mode::RollingMode;
 pub use rolling_time_series_forecast::RollingTimeSeriesForecast;
 pub use variable_period_moving_average::VariablePeriodMovingAverage;
 
@@ -759,17 +758,13 @@ mod cross_test;
 #[cfg(test)]
 mod donchian_test;
 #[cfg(test)]
-mod drawdown_test;
 #[cfg(test)]
 mod entry_exit_test;
 #[cfg(test)]
-mod exponentially_weighted_correlation_test;
 #[cfg(test)]
-mod exponentially_weighted_covariance_test;
 #[cfg(test)]
 mod exponentially_weighted_standard_deviation_test;
 #[cfg(test)]
-mod exponentially_weighted_sum_test;
 #[cfg(test)]
 mod exponentially_weighted_variance_test;
 #[cfg(test)]
@@ -1137,7 +1132,6 @@ mod accumulation_distribution_test;
 mod balance_of_power;
 #[cfg(test)]
 mod balance_of_power_test;
-mod drawdown;
 mod rolling_sharpe;
 mod williams_percent_r;
 #[cfg(test)]
@@ -1334,15 +1328,6 @@ mod swing_low;
 #[cfg(test)]
 mod swing_low_test;
 pub use swing_low::SwingLow;
-mod rolling_percentile;
-#[cfg(test)]
-mod rolling_percentile_test;
-mod rolling_quantile;
-#[cfg(test)]
-mod rolling_quantile_test;
-mod rolling_rank;
-#[cfg(test)]
-mod rolling_rank_test;
 mod rolling_skew;
 #[cfg(test)]
 mod rolling_skew_test;
@@ -1363,10 +1348,7 @@ mod chaikin_money_flow_test;
 mod detrended_price_oscillator;
 #[cfg(test)]
 mod detrended_price_oscillator_test;
-mod exponentially_weighted_correlation;
-mod exponentially_weighted_covariance;
 mod exponentially_weighted_standard_deviation;
-mod exponentially_weighted_sum;
 mod exponentially_weighted_variance;
 mod mass_index;
 #[cfg(test)]
@@ -1380,16 +1362,7 @@ mod negative_volume_index_test;
 mod positive_volume_index;
 #[cfg(test)]
 mod positive_volume_index_test;
-mod rolling_covariance;
-#[cfg(test)]
-mod rolling_covariance_test;
-mod rolling_interquartile_range;
-#[cfg(test)]
-mod rolling_interquartile_range_test;
 #[allow(unused_imports)]
-mod rolling_winsorize;
-#[cfg(test)]
-mod rolling_winsorize_test;
 mod volume_price_trend;
 #[cfg(test)]
 mod volume_price_trend_test;
@@ -1421,12 +1394,8 @@ pub use break_of_structure_change_of_character::{
 };
 pub use close_to_close_sigma::CloseToCloseSigma;
 pub use cumulative_sum_control_chart::CumulativeSumControlChart;
-pub use drawdown::Drawdown;
 pub use equal_highs_lows::{EqualHighsLows, EqualHighsLowsValue};
-pub use exponentially_weighted_correlation::ExponentiallyWeightedCorrelation;
-pub use exponentially_weighted_covariance::ExponentiallyWeightedCovariance;
 pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
-pub use exponentially_weighted_sum::ExponentiallyWeightedSum;
 pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use fair_value_gap::{FairValueGap, FairValueGapValue};
 pub use falling::Falling;
@@ -1459,14 +1428,8 @@ pub use rogers_satchell::RogersSatchell;
 pub use roll_spread::RollSpread;
 pub use rolling_alpha::RollingAlpha;
 pub use rolling_autocorr::RollingAutocorr;
-pub use rolling_covariance::RollingCovariance;
 pub use rolling_entropy::RollingEntropy;
 pub use rolling_information_ratio::RollingInformationRatio;
-pub use rolling_interquartile_range::RollingInterquartileRange;
-pub use rolling_percentile::RollingPercentile;
-pub use rolling_quantile::RollingQuantile;
-pub use rolling_rank::RollingRank;
-pub use rolling_winsorize::RollingWinsorize;
 pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
 pub use session_extrema::{SessionExtrema, SessionExtremaValue};

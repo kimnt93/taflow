@@ -1,7 +1,7 @@
 //! Stateful exponentially weighted covariance.
 
-use super::operator_states::ewm_alpha;
 use crate::error::TaResult;
+use crate::stream::ewm_alpha;
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `ExponentiallyWeightedCovariance`.

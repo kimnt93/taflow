@@ -1,11 +1,7 @@
 //! Batch implementation for `rolling_iqr`.
 
-use super::operator_states::*;
-use super::operator_states::*;
-use super::*;
-use super::*;
+use super::RollingQuantile;
 use crate::error::{TaError, TaResult};
-use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `RollingInterquartileRange`.

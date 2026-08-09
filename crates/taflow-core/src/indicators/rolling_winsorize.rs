@@ -1,11 +1,7 @@
 //! Batch implementation for `rolling_winsorize`.
 
-use super::operator_states::*;
-use super::operator_states::*;
-use super::*;
-use super::*;
 use crate::error::{TaError, TaResult};
-use std::collections::{HashMap, HashSet, VecDeque};
+use crate::stream::{validate_period, validate_quantile};
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `RollingWinsorize`.
@@ -13,7 +9,7 @@ use std::collections::{HashMap, HashSet, VecDeque};
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct RollingWinsorize {
-    window: super::sorted_ring::SortedRing,
+    window: crate::stream::sorted_ring::SortedRing,
     timeperiod: usize,
     lower: f64,
     upper: f64,
@@ -38,7 +34,7 @@ impl RollingWinsorize {
             });
         }
         Ok(Self {
-            window: super::sorted_ring::SortedRing::new(timeperiod),
+            window: crate::stream::sorted_ring::SortedRing::new(timeperiod),
             timeperiod,
             lower,
             upper,

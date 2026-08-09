@@ -1,19 +1,19 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingPercentile;
+use taflow::indicators::RollingPercentile as State;
 
 #[pyclass]
-pub struct RollingPercentileOperator {
-    inner: RollingPercentile,
+pub struct RollingPercentile {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingPercentileOperator {
+impl RollingPercentile {
     #[new]
     fn new(timeperiod: usize, percentile: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingPercentile::new(timeperiod, percentile)
+            inner: State::new(timeperiod, percentile)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

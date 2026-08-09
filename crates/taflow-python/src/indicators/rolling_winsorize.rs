@@ -1,18 +1,18 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingWinsorize;
+use taflow::indicators::RollingWinsorize as State;
 #[pyclass]
-pub struct RollingWinsorizeOperator {
-    inner: RollingWinsorize,
+pub struct RollingWinsorize {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingWinsorizeOperator {
+impl RollingWinsorize {
     #[new]
     fn new(timeperiod: usize, lower: f64, upper: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingWinsorize::new(timeperiod, lower, upper)
+            inner: State::new(timeperiod, lower, upper)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

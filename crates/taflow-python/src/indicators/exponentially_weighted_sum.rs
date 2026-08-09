@@ -1,21 +1,21 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::ExponentiallyWeightedSum;
+use taflow::indicators::ExponentiallyWeightedSum as State;
 
 /// Native persistent adapter for an exponentially weighted moving sum.
 #[pyclass]
-pub struct ExponentiallyWeightedSumOperator {
-    inner: ExponentiallyWeightedSum,
+pub struct ExponentiallyWeightedSum {
+    inner: State,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl ExponentiallyWeightedSumOperator {
+impl ExponentiallyWeightedSum {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: ExponentiallyWeightedSum::new(timeperiod)
+            inner: State::new(timeperiod)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
         })

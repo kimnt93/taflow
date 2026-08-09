@@ -2,7 +2,11 @@
 mod tests {
     use super::*;
     use crate::stream::*;
-    use crate::stream::{RollingMedian, RollingMode};
+    use crate::indicators::{
+        Drawdown, ExponentiallyWeightedCorrelation, ExponentiallyWeightedCovariance,
+        ExponentiallyWeightedSum, RollingCovariance, RollingInterquartileRange, RollingMode,
+        RollingPercentile, RollingQuantile, RollingRank, RollingWinsorize,
+    };
 
     fn bulk_lcg_series(n: usize, mut state: u64) -> Vec<f64> {
         (0..n)

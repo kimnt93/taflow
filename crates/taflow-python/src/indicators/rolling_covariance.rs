@@ -1,18 +1,18 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingCovariance;
+use taflow::indicators::RollingCovariance as State;
 #[pyclass]
-pub struct RollingCovarianceOperator {
-    inner: RollingCovariance,
+pub struct RollingCovariance {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingCovarianceOperator {
+impl RollingCovariance {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingCovariance::new(timeperiod)
+            inner: State::new(timeperiod)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
