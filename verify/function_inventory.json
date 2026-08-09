@@ -1,16 +1,16 @@
 {
   "counts": {
-    "benchmark": 184,
-    "complete": 54,
+    "benchmark": 185,
+    "complete": 55,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 611,
+    "rust_exports": 612,
     "smc_functions": 8,
-    "structure": 54,
+    "structure": 55,
     "talib_functions": 161
   },
   "rows": [
@@ -537,7 +537,8 @@
       "name": "HeikinAshi",
       "native_binding": true,
       "native_symbols": [
-        "StatefulHeikinAshi"
+        "HeikinAshi",
+        "_NativeHeikinAshi"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4536,6 +4537,7 @@
         "GarmanKlassOperator",
         "GarmanKlassYangZhangOperator",
         "HedgeRatioOperator",
+        "HeikinAshi",
         "HigherHighOperator",
         "HighestSinceOperator",
         "HilbertTransformDominantCyclePeriod",
@@ -4650,7 +4652,6 @@
         "StatefulDx",
         "StatefulEvenBetterSinewave",
         "StatefulFibonacciRetracement",
-        "StatefulHeikinAshi",
         "StatefulHtTrendline",
         "StatefulImi",
         "StatefulJurikMovingAverage",
@@ -4842,6 +4843,7 @@
         "GarmanKlassOperator",
         "GarmanKlassYangZhangOperator",
         "HedgeRatioOperator",
+        "HeikinAshi",
         "HigherHighOperator",
         "HighestSinceOperator",
         "HilbertTransformDominantCyclePeriod",
@@ -4956,7 +4958,6 @@
         "StatefulDx",
         "StatefulEvenBetterSinewave",
         "StatefulFibonacciRetracement",
-        "StatefulHeikinAshi",
         "StatefulHtTrendline",
         "StatefulImi",
         "StatefulJurikMovingAverage",

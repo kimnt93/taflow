@@ -276,6 +276,8 @@ mod anchored_volume_weighted_average_price;
 mod even_better_sinewave;
 mod fibonacci_retracement;
 mod heikin_ashi;
+#[cfg(test)]
+mod heikin_ashi_test;
 mod helpers;
 mod jurik_moving_average;
 mod klinger_volume_oscillator;
@@ -424,7 +426,7 @@ pub(crate) use ema::exponential_moving_average;
 pub use ema::ExponentialMovingAverage;
 pub use even_better_sinewave::EvenBetterSinewave;
 pub use fibonacci_retracement::FibonacciRetracement;
-pub use heikin_ashi::HeikinAshi;
+pub use heikin_ashi::{HeikinAshi, HeikinAshiValue};
 pub use ht_dcperiod::HilbertTransformDominantCyclePeriod;
 pub use ht_dcphase::HilbertTransformDominantCyclePhase;
 pub use ht_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};

@@ -503,7 +503,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
+| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 4097.09× | 7673.35× | 7945.52× | 3638.04× |
 | HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | HullMovingAverage | [pandas-ta-classic: `pandas_ta_classic.hma`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
@@ -717,7 +717,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 30.13× | 38.75× | 48.14× |
 | HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.36× | 1.74× | 2.07× |
@@ -1009,7 +1009,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 49.60× | 55.08× | 57.69× |
 | HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.92× | 1.87× | 1.98× |
@@ -1301,7 +1301,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 120.41× | 99.08× | 137.72× |
 | HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 1.92× | 1.76× |
@@ -1593,7 +1593,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | GarmanKlass | [pandas: `pandas.garman_klass`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | GarmanKlassYangZhang | [pandas: `pandas.garman_klass_yang_zhang`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HedgeRatio | [pandas: `pandas.hedge_ratio`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
+| HeikinAshi | [pandas-ta-classic: `pandas-ta-classic.heikin_ashi`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | 517.02× | 528.89× | 838.87× |
 | HigherHigh | [pandas: `pandas.higher_high`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HighestSince | [pandas: `pandas.highest_since`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | HilbertTransformDominantCyclePeriod | [TA-Lib: `HT_DCPERIOD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.15× | 2.77× | 2.67× |

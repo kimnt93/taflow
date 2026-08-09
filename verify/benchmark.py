@@ -96,6 +96,11 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
             pd.Series(arrays[0]),
             length=spec.ctor_kwargs.get("timeperiod", 1),
         ).to_numpy()
+    if source == "pandas-ta-classic" and spec.snake == "heikin_ashi":
+        import pandas as pd
+        import pandas_ta_classic as pta
+        frame = pta.ha(*(pd.Series(array) for array in arrays))
+        return tuple(frame[column].to_numpy() for column in frame.columns)
     raise KeyError(source)
 
 
@@ -250,6 +255,7 @@ def _continue_taflow(spec: Spec, base_arrays: list[np.ndarray],
 
 def continuation_rows(spec: Spec, data: dict, base: int, updates: int,
                       chunks: tuple[int, ...], repeats: int) -> list[dict]:
+    reference = selected_reference(spec)
     arrays = spec.arrays(data, base + updates)
     base_arrays = [a[:base] for a in arrays]
     update_arrays = [a[base:] for a in arrays]
@@ -264,19 +270,29 @@ def continuation_rows(spec: Spec, data: dict, base: int, updates: int,
             "taflow_native_continue": _continue_taflow(
                 spec, base_arrays, update_arrays, chunk, repeats, kernel=True),
         }
-        if spec.talib_name:
+        if has_timed_reference(reference):
             full = [a[:base + chunk] for a in arrays]
-            row["talib_full_recompute"] = timed(
-                lambda: talib_call(spec, full), min(repeats, 3))
-            tail_bars = min(base + chunk, spec.lookback + chunk + 1)
-            tail = [a[base + chunk - tail_bars:base + chunk] for a in arrays]
-            row["talib_tail_recompute"] = timed(
-                lambda: talib_call(spec, tail), min(repeats, 3))
+            row["external_full_recompute"] = timed(
+                lambda: external_reference_call(spec, full, reference),
+                min(repeats, 3),
+            )
             tf_us = row["taflow_native_continue"]["mean_call_us"]
             row["speedup_vs_full"] = (
-                row["talib_full_recompute"]["mean_ms"] * 1e3 / tf_us)
+                row["external_full_recompute"]["mean_ms"] * 1e3 / tf_us)
+
+        # A bounded tail is only a valid substitute for a full recomputation
+        # for the stateless TA-Lib vector functions. Recursive references such
+        # as pandas-ta-classic Heikin-Ashi require the complete prior state.
+        if reference.get("source") == "TA-Lib":
+            tail_bars = min(base + chunk, spec.lookback + chunk + 1)
+            tail = [a[base + chunk - tail_bars:base + chunk] for a in arrays]
+            row["external_tail_recompute"] = timed(
+                lambda: external_reference_call(spec, tail, reference),
+                min(repeats, 3),
+            )
+            tf_us = row["taflow_native_continue"]["mean_call_us"]
             row["speedup_vs_tail"] = (
-                row["talib_tail_recompute"]["mean_ms"] * 1e3 / tf_us)
+                row["external_tail_recompute"]["mean_ms"] * 1e3 / tf_us)
         rows.append(row)
     return rows
 
@@ -299,6 +315,7 @@ def _thread_wall(workers: list[Callable[[], None]]) -> float:
 
 def thread_rows(spec: Spec, data: dict, bars: int, updates: int,
                 thread_counts: tuple[int, ...], repeats: int) -> list[dict]:
+    reference = selected_reference(spec)
     arrays = spec.arrays(data, bars + updates)
     base_arrays = [a[:bars] for a in arrays]
     update_arrays = [a[bars:] for a in arrays]
@@ -307,7 +324,7 @@ def thread_rows(spec: Spec, data: dict, bars: int, updates: int,
         row = {"threads": count, "bars": bars, "updates": updates}
         vector_samples = []
         native_vector_samples = []
-        talib_samples = []
+        reference_samples = []
         continue_samples = []
         native_continue_samples = []
         for _ in range(min(repeats, 3)):
@@ -333,9 +350,9 @@ def thread_rows(spec: Spec, data: dict, bars: int, updates: int,
                                      for bar in zip(*update_arrays)]
                 for state in native_states
             ]))
-            if spec.talib_name:
-                talib_samples.append(_thread_wall([
-                    lambda a=arrays: talib_call(spec, a)
+            if has_timed_reference(reference):
+                reference_samples.append(_thread_wall([
+                    lambda a=arrays: external_reference_call(spec, a, reference)
                     for _ in range(count)
                 ]))
         row["taflow_canonical_vector"] = sample_stats(
@@ -346,11 +363,11 @@ def thread_rows(spec: Spec, data: dict, bars: int, updates: int,
             continue_samples, count * updates)
         row["taflow_native_continue"] = sample_stats(
             native_continue_samples, count * updates)
-        if talib_samples:
-            row["talib_original_vector"] = sample_stats(
-                talib_samples, count * bars)
+        if reference_samples:
+            row["external_reference_vector"] = sample_stats(
+                reference_samples, count * bars)
             row["vector_speedup"] = (
-                row["talib_original_vector"]["mean_ms"]
+                row["external_reference_vector"]["mean_ms"]
                 / row["taflow_native_vector"]["mean_ms"])
         rows.append(row)
     one = next((row for row in rows if row["threads"] == 1), None)
@@ -362,10 +379,10 @@ def thread_rows(spec: Spec, data: dict, bars: int, updates: int,
             row["taflow_continue_scaling"] = (
                 row["taflow_native_continue"]["units_per_second"]
                 / one["taflow_native_continue"]["units_per_second"])
-            if "talib_original_vector" in row:
-                row["talib_vector_scaling"] = (
-                    row["talib_original_vector"]["units_per_second"]
-                    / one["talib_original_vector"]["units_per_second"])
+            if "external_reference_vector" in row:
+                row["reference_vector_scaling"] = (
+                    row["external_reference_vector"]["units_per_second"]
+                    / one["external_reference_vector"]["units_per_second"])
     return rows
 
 
@@ -446,26 +463,42 @@ def render(report: dict) -> str:
                 + (f"{row['speedup']:.2f}× |" if "speedup" in row else "— |"))
         lines.append("")
     if report.get("continuation"):
-        lines += ["## Warmed continuation", "",
-                  "| Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | TA-Lib full µs | vs full | vs tail |",
-                  "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        has_tail = any("external_tail_recompute" in row
+                       for row in report["continuation"])
+        lines += ["## Warmed continuation", ""]
+        if has_tail:
+            lines += [
+                "| Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | Reference full µs | vs full | vs bounded tail |",
+                "|---:|---:|---:|---:|---:|---:|---:|---:|",
+            ]
+        else:
+            lines += [
+                "| Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | Reference full µs | vs full |",
+                "|---:|---:|---:|---:|---:|---:|---:|",
+            ]
         for row in report["continuation"]:
             api = row["taflow_canonical_continue"]
             tf = row["taflow_native_continue"]
-            full = row.get("talib_full_recompute", {})
-            lines.append(f"| {row['base_bars']:,} | {row['chunk']:,} | "
-                         f"{api['mean_call_us']:.3f} | {tf['mean_call_us']:.3f} | "
-                         f"{fmt_rate(tf['bars_per_second'])} | "
-                         f"{full.get('mean_ms', float('nan')) * 1e3:.3f} | "
-                         + (f"{row['speedup_vs_full']:.2f}× | {row['speedup_vs_tail']:.2f}× |"
-                            if "speedup_vs_full" in row else "— | — |"))
+            full = row["external_full_recompute"]
+            cells = [
+                f"{row['base_bars']:,}",
+                f"{row['chunk']:,}",
+                f"{api['mean_call_us']:.3f}",
+                f"{tf['mean_call_us']:.3f}",
+                fmt_rate(tf["bars_per_second"]),
+                f"{full['mean_ms'] * 1e3:.3f}",
+                f"{row['speedup_vs_full']:.2f}×",
+            ]
+            if has_tail:
+                cells.append(f"{row['speedup_vs_tail']:.2f}×")
+            lines.append("| " + " | ".join(cells) + " |")
         lines.append("")
     if report.get("threads"):
         lines += ["## Independent-stream threads", "",
-                  "| Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | TA-Lib vector/s |",
+                  "| Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | Reference vector/s |",
                   "|---:|---:|---:|---:|---:|---:|---:|---:|"]
         for row in report["threads"]:
-            talib = row.get("talib_original_vector", {})
+            reference = row["external_reference_vector"]
             lines.append(f"| {row['threads']} | "
                          f"{fmt_rate(row['taflow_canonical_vector']['units_per_second'])} | "
                          f"{fmt_rate(row['taflow_native_vector']['units_per_second'])} | "
@@ -473,7 +506,7 @@ def render(report: dict) -> str:
                          f"{fmt_rate(row['taflow_canonical_continue']['units_per_second'])} | "
                          f"{fmt_rate(row['taflow_native_continue']['units_per_second'])} | "
                          f"{row['taflow_continue_scaling']:.2f}× | "
-                         f"{fmt_rate(talib.get('units_per_second'))} |")
+                         f"{fmt_rate(reference['units_per_second'])} |")
         lines.append("")
     lines += ["---", "Times include Python conversion/binding overhead. Raw samples are retained in JSON.", ""]
     return "\n".join(lines)
