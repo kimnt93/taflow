@@ -1,11 +1,32 @@
 //! Canonical persistent technical indicators.
 
+mod accumulation_distribution;
+mod accumulation_distribution_oscillator;
+#[cfg(test)]
+mod accumulation_distribution_oscillator_test;
+#[cfg(test)]
+mod accumulation_distribution_test;
 mod arnaud_legoux_moving_average;
 #[cfg(test)]
 mod arnaud_legoux_moving_average_test;
+mod aroon;
+mod aroon_oscillator;
+#[cfg(test)]
+mod aroon_oscillator_test;
+#[cfg(test)]
+mod aroon_test;
+mod average_price;
+#[cfg(test)]
+mod average_price_test;
+mod average_true_range;
+#[cfg(test)]
+mod average_true_range_test;
 mod awesome_oscillator;
 #[cfg(test)]
 mod awesome_oscillator_test;
+mod balance_of_power;
+#[cfg(test)]
+mod balance_of_power_test;
 mod cumulative_count;
 #[cfg(test)]
 mod cumulative_count_test;
@@ -48,6 +69,12 @@ mod log_return_test;
 mod momentum;
 #[cfg(test)]
 mod momentum_test;
+mod normalized_average_true_range;
+#[cfg(test)]
+mod normalized_average_true_range_test;
+mod on_balance_volume;
+#[cfg(test)]
+mod on_balance_volume_test;
 mod opening_range;
 #[cfg(test)]
 mod opening_range_test;
@@ -111,6 +138,9 @@ mod smoothed_trend_channel_test;
 mod tom_de_mark_sequential;
 #[cfg(test)]
 mod tom_de_mark_sequential_test;
+mod true_range;
+#[cfg(test)]
+mod true_range_test;
 mod true_strength_index;
 #[cfg(test)]
 mod true_strength_index_test;
@@ -138,8 +168,15 @@ pub(crate) fn invalid_period(name: &'static str, period: usize, minimum: usize) 
     }
 }
 
+pub use accumulation_distribution::AccumulationDistribution;
+pub use accumulation_distribution_oscillator::AccumulationDistributionOscillator;
 pub use arnaud_legoux_moving_average::ArnaudLegouxMovingAverage;
+pub use aroon::{Aroon, AroonValue};
+pub use aroon_oscillator::AroonOscillator;
+pub use average_price::AveragePrice;
+pub use average_true_range::AverageTrueRange;
 pub use awesome_oscillator::AwesomeOscillator;
+pub use balance_of_power::BalanceOfPower;
 pub use cumulative_count::CumulativeCount;
 pub use cumulative_product::CumulativeProduct;
 pub use cumulative_sum::CumulativeSum;
@@ -154,6 +191,8 @@ pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscill
 pub use lag::Lag;
 pub use log_return::LogReturn;
 pub use momentum::Momentum;
+pub use normalized_average_true_range::NormalizedAverageTrueRange;
+pub use on_balance_volume::OnBalanceVolume;
 pub use opening_range::{OpeningRange, OpeningRangeValue};
 pub use parabolic_moving_average_stop::{
     ParabolicMovingAverageStop, ParabolicMovingAverageStopValue,
@@ -177,6 +216,7 @@ pub use rolling_winsorize::RollingWinsorize;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use smoothed_trend_channel::SmoothedTrendChannel;
 pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
+pub use true_range::TrueRange;
 pub use true_strength_index::TrueStrengthIndex;
 pub use volume_weighted_moving_average::VolumeWeightedMovingAverage;
 pub use williams_percent_r::WilliamsPercentR;

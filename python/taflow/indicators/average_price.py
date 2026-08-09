@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._native import AveragePrice as _NativeAveragePrice
-from ._price_state import OhlcPriceState
+from .._native import AveragePrice as _NativeAveragePrice
+from .._price_state import OhlcPriceState
 
 
 class AveragePrice(OhlcPriceState):

@@ -44,10 +44,7 @@ mod absolute_price_oscillator_test;
 mod acceleration_bands;
 #[cfg(test)]
 mod acceleration_bands_test;
-mod aroon;
-mod aroon_rescan;
-#[cfg(test)]
-mod aroon_test;
+pub(crate) mod aroon_rescan;
 mod average_directional_index;
 mod average_directional_index_rating;
 #[cfg(test)]
@@ -385,7 +382,7 @@ pub use math_tan::MathTan;
 mod math_tan_test;
 mod math_tanh;
 pub use math_tanh::MathTanh;
-mod accumulation_distribution_helper;
+pub(crate) mod accumulation_distribution_helper;
 #[cfg(test)]
 mod math_tanh_test;
 mod minus_directional_indicator;
@@ -659,16 +656,7 @@ pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
 pub use weighted_moving_average::WeightedMovingAverage;
 pub use window::Window;
 
-mod average_true_range;
-#[cfg(test)]
-mod average_true_range_test;
 mod math_add;
-mod normalized_average_true_range;
-#[cfg(test)]
-mod normalized_average_true_range_test;
-mod true_range;
-#[cfg(test)]
-mod true_range_test;
 pub use math_add::MathAdd;
 #[cfg(test)]
 mod math_add_test;
@@ -682,9 +670,9 @@ mod math_divide;
 #[cfg(test)]
 mod math_multiply_test;
 pub use math_divide::MathDivide;
-mod average_price;
 #[cfg(test)]
 mod math_divide_test;
+mod median_price;
 mod rolling_argmax;
 #[cfg(test)]
 mod rolling_argmax_test;
@@ -703,10 +691,6 @@ mod rolling_min_max_index_test;
 mod rolling_min_max_test;
 #[cfg(test)]
 mod rolling_min_test;
-pub use average_price::AveragePrice;
-#[cfg(test)]
-mod average_price_test;
-mod median_price;
 pub use median_price::MedianPrice;
 #[cfg(test)]
 mod median_price_test;
@@ -1078,19 +1062,6 @@ mod tests {
         }
     }
 }
-mod on_balance_volume;
-#[cfg(test)]
-mod on_balance_volume_test;
-
-mod accumulation_distribution;
-mod accumulation_distribution_oscillator;
-#[cfg(test)]
-mod accumulation_distribution_oscillator_test;
-#[cfg(test)]
-mod accumulation_distribution_test;
-mod balance_of_power;
-#[cfg(test)]
-mod balance_of_power_test;
 mod break_of_structure_change_of_character;
 #[cfg(test)]
 mod break_of_structure_change_of_character_test;
@@ -1268,9 +1239,6 @@ mod rolling_kurtosis;
 #[cfg(test)]
 mod rolling_kurtosis_test;
 pub use rolling_kurtosis::RollingKurtosis;
-mod aroon_oscillator;
-#[cfg(test)]
-mod aroon_oscillator_test;
 mod chaikin_money_flow;
 #[cfg(test)]
 mod chaikin_money_flow_test;
@@ -1395,20 +1363,12 @@ mod crossunder;
 mod crossunder_test;
 pub use crossunder::Crossunder;
 mod cross;
-pub use accumulation_distribution::AccumulationDistribution;
-pub use accumulation_distribution_oscillator::AccumulationDistributionOscillator;
-pub use aroon::{Aroon, AroonValue};
-pub use aroon_oscillator::AroonOscillator;
-pub use average_true_range::AverageTrueRange;
-pub use balance_of_power::BalanceOfPower;
 pub use chaikin_money_flow::ChaikinMoneyFlow;
 pub use cross::Cross;
 pub use detrended_price_oscillator::DetrendedPriceOscillator;
 pub use mass_index::MassIndex;
 pub use mc_ginley_dynamic::McGinleyDynamic;
 pub use negative_volume_index::NegativeVolumeIndex;
-pub use normalized_average_true_range::NormalizedAverageTrueRange;
-pub use on_balance_volume::OnBalanceVolume;
 pub use positive_volume_index::PositiveVolumeIndex;
 pub use rolling_average_deviation::RollingAverageDeviation;
 pub use rolling_beta::RollingBeta;
@@ -1419,5 +1379,4 @@ pub use rolling_min_max::{RollingMinMax, RollingMinMaxValue};
 pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
 pub use rolling_standard_deviation::RollingStandardDeviation;
 pub use rolling_variance::RollingVariance;
-pub use true_range::TrueRange;
 pub use volume_price_trend::VolumePriceTrend;

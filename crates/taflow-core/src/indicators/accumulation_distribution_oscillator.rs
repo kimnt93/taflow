@@ -1,7 +1,7 @@
 //! Persistent Accumulation/Distribution Oscillator state.
 
-use super::accumulation_distribution_helper::money_flow_volume;
 use crate::error::{TaError, TaResult};
+use crate::stream::accumulation_distribution_helper::money_flow_volume;
 
 /// Difference between fast and slow first-value-seeded EMAs of the A/D line.
 #[derive(Debug, Clone)]

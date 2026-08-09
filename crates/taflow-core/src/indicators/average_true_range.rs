@@ -1,7 +1,7 @@
 //! Persistent Average True Range state.
 
-use super::invalid_period;
 use crate::error::{TaError, TaResult};
+use crate::stream::invalid_period;
 
 /// Smooth true range with Wilder's recurrence after an arithmetic seed.
 #[derive(Debug, Clone)]

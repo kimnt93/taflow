@@ -1,6 +1,6 @@
 use super::equal_highs_lows::EqualHighsLows;
+use crate::indicators::AverageTrueRange;
 use crate::stream::swing_highs_lows_test::{lcg_series, ReferenceSwing};
-use crate::stream::AverageTrueRange;
 
 struct Reference {
     atr: AverageTrueRange,

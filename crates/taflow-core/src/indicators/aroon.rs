@@ -1,7 +1,7 @@
 //! Persistent Aroon state.
 
-use super::{aroon_rescan::aroon_rescan, invalid_period, MonotonicMax, MonotonicMin};
 use crate::error::{TaError, TaResult};
+use crate::stream::{aroon_rescan::aroon_rescan, invalid_period, MonotonicMax, MonotonicMin};
 
 /// Named Aroon down/up result for one warmed bar.
 #[derive(Debug, Clone, Copy, PartialEq)]

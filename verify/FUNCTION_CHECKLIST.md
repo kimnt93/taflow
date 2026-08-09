@@ -48,6 +48,18 @@ the full Python suite, interface audit, and ten external-oracle MATCH results
 passed. Benchmark fields remain `TODO` intentionally; no benchmark command was
 run.
 
+The fifth structural batch migrated `AccumulationDistribution`,
+`AccumulationDistributionOscillator`, `OnBalanceVolume`, `BalanceOfPower`,
+`Aroon`, `AroonOscillator`, `AveragePrice`, `AverageTrueRange`, `TrueRange`,
+and `NormalizedAverageTrueRange`. Their old `state_api.rs` definitions and
+legacy Python root modules were removed, and duplicate `vwap.py` and
+`rolling_vwap.py` compatibility modules were removed in favor of
+`RollingVolumeWeightedAveragePrice`. Rust lifecycle tests, the release PyO3
+build, the full Python suite, interface audit, and ten external-oracle MATCH
+results passed. Generated rows below may still report stale paths; the source
+scan is authoritative. Benchmark fields remain `TODO`; no benchmark command
+was run.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**

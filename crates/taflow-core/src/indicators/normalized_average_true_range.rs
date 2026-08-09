@@ -1,7 +1,7 @@
 //! Persistent Normalized Average True Range state.
 
-use super::AverageTrueRange;
 use crate::error::{TaError, TaResult};
+use crate::indicators::AverageTrueRange;
 
 /// Scale Average True Range by the current close as a percentage.
 #[derive(Debug, Clone)]

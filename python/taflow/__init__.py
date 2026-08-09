@@ -4,15 +4,12 @@ __version__ = "0.1.2"
 
 from .ma_type import MaType
 from .acceleration_bands import AccelerationBands
-from .average_true_range import AverageTrueRange
+from .indicators import AverageTrueRange
 from .double_exponential_moving_average import DoubleExponentialMovingAverage
 from .kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
-from .aroon import Aroon
-from .aroon_oscillator import AroonOscillator
-from .accumulation_distribution import AccumulationDistribution
-from .accumulation_distribution_oscillator import AccumulationDistributionOscillator
-from .balance_of_power import BalanceOfPower
-from .on_balance_volume import OnBalanceVolume
+from .indicators import Aroon, AroonOscillator
+from .indicators import AccumulationDistribution, AccumulationDistributionOscillator
+from .indicators import BalanceOfPower, OnBalanceVolume
 from .absolute_price_oscillator import AbsolutePriceOscillator
 from .percentage_price_oscillator import PercentagePriceOscillator
 from .chande_momentum_oscillator import ChandeMomentumOscillator
@@ -58,7 +55,7 @@ from .moving_average import MovingAverage
 from .minus_directional_indicator import MinusDirectionalIndicator
 from .minus_directional_movement import MinusDirectionalMovement
 from .money_flow_index import MoneyFlowIndex
-from .average_price import AveragePrice
+from .indicators import AveragePrice
 from .median_price import MedianPrice
 from .typical_price import TypicalPrice
 from .weighted_close import WeightedClose
@@ -95,8 +92,7 @@ from .anchored_volume_weighted_average_price import (
 from .variable_index_dynamic_average import VariableIndexDynamicAverage
 from .laguerre_relative_strength_index import LaguerreRelativeStrengthIndex
 from .simple_moving_average import SimpleMovingAverage
-from .normalized_average_true_range import NormalizedAverageTrueRange
-from .true_range import TrueRange
+from .indicators import NormalizedAverageTrueRange, TrueRange
 from .triangular_moving_average import TriangularMovingAverage
 from .triple_exponential_moving_average import TripleExponentialMovingAverage
 from .triple_exponential_average import TripleExponentialAverage

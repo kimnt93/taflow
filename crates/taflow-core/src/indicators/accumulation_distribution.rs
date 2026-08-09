@@ -1,7 +1,7 @@
 //! Persistent Accumulation/Distribution state.
 
-use super::accumulation_distribution_helper::money_flow_volume;
 use crate::error::{TaError, TaResult};
+use crate::stream::accumulation_distribution_helper::money_flow_volume;
 
 /// Accumulate close-location value multiplied by volume.
 #[derive(Debug, Clone, Default)]

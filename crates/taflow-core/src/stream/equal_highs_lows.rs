@@ -1,6 +1,7 @@
 use super::operator_states::*;
 use super::*;
 use crate::error::{TaError, TaResult};
+use crate::indicators::AverageTrueRange;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Persistent Rust state or aligned output type for `EqualHighsLowsValue`.

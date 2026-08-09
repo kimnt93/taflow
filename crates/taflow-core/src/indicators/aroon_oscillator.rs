@@ -1,7 +1,7 @@
 //! Persistent Aroon Oscillator state.
 
-use super::Aroon;
 use crate::error::TaResult;
+use crate::indicators::Aroon;
 
 /// Compute Aroon Up minus Aroon Down from one persistent extrema state.
 #[derive(Debug, Clone)]

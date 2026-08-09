@@ -1,6 +1,7 @@
 use super::operator_states::*;
 use super::*;
 use crate::error::{TaError, TaResult};
+use crate::indicators::TrueRange;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Persistent Rust state or aligned output type for `SqueezeValue`.

@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import Aroon as _NativeAroon
-from ._series import as_float64_series
+from .._native import Aroon as _NativeAroon
+from .._series import as_float64_series
 
 
 class Aroon:

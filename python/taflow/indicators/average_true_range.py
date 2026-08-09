@@ -1,31 +1,31 @@
-"""Persistent True Range adapter."""
+"""Persistent Average True Range adapter."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import TrueRange as _NativeTrueRange
-from ._series import as_float64_series
+from .._native import AverageTrueRange as _NativeAverageTrueRange
+from .._series import as_float64_series
 
 
-class TrueRange:
-    """Compute max(high-low, |high-prev close|, |low-prev close|) in Rust.
+class AverageTrueRange:
+    """Compute Wilder-smoothed True Range in persistent Rust state.
 
     High, low, and close histories are required; pass three empty arrays for a
-    fresh state. The first output is NaN because no previous close exists. This
-    maps to TA-Lib ``TRANGE``.
+    fresh state. ``timeperiod`` defaults to 14 and must be positive. The first
+    ``timeperiod`` outputs are NaN. This maps to TA-Lib ``ATR``.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any) -> None:
-        self._state = _NativeTrueRange()
+    def __init__(self, high: Any, low: Any, close: Any, timeperiod: int = 14) -> None:
+        self._state = _NativeAverageTrueRange(timeperiod)
         self.extend(high, low, close)
 
-    def append(self, high: float, low: float, close: float) -> "TrueRange":
+    def append(self, high: float, low: float, close: float) -> "AverageTrueRange":
         """Append one high/low/close tuple and return this indicator."""
         self._state.append(float(high), float(low), float(close))
         return self
 
-    def extend(self, high: Any, low: Any, close: Any) -> "TrueRange":
+    def extend(self, high: Any, low: Any, close: Any) -> "AverageTrueRange":
         """Append aligned high, low, and close histories and return this indicator."""
         self._state.extend(
             as_float64_series(high), as_float64_series(low), as_float64_series(close)
@@ -33,15 +33,15 @@ class TrueRange:
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned float64 history with first-bar NaN warm-up."""
+        """Return the aligned float64 history with NaN warm-up."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest value, or ``None`` before two bars are present."""
+        """Return the latest value, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self) -> "TrueRange":
+    def reset(self) -> "AverageTrueRange":
         """Restore fresh native state, clear history, and return this indicator."""
         self._state.reset()
         return self

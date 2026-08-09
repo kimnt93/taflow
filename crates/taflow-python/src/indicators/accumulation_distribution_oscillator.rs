@@ -1,0 +1,69 @@
+use numpy::{PyArray1, PyReadonlyArray1};
+use pyo3::exceptions::PyValueError;
+use pyo3::prelude::*;
+use taflow::indicators::AccumulationDistributionOscillator as State;
+
+#[pyclass]
+pub struct AccumulationDistributionOscillator {
+    inner: State,
+    outputs: Vec<f64>,
+}
+
+#[pymethods]
+impl AccumulationDistributionOscillator {
+    #[new]
+    #[pyo3(signature = (fastperiod=3, slowperiod=10))]
+    fn new(fastperiod: usize, slowperiod: usize) -> PyResult<Self> {
+        Ok(Self {
+            inner: State::new(fastperiod, slowperiod)
+                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+            outputs: Vec::new(),
+        })
+    }
+    fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
+        let value = self.inner.append(high, low, close, volume);
+        self.outputs.push(value.unwrap_or(f64::NAN));
+        value
+    }
+    fn extend(
+        &mut self,
+        py: Python<'_>,
+        high: PyReadonlyArray1<f64>,
+        low: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+        volume: PyReadonlyArray1<f64>,
+    ) -> PyResult<()> {
+        let (high, low, close, volume) = (
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+            volume.as_slice()?,
+        );
+        if [low.len(), close.len(), volume.len()]
+            .iter()
+            .any(|&len| len != high.len())
+        {
+            return Err(PyValueError::new_err("inputs must have equal lengths"));
+        }
+        py.allow_threads(|| {
+            for (((&h, &l), &c), &v) in high.iter().zip(low).zip(close).zip(volume) {
+                self.append(h, l, c, v);
+            }
+        });
+        Ok(())
+    }
+    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
+        PyArray1::from_vec(py, self.outputs.clone())
+    }
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value()
+    }
+    fn reset(&mut self) {
+        self.inner.reset();
+        self.outputs.clear();
+    }
+}

@@ -1,9 +1,9 @@
 use std::collections::VecDeque;
 
 use super::{
-    AverageTrueRange, CumulativeMaximum, ExponentialMovingAverage, MonotonicMax, MonotonicMin,
-    RollingMedian, RollingStandardDeviation, SchaffTrendCycle, SchaffTrendCycleValue,
-    SimpleMovingAverage, StreamingIndicator, TrueRange, Window,
+    CumulativeMaximum, ExponentialMovingAverage, MonotonicMax, MonotonicMin, RollingMedian,
+    RollingStandardDeviation, SchaffTrendCycle, SchaffTrendCycleValue, SimpleMovingAverage,
+    StreamingIndicator, Window,
 };
 use crate::error::{TaError, TaResult};
 
