@@ -127,6 +127,15 @@ through the canonical indicator package. Their 16 focused Python tests and the
 300/300 interface audit passed. Benchmark fields remain `TODO`; no benchmark
 command was run.
 
+The thirty-fifth structural batch migrated the matching Rust states and test
+files for the ten adapters above from `crates/taflow-core/src/stream/` into
+`crates/taflow-core/src/indicators/`. It also moved the shared MACD recurrence
+helper into the indicator namespace, updated the stream compatibility surface
+to re-export canonical states, and redirected the ten PyO3 bindings to
+`taflow::indicators`. The full Rust library suite (386 tests), focused Python
+tests (16), release extension build, and 300/300 interface audit passed.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

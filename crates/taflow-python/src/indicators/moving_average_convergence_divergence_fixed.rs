@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::MovingAverageConvergenceDivergenceFixed as State;
+use taflow::indicators::MovingAverageConvergenceDivergenceFixed as State;
 
 /// Native-backed Python boundary for canonical MACDFIX state.
 #[pyclass]

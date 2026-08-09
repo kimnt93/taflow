@@ -64,26 +64,10 @@ mod hilbert_transform_trendline;
 mod hilbert_transform_trendline_test;
 mod indicator;
 mod math_operator;
-mod minus_directional_indicator;
-#[cfg(test)]
-mod minus_directional_indicator_test;
-mod minus_directional_movement;
-#[cfg(test)]
-mod minus_directional_movement_test;
 mod money_flow_index;
 #[cfg(test)]
 mod money_flow_index_test;
 mod moving_average;
-mod moving_average_convergence_divergence;
-mod moving_average_convergence_divergence_extended;
-#[cfg(test)]
-mod moving_average_convergence_divergence_extended_test;
-mod moving_average_convergence_divergence_fixed;
-#[cfg(test)]
-mod moving_average_convergence_divergence_fixed_test;
-mod moving_average_convergence_divergence_helpers;
-#[cfg(test)]
-mod moving_average_convergence_divergence_test;
 pub(crate) mod moving_average_dispatcher;
 #[cfg(test)]
 mod moving_average_test;
@@ -110,12 +94,6 @@ pub(crate) mod sorted_ring;
 pub(crate) mod statistic;
 pub(crate) mod vhgw;
 pub use session_flags::session_flags;
-mod fast_stochastic_oscillator;
-#[cfg(test)]
-mod fast_stochastic_oscillator_test;
-mod fibonacci_retracement;
-#[cfg(test)]
-mod fibonacci_retracement_test;
 mod helpers;
 pub(crate) mod lagged_common;
 pub(crate) mod operator_states;
@@ -158,24 +136,23 @@ mod weighted_moving_average;
 #[cfg(test)]
 mod weighted_moving_average_test;
 
+pub use crate::indicators::{
+    ExponentiallyWeightedStandardDeviation, ExponentiallyWeightedVariance,
+    FastStochasticOscillator, FastStochasticOscillatorValue, FibonacciRetracement,
+    FibonacciRetracementValue, FracDiff, MinusDirectionalIndicator, MinusDirectionalMovement,
+    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceExtended,
+    MovingAverageConvergenceDivergenceFixed, MovingAverageConvergenceDivergenceValue,
+};
 #[allow(unused_imports)]
 #[allow(unused_imports)]
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
 pub use exponential_moving_average::ExponentialMovingAverage;
-pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
 pub use hilbert_transform_trendline::HilbertTransformTrendline;
 pub use indicator::StreamingIndicator;
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use minus_directional_indicator::MinusDirectionalIndicator;
-pub use minus_directional_movement::MinusDirectionalMovement;
 pub use money_flow_index::MoneyFlowIndex;
 pub use moving_average::MovingAverage;
-pub use moving_average_convergence_divergence::{
-    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue,
-};
-pub use moving_average_convergence_divergence_extended::MovingAverageConvergenceDivergenceExtended;
-pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDivergenceFixed;
 #[allow(unused_imports)]
 pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use plus_directional_indicator::PlusDirectionalIndicator;
@@ -185,7 +162,6 @@ pub use relative_momentum_index::RelativeMomentumIndex;
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 
 #[allow(unused_imports)]
-pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
 #[allow(unused_imports)]
 pub use relative_strength_index::RelativeStrengthIndex;
 pub use simple_moving_average::SimpleMovingAverage;
@@ -212,13 +188,6 @@ mod bars_since_test;
 #[cfg(test)]
 #[cfg(test)]
 mod entry_exit_test;
-#[cfg(test)]
-#[cfg(test)]
-#[cfg(test)]
-mod exponentially_weighted_standard_deviation_test;
-#[cfg(test)]
-#[cfg(test)]
-mod exponentially_weighted_variance_test;
 #[cfg(test)]
 #[cfg(test)]
 #[cfg(test)]
@@ -578,11 +547,6 @@ pub use decay_linear::DecayLinear;
 #[allow(unused_imports)]
 pub(crate) mod bar_relation;
 mod bars_since;
-mod exponentially_weighted_standard_deviation;
-mod exponentially_weighted_variance;
-mod frac_diff;
-#[cfg(test)]
-mod frac_diff_test;
 mod ichimoku;
 #[cfg(test)]
 mod ichimoku_test;
@@ -619,10 +583,7 @@ mod lowest_since;
 mod value_when;
 pub use bars_since::BarsSince;
 pub use ease_of_movement::EaseOfMovement;
-pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
-pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use force_index::ForceIndex;
-pub use frac_diff::FracDiff;
 pub use highest_since::HighestSince;
 pub use ichimoku::{Ichimoku, IchimokuValue};
 pub use lowest_since::LowestSince;

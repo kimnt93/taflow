@@ -7,11 +7,11 @@
 use crate::error::{TaError, TaResult};
 use crate::ma_type::MaType;
 
-use super::{
+use crate::indicators::{
     moving_average_convergence_divergence::MovingAverageConvergenceDivergenceValue,
     moving_average_convergence_divergence_helpers::macd_ema_steady_loop,
-    moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator,
 };
+use crate::stream::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
 
 /// Incremental MACDEXT with aligned fast/slow seeds.
 /// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergenceExtended`.

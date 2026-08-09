@@ -2,6 +2,51 @@
 
 pub use crate::stream::StreamingIndicator;
 
+mod exponentially_weighted_standard_deviation;
+#[cfg(test)]
+mod exponentially_weighted_standard_deviation_test;
+mod exponentially_weighted_variance;
+#[cfg(test)]
+mod exponentially_weighted_variance_test;
+mod fast_stochastic_oscillator;
+#[cfg(test)]
+mod fast_stochastic_oscillator_test;
+mod fibonacci_retracement;
+#[cfg(test)]
+mod fibonacci_retracement_test;
+mod frac_diff;
+#[cfg(test)]
+mod frac_diff_test;
+mod minus_directional_indicator;
+#[cfg(test)]
+mod minus_directional_indicator_test;
+mod minus_directional_movement;
+#[cfg(test)]
+mod minus_directional_movement_test;
+mod moving_average_convergence_divergence;
+mod moving_average_convergence_divergence_extended;
+#[cfg(test)]
+mod moving_average_convergence_divergence_extended_test;
+mod moving_average_convergence_divergence_fixed;
+#[cfg(test)]
+mod moving_average_convergence_divergence_fixed_test;
+mod moving_average_convergence_divergence_helpers;
+#[cfg(test)]
+mod moving_average_convergence_divergence_test;
+
+pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandardDeviation;
+pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
+pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
+pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
+pub use frac_diff::FracDiff;
+pub use minus_directional_indicator::MinusDirectionalIndicator;
+pub use minus_directional_movement::MinusDirectionalMovement;
+pub use moving_average_convergence_divergence::{
+    MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceValue,
+};
+pub use moving_average_convergence_divergence_extended::MovingAverageConvergenceDivergenceExtended;
+pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDivergenceFixed;
+
 mod acceleration_bands;
 #[cfg(test)]
 mod acceleration_bands_test;

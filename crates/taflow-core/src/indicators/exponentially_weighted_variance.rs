@@ -1,7 +1,7 @@
 //! Stateful exponentially weighted variance.
 
-use super::operator_states::ewm_alpha;
 use crate::error::TaResult;
+use crate::stream::operator_states::ewm_alpha;
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `ExponentiallyWeightedVariance`.

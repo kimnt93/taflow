@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::FibonacciRetracement as FibonacciRetracementState;
+use taflow::indicators::FibonacciRetracement as FibonacciRetracementState;
 
 /// Python boundary for the canonical Rust Fibonacci retracement state.
 #[pyclass]

@@ -110,7 +110,7 @@ impl FibonacciRetracement {
     /// Creates the retracement calculator with a positive rolling window.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 1 {
-            return Err(super::invalid_period("window", period, 1));
+            return Err(crate::stream::invalid_period("window", period, 1));
         }
         Ok(Self {
             period,

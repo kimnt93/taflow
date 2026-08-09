@@ -1,52 +1,71 @@
-//! Stateful fixed-parameter Moving Average Convergence/Divergence.
+//! Stateful Moving Average Convergence/Divergence.
 //!
-//! MACDFIX uses TA-Lib's fixed fast and slow smoothing constants (`0.15` and
-//! `0.075`) rather than the ordinary period-derived MACD constants.
+//! MACD aligns the fast EMA seed to the end of the slow EMA seed window, then
+//! seeds the signal EMA from the first `signal_period` MACD observations.
 
 use crate::error::{TaError, TaResult};
 
-use super::moving_average_convergence_divergence::MovingAverageConvergenceDivergenceValue;
-use super::moving_average_convergence_divergence_helpers::macd_ema_steady_loop;
+use crate::indicators::moving_average_convergence_divergence_helpers::macd_ema_steady_loop;
 
-/// Incremental MACDFIX with fixed 12/26 smoothing and configurable signal EMA.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergenceFixed`.
+/// The three values produced by a warmed MACD state machine.
+#[derive(Debug, Clone, Copy, PartialEq)]
+/// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergenceValue`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct MovingAverageConvergenceDivergenceFixed {
+pub struct MovingAverageConvergenceDivergenceValue {
+    pub macd: f64,
+    pub signal: f64,
+    pub histogram: f64,
+}
+
+/// Stateful MACD matching the batch function's aligned EMA seeds.
+#[derive(Debug, Clone)]
+/// Persistent Rust state or aligned output type for `MovingAverageConvergenceDivergence`.
+///
+/// The state consumes chronological inputs causally, preserves warm-up
+/// values, and exposes the current result through its public API.
+pub struct MovingAverageConvergenceDivergence {
+    fast_period: usize,
+    slow_period: usize,
     signal_period: usize,
     warmup: Vec<f64>,
+    fast_k: f64,
+    slow_k: f64,
+    signal_k: f64,
     fast_ema: Option<f64>,
     slow_ema: Option<f64>,
-    signal_k: f64,
     signal_count: usize,
     signal_sum: f64,
     signal_ema: Option<f64>,
     value: Option<MovingAverageConvergenceDivergenceValue>,
 }
 
-impl MovingAverageConvergenceDivergenceFixed {
-    const FAST_PERIOD: usize = 12;
-    const SLOW_PERIOD: usize = 26;
-    const FAST_K: f64 = 0.15;
-    const SLOW_K: f64 = 0.075;
-
-    /// Creates a MACDFIX state with a signal period of at least one.
-    pub fn new(signal_period: usize) -> TaResult<Self> {
-        if signal_period == 0 {
+impl MovingAverageConvergenceDivergence {
+    /// Creates a MACD state with TA-Lib-compatible periods.
+    pub fn new(fast_period: usize, slow_period: usize, signal_period: usize) -> TaResult<Self> {
+        if fast_period < 2 || slow_period < 2 || signal_period == 0 {
             return Err(TaError::InvalidParameter {
-                name: "signalperiod",
-                value: signal_period.to_string(),
-                reason: "must be >= 1",
+                name: "fastperiod/slowperiod/signalperiod",
+                value: format!("{fast_period}/{slow_period}/{signal_period}"),
+                reason: "fastperiod >= 2, slowperiod >= 2, signalperiod >= 1",
             });
         }
+        let (fast_period, slow_period) = if fast_period < slow_period {
+            (fast_period, slow_period)
+        } else {
+            (slow_period, fast_period)
+        };
         Ok(Self {
+            fast_period,
+            slow_period,
             signal_period,
-            warmup: Vec::with_capacity(Self::SLOW_PERIOD),
+            warmup: Vec::with_capacity(slow_period),
+            fast_k: 2.0 / (fast_period as f64 + 1.0),
+            slow_k: 2.0 / (slow_period as f64 + 1.0),
+            signal_k: 2.0 / (signal_period as f64 + 1.0),
             fast_ema: None,
             slow_ema: None,
-            signal_k: 2.0 / (signal_period as f64 + 1.0),
             signal_count: 0,
             signal_sum: 0.0,
             signal_ema: None,
@@ -58,22 +77,22 @@ impl MovingAverageConvergenceDivergenceFixed {
     pub fn append(&mut self, input: f64) -> Option<MovingAverageConvergenceDivergenceValue> {
         let macd = match (self.fast_ema, self.slow_ema) {
             (Some(fast), Some(slow)) => {
-                let fast = Self::FAST_K.mul_add(input - fast, fast);
-                let slow = Self::SLOW_K.mul_add(input - slow, slow);
+                let fast = self.fast_k.mul_add(input - fast, fast);
+                let slow = self.slow_k.mul_add(input - slow, slow);
                 self.fast_ema = Some(fast);
                 self.slow_ema = Some(slow);
                 fast - slow
             }
             _ => {
                 self.warmup.push(input);
-                if self.warmup.len() < Self::SLOW_PERIOD {
+                if self.warmup.len() < self.slow_period {
                     return None;
                 }
-                let slow = self.warmup.iter().sum::<f64>() / Self::SLOW_PERIOD as f64;
-                let fast = self.warmup[Self::SLOW_PERIOD - Self::FAST_PERIOD..]
+                let slow = self.warmup.iter().sum::<f64>() / self.slow_period as f64;
+                let fast = self.warmup[self.slow_period - self.fast_period..]
                     .iter()
                     .sum::<f64>()
-                    / Self::FAST_PERIOD as f64;
+                    / self.fast_period as f64;
                 self.fast_ema = Some(fast);
                 self.slow_ema = Some(slow);
                 fast - slow
@@ -102,10 +121,9 @@ impl MovingAverageConvergenceDivergenceFixed {
         self.value
     }
 
-    /// Bulk kernel: advances the fixed fast/slow EMAs and the signal EMA in
-    /// one loop with the scalar states held in locals, writing NaN during
-    /// warm-up. Bit-identical to per-bar [`Self::append`] in outputs and
-    /// post-run state.
+    /// Bulk kernel: advances the fast, slow, and signal EMA recurrences in one
+    /// loop with the scalar states held in locals, writing NaN during warm-up.
+    /// Bit-identical to per-bar [`Self::append`] in outputs and post-run state.
     pub fn extend_slices_into(
         &mut self,
         inputs: &[f64],
@@ -137,7 +155,7 @@ impl MovingAverageConvergenceDivergenceFixed {
             return;
         }
 
-        let k = [Self::FAST_K, Self::SLOW_K, self.signal_k];
+        let k = [self.fast_k, self.slow_k, self.signal_k];
         let mut state = [
             self.fast_ema.expect("warm fast EMA"),
             self.slow_ema.expect("warm slow EMA"),
