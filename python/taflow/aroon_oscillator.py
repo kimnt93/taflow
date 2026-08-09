@@ -1,97 +1,50 @@
-"""Native stateful Aroon oscillator adapter."""
+"""Persistent Aroon Oscillator adapter."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import StatefulAroonosc
+from ._native import AroonOscillator as _NativeAroonOscillator
 from ._series import as_float64_series
 
 
 class AroonOscillator:
-    """Compute the Aroon oscillator from aligned high and low prices.
+    """Compute Aroon Up minus Aroon Down in persistent Rust state.
 
-    Parameters
-    ----------
-    high, low : array-like
-        Initial aligned high and low histories.
-    timeperiod : int, default 14
-        Lookback period.
+    The constructor requires aligned chronological high and low series. Pass
+    two empty arrays for a fresh streaming state. ``timeperiod`` defaults to 14
+    and must be at least 2. Output contains NaN for the first ``timeperiod``
+    bars and maps to TA-Lib ``AROONOSC``.
     """
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        timeperiod: int = 14,
-    ) -> None:
-        """Create an oscillator state and process initial prices."""
-        self._state = StatefulAroonosc(timeperiod)
-        if high is not None or low is not None:
-            self.extend(high, low)
+    def __init__(self, high: Any, low: Any, timeperiod: int = 14) -> None:
+        self._state = _NativeAroonOscillator(timeperiod)
+        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "AroonOscillator":
-        """Append one chronological observation to the native Rust state.
-
-        Parameters
-        ----------
-        high : float
-            Current high price.
-        low : float
-            Current low price.
-
-        Returns
-        -------
-        AroonOscillator
-            This indicator, for fluent chaining; read `value` for the result."""
+        """Append one high/low pair and return this indicator."""
         self._state.append(float(high), float(low))
         return self
 
     def extend(self, high: Any, low: Any) -> "AroonOscillator":
-        """Append aligned chronological histories to the native Rust state.
-
-        Parameters
-        ----------
-        high : Any
-            Chronological high price series.
-        low : Any
-            Chronological low price series.
-
-        Returns
-        -------
-        AroonOscillator
-            This indicator, for fluent chaining."""
+        """Append aligned high and low histories and return this indicator."""
         self._state.extend(as_float64_series(high), as_float64_series(low))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
+        """Return the aligned float64 oscillator history with NaN warm-up."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest Rust result.
-
-        Returns
-        -------
-        float, tuple, or None
-            Latest output, or None while scalar warm-up is incomplete."""
+        """Return the latest oscillator value, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "AroonOscillator":
-        """Restore fresh-state behavior and clear output history.
-
-        Returns
-        -------
-        AroonOscillator
-            This indicator, for fluent chaining."""
+        """Restore fresh native state, clear history, and return this indicator."""
         self._state.reset()
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed pairs."""
         return len(self._state)

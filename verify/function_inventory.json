@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 184,
-    "complete": 44,
+    "complete": 46,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 602,
     "smc_functions": 8,
-    "structure": 44,
+    "structure": 46,
     "talib_functions": 161
   },
   "rows": [
@@ -958,7 +958,8 @@
       "name": "Aroon",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAroon"
+        "Aroon",
+        "_NativeAroon"
       ],
       "pandas_ta_reference": true,
       "rust_export": true,
@@ -972,7 +973,8 @@
       "name": "AroonOscillator",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAroonosc"
+        "AroonOscillator",
+        "_NativeAroonOscillator"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4420,6 +4422,8 @@
         "ActiveZoneListOperator",
         "AlmaOperator",
         "AmihudOperator",
+        "Aroon",
+        "AroonOscillator",
         "AverageDailyDollarValueOperator",
         "AveragePrice",
         "AwesomeOscillatorOperator",
@@ -4622,8 +4626,6 @@
         "StatefulAdxr",
         "StatefulAnchoredVolumeWeightedAveragePrice",
         "StatefulApo",
-        "StatefulAroon",
-        "StatefulAroonosc",
         "StatefulAtr",
         "StatefulAvgdev",
         "StatefulBbands",
@@ -4726,6 +4728,8 @@
         "ActiveZoneListOperator",
         "AlmaOperator",
         "AmihudOperator",
+        "Aroon",
+        "AroonOscillator",
         "AverageDailyDollarValueOperator",
         "AveragePrice",
         "AwesomeOscillatorOperator",
@@ -4928,8 +4932,6 @@
         "StatefulAdxr",
         "StatefulAnchoredVolumeWeightedAveragePrice",
         "StatefulApo",
-        "StatefulAroon",
-        "StatefulAroonosc",
         "StatefulAtr",
         "StatefulAvgdev",
         "StatefulBbands",

@@ -2175,14 +2175,14 @@ impl WilliamsPercentR {
 }
 
 #[pyclass]
-pub struct StatefulAroon {
+pub struct Aroon {
     inner: stream::Aroon,
     downs: Vec<f64>,
     ups: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulAroon {
+impl Aroon {
     #[new]
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
@@ -2212,16 +2212,9 @@ impl StatefulAroon {
     ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
-        if high.len() != low.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
         let (downs, ups) = (&mut self.downs, &mut self.ups);
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(high, low, downs, ups)
-                .expect("lengths validated above")
-        });
-        Ok(())
+        py.allow_threads(|| self.inner.extend_slices_into(high, low, downs, ups))
+            .map_err(py_value_error)
     }
 
     fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {
@@ -2248,13 +2241,13 @@ impl StatefulAroon {
 }
 
 #[pyclass]
-pub struct StatefulAroonosc {
+pub struct AroonOscillator {
     inner: stream::AroonOscillator,
     outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl StatefulAroonosc {
+impl AroonOscillator {
     #[new]
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
@@ -2276,16 +2269,8 @@ impl StatefulAroonosc {
     ) -> PyResult<()> {
         let high = high.as_slice()?;
         let low = low.as_slice()?;
-        if high.len() != low.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(high, low, outputs)
-                .expect("lengths validated above")
-        });
-        Ok(())
+        py.allow_threads(|| self.inner.extend_slices_into(high, low, &mut self.outputs))
+            .map_err(py_value_error)
     }
 
     #[getter]

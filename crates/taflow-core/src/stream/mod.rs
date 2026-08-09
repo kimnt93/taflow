@@ -43,9 +43,9 @@ mod adx;
 mod adxr;
 mod apo;
 mod aroon;
-#[allow(unused_imports)]
-pub(crate) use aroon::aroon;
-mod aroon_true_range;
+mod aroon_rescan;
+#[cfg(test)]
+mod aroon_test;
 mod bbands;
 mod candle_2crows;
 mod candle_3blackcrows;
@@ -1008,53 +1008,6 @@ mod tests {
     }
 
     #[test]
-    fn rolling_ohlc_momentum_states_match_batch_for_every_bar() {
-        let close: Vec<f64> = (0..100)
-            .map(|index| 70.0 + index as f64 * 0.04 + (index as f64 * 0.27).sin() * 4.0)
-            .collect();
-        let open: Vec<f64> = close
-            .iter()
-            .enumerate()
-            .map(|(index, close)| close + (index as f64 * 0.11).cos() * 0.7)
-            .collect();
-        let mut high: Vec<f64> = open
-            .iter()
-            .zip(&close)
-            .map(|(open, close)| open.max(*close) + 1.0)
-            .collect();
-        let mut low: Vec<f64> = open
-            .iter()
-            .zip(&close)
-            .map(|(open, close)| open.min(*close) - 0.8)
-            .collect();
-        for index in (9..close.len()).step_by(17) {
-            high[index] = close[index];
-            low[index] = close[index];
-        }
-        let period = 14;
-        let (down_expected, up_expected) = crate::stream::aroon(&high, &low, period).unwrap();
-        let osc_expected = crate::stream::aroon_oscillator(&high, &low, period).unwrap();
-        let mut aroon = Aroon::new(period).unwrap();
-        let mut oscillator = AroonOscillator::new(period).unwrap();
-        for index in 0..close.len() {
-            match aroon.append(high[index], low[index]) {
-                Some(value) => {
-                    assert_eq!(value.down, down_expected[index]);
-                    assert_eq!(value.up, up_expected[index]);
-                }
-                None => {
-                    assert!(down_expected[index].is_nan());
-                    assert!(up_expected[index].is_nan());
-                }
-            }
-            assert_optional_eq(
-                oscillator.append(high[index], low[index]),
-                osc_expected[index],
-            );
-        }
-    }
-
-    #[test]
     fn atr_and_macd_match_batch_for_every_bar() {
         let close: Vec<f64> = (0..90)
             .map(|i| 100.0 + (i as f64 * 0.21).cos() * 4.0 + i as f64 * 0.1)
@@ -1367,8 +1320,8 @@ pub(crate) use rolling_median::rolling_median;
 #[allow(unused_imports)]
 pub(crate) use rolling_mode::rolling_mode;
 mod aroon_oscillator;
-#[allow(unused_imports)]
-pub(crate) use aroon_oscillator::aroon_oscillator;
+#[cfg(test)]
+mod aroon_oscillator_test;
 
 mod bar_relation;
 mod bars_since;

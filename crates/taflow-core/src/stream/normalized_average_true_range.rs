@@ -1,6 +1,5 @@
 //! Batch implementation for `normalized_average_true_range`.
 
-use super::aroon_true_range::*;
 use crate::error::{TaError, TaResult};
 
 /// Compute the normalized average true range result for the supplied aligned series.

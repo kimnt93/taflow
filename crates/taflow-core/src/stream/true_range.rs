@@ -1,6 +1,5 @@
 //! Batch implementation for `true_range`.
 
-use super::aroon_true_range::*;
 use crate::error::{TaError, TaResult};
 
 /// Compute the true range result for the supplied aligned series.

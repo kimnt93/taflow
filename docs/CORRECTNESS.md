@@ -308,8 +308,8 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.71× | 1.48× | 1.12× | 1.12× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.99× | 1.17× | 0.94× | 0.92× |
 | AbsolutePriceOscillator | [TA-Lib: `APO`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.26× | 1.66× | 0.99× | 1.11× |
-| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.56× | 1.23× | 0.89× | 0.86× |
-| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.47× | 1.12× | 0.90× | 0.86× |
+| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.61× | 1.20× | 0.91× | 0.87× |
+| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.46× | 1.08× | 0.88× | 0.87× |
 | MathAsin | [TA-Lib: `ASIN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.45× | 1.42× | 1.10× | 0.88× |
 | MathAtan | [TA-Lib: `ATAN`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.22× | 1.47× | 1.08× | 1.02× |
 | AverageTrueRange | [TA-Lib: `ATR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 4.44× | 1.69× | 1.23× | 1.17× |
@@ -603,8 +603,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.21× | 2.77× | 1.93× |
-| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.67× | 1.56× | 1.87× |
+| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.99× | 2.06× |
+| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.80× | 1.99× |
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.44× | 1.93× | 2.20× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.42× | 1.66× | 1.80× |
@@ -895,8 +895,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.08× | 1.84× |
-| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.94× | 2.02× |
+| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.04× | 2.11× |
+| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.95× | 1.99× |
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.73× | 2.15× | 1.96× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.91× | 2.09× | 1.98× |
@@ -1187,8 +1187,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.79× | 1.85× | 1.99× |
-| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.80× | 1.80× | 1.95× |
+| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 2.03× | 2.00× |
+| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.95× | 1.82× |
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.16× | 2.02× | 2.00× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.90× | 1.97× |
@@ -1479,8 +1479,8 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
-| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.58× | 2.02× | 2.26× |
-| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 2.12× | 2.05× |
+| Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 2.24× | 2.20× |
+| AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 2.09× | 2.05× |
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
 | AverageDirectionalIndex | [TA-Lib: `ADX`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.66× | 2.04× | 1.98× |
 | AverageDirectionalIndexRating | [TA-Lib: `ADXR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.69× | 1.91× | 2.06× |
