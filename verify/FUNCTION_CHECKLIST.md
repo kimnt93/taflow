@@ -765,6 +765,16 @@ suite, interface audit, formatter, and diff checks passed. Generated rows may
 still lag; source scans are authoritative. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The sixteenth structural batch migrated `CandleMorningDojiStar`,
+`CandleMorningStar`, `CandleOnNeck`, `CandlePiercing`, `CandleRickshawman`,
+`CandleShootingStar`, `CandleShortLine`, `CandleSpinningTop`,
+`CandleStalledPattern`, and `CandleStickSandwich`. Their Rust
+implementations/tests, Python adapters, and PyO3 bindings now use canonical
+one-indicator files and exports. The release extension, workspace Rust tests,
+ten focused Python tests, full Python suite, interface audit, formatter, and
+diff checks passed. Generated rows may still lag; source scans are
+authoritative. Benchmark fields remain `TODO`; no benchmark command was run.
+
 The fifteenth structural batch migrated `CandleHomingPigeon`,
 `CandleIdenticalThreeCrows`, `CandleInNeck`, `CandleInvertedHammer`,
 `CandleKicking`, `CandleKickingByLength`, `CandleLadderBottom`,

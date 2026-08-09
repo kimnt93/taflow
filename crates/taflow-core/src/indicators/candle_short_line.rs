@@ -1,38 +1,38 @@
-//! Incremental Piercing candlestick recognition (CDLPIERCING).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
-#[derive(Clone, Copy)]
-struct Candle {
-    o: f64,
-    l: f64,
-    c: f64,
-}
-impl Candle {
-    fn body(self) -> f64 {
-        (self.c - self.o).abs()
-    }
-    fn color(self) -> i32 {
-        if self.c >= self.o {
-            1
-        } else {
-            -1
-        }
-    }
-}
-/// Stateful CandlePiercing candle recognizer.
+/// Stateful CandleShortLine candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandlePiercing {
-    candles: VecDeque<Candle>,
-    body_sum: [f64; 2],
+pub struct CandleShortLine {
+    b: VecDeque<f64>,
+    s: VecDeque<f64>,
+    bs: f64,
+    ss: f64,
     value: Option<i32>,
 }
-impl Default for CandlePiercing {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl CandlePiercing {
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle short line result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+impl CandleShortLine {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -40,8 +40,10 @@ impl CandlePiercing {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(11),
-            body_sum: [0.0; 2],
+            b: VecDeque::with_capacity(10),
+            s: VecDeque::with_capacity(10),
+            bs: 0.,
+            ss: 0.,
             value: None,
         }
     }
@@ -50,45 +52,34 @@ impl CandlePiercing {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, o: f64, _h: f64, l: f64, c: f64) -> Option<i32> {
-        let cur = Candle { o, l, c };
-        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
-        let value = if self.candles.len() == 11 {
-            let prev = self.candles[10]; // bar i-1
-            let long_prev = ca_realbody_scalar(BODY_LONG, self.body_sum[1], prev.o, prev.c);
-            let long_cur = ca_realbody_scalar(BODY_LONG, self.body_sum[0], o, c);
-            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_sum[1] += cr_realbody_scalar(prev.o, prev.c)
-                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_sum[0] +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
+    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
+        let body = (c - o).abs();
+        // SHADOW_SHORT range value, computed exactly like the batch cr_shadows.
+        let sh = cr_shadows_scalar(o, h, l, c);
+        let v = if self.b.len() == 10 {
             Some(
-                (prev.color() == -1
-                    && prev.body() > long_prev
-                    && cur.color() == 1
-                    && cur.body() > long_cur
-                    && cur.o < prev.l
-                    && cur.c < prev.o
-                    && cur.c > prev.c + prev.body() * 0.5) as i32
-                    * 100,
+                (body < self.bs / 10.
+                    && h - o.max(c) < self.ss / 20.
+                    && o.min(c) - l < self.ss / 20.) as i32
+                    * if c >= o { 100 } else { -100 },
             )
         } else {
-            // Warm-up: seed the sums exactly like the batch prologue.
-            let i = self.candles.len();
-            if i < 10 {
-                self.body_sum[1] += cr_realbody_scalar(o, c);
-            }
-            if (1..11).contains(&i) {
-                self.body_sum[0] += cr_realbody_scalar(o, c);
-            }
             None
         };
-        if self.candles.len() == 11 {
-            self.candles.pop_front();
+        if self.b.len() == 10 {
+            // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
+            let old_b = self.b.pop_front().unwrap();
+            let old_s = self.s.pop_front().unwrap();
+            self.bs += body - old_b;
+            self.ss += sh - old_s;
+        } else {
+            self.bs += body;
+            self.ss += sh;
         }
-        self.candles.push_back(cur);
-        self.value = value;
-        value
+        self.b.push_back(body);
+        self.s.push_back(sh);
+        self.value = v;
+        v
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
@@ -118,7 +109,7 @@ impl CandlePiercing {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        if !self.b.is_empty() {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
@@ -140,8 +131,10 @@ impl CandlePiercing {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.candles.clear();
-        self.body_sum = [0.0; 2];
+        self.b.clear();
+        self.s.clear();
+        self.bs = 0.0;
+        self.ss = 0.0;
         self.value = None;
     }
 }

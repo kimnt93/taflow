@@ -46,42 +46,12 @@ mod candle_mat_hold_test;
 mod candle_matching_low;
 #[cfg(test)]
 mod candle_matching_low_test;
-mod candle_morning_doji_star;
-#[cfg(test)]
-mod candle_morning_doji_star_test;
-mod candle_morning_star;
-#[cfg(test)]
-mod candle_morning_star_test;
-mod candle_on_neck;
-#[cfg(test)]
-mod candle_on_neck_test;
-mod candle_piercing;
-#[cfg(test)]
-mod candle_piercing_test;
-mod candle_rickshawman;
-#[cfg(test)]
-mod candle_rickshawman_test;
 mod candle_rise_fall_three_methods;
 #[cfg(test)]
 mod candle_rise_fall_three_methods_test;
 mod candle_separating_lines;
 #[cfg(test)]
 mod candle_separating_lines_test;
-mod candle_shooting_star;
-#[cfg(test)]
-mod candle_shooting_star_test;
-mod candle_short_line;
-#[cfg(test)]
-mod candle_short_line_test;
-mod candle_spinning_top;
-#[cfg(test)]
-mod candle_spinning_top_test;
-mod candle_stalled_pattern;
-#[cfg(test)]
-mod candle_stalled_pattern_test;
-mod candle_stick_sandwich;
-#[cfg(test)]
-mod candle_stick_sandwich_test;
 mod candle_takuri;
 mod candle_tasuki_gap;
 #[cfg(test)]
@@ -277,18 +247,8 @@ mod weighted_moving_average_test;
 #[allow(unused_imports)]
 pub use candle_mat_hold::CandleMatHold;
 pub use candle_matching_low::CandleMatchingLow;
-pub use candle_morning_doji_star::CandleMorningDojiStar;
-pub use candle_morning_star::CandleMorningStar;
-pub use candle_on_neck::CandleOnNeck;
-pub use candle_piercing::CandlePiercing;
-pub use candle_rickshawman::CandleRickshawman;
 pub use candle_rise_fall_three_methods::CandleRiseFallThreeMethods;
 pub use candle_separating_lines::CandleSeparatingLines;
-pub use candle_shooting_star::CandleShootingStar;
-pub use candle_short_line::CandleShortLine;
-pub use candle_spinning_top::CandleSpinningTop;
-pub use candle_stalled_pattern::CandleStalledPattern;
-pub use candle_stick_sandwich::CandleStickSandwich;
 pub use candle_takuri::CandleTakuri;
 pub use candle_tasuki_gap::CandleTasukiGap;
 pub use candle_three_black_crows::CandleThreeBlackCrows;

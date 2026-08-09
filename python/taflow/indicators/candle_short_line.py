@@ -1,13 +1,11 @@
-"""Persistent On Neck recognition (CDLONNECK)."""
-
 from typing import Any
 import numpy as np
-from ._native import CandleOnNeck as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleShortLine as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleOnNeck:
-    """Persistent On Neck recognition (CDLONNECK).
+class CandleShortLine:
+    """Short Line
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +41,7 @@ class CandleOnNeck:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleOnNeck":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleShortLine":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +63,7 @@ class CandleOnNeck:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleOnNeck":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleShortLine":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +110,7 @@ class CandleOnNeck:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleOnNeck":
+    def reset(self) -> "CandleShortLine":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

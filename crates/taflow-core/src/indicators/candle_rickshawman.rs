@@ -2,8 +2,8 @@
 
 use std::collections::VecDeque;
 
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 /// Incremental CDLRICKSHAWMAN state using TA-Lib's doji and near range averages.
 /// Persistent Rust state or aligned output type for `CandleRickshawman`.
 ///

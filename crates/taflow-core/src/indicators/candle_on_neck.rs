@@ -1,6 +1,6 @@
-//! Incremental Shooting Star candlestick recognition (CDLSHOOTINGSTAR).
-use super::pattern::*;
+//! Incremental On-Neck candlestick recognition (CDLONNECK).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -13,47 +13,28 @@ impl Candle {
     fn body(self) -> f64 {
         (self.c - self.o).abs()
     }
-    fn upper(self) -> f64 {
-        self.h - self.o.max(self.c)
-    }
-    fn lower(self) -> f64 {
-        self.o.min(self.c) - self.l
+    fn color(self) -> i32 {
+        if self.c >= self.o {
+            1
+        } else {
+            -1
+        }
     }
 }
-
-/// Compute the candle pattern signal for aligned OHLC bars.
-///
-/// # Parameters
-///
-/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
-///
-/// # Returns
-///
-/// A same-length vector containing -100, 0, or 100 pattern signals; bars
-/// Compute the candle shooting star result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `open` - Input series or configuration value.
-/// * `high` - Input series or configuration value.
-/// * `low` - Input series or configuration value.
-/// * `close` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub struct CandleShootingStar {
+/// Stateful CandleOnNeck candle recognizer.
+/// Consumes causal OHLC bars and returns an aligned pattern score.
+pub struct CandleOnNeck {
     candles: VecDeque<Candle>,
-    body_sum: f64,
-    shadow_vs_sum: f64,
+    body_long_sum: f64,
+    equal_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleShootingStar {
+impl Default for CandleOnNeck {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleShootingStar {
+impl CandleOnNeck {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -62,8 +43,8 @@ impl CandleShootingStar {
     pub fn new() -> Self {
         Self {
             candles: VecDeque::with_capacity(11),
-            body_sum: 0.0,
-            shadow_vs_sum: 0.0,
+            body_long_sum: 0.0,
+            equal_sum: 0.0,
             value: None,
         }
     }
@@ -77,26 +58,29 @@ impl CandleShootingStar {
         // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
         let value = if self.candles.len() == 11 {
             let prev = self.candles[10]; // bar i-1
-            let body = ca_realbody_scalar(BODY_SHORT, self.body_sum, o, c);
-            let vs = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_vs_sum, h, l);
-            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_sum +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
-            self.shadow_vs_sum +=
-                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, prev.o, prev.c);
+            let equal = ca_highlow_scalar(EQUAL, self.equal_sum, prev.h, prev.l);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - period).
+            self.equal_sum += cr_highlow_scalar(prev.h, prev.l)
+                - cr_highlow_scalar(self.candles[5].h, self.candles[5].l);
+            self.body_long_sum += cr_realbody_scalar(prev.o, prev.c)
+                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
             Some(
-                (cur.body() < body
-                    && cur.upper() > cur.body()
-                    && cur.lower() < vs
-                    && cur.o.min(cur.c) > prev.o.max(prev.c)) as i32
+                (prev.color() == -1
+                    && prev.body() > long
+                    && cur.color() == 1
+                    && cur.o < prev.l
+                    && (cur.c - prev.l).abs() <= equal) as i32
                     * -100,
             )
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
             let i = self.candles.len();
-            if (1..11).contains(&i) {
-                self.body_sum += cr_realbody_scalar(o, c);
-                self.shadow_vs_sum += cr_highlow_scalar(h, l);
+            if (5..10).contains(&i) {
+                self.equal_sum += cr_highlow_scalar(h, l);
+            }
+            if i < 10 {
+                self.body_long_sum += cr_realbody_scalar(o, c);
             }
             None
         };
@@ -158,8 +142,8 @@ impl CandleShootingStar {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.body_sum = 0.0;
-        self.shadow_vs_sum = 0.0;
+        self.body_long_sum = 0.0;
+        self.equal_sum = 0.0;
         self.value = None;
     }
 }

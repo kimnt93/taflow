@@ -1,13 +1,13 @@
-"""Persistent Stalled Pattern recognition (CDLSTALLEDPATTERN)."""
+"""Persistent Stick Sandwich recognition (CDLSTICKSANDWICH)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleStalledPattern as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleStickSandwich as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleStalledPattern:
-    """Persistent Stalled Pattern recognition (CDLSTALLEDPATTERN).
+class CandleStickSandwich:
+    """Persistent Stick Sandwich recognition (CDLSTICKSANDWICH).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,13 +37,9 @@ class CandleStalledPattern:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        (
-            self.extend(_open, high, low, close)
-            if any(x is not None for x in (_open, high, low, close))
-            else None
-        )
+        self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleStalledPattern":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleStickSandwich":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +61,7 @@ class CandleStalledPattern:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleStalledPattern":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleStickSandwich":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +108,7 @@ class CandleStalledPattern:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleStalledPattern":
+    def reset(self) -> "CandleStickSandwich":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

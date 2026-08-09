@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleSpinningTop as CandleSpinningTopState;
+use taflow::indicators::CandleSpinningTop as CandleSpinningTopState;
 #[pyclass]
 /// Stateful CandleSpinningTop candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.

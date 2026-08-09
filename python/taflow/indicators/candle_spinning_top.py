@@ -1,11 +1,13 @@
+"""Persistent Spinning Top recognition (CDLSPINNINGTOP)."""
+
 from typing import Any
 import numpy as np
-from ._native import CandleShortLine as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleSpinningTop as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleShortLine:
-    """Short Line
+class CandleSpinningTop:
+    """Persistent Spinning Top recognition (CDLSPINNINGTOP).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -41,7 +43,7 @@ class CandleShortLine:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleShortLine":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleSpinningTop":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -63,7 +65,7 @@ class CandleShortLine:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleShortLine":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleSpinningTop":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -110,7 +112,7 @@ class CandleShortLine:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleShortLine":
+    def reset(self) -> "CandleSpinningTop":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

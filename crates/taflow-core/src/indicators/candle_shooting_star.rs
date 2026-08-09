@@ -1,39 +1,59 @@
-//! Incremental Morning Star candlestick recognition (CDLMORNINGSTAR).
-use super::pattern::*;
+//! Incremental Shooting Star candlestick recognition (CDLSHOOTINGSTAR).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
     o: f64,
+    h: f64,
+    l: f64,
     c: f64,
 }
 impl Candle {
     fn body(self) -> f64 {
         (self.c - self.o).abs()
     }
-    fn color(self) -> i32 {
-        if self.c >= self.o {
-            1
-        } else {
-            -1
-        }
+    fn upper(self) -> f64 {
+        self.h - self.o.max(self.c)
+    }
+    fn lower(self) -> f64 {
+        self.o.min(self.c) - self.l
     }
 }
-/// Stateful CandleMorningStar candle recognizer.
-/// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleMorningStar {
+
+/// Compute the candle pattern signal for aligned OHLC bars.
+///
+/// # Parameters
+///
+/// * `open`, `high`, `low`, `close` - Equal-length chronological OHLC series.
+///
+/// # Returns
+///
+/// A same-length vector containing -100, 0, or 100 pattern signals; bars
+/// Compute the candle shooting star result for the supplied aligned series.
+///
+/// # Parameters
+///
+/// * `open` - Input series or configuration value.
+/// * `high` - Input series or configuration value.
+/// * `low` - Input series or configuration value.
+/// * `close` - Input series or configuration value.
+///
+/// # Returns
+///
+/// An aligned result with TA-Lib-compatible validation and warm-up values.
+pub struct CandleShootingStar {
     candles: VecDeque<Candle>,
-    body_long_sum: f64,
-    body_short_sum: f64,
-    body_short2_sum: f64,
+    body_sum: f64,
+    shadow_vs_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleMorningStar {
+impl Default for CandleShootingStar {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleMorningStar {
+impl CandleShootingStar {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -41,10 +61,9 @@ impl CandleMorningStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(12),
-            body_long_sum: 0.0,
-            body_short_sum: 0.0,
-            body_short2_sum: 0.0,
+            candles: VecDeque::with_capacity(11),
+            body_sum: 0.0,
+            shadow_vs_sum: 0.0,
             value: None,
         }
     }
@@ -53,47 +72,35 @@ impl CandleMorningStar {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, o: f64, _h: f64, _l: f64, c: f64) -> Option<i32> {
-        let cur = Candle { o, c };
-        // Deque holds bars i-12..=i-1; bar j maps to index 12 - (i - j).
-        let value = if self.candles.len() == 12 {
-            let a = self.candles[10]; // bar i-2
-            let b = self.candles[11]; // bar i-1
-            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, a.o, a.c);
-            let short = ca_realbody_scalar(BODY_SHORT, self.body_short_sum, b.o, b.c);
-            let short2 = ca_realbody_scalar(BODY_SHORT, self.body_short2_sum, o, c);
+    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
+        let cur = Candle { o, h, l, c };
+        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
+        let value = if self.candles.len() == 11 {
+            let prev = self.candles[10]; // bar i-1
+            let body = ca_realbody_scalar(BODY_SHORT, self.body_sum, o, c);
+            let vs = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_vs_sum, h, l);
             // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_long_sum += cr_realbody_scalar(a.o, a.c)
-                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_short_sum += cr_realbody_scalar(b.o, b.c)
-                - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
-            self.body_short2_sum +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[2].o, self.candles[2].c);
+            self.body_sum +=
+                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
+            self.shadow_vs_sum +=
+                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
             Some(
-                (a.color() == -1
-                    && a.body() > long
-                    && b.body() <= short
-                    && b.o.max(b.c) < a.o.min(a.c)
-                    && cur.color() == 1
-                    && cur.body() > short2
-                    && cur.c > a.c + a.body() * 0.3) as i32
-                    * 100,
+                (cur.body() < body
+                    && cur.upper() > cur.body()
+                    && cur.lower() < vs
+                    && cur.o.min(cur.c) > prev.o.max(prev.c)) as i32
+                    * -100,
             )
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
             let i = self.candles.len();
-            if i < 10 {
-                self.body_long_sum += cr_realbody_scalar(o, c);
-            }
             if (1..11).contains(&i) {
-                self.body_short_sum += cr_realbody_scalar(o, c);
-            }
-            if (2..12).contains(&i) {
-                self.body_short2_sum += cr_realbody_scalar(o, c);
+                self.body_sum += cr_realbody_scalar(o, c);
+                self.shadow_vs_sum += cr_highlow_scalar(h, l);
             }
             None
         };
-        if self.candles.len() == 12 {
+        if self.candles.len() == 11 {
             self.candles.pop_front();
         }
         self.candles.push_back(cur);
@@ -151,9 +158,8 @@ impl CandleMorningStar {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.body_long_sum = 0.0;
-        self.body_short_sum = 0.0;
-        self.body_short2_sum = 0.0;
+        self.body_sum = 0.0;
+        self.shadow_vs_sum = 0.0;
         self.value = None;
     }
 }

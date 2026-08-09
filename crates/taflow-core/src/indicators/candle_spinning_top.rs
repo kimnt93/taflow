@@ -2,8 +2,8 @@
 
 use std::collections::VecDeque;
 
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 /// Incremental CDLSPINNINGTOP state using TA-Lib's ten-bar short-body average.
 /// Persistent Rust state or aligned output type for `CandleSpinningTop`.
 ///

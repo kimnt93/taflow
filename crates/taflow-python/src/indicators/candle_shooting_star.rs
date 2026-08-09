@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleShortLine as CandleShortLineState;
+use taflow::indicators::CandleShootingStar as CandleShootingStarState;
 #[pyclass]
-/// Stateful CandleShortLine candlestick recognizer.
+/// Stateful CandleShootingStar candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleShortLine {
-    inner: CandleShortLineState,
+pub struct CandleShootingStar {
+    inner: CandleShootingStarState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleShortLine {
+impl CandleShootingStar {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleShortLineState::new(),
+            inner: CandleShootingStarState::new(),
             outputs: vec![],
         }
     }
@@ -49,6 +49,6 @@ impl CandleShortLine {
     }
     fn reset(&mut self) {
         self.inner.reset();
-        self.outputs.clear()
+        self.outputs.clear();
     }
 }

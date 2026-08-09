@@ -1,13 +1,13 @@
-"""Persistent Shooting Star recognition (CDLSHOOTINGSTAR)."""
+"""Persistent Stalled Pattern recognition (CDLSTALLEDPATTERN)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleShootingStar as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleStalledPattern as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleShootingStar:
-    """Persistent Shooting Star recognition (CDLSHOOTINGSTAR).
+class CandleStalledPattern:
+    """Persistent Stalled Pattern recognition (CDLSTALLEDPATTERN).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleShootingStar:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleShootingStar":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleStalledPattern":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleShootingStar:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleShootingStar":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleStalledPattern":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleShootingStar:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleShootingStar":
+    def reset(self) -> "CandleStalledPattern":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
