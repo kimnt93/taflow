@@ -31,7 +31,8 @@ class ForceIndex:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self.extend(close, volume) if close is not None or volume is not None else None
+        self._length = 0
+        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "ForceIndex":
         """Append one observation or aligned bar to the native Rust state.
@@ -48,7 +49,8 @@ class ForceIndex:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(close, volume)
+        self._state.append(float(close), float(volume))
+        self._length += 1
         return self
 
     def extend(self, close: Any, volume: Any) -> "ForceIndex":
@@ -66,7 +68,12 @@ class ForceIndex:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(close), as_float64_series(volume))
+        close_values = as_float64_series(close)
+        volume_values = as_float64_series(volume)
+        if len(close_values) != len(volume_values):
+            raise ValueError("close and volume must have equal lengths")
+        self._state.extend(close_values, volume_values)
+        self._length += len(close_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -80,7 +87,7 @@ class ForceIndex:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -99,4 +106,8 @@ class ForceIndex:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        return self._length

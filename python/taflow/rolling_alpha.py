@@ -34,11 +34,8 @@ class RollingAlpha:
             The constructor initializes the adapter and returns no value.
         """
         self._state = RollingAlphaOperator(timeperiod)
-        (
-            self.extend(_input, benchmark)
-            if _input is not None or benchmark is not None
-            else None
-        )
+        self._length = 0
+        self.extend(_input, benchmark)
 
     def append(self, _input: float, benchmark: float) -> "RollingAlpha":
         """Append one observation or aligned bar to the native Rust state.
@@ -55,7 +52,8 @@ class RollingAlpha:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_input, benchmark)
+        self._state.append(float(_input), float(benchmark))
+        self._length += 1
         return self
 
     def extend(self, _input: Any, benchmark: Any) -> "RollingAlpha":
@@ -73,7 +71,12 @@ class RollingAlpha:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(_input), as_float64_series(benchmark))
+        input_values = as_float64_series(_input)
+        benchmark_values = as_float64_series(benchmark)
+        if len(input_values) != len(benchmark_values):
+            raise ValueError("_input and benchmark must have equal lengths")
+        self._state.extend(input_values, benchmark_values)
+        self._length += len(input_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -87,7 +90,7 @@ class RollingAlpha:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -106,4 +109,8 @@ class RollingAlpha:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        return self._length

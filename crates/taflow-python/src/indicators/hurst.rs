@@ -1,13 +1,13 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Hurst;
+use taflow::stream::{FractalDimension, Hurst};
 
 macro_rules! hurst_operator {
-    ($name:ident, $map:expr) => {
+    ($name:ident, $inner:ty) => {
         #[pyclass]
         pub struct $name {
-            inner: Hurst,
+            inner: $inner,
             outputs: Vec<f64>,
         }
         #[pymethods]
@@ -15,13 +15,13 @@ macro_rules! hurst_operator {
             #[new]
             fn new(timeperiod: usize) -> PyResult<Self> {
                 Ok(Self {
-                    inner: Hurst::new(timeperiod)
+                    inner: <$inner>::new(timeperiod)
                         .map_err(|error| PyValueError::new_err(error.to_string()))?,
                     outputs: Vec::new(),
                 })
             }
             fn append(&mut self, input: f64) -> Option<f64> {
-                let value = self.inner.append(input).map($map);
+                let value = self.inner.append(input);
                 self.outputs.push(value.unwrap_or(f64::NAN));
                 value
             }
@@ -39,7 +39,7 @@ macro_rules! hurst_operator {
             }
             #[getter]
             fn value(&self) -> Option<f64> {
-                self.inner.value().map($map)
+                self.inner.value()
             }
             fn reset(&mut self) {
                 self.inner.reset();
@@ -49,5 +49,5 @@ macro_rules! hurst_operator {
     };
 }
 
-hurst_operator!(HurstOperator, |value: f64| value);
-hurst_operator!(FractalDimensionOperator, |value: f64| 2.0 - value);
+hurst_operator!(HurstOperator, Hurst);
+hurst_operator!(FractalDimensionOperator, FractalDimension);

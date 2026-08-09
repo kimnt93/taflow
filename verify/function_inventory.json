@@ -8,9 +8,9 @@
     "native_state_classes": 293,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 622,
+    "rust_exports": 624,
     "smc_functions": 8,
-    "structure": 239,
+    "structure": 249,
     "talib_functions": 161
   },
   "rows": [
@@ -3966,7 +3966,7 @@
         "_Native"
       ],
       "pandas_ta_reference": false,
-      "rust_export": false,
+      "rust_export": true,
       "smc_reference": false,
       "talib_alias": ""
     },

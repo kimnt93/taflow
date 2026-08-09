@@ -1217,41 +1217,39 @@ mod ulcer_index;
 mod ulcer_index_test;
 #[allow(unused_imports)]
 pub(crate) use rolling_volume_weighted_average_price::rolling_volume_weighted_average_price;
-mod force_index;
-#[allow(unused_imports)]
-pub(crate) use force_index::force_index;
 mod ease_of_movement;
-#[allow(unused_imports)]
-pub(crate) use ease_of_movement::ease_of_movement;
-mod rising;
-#[allow(unused_imports)]
-pub(crate) use rising::rising;
-pub use rising::Rising;
+#[cfg(test)]
+mod ease_of_movement_test;
 mod falling;
-#[allow(unused_imports)]
-pub(crate) use falling::falling;
-pub use falling::Falling;
-mod rolling_entropy;
-#[allow(unused_imports)]
-pub(crate) use rolling_entropy::rolling_entropy;
-mod rolling_autocorr;
-#[allow(unused_imports)]
-pub(crate) use rolling_autocorr::rolling_autocorr;
-mod hurst;
-#[allow(unused_imports)]
-pub(crate) use hurst::hurst;
+#[cfg(test)]
+mod falling_test;
+mod force_index;
+#[cfg(test)]
+mod force_index_test;
 mod fractal_dimension;
-#[allow(unused_imports)]
-pub(crate) use fractal_dimension::fractal_dimension;
+#[cfg(test)]
+mod fractal_dimension_test;
+mod hurst;
+#[cfg(test)]
+mod hurst_test;
+mod rising;
+#[cfg(test)]
+mod rising_test;
 mod rolling_alpha;
-#[allow(unused_imports)]
-pub(crate) use rolling_alpha::rolling_alpha;
+#[cfg(test)]
+mod rolling_alpha_test;
+mod rolling_autocorr;
+#[cfg(test)]
+mod rolling_autocorr_test;
+mod rolling_entropy;
+#[cfg(test)]
+mod rolling_entropy_test;
 mod rolling_information_ratio;
 #[allow(unused_imports)]
 pub(crate) use rolling_information_ratio::rolling_information_ratio;
 mod hedge_ratio;
-#[allow(unused_imports)]
-pub(crate) use hedge_ratio::hedge_ratio;
+#[cfg(test)]
+mod hedge_ratio_test;
 mod session_extrema;
 #[allow(unused_imports)]
 pub(crate) use session_extrema::session_extrema;
@@ -1452,7 +1450,9 @@ pub use exponentially_weighted_standard_deviation::ExponentiallyWeightedStandard
 pub use exponentially_weighted_sum::ExponentiallyWeightedSum;
 pub use exponentially_weighted_variance::ExponentiallyWeightedVariance;
 pub use fair_value_gap::{FairValueGap, FairValueGapValue};
+pub use falling::Falling;
 pub use frac_diff::FracDiff;
+pub use fractal_dimension::FractalDimension;
 pub use gap_down::GapDown;
 pub use gap_up::GapUp;
 pub use garman_klass::GarmanKlass;
@@ -1475,6 +1475,7 @@ pub use outside_bar::OutsideBar;
 pub use parkinson::Parkinson;
 pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
 pub use retracements::{Retracements, RetracementsValue};
+pub use rising::Rising;
 pub use rogers_satchell::RogersSatchell;
 pub use roll_spread::RollSpread;
 pub use rolling_alpha::RollingAlpha;

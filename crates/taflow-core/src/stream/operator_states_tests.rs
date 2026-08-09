@@ -279,7 +279,12 @@ mod tests {
         let z = spread_zscore(&x, &y, period).unwrap();
         assert!(z[..period - 1].iter().all(|&value| value.is_nan()));
 
-        let beta = hedge_ratio(&x, &y, period).unwrap();
+        let mut hedge_state = HedgeRatio::new(period).unwrap();
+        let beta: Vec<f64> = x
+            .iter()
+            .zip(&y)
+            .map(|(&x, &y)| hedge_state.append(x, y).unwrap_or(f64::NAN))
+            .collect();
         for i in period - 1..x.len() {
             let window_x = &x[i + 1 - period..=i];
             let window_y = &y[i + 1 - period..=i];

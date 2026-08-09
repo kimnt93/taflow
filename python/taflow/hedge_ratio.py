@@ -34,7 +34,8 @@ class HedgeRatio:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(x, y) if x is not None or y is not None else None
+        self._length = 0
+        self.extend(x, y)
 
     def append(self, x: float, y: float) -> "HedgeRatio":
         """Append one observation or aligned bar to the native Rust state.
@@ -51,7 +52,8 @@ class HedgeRatio:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(x, y)
+        self._state.append(float(x), float(y))
+        self._length += 1
         return self
 
     def extend(self, x: Any, y: Any) -> "HedgeRatio":
@@ -69,7 +71,12 @@ class HedgeRatio:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(x), as_float64_series(y))
+        x_values = as_float64_series(x)
+        y_values = as_float64_series(y)
+        if len(x_values) != len(y_values):
+            raise ValueError("x and y must have equal lengths")
+        self._state.extend(x_values, y_values)
+        self._length += len(x_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -83,7 +90,7 @@ class HedgeRatio:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -102,4 +109,8 @@ class HedgeRatio:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        return self._length

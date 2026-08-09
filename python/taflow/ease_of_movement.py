@@ -34,11 +34,8 @@ class EaseOfMovement:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        (
-            self.extend(high, low, volume)
-            if high is not None or low is not None or volume is not None
-            else None
-        )
+        self._length = 0
+        self.extend(high, low, volume)
 
     def append(self, high: float, low: float, volume: float) -> "EaseOfMovement":
         """Append one observation or aligned bar to the native Rust state.
@@ -57,7 +54,8 @@ class EaseOfMovement:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(high, low, volume)
+        self._state.append(float(high), float(low), float(volume))
+        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any, volume: Any) -> "EaseOfMovement":
@@ -77,9 +75,13 @@ class EaseOfMovement:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(
-            as_float64_series(high), as_float64_series(low), as_float64_series(volume)
-        )
+        high_values = as_float64_series(high)
+        low_values = as_float64_series(low)
+        volume_values = as_float64_series(volume)
+        if len({len(high_values), len(low_values), len(volume_values)}) != 1:
+            raise ValueError("high, low, and volume must have equal lengths")
+        self._state.extend(high_values, low_values, volume_values)
+        self._length += len(high_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -93,7 +95,7 @@ class EaseOfMovement:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -112,4 +114,8 @@ class EaseOfMovement:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        return self._length

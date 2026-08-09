@@ -854,53 +854,6 @@ impl MultiPeriodStaircase {
     }
 }
 
-macro_rules! direction_operator {
-    ($name:ident, $predicate:expr) => {
-        #[derive(Debug, Clone)]
-        pub struct $name {
-            values: VecDeque<f64>,
-            period: usize,
-            value: Option<f64>,
-        }
-        impl $name {
-            /// Create a direction detector with the requested comparison period.
-            pub fn new(period: usize) -> TaResult<Self> {
-                validate_period(period)?;
-                Ok(Self {
-                    values: VecDeque::with_capacity(period + 1),
-                    period,
-                    value: None,
-                })
-            }
-            /// Append a value and return the causal direction flag.
-            pub fn append(&mut self, input: f64) -> Option<f64> {
-                if self.values.len() == self.period + 1 {
-                    self.values.pop_front();
-                }
-                self.values.push_back(input);
-                self.value = (self.values.len() == self.period + 1).then(|| {
-                    if $predicate(input, self.values.front().copied().unwrap()) {
-                        1.0
-                    } else {
-                        0.0
-                    }
-                });
-                self.value
-            }
-            /// Return the latest direction flag.
-            pub fn value(&self) -> Option<f64> {
-                self.value
-            }
-            /// Clear the comparison history.
-            pub fn reset(&mut self) {
-                self.values.clear();
-                self.value = None;
-            }
-        }
-    };
-}
-pub(crate) use direction_operator;
-
 #[derive(Debug, Clone)]
 pub(crate) struct MassEma {
     period: usize,

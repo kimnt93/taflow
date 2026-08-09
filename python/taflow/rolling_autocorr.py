@@ -31,7 +31,8 @@ class RollingAutocorr:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(_input) if _input is not None else None
+        self._length = 0
+        self.extend(_input)
 
     def append(self, _input: float) -> "RollingAutocorr":
         """Append one observation or aligned bar to the native Rust state.
@@ -46,7 +47,8 @@ class RollingAutocorr:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_input)
+        self._state.append(float(_input))
+        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "RollingAutocorr":
@@ -62,7 +64,9 @@ class RollingAutocorr:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(_input))
+        values = as_float64_series(_input)
+        self._state.extend(values)
+        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -76,7 +80,7 @@ class RollingAutocorr:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -95,4 +99,8 @@ class RollingAutocorr:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        return self._length
