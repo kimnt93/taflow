@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.rolling_alpha import RollingAlpha
+from taflow import RollingAlpha
 
 
 def test_rolling_alpha_lifecycle_and_alignment():

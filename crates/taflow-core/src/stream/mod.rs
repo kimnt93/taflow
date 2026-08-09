@@ -47,7 +47,7 @@ pub use crate::indicators::{
     DonchianValue, EqualHighsLows, FairValueGap, FairValueGapValue, Falling, FractalDimension,
     GapDown, GapUp, HedgeRatio, HigherHigh, HilbertTransformDominantCyclePhase, InsideBar,
     KaufmanAdaptiveMovingAverage, KeltnerChannels, KeltnerValue, KnowSureThing, LowerLow,
-    MassIndex, OutsideBar, Rising, UlcerIndex,
+    MassIndex, OutsideBar, Rising, RollingAlpha, RollingInformationRatio, UlcerIndex,
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
@@ -551,15 +551,9 @@ mod retracements_test;
 mod rogers_satchell;
 #[cfg(test)]
 mod rogers_satchell_test;
-mod rolling_alpha;
-#[cfg(test)]
-mod rolling_alpha_test;
 mod rolling_autocorr;
 #[cfg(test)]
 mod rolling_autocorr_test;
-mod rolling_information_ratio;
-#[cfg(test)]
-mod rolling_information_ratio_test;
 mod rolling_volume_weighted_average_price;
 #[cfg(test)]
 mod rolling_volume_weighted_average_price_test;
@@ -672,9 +666,7 @@ pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
 pub use retracements::{Retracements, RetracementsValue};
 pub use rogers_satchell::RogersSatchell;
 pub use roll_spread::RollSpread;
-pub use rolling_alpha::RollingAlpha;
 pub use rolling_autocorr::RollingAutocorr;
-pub use rolling_information_ratio::RollingInformationRatio;
 pub use rolling_volume_weighted_average_price::RollingVolumeWeightedAveragePrice;
 pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};

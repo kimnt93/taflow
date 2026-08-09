@@ -72,6 +72,14 @@ release extension, six focused Python tests, focused Rust tests, full Python
 suite (591 passed, 2 skipped), and 303/303 interface audit passed. Benchmark
 fields remain `TODO`; no benchmark command was run.
 
+The twenty-ninth structural batch split the macro-generated rolling bindings
+into dedicated `RollingAlpha` and `RollingInformationRatio` files, moved both
+Python adapters into `taflow/indicators/`, and migrated their Rust
+implementations/tests from `stream/` into the canonical indicators directory.
+The release extension, three focused Python tests, focused Rust tests, full
+Python suite (591 passed, 2 skipped), and 303/303 interface audit passed.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

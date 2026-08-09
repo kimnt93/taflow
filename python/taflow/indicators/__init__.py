@@ -252,8 +252,8 @@ from .rolling_variance import RollingVariance
 from ..rolling_autocorr import RollingAutocorr
 from .hurst import Hurst
 from .fractal_dimension import FractalDimension
-from ..rolling_alpha import RollingAlpha
-from ..rolling_information_ratio import RollingInformationRatio
+from .rolling_alpha import RollingAlpha
+from .rolling_information_ratio import RollingInformationRatio
 from .close_to_close_sigma import CloseToCloseSigma
 from ..parkinson import Parkinson
 from .garman_klass import GarmanKlass

@@ -629,6 +629,12 @@ mod outside_bar_test;
 mod rising;
 #[cfg(test)]
 mod rising_test;
+mod rolling_alpha;
+#[cfg(test)]
+mod rolling_alpha_test;
+mod rolling_information_ratio;
+#[cfg(test)]
+mod rolling_information_ratio_test;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
@@ -658,6 +664,8 @@ pub use keltner_channels::{KeltnerChannels, KeltnerValue};
 pub use lower_low::LowerLow;
 pub use outside_bar::OutsideBar;
 pub use rising::Rising;
+pub use rolling_alpha::RollingAlpha;
+pub use rolling_information_ratio::RollingInformationRatio;
 pub use ulcer_index::UlcerIndex;
 
 mod candle_three_stars_in_south;

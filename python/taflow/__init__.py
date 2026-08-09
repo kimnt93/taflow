@@ -253,8 +253,8 @@ from .indicators import RollingEntropy
 from .rolling_autocorr import RollingAutocorr
 from .indicators.hurst import Hurst
 from .indicators.fractal_dimension import FractalDimension
-from .rolling_alpha import RollingAlpha
-from .rolling_information_ratio import RollingInformationRatio
+from .indicators.rolling_alpha import RollingAlpha
+from .indicators.rolling_information_ratio import RollingInformationRatio
 from .indicators.close_to_close_sigma import CloseToCloseSigma
 from .parkinson import Parkinson
 from .indicators.garman_klass import GarmanKlass

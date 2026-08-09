@@ -1,19 +1,17 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::RollingAlpha;
-
+use taflow::stream::RollingInformationRatio;
 #[pyclass]
-pub struct RollingAlphaOperator {
-    inner: RollingAlpha,
+pub struct RollingInformationRatioOperator {
+    inner: RollingInformationRatio,
     outputs: Vec<f64>,
 }
-
 #[pymethods]
-impl RollingAlphaOperator {
+impl RollingInformationRatioOperator {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingAlpha::new(timeperiod)
+            inner: RollingInformationRatio::new(timeperiod)
                 .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })

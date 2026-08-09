@@ -1,5 +1,5 @@
-use super::operator_states::ContiguousWindow;
 use crate::error::TaResult;
+use crate::stream::operator_states::ContiguousWindow;
 
 /// Rolling information ratio of the input-minus-benchmark differential.
 #[derive(Debug, Clone)]
@@ -12,7 +12,7 @@ pub struct RollingInformationRatio {
 impl RollingInformationRatio {
     /// Create a validated empty rolling information-ratio state.
     pub fn new(period: usize) -> TaResult<Self> {
-        super::operator_states::validate_period(period)?;
+        crate::stream::operator_states::validate_period(period)?;
         Ok(Self {
             values: ContiguousWindow::new(period),
             period,
