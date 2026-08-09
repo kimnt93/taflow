@@ -2,8 +2,8 @@
 
 use std::collections::VecDeque;
 
-use super::{invalid_period, StreamingIndicator};
 use crate::error::TaResult;
+use crate::stream::{invalid_period, StreamingIndicator};
 
 /// Computes Relative Momentum Index using Wilder-smoothed momentum gains.
 #[derive(Debug, Clone)]

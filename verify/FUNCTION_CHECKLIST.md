@@ -136,6 +136,16 @@ to re-export canonical states, and redirected the ten PyO3 bindings to
 tests (16), release extension build, and 300/300 interface audit passed.
 Benchmark fields remain `TODO`; no benchmark command was run.
 
+The thirty-sixth structural batch migrated the Rust implementation and test
+files for the ten adapters from `crates/taflow-core/src/stream/` into
+`crates/taflow-core/src/indicators/`, kept stream as a compatibility
+re-export surface, and redirected the nine dedicated PyO3 bindings to
+`taflow::indicators` (the decay-linear adapter intentionally reuses the
+weighted-moving-average native state). The full Rust library suite (386
+tests), focused Python tests (132), release extension build, and 300/300
+interface audit passed. Benchmark fields remain `TODO`; no benchmark command
+was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,

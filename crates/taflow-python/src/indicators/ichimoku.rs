@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::Ichimoku;
+use taflow::indicators::Ichimoku;
 
 #[pyclass]
 pub struct IchimokuOperator {

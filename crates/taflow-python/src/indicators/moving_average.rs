@@ -1,7 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{MovingAverage as MovingAverageState, StreamingIndicator};
+use taflow::indicators::MovingAverage as MovingAverageState;
+use taflow::stream::StreamingIndicator;
 use taflow::MaType;
 
 /// Python boundary for the canonical Rust selectable moving-average state.

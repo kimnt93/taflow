@@ -2,7 +2,7 @@
 
 use crate::error::{TaError, TaResult};
 
-use super::{invalid_period, Window};
+use crate::stream::{invalid_period, Window};
 
 /// Persistent Rust state or aligned output type for `MoneyFlowIndex`.
 ///

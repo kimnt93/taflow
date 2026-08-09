@@ -3,7 +3,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::MoneyFlowIndex as NativeMoneyFlowIndex;
+use taflow::indicators::MoneyFlowIndex as NativeMoneyFlowIndex;
 
 use crate::conversion::to_py_array;
 

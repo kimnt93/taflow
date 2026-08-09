@@ -6,7 +6,7 @@
 use crate::error::TaResult;
 use crate::ma_type::MaType;
 
-use super::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
+use crate::stream::{moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator};
 
 /// Incremental moving average selected by [`MaType`].
 /// Persistent Rust state or aligned output type for `MovingAverage`.

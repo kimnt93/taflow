@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::HilbertTransformTrendline as State;
+use taflow::indicators::HilbertTransformTrendline as State;
 
 #[pyclass]
 pub struct HilbertTransformTrendline {

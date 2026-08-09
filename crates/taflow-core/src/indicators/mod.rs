@@ -47,6 +47,48 @@ pub use moving_average_convergence_divergence::{
 pub use moving_average_convergence_divergence_extended::MovingAverageConvergenceDivergenceExtended;
 pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDivergenceFixed;
 
+mod decay_linear;
+#[cfg(test)]
+mod decay_linear_test;
+mod double_exponential_moving_average;
+#[cfg(test)]
+mod double_exponential_moving_average_test;
+mod exponential_moving_average;
+#[cfg(test)]
+mod exponential_moving_average_test;
+mod hilbert_transform_trendline;
+#[cfg(test)]
+mod hilbert_transform_trendline_test;
+mod ichimoku;
+#[cfg(test)]
+mod ichimoku_test;
+mod money_flow_index;
+#[cfg(test)]
+mod money_flow_index_test;
+mod moving_average;
+#[cfg(test)]
+mod moving_average_test;
+mod parkinson;
+#[cfg(test)]
+mod parkinson_test;
+mod percentage_price_oscillator;
+#[cfg(test)]
+mod percentage_price_oscillator_test;
+mod relative_momentum_index;
+#[cfg(test)]
+mod relative_momentum_index_test;
+
+pub use decay_linear::DecayLinear;
+pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
+pub use exponential_moving_average::ExponentialMovingAverage;
+pub use hilbert_transform_trendline::HilbertTransformTrendline;
+pub use ichimoku::{Ichimoku, IchimokuValue};
+pub use money_flow_index::MoneyFlowIndex;
+pub use moving_average::MovingAverage;
+pub use parkinson::Parkinson;
+pub use percentage_price_oscillator::PercentagePriceOscillator;
+pub use relative_momentum_index::RelativeMomentumIndex;
+
 mod acceleration_bands;
 #[cfg(test)]
 mod acceleration_bands_test;

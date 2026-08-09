@@ -53,28 +53,10 @@ pub use crate::indicators::{
 };
 pub(crate) mod cycle;
 pub(crate) mod directional;
-mod double_exponential_moving_average;
-#[cfg(test)]
-mod double_exponential_moving_average_test;
-mod exponential_moving_average;
-#[cfg(test)]
-mod exponential_moving_average_test;
-mod hilbert_transform_trendline;
-#[cfg(test)]
-mod hilbert_transform_trendline_test;
 mod indicator;
 mod math_operator;
-mod money_flow_index;
-#[cfg(test)]
-mod money_flow_index_test;
-mod moving_average;
 pub(crate) mod moving_average_dispatcher;
-#[cfg(test)]
-mod moving_average_test;
 pub(crate) mod pattern;
-mod percentage_price_oscillator;
-#[cfg(test)]
-mod percentage_price_oscillator_test;
 mod plus_directional_indicator;
 #[cfg(test)]
 mod plus_directional_indicator_test;
@@ -97,9 +79,6 @@ pub use session_flags::session_flags;
 mod helpers;
 pub(crate) mod lagged_common;
 pub(crate) mod operator_states;
-mod relative_momentum_index;
-#[cfg(test)]
-mod relative_momentum_index_test;
 mod simple_moving_average;
 #[cfg(test)]
 mod simple_moving_average_test;
@@ -137,6 +116,11 @@ mod weighted_moving_average;
 mod weighted_moving_average_test;
 
 pub use crate::indicators::{
+    DecayLinear, DoubleExponentialMovingAverage, ExponentialMovingAverage,
+    HilbertTransformTrendline, Ichimoku, IchimokuValue, MoneyFlowIndex, MovingAverage, Parkinson,
+    PercentagePriceOscillator, RelativeMomentumIndex,
+};
+pub use crate::indicators::{
     ExponentiallyWeightedStandardDeviation, ExponentiallyWeightedVariance,
     FastStochasticOscillator, FastStochasticOscillatorValue, FibonacciRetracement,
     FibonacciRetracementValue, FracDiff, MinusDirectionalIndicator, MinusDirectionalMovement,
@@ -145,19 +129,12 @@ pub use crate::indicators::{
 };
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
-pub use exponential_moving_average::ExponentialMovingAverage;
-pub use hilbert_transform_trendline::HilbertTransformTrendline;
 pub use indicator::StreamingIndicator;
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use money_flow_index::MoneyFlowIndex;
-pub use moving_average::MovingAverage;
 #[allow(unused_imports)]
-pub use percentage_price_oscillator::PercentagePriceOscillator;
 pub use plus_directional_indicator::PlusDirectionalIndicator;
 pub use plus_directional_movement::PlusDirectionalMovement;
-pub use relative_momentum_index::RelativeMomentumIndex;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 
@@ -505,9 +482,6 @@ mod ease_of_movement_test;
 mod force_index;
 #[cfg(test)]
 mod force_index_test;
-mod parkinson;
-#[cfg(test)]
-mod parkinson_test;
 mod previous_high_low;
 #[cfg(test)]
 mod previous_high_low_test;
@@ -540,16 +514,9 @@ mod signed_power;
 #[cfg(test)]
 mod signed_power_test;
 pub use signed_power::SignedPower;
-mod decay_linear;
-#[cfg(test)]
-mod decay_linear_test;
-pub use decay_linear::DecayLinear;
 #[allow(unused_imports)]
 pub(crate) mod bar_relation;
 mod bars_since;
-mod ichimoku;
-#[cfg(test)]
-mod ichimoku_test;
 mod ornstein_uhlenbeck_half_life;
 #[cfg(test)]
 mod ornstein_uhlenbeck_half_life_test;
@@ -585,10 +552,8 @@ pub use bars_since::BarsSince;
 pub use ease_of_movement::EaseOfMovement;
 pub use force_index::ForceIndex;
 pub use highest_since::HighestSince;
-pub use ichimoku::{Ichimoku, IchimokuValue};
 pub use lowest_since::LowestSince;
 pub use ornstein_uhlenbeck_half_life::OrnsteinUhlenbeckHalfLife;
-pub use parkinson::Parkinson;
 pub use previous_high_low::{PreviousHighLow, PreviousHighLowValue};
 pub use retracements::{Retracements, RetracementsValue};
 pub use rogers_satchell::RogersSatchell;

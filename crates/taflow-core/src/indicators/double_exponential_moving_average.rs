@@ -2,7 +2,7 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
+use crate::stream::{invalid_period, ExponentialMovingAverage, StreamingIndicator};
 
 /// Compute the double exponential moving average result for the supplied aligned series.
 ///

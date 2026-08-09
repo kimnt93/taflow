@@ -1,7 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{RelativeMomentumIndex as RelativeMomentumIndexState, StreamingIndicator};
+use taflow::indicators::RelativeMomentumIndex as RelativeMomentumIndexState;
+use taflow::stream::StreamingIndicator;
 
 /// Python boundary for the canonical Rust Relative Momentum Index state.
 #[pyclass]

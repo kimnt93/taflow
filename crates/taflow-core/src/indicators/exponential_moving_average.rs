@@ -4,7 +4,7 @@ use multiversion::multiversion;
 
 use crate::error::TaResult;
 
-use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
+use crate::stream::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
 /// Steady-state EMA recurrence used by [`ExponentialMovingAverage::extend_slice`].
 ///

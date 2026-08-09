@@ -1,7 +1,7 @@
 //! Persistent WorldQuant Alpha101 linear-decay moving average state.
 
-use super::{StreamingIndicator, WeightedMovingAverage};
 use crate::error::TaResult;
+use crate::stream::{StreamingIndicator, WeightedMovingAverage};
 
 /// Linear-decay weighted moving average with a persistent bounded state.
 #[derive(Debug, Clone)]
