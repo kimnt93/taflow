@@ -83,9 +83,9 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | Polars | `tan` | `tan` | MATCH | `0.000e+00` | 0 |  |
 | Polars | `variance` | `variance` | MATCH | `3.930e-11` | 0 |  |
 | pandas | `amihud` | `all` | MATCH | `2.895e-24` | 0 | Series.pct_change/rolling.mean |
-| pandas | `anchored_vwap` | `lower` | MATCH | `0.000e+00` | 0 | pandas/NumPy anchored weighted moments |
-| pandas | `anchored_vwap` | `upper` | MATCH | `0.000e+00` | 0 | pandas/NumPy anchored weighted moments |
-| pandas | `anchored_vwap` | `vwap` | MATCH | `0.000e+00` | 0 | pandas/NumPy anchored weighted moments |
+| pandas | `anchored_vwap` | `lower` | MATCH | `1.062e-11` | 0 | pandas grouped cumulative weighted moments |
+| pandas | `anchored_vwap` | `upper` | MATCH | `1.062e-11` | 0 | pandas grouped cumulative weighted moments |
+| pandas | `anchored_vwap` | `vwap` | MATCH | `8.527e-14` | 0 | pandas grouped cumulative weighted moments |
 | pandas | `average_daily_dollar_value` | `all` | MATCH | `9.686e-08` | 0 | Series.rolling.mean |
 | pandas | `bars_since` | `all` | MATCH | `0.000e+00` | 0 | Series.groupby.cumcount |
 | pandas | `close_to_close_sigma` | `all` | MATCH | `4.857e-17` | 0 | Series.rolling.std(log returns) |

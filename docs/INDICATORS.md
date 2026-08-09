@@ -163,7 +163,7 @@ Correctness uses the highest-priority available external oracle in [../verify/SO
 | `AccumulationDistribution` | AD | — | `(high, low, close, volume)` |
 | `AccumulationDistributionOscillator` | ADOSC | fastperiod=3, slowperiod=10 | `(high, low, close, volume, fastperiod, slowperiod)` |
 | `Amihud` | — | timeperiod=20 | `(close, volume, timeperiod)` |
-| `AnchoredVolumeWeightedAveragePrice` | — | anchor, stdev=1.0 | `(high, low, close, volume, anchor, stdev)` |
+| `AnchoredVolumeWeightedAveragePrice` | — | anchor, standard_deviation_multiplier=1.0 | `(high, low, close, volume, anchor, standard_deviation_multiplier)` |
 | `ChaikinMoneyFlow` | — | period=20 | `(high, low, close, volume, period)` |
 | `EaseOfMovement` | — | — | `(high, low, volume)` |
 | `ForceIndex` | — | — | `(close, volume)` |

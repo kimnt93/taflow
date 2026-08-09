@@ -4266,41 +4266,41 @@
   {
     "class": "AnchoredVolumeWeightedAveragePrice",
     "snake": "anchored_vwap",
-    "oracle_api": "pandas.anchored_vwap",
+    "oracle_api": "pandas.core.groupby.SeriesGroupBy.cumsum",
     "output": "vwap",
     "source": "pandas",
     "version": "3.0.5",
-    "url": "https://pandas.pydata.org/docs/reference/window.html",
+    "url": "https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html",
     "verdict": "MATCH",
-    "error": 0.0,
+    "error": 8.526512829121202e-14,
     "nan": 0,
-    "note": "pandas/NumPy anchored weighted moments"
+    "note": "pandas grouped cumulative weighted moments"
   },
   {
     "class": "AnchoredVolumeWeightedAveragePrice",
     "snake": "anchored_vwap",
-    "oracle_api": "pandas.anchored_vwap",
+    "oracle_api": "pandas.core.groupby.SeriesGroupBy.cumsum",
     "output": "upper",
     "source": "pandas",
     "version": "3.0.5",
-    "url": "https://pandas.pydata.org/docs/reference/window.html",
+    "url": "https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html",
     "verdict": "MATCH",
-    "error": 0.0,
+    "error": 1.0622613899613498e-11,
     "nan": 0,
-    "note": "pandas/NumPy anchored weighted moments"
+    "note": "pandas grouped cumulative weighted moments"
   },
   {
     "class": "AnchoredVolumeWeightedAveragePrice",
     "snake": "anchored_vwap",
-    "oracle_api": "pandas.anchored_vwap",
+    "oracle_api": "pandas.core.groupby.SeriesGroupBy.cumsum",
     "output": "lower",
     "source": "pandas",
     "version": "3.0.5",
-    "url": "https://pandas.pydata.org/docs/reference/window.html",
+    "url": "https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html",
     "verdict": "MATCH",
-    "error": 0.0,
+    "error": 1.0622613899613498e-11,
     "nan": 0,
-    "note": "pandas/NumPy anchored weighted moments"
+    "note": "pandas grouped cumulative weighted moments"
   },
   {
     "class": "PivotPoints",

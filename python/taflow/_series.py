@@ -40,3 +40,38 @@ def as_float64_series(values: Any, *, column: str | None = None) -> np.ndarray:
     if array.ndim != 1:
         raise ValueError("input must be one-dimensional")
     return np.ascontiguousarray(array)
+
+
+def as_bool_series(values: Any, *, column: str | None = None) -> np.ndarray:
+    """Return a contiguous one-dimensional boolean array.
+
+    Dataframes follow the same explicit-column rules as numeric series. This
+    adapter performs shape normalization only; indicator semantics stay in
+    the native Rust state.
+    """
+
+    if hasattr(values, "columns"):
+        columns = list(values.columns)
+        if column is None:
+            if len(columns) != 1:
+                raise ValueError(
+                    "column is required when a dataframe has multiple columns"
+                )
+            column = columns[0]
+        if column not in columns:
+            raise ValueError(f"column {column!r} was not found")
+        values = values[column]
+    elif column is not None:
+        raise ValueError("column is only valid for dataframe input")
+
+    if hasattr(values, "to_numpy"):
+        values = values.to_numpy()
+
+    try:
+        array = np.asarray(values, dtype=np.bool_)
+    except (TypeError, ValueError) as error:
+        raise ValueError("input must be a boolean one-dimensional series") from error
+
+    if array.ndim != 1:
+        raise ValueError("input must be one-dimensional")
+    return np.ascontiguousarray(array)

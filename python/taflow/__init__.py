@@ -89,7 +89,9 @@ from .ultimate_oscillator import UltimateOscillator
 from .variable_period_moving_average import VariablePeriodMovingAverage
 from .heikin_ashi import HeikinAshi
 from .fibonacci_retracement import FibonacciRetracement
-from .anchored_vwap import AnchoredVolumeWeightedAveragePrice
+from .anchored_volume_weighted_average_price import (
+    AnchoredVolumeWeightedAveragePrice,
+)
 from .vidya import VariableIndexDynamicAverage
 from .laguerre_rsi import LaguerreRelativeStrengthIndex
 from .simple_moving_average import SimpleMovingAverage

@@ -389,26 +389,29 @@ def run_pandas(data: dict[str, np.ndarray], rows: list[Result]) -> None:
 
     # Anchored and rolling level operators.
     anchor = np.asarray(data["anchor"], dtype=bool)
-    typical_values = ((high + low + close) / 3.0).to_numpy()
-    volume_values = volume.to_numpy()
-    anchored = [np.empty(len(close)) for _ in range(3)]
-    weighted = weighted_square = total_volume = 0.0
-    for index, (price, bar_volume) in enumerate(zip(typical_values, volume_values)):
-        if anchor[index]:
-            weighted = weighted_square = total_volume = 0.0
-        weighted += price * bar_volume
-        weighted_square += price * price * bar_volume
-        total_volume += bar_volume
-        center = weighted / total_volume
-        deviation = np.sqrt(max(0.0, weighted_square / total_volume - center * center))
-        anchored[0][index], anchored[1][index], anchored[2][index] = (
-            center, center + deviation, center - deviation)
+    anchor_groups = pd.Series(anchor, index=close.index).cumsum()
+    anchored_typical = (high + low + close) / 3.0
+    anchored_volume = volume.groupby(anchor_groups, sort=False).cumsum()
+    anchored_weighted = (anchored_typical * volume).groupby(
+        anchor_groups, sort=False).cumsum()
+    anchored_weighted_square = (anchored_typical * anchored_typical * volume).groupby(
+        anchor_groups, sort=False).cumsum()
+    anchored_center = anchored_weighted / anchored_volume
+    anchored_variance = (
+        anchored_weighted_square / anchored_volume - anchored_center * anchored_center
+    ).clip(lower=0.0)
+    anchored_deviation = anchored_variance.pow(0.5)
+    anchored = (
+        anchored_center,
+        anchored_center + anchored_deviation,
+        anchored_center - anchored_deviation,
+    )
     anchored_actual = taflow.AnchoredVolumeWeightedAveragePrice(
         high, low, close, volume, anchor, 1.0).compute()
     for output, actual, expected in zip(("vwap", "upper", "lower"),
                                         anchored_actual, anchored, strict=True):
         compare(rows, "pandas", "anchored_vwap", output, actual, expected,
-                atol=1e-8, note="pandas/NumPy anchored weighted moments")
+                atol=1e-8, note="pandas grouped cumulative weighted moments")
 
     fib_high = close.rolling(120, min_periods=1).max()
     fib_low = close.rolling(120, min_periods=1).min()

@@ -13,7 +13,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.490e-08` |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `2.895e-24` |
-| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | MATCH | `0.000e+00` |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | MATCH | `1.062e-11` |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | VARIANT | `5.611e+00` |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `0.000e+00` |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | MATCH | `1.421e-14` |
@@ -462,7 +462,7 @@ Every correctness row uses an external implementation. `VARIANT` means the exter
 | WilliamsPercentR | [TA-Lib: `WILLR`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 3.73× | 1.26× | 0.99× | 0.86× |
 | WeightedMovingAverage | [TA-Lib: `WMA`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 5.24× | 1.43× | 0.68× | 0.61× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 110.09× | 23.96× | 8.15× | 9.20× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
 | AverageDailyDollarValue | [pandas: `pandas.average_daily_dollar_value`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — | — |
 | AwesomeOscillator | [pandas-ta-classic: `pandas_ta_classic.ao`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — | — |
@@ -601,7 +601,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.89× | 1.75× | 1.84× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 2.04× | 1.58× | 2.04× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 19.96× | 27.84× | 29.07× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.72× | 1.99× | 2.06× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.80× | 1.99× |
@@ -893,7 +893,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.74× | 1.97× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.00× | 1.94× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 26.54× | 27.61× | 28.56× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.90× | 2.04× | 2.11× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.95× | 1.99× |
@@ -1185,7 +1185,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.83× | 1.80× | 1.76× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.78× | 1.98× | 1.89× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 25.40× | 24.35× | 25.94× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.98× | 2.03× | 2.00× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.81× | 1.95× | 1.82× |
@@ -1477,7 +1477,7 @@ Fresh independent states are constructed and fed the stated number of bars. Thre
 | AccumulationDistribution | [TA-Lib: `AD`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.55× | 1.80× | 1.67× |
 | AccumulationDistributionOscillator | [TA-Lib: `ADOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.68× | 1.91× | 1.90× |
 | Amihud | [pandas: `pandas.amihud`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
-| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.anchored_vwap`](https://pandas.pydata.org/docs/reference/window.html) | — | — | — |
+| AnchoredVolumeWeightedAveragePrice | [pandas: `pandas.core.groupby.SeriesGroupBy.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.SeriesGroupBy.cumsum.html) | 23.72× | 27.41× | 30.30× |
 | ArnaudLegouxMovingAverage | [pandas-ta-classic: `pandas-ta-classic.arnaud_legoux_moving_average`](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | — | — | — |
 | Aroon | [TA-Lib: `AROON`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.70× | 2.24× | 2.20× |
 | AroonOscillator | [TA-Lib: `AROONOSC`](https://ta-lib.github.io/ta-lib-python/funcs.html) | 1.63× | 2.09× | 2.05× |

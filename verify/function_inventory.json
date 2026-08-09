@@ -1,16 +1,16 @@
 {
   "counts": {
-    "benchmark": 186,
-    "complete": 56,
+    "benchmark": 187,
+    "complete": 57,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
     "native_state_classes": 295,
     "pandas_ta_symbols": 427,
     "python_exports": 301,
-    "rust_exports": 613,
+    "rust_exports": 612,
     "smc_functions": 8,
-    "structure": 56,
+    "structure": 57,
     "talib_functions": 161
   },
   "rows": [
@@ -563,14 +563,15 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "anchored_vwap",
+      "module": "anchored_volume_weighted_average_price",
       "name": "AnchoredVolumeWeightedAveragePrice",
       "native_binding": true,
       "native_symbols": [
-        "StatefulAnchoredVolumeWeightedAveragePrice"
+        "AnchoredVolumeWeightedAveragePrice",
+        "_NativeAnchoredVolumeWeightedAveragePrice"
       ],
       "pandas_ta_reference": false,
-      "rust_export": true,
+      "rust_export": false,
       "smc_reference": false,
       "talib_alias": ""
     },
@@ -4432,6 +4433,7 @@
         "ActiveZoneListOperator",
         "AlmaOperator",
         "AmihudOperator",
+        "AnchoredVolumeWeightedAveragePrice",
         "Aroon",
         "AroonOscillator",
         "AverageDailyDollarValueOperator",
@@ -4643,7 +4645,6 @@
         "StatefulAccbands",
         "StatefulAdx",
         "StatefulAdxr",
-        "StatefulAnchoredVolumeWeightedAveragePrice",
         "StatefulApo",
         "StatefulAvgdev",
         "StatefulBbands",
@@ -4738,6 +4739,7 @@
         "ActiveZoneListOperator",
         "AlmaOperator",
         "AmihudOperator",
+        "AnchoredVolumeWeightedAveragePrice",
         "Aroon",
         "AroonOscillator",
         "AverageDailyDollarValueOperator",
@@ -4949,7 +4951,6 @@
         "StatefulAccbands",
         "StatefulAdx",
         "StatefulAdxr",
-        "StatefulAnchoredVolumeWeightedAveragePrice",
         "StatefulApo",
         "StatefulAvgdev",
         "StatefulBbands",

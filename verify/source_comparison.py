@@ -26,6 +26,7 @@ PACKAGES = {"TA-Lib": "TA-Lib", "NumPy": "numpy", "Polars": "polars", "pandas": 
             "pandas-ta-classic": "pandas-ta-classic",
             "smartmoneyconcepts": "smartmoneyconcepts"}
 API_NAMES = {
+    "anchored_vwap": "pandas.core.groupby.SeriesGroupBy.cumsum",
     "awesome_oscillator": "pandas_ta_classic.ao",
     "log_return": "pandas_ta_classic.log_return",
     "force_index": "pandas_ta_classic.efi",
@@ -43,6 +44,12 @@ API_NAMES = {
     "schaff_trend_cycle": "pandas_ta_classic.stc",
     "klinger_volume_oscillator": "pandas_ta_classic.kvo",
     "tom_de_mark_sequential": "pandas_ta_classic.td_seq",
+}
+API_URLS = {
+    "anchored_vwap": (
+        "https://pandas.pydata.org/docs/reference/api/"
+        "pandas.core.groupby.SeriesGroupBy.cumsum.html"
+    ),
 }
 
 
@@ -109,7 +116,7 @@ def main() -> None:
             selected.append({"class": class_by_snake[snake], "snake": snake,
                              "oracle_api": oracle_api, "output": item["output"],
                              "source": source, "version": version(source, external_doc["versions"]),
-                             "url": URLS[source], "verdict": verdict,
+                             "url": API_URLS.get(snake, URLS[source]), "verdict": verdict,
                              "error": float(item.get("max_abs_error", 0.0)),
                              "nan": int(item.get("nan_mismatches", 0)),
                              "note": item.get("error") or item.get("note", "")})

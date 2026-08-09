@@ -4,6 +4,7 @@ mod abandoned_baby;
 mod adv;
 mod advance_block;
 mod amihud;
+mod anchored_volume_weighted_average_price;
 mod bar_helpers;
 mod belt_hold;
 mod bos_choch;
@@ -162,6 +163,7 @@ pub use abandoned_baby::CandleAbandonedBaby;
 pub use adv::AverageDailyDollarValueOperator;
 pub use advance_block::CandleAdvanceBlock;
 pub use amihud::AmihudOperator;
+pub use anchored_volume_weighted_average_price::AnchoredVolumeWeightedAveragePrice;
 pub use bar_helpers::{
     GapDownOperator, GapUpOperator, HigherHighOperator, InsideBarOperator, LowerLowOperator,
     OutsideBarOperator,

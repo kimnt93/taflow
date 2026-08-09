@@ -95,6 +95,29 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
             (high - span * ratio).to_numpy()
             for ratio in (0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0)
         )
+    if source == "pandas" and spec.snake == "anchored_vwap":
+        import pandas as pd
+        high, low, close, volume = (pd.Series(array) for array in arrays[:4])
+        groups = pd.Series(arrays[4], dtype=bool).cumsum()
+        typical = (high + low + close) / 3.0
+        cumulative_volume = volume.groupby(groups, sort=False).cumsum()
+        cumulative_weighted = (typical * volume).groupby(
+            groups, sort=False
+        ).cumsum()
+        cumulative_weighted_square = (typical * typical * volume).groupby(
+            groups, sort=False
+        ).cumsum()
+        average = cumulative_weighted / cumulative_volume
+        variance = (
+            cumulative_weighted_square / cumulative_volume - average * average
+        ).clip(lower=0.0)
+        multiplier = spec.ctor_kwargs.get("standard_deviation_multiplier", 1.0)
+        deviation = variance.pow(0.5) * multiplier
+        return (
+            average.to_numpy(),
+            (average + deviation).to_numpy(),
+            (average - deviation).to_numpy(),
+        )
     if source == "pandas" and spec.snake == "lag":
         import pandas as pd
         return pd.Series(arrays[0]).shift(

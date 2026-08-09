@@ -273,6 +273,8 @@ pub use cumulative_minimum::CumulativeMinimum;
 pub use cumulative_product::CumulativeProduct;
 pub use cumulative_sum::CumulativeSum;
 mod anchored_volume_weighted_average_price;
+#[cfg(test)]
+mod anchored_volume_weighted_average_price_test;
 mod even_better_sinewave;
 mod fibonacci_retracement;
 #[cfg(test)]
@@ -342,7 +344,9 @@ pub use adx::AverageDirectionalIndex;
 #[allow(unused_imports)]
 pub(crate) use adxr::average_directional_index_rating;
 pub use adxr::AverageDirectionalIndexRating;
-pub use anchored_volume_weighted_average_price::AnchoredVolumeWeightedAveragePrice;
+pub use anchored_volume_weighted_average_price::{
+    AnchoredVolumeWeightedAveragePrice, AnchoredVolumeWeightedAveragePriceValue,
+};
 #[allow(unused_imports)]
 pub(crate) use apo::absolute_price_oscillator;
 pub use apo::AbsolutePriceOscillator;

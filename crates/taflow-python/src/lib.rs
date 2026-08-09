@@ -55,6 +55,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::UltimateOscillator>()?;
     m.add_class::<indicators::HeikinAshi>()?;
     m.add_class::<indicators::FibonacciRetracement>()?;
+    m.add_class::<indicators::AnchoredVolumeWeightedAveragePrice>()?;
     m.add_class::<indicators::Lag>()?;
     m.add_class::<indicators::LogReturn>()?;
     m.add_class::<indicators::CumulativeSum>()?;
@@ -245,7 +246,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulKlingerVolumeOscillator>()?;
     m.add_class::<state_api::StatefulParabolicMovingAverageStop>()?;
     m.add_class::<state_api::StatefulTomDeMarkSequential>()?;
-    m.add_class::<state_api::StatefulAnchoredVolumeWeightedAveragePrice>()?;
     m.add_class::<state_api::StatefulPivotPoints>()?;
     m.add_class::<state_api::StatefulCci>()?;
     m.add_class::<state_api::StatefulKama>()?;
