@@ -31,7 +31,8 @@ class RollSpread:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(price) if price is not None else None
+        self._length = 0
+        self.extend(price)
 
     def append(self, price: float) -> "RollSpread":
         """Append one observation or aligned bar to the native Rust state.
@@ -46,7 +47,8 @@ class RollSpread:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(price)
+        self._state.append(float(price))
+        self._length += 1
         return self
 
     def extend(self, price: Any) -> "RollSpread":
@@ -62,7 +64,9 @@ class RollSpread:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(price))
+        price_array = as_float64_series(price)
+        self._state.extend(price_array)
+        self._length += len(price_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -76,7 +80,7 @@ class RollSpread:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -95,4 +99,9 @@ class RollSpread:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed prices."""
+        return self._length

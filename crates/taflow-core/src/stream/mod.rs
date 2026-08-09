@@ -1275,31 +1275,31 @@ mod close_to_close_sigma_test;
 mod equal_highs_lows;
 #[cfg(test)]
 mod equal_highs_lows_test;
+mod garman_klass;
+#[cfg(test)]
+mod garman_klass_test;
+mod garman_klass_yang_zhang;
+#[cfg(test)]
+mod garman_klass_yang_zhang_test;
 mod parkinson;
+#[cfg(test)]
+mod parkinson_test;
 mod previous_high_low;
 #[cfg(test)]
 mod previous_high_low_test;
 mod retracements;
 #[cfg(test)]
 mod retracements_test;
+mod rogers_satchell;
+#[cfg(test)]
+mod rogers_satchell_test;
 mod sessions;
 #[cfg(test)]
 mod sessions_test;
-#[allow(unused_imports)]
-pub(crate) use parkinson::parkinson;
-mod garman_klass;
-#[allow(unused_imports)]
-pub(crate) use garman_klass::garman_klass;
-mod rogers_satchell;
-#[allow(unused_imports)]
-pub(crate) use rogers_satchell::rogers_satchell;
-mod garman_klass_yang_zhang;
-#[allow(unused_imports)]
-pub(crate) use garman_klass_yang_zhang::garman_klass_yang_zhang;
-mod yang_zhang;
-#[allow(unused_imports)]
-pub(crate) use yang_zhang::yang_zhang;
 mod time_series_rank;
+mod yang_zhang;
+#[cfg(test)]
+mod yang_zhang_test;
 #[allow(unused_imports)]
 pub(crate) use time_series_rank::time_series_rank;
 pub use time_series_rank::TimeSeriesRank;
@@ -1312,18 +1312,18 @@ mod decay_linear;
 pub(crate) use decay_linear::decay_linear;
 pub use decay_linear::DecayLinear;
 mod amihud;
+#[cfg(test)]
+mod amihud_test;
 mod average_daily_dollar_value;
 #[cfg(test)]
 mod average_daily_dollar_value_test;
-#[allow(unused_imports)]
-pub(crate) use amihud::amihud;
-mod roll_spread;
-#[allow(unused_imports)]
-pub(crate) use roll_spread::roll_spread;
-mod ornstein_uhlenbeck_half_life;
-#[allow(unused_imports)]
-pub(crate) use ornstein_uhlenbeck_half_life::ornstein_uhlenbeck_half_life;
 mod cumulative_sum_control_chart;
+mod ornstein_uhlenbeck_half_life;
+#[cfg(test)]
+mod ornstein_uhlenbeck_half_life_test;
+mod roll_spread;
+#[cfg(test)]
+mod roll_spread_test;
 #[allow(unused_imports)]
 pub(crate) use cumulative_sum_control_chart::cumulative_sum_control_chart;
 mod frac_diff;
@@ -1357,17 +1357,19 @@ mod know_sure_thing;
 #[allow(unused_imports)]
 pub(crate) use know_sure_thing::know_sure_thing;
 mod swing_high_low;
+#[cfg(test)]
+mod swing_high_low_test;
 mod swing_highs_lows;
 pub use swing_high_low::{SwingHighLow, SwingValue};
+pub use swing_highs_lows::SwingHighsLows;
+mod swing_high;
+#[cfg(test)]
+mod swing_high_test;
 mod swing_highs_lows_indicator;
 #[cfg(test)]
 mod swing_highs_lows_indicator_test;
 #[cfg(test)]
 mod swing_highs_lows_test;
-pub use swing_highs_lows_indicator::SwingHighsLows;
-mod swing_high;
-#[cfg(test)]
-mod swing_high_test;
 pub use swing_high::SwingHigh;
 mod swing_low;
 #[cfg(test)]

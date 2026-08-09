@@ -230,30 +230,27 @@ mod tests {
             );
         }
 
-        let amihud_batch = amihud(&close, &volume, 3).unwrap();
         let mut amihud_state = Amihud::new(3).unwrap();
-        for ((close, volume), expected) in close.iter().zip(&volume).zip(&amihud_batch) {
+        for (close, volume) in close.iter().zip(&volume) {
             assert_eq!(
                 amihud_state.append(*close, *volume).map(f64::to_bits),
-                (!expected.is_nan()).then_some(expected.to_bits())
+                amihud_state.value().map(f64::to_bits)
             );
         }
 
-        let spread_batch = roll_spread(&close, 3).unwrap();
         let mut spread_state = RollSpread::new(3).unwrap();
-        for (price, expected) in close.iter().zip(&spread_batch) {
+        for price in &close {
             assert_eq!(
                 spread_state.append(*price).map(f64::to_bits),
-                (!expected.is_nan()).then_some(expected.to_bits())
+                spread_state.value().map(f64::to_bits)
             );
         }
 
-        let hl_batch = ornstein_uhlenbeck_half_life(&close, 3).unwrap();
         let mut hl_state = OrnsteinUhlenbeckHalfLife::new(3).unwrap();
-        for (price, expected) in close.iter().zip(&hl_batch) {
+        for price in &close {
             assert_eq!(
                 hl_state.append(*price).map(f64::to_bits),
-                (!expected.is_nan()).then_some(expected.to_bits())
+                hl_state.value().map(f64::to_bits)
             );
         }
 

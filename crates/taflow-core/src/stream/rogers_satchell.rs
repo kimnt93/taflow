@@ -1,48 +1,6 @@
-//! Batch implementation for `rogers_satchell`.
-
 use super::operator_states::*;
-use super::*;
-use crate::error::{TaError, TaResult};
+use crate::error::TaResult;
 
-/// Computes or updates `rogers_satchell` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Returns the computed value, aligned history, or a validation error.
-pub fn rogers_satchell(
-    open: &[f64],
-    high: &[f64],
-    low: &[f64],
-    close: &[f64],
-    timeperiod: usize,
-) -> TaResult<Vec<f64>> {
-    if open.len() != high.len() || high.len() != low.len() || low.len() != close.len() {
-        return Err(TaError::LengthMismatch {
-            expected: open.len(),
-            got: high.len().max(low.len()).max(close.len()),
-        });
-    }
-    let mut state = RogersSatchell::new(timeperiod)?;
-    Ok(open
-        .iter()
-        .zip(high)
-        .zip(low)
-        .zip(close)
-        .map(|(((&open, &high), &low), &close)| {
-            state.append(open, high, low, close).unwrap_or(f64::NAN)
-        })
-        .collect())
-}
-use super::operator_states::*;
-use super::*;
-use std::collections::{HashMap, HashSet, VecDeque};
-
-/// Rolling mean of `ln(H/C)ln(H/O) + ln(L/C)ln(L/O)` (Rogers-Satchell).
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `RogersSatchell`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct RogersSatchell {
     mean: RollingMean,
     value: Option<f64>,

@@ -40,11 +40,8 @@ class YangZhang:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        (
-            self.extend(_open, high, low, close)
-            if any(value is not None for value in (_open, high, low, close))
-            else None
-        )
+        self._length = 0
+        self.extend(_open, high, low, close)
 
     def append(self, _open: float, high: float, low: float, close: float) -> "YangZhang":
         """Append one observation or aligned bar to the native Rust state.
@@ -65,7 +62,8 @@ class YangZhang:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_open, high, low, close)
+        self._state.append(float(_open), float(high), float(low), float(close))
+        self._length += 1
         return self
 
     def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "YangZhang":
@@ -87,12 +85,11 @@ class YangZhang:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(
-            as_float64_series(_open),
-            as_float64_series(high),
-            as_float64_series(low),
-            as_float64_series(close),
-        )
+        arrays = tuple(as_float64_series(value) for value in (_open, high, low, close))
+        if not all(array.shape == arrays[0].shape for array in arrays[1:]):
+            raise ValueError("_open, high, low, and close must have equal lengths")
+        self._state.extend(*arrays)
+        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -106,7 +103,7 @@ class YangZhang:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -125,4 +122,9 @@ class YangZhang:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return self._length

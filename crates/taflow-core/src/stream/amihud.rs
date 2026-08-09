@@ -1,48 +1,6 @@
-//! Batch implementation for `amihud`.
-
 use super::operator_states::*;
-use super::*;
-use crate::error::{TaError, TaResult};
+use crate::error::TaResult;
 
-/// Computes or updates `amihud` through the native Rust kernel.
-///
-/// Parameters are the typed series and configuration values in the signature.
-///
-/// Compute the amihud result for the supplied aligned series.
-///
-/// # Parameters
-///
-/// * `close` - Input series or configuration value.
-/// * `volume` - Input series or configuration value.
-/// * `timeperiod` - Input series or configuration value.
-///
-/// # Returns
-///
-/// An aligned result with TA-Lib-compatible validation and warm-up values.
-pub fn amihud(close: &[f64], volume: &[f64], timeperiod: usize) -> TaResult<Vec<f64>> {
-    if close.len() != volume.len() {
-        return Err(TaError::LengthMismatch {
-            expected: close.len(),
-            got: volume.len(),
-        });
-    }
-    let mut state = Amihud::new(timeperiod)?;
-    Ok(close
-        .iter()
-        .zip(volume)
-        .map(|(&close, &volume)| state.append(close, volume).unwrap_or(f64::NAN))
-        .collect())
-}
-use super::operator_states::*;
-use super::*;
-use std::collections::{HashMap, HashSet, VecDeque};
-
-/// Amihud illiquidity: rolling mean of `|ret| / (close × volume)`.
-#[derive(Debug, Clone)]
-/// Persistent Rust state or aligned output type for `Amihud`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct Amihud {
     mean: RollingMean,
     previous_close: Option<f64>,
