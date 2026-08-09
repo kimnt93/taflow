@@ -203,6 +203,12 @@ Focused tests (7), full Python tests (588 passed, 2 skipped), and the 300/300
 interface audit passed. Benchmark fields remain `TODO`; no benchmark command
 was run.
 
+The forty-third structural cleanup removed the unused root `math_transform.py`
+forwarding module; pointwise math adapters remain exclusively under
+`python/taflow/indicators/` and are exported through both package surfaces.
+The module had no internal or test references. Benchmark fields remain
+`TODO`; no benchmark command was run.
+
 The next structural batch migrated `RollingMode`, `RollingPercentile`,
 `RollingRank`, `RollingInterquartileRange`, `RollingCovariance`,
 `RollingWinsorize`, `ExponentiallyWeightedSum`,
