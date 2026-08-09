@@ -16,7 +16,7 @@ class RollingInformationRatio:
         _input: Any,
         benchmark: Any,
         timeperiod: int = 20,
-    ) -> None:
+        ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
@@ -34,11 +34,8 @@ class RollingInformationRatio:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        (
-            self.extend(_input, benchmark)
-            if _input is not None or benchmark is not None
-            else None
-        )
+        self._length = 0
+        self.extend(_input, benchmark)
 
     def append(self, _input: float, benchmark: float) -> "RollingInformationRatio":
         """Append one observation or aligned bar to the native Rust state.
@@ -55,7 +52,8 @@ class RollingInformationRatio:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(_input, benchmark)
+        self._state.append(float(_input), float(benchmark))
+        self._length += 1
         return self
 
     def extend(self, _input: Any, benchmark: Any) -> "RollingInformationRatio":
@@ -73,7 +71,12 @@ class RollingInformationRatio:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(_input), as_float64_series(benchmark))
+        input_array = as_float64_series(_input)
+        benchmark_array = as_float64_series(benchmark)
+        if input_array.shape != benchmark_array.shape:
+            raise ValueError("_input and benchmark must have equal lengths")
+        self._state.extend(input_array, benchmark_array)
+        self._length += len(input_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -87,7 +90,7 @@ class RollingInformationRatio:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -106,4 +109,9 @@ class RollingInformationRatio:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed observations."""
+        return self._length

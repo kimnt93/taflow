@@ -1266,9 +1266,12 @@ mod liquidity;
 #[allow(unused_imports)]
 pub(crate) use liquidity::liquidity;
 mod close_to_close_sigma;
+#[cfg(test)]
+mod close_to_close_sigma_test;
 mod equal_highs_lows;
 #[cfg(test)]
 mod equal_highs_lows_test;
+mod parkinson;
 mod previous_high_low;
 #[cfg(test)]
 mod previous_high_low_test;
@@ -1278,9 +1281,6 @@ mod retracements_test;
 mod sessions;
 #[cfg(test)]
 mod sessions_test;
-#[allow(unused_imports)]
-pub(crate) use close_to_close_sigma::close_to_close_sigma;
-mod parkinson;
 #[allow(unused_imports)]
 pub(crate) use parkinson::parkinson;
 mod garman_klass;
