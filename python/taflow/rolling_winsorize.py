@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 
 from ._native import RollingWinsorizeOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
@@ -44,20 +45,17 @@ class RollingWinsorize:
             The constructor initializes native state and returns no value.
         """
         self._state = _Native(int(timeperiod), float(lower), float(upper))
-        self._length = 0
         self.extend(_input)
 
     def append(self, _input: float) -> "RollingWinsorize":
         """Append one observation and return this adapter."""
         self._state.append(float(_input))
-        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "RollingWinsorize":
         """Append a chronological input history and return this adapter."""
         values = as_float64_series(_input)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -72,9 +70,11 @@ class RollingWinsorize:
     def reset(self) -> "RollingWinsorize":
         """Reset native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
+
+
+__all__ = ["RollingWinsorize"]

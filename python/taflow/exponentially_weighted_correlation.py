@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 
 from ._native import ExponentiallyWeightedCorrelationOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
@@ -45,7 +46,6 @@ class ExponentiallyWeightedCorrelation:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(int(timeperiod))
-        self._length = 0
         self.extend(left, right)
 
     def append(self, left: float, right: float) -> "ExponentiallyWeightedCorrelation":
@@ -64,7 +64,6 @@ class ExponentiallyWeightedCorrelation:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(left), float(right))
-        self._length += 1
         return self
 
     def extend(self, left: Any, right: Any) -> "ExponentiallyWeightedCorrelation":
@@ -87,7 +86,6 @@ class ExponentiallyWeightedCorrelation:
         if len(left_values) != len(right_values):
             raise ValueError("left and right input series must have equal length")
         self._state.extend(left_values, right_values)
-        self._length += len(left_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -113,7 +111,7 @@ class ExponentiallyWeightedCorrelation:
 
     def __len__(self) -> int:
         """Return the number of paired observations consumed by this state."""
-        return self._length
+        return adapter_length(self)
 
     def reset(self) -> "ExponentiallyWeightedCorrelation":
         """Execute the reset operation through the native Rust implementation.
@@ -124,5 +122,7 @@ class ExponentiallyWeightedCorrelation:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
+
+
+__all__ = ["ExponentiallyWeightedCorrelation"]

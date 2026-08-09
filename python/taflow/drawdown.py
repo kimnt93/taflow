@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 
 from ._native import DrawdownOperator as _Native
+from ._adapter_protocol import adapter_length
 from ._series import as_float64_series
 
 
@@ -36,7 +37,6 @@ class Drawdown:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self._length = 0
         self.extend(_input)
 
     def append(self, _input: float) -> "Drawdown":
@@ -53,7 +53,6 @@ class Drawdown:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(_input))
-        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "Drawdown":
@@ -71,7 +70,6 @@ class Drawdown:
         """
         values = as_float64_series(_input)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -97,7 +95,7 @@ class Drawdown:
 
     def __len__(self) -> int:
         """Return the number of observations consumed by this state."""
-        return self._length
+        return adapter_length(self)
 
     def reset(self) -> "Drawdown":
         """Execute the reset operation through the native Rust implementation.
@@ -108,5 +106,7 @@ class Drawdown:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
+
+
+__all__ = ["Drawdown"]
