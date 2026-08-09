@@ -276,9 +276,11 @@ mod intraday_momentum_index_test;
 mod kaufman_adaptive_moving_average;
 #[cfg(test)]
 mod kaufman_adaptive_moving_average_test;
-mod mama;
 mod math_abs;
 mod math_operator;
+mod mesa_adaptive_moving_average;
+#[cfg(test)]
+mod mesa_adaptive_moving_average_test;
 mod moving_average;
 mod moving_average_convergence_divergence;
 mod moving_average_convergence_divergence_extended;
@@ -662,8 +664,7 @@ pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscill
 pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
-pub(crate) use mama::mesa_adaptive_moving_average;
-pub use mama::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
+pub use mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
 pub use minus_directional_indicator::MinusDirectionalIndicator;
 pub use minus_directional_movement::MinusDirectionalMovement;
