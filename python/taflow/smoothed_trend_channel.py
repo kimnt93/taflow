@@ -28,11 +28,10 @@ class SmoothedTrendChannel:
 
     def extend(self, high: Any, low: Any, close: Any) -> "SmoothedTrendChannel":
         """Append aligned high, low and close series and return this indicator."""
-        self._state.extend(
-            as_float64_series(high),
-            as_float64_series(low),
-            as_float64_series(close),
-        )
+        arrays = tuple(as_float64_series(series) for series in (high, low, close))
+        if len({len(array) for array in arrays}) != 1:
+            raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(*arrays)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray]:

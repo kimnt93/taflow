@@ -46,6 +46,7 @@ class TomDeMarkSequential:
         return self
 
     def __len__(self) -> int:
+        """Return the number of processed close values."""
         return len(self._state)
 
 

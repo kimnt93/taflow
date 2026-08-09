@@ -11,12 +11,13 @@ from ._series import as_float64_series
 class KlingerVolumeOscillator:
     """Compute signed-volume fast/slow EMA and signal outputs.
 
-    ``high``, ``low``, ``close``, and ``volume`` are required aligned series;
-    empty arrays create a fresh stream. ``fast``, ``slow``, and ``signal``
-    default to 34, 55, and 13. Rust owns force calculation, EMA warm-up, and
-    aligned NaN history. ``compute`` returns ``(oscillator, signal)`` arrays;
-    lifecycle mutators return ``self`` and ``value`` exposes the latest pair.
-    The correctness oracle is ``pandas-ta-classic.kvo``.
+    ``high``, ``low``, ``close``, and ``volume`` are required aligned series in
+    that order; empty arrays create a fresh stream. ``fast``, ``slow``, and
+    ``signal`` default to 34, 55, and 13. Rust owns signed-volume force,
+    exponential smoothing, warm-up, and aligned NaN history. ``compute``
+    returns ``(oscillator, signal)`` arrays; lifecycle mutators return ``self``
+    and ``value`` exposes the latest pair. The correctness oracle is
+    ``pandas-ta-classic.kvo``.
     """
 
     def __init__(
