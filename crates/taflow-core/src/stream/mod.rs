@@ -1327,9 +1327,9 @@ mod cumulative_sum_control_chart;
 #[allow(unused_imports)]
 pub(crate) use cumulative_sum_control_chart::cumulative_sum_control_chart;
 mod frac_diff;
-mod spread_zscore;
+mod spread_z_score;
 #[cfg(test)]
-mod spread_zscore_test;
+mod spread_z_score_test;
 #[allow(unused_imports)]
 pub(crate) use frac_diff::frac_diff;
 mod kalman_hedge_ratio;
@@ -1510,7 +1510,7 @@ pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
 pub use session_extrema::{SessionExtrema, SessionExtremaValue};
 pub use sessions::{Sessions, SessionsValue};
-pub use spread_zscore::SpreadZScore;
+pub use spread_z_score::SpreadZScore;
 pub use squeeze::{Squeeze, SqueezeValue};
 pub use squeeze_pro::{SqueezePro, SqueezeProValue};
 pub use supertrend::{Supertrend, SupertrendValue};

@@ -291,7 +291,7 @@ from .amihud import Amihud
 from .roll_spread import RollSpread
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
 from .cumulative_sum_control_chart import CumulativeSumControlChart
-from .spread_zscore import SpreadZScore
+from .spread_z_score import SpreadZScore
 from .frac_diff import FracDiff
 from .kalman_hedge_ratio import KalmanHedgeRatio
 from .supertrend import Supertrend
