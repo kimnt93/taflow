@@ -37,7 +37,8 @@ class AwesomeOscillator:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(fast, slow)
-        self.extend(high, low) if high is not None or low is not None else None
+        self._length = 0
+        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "AwesomeOscillator":
         """Append one observation or aligned bar to the native Rust state.
@@ -54,7 +55,8 @@ class AwesomeOscillator:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(high, low)
+        self._state.append(float(high), float(low))
+        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any) -> "AwesomeOscillator":
@@ -72,7 +74,12 @@ class AwesomeOscillator:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(as_float64_series(high), as_float64_series(low))
+        high_values = as_float64_series(high)
+        low_values = as_float64_series(low)
+        if len(high_values) != len(low_values):
+            raise ValueError("high and low input series must have equal length")
+        self._state.extend(high_values, low_values)
+        self._length += len(high_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -86,7 +93,7 @@ class AwesomeOscillator:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -95,6 +102,10 @@ class AwesomeOscillator:
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
+
+    def __len__(self) -> int:
+        """Return the number of paired observations consumed by this state."""
+        return self._length
 
     def reset(self) -> "AwesomeOscillator":
         """Execute the reset operation through the native Rust implementation.
@@ -105,4 +116,5 @@ class AwesomeOscillator:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
+        self._length = 0
         return self

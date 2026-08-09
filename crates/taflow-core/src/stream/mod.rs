@@ -1189,6 +1189,9 @@ mod arnaud_legoux_moving_average;
 #[cfg(test)]
 mod arnaud_legoux_moving_average_test;
 mod awesome_oscillator;
+#[cfg(test)]
+mod awesome_oscillator_test;
+mod fisher_transform;
 mod hull_moving_average;
 #[cfg(test)]
 mod hull_moving_average_test;
@@ -1202,14 +1205,11 @@ mod volume_weighted_moving_average_test;
 mod zero_lag_exponential_moving_average;
 #[cfg(test)]
 mod zero_lag_exponential_moving_average_test;
-#[allow(unused_imports)]
-pub(crate) use awesome_oscillator::awesome_oscillator;
-mod fisher_transform;
 pub use fisher_transform::FisherTransform;
-mod ulcer_index;
-#[allow(unused_imports)]
-pub(crate) use ulcer_index::ulcer_index;
 mod chaikin_volatility;
+mod ulcer_index;
+#[cfg(test)]
+mod ulcer_index_test;
 #[allow(unused_imports)]
 pub(crate) use chaikin_volatility::chaikin_volatility;
 mod rolling_volume_weighted_average_price;
