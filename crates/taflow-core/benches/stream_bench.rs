@@ -1,17 +1,17 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use taflow::indicators::{
-    Momentum, RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent,
-    WilliamsPercentR,
+    AccelerationBands, MesaAdaptiveMovingAverage, Momentum, ParabolicSar, ParabolicSarExtended,
+    RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent, RollingMinMax,
+    RollingMinMaxIndex, WilliamsPercentR,
 };
 use taflow::stream::{
-    self, AbsolutePriceOscillator, AccelerationBands, AverageTrueRange, BollingerBands,
-    DoubleExponentialMovingAverage, ExponentialMovingAverage, FastStochasticOscillator,
-    IntradayMomentumIndex, MesaAdaptiveMovingAverage, MovingAverage,
+    AbsolutePriceOscillator, AverageTrueRange, BollingerBands, DoubleExponentialMovingAverage,
+    ExponentialMovingAverage, FastStochasticOscillator, IntradayMomentumIndex, MovingAverage,
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceFixed,
-    NormalizedAverageTrueRange, ParabolicSar, ParabolicSarExtended, PercentagePriceOscillator,
-    RelativeStrengthIndex, RollingMidpoint, RollingMidprice, SimpleMovingAverage,
-    StochasticOscillator, StreamingIndicator, TriangularMovingAverage, TripleExponentialAverage,
-    TripleExponentialMovingAverage, TrueRange, WeightedMovingAverage,
+    NormalizedAverageTrueRange, PercentagePriceOscillator, RelativeStrengthIndex, RollingMidpoint,
+    RollingMidprice, SimpleMovingAverage, StochasticOscillator, StreamingIndicator,
+    TriangularMovingAverage, TripleExponentialAverage, TripleExponentialMovingAverage, TrueRange,
+    WeightedMovingAverage,
 };
 use taflow::MaType;
 
@@ -369,7 +369,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     bench_periodic!("tsf", RollingTimeSeriesForecast);
     group.bench_function(BenchmarkId::new("minmax", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::RollingMinMax::new(20).unwrap();
+            let mut state = RollingMinMax::new(20).unwrap();
             for value in warmup {
                 state.append(*value);
             }
@@ -380,7 +380,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("minmaxindex", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::RollingMinMaxIndex::new(20).unwrap();
+            let mut state = RollingMinMaxIndex::new(20).unwrap();
             for value in warmup {
                 state.append(*value);
             }

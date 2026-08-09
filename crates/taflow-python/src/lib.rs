@@ -251,8 +251,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<state_api::StatefulMaxindex>()?;
     m.add_class::<state_api::StatefulMin>()?;
     m.add_class::<state_api::StatefulMinindex>()?;
-    m.add_class::<state_api::StatefulMinmax>()?;
-    m.add_class::<state_api::StatefulMinmaxindex>()?;
+    m.add_class::<indicators::RollingMinMax>()?;
+    m.add_class::<indicators::RollingMinMaxIndex>()?;
     m.add_class::<state_api::StatefulBeta>()?;
     m.add_class::<state_api::StatefulCorrel>()?;
     m.add_class::<state_api::StatefulLinearreg>()?;
@@ -302,13 +302,13 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::AverageTrueRange>()?;
     m.add_class::<indicators::TrueRange>()?;
     m.add_class::<indicators::NormalizedAverageTrueRange>()?;
-    m.add_class::<state_api::VariablePeriodMovingAverage>()?;
-    m.add_class::<state_api::StatefulAdxr>()?;
-    m.add_class::<state_api::StatefulDx>()?;
-    m.add_class::<state_api::StatefulMama>()?;
-    m.add_class::<state_api::StatefulAccbands>()?;
-    m.add_class::<state_api::StatefulSar>()?;
-    m.add_class::<state_api::StatefulSarext>()?;
+    m.add_class::<indicators::VariablePeriodMovingAverage>()?;
+    m.add_class::<indicators::AverageDirectionalIndexRating>()?;
+    m.add_class::<indicators::DirectionalMovementIndex>()?;
+    m.add_class::<indicators::MesaAdaptiveMovingAverage>()?;
+    m.add_class::<indicators::AccelerationBands>()?;
+    m.add_class::<indicators::ParabolicSar>()?;
+    m.add_class::<indicators::ParabolicSarExtended>()?;
 
     Ok(())
 }

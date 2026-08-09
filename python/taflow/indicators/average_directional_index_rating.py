@@ -1,15 +1,15 @@
-"""Descriptive stateful interface for the Directional Movement Index."""
+"""Descriptive stateful interface for the ADX Rating."""
 
-from taflow._native import StatefulDx
+from .._native import AverageDirectionalIndexRating as _NativeAverageDirectionalIndexRating
 from typing import Any
 
 import numpy as np
 
-from ._series import as_float64_series
+from .._series import as_float64_series
 
 
-class DirectionalMovementIndex:
-    """Incrementally compute Wilder's Directional Movement Index
+class AverageDirectionalIndexRating:
+    """Incrementally compute the lag-averaged Average Directional Index
 
     Parameters
     ----------
@@ -17,7 +17,7 @@ class DirectionalMovementIndex:
 
     Returns
     -------
-    DirectionalMovementIndex
+    AverageDirectionalIndexRating
         A persistent native-backed indicator adapter.
     """
 
@@ -28,11 +28,11 @@ class DirectionalMovementIndex:
         close: Any,
         period: int = 14,
     ) -> None:
-        """Create DX with an optional aligned high/low/close history."""
-        self._state = StatefulDx(period)
+        """Create ADXR with an optional aligned high/low/close history."""
+        self._state = _NativeAverageDirectionalIndexRating(period)
         self.extend(high, low, close)
 
-    def append(self, high: object, low: object, close: object) -> "DirectionalMovementIndex":
+    def append(self, high: object, low: object, close: object) -> "AverageDirectionalIndexRating":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -52,7 +52,7 @@ class DirectionalMovementIndex:
         self._state.append(float(high), float(low), float(close))
         return self
 
-    def extend(self, high: object, low: object, close: object) -> "DirectionalMovementIndex":
+    def extend(self, high: object, low: object, close: object) -> "AverageDirectionalIndexRating":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -95,7 +95,7 @@ class DirectionalMovementIndex:
         """
         return self._state.value
 
-    def reset(self) -> "DirectionalMovementIndex":
+    def reset(self) -> "AverageDirectionalIndexRating":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

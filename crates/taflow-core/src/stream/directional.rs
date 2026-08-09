@@ -4,30 +4,30 @@ use crate::error::{TaError, TaResult};
 
 #[derive(Debug, Clone, Copy)]
 #[allow(dead_code)]
-pub(super) struct DirectionalValue {
-    pub(super) true_range: f64,
-    pub(super) plus_dm: f64,
-    pub(super) minus_dm: f64,
-    pub(super) plus_di: f64,
-    pub(super) minus_di: f64,
-    pub(super) dx: f64,
+pub(crate) struct DirectionalValue {
+    pub(crate) true_range: f64,
+    pub(crate) plus_dm: f64,
+    pub(crate) minus_dm: f64,
+    pub(crate) plus_di: f64,
+    pub(crate) minus_di: f64,
+    pub(crate) dx: f64,
 }
 
-pub(super) struct DirectionalMovement {
-    // Fields are `pub(super)` so sibling bulk kernels (ADX/ADXR/+DI) can hold
+pub(crate) struct DirectionalMovement {
+    // Fields are `pub(crate)` so sibling bulk kernels (ADX/ADXR/+DI) can hold
     // the Wilder recurrence state in locals and write it back after a fused
     // loop; the arithmetic contract lives in `append` below.
-    pub(super) period: usize,
-    pub(super) period_f: f64,
-    pub(super) index: usize,
-    pub(super) previous: Option<(f64, f64, f64)>,
-    pub(super) true_range: f64,
-    pub(super) plus_dm: f64,
-    pub(super) minus_dm: f64,
+    pub(crate) period: usize,
+    pub(crate) period_f: f64,
+    pub(crate) index: usize,
+    pub(crate) previous: Option<(f64, f64, f64)>,
+    pub(crate) true_range: f64,
+    pub(crate) plus_dm: f64,
+    pub(crate) minus_dm: f64,
 }
 
 impl DirectionalMovement {
-    pub(super) fn new(period: usize) -> TaResult<Self> {
+    pub(crate) fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(TaError::InvalidParameter {
                 name: "timeperiod",
@@ -46,7 +46,7 @@ impl DirectionalMovement {
         })
     }
 
-    pub(super) fn append(&mut self, high: f64, low: f64, close: f64) -> Option<DirectionalValue> {
+    pub(crate) fn append(&mut self, high: f64, low: f64, close: f64) -> Option<DirectionalValue> {
         let index = self.index;
         self.index += 1;
         let Some((previous_high, previous_low, previous_close)) = self.previous else {
@@ -96,7 +96,7 @@ impl DirectionalMovement {
         })
     }
 
-    pub(super) fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         self.index = 0;
         self.previous = None;
         self.true_range = 0.0;

@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import StatefulSarext
-from ._series import as_float64_series
+from .._native import ParabolicSarExtended as _NativeParabolicSarExtended
+from .._series import as_float64_series
 
 
 class ParabolicSarExtended:
@@ -64,7 +64,7 @@ class ParabolicSarExtended:
         None
             The constructor initializes the adapter and returns no value.
         """
-        self._state = StatefulSarext(
+        self._state = _NativeParabolicSarExtended(
             start_value,
             offset_on_reverse,
             acceleration_init_long,

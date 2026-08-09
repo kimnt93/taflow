@@ -1,6 +1,6 @@
-use super::rolling_extrema::RollingExtrema;
-use super::vhgw;
 use crate::error::TaResult;
+use crate::stream::rolling_extrema::RollingExtrema;
+use crate::stream::vhgw;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RollingMinMaxValue {

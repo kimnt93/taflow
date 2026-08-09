@@ -1,60 +1,51 @@
-//! Stateful Average Directional Index.
-//!
-//! ADX advances Wilder-smoothed true range and directional movement, seeds
-//! from the first full period of DX values, and then Wilder-smooths later DX.
+//! Stateful Average Directional Movement Index Rating.
+
+use std::collections::VecDeque;
 
 use crate::error::TaResult;
 
-use super::directional::DirectionalMovement;
+use crate::indicators::AverageDirectionalIndex;
 
-/// Incremental ADX with TA-Lib-compatible seeding and lookback.
-/// Persistent Rust state or aligned output type for `AverageDirectionalIndex`.
+/// Incremental ADXR using the current and `period - 1` lagged ADX values.
+/// Persistent Rust state or aligned output type for `AverageDirectionalIndexRating`.
 ///
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
-pub struct AverageDirectionalIndex {
-    // `pub(super)` so the ADXR bulk kernel can advance the shared recurrence.
-    pub(super) period: usize,
-    pub(super) period_f: f64,
-    pub(super) directional: DirectionalMovement,
-    pub(super) dx_sum: f64,
-    pub(super) dx_count: usize,
-    pub(super) value: Option<f64>,
+pub struct AverageDirectionalIndexRating {
+    period: usize,
+    adx: AverageDirectionalIndex,
+    values: VecDeque<f64>,
+    value: Option<f64>,
 }
 
-impl AverageDirectionalIndex {
-    /// Creates an ADX state with a period of at least two bars.
+impl AverageDirectionalIndexRating {
+    /// Creates an ADXR state with a period of at least two bars.
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             period,
-            period_f: period as f64,
-            directional: DirectionalMovement::new(period)?,
-            dx_sum: 0.0,
-            dx_count: 0,
+            adx: AverageDirectionalIndex::new(period)?,
+            values: VecDeque::with_capacity(period),
             value: None,
         })
     }
 
     /// Appends one high, low, and close observation.
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        let directional = self.directional.append(high, low, close)?;
-        self.value = if self.dx_count < self.period {
-            self.dx_sum += directional.dx;
-            self.dx_count += 1;
-            (self.dx_count == self.period).then_some(self.dx_sum / self.period_f)
+        let current = self.adx.append(high, low, close)?;
+        self.values.push_back(current);
+        self.value = if self.values.len() == self.period {
+            let lagged = self.values.pop_front().expect("full ADXR lag window");
+            Some((current + lagged) / 2.0)
         } else {
-            Some(
-                (self.value.expect("ADX is seeded") * (self.period_f - 1.0) + directional.dx)
-                    / self.period_f,
-            )
+            None
         };
         self.value
     }
 
-    /// Bulk kernel: once the ADX seed exists, advances the Wilder-smoothed
-    /// TR/+DM/-DM recurrences and the ADX recurrence in one loop with all
-    /// scalar states held in locals, writing NaN during warm-up. Bit-identical
-    /// to per-bar [`Self::append`] in outputs and post-run streaming state.
+    /// Bulk kernel: once warm, advances the shared Wilder/ADX recurrences in
+    /// one loop with all scalar states held in locals while maintaining the
+    /// ADX lag window, writing NaN during warm-up. Bit-identical to per-bar
+    /// [`Self::append`] in outputs and post-run streaming state.
     pub fn extend_slices_into(
         &mut self,
         high: &[f64],
@@ -65,7 +56,7 @@ impl AverageDirectionalIndex {
         let len = high.len().min(low.len()).min(close.len());
         output.reserve(len);
         let mut index = 0;
-        // Warm-up prologue: per-bar appends until the ADX seed is emitted.
+        // Warm-up prologue: per-bar appends until the lag window is full.
         while index < len && self.value.is_none() {
             output.push(
                 self.append(high[index], low[index], close[index])
@@ -77,15 +68,17 @@ impl AverageDirectionalIndex {
             return;
         }
 
-        let pf = self.period_f;
+        let pf = self.adx.period_f;
         let (mut previous_high, mut previous_low, mut previous_close) = self
+            .adx
             .directional
             .previous
             .expect("warm directional state has a previous bar");
-        let mut smoothed_tr = self.directional.true_range;
-        let mut smoothed_pdm = self.directional.plus_dm;
-        let mut smoothed_mdm = self.directional.minus_dm;
-        let mut adx = self.value.expect("ADX is seeded");
+        let mut smoothed_tr = self.adx.directional.true_range;
+        let mut smoothed_pdm = self.adx.directional.plus_dm;
+        let mut smoothed_mdm = self.adx.directional.minus_dm;
+        let mut adx = self.adx.value.expect("ADX is seeded");
+        let mut last = f64::NAN;
         for bar in index..len {
             let (high, low, close) = (high[bar], low[bar], close[bar]);
             let true_range = (high - low)
@@ -115,15 +108,20 @@ impl AverageDirectionalIndex {
                 0.0
             };
             adx = (adx * (pf - 1.0) + dx) / pf;
-            output.push(adx);
+
+            self.values.push_back(adx);
+            let lagged = self.values.pop_front().expect("full ADXR lag window");
+            last = (adx + lagged) / 2.0;
+            output.push(last);
         }
 
-        self.directional.previous = Some((previous_high, previous_low, previous_close));
-        self.directional.true_range = smoothed_tr;
-        self.directional.plus_dm = smoothed_pdm;
-        self.directional.minus_dm = smoothed_mdm;
-        self.directional.index += len - index;
-        self.value = Some(adx);
+        self.adx.directional.previous = Some((previous_high, previous_low, previous_close));
+        self.adx.directional.true_range = smoothed_tr;
+        self.adx.directional.plus_dm = smoothed_pdm;
+        self.adx.directional.minus_dm = smoothed_mdm;
+        self.adx.directional.index += len - index;
+        self.adx.value = Some(adx);
+        self.value = Some(last);
     }
 
     /// Returns the latest warmed output.
@@ -133,9 +131,8 @@ impl AverageDirectionalIndex {
 
     /// Restores the post-construction state.
     pub fn reset(&mut self) {
-        self.directional.reset();
-        self.dx_sum = 0.0;
-        self.dx_count = 0;
+        self.adx.reset();
+        self.values.clear();
         self.value = None;
     }
 }

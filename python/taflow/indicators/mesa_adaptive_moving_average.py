@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import StatefulMama
-from ._series import as_float64_series
+from .._native import MesaAdaptiveMovingAverage as _NativeMesaAdaptiveMovingAverage
+from .._series import as_float64_series
 
 
 class MesaAdaptiveMovingAverage:
@@ -16,7 +16,7 @@ class MesaAdaptiveMovingAverage:
     """
 
     def __init__(self, _input: Any, fastlimit: float = 0.5, slowlimit: float = 0.05) -> None:
-        self._state = StatefulMama(fastlimit, slowlimit)
+        self._state = _NativeMesaAdaptiveMovingAverage(fastlimit, slowlimit)
         self.extend(_input)
 
     def append(self, _input: float) -> "MesaAdaptiveMovingAverage":

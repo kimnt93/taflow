@@ -1,5 +1,8 @@
 //! Canonical persistent technical indicators.
 
+mod acceleration_bands;
+#[cfg(test)]
+mod acceleration_bands_test;
 mod accumulation_distribution;
 mod accumulation_distribution_oscillator;
 #[cfg(test)]
@@ -15,6 +18,12 @@ mod aroon_oscillator;
 mod aroon_oscillator_test;
 #[cfg(test)]
 mod aroon_test;
+mod average_directional_index;
+mod average_directional_index_rating;
+#[cfg(test)]
+mod average_directional_index_rating_test;
+#[cfg(test)]
+mod average_directional_index_test;
 mod average_price;
 #[cfg(test)]
 mod average_price_test;
@@ -36,6 +45,9 @@ mod cumulative_product_test;
 mod cumulative_sum;
 #[cfg(test)]
 mod cumulative_sum_test;
+mod directional_movement_index;
+#[cfg(test)]
+mod directional_movement_index_test;
 mod drawdown;
 #[cfg(test)]
 mod drawdown_test;
@@ -66,6 +78,9 @@ mod lag_test;
 mod log_return;
 #[cfg(test)]
 mod log_return_test;
+mod mesa_adaptive_moving_average;
+#[cfg(test)]
+mod mesa_adaptive_moving_average_test;
 mod momentum;
 #[cfg(test)]
 mod momentum_test;
@@ -81,6 +96,12 @@ mod opening_range_test;
 mod parabolic_moving_average_stop;
 #[cfg(test)]
 mod parabolic_moving_average_stop_test;
+mod parabolic_sar;
+mod parabolic_sar_extended;
+#[cfg(test)]
+mod parabolic_sar_extended_test;
+#[cfg(test)]
+mod parabolic_sar_test;
 mod pivot_points;
 #[cfg(test)]
 mod pivot_points_test;
@@ -108,6 +129,12 @@ mod rolling_covariance_test;
 mod rolling_interquartile_range;
 #[cfg(test)]
 mod rolling_interquartile_range_test;
+mod rolling_min_max;
+mod rolling_min_max_index;
+#[cfg(test)]
+mod rolling_min_max_index_test;
+#[cfg(test)]
+mod rolling_min_max_test;
 mod rolling_mode;
 #[cfg(test)]
 mod rolling_mode_test;
@@ -144,6 +171,9 @@ mod true_range_test;
 mod true_strength_index;
 #[cfg(test)]
 mod true_strength_index_test;
+mod variable_period_moving_average;
+#[cfg(test)]
+mod variable_period_moving_average_test;
 mod volume_weighted_moving_average;
 #[cfg(test)]
 mod volume_weighted_moving_average_test;
@@ -168,11 +198,14 @@ pub(crate) fn invalid_period(name: &'static str, period: usize, minimum: usize) 
     }
 }
 
+pub use acceleration_bands::{AccelerationBands, AccelerationBandsValue};
 pub use accumulation_distribution::AccumulationDistribution;
 pub use accumulation_distribution_oscillator::AccumulationDistributionOscillator;
 pub use arnaud_legoux_moving_average::ArnaudLegouxMovingAverage;
 pub use aroon::{Aroon, AroonValue};
 pub use aroon_oscillator::AroonOscillator;
+pub use average_directional_index::AverageDirectionalIndex;
+pub use average_directional_index_rating::AverageDirectionalIndexRating;
 pub use average_price::AveragePrice;
 pub use average_true_range::AverageTrueRange;
 pub use awesome_oscillator::AwesomeOscillator;
@@ -180,6 +213,7 @@ pub use balance_of_power::BalanceOfPower;
 pub use cumulative_count::CumulativeCount;
 pub use cumulative_product::CumulativeProduct;
 pub use cumulative_sum::CumulativeSum;
+pub use directional_movement_index::DirectionalMovementIndex;
 pub use drawdown::Drawdown;
 pub use even_better_sinewave::EvenBetterSinewave;
 pub use exponentially_weighted_correlation::ExponentiallyWeightedCorrelation;
@@ -190,6 +224,7 @@ pub use hull_moving_average::HullMovingAverage;
 pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
 pub use lag::Lag;
 pub use log_return::LogReturn;
+pub use mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 pub use momentum::Momentum;
 pub use normalized_average_true_range::NormalizedAverageTrueRange;
 pub use on_balance_volume::OnBalanceVolume;
@@ -197,6 +232,8 @@ pub use opening_range::{OpeningRange, OpeningRangeValue};
 pub use parabolic_moving_average_stop::{
     ParabolicMovingAverageStop, ParabolicMovingAverageStopValue,
 };
+pub use parabolic_sar::ParabolicSar;
+pub use parabolic_sar_extended::ParabolicSarExtended;
 pub use pivot_points::{PivotPoints, PivotPointsValue};
 pub use premium_discount::{PremiumDiscount, PremiumDiscountValue};
 pub use rate_of_change::RateOfChange;
@@ -206,6 +243,8 @@ pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
 pub use rolling_calmar::RollingCalmar;
 pub use rolling_covariance::RollingCovariance;
 pub use rolling_interquartile_range::RollingInterquartileRange;
+pub use rolling_min_max::{RollingMinMax, RollingMinMaxValue};
+pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
 pub use rolling_mode::RollingMode;
 pub use rolling_percentile::RollingPercentile;
 pub use rolling_quantile::RollingQuantile;
@@ -218,6 +257,7 @@ pub use smoothed_trend_channel::SmoothedTrendChannel;
 pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
 pub use true_range::TrueRange;
 pub use true_strength_index::TrueStrengthIndex;
+pub use variable_period_moving_average::VariablePeriodMovingAverage;
 pub use volume_weighted_moving_average::VolumeWeightedMovingAverage;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;

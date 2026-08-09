@@ -60,6 +60,17 @@ results passed. Generated rows below may still report stale paths; the source
 scan is authoritative. Benchmark fields remain `TODO`; no benchmark command
 was run.
 
+The sixth structural batch migrated `AccelerationBands`, `ParabolicSar`,
+`ParabolicSarExtended`, `AverageDirectionalIndex`,
+`AverageDirectionalIndexRating`, `DirectionalMovementIndex`,
+`MesaAdaptiveMovingAverage`, `RollingMinMax`, `RollingMinMaxIndex`, and
+`VariablePeriodMovingAverage`. Their Rust implementations/tests, Python
+adapters, and PyO3 bindings now use matching canonical files and exports.
+Rust lifecycle tests, the release PyO3 build, the full Python suite, interface
+audit, and ten TA-Lib external-oracle MATCH results passed. Generated rows
+below may still report historical binding names; the source scan is
+authoritative. Benchmark fields remain `TODO`; no benchmark command was run.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**

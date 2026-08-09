@@ -1,15 +1,15 @@
-"""Descriptive stateful interface for the ADX Rating."""
+"""Descriptive stateful interface for Parabolic SAR."""
 
-from taflow._native import StatefulAdxr
 from typing import Any
 
 import numpy as np
 
-from ._series import as_float64_series
+from .._native import ParabolicSar as _NativeParabolicSar
+from .._series import as_float64_series
 
 
-class AverageDirectionalIndexRating:
-    """Incrementally compute the lag-averaged Average Directional Index
+class ParabolicSar:
+    """Incrementally compute Parabolic SAR from high/low bars
 
     Parameters
     ----------
@@ -17,7 +17,7 @@ class AverageDirectionalIndexRating:
 
     Returns
     -------
-    AverageDirectionalIndexRating
+    ParabolicSar
         A persistent native-backed indicator adapter.
     """
 
@@ -25,14 +25,14 @@ class AverageDirectionalIndexRating:
         self,
         high: Any,
         low: Any,
-        close: Any,
-        period: int = 14,
+        acceleration: float = 0.02,
+        maximum: float = 0.2,
     ) -> None:
-        """Create ADXR with an optional aligned high/low/close history."""
-        self._state = StatefulAdxr(period)
-        self.extend(high, low, close)
+        """Create Parabolic SAR with optional aligned high/low history."""
+        self._state = _NativeParabolicSar(acceleration, maximum)
+        self.extend(high, low)
 
-    def append(self, high: object, low: object, close: object) -> "AverageDirectionalIndexRating":
+    def append(self, high: float, low: float) -> "ParabolicSar":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -41,18 +41,16 @@ class AverageDirectionalIndexRating:
             High-price series or the current bar high.
         low : object
             Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(high), float(low), float(close))
+        self._state.append(float(high), float(low))
         return self
 
-    def extend(self, high: object, low: object, close: object) -> "AverageDirectionalIndexRating":
+    def extend(self, high: Any, low: Any) -> "ParabolicSar":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -61,18 +59,17 @@ class AverageDirectionalIndexRating:
             High-price series or the current bar high.
         low : object
             Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        arrays = tuple(as_float64_series(series) for series in (high, low, close))
-        if any(array.shape != arrays[0].shape for array in arrays[1:]):
-            raise ValueError("high, low, and close must have equal lengths")
-        self._state.extend(*arrays)
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        if len(high_array) != len(low_array):
+            raise ValueError("high and low must have equal lengths")
+        self._state.extend(high_array, low_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -95,7 +92,7 @@ class AverageDirectionalIndexRating:
         """
         return self._state.value
 
-    def reset(self) -> "AverageDirectionalIndexRating":
+    def reset(self) -> "ParabolicSar":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

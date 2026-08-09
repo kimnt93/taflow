@@ -1,15 +1,15 @@
-"""Descriptive stateful interface for Parabolic SAR."""
+"""Descriptive stateful interface for Acceleration Bands."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import StatefulSar
-from ._series import as_float64_series
+from .._native import AccelerationBands as _NativeAccelerationBands
+from .._series import as_float64_series
 
 
-class ParabolicSar:
-    """Incrementally compute Parabolic SAR from high/low bars
+class AccelerationBands:
+    """Incrementally compute upper, middle, and lower Acceleration Bands
 
     Parameters
     ----------
@@ -17,7 +17,7 @@ class ParabolicSar:
 
     Returns
     -------
-    ParabolicSar
+    AccelerationBands
         A persistent native-backed indicator adapter.
     """
 
@@ -25,14 +25,14 @@ class ParabolicSar:
         self,
         high: Any,
         low: Any,
-        acceleration: float = 0.02,
-        maximum: float = 0.2,
+        close: Any,
+        period: int = 20,
     ) -> None:
-        """Create Parabolic SAR with optional aligned high/low history."""
-        self._state = StatefulSar(acceleration, maximum)
-        self.extend(high, low)
+        """Create Acceleration Bands with optional aligned OHLC history."""
+        self._state = _NativeAccelerationBands(period)
+        self.extend(high, low, close)
 
-    def append(self, high: float, low: float) -> "ParabolicSar":
+    def append(self, high: float, low: float, close: float) -> "AccelerationBands":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -41,16 +41,18 @@ class ParabolicSar:
             High-price series or the current bar high.
         low : object
             Low-price series or the current bar low.
+        close : object
+            Close-price series or the current bar close.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(float(high), float(low))
+        self._state.append(float(high), float(low), float(close))
         return self
 
-    def extend(self, high: Any, low: Any) -> "ParabolicSar":
+    def extend(self, high: Any, low: Any, close: Any) -> "AccelerationBands":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -59,20 +61,21 @@ class ParabolicSar:
             High-price series or the current bar high.
         low : object
             Low-price series or the current bar low.
+        close : object
+            Close-price series or the current bar close.
 
         Returns
         -------
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        high_array = as_float64_series(high)
-        low_array = as_float64_series(low)
-        if len(high_array) != len(low_array):
-            raise ValueError("high and low must have equal lengths")
-        self._state.extend(high_array, low_array)
+        arrays = tuple(as_float64_series(value) for value in (high, low, close))
+        if len({len(array) for array in arrays}) != 1:
+            raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(*arrays)
         return self
 
-    def compute(self) -> np.ndarray:
+    def compute(self) -> tuple[np.ndarray, ...]:
         """Return the complete aligned history produced by Rust.
 
         Returns
@@ -82,7 +85,7 @@ class ParabolicSar:
         return self._state.compute()
 
     @property
-    def value(self) -> float | None:
+    def value(self) -> tuple[float, float, float] | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -92,7 +95,7 @@ class ParabolicSar:
         """
         return self._state.value
 
-    def reset(self) -> "ParabolicSar":
+    def reset(self) -> "AccelerationBands":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

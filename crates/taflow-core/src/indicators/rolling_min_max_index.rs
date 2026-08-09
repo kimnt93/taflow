@@ -1,5 +1,5 @@
-use super::rolling_extrema::{MonotonicArgmax, MonotonicArgmin};
 use crate::error::TaResult;
+use crate::stream::rolling_extrema::{MonotonicArgmax, MonotonicArgmin};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RollingMinMaxIndexValue {

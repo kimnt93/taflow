@@ -41,16 +41,7 @@ pub(crate) mod tests_extrema_support {
 mod absolute_price_oscillator;
 #[cfg(test)]
 mod absolute_price_oscillator_test;
-mod acceleration_bands;
-#[cfg(test)]
-mod acceleration_bands_test;
 pub(crate) mod aroon_rescan;
-mod average_directional_index;
-mod average_directional_index_rating;
-#[cfg(test)]
-mod average_directional_index_rating_test;
-#[cfg(test)]
-mod average_directional_index_test;
 mod bollinger_bands;
 #[cfg(test)]
 mod bollinger_bands_test;
@@ -237,11 +228,8 @@ mod chande_momentum_oscillator_test;
 mod commodity_channel_index;
 #[cfg(test)]
 mod commodity_channel_index_test;
-mod cycle;
-mod directional;
-mod directional_movement_index;
-#[cfg(test)]
-mod directional_movement_index_test;
+pub(crate) mod cycle;
+pub(crate) mod directional;
 mod double_exponential_moving_average;
 #[cfg(test)]
 mod double_exponential_moving_average_test;
@@ -275,9 +263,6 @@ mod kaufman_adaptive_moving_average;
 mod kaufman_adaptive_moving_average_test;
 mod math_abs;
 mod math_operator;
-mod mesa_adaptive_moving_average;
-#[cfg(test)]
-mod mesa_adaptive_moving_average_test;
 mod moving_average;
 mod moving_average_convergence_divergence;
 mod moving_average_convergence_divergence_extended;
@@ -394,7 +379,7 @@ mod minus_directional_movement_test;
 mod money_flow_index;
 #[cfg(test)]
 mod money_flow_index_test;
-mod moving_average_dispatcher;
+pub(crate) mod moving_average_dispatcher;
 #[cfg(test)]
 mod moving_average_test;
 mod pattern;
@@ -412,7 +397,7 @@ mod regression;
 mod relative_strength_index;
 #[cfg(test)]
 mod relative_strength_index_test;
-mod rolling_extrema;
+pub(crate) mod rolling_extrema;
 mod rolling_median;
 #[cfg(test)]
 mod rolling_median_test;
@@ -424,9 +409,6 @@ mod rolling_sum_test;
 mod session_flags;
 pub(crate) mod sorted_ring;
 mod statistic;
-mod variable_period_moving_average;
-#[cfg(test)]
-mod variable_period_moving_average_test;
 pub(crate) mod vhgw;
 pub use session_flags::session_flags;
 mod cumulative_maximum;
@@ -462,12 +444,6 @@ pub use active_zone_list::ActiveZoneList;
 mod fast_stochastic_oscillator;
 #[cfg(test)]
 mod fast_stochastic_oscillator_test;
-mod parabolic_sar;
-mod parabolic_sar_extended;
-#[cfg(test)]
-mod parabolic_sar_extended_test;
-#[cfg(test)]
-mod parabolic_sar_test;
 mod relative_momentum_index;
 #[cfg(test)]
 mod relative_momentum_index_test;
@@ -509,14 +485,9 @@ mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 pub use absolute_price_oscillator::AbsolutePriceOscillator;
-pub use acceleration_bands::{AccelerationBands, AccelerationBandsValue};
 pub use anchored_volume_weighted_average_price::{
     AnchoredVolumeWeightedAveragePrice, AnchoredVolumeWeightedAveragePriceValue,
 };
-#[allow(unused_imports)]
-pub use average_directional_index::AverageDirectionalIndex;
-#[allow(unused_imports)]
-pub use average_directional_index_rating::AverageDirectionalIndexRating;
 
 #[allow(unused_imports)]
 pub use bollinger_bands::{BollingerBands, BollingerBandsValue};
@@ -583,7 +554,6 @@ pub use candle_up_down_side_gap_three_methods::CandleUpDownSideGapThreeMethods;
 pub use candle_upside_gap_two_crows::CandleUpsideGapTwoCrows;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
-pub use directional_movement_index::DirectionalMovementIndex;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
@@ -600,7 +570,6 @@ pub use intraday_momentum_index::IntradayMomentumIndex;
 pub use jurik_moving_average::JurikMovingAverage;
 pub use kaufman_adaptive_moving_average::KaufmanAdaptiveMovingAverage;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
-pub use mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageValue};
 #[allow(unused_imports)]
 pub use minus_directional_indicator::MinusDirectionalIndicator;
 pub use minus_directional_movement::MinusDirectionalMovement;
@@ -628,12 +597,9 @@ pub use rolling_max::RollingMax;
 pub use rolling_median::RollingMedian;
 pub use rolling_min::RollingMin;
 pub use rolling_time_series_forecast::RollingTimeSeriesForecast;
-pub use variable_period_moving_average::VariablePeriodMovingAverage;
 
 #[allow(unused_imports)]
 pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
-pub use parabolic_sar::ParabolicSar;
-pub use parabolic_sar_extended::ParabolicSarExtended;
 #[allow(unused_imports)]
 pub use relative_strength_index::RelativeStrengthIndex;
 pub use rolling_sum::RollingSum;
@@ -683,12 +649,6 @@ mod rolling_max;
 #[cfg(test)]
 mod rolling_max_test;
 mod rolling_min;
-mod rolling_min_max;
-mod rolling_min_max_index;
-#[cfg(test)]
-mod rolling_min_max_index_test;
-#[cfg(test)]
-mod rolling_min_max_test;
 #[cfg(test)]
 mod rolling_min_test;
 pub use median_price::MedianPrice;
@@ -778,6 +738,7 @@ mod weighted_close_test;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::indicators::{RollingMinMax, RollingMinMaxIndex};
 
     fn assert_optional_eq(actual: Option<f64>, expected: f64) {
         if expected.is_nan() {
@@ -1375,8 +1336,6 @@ pub use rolling_beta::RollingBeta;
 pub use rolling_correlation::RollingCorrelation;
 pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;
-pub use rolling_min_max::{RollingMinMax, RollingMinMaxValue};
-pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
 pub use rolling_standard_deviation::RollingStandardDeviation;
 pub use rolling_variance::RollingVariance;
 pub use volume_price_trend::VolumePriceTrend;

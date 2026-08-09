@@ -4,15 +4,16 @@
 //! moving-average implementation while preserving each type's own warm-up.
 
 use crate::error::TaResult;
+use crate::indicators::MesaAdaptiveMovingAverage;
 use crate::ma_type::MaType;
 
 use super::{
     DoubleExponentialMovingAverage, ExponentialMovingAverage, KaufmanAdaptiveMovingAverage,
-    MesaAdaptiveMovingAverage, SimpleMovingAverage, StreamingIndicator, TriangularMovingAverage,
-    TripleExponentialAverage, TripleExponentialMovingAverage, WeightedMovingAverage,
+    SimpleMovingAverage, StreamingIndicator, TriangularMovingAverage, TripleExponentialAverage,
+    TripleExponentialMovingAverage, WeightedMovingAverage,
 };
 
-pub(super) enum MovingAverageDispatcher {
+pub(crate) enum MovingAverageDispatcher {
     SimpleMovingAverage(SimpleMovingAverage),
     ExponentialMovingAverage(ExponentialMovingAverage),
     WeightedMovingAverage(WeightedMovingAverage),
@@ -25,7 +26,7 @@ pub(super) enum MovingAverageDispatcher {
 }
 
 impl MovingAverageDispatcher {
-    pub(super) fn new(period: usize, ma_type: MaType) -> TaResult<Self> {
+    pub(crate) fn new(period: usize, ma_type: MaType) -> TaResult<Self> {
         if period == 1 {
             return Ok(Self::SimpleMovingAverage(SimpleMovingAverage::new(1)?));
         }
@@ -60,7 +61,7 @@ impl MovingAverageDispatcher {
         })
     }
 
-    pub(super) fn append(&mut self, input: f64) -> Option<f64> {
+    pub(crate) fn append(&mut self, input: f64) -> Option<f64> {
         match self {
             Self::SimpleMovingAverage(state) => state.append(input),
             Self::ExponentialMovingAverage(state) => state.append(input),
@@ -76,7 +77,7 @@ impl MovingAverageDispatcher {
 
     /// Whether the wrapped state has produced at least one warmed value.
     #[inline]
-    pub(super) fn is_warm(&self) -> bool {
+    pub(crate) fn is_warm(&self) -> bool {
         match self {
             Self::SimpleMovingAverage(state) => state.value().is_some(),
             Self::ExponentialMovingAverage(state) => state.value().is_some(),
@@ -97,7 +98,7 @@ impl MovingAverageDispatcher {
     /// contractually bit-identical to their per-bar `append`, so the emitted
     /// series and the exit state match a per-bar drive exactly. MAMA has no
     /// `f64` bulk kernel and keeps the per-bar loop.
-    pub(super) fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+    pub(crate) fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
         match self {
             Self::SimpleMovingAverage(state) => state.extend_slice_into(inputs, output),
             Self::ExponentialMovingAverage(state) => state.extend_slice_into(inputs, output),
@@ -121,13 +122,13 @@ impl MovingAverageDispatcher {
 
     /// Whether this dispatcher wraps a plain EMA state (fused bulk paths).
     #[inline]
-    pub(super) fn is_ema(&self) -> bool {
+    pub(crate) fn is_ema(&self) -> bool {
         matches!(self, Self::ExponentialMovingAverage(_))
     }
 
     /// Mutable access to the wrapped EMA state, if this is the EMA variant.
     #[inline]
-    pub(super) fn as_ema_mut(&mut self) -> Option<&mut ExponentialMovingAverage> {
+    pub(crate) fn as_ema_mut(&mut self) -> Option<&mut ExponentialMovingAverage> {
         match self {
             Self::ExponentialMovingAverage(state) => Some(state),
             _ => None,
@@ -139,13 +140,13 @@ impl MovingAverageDispatcher {
     /// Note that a `period == 1` dispatcher is an SMA whatever `MaType` it was
     /// built from, which is exactly the state the fused paths can drive.
     #[inline]
-    pub(super) fn is_sma(&self) -> bool {
+    pub(crate) fn is_sma(&self) -> bool {
         matches!(self, Self::SimpleMovingAverage(_))
     }
 
     /// Mutable access to the wrapped SMA state, if this is the SMA variant.
     #[inline]
-    pub(super) fn as_sma_mut(&mut self) -> Option<&mut SimpleMovingAverage> {
+    pub(crate) fn as_sma_mut(&mut self) -> Option<&mut SimpleMovingAverage> {
         match self {
             Self::SimpleMovingAverage(state) => Some(state),
             _ => None,
@@ -159,7 +160,7 @@ impl MovingAverageDispatcher {
     /// `inputs` must be at least `period` long and end at the bar the leg was
     /// advanced to.
     #[inline]
-    pub(super) fn restore_sma_leg(state: &mut SimpleMovingAverage, inputs: &[f64], sum: f64) {
+    pub(crate) fn restore_sma_leg(state: &mut SimpleMovingAverage, inputs: &[f64], sum: f64) {
         let period = state.period();
         let window = state.window_mut();
         window.clear();
@@ -169,7 +170,7 @@ impl MovingAverageDispatcher {
         state.store_bulk_state(sum, Some(sum / period as f64));
     }
 
-    pub(super) fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         match self {
             Self::SimpleMovingAverage(state) => state.reset(),
             Self::ExponentialMovingAverage(state) => state.reset(),

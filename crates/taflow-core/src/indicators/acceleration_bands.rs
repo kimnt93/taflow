@@ -5,7 +5,7 @@
 
 use crate::error::TaResult;
 
-use super::{invalid_period, SimpleMovingAverage, StreamingIndicator};
+use crate::stream::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
 /// One aligned upper, middle, and lower Acceleration Bands observation.
 #[derive(Debug, Clone, Copy, PartialEq)]

@@ -1,29 +1,32 @@
+use crate::conversion::to_py_array;
+use crate::state_api::{extend_from_options, push_option, py_value_error};
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::indicators::AverageDirectionalIndex as State;
+use taflow::indicators;
+use taflow::indicators::AverageDirectionalIndexRating as State;
 
 #[pyclass]
-pub struct AverageDirectionalIndex {
+pub struct AverageDirectionalIndexRating {
     inner: State,
-    output: Vec<f64>,
+    outputs: Vec<f64>,
 }
 
 #[pymethods]
-impl AverageDirectionalIndex {
+impl AverageDirectionalIndexRating {
     #[new]
     #[pyo3(signature = (timeperiod=14))]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
-            output: Vec::new(),
+            inner: State::new(timeperiod).map_err(py_value_error)?,
+            outputs: Vec::new(),
         })
     }
+
     fn append(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
-        let value = self.inner.append(high, low, close);
-        self.output.push(value.unwrap_or(f64::NAN));
-        value
+        push_option(&mut self.outputs, self.inner.append(high, low, close))
     }
+
     fn extend(
         &mut self,
         py: Python<'_>,
@@ -39,24 +42,26 @@ impl AverageDirectionalIndex {
                 "high, low, and close must have equal lengths",
             ));
         }
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(high, low, close, &mut self.output)
-        });
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| self.inner.extend_slices_into(high, low, close, outputs));
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
-        PyArray1::from_vec(py, self.output.clone())
-    }
+
     #[getter]
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
+
+    fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {
+        to_py_array(py, self.outputs.clone())
+    }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
+
     fn reset(&mut self) {
         self.inner.reset();
-        self.output.clear();
-    }
-    fn __len__(&self) -> usize {
-        self.output.len()
+        self.outputs.clear();
     }
 }

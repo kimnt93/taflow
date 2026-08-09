@@ -7,7 +7,7 @@
 use crate::error::{TaError, TaResult};
 use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars, WmaState};
 
-use super::StreamingIndicator;
+use crate::stream::StreamingIndicator;
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 const LOOKBACK: usize = 32;

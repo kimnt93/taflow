@@ -7,7 +7,7 @@ use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator};
 
 #[cfg(test)]
-use crate::stream::{RollingMinMax, RollingMinMaxIndex, RollingMinMaxIndexValue};
+use crate::indicators::{RollingMinMax, RollingMinMaxIndex, RollingMinMaxIndexValue};
 
 /// Single-sided monotonic deque tracking the rolling maximum.
 ///
@@ -163,7 +163,7 @@ pub(crate) struct RollingExtrema {
 }
 
 impl RollingExtrema {
-    pub(super) fn new(period: usize) -> TaResult<Self> {
+    pub(crate) fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
             maximum: MonotonicMax::new(period)?,
             minimum: MonotonicMin::new(period)?,
@@ -178,13 +178,13 @@ impl RollingExtrema {
         self.maximum.count()
     }
 
-    pub(super) fn append_indexed(&mut self, input: f64) -> Option<((usize, f64), (usize, f64))> {
+    pub(crate) fn append_indexed(&mut self, input: f64) -> Option<((usize, f64), (usize, f64))> {
         let maximum = self.maximum.append_indexed(input);
         let minimum = self.minimum.append_indexed(input);
         maximum.zip(minimum)
     }
 
-    pub(super) fn append(&mut self, input: f64) -> Option<(f64, f64)> {
+    pub(crate) fn append(&mut self, input: f64) -> Option<(f64, f64)> {
         self.append_indexed(input)
             .map(|(maximum, minimum)| (maximum.1, minimum.1))
     }
@@ -195,7 +195,7 @@ impl RollingExtrema {
         self.minimum.rebuild_from_full_run(inputs);
     }
 
-    pub(super) fn reset(&mut self) {
+    pub(crate) fn reset(&mut self) {
         self.maximum.reset();
         self.minimum.reset();
     }

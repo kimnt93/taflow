@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ._rolling_pair_state import RollingPairState
-from ._native import StatefulMinmaxindex
+from .._rolling_pair_state import RollingPairState
+from .._native import RollingMinMaxIndex as _NativeRollingMinMaxIndex
 
 
 class RollingMinMaxIndex(RollingPairState):
@@ -13,7 +13,7 @@ class RollingMinMaxIndex(RollingPairState):
     until the trailing window is complete.
     """
 
-    _native_cls = StatefulMinmaxindex
+    _native_cls = _NativeRollingMinMaxIndex
 
     def append(self, _input: float) -> "RollingMinMaxIndex":
         """Append one value and return this indicator."""

@@ -2,7 +2,7 @@
 
 use crate::error::TaResult;
 
-use super::directional::DirectionalMovement;
+use crate::stream::directional::DirectionalMovement;
 
 /// Incremental DX with TA-Lib-compatible Wilder smoothing and lookback.
 /// Persistent Rust state or aligned output type for `DirectionalMovementIndex`.

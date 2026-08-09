@@ -118,7 +118,7 @@ pub fn compute_ma(input: &[f64], period: usize, ma_type: MaType) -> TaResult<Vec
         //   MAMA: fastlimit=0.5, slowlimit=0.05 (period is ignored)
         //   TripleExponentialAverage: vfactor=0.7 (period is forwarded)
         MaType::MesaAdaptiveMovingAverage => {
-            let mut state = crate::stream::MesaAdaptiveMovingAverage::new(0.5, 0.05)?;
+            let mut state = crate::indicators::MesaAdaptiveMovingAverage::new(0.5, 0.05)?;
             let mut output = Vec::with_capacity(input.len());
             for &value in input {
                 output.push(state.append(value).map_or(f64::NAN, |result| result.mama));

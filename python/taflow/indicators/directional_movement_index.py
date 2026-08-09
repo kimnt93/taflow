@@ -1,15 +1,15 @@
-"""Descriptive stateful interface for Acceleration Bands."""
+"""Descriptive stateful interface for the Directional Movement Index."""
 
+from .._native import DirectionalMovementIndex as _NativeDirectionalMovementIndex
 from typing import Any
 
 import numpy as np
 
-from ._native import StatefulAccbands
-from ._series import as_float64_series
+from .._series import as_float64_series
 
 
-class AccelerationBands:
-    """Incrementally compute upper, middle, and lower Acceleration Bands
+class DirectionalMovementIndex:
+    """Incrementally compute Wilder's Directional Movement Index
 
     Parameters
     ----------
@@ -17,7 +17,7 @@ class AccelerationBands:
 
     Returns
     -------
-    AccelerationBands
+    DirectionalMovementIndex
         A persistent native-backed indicator adapter.
     """
 
@@ -26,13 +26,13 @@ class AccelerationBands:
         high: Any,
         low: Any,
         close: Any,
-        period: int = 20,
+        period: int = 14,
     ) -> None:
-        """Create Acceleration Bands with optional aligned OHLC history."""
-        self._state = StatefulAccbands(period)
+        """Create DX with an optional aligned high/low/close history."""
+        self._state = _NativeDirectionalMovementIndex(period)
         self.extend(high, low, close)
 
-    def append(self, high: float, low: float, close: float) -> "AccelerationBands":
+    def append(self, high: object, low: object, close: object) -> "DirectionalMovementIndex":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -52,7 +52,7 @@ class AccelerationBands:
         self._state.append(float(high), float(low), float(close))
         return self
 
-    def extend(self, high: Any, low: Any, close: Any) -> "AccelerationBands":
+    def extend(self, high: object, low: object, close: object) -> "DirectionalMovementIndex":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -69,13 +69,13 @@ class AccelerationBands:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        arrays = tuple(as_float64_series(value) for value in (high, low, close))
-        if len({len(array) for array in arrays}) != 1:
+        arrays = tuple(as_float64_series(series) for series in (high, low, close))
+        if any(array.shape != arrays[0].shape for array in arrays[1:]):
             raise ValueError("high, low, and close must have equal lengths")
         self._state.extend(*arrays)
         return self
 
-    def compute(self) -> tuple[np.ndarray, ...]:
+    def compute(self) -> np.ndarray:
         """Return the complete aligned history produced by Rust.
 
         Returns
@@ -85,7 +85,7 @@ class AccelerationBands:
         return self._state.compute()
 
     @property
-    def value(self) -> tuple[float, float, float] | None:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -95,7 +95,7 @@ class AccelerationBands:
         """
         return self._state.value
 
-    def reset(self) -> "AccelerationBands":
+    def reset(self) -> "DirectionalMovementIndex":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
