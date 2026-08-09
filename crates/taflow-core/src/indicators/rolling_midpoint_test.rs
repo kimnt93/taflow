@@ -1,4 +1,5 @@
-use super::{RollingMidpoint, StreamingIndicator};
+use super::RollingMidpoint;
+use crate::stream::StreamingIndicator;
 
 #[test]
 fn bulk_and_scalar_are_bitwise_equal() {

@@ -123,6 +123,9 @@ mod rate_of_change_ratio_percent_test;
 mod rate_of_change_ratio_test;
 #[cfg(test)]
 mod rate_of_change_test;
+mod rolling_average_deviation;
+#[cfg(test)]
+mod rolling_average_deviation_test;
 mod rolling_beta;
 #[cfg(test)]
 mod rolling_beta_test;
@@ -135,9 +138,15 @@ mod rolling_correlation_test;
 mod rolling_covariance;
 #[cfg(test)]
 mod rolling_covariance_test;
+mod rolling_entropy;
+#[cfg(test)]
+mod rolling_entropy_test;
 mod rolling_interquartile_range;
 #[cfg(test)]
 mod rolling_interquartile_range_test;
+mod rolling_kurtosis;
+#[cfg(test)]
+mod rolling_kurtosis_test;
 mod rolling_linear_regression;
 mod rolling_linear_regression_angle;
 #[cfg(test)]
@@ -150,6 +159,15 @@ mod rolling_linear_regression_slope;
 mod rolling_linear_regression_slope_test;
 #[cfg(test)]
 mod rolling_linear_regression_test;
+mod rolling_median;
+#[cfg(test)]
+mod rolling_median_test;
+mod rolling_midpoint;
+#[cfg(test)]
+mod rolling_midpoint_test;
+mod rolling_midprice;
+#[cfg(test)]
+mod rolling_midprice_test;
 mod rolling_min_max;
 mod rolling_min_max_index;
 #[cfg(test)]
@@ -171,12 +189,24 @@ mod rolling_rank_test;
 mod rolling_sharpe;
 #[cfg(test)]
 mod rolling_sharpe_test;
+mod rolling_skew;
+#[cfg(test)]
+mod rolling_skew_test;
 mod rolling_sortino;
 #[cfg(test)]
 mod rolling_sortino_test;
+mod rolling_standard_deviation;
+#[cfg(test)]
+mod rolling_standard_deviation_test;
+mod rolling_sum;
+#[cfg(test)]
+mod rolling_sum_test;
 mod rolling_time_series_forecast;
 #[cfg(test)]
 mod rolling_time_series_forecast_test;
+mod rolling_variance;
+#[cfg(test)]
+mod rolling_variance_test;
 mod rolling_winsorize;
 #[cfg(test)]
 mod rolling_winsorize_test;
@@ -271,15 +301,21 @@ pub use rate_of_change::RateOfChange;
 pub use rate_of_change_percent::RateOfChangePercent;
 pub use rate_of_change_ratio::RateOfChangeRatio;
 pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
+pub use rolling_average_deviation::RollingAverageDeviation;
 pub use rolling_beta::RollingBeta;
 pub use rolling_calmar::RollingCalmar;
 pub use rolling_correlation::RollingCorrelation;
 pub use rolling_covariance::RollingCovariance;
+pub use rolling_entropy::RollingEntropy;
 pub use rolling_interquartile_range::RollingInterquartileRange;
+pub use rolling_kurtosis::RollingKurtosis;
 pub use rolling_linear_regression::RollingLinearRegression;
 pub use rolling_linear_regression_angle::RollingLinearRegressionAngle;
 pub use rolling_linear_regression_intercept::RollingLinearRegressionIntercept;
 pub use rolling_linear_regression_slope::RollingLinearRegressionSlope;
+pub use rolling_median::RollingMedian;
+pub use rolling_midpoint::RollingMidpoint;
+pub use rolling_midprice::RollingMidprice;
 pub use rolling_min_max::{RollingMinMax, RollingMinMaxValue};
 pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
 pub use rolling_mode::RollingMode;
@@ -287,8 +323,12 @@ pub use rolling_percentile::RollingPercentile;
 pub use rolling_quantile::RollingQuantile;
 pub use rolling_rank::RollingRank;
 pub use rolling_sharpe::RollingSharpe;
+pub use rolling_skew::RollingSkew;
 pub use rolling_sortino::RollingSortino;
+pub use rolling_standard_deviation::RollingStandardDeviation;
+pub use rolling_sum::RollingSum;
 pub use rolling_time_series_forecast::RollingTimeSeriesForecast;
+pub use rolling_variance::RollingVariance;
 pub use rolling_winsorize::RollingWinsorize;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use smoothed_trend_channel::SmoothedTrendChannel;

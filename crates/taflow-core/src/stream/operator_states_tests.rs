@@ -139,7 +139,7 @@ mod tests {
     #[test]
     fn rolling_statistics_match_batch_and_reset() {
         let input = vec![1.0, 4.0, 2.0, 2.0, 9.0, 4.0];
-        let mut median_state = RollingMedian::new(3).unwrap();
+        let mut median_state = crate::indicators::RollingMedian::new(3).unwrap();
         let mut median = Vec::new();
         median_state.extend_slice_into(&input, &mut median);
         let mut mode_state = RollingMode::new(3).unwrap();
@@ -150,7 +150,7 @@ mod tests {
         assert!(mode[0].is_nan() && mode[1].is_nan());
         assert_eq!(&mode[2..], &[1.0, 2.0, 2.0, 2.0]);
 
-        let mut state = RollingMedian::new(3).unwrap();
+        let mut state = crate::indicators::RollingMedian::new(3).unwrap();
         for &value in &input {
             state.append(value);
         }

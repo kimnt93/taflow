@@ -1,6 +1,7 @@
 use super::operator_states::*;
 use super::*;
 use crate::error::TaResult;
+use crate::indicators::RollingSum;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct VortexValue {

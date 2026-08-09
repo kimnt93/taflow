@@ -1,8 +1,8 @@
 //! Rolling median state.
 
-use super::operator_states::validate_period;
-use super::sorted_ring::SortedRing;
-use super::StreamingIndicator;
+use crate::stream::operator_states::validate_period;
+use crate::stream::sorted_ring::SortedRing;
+use crate::stream::StreamingIndicator;
 use crate::TaResult;
 
 /// Computes the causal median over a fixed trailing window.

@@ -5,9 +5,9 @@ use crate::error::TaResult;
 use super::{invalid_period, StreamingIndicator, Window};
 
 #[cfg(test)]
-use crate::{
-    indicators::{RollingBeta, RollingCorrelation},
-    stream::{RollingAverageDeviation, RollingStandardDeviation, RollingVariance},
+use crate::indicators::{
+    RollingAverageDeviation, RollingBeta, RollingCorrelation, RollingStandardDeviation,
+    RollingVariance,
 };
 
 /// TA-Lib's `TA_STDDEV` collapses a variance below this threshold to zero
@@ -20,7 +20,7 @@ pub(super) const STDDEV_VARIANCE_EPSILON: f64 = 0.00000000000001;
 /// multiply, and multiplying by exactly `1.0` is the identity in IEEE-754, so a
 /// single form covers both.
 #[inline]
-pub(super) fn stddev_from_variance(variance: f64, nbdev: f64) -> f64 {
+pub(crate) fn stddev_from_variance(variance: f64, nbdev: f64) -> f64 {
     if !(variance < STDDEV_VARIANCE_EPSILON) {
         variance.sqrt() * nbdev
     } else {

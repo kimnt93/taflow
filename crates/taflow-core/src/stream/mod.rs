@@ -398,17 +398,11 @@ mod relative_strength_index;
 #[cfg(test)]
 mod relative_strength_index_test;
 pub(crate) mod rolling_extrema;
-mod rolling_median;
-#[cfg(test)]
-mod rolling_median_test;
 mod rolling_price;
 pub(crate) mod rolling_statistics;
-mod rolling_sum;
-#[cfg(test)]
-mod rolling_sum_test;
 mod session_flags;
 pub(crate) mod sorted_ring;
-mod statistic;
+pub(crate) mod statistic;
 pub(crate) mod vhgw;
 pub use session_flags::session_flags;
 mod cumulative_maximum;
@@ -590,14 +584,12 @@ pub use rolling_argmin::RollingArgmin;
 #[allow(unused_imports)]
 pub(crate) use rolling_extrema::{MonotonicMax, MonotonicMin, RollingExtrema};
 pub use rolling_max::RollingMax;
-pub use rolling_median::RollingMedian;
 pub use rolling_min::RollingMin;
 
 #[allow(unused_imports)]
 pub use fast_stochastic_oscillator::{FastStochasticOscillator, FastStochasticOscillatorValue};
 #[allow(unused_imports)]
 pub use relative_strength_index::RelativeStrengthIndex;
-pub use rolling_sum::RollingSum;
 pub use simple_moving_average::SimpleMovingAverage;
 #[allow(unused_imports)]
 pub use stochastic_oscillator::{StochasticOscillator, StochasticOscillatorValue};
@@ -669,27 +661,12 @@ mod rolling_argmax_test;
 mod rolling_argmin;
 #[cfg(test)]
 mod rolling_argmin_test;
-mod rolling_average_deviation;
-#[cfg(test)]
-mod rolling_average_deviation_test;
 mod rolling_max;
 #[cfg(test)]
 mod rolling_max_test;
-mod rolling_midpoint;
-#[cfg(test)]
-mod rolling_midpoint_test;
-mod rolling_midprice;
-#[cfg(test)]
-mod rolling_midprice_test;
 mod rolling_min;
 #[cfg(test)]
 mod rolling_min_test;
-mod rolling_standard_deviation;
-#[cfg(test)]
-mod rolling_standard_deviation_test;
-mod rolling_variance;
-#[cfg(test)]
-mod rolling_variance_test;
 #[cfg(test)]
 mod signal_delay_test;
 #[cfg(test)]
@@ -700,10 +677,11 @@ mod value_when_test;
 mod tests {
     use super::*;
     use crate::indicators::{
-        MedianPrice, RollingBeta, RollingCorrelation, RollingLinearRegression,
-        RollingLinearRegressionAngle, RollingLinearRegressionIntercept,
-        RollingLinearRegressionSlope, RollingMinMax, RollingMinMaxIndex, RollingTimeSeriesForecast,
-        TypicalPrice, WeightedClose,
+        MedianPrice, RollingAverageDeviation, RollingBeta, RollingCorrelation,
+        RollingLinearRegression, RollingLinearRegressionAngle, RollingLinearRegressionIntercept,
+        RollingLinearRegressionSlope, RollingMidpoint, RollingMidprice, RollingMinMax,
+        RollingMinMaxIndex, RollingStandardDeviation, RollingSum, RollingTimeSeriesForecast,
+        RollingVariance, TypicalPrice, WeightedClose,
     };
 
     fn assert_optional_eq(actual: Option<f64>, expected: f64) {
@@ -1058,9 +1036,6 @@ mod rolling_alpha_test;
 mod rolling_autocorr;
 #[cfg(test)]
 mod rolling_autocorr_test;
-mod rolling_entropy;
-#[cfg(test)]
-mod rolling_entropy_test;
 mod rolling_information_ratio;
 #[cfg(test)]
 mod rolling_information_ratio_test;
@@ -1155,17 +1130,6 @@ mod swing_low;
 #[cfg(test)]
 mod swing_low_test;
 pub use swing_low::SwingLow;
-mod rolling_skew;
-#[cfg(test)]
-mod rolling_skew_test;
-mod rolling_z_score;
-#[cfg(test)]
-mod rolling_z_score_test;
-pub use rolling_skew::RollingSkew;
-mod rolling_kurtosis;
-#[cfg(test)]
-mod rolling_kurtosis_test;
-pub use rolling_kurtosis::RollingKurtosis;
 mod chaikin_money_flow;
 #[cfg(test)]
 mod chaikin_money_flow_test;
@@ -1186,6 +1150,9 @@ mod negative_volume_index_test;
 mod positive_volume_index;
 #[cfg(test)]
 mod positive_volume_index_test;
+mod rolling_z_score;
+#[cfg(test)]
+mod rolling_z_score_test;
 #[allow(unused_imports)]
 mod volume_price_trend;
 #[cfg(test)]
@@ -1249,7 +1216,6 @@ pub use rogers_satchell::RogersSatchell;
 pub use roll_spread::RollSpread;
 pub use rolling_alpha::RollingAlpha;
 pub use rolling_autocorr::RollingAutocorr;
-pub use rolling_entropy::RollingEntropy;
 pub use rolling_information_ratio::RollingInformationRatio;
 pub use rolling_z_score::RollingZScore;
 pub use schaff_trend_cycle::{SchaffTrendCycle, SchaffTrendCycleValue};
@@ -1297,9 +1263,4 @@ pub use mass_index::MassIndex;
 pub use mc_ginley_dynamic::McGinleyDynamic;
 pub use negative_volume_index::NegativeVolumeIndex;
 pub use positive_volume_index::PositiveVolumeIndex;
-pub use rolling_average_deviation::RollingAverageDeviation;
-pub use rolling_midpoint::RollingMidpoint;
-pub use rolling_midprice::RollingMidprice;
-pub use rolling_standard_deviation::RollingStandardDeviation;
-pub use rolling_variance::RollingVariance;
 pub use volume_price_trend::VolumePriceTrend;

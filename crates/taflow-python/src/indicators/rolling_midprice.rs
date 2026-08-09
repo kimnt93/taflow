@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingMidprice as State;
+use taflow::indicators::RollingMidprice as State;
 
 #[pyclass]
 pub struct RollingMidprice {

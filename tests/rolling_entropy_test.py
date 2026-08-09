@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.rolling_entropy import RollingEntropy
+from taflow import RollingEntropy
 
 
 def test_rolling_entropy_lifecycle_and_alignment():
@@ -10,4 +10,3 @@ def test_rolling_entropy_lifecycle_and_alignment():
     assert len(state) == 2
     state.reset()
     assert state.value is None
-

@@ -1,6 +1,6 @@
 use crate::error::TaResult;
 
-use super::{StreamingIndicator, Window};
+use crate::stream::{StreamingIndicator, Window};
 
 /// Stateful rolling sum.
 ///

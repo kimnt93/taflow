@@ -1,19 +1,18 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingKurtosis;
+use taflow::indicators::RollingKurtosis as State;
 #[pyclass]
-pub struct RollingKurtosisOperator {
-    inner: RollingKurtosis,
+pub struct RollingKurtosis {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingKurtosisOperator {
+impl RollingKurtosis {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingKurtosis::new(timeperiod)
-                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

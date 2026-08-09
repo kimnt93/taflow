@@ -1,8 +1,8 @@
 """Canonical native-backed Rolling Standard Deviation adapter."""
 from typing import Any
 import numpy as np
-from ._native import RollingStandardDeviation as _NativeRollingStandardDeviation
-from ._series import as_float64_series
+from .._native import RollingStandardDeviation as _NativeRollingStandardDeviation
+from .._series import as_float64_series
 
 class RollingStandardDeviation:
     """Compute STDDEV from required ``values`` with configurable ``nbdev``."""

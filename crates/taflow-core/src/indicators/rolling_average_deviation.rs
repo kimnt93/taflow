@@ -1,7 +1,8 @@
 //! Batch implementation for `rolling_avgdev`.
 
-use super::statistic::*;
 use crate::error::{TaError, TaResult};
+use crate::stream::statistic::*;
+use crate::stream::{invalid_period, Window};
 
 /// Average Deviation (AVGDEV), measured from each window's arithmetic mean.
 ///
@@ -16,8 +17,8 @@ use crate::error::{TaError, TaResult};
 /// # Returns
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
-use super::rolling_statistics::*;
-use super::*;
+use crate::stream::rolling_statistics::*;
+use crate::stream::StreamingIndicator;
 
 /// Stateful average absolute deviation with TA-Lib's newest-to-oldest summation order.
 #[derive(Debug, Clone)]

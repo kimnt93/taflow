@@ -1,8 +1,8 @@
 """Canonical native-backed Rolling Average Deviation adapter."""
 from typing import Any
 import numpy as np
-from ._native import RollingAverageDeviation as _NativeRollingAverageDeviation
-from ._series import as_float64_series
+from .._native import RollingAverageDeviation as _NativeRollingAverageDeviation
+from .._series import as_float64_series
 
 class RollingAverageDeviation:
     """Compute AVGDEV from required ``values`` with period 14 by default."""

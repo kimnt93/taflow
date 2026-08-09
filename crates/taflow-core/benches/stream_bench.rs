@@ -2,16 +2,15 @@ use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criteri
 use taflow::indicators::{
     AccelerationBands, MesaAdaptiveMovingAverage, Momentum, ParabolicSar, ParabolicSarExtended,
     RateOfChange, RateOfChangePercent, RateOfChangeRatio, RateOfChangeRatioPercent, RollingMinMax,
-    RollingMinMaxIndex, WilliamsPercentR,
+    RollingMinMaxIndex, RollingStandardDeviation, RollingVariance, WilliamsPercentR,
 };
 use taflow::stream::{
     AbsolutePriceOscillator, AverageTrueRange, BollingerBands, DoubleExponentialMovingAverage,
     ExponentialMovingAverage, FastStochasticOscillator, IntradayMomentumIndex, MovingAverage,
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceFixed,
-    NormalizedAverageTrueRange, PercentagePriceOscillator, RelativeStrengthIndex, RollingMidpoint,
-    RollingMidprice, SimpleMovingAverage, StochasticOscillator, StreamingIndicator,
-    TriangularMovingAverage, TripleExponentialAverage, TripleExponentialMovingAverage, TrueRange,
-    WeightedMovingAverage,
+    NormalizedAverageTrueRange, PercentagePriceOscillator, RelativeStrengthIndex,
+    SimpleMovingAverage, StochasticOscillator, StreamingIndicator, TriangularMovingAverage,
+    TripleExponentialAverage, TripleExponentialMovingAverage, TrueRange, WeightedMovingAverage,
 };
 use taflow::MaType;
 
@@ -391,7 +390,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("var", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::RollingVariance::new(20, 1.0).unwrap();
+            let mut state = indicators::RollingVariance::new(20, 1.0).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));
@@ -400,7 +399,7 @@ fn append_benchmark(criterion: &mut Criterion) {
     });
     group.bench_function(BenchmarkId::new("stddev", updates.len()), |bench| {
         bench.iter(|| {
-            let mut state = stream::RollingStandardDeviation::new(20, 2.0).unwrap();
+            let mut state = indicators::RollingStandardDeviation::new(20, 2.0).unwrap();
             state.extend(warmup.iter().copied());
             for value in updates {
                 black_box(state.append(*value));

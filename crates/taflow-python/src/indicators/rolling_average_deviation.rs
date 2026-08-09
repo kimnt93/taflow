@@ -1,7 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{RollingAverageDeviation as State, StreamingIndicator};
+use taflow::indicators::RollingAverageDeviation as State;
+use taflow::stream::StreamingIndicator;
 
 #[pyclass]
 pub struct RollingAverageDeviation {

@@ -1,13 +1,13 @@
-//! Stateful rolling rollingkurtosis indicator.
+//! Stateful rolling rollingskew indicator.
 
 use crate::error::TaResult;
 
-use super::operator_states::validate_period;
-use super::Window;
+use crate::stream::operator_states::validate_period;
+use crate::stream::Window;
 
-/// Persistent trailing rollingkurtosis computed from a fixed-size moment window.
+/// Persistent trailing rollingskew computed from a fixed-size moment window.
 #[derive(Debug, Clone)]
-pub struct RollingKurtosis {
+pub struct RollingSkew {
     values: Window,
     timeperiod: usize,
     nobs: usize,
@@ -18,7 +18,7 @@ pub struct RollingKurtosis {
     value: Option<f64>,
 }
 
-impl RollingKurtosis {
+impl RollingSkew {
     /// Create a state with a positive trailing period.
     pub fn new(timeperiod: usize) -> TaResult<Self> {
         validate_period(timeperiod)?;
@@ -65,7 +65,7 @@ impl RollingKurtosis {
         self.nobs += 1;
         self.value = if self.nobs == self.timeperiod {
             Some(if self.m2 > 0.0 {
-                self.nobs as f64 * self.m4 / self.m2.powi(2) - 3.0
+                (self.nobs as f64).sqrt() * self.m3 / self.m2.powf(1.5)
             } else {
                 0.0
             })

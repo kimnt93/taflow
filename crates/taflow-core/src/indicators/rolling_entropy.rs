@@ -1,5 +1,5 @@
-use super::operator_states::validate_period;
 use crate::error::TaResult;
+use crate::stream::operator_states::validate_period;
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone)]

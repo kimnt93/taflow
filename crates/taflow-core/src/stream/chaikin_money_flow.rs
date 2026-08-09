@@ -1,6 +1,7 @@
 use super::operator_states::*;
 use super::*;
 use crate::error::TaResult;
+use crate::indicators::RollingSum;
 
 /// Stateful Chaikin Money Flow, aligned to `ta.volume.ChaikinMoneyFlowIndicator`.
 #[derive(Debug, Clone)]
@@ -9,8 +10,8 @@ use crate::error::TaResult;
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct ChaikinMoneyFlow {
-    mfv: crate::stream::RollingSum,
-    volume: crate::stream::RollingSum,
+    mfv: RollingSum,
+    volume: RollingSum,
     value: Option<f64>,
 }
 
@@ -23,8 +24,8 @@ impl ChaikinMoneyFlow {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            mfv: crate::stream::RollingSum::new(period)?,
-            volume: crate::stream::RollingSum::new(period)?,
+            mfv: RollingSum::new(period)?,
+            volume: RollingSum::new(period)?,
             value: None,
         })
     }

@@ -1,19 +1,18 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingSkew;
+use taflow::indicators::RollingSkew as State;
 #[pyclass]
-pub struct RollingSkewOperator {
-    inner: RollingSkew,
+pub struct RollingSkew {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingSkewOperator {
+impl RollingSkew {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingSkew::new(timeperiod)
-                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

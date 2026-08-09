@@ -5,7 +5,7 @@ use crate::error::{TaError, TaResult};
 use super::{vhgw, MonotonicMax, MonotonicMin, RollingExtrema, StreamingIndicator};
 
 #[cfg(test)]
-use crate::stream::{RollingMidpoint, RollingMidprice};
+use crate::indicators::{RollingMidpoint, RollingMidprice};
 
 #[cfg(test)]
 mod tests {

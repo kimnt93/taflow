@@ -1,8 +1,8 @@
 """Canonical native-backed Rolling Variance adapter."""
 from typing import Any
 import numpy as np
-from ._native import RollingVariance as _NativeRollingVariance
-from ._series import as_float64_series
+from .._native import RollingVariance as _NativeRollingVariance
+from .._series import as_float64_series
 
 class RollingVariance:
     """Compute population variance from required ``values``; ``nbdev`` is accepted for API parity."""

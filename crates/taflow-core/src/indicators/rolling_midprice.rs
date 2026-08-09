@@ -1,7 +1,7 @@
 //! Persistent rolling midprice state.
 
-use super::vhgw;
 use crate::error::{TaError, TaResult};
+use crate::stream::vhgw;
 use crate::stream::{MonotonicMax, MonotonicMin};
 
 /// Rolling midpoint of the highest high and lowest low over `period` bars.

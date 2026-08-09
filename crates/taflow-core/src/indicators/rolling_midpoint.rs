@@ -1,9 +1,9 @@
 //! Persistent rolling midpoint state.
 
-use super::vhgw;
-use super::StreamingIndicator;
 use crate::error::TaResult;
+use crate::stream::vhgw;
 use crate::stream::RollingExtrema;
+use crate::stream::StreamingIndicator;
 
 /// Rolling midpoint of the highest and lowest values over `period` bars.
 #[derive(Debug, Clone)]

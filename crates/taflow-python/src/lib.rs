@@ -113,8 +113,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingPercentile>()?;
     m.add_class::<indicators::RollingRank>()?;
     m.add_class::<indicators::RollingZScoreOperator>()?;
-    m.add_class::<indicators::RollingSkewOperator>()?;
-    m.add_class::<indicators::RollingKurtosisOperator>()?;
+    m.add_class::<indicators::RollingSkew>()?;
+    m.add_class::<indicators::RollingKurtosis>()?;
     m.add_class::<indicators::RollingInterquartileRange>()?;
     m.add_class::<indicators::RollingCovariance>()?;
     m.add_class::<indicators::RollingWinsorize>()?;
@@ -203,7 +203,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::LiquidityOperator>()?;
     m.add_class::<indicators::EqualHighsLowsOperator>()?;
     m.add_class::<indicators::HedgeRatioOperator>()?;
-    m.add_class::<indicators::RollingEntropyOperator>()?;
+    m.add_class::<indicators::RollingEntropy>()?;
     m.add_class::<indicators::RollingAutocorrOperator>()?;
     m.add_class::<indicators::HurstOperator>()?;
     m.add_class::<indicators::FractalDimensionOperator>()?;

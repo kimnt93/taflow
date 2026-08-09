@@ -1,6 +1,7 @@
 use super::operator_states::*;
 use super::*;
 use crate::error::TaResult;
+use crate::indicators::RollingSum;
 
 /// Stateful Mass Index (Dorsey): rolling sum of the ratio between a short EMA
 /// of the high-low range and an EMA of that EMA.
@@ -12,7 +13,7 @@ use crate::error::TaResult;
 pub struct MassIndex {
     ema_range: MassEma,
     ema_signal: MassEma,
-    ratio_sum: crate::stream::RollingSum,
+    ratio_sum: RollingSum,
     value: Option<f64>,
 }
 
@@ -28,7 +29,7 @@ impl MassIndex {
         Ok(Self {
             ema_range: MassEma::new(ema_period),
             ema_signal: MassEma::new(ema_period),
-            ratio_sum: crate::stream::RollingSum::new(sum_period)?,
+            ratio_sum: RollingSum::new(sum_period)?,
             value: None,
         })
     }

@@ -6,11 +6,11 @@
 use multiversion::multiversion;
 
 use crate::error::TaResult;
+use crate::indicators::RollingStandardDeviation;
 use crate::ma_type::MaType;
 
 use super::{
-    invalid_period, moving_average_dispatcher::MovingAverageDispatcher, RollingStandardDeviation,
-    StreamingIndicator, Window,
+    invalid_period, moving_average_dispatcher::MovingAverageDispatcher, StreamingIndicator, Window,
 };
 
 /// Steady-state kernel of [`BollingerBands::extend_slices_into`].

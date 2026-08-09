@@ -83,6 +83,18 @@ external-oracle MATCH results passed. Generated rows below may still report
 historical binding names; the source scan is authoritative. Benchmark fields
 remain `TODO`; no benchmark command was run.
 
+The eighth structural batch migrated `RollingMedian`, `RollingSum`,
+`RollingAverageDeviation`, `RollingMidpoint`, `RollingStandardDeviation`,
+`RollingVariance`, `RollingMidprice`, `RollingKurtosis`, `RollingSkew`, and
+`RollingEntropy`. Their Rust implementations/tests, Python adapters, and
+PyO3 bindings now use matching canonical files and exports. The former
+two-class entropy binding was split so each binding file owns one class;
+`RollingAutocorrOperator` moved to its own binding file. Rust lifecycle tests,
+the release PyO3 build, the full Python suite, interface audit, and ten
+external-oracle MATCH results passed. Generated rows may still show historical
+names; source scan is authoritative. Benchmark fields remain `TODO`; no
+benchmark command was run.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**

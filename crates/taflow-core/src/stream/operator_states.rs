@@ -1,11 +1,11 @@
 use std::collections::VecDeque;
 
 use super::{
-    CumulativeMaximum, ExponentialMovingAverage, MonotonicMax, MonotonicMin, RollingMedian,
-    RollingStandardDeviation, SchaffTrendCycle, SchaffTrendCycleValue, SimpleMovingAverage,
-    StreamingIndicator, Window,
+    CumulativeMaximum, ExponentialMovingAverage, MonotonicMax, MonotonicMin, SchaffTrendCycle,
+    SchaffTrendCycleValue, SimpleMovingAverage, StreamingIndicator, Window,
 };
 use crate::error::{TaError, TaResult};
+use crate::indicators::{RollingMedian, RollingStandardDeviation};
 
 pub(crate) fn validate_period(timeperiod: usize) -> TaResult<()> {
     if timeperiod == 0 {

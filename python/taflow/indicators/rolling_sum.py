@@ -1,8 +1,8 @@
 """Canonical native-backed rolling sum adapter."""
 from typing import Any
 import numpy as np
-from ._native import RollingSum as _NativeRollingSum
-from ._series import as_float64_series
+from .._native import RollingSum as _NativeRollingSum
+from .._series import as_float64_series
 
 class RollingSum:
     """Compute trailing sums from required ``values`` in Rust."""
