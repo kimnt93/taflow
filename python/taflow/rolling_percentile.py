@@ -1,101 +1,62 @@
-"""Persistent causal rolling percentile operator."""
+"""Native-backed causal rolling-percentile adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import RollingPercentileOperator as _Native
 from ._series import as_float64_series
 
 
 class RollingPercentile:
-    """Persistent causal rolling percentile operator.
+    """Compute a trailing percentile on a 0--100 scale.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    ``_input`` is the required chronological series and may be empty for a
+    fresh stream. ``timeperiod`` defaults to 14 and ``percentile`` to 50.0;
+    the latter must lie in ``[0, 100]``. Rust owns sorted-window warm-up and
+    interpolation. ``compute`` returns one aligned float array, ``value`` is
+    the latest scalar or ``None`` while warming up, and all lifecycle mutators
+    return ``self``. The independent oracle is pandas rolling quantile.
+    """
 
     def __init__(
-        self,
-        _input: Any,
-        timeperiod: int = 14,
-        percentile: float = 50.0,
+        self, _input: Any, timeperiod: int = 14, percentile: float = 50.0
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        timeperiod : object
-            Trailing window length in bars.
-        percentile : object
-            Requested trailing percentile.
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = _Native(timeperiod, percentile)
+        self._state = _Native(int(timeperiod), float(percentile))
+        self._length = 0
         self.extend(_input)
 
     def append(self, _input: float) -> "RollingPercentile":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append one observation and return this adapter."""
         self._state.append(float(_input))
+        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "RollingPercentile":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(_input))
+        """Append a chronological observation series and return this adapter."""
+        values = as_float64_series(_input)
+        self._state.extend(values)
+        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned trailing-percentile history."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest percentile, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "RollingPercentile":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed observations."""
+        return self._length
+
+
+__all__ = ["RollingPercentile"]

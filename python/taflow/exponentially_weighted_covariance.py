@@ -1,15 +1,24 @@
 """Persistent exponentially weighted covariance."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import ExponentiallyWeightedCovarianceOperator as _Native
 from ._series import as_float64_series
 
 
 class ExponentiallyWeightedCovariance:
-    """Persistent exponentially weighted covariance.
+    """Compute causal exponentially weighted population covariance.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `left`, `right`. Warm-up positions are represented by `NaN` in history."""
+    ``left`` and ``right`` are required equal-length chronological series and
+    may both be empty for a fresh stream. ``timeperiod`` defaults to 14 and is
+    interpreted as a pandas EWM span. Rust owns the paired recurrence and
+    aligned history; ``compute`` returns one float array and ``value`` is the
+    latest covariance or ``None`` before the first pair. Lifecycle mutators
+    return ``self`` and reject length mismatches before mutation. The oracle is
+    pandas ``ExponentialMovingWindow.cov(bias=True)``.
+    """
 
     def __init__(
         self,
@@ -33,7 +42,7 @@ class ExponentiallyWeightedCovariance:
         None
             The constructor initializes the adapter and returns no value.
         """
-        self._state = _Native(timeperiod)
+        self._state = _Native(int(timeperiod))
         self._length = 0
         self.extend(left, right)
 

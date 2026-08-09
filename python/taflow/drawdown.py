@@ -1,15 +1,23 @@
 """Persistent percentage drawdown from the running maximum."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import DrawdownOperator as _Native
 from ._series import as_float64_series
 
 
 class Drawdown:
-    """Persistent percentage drawdown from the running maximum.
+    """Compute percentage drawdown from the causal running maximum.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    ``_input`` is the required chronological series and may be empty for a
+    fresh stream. Each output is ``input / running_maximum - 1`` (or zero when
+    the running maximum is zero), so ``compute`` returns one aligned float
+    array and ``value`` is the latest scalar or ``None`` before the first bar.
+    Lifecycle mutators return ``self``. The independent oracle is pandas
+    ``Series.cummax``.
+    """
 
     def __init__(
         self,
