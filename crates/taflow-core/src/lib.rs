@@ -1,5 +1,6 @@
 pub mod common;
 pub mod error;
+pub mod indicators;
 pub mod ma_type;
 pub mod simd;
 pub mod stream;

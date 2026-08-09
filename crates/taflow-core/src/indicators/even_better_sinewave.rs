@@ -1,7 +1,8 @@
 //! Stateful pandas-ta-classic Even Better Sinewave oscillator.
 
-use super::{invalid_period, StreamingIndicator};
+use super::invalid_period;
 use crate::error::TaResult;
+use crate::stream::StreamingIndicator;
 
 /// Computes a causal detrended cycle value from close prices.
 #[derive(Debug, Clone)]

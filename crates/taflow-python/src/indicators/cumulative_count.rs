@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::CumulativeCount as CumulativeCountState;
+use taflow::indicators::CumulativeCount as CumulativeCountState;
 
 /// Native persistent adapter for the one-based cumulative observation count.
 #[pyclass]

@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import PivotPoints as _NativePivotPoints
-from ._series import as_bool_series, as_float64_series
+from .._native import PivotPoints as _NativePivotPoints
+from .._series import as_bool_series, as_float64_series
 
 
 class PivotPoints:

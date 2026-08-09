@@ -92,7 +92,7 @@ pub struct PremiumDiscountValue {
 impl PremiumDiscount {
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 1 {
-            return Err(super::invalid_period("window", period, 1));
+            return Err(crate::indicators::invalid_period("window", period, 1));
         }
         Ok(Self {
             highs: Staircase::new(period, true),

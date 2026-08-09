@@ -1,4 +1,4 @@
-use super::StreamingIndicator;
+use crate::stream::StreamingIndicator;
 
 /// Persistent one-based count of processed observations.
 #[derive(Debug, Clone, Default)]

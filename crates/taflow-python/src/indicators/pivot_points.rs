@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{PivotPoints as State, PivotPointsValue};
+use taflow::indicators::{PivotPoints as State, PivotPointsValue};
 
 #[pyclass]
 pub struct PivotPoints {

@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{TomDeMarkSequential as State, TomDeMarkSequentialValue};
+use taflow::indicators::{TomDeMarkSequential as State, TomDeMarkSequentialValue};
 
 /// Python boundary for the canonical Rust DeMark setup state.
 #[pyclass]

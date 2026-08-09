@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{KlingerVolumeOscillator as State, KlingerVolumeOscillatorValue};
+use taflow::indicators::{KlingerVolumeOscillator as State, KlingerVolumeOscillatorValue};
 
 /// Python boundary for the canonical Rust Klinger Volume Oscillator state.
 #[pyclass]

@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{SessionVolumeLevels as State, SessionVolumeLevelsValue};
+use taflow::indicators::{SessionVolumeLevels as State, SessionVolumeLevelsValue};
 
 #[pyclass]
 pub struct SessionVolumeLevels {

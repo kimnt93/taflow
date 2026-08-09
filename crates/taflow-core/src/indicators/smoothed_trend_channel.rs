@@ -23,7 +23,7 @@ impl SmoothedTrendChannel {
     /// Creates an SSL Channel with a positive rolling period.
     pub fn new(period: usize) -> TaResult<Self> {
         if period < 1 {
-            return Err(super::invalid_period("length", period, 1));
+            return Err(crate::indicators::invalid_period("length", period, 1));
         }
         Ok(Self {
             period,

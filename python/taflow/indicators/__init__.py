@@ -1,6 +1,16 @@
 "Canonical namespace for persistent TAFlow indicators."
 
 from ..commodity_channel_index import CommodityChannelIndex
+from .cumulative_count import CumulativeCount
+from .even_better_sinewave import EvenBetterSinewave
+from .klinger_volume_oscillator import KlingerVolumeOscillator
+from .opening_range import OpeningRange
+from .parabolic_moving_average_stop import ParabolicMovingAverageStop
+from .pivot_points import PivotPoints
+from .premium_discount import PremiumDiscount
+from .session_volume_levels import SessionVolumeLevels
+from .smoothed_trend_channel import SmoothedTrendChannel
+from .tom_de_mark_sequential import TomDeMarkSequential
 from ..candle_doji import CandleDoji
 from ..candle_takuri import CandleTakuri
 from ..candle_marubozu import CandleMarubozu
@@ -81,7 +91,6 @@ from ..lag import Lag
 from ..log_return import LogReturn
 from ..cumulative_sum import CumulativeSum
 from ..cumulative_product import CumulativeProduct
-from ..cumulative_count import CumulativeCount
 from ..rolling_median import RollingMedian
 from ..rolling_mode import RollingMode
 from ..rolling_quantile import RollingQuantile
@@ -151,7 +160,9 @@ from ..state_helpers import (
     PositionHold,
     EntryExit,
 )
-from ..swing import SwingHighLow, SwingHigh, SwingLow
+from ..swing_high_low import SwingHighLow
+from ..swing_high import SwingHigh
+from ..swing_low import SwingLow
 from ..retracements import Retracements
 from ..session import SessionExtrema
 from ..previous_high_low import PreviousHighLow

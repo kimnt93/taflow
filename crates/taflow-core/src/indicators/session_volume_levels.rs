@@ -25,7 +25,7 @@ pub struct SessionVolumeLevels {
 impl SessionVolumeLevels {
     pub fn new(bins: usize, value_area: f64) -> TaResult<Self> {
         if bins < 1 {
-            return Err(super::invalid_period("bins", bins, 1));
+            return Err(crate::indicators::invalid_period("bins", bins, 1));
         }
         if !(0.0..=1.0).contains(&value_area) || value_area == 0.0 {
             return Err(TaError::InvalidParameter {

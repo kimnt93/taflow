@@ -1,5 +1,5 @@
 use super::even_better_sinewave::EvenBetterSinewave;
-use super::StreamingIndicator;
+use crate::stream::StreamingIndicator;
 
 #[test]
 fn bulk_and_reset_replay_match() {

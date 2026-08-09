@@ -433,9 +433,6 @@ mod variable_period_moving_average;
 mod variable_period_moving_average_test;
 mod vhgw;
 pub use session_flags::session_flags;
-mod cumulative_count;
-#[cfg(test)]
-mod cumulative_count_test;
 mod cumulative_maximum;
 #[cfg(test)]
 mod cumulative_maximum_test;
@@ -448,8 +445,6 @@ mod cumulative_product_test;
 mod cumulative_sum;
 #[cfg(test)]
 mod cumulative_sum_test;
-#[allow(unused_imports)]
-pub use cumulative_count::CumulativeCount;
 pub use cumulative_maximum::CumulativeMaximum;
 pub use cumulative_minimum::CumulativeMinimum;
 pub use cumulative_product::CumulativeProduct;
@@ -460,9 +455,6 @@ mod active_zone_list_test;
 mod anchored_volume_weighted_average_price;
 #[cfg(test)]
 mod anchored_volume_weighted_average_price_test;
-mod even_better_sinewave;
-#[cfg(test)]
-mod even_better_sinewave_test;
 mod fibonacci_retracement;
 #[cfg(test)]
 mod fibonacci_retracement_test;
@@ -473,9 +465,6 @@ mod helpers;
 mod jurik_moving_average;
 #[cfg(test)]
 mod jurik_moving_average_test;
-mod klinger_volume_oscillator;
-#[cfg(test)]
-mod klinger_volume_oscillator_test;
 mod lag;
 #[cfg(test)]
 mod lag_test;
@@ -489,29 +478,17 @@ mod log_return_test;
 mod momentum;
 #[cfg(test)]
 mod momentum_test;
-mod opening_range;
-#[cfg(test)]
-mod opening_range_test;
 mod operator_states;
 pub use active_zone_list::ActiveZoneList;
 mod fast_stochastic_oscillator;
 #[cfg(test)]
 mod fast_stochastic_oscillator_test;
-mod parabolic_moving_average_stop;
-#[cfg(test)]
-mod parabolic_moving_average_stop_test;
 mod parabolic_sar;
 mod parabolic_sar_extended;
 #[cfg(test)]
 mod parabolic_sar_extended_test;
 #[cfg(test)]
 mod parabolic_sar_test;
-mod pivot_points;
-#[cfg(test)]
-mod pivot_points_test;
-mod premium_discount;
-#[cfg(test)]
-mod premium_discount_test;
 mod rate_of_change;
 mod rate_of_change_percent;
 #[cfg(test)]
@@ -527,24 +504,15 @@ mod rate_of_change_test;
 mod relative_momentum_index;
 #[cfg(test)]
 mod relative_momentum_index_test;
-mod session_volume_levels;
-#[cfg(test)]
-mod session_volume_levels_test;
 mod simple_moving_average;
 #[cfg(test)]
 mod simple_moving_average_test;
-mod smoothed_trend_channel;
-#[cfg(test)]
-mod smoothed_trend_channel_test;
 mod stochastic_oscillator;
 #[cfg(test)]
 mod stochastic_oscillator_test;
 mod stochastic_relative_strength_index;
 #[cfg(test)]
 mod stochastic_relative_strength_index_test;
-mod tom_de_mark_sequential;
-#[cfg(test)]
-mod tom_de_mark_sequential_test;
 mod triangular_moving_average;
 #[cfg(test)]
 mod triangular_moving_average_test;
@@ -648,7 +616,6 @@ pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
 pub use directional_movement_index::DirectionalMovementIndex;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
-pub use even_better_sinewave::EvenBetterSinewave;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
 pub use heikin_ashi::{HeikinAshi, HeikinAshiValue};
@@ -663,7 +630,6 @@ pub use indicator::StreamingIndicator;
 pub use intraday_momentum_index::IntradayMomentumIndex;
 pub use jurik_moving_average::JurikMovingAverage;
 pub use kaufman_adaptive_moving_average::KaufmanAdaptiveMovingAverage;
-pub use klinger_volume_oscillator::{KlingerVolumeOscillator, KlingerVolumeOscillatorValue};
 pub use lag::Lag;
 pub use laguerre_relative_strength_index::LaguerreRelativeStrengthIndex;
 pub use log_return::LogReturn;
@@ -679,16 +645,10 @@ pub use moving_average_convergence_divergence::{
 };
 pub use moving_average_convergence_divergence_extended::MovingAverageConvergenceDivergenceExtended;
 pub use moving_average_convergence_divergence_fixed::MovingAverageConvergenceDivergenceFixed;
-pub use opening_range::{OpeningRange, OpeningRangeValue};
-pub use parabolic_moving_average_stop::{
-    ParabolicMovingAverageStop, ParabolicMovingAverageStopValue,
-};
 #[allow(unused_imports)]
 pub use percentage_price_oscillator::PercentagePriceOscillator;
-pub use pivot_points::{PivotPoints, PivotPointsValue};
 pub use plus_directional_indicator::PlusDirectionalIndicator;
 pub use plus_directional_movement::PlusDirectionalMovement;
-pub use premium_discount::{PremiumDiscount, PremiumDiscountValue};
 pub use rate_of_change::RateOfChange;
 pub use rate_of_change_percent::RateOfChangePercent;
 pub use rate_of_change_ratio::RateOfChangeRatio;
@@ -716,16 +676,13 @@ pub use parabolic_sar_extended::ParabolicSarExtended;
 #[allow(unused_imports)]
 pub use relative_strength_index::RelativeStrengthIndex;
 pub use rolling_sum::RollingSum;
-pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
 pub use simple_moving_average::SimpleMovingAverage;
-pub use smoothed_trend_channel::SmoothedTrendChannel;
 #[allow(unused_imports)]
 pub use stochastic_oscillator::{StochasticOscillator, StochasticOscillatorValue};
 #[allow(unused_imports)]
 pub use stochastic_relative_strength_index::{
     StochasticRelativeStrengthIndex, StochasticRelativeStrengthIndexValue,
 };
-pub use tom_de_mark_sequential::{TomDeMarkSequential, TomDeMarkSequentialValue};
 pub use triangular_moving_average::TriangularMovingAverage;
 #[allow(unused_imports)]
 pub use triple_exponential_average::TripleExponentialAverage;
@@ -875,7 +832,6 @@ mod rolling_variance_test;
 #[cfg(test)]
 mod signal_delay_test;
 #[cfg(test)]
-mod smoothed_trend_channel_lifecycle_test;
 #[cfg(test)]
 mod value_when_test;
 #[cfg(test)]

@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{OpeningRange as State, OpeningRangeValue};
+use taflow::indicators::{OpeningRange as State, OpeningRangeValue};
 
 #[pyclass]
 pub struct OpeningRange {

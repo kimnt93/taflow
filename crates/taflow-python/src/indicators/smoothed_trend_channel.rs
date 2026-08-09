@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::SmoothedTrendChannel as State;
+use taflow::indicators::SmoothedTrendChannel as State;
 
 #[pyclass]
 pub struct SmoothedTrendChannel {

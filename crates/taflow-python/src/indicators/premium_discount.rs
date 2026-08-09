@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::{PremiumDiscount as State, PremiumDiscountValue};
+use taflow::indicators::{PremiumDiscount as State, PremiumDiscountValue};
 
 #[pyclass]
 pub struct PremiumDiscount {

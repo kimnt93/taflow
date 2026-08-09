@@ -1,7 +1,8 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{EvenBetterSinewave as State, StreamingIndicator};
+use taflow::indicators::EvenBetterSinewave as State;
+use taflow::stream::StreamingIndicator;
 
 /// Python boundary for the canonical Rust Even Better Sinewave state.
 #[pyclass]

@@ -1,4 +1,4 @@
-use super::SmoothedTrendChannel;
+use super::smoothed_trend_channel::SmoothedTrendChannel;
 
 #[test]
 fn bulk_and_scalar_are_bitwise_equal() {

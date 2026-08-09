@@ -31,7 +31,7 @@ impl ParabolicMovingAverageStop {
     /// Creates PMAX with a positive EMA/ATR lookback and multiplier.
     pub fn new(period: usize, multiplier: f64) -> TaResult<Self> {
         if period < 1 {
-            return Err(super::invalid_period("length", period, 1));
+            return Err(crate::indicators::invalid_period("length", period, 1));
         }
         Ok(Self {
             period,

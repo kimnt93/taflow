@@ -437,3 +437,64 @@ class EqualHighsLows:
   compare every output and warm-up position with the target, and exercise reset,
   chunked `extend`, and scalar `append` through the same class. A lifecycle-only
   test is not sufficient when an external oracle exists.
+
+## Batch execution clarifications
+
+- Before each ten-indicator batch, reread this file and inspect the checklist,
+  then independently scan the repository. The generated checklist is a useful
+  report but is not authoritative: a row can be stale, checked too early, or
+  miss a duplicate/alias. Verify every claimed completion from source files,
+  exports, bindings, tests, and the external-oracle report before updating it.
+- The canonical Rust implementation directory is
+  `crates/taflow-core/src/indicators/`; legacy `stream/` files must be migrated
+  as part of the normalization and must not remain as duplicate implementations.
+  Python implementations live in `python/taflow/indicators/`, with matching
+  snake_case implementation and test filenames. Bindings live in
+  `crates/taflow-python/src/indicators/`, one public binding class per file.
+- Every public Python adapter should follow this complete lifecycle shape; the
+  native state remains the source of truth for arithmetic, history, and length:
+
+```python
+class PositiveVolumeIndex:
+    """Persistent Positive Volume Index.
+
+    Rust owns the persistent state and arithmetic; Python converts containers
+    only. ``append``, ``extend``, and ``reset`` are fluent, ``value`` exposes
+    the latest result, and ``compute`` returns aligned history. Required input
+    histories are ``close`` and ``volume``; warm-up is represented by ``NaN``.
+    The oracle/name mapping is TA-Lib ``PVI`` when available.
+    """
+
+    def __init__(self, close: Any, volume: Any) -> None:
+        """Initialize the adapter and process aligned input histories."""
+        self._state = _Native()
+        self.extend(close, volume)
+
+    def append(self, close: float, volume: float) -> "PositiveVolumeIndex":
+        """Append one close/volume observation and return this adapter."""
+        self._state.append(float(close), float(volume))
+        return self
+
+    def extend(self, close: Any, volume: Any) -> "PositiveVolumeIndex":
+        """Append aligned close and volume series and return this adapter."""
+        self._state.extend(as_float64_series(close), as_float64_series(volume))
+        return self
+
+    @property
+    def value(self) -> float | None:
+        """Return the latest native result, or ``None`` during warm-up."""
+        return self._state.value
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned native output history as a NumPy array."""
+        return self._state.compute()
+
+    def reset(self) -> "PositiveVolumeIndex":
+        """Reset native state and return this adapter."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the processed-bar count delegated to native state."""
+        return len(self._state)
+```

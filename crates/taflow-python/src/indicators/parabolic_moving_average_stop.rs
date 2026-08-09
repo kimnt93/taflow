@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::{ParabolicMovingAverageStop as State, ParabolicMovingAverageStopValue};
+use taflow::indicators::{ParabolicMovingAverageStop as State, ParabolicMovingAverageStopValue};
 
 /// Python boundary for the canonical Rust PMAX state.
 #[pyclass]
