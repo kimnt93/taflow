@@ -1208,12 +1208,16 @@ mod zero_lag_exponential_moving_average;
 #[cfg(test)]
 mod zero_lag_exponential_moving_average_test;
 pub use fisher_transform::FisherTransform;
+mod break_of_structure_change_of_character;
 mod chaikin_volatility;
 #[cfg(test)]
 mod chaikin_volatility_test;
 mod ease_of_movement;
 #[cfg(test)]
 mod ease_of_movement_test;
+mod fair_value_gap;
+#[cfg(test)]
+mod fair_value_gap_test;
 mod falling;
 #[cfg(test)]
 mod falling_test;
@@ -1223,6 +1227,9 @@ mod force_index_test;
 mod fractal_dimension;
 #[cfg(test)]
 mod fractal_dimension_test;
+mod hedge_ratio;
+#[cfg(test)]
+mod hedge_ratio_test;
 mod hurst;
 #[cfg(test)]
 mod hurst_test;
@@ -1239,24 +1246,17 @@ mod rolling_entropy;
 #[cfg(test)]
 mod rolling_entropy_test;
 mod rolling_information_ratio;
+#[cfg(test)]
+mod rolling_information_ratio_test;
 mod rolling_volume_weighted_average_price;
 #[cfg(test)]
 mod rolling_volume_weighted_average_price_test;
-mod ulcer_index;
-#[cfg(test)]
-mod ulcer_index_test;
-#[allow(unused_imports)]
-pub(crate) use rolling_information_ratio::rolling_information_ratio;
-mod break_of_structure_change_of_character;
-mod fair_value_gap;
-#[cfg(test)]
-mod fair_value_gap_test;
-mod hedge_ratio;
-#[cfg(test)]
-mod hedge_ratio_test;
 mod session_extrema;
 #[cfg(test)]
 mod session_extrema_test;
+mod ulcer_index;
+#[cfg(test)]
+mod ulcer_index_test;
 #[allow(unused_imports)]
 pub(crate) use break_of_structure_change_of_character::break_of_structure_change_of_character;
 mod order_block;
