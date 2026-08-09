@@ -3939,6 +3939,58 @@
     "note": ""
   },
   {
+    "class": "VariableIndexDynamicAverage",
+    "snake": "vidya",
+    "oracle_api": "pandas-ta-classic.vidya",
+    "output": "vidya[constant]",
+    "source": "pandas-ta-classic",
+    "version": "0.6.52",
+    "url": "https://xgboosted.github.io/pandas-ta-classic/indicators.html",
+    "verdict": "MATCH",
+    "error": 0.0,
+    "nan": 0,
+    "note": "required source-shape matrix"
+  },
+  {
+    "class": "VariableIndexDynamicAverage",
+    "snake": "vidya",
+    "oracle_api": "pandas-ta-classic.vidya",
+    "output": "vidya[monotonic]",
+    "source": "pandas-ta-classic",
+    "version": "0.6.52",
+    "url": "https://xgboosted.github.io/pandas-ta-classic/indicators.html",
+    "verdict": "MATCH",
+    "error": 0.0,
+    "nan": 0,
+    "note": "required source-shape matrix"
+  },
+  {
+    "class": "VariableIndexDynamicAverage",
+    "snake": "vidya",
+    "oracle_api": "pandas-ta-classic.vidya",
+    "output": "vidya[repeated]",
+    "source": "pandas-ta-classic",
+    "version": "0.6.52",
+    "url": "https://xgboosted.github.io/pandas-ta-classic/indicators.html",
+    "verdict": "MATCH",
+    "error": 0.0,
+    "nan": 0,
+    "note": "required source-shape matrix"
+  },
+  {
+    "class": "VariableIndexDynamicAverage",
+    "snake": "vidya",
+    "oracle_api": "pandas-ta-classic.vidya",
+    "output": "vidya[minimum]",
+    "source": "pandas-ta-classic",
+    "version": "0.6.52",
+    "url": "https://xgboosted.github.io/pandas-ta-classic/indicators.html",
+    "verdict": "MATCH",
+    "error": 0.0,
+    "nan": 0,
+    "note": "required source-shape matrix"
+  },
+  {
     "class": "LaguerreRelativeStrengthIndex",
     "snake": "laguerre_rsi",
     "oracle_api": "pandas.laguerre_rsi",

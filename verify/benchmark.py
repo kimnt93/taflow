@@ -135,6 +135,14 @@ def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dic
         import pandas_ta_classic as pta
         frame = pta.ha(*(pd.Series(array) for array in arrays))
         return tuple(frame[column].to_numpy() for column in frame.columns)
+    if source == "pandas-ta-classic" and spec.snake == "vidya":
+        import pandas as pd
+        import pandas_ta_classic as pta
+        result = pta.vidya(
+            pd.Series(arrays[0]),
+            length=spec.ctor_kwargs.get("length", 14),
+        )
+        return None if result is None else result.to_numpy()
     raise KeyError(source)
 
 

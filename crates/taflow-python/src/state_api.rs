@@ -19,8 +19,7 @@ use taflow::stream::{
     SimpleMovingAverage, SmoothedTrendChannel, StochasticOscillator,
     StochasticRelativeStrengthIndex, StreamingIndicator, TomDeMarkSequential,
     TriangularMovingAverage, TripleExponentialMovingAverage, TrueRange as CoreTrueRange,
-    VariableIndexDynamicAverage, VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage,
-    WeightedMovingAverage,
+    VariablePeriodMovingAverage as CoreVariablePeriodMovingAverage, WeightedMovingAverage,
 };
 use taflow::MaType;
 
@@ -120,13 +119,6 @@ scalar_state_class!(StatefulTsf, stream::Tsf, 14);
 #[pyclass]
 pub struct StatefulRelativeMomentumIndex {
     inner: RelativeMomentumIndex,
-    output: Vec<f64>,
-}
-
-/// Native state adapter for Variable Index Dynamic Average.
-#[pyclass]
-pub struct StatefulVariableIndexDynamicAverage {
-    inner: VariableIndexDynamicAverage,
     output: Vec<f64>,
 }
 
@@ -823,51 +815,6 @@ impl StatefulLaguerreRelativeStrengthIndex {
     fn value(&self) -> Option<f64> {
         self.inner.value()
     }
-    fn __len__(&self) -> usize {
-        self.output.len()
-    }
-
-    fn reset(&mut self) {
-        self.inner.reset();
-        self.output.clear();
-    }
-}
-
-#[pymethods]
-impl StatefulVariableIndexDynamicAverage {
-    #[new]
-    #[pyo3(signature = (length=14, alpha=None))]
-    fn new(length: usize, alpha: Option<f64>) -> PyResult<Self> {
-        let alpha = alpha.unwrap_or(2.0 / (length as f64 + 1.0));
-        Ok(Self {
-            inner: VariableIndexDynamicAverage::new(length, alpha).map_err(py_value_error)?,
-            output: Vec::new(),
-        })
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        let value = self.inner.append(input);
-        self.output.push(value.unwrap_or(f64::NAN));
-        value
-    }
-
-    fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
-        let input = input.as_slice()?;
-        let inner = &mut self.inner;
-        let output = &mut self.output;
-        py.allow_threads(|| inner.extend_slice_into(input, output));
-        Ok(())
-    }
-
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
-        PyArray1::from_vec(py, self.output.clone())
-    }
-
-    #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
-    }
-
     fn __len__(&self) -> usize {
         self.output.len()
     }

@@ -771,6 +771,17 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
         many("variable_index_dynamic_average",
              taflow.VariableIndexDynamicAverage(close, length).compute(),
              pta.vidya(c, length=length), (f"vidya[length={length}]",))
+    vidya_cases = {
+        "constant": np.full(64, 42.0),
+        "monotonic": np.linspace(10.0, 90.0, 64),
+        "repeated": np.resize(np.array([10.0, 12.0, 12.0, 9.0, 9.0, 12.0]), 64),
+        "minimum": np.linspace(5.0, 18.0, 14),
+    }
+    for case, values in vidya_cases.items():
+        many("variable_index_dynamic_average",
+             taflow.VariableIndexDynamicAverage(values, 14).compute(),
+             pta.vidya(pd.Series(values), length=14),
+             (f"vidya[{case}]",), note="required source-shape matrix")
     many("jurik_moving_average", taflow.JurikMovingAverage(close, 7, 0).compute(),
          pta.jma(c, length=7, phase=0), ("jma",))
     for length, phase in ((1, 0), (2, -100), (7, 100), (21, 35)):

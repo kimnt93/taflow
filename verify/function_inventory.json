@@ -1,7 +1,7 @@
 {
   "counts": {
-    "benchmark": 187,
-    "complete": 57,
+    "benchmark": 188,
+    "complete": 58,
     "correctness": 269,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 612,
     "smc_functions": 8,
-    "structure": 57,
+    "structure": 58,
     "talib_functions": 161
   },
   "rows": [
@@ -578,11 +578,12 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "vidya",
+      "module": "variable_index_dynamic_average",
       "name": "VariableIndexDynamicAverage",
       "native_binding": true,
       "native_symbols": [
-        "StatefulVariableIndexDynamicAverage"
+        "VariableIndexDynamicAverage",
+        "_NativeVariableIndexDynamicAverage"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -4700,7 +4701,6 @@
         "StatefulTrima",
         "StatefulTsf",
         "StatefulVar",
-        "StatefulVariableIndexDynamicAverage",
         "StatefulWma",
         "SupertrendOperator",
         "SwingHighLowOperator",
@@ -4711,6 +4711,7 @@
         "UlcerIndexOperator",
         "UltimateOscillator",
         "ValueWhenOperator",
+        "VariableIndexDynamicAverage",
         "VariablePeriodMovingAverage",
         "VolumePriceTrendOperator",
         "VortexOperator",
@@ -5006,7 +5007,6 @@
         "StatefulTrima",
         "StatefulTsf",
         "StatefulVar",
-        "StatefulVariableIndexDynamicAverage",
         "StatefulWma",
         "SupertrendOperator",
         "SwingHighLowOperator",
@@ -5017,6 +5017,7 @@
         "UlcerIndexOperator",
         "UltimateOscillator",
         "ValueWhenOperator",
+        "VariableIndexDynamicAverage",
         "VariablePeriodMovingAverage",
         "VolumePriceTrendOperator",
         "VortexOperator",

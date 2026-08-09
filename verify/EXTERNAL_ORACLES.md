@@ -1,6 +1,6 @@
 # External correctness oracles
 
-Bars: **2,000** | Matches: **185** | Documented variants: **39** | Failures: **0** | rtol=1e-08, atol=1e-10
+Bars: **2,000** | Matches: **189** | Documented variants: **39** | Failures: **0** | rtol=1e-08, atol=1e-10
 
 Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27
 
@@ -213,9 +213,13 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas-ta-classic | `tom_de_mark_sequential` | `buy` | MATCH | `0.000e+00` | 0 | pandas-ta columns reordered and capped at the DeMark setup count of nine |
 | pandas-ta-classic | `tom_de_mark_sequential` | `sell` | MATCH | `0.000e+00` | 0 | pandas-ta columns reordered and capped at the DeMark setup count of nine |
 | pandas-ta-classic | `variable_index_dynamic_average` | `vidya` | MATCH | `0.000e+00` | 0 |  |
+| pandas-ta-classic | `variable_index_dynamic_average` | `vidya[constant]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
 | pandas-ta-classic | `variable_index_dynamic_average` | `vidya[length=1]` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `variable_index_dynamic_average` | `vidya[length=2]` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `variable_index_dynamic_average` | `vidya[length=30]` | MATCH | `1.421e-14` | 0 |  |
+| pandas-ta-classic | `variable_index_dynamic_average` | `vidya[minimum]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| pandas-ta-classic | `variable_index_dynamic_average` | `vidya[monotonic]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| pandas-ta-classic | `variable_index_dynamic_average` | `vidya[repeated]` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
 | pandas-ta-classic | `volume_weighted_moving_average` | `vwma` | MATCH | `5.684e-14` | 0 |  |
 | pandas-ta-classic | `vortex` | `minus` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `vortex` | `plus` | MATCH | `0.000e+00` | 0 |  |

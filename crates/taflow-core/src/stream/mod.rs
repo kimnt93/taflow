@@ -329,7 +329,9 @@ mod tom_de_mark_sequential;
 mod trima;
 mod trix;
 mod ultosc;
-mod vidya;
+mod variable_index_dynamic_average;
+#[cfg(test)]
+mod variable_index_dynamic_average_test;
 mod window;
 #[allow(unused_imports)]
 pub(crate) use helpers::invalid_period;
@@ -546,7 +548,7 @@ pub use trix::TripleExponentialRateOfChange;
 #[allow(unused_imports)]
 pub(crate) use ultosc::ultimate_oscillator;
 pub use ultosc::UltimateOscillator;
-pub use vidya::VariableIndexDynamicAverage;
+pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
 pub use window::Window;
 #[allow(unused_imports)]
 pub(crate) use wma::weighted_moving_average;

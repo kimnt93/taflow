@@ -2,7 +2,7 @@
 
 One oracle is selected per indicator using: **TA-Lib > NumPy > Polars > pandas > pandas-ta-classic > pinned GitHub**. `VARIANT` is a documented semantic difference, not a failed comparison; `INVARIANT` rows have no external oracle.
 
-Matches: **331** | Documented variants: **39** | Self-invariant outputs: **0** | Failures: **0**
+Matches: **335** | Documented variants: **39** | Self-invariant outputs: **0** | Failures: **0**
 
 | TAFlow class ↔ oracle API | Output | Selected source | Version | Verdict | Max error | NaN | Note |
 |---|---|---|---|---:|---:|---:|---|
@@ -360,9 +360,13 @@ Matches: **331** | Documented variants: **39** | Self-invariant outputs: **0** |
 | `UltimateOscillator` ↔ `ULTOSC` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `1.421e-14` | 0 | external parity plus bitwise lifecycle invariance |
 | `ValueWhen` ↔ `pandas.value_when` | `all` | [pandas](https://pandas.pydata.org/docs/reference/window.html) | `3.0.5` | MATCH | `0.000e+00` | 0 | Series.where/ffill |
 | `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
+| `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya[constant]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
 | `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya[length=1]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
 | `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya[length=2]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 |  |
 | `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya[length=30]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `1.421e-14` | 0 |  |
+| `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya[minimum]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya[monotonic]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
+| `VariableIndexDynamicAverage` ↔ `pandas-ta-classic.vidya` | `vidya[repeated]` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `0.000e+00` | 0 | required source-shape matrix |
 | `VariablePeriodMovingAverage` ↔ `MAVP` | `all` | [TA-Lib](https://ta-lib.github.io/ta-lib-python/funcs.html) | `0.7.1` | MATCH | `0.000e+00` | 0 | external parity plus bitwise lifecycle invariance |
 | `VolumePriceTrend` ↔ `pandas-ta-classic.volume_price_trend` | `volume_price_trend` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | VARIANT | `6.091e+07` | 0 | independently compared; documented initialization/formula convention differs |
 | `VolumeWeightedMovingAverage` ↔ `pandas_ta_classic.vwma` | `vwma` | [pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/indicators.html) | `0.6.52` | MATCH | `5.684e-14` | 0 |  |
