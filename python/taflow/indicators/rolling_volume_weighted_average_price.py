@@ -4,8 +4,8 @@ from typing import Any
 
 import numpy as np
 
-from ._native import VwapOperator as _Native
-from ._series import as_float64_series
+from .._native import RollingVolumeWeightedAveragePriceOperator as _Native
+from .._series import as_float64_series
 
 
 class RollingVolumeWeightedAveragePrice:

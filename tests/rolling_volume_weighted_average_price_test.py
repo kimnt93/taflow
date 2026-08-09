@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
+from taflow import RollingVolumeWeightedAveragePrice
 
 
 def test_rolling_vwap_lifecycle_and_reset():
@@ -12,4 +12,3 @@ def test_rolling_vwap_lifecycle_and_reset():
     assert len(state) == 2
     state.reset()
     assert state.value is None
-

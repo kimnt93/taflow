@@ -212,9 +212,9 @@ from ..statistics import (
 from ..decay_linear import DecayLinear
 from ..signed_power import SignedPower
 from ..time_series_rank import TimeSeriesRank
-from ..rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
-from ..force_index import ForceIndex
-from ..ease_of_movement import EaseOfMovement
+from .rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
+from .force_index import ForceIndex
+from .ease_of_movement import EaseOfMovement
 from ..bar_helpers import HigherHigh, LowerLow, InsideBar, OutsideBar, GapUp, GapDown
 from ..state_helpers import (
     BarsSince,

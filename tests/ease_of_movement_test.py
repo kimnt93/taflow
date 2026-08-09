@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.ease_of_movement import EaseOfMovement
+from taflow import EaseOfMovement
 
 
 def test_ease_of_movement_lifecycle_and_alignment():

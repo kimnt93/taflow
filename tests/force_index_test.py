@@ -1,6 +1,6 @@
 import numpy as np
 
-from taflow.force_index import ForceIndex
+from taflow import ForceIndex
 
 
 def test_force_index_lifecycle_and_alignment():

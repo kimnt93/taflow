@@ -218,9 +218,9 @@ from .crossunder import Crossunder
 from .cross import Cross
 from .rising import Rising
 from .falling import Falling
-from .rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
-from .force_index import ForceIndex
-from .ease_of_movement import EaseOfMovement
+from .indicators.rolling_volume_weighted_average_price import RollingVolumeWeightedAveragePrice
+from .indicators.force_index import ForceIndex
+from .indicators.ease_of_movement import EaseOfMovement
 from .higher_high import HigherHigh
 from .lower_low import LowerLow
 from .inside_bar import InsideBar

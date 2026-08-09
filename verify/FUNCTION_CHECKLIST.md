@@ -765,6 +765,17 @@ suite, interface audit, formatter, and diff checks passed. Generated rows may
 still lag; source scans are authoritative. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The twenty-second structural batch split the grouped PyO3 `volume_operators.rs`
+into one-class files: `vwap.rs`, `force_index.rs`, and
+`ease_of_movement.rs`. The native VWAP binding was renamed to
+`RollingVolumeWeightedAveragePriceOperator` so the public adapter no longer
+depends on the abbreviated `VwapOperator` alias. The corresponding Python
+adapters now live under `python/taflow/indicators/`, and root tests use the
+canonical `taflow` surface. Release build, focused tests, full Python suite,
+interface audit, formatter, and diff checks passed. Generated rows may still
+lag; source scans are authoritative. Benchmark fields remain `TODO`; no
+benchmark command was run.
+
 The twenty-first structural batch migrated `IntradayMomentumIndex`,
 `JurikMovingAverage`, `KalmanHedgeRatio`, `KaufmanAdaptiveMovingAverage`,
 `KnowSureThing`, `LaguerreRelativeStrengthIndex`, `Liquidity`, `MassIndex`,
