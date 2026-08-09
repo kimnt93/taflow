@@ -127,6 +127,8 @@ mod double_exponential_moving_average;
 mod double_exponential_moving_average_test;
 mod dx;
 mod exponential_moving_average;
+#[cfg(test)]
+mod exponential_moving_average_test;
 mod hilbert_transform_trendline;
 #[cfg(test)]
 mod hilbert_transform_trendline_test;
@@ -283,6 +285,8 @@ mod rolling_mode;
 mod rolling_price;
 mod rolling_statistics;
 mod rolling_sum;
+#[cfg(test)]
+mod rolling_sum_test;
 mod session_flags;
 pub(crate) mod sorted_ring;
 mod statistic;
@@ -655,9 +659,15 @@ mod typical_price_test;
 mod weighted_close;
 pub use weighted_close::WeightedClose;
 mod rolling_average_deviation;
+#[cfg(test)]
+mod rolling_average_deviation_test;
 mod rolling_beta;
 mod rolling_standard_deviation;
+#[cfg(test)]
+mod rolling_standard_deviation_test;
 mod rolling_variance;
+#[cfg(test)]
+mod rolling_variance_test;
 #[cfg(test)]
 mod weighted_close_test;
 #[allow(unused_imports)]
@@ -1351,9 +1361,15 @@ mod bars_since;
 mod gap_down;
 mod gap_up;
 mod higher_high;
+#[cfg(test)]
+mod higher_high_test;
 mod highest_since;
 mod inside_bar;
+#[cfg(test)]
+mod inside_bar_test;
 mod lower_low;
+#[cfg(test)]
+mod lower_low_test;
 mod lowest_since;
 mod outside_bar;
 mod value_when;
@@ -1439,8 +1455,12 @@ pub use position_hold::PositionHold;
 mod entry_exit;
 pub use entry_exit::EntryExit;
 mod crossover;
+#[cfg(test)]
+mod crossover_test;
 pub use crossover::Crossover;
 mod crossunder;
+#[cfg(test)]
+mod crossunder_test;
 pub use crossunder::Crossunder;
 mod cross;
 pub use accumulation_distribution::AccumulationDistribution;

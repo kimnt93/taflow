@@ -1,7 +1,7 @@
 {
   "counts": {
     "benchmark": 191,
-    "complete": 88,
+    "complete": 93,
     "correctness": 270,
     "indicators": 299,
     "native_functions": 0,
@@ -10,7 +10,7 @@
     "python_exports": 301,
     "rust_exports": 613,
     "smc_functions": 8,
-    "structure": 97,
+    "structure": 107,
     "talib_functions": 161
   },
   "rows": [
