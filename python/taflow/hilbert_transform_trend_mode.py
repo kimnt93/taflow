@@ -28,8 +28,7 @@ class HilbertTransformTrendMode:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        if _input is not None:
-            self.extend(_input)
+        self.extend(_input)
 
     def append(self, value: float) -> "HilbertTransformTrendMode":
         """Append one observation or aligned bar to the native Rust state.
@@ -74,7 +73,7 @@ class HilbertTransformTrendMode:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> int | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
@@ -83,6 +82,10 @@ class HilbertTransformTrendMode:
             The updated adapter, native value, aligned output array, or execution node.
         """
         return self._state.value
+
+    def __len__(self) -> int:
+        """Return the number of processed input bars."""
+        return len(self._state.compute())
 
     def reset(self) -> "HilbertTransformTrendMode":
         """Execute the reset operation through the native Rust implementation.

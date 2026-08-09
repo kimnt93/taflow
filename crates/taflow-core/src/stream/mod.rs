@@ -149,14 +149,24 @@ mod dx;
 mod exponential_moving_average;
 #[cfg(test)]
 mod exponential_moving_average_test;
+mod hilbert_transform_dominant_cycle_period;
+#[cfg(test)]
+mod hilbert_transform_dominant_cycle_period_test;
+mod hilbert_transform_dominant_cycle_phase;
+#[cfg(test)]
+mod hilbert_transform_dominant_cycle_phase_test;
+mod hilbert_transform_phasor;
+#[cfg(test)]
+mod hilbert_transform_phasor_test;
+mod hilbert_transform_sine_wave;
+#[cfg(test)]
+mod hilbert_transform_sine_wave_test;
+mod hilbert_transform_trend_mode;
+#[cfg(test)]
+mod hilbert_transform_trend_mode_test;
 mod hilbert_transform_trendline;
 #[cfg(test)]
 mod hilbert_transform_trendline_test;
-mod ht_dcperiod;
-mod ht_dcphase;
-mod ht_phasor;
-mod ht_sine;
-mod ht_trendmode;
 mod imi;
 #[cfg(test)]
 mod imi_test;
@@ -429,7 +439,9 @@ mod triple_exponential_average_test;
 mod triple_exponential_moving_average;
 #[cfg(test)]
 mod triple_exponential_moving_average_test;
-mod trix;
+mod triple_exponential_rate_of_change;
+#[cfg(test)]
+mod triple_exponential_rate_of_change_test;
 mod ultimate_oscillator;
 #[cfg(test)]
 mod ultimate_oscillator_test;
@@ -530,12 +542,12 @@ pub use even_better_sinewave::EvenBetterSinewave;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};
 pub use heikin_ashi::{HeikinAshi, HeikinAshiValue};
+pub use hilbert_transform_dominant_cycle_period::HilbertTransformDominantCyclePeriod;
+pub use hilbert_transform_dominant_cycle_phase::HilbertTransformDominantCyclePhase;
+pub use hilbert_transform_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
+pub use hilbert_transform_sine_wave::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
+pub use hilbert_transform_trend_mode::HilbertTransformTrendMode;
 pub use hilbert_transform_trendline::HilbertTransformTrendline;
-pub use ht_dcperiod::HilbertTransformDominantCyclePeriod;
-pub use ht_dcphase::HilbertTransformDominantCyclePhase;
-pub use ht_phasor::{HilbertTransformPhasor, HilbertTransformPhasorValue};
-pub use ht_sine::{HilbertTransformSineWave, HilbertTransformSineWaveValue};
-pub use ht_trendmode::HilbertTransformTrendMode;
 #[allow(unused_imports)]
 pub use imi::IntradayMomentumIndex;
 pub use indicator::StreamingIndicator;
@@ -612,9 +624,7 @@ pub use triangular_moving_average::TriangularMovingAverage;
 pub use triple_exponential_average::TripleExponentialAverage;
 #[allow(unused_imports)]
 pub use triple_exponential_moving_average::TripleExponentialMovingAverage;
-#[allow(unused_imports)]
-pub(crate) use trix::triple_exponential_rate_of_change;
-pub use trix::TripleExponentialRateOfChange;
+pub use triple_exponential_rate_of_change::TripleExponentialRateOfChange;
 #[allow(unused_imports)]
 pub use ultimate_oscillator::UltimateOscillator;
 pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
@@ -710,21 +720,6 @@ pub(crate) use rolling_linreg_angle::rolling_linreg_angle;
 mod rolling_tsf;
 #[allow(unused_imports)]
 pub(crate) use rolling_tsf::rolling_tsf;
-mod hilbert_transform_dominant_cycle_period;
-#[allow(unused_imports)]
-pub(crate) use hilbert_transform_dominant_cycle_period::hilbert_transform_dominant_cycle_period;
-mod hilbert_transform_phasor;
-#[allow(unused_imports)]
-pub(crate) use hilbert_transform_phasor::hilbert_transform_phasor;
-mod hilbert_transform_dominant_cycle_phase;
-#[allow(unused_imports)]
-pub(crate) use hilbert_transform_dominant_cycle_phase::hilbert_transform_dominant_cycle_phase;
-mod hilbert_transform_sine_wave;
-#[allow(unused_imports)]
-pub(crate) use hilbert_transform_sine_wave::hilbert_transform_sine_wave;
-mod hilbert_transform_trend_mode;
-#[allow(unused_imports)]
-pub(crate) use hilbert_transform_trend_mode::hilbert_transform_trend_mode;
 #[cfg(test)]
 mod bars_since_test;
 #[cfg(test)]
