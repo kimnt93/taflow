@@ -16,7 +16,7 @@ NATIVE_FLAGS  := -C target-cpu=native
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build build-native wheel check test test-rust \
-        test-python verify bench docs fmt lint clean
+        test-python verify verify-external bench docs fmt lint clean
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -46,8 +46,10 @@ wheel: ## Produce a distributable wheel in dist/
 # ------------------------------------------------------------ correctness ----
 
 check: ## Verify the Python implementation: unit tests (incl. doc examples) + oracle parity
-	$(PYTHON) -m pytest -q
-	cd verify && uv sync && uv run python verify.py $(ARGS)
+	uv run pytest -q
+	cd verify && uv sync --extra extra-oracles && uv run python verify.py $(ARGS)
+	cd verify && uv run python external_oracles.py
+	cd verify && uv run python source_comparison.py
 
 test: test-rust test-python ## Run the Rust and Python unit test suites
 
@@ -55,10 +57,14 @@ test-rust: ## Rust unit and integration tests
 	cargo test --workspace
 
 test-python: ## Python unit tests (pipelines, adapters, API surface)
-	$(PYTHON) -m pytest -q
+	uv run pytest -q
 
 verify: ## Oracle parity only (TA-Lib / pandas); narrow with ARGS="EMA ATR"
 	cd verify && uv sync && uv run python verify.py $(ARGS)
+
+verify-external: ## pandas-ta-classic, Polars, and SmartMoneyConcepts parity
+	cd verify && uv sync --extra extra-oracles && uv run python external_oracles.py $(ARGS)
+	cd verify && uv run python source_comparison.py
 
 # ------------------------------------------------------------- benchmarks ----
 

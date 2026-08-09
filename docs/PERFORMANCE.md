@@ -186,10 +186,30 @@ Kernel throughput vs TA-Lib at 10,000 bars, before and after:
 | BollingerBands (BBANDS) | 0.46× | **1.19×** |
 
 153 of the 161 TA-Lib-mapped functions now meet or beat the C implementation
-at 10k bars (median **1.61×**, mean **2.01×**), and **every** extended operator
-clears 20M bars/s. Per-function
+at 10k bars (median **1.61×**, mean **2.01×**). Per-function
 numbers across 1k/10k/100k/1M bars, plus append latency and thread scaling, are
 in [the benchmark reports](../verify/benchmark_reports/BENCHMARK.md).
+
+The independently corrected extension paths retain high throughput through the
+canonical Python interface at 10,000 bars:
+
+| Function | Python batch throughput |
+|---|---:|
+| ZeroLagExponentialMovingAverage | **208.2M bars/s** |
+| TomDeMarkSequential | **169.4M bars/s** |
+| KlingerVolumeOscillator | **91.5M bars/s** |
+| FairValueGap | **88.9M bars/s** |
+| VariableIndexDynamicAverage | **88.1M bars/s** |
+| EvenBetterSinewave | **52.3M bars/s** |
+| FisherTransform | **27.5M bars/s** |
+| JurikMovingAverage | **11.7M bars/s** |
+
+VIDYA keeps rolling positive/negative momentum sums in O(1), increasing the
+corrected path from about 15.3M to 88.1M bars/s. JMA keeps its 66-sample
+volatility average in O(1), increasing the exact adaptive recurrence from about
+7.6M to 11.7M bars/s. The JMA recurrence remains more expensive than the
+previous simplified formula, but direct local measurement still places the
+Rust-backed Python call over 200× ahead of pandas-ta-classic for 10,000 bars.
 
 Reproduce on your own machine:
 

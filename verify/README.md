@@ -61,8 +61,21 @@ Benchmark output is written under `verify/benchmark_reports/`, including the
 aggregate `BENCHMARK.md`. The historical `python benches/bench.py ...` command
 is retained as a launcher for this same runner.
 
-Optional extra oracles (pandas-ta-classic, smartmoneyconcepts):
+Independent extension oracles (pandas-ta-classic, Polars, and
+smartmoneyconcepts):
 
 ```bash
 uv sync --extra extra-oracles
+uv run python external_oracles.py
+uv run python external_oracles.py --oracle polars --bars 10000
 ```
+
+Output: `EXTERNAL_ORACLES.md` and `EXTERNAL_ORACLES.json`. The runner records
+each output separately and exits non-zero for unexplained mismatches or oracle
+errors. Intentional contract differences are reported as `VARIANT` rather than
+being silently counted as matches (for example, taflow's causal SMC swing
+events versus the package's retroactive lookahead markers).
+
+`source_comparison.py` merges the primary and external JSON artifacts into
+`SOURCE_COMPARISON.md`. Its `INVARIANT` verdict means only that native batch,
+append, and chunked execution agree; it is never presented as external parity.

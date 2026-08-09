@@ -14,6 +14,11 @@ build-native:
 verify *ARGS:
     cd verify && uv run python verify.py {{ARGS}}
 
+# Extension correctness against pandas-ta-classic, Polars, and SMC.
+verify-external *ARGS:
+    cd verify && uv sync --extra extra-oracles && uv run python external_oracles.py {{ARGS}}
+    cd verify && uv run python source_comparison.py
+
 # Benchmarks (writes verify/benchmark_reports/).
 bench *ARGS:
     cd verify && uv run python benchmark.py {{ARGS}}

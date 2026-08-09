@@ -906,6 +906,18 @@ impl FairValueGap {
         low: f64,
         close: f64,
     ) -> Option<FairValueGapValue> {
+        // smartmoneyconcepts starts looking for mitigation one bar after the
+        // causal detection bar.  Scan existing zones before adding a newly
+        // detected one so a gap cannot mitigate itself on its birth bar.
+        let mut mitigated = f64::NAN;
+        self.zones.retain(|zone| {
+            let filled = (zone.direction > 0.0 && low <= zone.top)
+                || (zone.direction < 0.0 && high >= zone.bottom);
+            if filled {
+                mitigated = zone.direction;
+            }
+            !filled
+        });
         let previous = self.bars.back().copied();
         let two_back = self.bars.front().copied();
         let mut signal = f64::NAN;
@@ -933,18 +945,6 @@ impl FairValueGap {
                     bottom,
                 });
             }
-        }
-        let mut mitigated = f64::NAN;
-        self.zones.retain(|zone| {
-            let filled = (zone.direction > 0.0 && low <= zone.bottom)
-                || (zone.direction < 0.0 && high >= zone.top);
-            if filled {
-                mitigated = zone.direction;
-            }
-            !filled
-        });
-        if signal.is_nan() && !mitigated.is_nan() {
-            signal = f64::NAN;
         }
         if self.bars.len() == 2 {
             self.bars.pop_front();
@@ -6225,6 +6225,8 @@ pub struct ZeroLagExponentialMovingAverage {
     period: usize,
     lag: usize,
     alpha: f64,
+    adjusted_count: usize,
+    adjusted_sum: f64,
     ema: Option<f64>,
     value: Option<f64>,
 }
@@ -6234,10 +6236,12 @@ impl ZeroLagExponentialMovingAverage {
     pub fn new(period: usize) -> TaResult<Self> {
         validate_period(period)?;
         Ok(Self {
-            values: VecDeque::with_capacity((period / 2).max(1)),
+            values: VecDeque::with_capacity((period / 2).max(1) + 1),
             period,
             lag: (period - 1) / 2,
             alpha: 2.0 / (period as f64 + 1.0),
+            adjusted_count: 0,
+            adjusted_sum: 0.0,
             ema: None,
             value: None,
         })
@@ -6245,19 +6249,26 @@ impl ZeroLagExponentialMovingAverage {
     /// Append one causal observation and return the latest result.
     ///
     pub fn append(&mut self, input: f64) -> Option<f64> {
-        if self.values.len() == self.lag.max(1) {
+        self.values.push_back(input);
+        if self.values.len() > self.lag + 1 {
             self.values.pop_front();
         }
-        self.values.push_back(input);
         if self.values.len() <= self.lag {
             self.value = None
         } else {
             let lagged = self.values.front().copied().unwrap_or(input);
             let adjusted = 2.0 * input - lagged;
-            self.ema = Some(match self.ema {
-                Some(previous) => previous + self.alpha * (adjusted - previous),
-                None => adjusted,
-            });
+            self.adjusted_count += 1;
+            self.ema = if self.adjusted_count < self.period {
+                self.adjusted_sum += adjusted;
+                None
+            } else if self.adjusted_count == self.period {
+                self.adjusted_sum += adjusted;
+                Some(self.adjusted_sum / self.period as f64)
+            } else {
+                self.ema
+                    .map(|previous| previous + self.alpha * (adjusted - previous))
+            };
             self.value = self.ema;
         }
         self.value
@@ -6271,6 +6282,8 @@ impl ZeroLagExponentialMovingAverage {
     ///
     pub fn reset(&mut self) {
         self.values.clear();
+        self.adjusted_count = 0;
+        self.adjusted_sum = 0.0;
         self.ema = None;
         self.value = None;
     }
@@ -6484,7 +6497,9 @@ impl AwesomeOscillator {
 pub struct FisherTransform {
     highs: MonotonicMax,
     lows: MonotonicMin,
-    previous: f64,
+    previous_position: f64,
+    previous_fisher: f64,
+    seeded: bool,
     value: Option<f64>,
 }
 impl FisherTransform {
@@ -6495,7 +6510,9 @@ impl FisherTransform {
         Ok(Self {
             highs: MonotonicMax::new(period)?,
             lows: MonotonicMin::new(period)?,
-            previous: 0.0,
+            previous_position: 0.0,
+            previous_fisher: 0.0,
+            seeded: false,
             value: None,
         })
     }
@@ -6510,14 +6527,31 @@ impl FisherTransform {
         let maximum = self.highs.append(midpoint);
         let minimum = self.lows.append(midpoint);
         self.value = maximum.zip(minimum).map(|(high, low)| {
-            let normalized = if high != low {
-                2.0 * ((midpoint - low) / (high - low) - 0.5)
+            // pandas-ta-classic seeds the first complete window with zero;
+            // its recurrence begins on the following bar.
+            if !self.seeded {
+                self.seeded = true;
+                self.previous_position = 0.0;
+                self.previous_fisher = 0.0;
+                return 0.0;
+            }
+            let position = if high != low {
+                (midpoint - low) / (high - low) - 0.5
             } else {
                 0.0
             };
-            let x = (0.66 * normalized + 0.67 * self.previous).clamp(-0.999, 0.999);
-            self.previous = x;
-            0.5 * ((1.0 + x) / (1.0 - x)).ln()
+            let raw = 0.66 * position + 0.67 * self.previous_position;
+            let bounded = if raw < -0.99 {
+                -0.999
+            } else if raw > 0.99 {
+                0.999
+            } else {
+                raw
+            };
+            let fisher = 0.5 * (((1.0 + bounded) / (1.0 - bounded)).ln() + self.previous_fisher);
+            self.previous_position = bounded;
+            self.previous_fisher = fisher;
+            fisher
         });
         self.value
     }
@@ -6531,7 +6565,9 @@ impl FisherTransform {
     pub fn reset(&mut self) {
         self.highs.reset();
         self.lows.reset();
-        self.previous = 0.0;
+        self.previous_position = 0.0;
+        self.previous_fisher = 0.0;
+        self.seeded = false;
         self.value = None;
     }
 }

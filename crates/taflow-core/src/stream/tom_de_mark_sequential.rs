@@ -29,6 +29,9 @@ impl TomDeMarkSequential {
     /// Appends one close and returns buy and sell setup counts.
     pub fn append(&mut self, close: f64) -> (i32, i32) {
         self.closes.push_back(close);
+        if self.closes.len() > 5 {
+            self.closes.pop_front();
+        }
         let result = if self.closes.len() <= 4 {
             (0, 0)
         } else {
@@ -45,9 +48,6 @@ impl TomDeMarkSequential {
             }
             (self.buy, self.sell)
         };
-        if self.closes.len() > 5 {
-            self.closes.pop_front();
-        }
         self.value = Some(result);
         result
     }

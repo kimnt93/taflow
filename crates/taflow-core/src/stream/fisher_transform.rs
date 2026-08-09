@@ -37,11 +37,13 @@ mod tests {
     use super::*;
     use std::collections::VecDeque;
 
-    /// Pre-optimization `FisherTransform::append` oracle (deque rescans).
+    /// pandas-ta-classic recurrence with deque extrema scans.
     struct Reference {
         period: usize,
         values: VecDeque<f64>,
-        previous: f64,
+        previous_position: f64,
+        previous_fisher: f64,
+        seeded: bool,
     }
 
     impl Reference {
@@ -49,7 +51,9 @@ mod tests {
             Self {
                 period,
                 values: VecDeque::with_capacity(period),
-                previous: 0.0,
+                previous_position: 0.0,
+                previous_fisher: 0.0,
+                seeded: false,
             }
         }
 
@@ -61,20 +65,33 @@ mod tests {
             if self.values.len() != self.period {
                 return None;
             }
+            if !self.seeded {
+                self.seeded = true;
+                return Some(0.0);
+            }
             let maximum = self
                 .values
                 .iter()
                 .copied()
                 .fold(f64::NEG_INFINITY, f64::max);
             let minimum = self.values.iter().copied().fold(f64::INFINITY, f64::min);
-            let normalized = if maximum != minimum {
-                2.0 * ((self.values.back().copied().unwrap() - minimum) / (maximum - minimum) - 0.5)
+            let position = if maximum != minimum {
+                (self.values.back().copied().unwrap() - minimum) / (maximum - minimum) - 0.5
             } else {
                 0.0
             };
-            let x = (0.66 * normalized + 0.67 * self.previous).clamp(-0.999, 0.999);
-            self.previous = x;
-            Some(0.5 * ((1.0 + x) / (1.0 - x)).ln())
+            let raw = 0.66 * position + 0.67 * self.previous_position;
+            let bounded = if raw < -0.99 {
+                -0.999
+            } else if raw > 0.99 {
+                0.999
+            } else {
+                raw
+            };
+            let fisher = 0.5 * (((1.0 + bounded) / (1.0 - bounded)).ln() + self.previous_fisher);
+            self.previous_position = bounded;
+            self.previous_fisher = fisher;
+            Some(fisher)
         }
     }
 
