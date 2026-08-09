@@ -42,12 +42,14 @@ mod absolute_price_oscillator;
 #[cfg(test)]
 mod absolute_price_oscillator_test;
 mod accbands;
-mod adxr;
 mod aroon;
 mod aroon_rescan;
 #[cfg(test)]
 mod aroon_test;
 mod average_directional_index;
+mod average_directional_index_rating;
+#[cfg(test)]
+mod average_directional_index_rating_test;
 #[cfg(test)]
 mod average_directional_index_test;
 mod bollinger_bands;
@@ -142,10 +144,12 @@ mod commodity_channel_index;
 mod commodity_channel_index_test;
 mod cycle;
 mod directional;
+mod directional_movement_index;
+#[cfg(test)]
+mod directional_movement_index_test;
 mod double_exponential_moving_average;
 #[cfg(test)]
 mod double_exponential_moving_average_test;
-mod dx;
 mod exponential_moving_average;
 #[cfg(test)]
 mod exponential_moving_average_test;
@@ -460,14 +464,13 @@ pub use absolute_price_oscillator::AbsolutePriceOscillator;
 #[allow(unused_imports)]
 pub(crate) use accbands::acceleration_bands;
 pub use accbands::{AccelerationBands, AccelerationBandsValue};
-#[allow(unused_imports)]
-pub(crate) use adxr::average_directional_index_rating;
-pub use adxr::AverageDirectionalIndexRating;
 pub use anchored_volume_weighted_average_price::{
     AnchoredVolumeWeightedAveragePrice, AnchoredVolumeWeightedAveragePriceValue,
 };
 #[allow(unused_imports)]
 pub use average_directional_index::AverageDirectionalIndex;
+#[allow(unused_imports)]
+pub use average_directional_index_rating::AverageDirectionalIndexRating;
 
 #[allow(unused_imports)]
 pub use bollinger_bands::{BollingerBands, BollingerBandsValue};
@@ -534,10 +537,8 @@ pub use candle_upsidegap2crows::CandleUpsideGapTwoCrows;
 pub use candle_xsidegap3methods::CandleUpDownSideGapThreeMethods;
 pub use chande_momentum_oscillator::ChandeMomentumOscillator;
 pub use commodity_channel_index::CommodityChannelIndex;
+pub use directional_movement_index::DirectionalMovementIndex;
 pub use double_exponential_moving_average::DoubleExponentialMovingAverage;
-#[allow(unused_imports)]
-pub(crate) use dx::directional_movement_index;
-pub use dx::DirectionalMovementIndex;
 pub use even_better_sinewave::EvenBetterSinewave;
 pub use exponential_moving_average::ExponentialMovingAverage;
 pub use fibonacci_retracement::{FibonacciRetracement, FibonacciRetracementValue};

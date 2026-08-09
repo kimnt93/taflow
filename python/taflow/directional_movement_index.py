@@ -5,6 +5,8 @@ from typing import Any
 
 import numpy as np
 
+from ._series import as_float64_series
+
 
 class DirectionalMovementIndex:
     """Incrementally compute Wilder's Directional Movement Index
@@ -28,8 +30,7 @@ class DirectionalMovementIndex:
     ) -> None:
         """Create DX with an optional aligned high/low/close history."""
         self._state = StatefulDx(period)
-        if any(value is not None for value in (high, low, close)):
-            self.extend(high, low, close)
+        self.extend(high, low, close)
 
     def append(self, high: object, low: object, close: object) -> "DirectionalMovementIndex":
         """Append one observation or aligned bar to the native Rust state.
@@ -48,7 +49,7 @@ class DirectionalMovementIndex:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.append(high, low, close)
+        self._state.append(float(high), float(low), float(close))
         return self
 
     def extend(self, high: object, low: object, close: object) -> "DirectionalMovementIndex":
@@ -68,7 +69,10 @@ class DirectionalMovementIndex:
         Self
             The updated adapter, native value, aligned output array, or execution node.
         """
-        self._state.extend(high, low, close)
+        arrays = tuple(as_float64_series(series) for series in (high, low, close))
+        if any(array.shape != arrays[0].shape for array in arrays[1:]):
+            raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(*arrays)
         return self
 
     def compute(self) -> np.ndarray:
@@ -81,7 +85,7 @@ class DirectionalMovementIndex:
         return self._state.compute()
 
     @property
-    def value(self) -> object:
+    def value(self) -> float | None:
         """Return the latest computed value, or None during warm-up.
 
         Returns
