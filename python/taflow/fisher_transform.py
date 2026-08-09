@@ -52,7 +52,8 @@ class FisherTransform:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(high, low) if high is not None or low is not None else None
+        self._length = 0
+        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "FisherTransform":
         """Append one high/low bar to the persistent Rust state.
@@ -67,7 +68,8 @@ class FisherTransform:
         FisherTransform
             This indicator, for fluent chaining. Read ``value`` for the result.
         """
-        self._state.append(high, low)
+        self._state.append(float(high), float(low))
+        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any) -> "FisherTransform":
@@ -88,7 +90,12 @@ class FisherTransform:
         ValueError
             If the input lengths differ.
         """
-        self._state.extend(as_float64_series(high), as_float64_series(low))
+        high_values = as_float64_series(high)
+        low_values = as_float64_series(low)
+        if len(high_values) != len(low_values):
+            raise ValueError("high and low input series must have equal length")
+        self._state.extend(high_values, low_values)
+        self._length += len(high_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -100,6 +107,10 @@ class FisherTransform:
             One value per processed bar, with ``NaN`` during warm-up.
         """
         return self._state.compute()
+
+    def __len__(self) -> int:
+        """Return the number of paired observations consumed by this state."""
+        return self._length
 
     @property
     def value(self) -> float | None:
@@ -121,6 +132,7 @@ class FisherTransform:
             This indicator, for fluent chaining.
         """
         self._state.reset()
+        self._length = 0
         return self
 
     def __len__(self) -> int:

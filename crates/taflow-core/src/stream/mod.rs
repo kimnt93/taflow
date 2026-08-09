@@ -1192,6 +1192,8 @@ mod awesome_oscillator;
 #[cfg(test)]
 mod awesome_oscillator_test;
 mod fisher_transform;
+#[cfg(test)]
+mod fisher_transform_test;
 mod hull_moving_average;
 #[cfg(test)]
 mod hull_moving_average_test;
