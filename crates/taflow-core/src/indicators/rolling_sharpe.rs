@@ -1,6 +1,7 @@
 //! Persistent rolling Sharpe ratio state.
 
 use crate::error::TaResult;
+use crate::stream::operator_states::validate_period;
 use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]
@@ -12,7 +13,7 @@ pub struct RollingSharpe {
 
 impl RollingSharpe {
     pub fn new(timeperiod: usize) -> TaResult<Self> {
-        super::operator_states::validate_period(timeperiod)?;
+        validate_period(timeperiod)?;
         Ok(Self {
             values: VecDeque::with_capacity(timeperiod),
             timeperiod,

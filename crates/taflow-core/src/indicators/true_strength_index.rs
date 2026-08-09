@@ -1,7 +1,7 @@
 //! Persistent true strength index state.
 
-use super::operator_states::validate_period;
 use crate::error::TaResult;
+use crate::stream::operator_states::validate_period;
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `TrueStrengthIndex`.

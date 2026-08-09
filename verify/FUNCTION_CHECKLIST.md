@@ -28,6 +28,17 @@ dependency. Focused Rust/Python lifecycle tests passed, and the
 pandas-ta-classic external-oracle run reported 82 matches, 14 documented
 variants, and 0 failures. Benchmark fields remain `TODO`.
 
+The third structural batch migrated `RollingSharpe`, `RollingSortino`,
+`RollingCalmar`, `HullMovingAverage`, `VolumeWeightedMovingAverage`,
+`ZeroLagExponentialMovingAverage`, `ArnaudLegouxMovingAverage`,
+`TrueStrengthIndex`, `AwesomeOscillator`, and `FisherTransform`. Each now has
+one canonical Rust implementation/test pair, one canonical Python adapter,
+and one canonical PyO3 binding file. Focused Rust compilation, PyO3 release
+build, 592 Python tests, 304/304 interface checks, and ten external-oracle
+MATCH results passed. Generated inventory/export rows below may retain stale
+historical binding names; the source scan is authoritative. Benchmark fields
+remain `TODO` intentionally; no benchmark command was run.
+
 - Python exports: **300**
 - Indicator classes: **298**
 - Fully complete indicators: **190**
@@ -563,16 +574,16 @@ separate same-named Rust and Python tests exist, an independent source reports
 | implemented | `CumulativeMaximum` | class | `cumulative_maximum` | `CumulativeMaximum`, `_NativeCumulativeMaximum` | yes | `` | — | — |
 | implemented | `CumulativeMinimum` | class | `cumulative_minimum` | `CumulativeMinimum`, `_NativeCumulativeMinimum` | yes | `` | — | — |
 | implemented | `Drawdown` | class | `drawdown` | `DrawdownOperator`, `_Native` | yes | `` | yes | — |
-| implemented | `RollingSharpe` | class | `rolling_sharpe` | `RollingSharpeOperator`, `_Native` | yes | `` | — | — |
-| implemented | `RollingSortino` | class | `rolling_sortino` | `RollingSortinoOperator`, `_Native` | yes | `` | — | — |
-| implemented | `RollingCalmar` | class | `rolling_calmar` | `RollingCalmarOperator`, `_Native` | yes | `` | — | — |
-| implemented | `HullMovingAverage` | class | `hull_moving_average` | `HmaOperator`, `_Native` | yes | `` | — | — |
-| implemented | `VolumeWeightedMovingAverage` | class | `volume_weighted_moving_average` | `VwmaOperator`, `_Native` | yes | `` | — | — |
-| implemented | `ZeroLagExponentialMovingAverage` | class | `zero_lag_exponential_moving_average` | `ZlemaOperator`, `_Native` | yes | `` | — | — |
-| implemented | `ArnaudLegouxMovingAverage` | class | `arnaud_legoux_moving_average` | `AlmaOperator`, `_Native` | yes | `` | — | — |
-| implemented | `TrueStrengthIndex` | class | `true_strength_index` | `TrueStrengthIndexOperator`, `_Native` | yes | `` | — | — |
-| implemented | `AwesomeOscillator` | class | `awesome_oscillator` | `AwesomeOscillatorOperator`, `_Native` | yes | `` | — | — |
-| implemented | `FisherTransform` | class | `fisher_transform` | `FisherTransformOperator`, `_Native` | yes | `` | — | — |
+| implemented | `RollingSharpe` | class | `rolling_sharpe` | `RollingSharpe`, `_Native` | yes | `` | — | — |
+| implemented | `RollingSortino` | class | `rolling_sortino` | `RollingSortino`, `_Native` | yes | `` | — | — |
+| implemented | `RollingCalmar` | class | `rolling_calmar` | `RollingCalmar`, `_Native` | yes | `` | — | — |
+| implemented | `HullMovingAverage` | class | `hull_moving_average` | `HullMovingAverage`, `_Native` | yes | `` | — | — |
+| implemented | `VolumeWeightedMovingAverage` | class | `volume_weighted_moving_average` | `VolumeWeightedMovingAverage`, `_Native` | yes | `` | — | — |
+| implemented | `ZeroLagExponentialMovingAverage` | class | `zero_lag_exponential_moving_average` | `ZeroLagExponentialMovingAverage`, `_Native` | yes | `` | — | — |
+| implemented | `ArnaudLegouxMovingAverage` | class | `arnaud_legoux_moving_average` | `ArnaudLegouxMovingAverage`, `_Native` | yes | `` | — | — |
+| implemented | `TrueStrengthIndex` | class | `true_strength_index` | `TrueStrengthIndex`, `_Native` | yes | `` | — | — |
+| implemented | `AwesomeOscillator` | class | `awesome_oscillator` | `AwesomeOscillator`, `_Native` | yes | `` | — | — |
+| implemented | `FisherTransform` | class | `fisher_transform` | `FisherTransform`, `_Native` | yes | `` | — | — |
 | implemented | `Donchian` | class | `donchian` | `DonchianOperator`, `_Native` | yes | `` | yes | — |
 | implemented | `UlcerIndex` | class | `ulcer_index` | `UlcerIndexOperator`, `_Native` | yes | `` | — | — |
 | implemented | `KeltnerChannels` | class | `keltner_channels` | `KeltnerChannelsOperator`, `_Native` | yes | `` | — | — |

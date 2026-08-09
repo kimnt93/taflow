@@ -1,7 +1,7 @@
 //! Persistent Awesome Oscillator state.
 
-use super::operator_states::{validate_period, ContiguousWindow};
 use crate::error::{TaError, TaResult};
+use crate::stream::operator_states::{validate_period, ContiguousWindow};
 
 #[derive(Debug, Clone)]
 pub struct AwesomeOscillator {

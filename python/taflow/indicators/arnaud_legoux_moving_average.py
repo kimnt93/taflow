@@ -4,9 +4,9 @@ from typing import Any
 
 import numpy as np
 
-from ._native import AlmaOperator as _Native
-from ._adapter_protocol import adapter_length
-from ._series import as_float64_series
+from .._native import ArnaudLegouxMovingAverage as _Native
+from .._adapter_protocol import adapter_length
+from .._series import as_float64_series
 
 
 class ArnaudLegouxMovingAverage:

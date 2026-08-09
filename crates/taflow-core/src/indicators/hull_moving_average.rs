@@ -1,7 +1,7 @@
 //! Persistent Hull moving average state.
 
-use super::operator_states::{validate_period, weighted_mean_slice, ContiguousWindow};
 use crate::error::TaResult;
+use crate::stream::operator_states::{validate_period, weighted_mean_slice, ContiguousWindow};
 
 #[derive(Debug, Clone)]
 pub struct HullMovingAverage {

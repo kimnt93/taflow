@@ -1,19 +1,18 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingSharpe;
+use taflow::indicators::RollingSharpe as State;
 #[pyclass]
-pub struct RollingSharpeOperator {
-    inner: RollingSharpe,
+pub struct RollingSharpe {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingSharpeOperator {
+impl RollingSharpe {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingSharpe::new(timeperiod)
-                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

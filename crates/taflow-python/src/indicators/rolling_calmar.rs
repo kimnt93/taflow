@@ -1,19 +1,18 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::RollingCalmar;
+use taflow::indicators::RollingCalmar as State;
 #[pyclass]
-pub struct RollingCalmarOperator {
-    inner: RollingCalmar,
+pub struct RollingCalmar {
+    inner: State,
     outputs: Vec<f64>,
 }
 #[pymethods]
-impl RollingCalmarOperator {
+impl RollingCalmar {
     #[new]
     fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: RollingCalmar::new(timeperiod)
-                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             outputs: Vec::new(),
         })
     }

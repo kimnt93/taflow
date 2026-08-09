@@ -477,7 +477,7 @@ mod log_return_test;
 mod momentum;
 #[cfg(test)]
 mod momentum_test;
-mod operator_states;
+pub(crate) mod operator_states;
 pub use active_zone_list::ActiveZoneList;
 mod fast_stochastic_oscillator;
 #[cfg(test)]
@@ -534,6 +534,7 @@ mod window;
 #[allow(unused_imports)]
 pub(crate) use helpers::invalid_period;
 pub(crate) use operator_states::{ewm_alpha, validate_period, validate_quantile};
+pub(crate) use operator_states::{weighted_mean_slice, ContiguousWindow};
 mod weighted_moving_average;
 #[cfg(test)]
 mod weighted_moving_average_test;
@@ -787,8 +788,6 @@ mod rolling_average_deviation_test;
 mod rolling_beta;
 #[cfg(test)]
 mod rolling_beta_test;
-#[cfg(test)]
-mod rolling_calmar_test;
 #[allow(unused_imports)]
 mod rolling_correlation;
 #[cfg(test)]
@@ -811,10 +810,6 @@ mod rolling_midpoint_test;
 mod rolling_midprice;
 #[cfg(test)]
 mod rolling_midprice_test;
-#[cfg(test)]
-mod rolling_sharpe_test;
-#[cfg(test)]
-mod rolling_sortino_test;
 mod rolling_standard_deviation;
 #[cfg(test)]
 mod rolling_standard_deviation_test;
@@ -1132,36 +1127,6 @@ mod accumulation_distribution_test;
 mod balance_of_power;
 #[cfg(test)]
 mod balance_of_power_test;
-mod rolling_sharpe;
-mod williams_percent_r;
-#[cfg(test)]
-mod williams_percent_r_test;
-pub use rolling_sharpe::RollingSharpe;
-mod rolling_sortino;
-pub use rolling_sortino::RollingSortino;
-mod arnaud_legoux_moving_average;
-#[cfg(test)]
-mod arnaud_legoux_moving_average_test;
-mod awesome_oscillator;
-#[cfg(test)]
-mod awesome_oscillator_test;
-mod fisher_transform;
-#[cfg(test)]
-mod fisher_transform_test;
-mod hull_moving_average;
-#[cfg(test)]
-mod hull_moving_average_test;
-mod rolling_calmar;
-mod true_strength_index;
-#[cfg(test)]
-mod true_strength_index_test;
-mod volume_weighted_moving_average;
-#[cfg(test)]
-mod volume_weighted_moving_average_test;
-mod zero_lag_exponential_moving_average;
-#[cfg(test)]
-mod zero_lag_exponential_moving_average_test;
-pub use fisher_transform::FisherTransform;
 mod break_of_structure_change_of_character;
 #[cfg(test)]
 mod break_of_structure_change_of_character_test;
@@ -1252,6 +1217,9 @@ mod time_series_rank_test;
 mod ulcer_index;
 #[cfg(test)]
 mod ulcer_index_test;
+mod williams_percent_r;
+#[cfg(test)]
+mod williams_percent_r_test;
 mod yang_zhang;
 #[cfg(test)]
 mod yang_zhang_test;
@@ -1385,9 +1353,7 @@ mod lowest_since;
 mod outside_bar;
 mod value_when;
 pub use amihud::Amihud;
-pub use arnaud_legoux_moving_average::ArnaudLegouxMovingAverage;
 pub use average_daily_dollar_value::AverageDailyDollarValue;
-pub use awesome_oscillator::AwesomeOscillator;
 pub use bars_since::BarsSince;
 pub use break_of_structure_change_of_character::{
     BreakOfStructureChangeOfCharacter, BreakOfStructureChangeOfCharacterValue,
@@ -1408,7 +1374,6 @@ pub use garman_klass_yang_zhang::GarmanKlassYangZhang;
 pub use hedge_ratio::HedgeRatio;
 pub use higher_high::HigherHigh;
 pub use highest_since::HighestSince;
-pub use hull_moving_average::HullMovingAverage;
 pub use hurst::Hurst;
 pub use ichimoku::{Ichimoku, IchimokuValue};
 pub use inside_bar::InsideBar;
@@ -1438,12 +1403,9 @@ pub use spread_z_score::SpreadZScore;
 pub use squeeze::{Squeeze, SqueezeValue};
 pub use squeeze_pro::{SqueezePro, SqueezeProValue};
 pub use supertrend::{Supertrend, SupertrendValue};
-pub use true_strength_index::TrueStrengthIndex;
 pub use value_when::ValueWhen;
-pub use volume_weighted_moving_average::VolumeWeightedMovingAverage;
 pub use vortex::{Vortex, VortexValue};
 pub use yang_zhang::YangZhang;
-pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 mod donchian;
 pub use donchian::{Donchian, DonchianValue};
 mod donchian_channels;
@@ -1489,7 +1451,6 @@ pub use on_balance_volume::OnBalanceVolume;
 pub use positive_volume_index::PositiveVolumeIndex;
 pub use rolling_average_deviation::RollingAverageDeviation;
 pub use rolling_beta::RollingBeta;
-pub use rolling_calmar::RollingCalmar;
 pub use rolling_correlation::RollingCorrelation;
 pub use rolling_midpoint::RollingMidpoint;
 pub use rolling_midprice::RollingMidprice;

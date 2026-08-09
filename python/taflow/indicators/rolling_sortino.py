@@ -1,42 +1,42 @@
-"""Native-backed causal rolling-Sharpe adapter."""
+"""Native-backed causal rolling-Sortino adapter."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import RollingSharpeOperator as _Native
-from ._adapter_protocol import adapter_length
-from ._series import as_float64_series
+from .._native import RollingSortino as _Native
+from .._adapter_protocol import adapter_length
+from .._series import as_float64_series
 
 
-class RollingSharpe:
-    """Compute an unannualized population rolling Sharpe ratio.
+class RollingSortino:
+    """Compute an unannualized rolling Sortino ratio.
 
     ``_input`` is the required chronological series and may be empty for a
-    fresh stream. ``timeperiod`` defaults to 14; Rust emits NaN until its
-    trailing population window is full and returns zero for a zero standard
-    deviation. ``compute`` returns one aligned float array, ``value`` is the
-    latest scalar or ``None`` during warm-up, and lifecycle mutators return
-    ``self``. The oracle is pandas rolling mean/std with ``ddof=0``.
+    fresh stream. ``timeperiod`` defaults to 14; Rust emits NaN until the
+    trailing window is full and uses downside deviation for the denominator.
+    ``compute`` returns one aligned float array, ``value`` is the latest scalar
+    or ``None`` during warm-up, and lifecycle mutators return ``self``. The
+    oracle is pandas rolling downside-deviation arithmetic.
     """
 
     def __init__(self, _input: Any, timeperiod: int = 14) -> None:
         self._state = _Native(int(timeperiod))
         self.extend(_input)
 
-    def append(self, _input: float) -> "RollingSharpe":
+    def append(self, _input: float) -> "RollingSortino":
         """Append one observation and return this adapter."""
         self._state.append(float(_input))
         return self
 
-    def extend(self, _input: Any) -> "RollingSharpe":
+    def extend(self, _input: Any) -> "RollingSortino":
         """Append a chronological observation series and return this adapter."""
         values = as_float64_series(_input)
         self._state.extend(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned rolling-Sharpe history."""
+        """Return the aligned rolling-Sortino history."""
         return self._state.compute()
 
     @property
@@ -44,7 +44,7 @@ class RollingSharpe:
         """Return the latest ratio, or ``None`` during warm-up."""
         return self._state.value
 
-    def reset(self) -> "RollingSharpe":
+    def reset(self) -> "RollingSortino":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
         return self
@@ -54,4 +54,4 @@ class RollingSharpe:
         return adapter_length(self)
 
 
-__all__ = ["RollingSharpe"]
+__all__ = ["RollingSortino"]

@@ -1,7 +1,7 @@
 //! Persistent volume-weighted moving average state.
 
-use super::operator_states::{validate_period, ContiguousWindow};
 use crate::error::TaResult;
+use crate::stream::operator_states::{validate_period, ContiguousWindow};
 
 #[derive(Debug, Clone)]
 pub struct VolumeWeightedMovingAverage {

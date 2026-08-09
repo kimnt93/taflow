@@ -1,7 +1,7 @@
 //! Persistent Fisher Transform state.
 
-use super::{MonotonicMax, MonotonicMin};
 use crate::error::{TaError, TaResult};
+use crate::stream::{MonotonicMax, MonotonicMin};
 
 #[derive(Debug, Clone)]
 pub struct FisherTransform {

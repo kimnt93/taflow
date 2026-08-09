@@ -1,7 +1,7 @@
 //! Persistent Arnaud Legoux moving average state.
 
-use super::operator_states::validate_period;
 use crate::error::{TaError, TaResult};
+use crate::stream::operator_states::validate_period;
 use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]
