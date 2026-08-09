@@ -26,3 +26,7 @@ class LowestSince(ConditionValueAdapter):
     def reset(self) -> "LowestSince":
         super().reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed condition/input pairs."""
+        return super().__len__()

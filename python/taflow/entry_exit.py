@@ -1,60 +1,62 @@
-"""Persistent entry/exit signal adapter."""
+"""Native-backed entry/exit signal adapter."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import EntryExitOperator
+from ._native import EntryExitOperator as _Native
 from ._series import as_bool_series
 
 
 class EntryExit:
     """Track entry and exit events as a causal position signal.
 
-    ``entry`` and ``exit`` are required aligned boolean histories; empty arrays
-    create a fresh stream. An entry sets position +1, an exit sets -1, and a
-    simultaneous or inactive pair holds the previous position. Lifecycle
-    methods are fluent, ``value`` returns the latest scalar or ``None``, and
-    ``compute`` returns a NumPy history.
+    ``entry`` and ``exit`` are required equal-length chronological boolean
+    histories and may both be empty for a fresh stream. An entry sets +1, an
+    exit sets -1, and an inactive or simultaneous pair holds the previous
+    position. ``compute`` returns one aligned float array, ``value`` is the
+    latest position or ``None`` for an empty stream, and lifecycle mutators
+    return ``self``.
     """
 
-    def __init__(
-        self,
-        entry: Any,
-        exit: Any,
-    ) -> None:
-        """Create the native state and replay aligned event histories."""
-        self._state = EntryExitOperator()
+    def __init__(self, entry: Any, exit: Any) -> None:
+        self._state = _Native()
+        self._length = 0
         self.extend(entry, exit)
 
     def append(self, entry: bool, exit: bool) -> "EntryExit":
         """Append one entry/exit pair and return this adapter."""
         self._state.append(bool(entry), bool(exit))
+        self._length += 1
         return self
 
     def extend(self, entry: Any, exit: Any) -> "EntryExit":
-        """Append aligned boolean event histories and return this adapter."""
-        entry_array = as_bool_series(entry)
-        exit_array = as_bool_series(exit)
-        if entry_array.shape != exit_array.shape:
+        """Append equal-length boolean event histories."""
+        arrays = as_bool_series(entry), as_bool_series(exit)
+        if len(arrays[0]) != len(arrays[1]):
             raise ValueError("entry and exit must have equal lengths")
-        self._state.extend(entry_array, exit_array)
+        self._state.extend(*arrays)
+        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the complete causal position history."""
+        """Return the aligned causal position history."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest position or ``None`` for an empty stream."""
+        """Return the latest position, or ``None`` for an empty stream."""
         return self._state.value
 
     def reset(self) -> "EntryExit":
-        """Reset native state and output history, returning this adapter."""
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
+        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed event pairs."""
-        return len(self._state.compute())
+        return self._length
+
+
+__all__ = ["EntryExit"]

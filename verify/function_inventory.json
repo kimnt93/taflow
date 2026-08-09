@@ -3623,7 +3623,8 @@
       "name": "SignalDelay",
       "native_binding": true,
       "native_symbols": [
-        "SignalDelayOperator"
+        "SignalDelayOperator",
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -3637,7 +3638,8 @@
       "name": "PositionHold",
       "native_binding": true,
       "native_symbols": [
-        "PositionHoldOperator"
+        "PositionHoldOperator",
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
@@ -3651,7 +3653,8 @@
       "name": "EntryExit",
       "native_binding": true,
       "native_symbols": [
-        "EntryExitOperator"
+        "EntryExitOperator",
+        "_Native"
       ],
       "pandas_ta_reference": false,
       "rust_export": true,

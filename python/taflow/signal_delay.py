@@ -1,89 +1,59 @@
-"""Native-backed causal signal delay state."""
+"""Native-backed causal signal-delay adapter."""
 
 from typing import Any
 
 import numpy as np
 
-from ._native import SignalDelayOperator
+from ._native import SignalDelayOperator as _Native
 from ._series import as_float64_series
 
 
 class SignalDelay:
     """Delay a scalar series by a fixed number of bars.
 
-    Parameters
-    ----------
-    timeperiod : int
-        Number of bars to delay.
-    _input : array-like
-        Initial input history.
+    ``_input`` is the required chronological series and may be empty for a
+    fresh stream. ``timeperiod`` defaults to 1 and must be positive. Rust owns
+    the bounded delay queue and NaN warm-up; ``compute`` returns one aligned
+    float array, ``value`` is the latest scalar or ``None`` during warm-up, and
+    lifecycle mutators return ``self``. The oracle is pandas ``Series.shift``.
     """
 
-    def __init__(
-        self,
-        _input: Any,
-        timeperiod: int = 1,
-    ) -> None:
-        """Create the delay state and process input history."""
-        self._state = SignalDelayOperator(timeperiod)
-        if _input is not None:
-            self.extend(_input)
+    def __init__(self, _input: Any, timeperiod: int = 1) -> None:
+        self._state = _Native(int(timeperiod))
+        self._length = 0
+        self.extend(_input)
 
     def append(self, _input: float) -> "SignalDelay":
-        """Append one chronological observation to the native Rust state.
-
-        Parameters
-        ----------
-        _input : float
-            Current input.
-
-        Returns
-        -------
-        SignalDelay
-            This indicator, for fluent chaining; read `value` for the result."""
-        self._state.append(_input)
+        """Append one observation and return this adapter."""
+        self._state.append(float(_input))
+        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "SignalDelay":
-        """Append aligned chronological histories to the native Rust state.
-
-        Parameters
-        ----------
-        _input : Any
-            Chronological input series.
-
-        Returns
-        -------
-        SignalDelay
-            This indicator, for fluent chaining."""
-        self._state.extend(as_float64_series(_input))
+        """Append a chronological observation series and return this adapter."""
+        values = as_float64_series(_input)
+        self._state.extend(values)
+        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
+        """Return the aligned delayed history."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest Rust result.
-
-        Returns
-        -------
-        float, tuple, or None
-            Latest output, or None while scalar warm-up is incomplete."""
+    def value(self) -> float | None:
+        """Return the latest delayed value, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "SignalDelay":
-        """Restore fresh-state behavior and clear output history.
-
-        Returns
-        -------
-        SignalDelay
-            This indicator, for fluent chaining."""
+        """Restore fresh native state and return this adapter."""
         self._state.reset()
+        self._length = 0
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed observations."""
+        return self._length
+
+
+__all__ = ["SignalDelay"]

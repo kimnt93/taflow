@@ -569,9 +569,9 @@ separate same-named Rust and Python tests exist, an independent source reports
 | implemented | `ValueWhen` | class | `value_when` | `ValueWhenOperator` | yes | `` | — | — |
 | implemented | `HighestSince` | class | `highest_since` | `HighestSinceOperator` | yes | `` | — | — |
 | implemented | `LowestSince` | class | `lowest_since` | `LowestSinceOperator` | yes | `` | — | — |
-| implemented | `SignalDelay` | class | `signal_delay` | `SignalDelayOperator` | yes | `` | — | — |
-| implemented | `PositionHold` | class | `position_hold` | `PositionHoldOperator` | yes | `` | — | — |
-| implemented | `EntryExit` | class | `entry_exit` | `EntryExitOperator` | yes | `` | — | — |
+| implemented | `SignalDelay` | class | `signal_delay` | `SignalDelayOperator`, `_Native` | yes | `` | — | — |
+| implemented | `PositionHold` | class | `position_hold` | `PositionHoldOperator`, `_Native` | yes | `` | — | — |
+| implemented | `EntryExit` | class | `entry_exit` | `EntryExitOperator`, `_Native` | yes | `` | — | — |
 | implemented | `SwingHighLow` | class | `swing_high_low` | `SwingHighLowOperator`, `_Native` | yes | `` | — | — |
 | implemented | `SwingHigh` | class | `swing_high` | `SwingHighLowOperator` | yes | `` | — | — |
 | implemented | `SwingLow` | class | `swing_low` | `SwingHighLowOperator` | yes | `` | — | — |
