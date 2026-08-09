@@ -1,15 +1,28 @@
-"""Persistent Donchian Channels."""
+"""Persistent Donchian channel adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from ._native import DonchianOperator as _Native
 from ._series import as_float64_series
 
 
 class Donchian:
-    """Persistent Donchian Channels.
+    """Causal rolling high, low, and midpoint channel.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
+    Parameters
+    ----------
+    high, low : array-like
+        Aligned high and low price histories. Empty arrays create a fresh
+        stream for later ``append`` calls.
+    timeperiod : int, default 20
+        Number of bars in the trailing extrema window.
+
+    The first ``timeperiod - 1`` aligned outputs are ``NaN``. ``compute``
+    returns ``(upper, lower, middle)`` NumPy arrays. Lifecycle methods mutate
+    and return this adapter; ``value`` exposes the latest tuple or ``None``.
+    """
 
     def __init__(
         self,
@@ -17,89 +30,38 @@ class Donchian:
         low: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        timeperiod : object
-            Trailing window length in bars.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
+        """Create the native state and replay the aligned input histories."""
         self._state = _Native(timeperiod)
-        self.extend(high, low) if high is not None or low is not None else None
+        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Donchian":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(high, low)
+        """Append one high/low bar and return this adapter."""
+        self._state.append(float(high), float(low))
         return self
 
     def extend(self, high: Any, low: Any) -> "Donchian":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(high), as_float64_series(low))
+        """Append aligned high and low histories and return this adapter."""
+        high_array = as_float64_series(high)
+        low_array = as_float64_series(low)
+        if high_array.shape != low_array.shape:
+            raise ValueError("high and low must have equal lengths")
+        self._state.extend(high_array, low_array)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return ``(upper, lower, middle)`` aligned output arrays."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> tuple[float, float, float] | None:
+        """Return the latest ``(upper, lower, middle)`` tuple or ``None``."""
         return self._state.value
 
     def reset(self) -> "Donchian":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Reset native state and output history, returning this adapter."""
         self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return len(self._state.compute()[0])

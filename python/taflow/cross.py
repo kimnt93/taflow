@@ -5,96 +5,51 @@ from ._series import as_float64_series
 
 
 class Cross:
-    """Cross
+    """Detect either a causal upward or downward crossing.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `left`, `right`. Warm-up positions are represented by `NaN` in history."""
+    ``left`` and ``right`` are required aligned numeric histories. Each output
+    is 1.0 on a crossing and 0.0 otherwise; the first bar is 0.0 because no
+    prior pair exists. ``append``, ``extend``, and ``reset`` are fluent,
+    ``value`` returns the latest scalar or ``None``, and ``compute`` returns a
+    NumPy array.
+    """
 
     def __init__(
         self,
         left: Any,
         right: Any,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        left : object
-            Left-hand aligned input series or scalar value.
-        right : object
-            Right-hand aligned input series or scalar value.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
+        """Create the native state and replay aligned input histories."""
         self._state = _Native()
-        self.extend(left, right) if left is not None or right is not None else None
+        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "Cross":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        left : object
-            Left-hand aligned input series or scalar value.
-        right : object
-            Right-hand aligned input series or scalar value.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(left, right)
+        """Append one pair and return this adapter."""
+        self._state.append(float(left), float(right))
         return self
 
     def extend(self, left: Any, right: Any) -> "Cross":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        left : object
-            Left-hand aligned input series or scalar value.
-        right : object
-            Right-hand aligned input series or scalar value.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(as_float64_series(left), as_float64_series(right))
+        """Append aligned left/right histories and return this adapter."""
+        arrays = tuple(as_float64_series(series) for series in (left, right))
+        if arrays[0].shape != arrays[1].shape:
+            raise ValueError("left and right must have equal lengths")
+        self._state.extend(*arrays)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned 0.0/1.0 crossing history."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> float | None:
+        """Return the latest crossing flag or ``None`` for an empty stream."""
         return self._state.value
 
     def reset(self) -> "Cross":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Reset native state and output history, returning this adapter."""
         self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed pairs."""
+        return len(self._state.compute())

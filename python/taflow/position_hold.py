@@ -1,4 +1,4 @@
-"""Native-backed position-hold state."""
+"""Persistent position-hold adapter."""
 
 from typing import Any
 
@@ -9,78 +9,46 @@ from ._series import as_float64_series
 
 
 class PositionHold:
-    """Hold the most recently supplied position value.
+    """Hold the most recent non-zero position value.
 
-    Parameters
-    ----------
-    _input : array-like
-        Initial position history.
+    ``position`` is a required numeric history; an empty array creates a fresh
+    stream. Every zero input carries the previous position, while non-zero
+    inputs replace it. Lifecycle methods are fluent, ``value`` returns the
+    latest scalar or ``None``, and ``compute`` returns a NumPy history.
     """
 
     def __init__(
         self,
-        _input: Any,
+        position: Any,
     ) -> None:
-        """Create the state and process position history."""
+        """Create the native state and replay the position history."""
         self._state = PositionHoldOperator()
-        if _input is not None:
-            self.extend(_input)
+        self.extend(position)
 
-    def append(self, _input: float) -> "PositionHold":
-        """Append one chronological observation to the native Rust state.
-
-        Parameters
-        ----------
-        _input : float
-            Current input.
-
-        Returns
-        -------
-        PositionHold
-            This indicator, for fluent chaining; read `value` for the result."""
-        self._state.append(_input)
+    def append(self, position: float) -> "PositionHold":
+        """Append one position and return this adapter."""
+        self._state.append(float(position))
         return self
 
-    def extend(self, _input: Any) -> "PositionHold":
-        """Append aligned chronological histories to the native Rust state.
-
-        Parameters
-        ----------
-        _input : Any
-            Chronological input series.
-
-        Returns
-        -------
-        PositionHold
-            This indicator, for fluent chaining."""
-        self._state.extend(as_float64_series(_input))
+    def extend(self, position: Any) -> "PositionHold":
+        """Append a numeric position history and return this adapter."""
+        self._state.extend(as_float64_series(position))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the complete aligned history produced by Rust.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            One output per processed bar, including NaN warm-up positions."""
+        """Return the complete held-position history."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest Rust result.
-
-        Returns
-        -------
-        float, tuple, or None
-            Latest output, or None while scalar warm-up is incomplete."""
+    def value(self) -> float | None:
+        """Return the latest held position or ``None`` for an empty stream."""
         return self._state.value
 
     def reset(self) -> "PositionHold":
-        """Restore fresh-state behavior and clear output history.
-
-        Returns
-        -------
-        PositionHold
-            This indicator, for fluent chaining."""
+        """Reset native state and output history, returning this adapter."""
         self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed positions."""
+        return len(self._state.compute())

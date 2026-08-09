@@ -1247,6 +1247,18 @@
     },
     {
       "oracle": "pandas-ta-classic",
+      "function": "cross",
+      "output": "cross",
+      "passed": true,
+      "max_abs_error": 0.0,
+      "nan_mismatches": 0,
+      "compared": 2000,
+      "note": "independently compared; documented initialization/formula convention differs",
+      "error": null,
+      "expected_difference": true
+    },
+    {
+      "oracle": "pandas-ta-classic",
       "function": "hull_moving_average",
       "output": "hma",
       "passed": true,
@@ -1314,6 +1326,42 @@
       "nan_mismatches": 0,
       "compared": 1970,
       "note": "parameter matrix; force pandas-ta's native EMA",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "pandas-ta-classic",
+      "function": "donchian",
+      "output": "upper",
+      "passed": true,
+      "max_abs_error": 0.0,
+      "nan_mismatches": 0,
+      "compared": 1981,
+      "note": "",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "pandas-ta-classic",
+      "function": "donchian",
+      "output": "lower",
+      "passed": true,
+      "max_abs_error": 0.0,
+      "nan_mismatches": 0,
+      "compared": 1981,
+      "note": "",
+      "error": null,
+      "expected_difference": false
+    },
+    {
+      "oracle": "pandas-ta-classic",
+      "function": "donchian",
+      "output": "mid",
+      "passed": true,
+      "max_abs_error": 0.0,
+      "nan_mismatches": 0,
+      "compared": 1981,
+      "note": "",
       "error": null,
       "expected_difference": false
     },

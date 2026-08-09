@@ -715,6 +715,11 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
          pta.cross(c, c2, above=True), ("crossover",))
     many("crossunder", taflow.Crossunder(close, data["close2"]).compute(),
          pta.cross(c, c2, above=False), ("crossunder",))
+    many("cross", taflow.Cross(close, data["close2"]).compute(),
+         np.maximum(
+             pta.cross(c, c2, above=True).to_numpy(),
+             pta.cross(c, c2, above=False).to_numpy(),
+         ), ("cross",), **variant)
     many("hull_moving_average", taflow.HullMovingAverage(close, 10).compute(),
          pta.hma(c, length=10), ("hma",))
     many("volume_weighted_moving_average",
@@ -732,6 +737,8 @@ def run_pandas_ta(data: dict[str, np.ndarray], rows: list[Result]) -> None:
              note="parameter matrix; force pandas-ta's native EMA")
     donchian = pta.donchian(h, l, lower_length=20, upper_length=20)
     donchian = donchian.iloc[:, [2, 0, 1]]
+    many("donchian", taflow.Donchian(high, low, 20).compute(),
+         donchian, ("upper", "lower", "mid"))
     many("donchian_channels", taflow.DonchianChannels(high, low, 20).compute(),
          donchian, ("upper", "lower", "mid"))
     many("fisher_transform", taflow.FisherTransform(high, low, 10).compute(),

@@ -1,4 +1,4 @@
-"""Persistent Keltner Channels."""
+"""Persistent Keltner channel adapter."""
 
 from typing import Any
 import numpy as np
@@ -7,9 +7,15 @@ from ._series import as_float64_series
 
 
 class KeltnerChannels:
-    """Persistent Keltner Channels.
+    """Causal EMA-based Keltner channel.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
+    ``high``, ``low``, and ``close`` are required aligned histories (empty
+    arrays create a fresh stream). ``timeperiod`` defaults to 20 and
+    ``multiplier`` defaults to 2.0. The channel uses EMA typical price and
+    EMA high-low range, returning ``(upper, middle, lower)`` arrays. Outputs
+    are causal from the first bar; lifecycle methods are fluent and ``value``
+    returns the latest tuple or ``None``.
+    """
 
     def __init__(
         self,
@@ -19,103 +25,37 @@ class KeltnerChannels:
         timeperiod: int = 20,
         multiplier: float = 2.0,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-        timeperiod : object
-            Trailing window length in bars.
-        multiplier : object
-            Channel or volatility multiplier.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
+        """Create the native state and replay aligned OHLC histories."""
         self._state = _Native(timeperiod, multiplier)
-        (
-            self.extend(high, low, close)
-            if high is not None or low is not None or close is not None
-            else None
-        )
+        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "KeltnerChannels":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(high, low, close)
+        """Append one OHLC bar and return this adapter."""
+        self._state.append(float(high), float(low), float(close))
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "KeltnerChannels":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.extend(
-            as_float64_series(high), as_float64_series(low), as_float64_series(close)
-        )
+        """Append aligned OHLC histories and return this adapter."""
+        arrays = tuple(as_float64_series(series) for series in (high, low, close))
+        if not (arrays[0].shape == arrays[1].shape == arrays[2].shape):
+            raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(*arrays)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return ``(upper, middle, lower)`` aligned output arrays."""
         return self._state.compute()
 
     @property
-    def value(self) -> object:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+    def value(self) -> tuple[float, float, float] | None:
+        """Return the latest ``(upper, middle, lower)`` tuple or ``None``."""
         return self._state.value
 
     def reset(self) -> "KeltnerChannels":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Reset native state and output history, returning this adapter."""
         self._state.reset()
         return self
+
+    def __len__(self) -> int:
+        """Return the number of processed bars."""
+        return len(self._state.compute()[0])

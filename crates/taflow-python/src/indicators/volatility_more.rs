@@ -29,6 +29,9 @@ impl KeltnerChannelsOperator {
             self.lower.push(v.lower);
             Some((v.upper, v.middle, v.lower))
         } else {
+            self.upper.push(f64::NAN);
+            self.middle.push(f64::NAN);
+            self.lower.push(f64::NAN);
             None
         }
     }

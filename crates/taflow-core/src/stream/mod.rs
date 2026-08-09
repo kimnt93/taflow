@@ -708,15 +708,25 @@ pub(crate) use hilbert_transform_trend_mode::hilbert_transform_trend_mode;
 #[cfg(test)]
 mod bars_since_test;
 #[cfg(test)]
+mod cross_test;
+#[cfg(test)]
+mod donchian_test;
+#[cfg(test)]
+mod entry_exit_test;
+#[cfg(test)]
 mod gap_down_test;
 #[cfg(test)]
 mod gap_up_test;
 #[cfg(test)]
 mod highest_since_test;
 #[cfg(test)]
+mod keltner_channels_test;
+#[cfg(test)]
 mod lowest_since_test;
 #[cfg(test)]
 mod outside_bar_test;
+#[cfg(test)]
+mod position_hold_test;
 mod rolling_midpoint;
 #[cfg(test)]
 mod rolling_midpoint_test;
@@ -725,6 +735,8 @@ mod rolling_midprice;
 mod rolling_midprice_test;
 #[cfg(test)]
 mod signal_delay_test;
+#[cfg(test)]
+mod smoothed_trend_channel_lifecycle_test;
 #[cfg(test)]
 mod value_when_test;
 #[allow(unused_imports)]

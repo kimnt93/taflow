@@ -1,6 +1,6 @@
 # External correctness oracles
 
-Bars: **2,000** | Matches: **200** | Documented variants: **38** | Failures: **0** | rtol=1e-08, atol=1e-10
+Bars: **2,000** | Matches: **204** | Documented variants: **38** | Failures: **0** | rtol=1e-08, atol=1e-10
 
 Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, smartmoneyconcepts 0.0.27, wickra 0.9.9
 
@@ -161,9 +161,13 @@ Versions: taflow 0.1.2, numpy 2.4.6, pandas-ta-classic 0.6.52, polars 1.43.2, sm
 | pandas | `yang_zhang` | `all` | MATCH | `2.776e-17` | 0 | Yang-Zhang via Rolling.mean |
 | pandas-ta-classic | `awesome_oscillator` | `ao` | MATCH | `8.527e-14` | 0 |  |
 | pandas-ta-classic | `chaikin_money_flow` | `cmf` | MATCH | `3.993e-14` | 0 |  |
+| pandas-ta-classic | `cross` | `cross` | MATCH | `0.000e+00` | 0 | independently compared; documented initialization/formula convention differs |
 | pandas-ta-classic | `crossover` | `crossover` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `crossunder` | `crossunder` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `detrended_price_oscillator` | `dpo` | MATCH | `1.137e-13` | 0 |  |
+| pandas-ta-classic | `donchian` | `lower` | MATCH | `0.000e+00` | 0 |  |
+| pandas-ta-classic | `donchian` | `mid` | MATCH | `0.000e+00` | 0 |  |
+| pandas-ta-classic | `donchian` | `upper` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `donchian_channels` | `lower` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `donchian_channels` | `mid` | MATCH | `0.000e+00` | 0 |  |
 | pandas-ta-classic | `donchian_channels` | `upper` | MATCH | `0.000e+00` | 0 |  |
