@@ -1311,10 +1311,10 @@ mod decay_linear;
 #[allow(unused_imports)]
 pub(crate) use decay_linear::decay_linear;
 pub use decay_linear::DecayLinear;
-mod average_daily_dollar_value;
-#[allow(unused_imports)]
-pub(crate) use average_daily_dollar_value::average_daily_dollar_value;
 mod amihud;
+mod average_daily_dollar_value;
+#[cfg(test)]
+mod average_daily_dollar_value_test;
 #[allow(unused_imports)]
 pub(crate) use amihud::amihud;
 mod roll_spread;

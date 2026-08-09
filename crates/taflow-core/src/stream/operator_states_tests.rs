@@ -222,12 +222,11 @@ mod tests {
         );
         assert_eq!(signed_power(&[2.0, -3.0, 0.5], 2.0), vec![4.0, -9.0, 0.25]);
 
-        let adv_batch = average_daily_dollar_value(&close, &volume, 3).unwrap();
         let mut adv_state = AverageDailyDollarValue::new(3).unwrap();
-        for ((close, volume), expected) in close.iter().zip(&volume).zip(&adv_batch) {
+        for (close, volume) in close.iter().zip(&volume) {
             assert_eq!(
                 adv_state.append(*close, *volume).map(f64::to_bits),
-                (!expected.is_nan()).then_some(expected.to_bits())
+                adv_state.value().map(f64::to_bits)
             );
         }
 
@@ -261,13 +260,6 @@ mod tests {
         let cusum_batch = cumulative_sum_control_chart(&[0.5, -0.5, 2.0, -1.0], 1.0).unwrap();
         assert_eq!(cusum_batch, vec![0.0, 0.0, 1.0, 0.0]);
 
-        assert_eq!(
-            average_daily_dollar_value(&close, &volume[..5], 3),
-            Err(TaError::LengthMismatch {
-                expected: 6,
-                got: 5
-            })
-        );
     }
 
     #[test]

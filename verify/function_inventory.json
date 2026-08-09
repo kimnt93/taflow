@@ -10,7 +10,7 @@
     "python_exports": 300,
     "rust_exports": 632,
     "smc_functions": 8,
-    "structure": 263,
+    "structure": 264,
     "talib_functions": 161
   },
   "rows": [
@@ -4075,7 +4075,7 @@
     {
       "exported": true,
       "kind": "class",
-      "module": "adv",
+      "module": "average_daily_dollar_value",
       "name": "AverageDailyDollarValue",
       "native_binding": true,
       "native_symbols": [

@@ -286,7 +286,7 @@ from .garman_klass import GarmanKlass
 from .rogers_satchell import RogersSatchell
 from .garman_klass_yang_zhang import GarmanKlassYangZhang
 from .yang_zhang import YangZhang
-from .adv import AverageDailyDollarValue
+from .average_daily_dollar_value import AverageDailyDollarValue
 from .amihud import Amihud
 from .roll_spread import RollSpread
 from .ornstein_uhlenbeck_half_life import OrnsteinUhlenbeckHalfLife
