@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleSeparatingLines as CandleSeparatingLinesState;
+use taflow::indicators::CandleMatHold as CandleMatHoldState;
 #[pyclass]
-/// Stateful CandleSeparatingLines candlestick recognizer.
+/// Stateful CandleMatHold candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleSeparatingLines {
-    inner: CandleSeparatingLinesState,
+pub struct CandleMatHold {
+    inner: CandleMatHoldState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleSeparatingLines {
+impl CandleMatHold {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleSeparatingLinesState::new(),
+            inner: CandleMatHoldState::new(),
             outputs: vec![],
         }
     }

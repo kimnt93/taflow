@@ -1,6 +1,6 @@
-//! Incremental Matching Low candlestick recognition (CDLMATCHINGLOW).
-use super::pattern::*;
+//! Incremental Separating Lines candlestick recognition (CDLSEPARATINGLINES).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -10,6 +10,15 @@ struct Candle {
     c: f64,
 }
 impl Candle {
+    fn body(self) -> f64 {
+        (self.c - self.o).abs()
+    }
+    fn upper(self) -> f64 {
+        self.h - self.o.max(self.c)
+    }
+    fn lower(self) -> f64 {
+        self.o.min(self.c) - self.l
+    }
     fn color(self) -> i32 {
         if self.c >= self.o {
             1
@@ -18,19 +27,21 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleMatchingLow candle recognizer.
+/// Stateful CandleSeparatingLines candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleMatchingLow {
+pub struct CandleSeparatingLines {
     candles: VecDeque<Candle>,
+    shadow_sum: f64,
+    body_sum: f64,
     equal_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleMatchingLow {
+impl Default for CandleSeparatingLines {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleMatchingLow {
+impl CandleSeparatingLines {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -38,7 +49,9 @@ impl CandleMatchingLow {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(6),
+            candles: VecDeque::with_capacity(11),
+            shadow_sum: 0.0,
+            body_sum: 0.0,
             equal_sum: 0.0,
             value: None,
         }
@@ -50,25 +63,39 @@ impl CandleMatchingLow {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
-        // Deque holds bars i-6..=i-1; bar j maps to index 6 - (i - j).
-        let value = if self.candles.len() == 6 {
-            let prev = self.candles[5]; // bar i-1
+        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
+        let value = if self.candles.len() == 11 {
+            let prev = self.candles[10]; // bar i-1
+            let vs = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_sum, h, l);
+            let long = ca_realbody_scalar(BODY_LONG, self.body_sum, o, c);
             let equal = ca_highlow_scalar(EQUAL, self.equal_sum, prev.h, prev.l);
-            // Slide the sum exactly like the batch loop: sum += cr(bar) - cr(bar - 5).
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - period).
+            self.shadow_sum +=
+                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            self.body_sum +=
+                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
             self.equal_sum += cr_highlow_scalar(prev.h, prev.l)
-                - cr_highlow_scalar(self.candles[0].h, self.candles[0].l);
-            Some(
-                (prev.color() == -1 && cur.color() == -1 && (cur.c - prev.c).abs() <= equal) as i32
-                    * 100,
-            )
+                - cr_highlow_scalar(self.candles[5].h, self.candles[5].l);
+            let color_prev = prev.color();
+            let color_cur = cur.color();
+            let base =
+                color_prev != color_cur && (cur.o - prev.o).abs() <= equal && cur.body() > long;
+            let bull = base && color_cur == 1 && cur.lower() < vs;
+            let bear = base && color_cur == -1 && cur.upper() < vs;
+            Some((bull as i32) * 100 - (bear as i32) * 100)
         } else {
-            // Warm-up: seed the sum exactly like the batch prologue.
-            if self.candles.len() < 5 {
+            // Warm-up: seed the sums exactly like the batch prologue.
+            let i = self.candles.len();
+            if (1..11).contains(&i) {
+                self.shadow_sum += cr_highlow_scalar(h, l);
+                self.body_sum += cr_realbody_scalar(o, c);
+            }
+            if (5..10).contains(&i) {
                 self.equal_sum += cr_highlow_scalar(h, l);
             }
             None
         };
-        if self.candles.len() == 6 {
+        if self.candles.len() == 11 {
             self.candles.pop_front();
         }
         self.candles.push_back(cur);
@@ -126,6 +153,8 @@ impl CandleMatchingLow {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
+        self.shadow_sum = 0.0;
+        self.body_sum = 0.0;
         self.equal_sum = 0.0;
         self.value = None;
     }

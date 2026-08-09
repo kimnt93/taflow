@@ -1,6 +1,6 @@
 //! Incremental Tasuki Gap candlestick recognition (CDLTASUKIGAP).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {

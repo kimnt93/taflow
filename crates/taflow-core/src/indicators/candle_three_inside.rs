@@ -1,6 +1,6 @@
 //! Incremental Three Inside pattern recognition (CDL3INSIDE).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {

@@ -1,28 +1,27 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleTakuri as CandleTakuriState;
+use taflow::indicators::CandleThreeOutside as Candle3Outside;
 #[pyclass]
-/// Stateful CandleTakuri candlestick recognizer.
+/// Stateful CandleThreeOutside candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleTakuri {
-    inner: CandleTakuriState,
+pub struct CandleThreeOutside {
+    inner: Candle3Outside,
     outputs: Vec<i32>,
 }
-
 #[pymethods]
-impl CandleTakuri {
+impl CandleThreeOutside {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleTakuriState::new(),
+            inner: Candle3Outside::new(),
             outputs: Vec::new(),
         }
     }
     fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
-        let value = self.inner.append(open, high, low, close);
-        self.outputs.push(value.unwrap_or(0));
-        value
+        let v = self.inner.append(open, high, low, close);
+        self.outputs.push(v.unwrap_or(0));
+        v
     }
     fn extend(
         &mut self,
@@ -32,19 +31,18 @@ impl CandleTakuri {
         low: PyReadonlyArray1<f64>,
         close: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let open = open.as_slice()?;
-        let high = high.as_slice()?;
-        let low = low.as_slice()?;
-        let close = close.as_slice()?;
-        if open.len() != high.len() || open.len() != low.len() || open.len() != close.len() {
+        let (o, h, l, c) = (
+            open.as_slice()?,
+            high.as_slice()?,
+            low.as_slice()?,
+            close.as_slice()?,
+        );
+        if o.len() != h.len() || o.len() != l.len() || o.len() != c.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
         let outputs = &mut self.outputs;
-        py.allow_threads(|| {
-            self.inner
-                .extend_slices_into(open, high, low, close, outputs)
-        })
-        .map_err(|error| PyValueError::new_err(error.to_string()))?;
+        py.allow_threads(|| self.inner.extend_slices_into(o, h, l, c, outputs))
+            .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<i32>> {

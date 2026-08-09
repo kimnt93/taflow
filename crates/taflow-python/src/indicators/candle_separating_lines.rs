@@ -1,20 +1,20 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleTasukiGap as CandleTasukiGapState;
+use taflow::indicators::CandleSeparatingLines as CandleSeparatingLinesState;
 #[pyclass]
-/// Stateful CandleTasukiGap candlestick recognizer.
+/// Stateful CandleSeparatingLines candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
-pub struct CandleTasukiGap {
-    inner: CandleTasukiGapState,
+pub struct CandleSeparatingLines {
+    inner: CandleSeparatingLinesState,
     outputs: Vec<i32>,
 }
 #[pymethods]
-impl CandleTasukiGap {
+impl CandleSeparatingLines {
     #[new]
     fn new() -> Self {
         Self {
-            inner: CandleTasukiGapState::new(),
+            inner: CandleSeparatingLinesState::new(),
             outputs: vec![],
         }
     }

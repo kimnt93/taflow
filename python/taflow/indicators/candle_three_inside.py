@@ -2,8 +2,8 @@
 
 from typing import Any
 import numpy as np
-from ._native import CandleThreeInside as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleThreeInside as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
 class CandleThreeInside:

@@ -1,13 +1,13 @@
-"""Persistent Three Black Crows recognition (CDL3BLACKCROWS)."""
+"""Persistent Three Outside pattern recognition (CDL3OUTSIDE)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleThreeBlackCrows as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleThreeOutside as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleThreeBlackCrows:
-    """Persistent Three Black Crows recognition (CDL3BLACKCROWS).
+class CandleThreeOutside:
+    """Persistent Three Outside pattern recognition (CDL3OUTSIDE).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -39,7 +39,7 @@ class CandleThreeBlackCrows:
         self._state = _Native()
         self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleThreeBlackCrows":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleThreeOutside":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -61,7 +61,7 @@ class CandleThreeBlackCrows:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleThreeBlackCrows":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleThreeOutside":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -108,7 +108,7 @@ class CandleThreeBlackCrows:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleThreeBlackCrows":
+    def reset(self) -> "CandleThreeOutside":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

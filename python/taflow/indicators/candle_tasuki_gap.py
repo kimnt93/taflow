@@ -1,13 +1,13 @@
-"""Persistent Separating Lines recognition (CDLSEPARATINGLINES)."""
+"""Persistent Tasuki Gap recognition (CDLTASUKIGAP)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleSeparatingLines as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleTasukiGap as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleSeparatingLines:
-    """Persistent Separating Lines recognition (CDLSEPARATINGLINES).
+class CandleTasukiGap:
+    """Persistent Tasuki Gap recognition (CDLTASUKIGAP).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleSeparatingLines:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleSeparatingLines":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleTasukiGap":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleSeparatingLines:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleSeparatingLines":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleTasukiGap":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleSeparatingLines:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleSeparatingLines":
+    def reset(self) -> "CandleTasukiGap":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -462,6 +462,48 @@ pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;
 
+mod candle_mat_hold;
+#[cfg(test)]
+mod candle_mat_hold_test;
+mod candle_matching_low;
+#[cfg(test)]
+mod candle_matching_low_test;
+mod candle_rise_fall_three_methods;
+#[cfg(test)]
+mod candle_rise_fall_three_methods_test;
+mod candle_separating_lines;
+#[cfg(test)]
+mod candle_separating_lines_test;
+mod candle_takuri;
+#[cfg(test)]
+mod candle_takuri_test;
+mod candle_tasuki_gap;
+#[cfg(test)]
+mod candle_tasuki_gap_test;
+mod candle_three_black_crows;
+#[cfg(test)]
+mod candle_three_black_crows_test;
+mod candle_three_inside;
+#[cfg(test)]
+mod candle_three_inside_test;
+mod candle_three_line_strike;
+#[cfg(test)]
+mod candle_three_line_strike_test;
+mod candle_three_outside;
+#[cfg(test)]
+mod candle_three_outside_test;
+
+pub use candle_mat_hold::CandleMatHold;
+pub use candle_matching_low::CandleMatchingLow;
+pub use candle_rise_fall_three_methods::CandleRiseFallThreeMethods;
+pub use candle_separating_lines::CandleSeparatingLines;
+pub use candle_takuri::CandleTakuri;
+pub use candle_tasuki_gap::CandleTasukiGap;
+pub use candle_three_black_crows::CandleThreeBlackCrows;
+pub use candle_three_inside::CandleThreeInside;
+pub use candle_three_line_strike::CandleThreeLineStrike;
+pub use candle_three_outside::CandleThreeOutside;
+
 mod candle_morning_doji_star;
 #[cfg(test)]
 mod candle_morning_doji_star_test;

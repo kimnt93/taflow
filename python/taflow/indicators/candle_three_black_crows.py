@@ -1,13 +1,13 @@
-"""Persistent Matching Low recognition (CDLMATCHINGLOW)."""
+"""Persistent Three Black Crows recognition (CDL3BLACKCROWS)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleMatchingLow as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleThreeBlackCrows as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleMatchingLow:
-    """Persistent Matching Low recognition (CDLMATCHINGLOW).
+class CandleThreeBlackCrows:
+    """Persistent Three Black Crows recognition (CDL3BLACKCROWS).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,13 +37,9 @@ class CandleMatchingLow:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        (
-            self.extend(_open, high, low, close)
-            if any(x is not None for x in (_open, high, low, close))
-            else None
-        )
+        self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleMatchingLow":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleThreeBlackCrows":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +61,7 @@ class CandleMatchingLow:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleMatchingLow":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleThreeBlackCrows":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +108,7 @@ class CandleMatchingLow:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleMatchingLow":
+    def reset(self) -> "CandleThreeBlackCrows":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

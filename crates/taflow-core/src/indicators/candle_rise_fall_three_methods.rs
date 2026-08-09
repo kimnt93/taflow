@@ -1,6 +1,6 @@
 //! Incremental Rising/Falling Three Methods candlestick recognition (CDLRISEFALL3METHODS).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {

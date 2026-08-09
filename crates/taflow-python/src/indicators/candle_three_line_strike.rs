@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleThreeLineStrike as Candle3LineStrike;
+use taflow::indicators::CandleThreeLineStrike as Candle3LineStrike;
 #[pyclass]
 /// Stateful CandleThreeLineStrike candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.
