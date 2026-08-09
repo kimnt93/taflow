@@ -40,36 +40,6 @@ pub(crate) mod tests_extrema_support {
 
 pub(crate) mod accumulation_distribution_helper;
 pub(crate) mod aroon_rescan;
-mod candle_evening_star;
-#[cfg(test)]
-mod candle_evening_star_test;
-mod candle_gap_side_side_white;
-#[cfg(test)]
-mod candle_gap_side_side_white_test;
-mod candle_gravestone_doji;
-#[cfg(test)]
-mod candle_gravestone_doji_test;
-mod candle_hammer;
-#[cfg(test)]
-mod candle_hammer_test;
-mod candle_hanging_man;
-#[cfg(test)]
-mod candle_hanging_man_test;
-mod candle_harami;
-mod candle_harami_cross;
-#[cfg(test)]
-mod candle_harami_cross_test;
-#[cfg(test)]
-mod candle_harami_test;
-mod candle_high_wave;
-#[cfg(test)]
-mod candle_high_wave_test;
-mod candle_hikkake;
-mod candle_hikkake_modified;
-#[cfg(test)]
-mod candle_hikkake_modified_test;
-#[cfg(test)]
-mod candle_hikkake_test;
 mod candle_homing_pigeon;
 #[cfg(test)]
 mod candle_homing_pigeon_test;
@@ -333,16 +303,6 @@ mod weighted_moving_average_test;
 
 #[allow(unused_imports)]
 #[allow(unused_imports)]
-pub use candle_evening_star::CandleEveningStar;
-pub use candle_gap_side_side_white::CandleGapSideSideWhite;
-pub use candle_gravestone_doji::CandleGravestoneDoji;
-pub use candle_hammer::CandleHammer;
-pub use candle_hanging_man::CandleHangingMan;
-pub use candle_harami::CandleHarami;
-pub use candle_harami_cross::CandleHaramiCross;
-pub use candle_high_wave::CandleHighWave;
-pub use candle_hikkake::CandleHikkake;
-pub use candle_hikkake_modified::CandleHikkakeModified;
 pub use candle_homing_pigeon::CandleHomingPigeon;
 pub use candle_identical_three_crows::CandleIdenticalThreeCrows;
 pub use candle_in_neck::CandleInNeck;

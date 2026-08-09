@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::stream::CandleHammer as CandleHammerState;
+use taflow::indicators::CandleHammer as CandleHammerState;
 #[pyclass]
 /// Stateful CandleHammer candlestick recognizer.
 /// Inputs are OHLC bars; output is the aligned integer pattern score.

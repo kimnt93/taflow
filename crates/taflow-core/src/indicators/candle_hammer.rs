@@ -2,8 +2,8 @@
 
 use std::collections::VecDeque;
 
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 /// Incremental CDLHAMMER state using TA-Lib's body, range, and near windows.
 /// Persistent Rust state or aligned output type for `CandleHammer`.
 ///

@@ -1,13 +1,13 @@
-"""Persistent Evening Star recognition (CDLEVENINGSTAR)."""
+"""Persistent Gap Side Side White recognition (CDLGAPSIDESIDEWHITE)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleEveningStar as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleGapSideSideWhite as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleEveningStar:
-    """Persistent Evening Star recognition (CDLEVENINGSTAR).
+class CandleGapSideSideWhite:
+    """Persistent Gap Side Side White recognition (CDLGAPSIDESIDEWHITE).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -43,7 +43,7 @@ class CandleEveningStar:
             else None
         )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleEveningStar":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleGapSideSideWhite":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +65,7 @@ class CandleEveningStar:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleEveningStar":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleGapSideSideWhite":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +112,7 @@ class CandleEveningStar:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleEveningStar":
+    def reset(self) -> "CandleGapSideSideWhite":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

@@ -2,8 +2,8 @@
 
 use std::collections::VecDeque;
 
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 /// Incremental CDLHIGHWAVE state using TA-Lib's rolling short-body average.
 /// Persistent Rust state or aligned output type for `CandleHighWave`.
 ///

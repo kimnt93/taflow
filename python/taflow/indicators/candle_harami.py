@@ -1,13 +1,13 @@
-"""Persistent Modified CandleHikkake pattern recognition (CDLHIKKAKEMOD)."""
+"""Persistent CandleHarami recognition (CDLHARAMI)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleHikkakeModified as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleHarami as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleHikkakeModified:
-    """Persistent Modified CandleHikkake pattern recognition (CDLHIKKAKEMOD).
+class CandleHarami:
+    """Persistent CandleHarami recognition (CDLHARAMI).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,9 +37,13 @@ class CandleHikkakeModified:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self.extend(_open, high, low, close)
+        (
+            self.extend(_open, high, low, close)
+            if any(x is not None for x in (_open, high, low, close))
+            else None
+        )
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleHikkakeModified":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleHarami":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -61,7 +65,7 @@ class CandleHikkakeModified:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleHikkakeModified":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleHarami":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -108,7 +112,7 @@ class CandleHikkakeModified:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleHikkakeModified":
+    def reset(self) -> "CandleHarami":
         """Execute the reset operation through the native Rust implementation.
 
         Returns

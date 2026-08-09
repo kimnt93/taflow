@@ -1,6 +1,6 @@
-//! Incremental Harami Cross candlestick recognition (CDLHARAMICROSS).
-use super::pattern::*;
+//! Incremental Gap Side-by-Side White candlestick recognition (CDLGAPSIDESIDEWHITE).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
@@ -21,20 +21,20 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleHaramiCross candle recognizer.
+/// Stateful CandleGapSideSideWhite candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleHaramiCross {
+pub struct CandleGapSideSideWhite {
     candles: VecDeque<Candle>,
-    body_long_sum: f64,
-    body_doji_sum: f64,
+    near_sum: f64,
+    equal_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleHaramiCross {
+impl Default for CandleGapSideSideWhite {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleHaramiCross {
+impl CandleGapSideSideWhite {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -42,9 +42,9 @@ impl CandleHaramiCross {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(11),
-            body_long_sum: 0.0,
-            body_doji_sum: 0.0,
+            candles: VecDeque::with_capacity(7),
+            near_sum: 0.0,
+            equal_sum: 0.0,
             value: None,
         }
     }
@@ -55,36 +55,36 @@ impl CandleHaramiCross {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
-        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
-        let value = if self.candles.len() == 11 {
-            let prev = self.candles[10]; // bar i-1
-            let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, prev.o, prev.c);
-            let doji = ca_highlow_scalar(BODY_DOJI, self.body_doji_sum, h, l);
-            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_long_sum += cr_realbody_scalar(prev.o, prev.c)
-                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_doji_sum +=
-                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
-            Some(
-                (prev.body() > long
-                    && cur.body() <= doji
-                    && cur.o.max(cur.c) < prev.o.max(prev.c)
-                    && cur.o.min(cur.c) > prev.o.min(prev.c)) as i32
-                    * -prev.color()
-                    * 100,
-            )
+        // Deque holds bars i-7..=i-1; bar j maps to index 7 - (i - j).
+        let value = if self.candles.len() == 7 {
+            let a = self.candles[5]; // bar i-2
+            let b = self.candles[6]; // bar i-1
+            let near = ca_highlow_scalar(NEAR, self.near_sum, b.h, b.l);
+            let equal = ca_highlow_scalar(EQUAL, self.equal_sum, b.h, b.l);
+            let base = b.color() == 1
+                && cur.color() == 1
+                && cur.body() >= b.body() - near
+                && cur.body() <= b.body() + near
+                && cur.o >= b.o - equal
+                && cur.o <= b.o + equal;
+            let bull = base && b.o.min(b.c) > a.o.max(a.c) && cur.o.min(cur.c) > a.o.max(a.c);
+            let bear = base && b.o.max(b.c) < a.o.min(a.c) && cur.o.max(cur.c) < a.o.min(a.c);
+            // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 5).
+            self.near_sum += cr_highlow_scalar(b.h, b.l)
+                - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            self.equal_sum += cr_highlow_scalar(b.h, b.l)
+                - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            Some((bull as i32) * 100 - (bear as i32) * 100)
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
             let i = self.candles.len();
-            if i < 10 {
-                self.body_long_sum += cr_realbody_scalar(o, c);
-            }
-            if (1..11).contains(&i) {
-                self.body_doji_sum += cr_highlow_scalar(h, l);
+            if (1..6).contains(&i) {
+                self.near_sum += cr_highlow_scalar(h, l);
+                self.equal_sum += cr_highlow_scalar(h, l);
             }
             None
         };
-        if self.candles.len() == 11 {
+        if self.candles.len() == 7 {
             self.candles.pop_front();
         }
         self.candles.push_back(cur);
@@ -142,8 +142,8 @@ impl CandleHaramiCross {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.candles.clear();
-        self.body_long_sum = 0.0;
-        self.body_doji_sum = 0.0;
+        self.near_sum = 0.0;
+        self.equal_sum = 0.0;
         self.value = None;
     }
 }

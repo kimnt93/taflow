@@ -1,6 +1,6 @@
 //! Incremental Modified Hikkake recognition (CDLHIKKAKEMOD).
-use super::pattern::*;
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {

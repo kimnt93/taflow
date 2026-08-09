@@ -1,10 +1,12 @@
-//! Incremental Harami candlestick recognition (CDLHARAMI).
-use super::pattern::*;
+//! Incremental Harami Cross candlestick recognition (CDLHARAMICROSS).
 use crate::error::TaResult;
+use crate::stream::pattern::*;
 use std::collections::VecDeque;
 #[derive(Clone, Copy)]
 struct Candle {
     o: f64,
+    h: f64,
+    l: f64,
     c: f64,
 }
 impl Candle {
@@ -19,20 +21,20 @@ impl Candle {
         }
     }
 }
-/// Stateful CandleHarami candle recognizer.
+/// Stateful CandleHaramiCross candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
-pub struct CandleHarami {
+pub struct CandleHaramiCross {
     candles: VecDeque<Candle>,
     body_long_sum: f64,
-    body_short_sum: f64,
+    body_doji_sum: f64,
     value: Option<i32>,
 }
-impl Default for CandleHarami {
+impl Default for CandleHaramiCross {
     fn default() -> Self {
         Self::new()
     }
 }
-impl CandleHarami {
+impl CandleHaramiCross {
     /// Computes or updates `new` through the native Rust kernel.
     ///
     /// Parameters are the typed series and configuration values in the signature.
@@ -42,7 +44,7 @@ impl CandleHarami {
         Self {
             candles: VecDeque::with_capacity(11),
             body_long_sum: 0.0,
-            body_short_sum: 0.0,
+            body_doji_sum: 0.0,
             value: None,
         }
     }
@@ -51,21 +53,21 @@ impl CandleHarami {
     /// Parameters are the typed series and configuration values in the signature.
     ///
     /// Returns the computed value, aligned history, or a validation error.
-    pub fn append(&mut self, o: f64, _h: f64, _l: f64, c: f64) -> Option<i32> {
-        let cur = Candle { o, c };
+    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
+        let cur = Candle { o, h, l, c };
         // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
         let value = if self.candles.len() == 11 {
             let prev = self.candles[10]; // bar i-1
             let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, prev.o, prev.c);
-            let short = ca_realbody_scalar(BODY_SHORT, self.body_short_sum, o, c);
+            let doji = ca_highlow_scalar(BODY_DOJI, self.body_doji_sum, h, l);
             // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
             self.body_long_sum += cr_realbody_scalar(prev.o, prev.c)
                 - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_short_sum +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
+            self.body_doji_sum +=
+                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
             Some(
                 (prev.body() > long
-                    && cur.body() <= short
+                    && cur.body() <= doji
                     && cur.o.max(cur.c) < prev.o.max(prev.c)
                     && cur.o.min(cur.c) > prev.o.min(prev.c)) as i32
                     * -prev.color()
@@ -78,7 +80,7 @@ impl CandleHarami {
                 self.body_long_sum += cr_realbody_scalar(o, c);
             }
             if (1..11).contains(&i) {
-                self.body_short_sum += cr_realbody_scalar(o, c);
+                self.body_doji_sum += cr_highlow_scalar(h, l);
             }
             None
         };
@@ -141,7 +143,7 @@ impl CandleHarami {
     pub fn reset(&mut self) {
         self.candles.clear();
         self.body_long_sum = 0.0;
-        self.body_short_sum = 0.0;
+        self.body_doji_sum = 0.0;
         self.value = None;
     }
 }

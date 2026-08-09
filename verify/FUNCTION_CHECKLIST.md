@@ -765,6 +765,16 @@ suite, interface audit, formatter, and diff checks passed. Generated rows may
 still lag; source scans are authoritative. Benchmark fields remain `TODO`;
 no benchmark command was run.
 
+The fourteenth structural batch migrated `CandleEveningStar`,
+`CandleGapSideSideWhite`, `CandleGravestoneDoji`, `CandleHammer`,
+`CandleHangingMan`, `CandleHarami`, `CandleHaramiCross`, `CandleHighWave`,
+`CandleHikkake`, and `CandleHikkakeModified`. Their Rust implementations and
+tests, Python adapters, and PyO3 bindings now use canonical one-indicator
+files and exports. The release extension, workspace Rust tests, ten focused
+Python tests, full Python suite, interface audit, formatter, and diff checks
+passed. Generated rows may still lag; source scans are authoritative.
+Benchmark fields remain `TODO`; no benchmark command was run.
+
 The thirteenth structural batch migrated `CandleBreakaway`,
 `CandleClosingMarubozu`, `CandleConcealBabySwall`, `CandleCounterAttack`,
 `CandleDarkCloudCover`, `CandleDoji`, `CandleDojiStar`,

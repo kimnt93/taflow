@@ -1,13 +1,13 @@
-"""Persistent High-Wave candlestick recognition (CDLHIGHWAVE)."""
+"""Persistent Modified CandleHikkake pattern recognition (CDLHIKKAKEMOD)."""
 
 from typing import Any
 import numpy as np
-from ._native import CandleHighWave as _Native
-from ._candle_ohlc import as_ohlc_arrays
+from .._native import CandleHikkakeModified as _Native
+from .._candle_ohlc import as_ohlc_arrays
 
 
-class CandleHighWave:
-    """Persistent High-Wave candlestick recognition (CDLHIGHWAVE).
+class CandleHikkakeModified:
+    """Persistent Modified CandleHikkake pattern recognition (CDLHIKKAKEMOD).
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
@@ -37,13 +37,9 @@ class CandleHighWave:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        (
-            self.extend(_open, high, low, close)
-            if any(value is not None for value in (_open, high, low, close))
-            else None
-        )
+        self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "CandleHighWave":
+    def append(self, _open: float, high: float, low: float, close: float) -> "CandleHikkakeModified":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -65,7 +61,7 @@ class CandleHighWave:
         self._state.append(float(_open), float(high), float(low), float(close))
         return self
 
-    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleHighWave":
+    def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "CandleHikkakeModified":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -112,7 +108,7 @@ class CandleHighWave:
         """Return the number of processed OHLC bars."""
         return len(self._state.compute())
 
-    def reset(self) -> "CandleHighWave":
+    def reset(self) -> "CandleHikkakeModified":
         """Execute the reset operation through the native Rust implementation.
 
         Returns
