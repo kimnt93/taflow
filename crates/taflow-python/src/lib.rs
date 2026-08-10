@@ -333,6 +333,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingKendallRankCorrelation>()?;
     m.add_class::<indicators::RollingCointegration>()?;
     m.add_class::<indicators::RollingGrangerCausality>()?;
+    m.add_class::<indicators::RollingLeadLagCrossCorrelation>()?;
+    m.add_class::<indicators::RollingPairwiseBeta>()?;
+    m.add_class::<indicators::RollingBetaNeutralSpread>()?;
+    m.add_class::<indicators::RollingMedianAbsoluteDeviation>()?;
+    m.add_class::<indicators::RollingStandardError>()?;
+    m.add_class::<indicators::RollingCoefficientOfDetermination>()?;
+    m.add_class::<indicators::VolumeWeightedMovingAverageConvergenceDivergence>()?;
+    m.add_class::<indicators::BetterVolume>()?;
+    m.add_class::<indicators::IntradayIntensity>()?;
+    m.add_class::<indicators::TradeVolumeIndex>()?;
 
     Ok(())
 }

@@ -54,8 +54,8 @@ as `VARIANT` during oracle verification.
 ## Implementation checklist
 
 Implementation progress: the first twenty unchecked high-priority/medium-
-priority entries below now have canonical Rust states, separate Rust tests,
-PyO3 bindings, Python adapters, exports, and lifecycle tests. Their external correctness and
+priority entries below have canonical Rust states, separate Rust tests, PyO3
+bindings, Python adapters, exports, and lifecycle tests. Their external correctness and
 performance gates remain pending by request; the roadmap checkboxes therefore
 stay unchecked until those gates are run.
 

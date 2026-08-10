@@ -1318,8 +1318,48 @@ pub use rolling_cointegration::RollingCointegration;
 pub use rolling_drawdown_duration::RollingDrawdownDuration;
 pub use rolling_gain_loss_ratio::RollingGainLossRatio;
 pub use rolling_granger_causality::RollingGrangerCausality;
+mod better_volume;
+#[cfg(test)]
+mod better_volume_test;
+mod intraday_intensity;
+#[cfg(test)]
+mod intraday_intensity_test;
+mod rolling_beta_neutral_spread;
+#[cfg(test)]
+mod rolling_beta_neutral_spread_test;
+mod rolling_coefficient_of_determination;
+#[cfg(test)]
+mod rolling_coefficient_of_determination_test;
+mod rolling_lead_lag_cross_correlation;
+#[cfg(test)]
+mod rolling_lead_lag_cross_correlation_test;
+mod rolling_median_absolute_deviation;
+#[cfg(test)]
+mod rolling_median_absolute_deviation_test;
+mod rolling_pairwise_beta;
+#[cfg(test)]
+mod rolling_pairwise_beta_test;
+mod rolling_standard_error;
+#[cfg(test)]
+mod rolling_standard_error_test;
+mod trade_volume_index;
+#[cfg(test)]
+mod trade_volume_index_test;
+mod volume_weighted_moving_average_convergence_divergence;
+#[cfg(test)]
+mod volume_weighted_moving_average_convergence_divergence_test;
+pub use better_volume::BetterVolume;
+pub use intraday_intensity::IntradayIntensity;
+pub use rolling_beta_neutral_spread::RollingBetaNeutralSpread;
+pub use rolling_coefficient_of_determination::RollingCoefficientOfDetermination;
 pub use rolling_kendall_rank_correlation::RollingKendallRankCorrelation;
+pub use rolling_lead_lag_cross_correlation::RollingLeadLagCrossCorrelation;
+pub use rolling_median_absolute_deviation::RollingMedianAbsoluteDeviation;
 pub use rolling_pain_index::RollingPainIndex;
+pub use rolling_pairwise_beta::RollingPairwiseBeta;
 pub use rolling_spearman_correlation::RollingSpearmanCorrelation;
+pub use rolling_standard_error::RollingStandardError;
 pub use rolling_variance_ratio::RollingVarianceRatio;
+pub use trade_volume_index::TradeVolumeIndex;
 pub use volume_relative_strength_index::VolumeRelativeStrengthIndex;
+pub use volume_weighted_moving_average_convergence_divergence::VolumeWeightedMovingAverageConvergenceDivergence;

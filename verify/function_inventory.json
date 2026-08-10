@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 315,
+    "indicators": 325,
     "native_functions": 0,
-    "native_state_classes": 314,
+    "native_state_classes": 324,
     "pandas_ta_symbols": 427,
-    "python_exports": 317,
-    "rust_exports": 661,
+    "python_exports": 327,
+    "rust_exports": 681,
     "smc_functions": 8,
-    "structure": 315,
+    "structure": 325,
     "talib_functions": 161
   },
   "rows": [
@@ -3303,6 +3303,156 @@
       "native_binding": true,
       "native_symbols": [
         "VolumeRelativeStrengthIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_lead_lag_cross_correlation",
+      "name": "RollingLeadLagCrossCorrelation",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingLeadLagCrossCorrelation",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_pairwise_beta",
+      "name": "RollingPairwiseBeta",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingPairwiseBeta",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_beta_neutral_spread",
+      "name": "RollingBetaNeutralSpread",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingBetaNeutralSpread",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_median_absolute_deviation",
+      "name": "RollingMedianAbsoluteDeviation",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingMedianAbsoluteDeviation",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_standard_error",
+      "name": "RollingStandardError",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingStandardError",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_coefficient_of_determination",
+      "name": "RollingCoefficientOfDetermination",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingCoefficientOfDetermination",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "volume_weighted_moving_average_convergence_divergence",
+      "name": "VolumeWeightedMovingAverageConvergenceDivergence",
+      "native_binding": true,
+      "native_symbols": [
+        "VolumeWeightedMovingAverageConvergenceDivergence",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "better_volume",
+      "name": "BetterVolume",
+      "native_binding": true,
+      "native_symbols": [
+        "BetterVolume",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "intraday_intensity",
+      "name": "IntradayIntensity",
+      "native_binding": true,
+      "native_symbols": [
+        "IntradayIntensity",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "trade_volume_index",
+      "name": "TradeVolumeIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "TradeVolumeIndex",
         "_Native"
       ],
       "pandas_ta_reference": false,

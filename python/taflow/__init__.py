@@ -5,6 +5,9 @@ __version__ = "0.1.2"
 from .ma_type import MaType
 from .indicators import AccelerationBands
 from .indicators import VolumeRelativeStrengthIndex, RollingAverageDrawdown
+from .indicators import RollingLeadLagCrossCorrelation, RollingPairwiseBeta, RollingBetaNeutralSpread
+from .indicators import RollingMedianAbsoluteDeviation, RollingStandardError, RollingCoefficientOfDetermination
+from .indicators import VolumeWeightedMovingAverageConvergenceDivergence, BetterVolume, IntradayIntensity, TradeVolumeIndex
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -485,6 +488,16 @@ __all__ = [
     "RollingKellyCriterion",
     "RollingRecoveryFactor",
     "VolumeRelativeStrengthIndex",
+    "RollingLeadLagCrossCorrelation",
+    "RollingPairwiseBeta",
+    "RollingBetaNeutralSpread",
+    "RollingMedianAbsoluteDeviation",
+    "RollingStandardError",
+    "RollingCoefficientOfDetermination",
+    "VolumeWeightedMovingAverageConvergenceDivergence",
+    "BetterVolume",
+    "IntradayIntensity",
+    "TradeVolumeIndex",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

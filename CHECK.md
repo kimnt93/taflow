@@ -370,6 +370,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | rolling_kendall_rank_correlation | rolling_kendall_rank_correlation | _ |
 | [ ] | rolling_cointegration | rolling_cointegration | _ |
 | [ ] | rolling_granger_causality | rolling_granger_causality | _ |
+| [ ] | rolling_lead_lag_cross_correlation | rolling_lead_lag_cross_correlation | _ |
+| [ ] | rolling_pairwise_beta | rolling_pairwise_beta | _ |
+| [ ] | rolling_beta_neutral_spread | rolling_beta_neutral_spread | _ |
+| [ ] | rolling_median_absolute_deviation | rolling_median_absolute_deviation | _ |
+| [ ] | rolling_standard_error | rolling_standard_error | _ |
+| [ ] | rolling_coefficient_of_determination | rolling_coefficient_of_determination | _ |
+| [ ] | volume_weighted_moving_average_convergence_divergence | volume_weighted_moving_average_convergence_divergence | _ |
+| [ ] | better_volume | better_volume | _ |
+| [ ] | intraday_intensity | intraday_intensity | _ |
+| [ ] | trade_volume_index | trade_volume_index | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

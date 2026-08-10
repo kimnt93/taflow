@@ -2,6 +2,16 @@
 
 from .absolute_price_oscillator import AbsolutePriceOscillator
 from .volume_relative_strength_index import VolumeRelativeStrengthIndex
+from .rolling_lead_lag_cross_correlation import RollingLeadLagCrossCorrelation
+from .rolling_pairwise_beta import RollingPairwiseBeta
+from .rolling_beta_neutral_spread import RollingBetaNeutralSpread
+from .rolling_median_absolute_deviation import RollingMedianAbsoluteDeviation
+from .rolling_standard_error import RollingStandardError
+from .rolling_coefficient_of_determination import RollingCoefficientOfDetermination
+from .volume_weighted_moving_average_convergence_divergence import VolumeWeightedMovingAverageConvergenceDivergence
+from .better_volume import BetterVolume
+from .intraday_intensity import IntradayIntensity
+from .trade_volume_index import TradeVolumeIndex
 from .rolling_average_drawdown import RollingAverageDrawdown
 from .rolling_drawdown_duration import RollingDrawdownDuration
 from .rolling_gain_loss_ratio import RollingGainLossRatio
@@ -518,6 +528,16 @@ __all__ = [
     "RollingKellyCriterion",
     "RollingRecoveryFactor",
     "VolumeRelativeStrengthIndex",
+    "RollingLeadLagCrossCorrelation",
+    "RollingPairwiseBeta",
+    "RollingBetaNeutralSpread",
+    "RollingMedianAbsoluteDeviation",
+    "RollingStandardError",
+    "RollingCoefficientOfDetermination",
+    "VolumeWeightedMovingAverageConvergenceDivergence",
+    "BetterVolume",
+    "IntradayIntensity",
+    "TradeVolumeIndex",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",
