@@ -1,17 +1,62 @@
+"""Public adapter for native Williams Accumulation/Distribution."""
+
 from typing import Any
+
 import numpy as np
+
 from .._native import WilliamsAccumulationDistribution as _Native
 from .._series import as_float64_series
+
+
 class WilliamsAccumulationDistribution:
-    """Cumulative Williams accumulation/distribution from OHLC bars."""
-    def __init__(self,high:Any,low:Any,close:Any)->None:self._state=_Native();self.extend(high,low,close)
-    def append(self,high:float,low:float,close:float)->"WilliamsAccumulationDistribution":self._state.append(float(high),float(low),float(close));return self
-    def extend(self,high:Any,low:Any,close:Any)->"WilliamsAccumulationDistribution":
-        a=tuple(as_float64_series(x) for x in(high,low,close))
-        if len({len(x) for x in a})!=1:raise ValueError("high, low, and close must have equal lengths")
-        self._state.extend(*a);return self
-    def compute(self)->np.ndarray:return self._state.compute()
+    """Accumulate price movement relative to true highs and true lows.
+
+    Up-closes add ``close - min(low, previous_close)`` and down-closes add
+    ``close - max(high, previous_close)``. This indicator uses no volume. The
+    first bar seeds the previous close and returns ``NaN``. It maps to Wickra
+    ``Wad``.
+
+    Args:
+        high: Initial chronological high prices.
+        low: Initial chronological low prices.
+        close: Initial chronological closing prices.
+
+    Raises:
+        ValueError: If the three series differ in length.
+    """
+
+    def __init__(self, high: Any, low: Any, close: Any) -> None:
+        """Initialize native state and process the aligned history."""
+        self._state = _Native()
+        self.extend(high, low, close)
+
+    def append(self, high: float, low: float, close: float) -> "WilliamsAccumulationDistribution":
+        """Append one high/low/close bar and return this instance."""
+        self._state.append(float(high), float(low), float(close))
+        return self
+
+    def extend(self, high: Any, low: Any, close: Any) -> "WilliamsAccumulationDistribution":
+        """Append aligned high, low, and close histories and return self."""
+        series = tuple(as_float64_series(item) for item in (high, low, close))
+        if len({len(item) for item in series}) != 1:
+            raise ValueError("high, low, and close must have equal lengths")
+        self._state.extend(*series)
+        return self
+
     @property
-    def value(self)->float|None:return self._state.value
-    def reset(self)->"WilliamsAccumulationDistribution":self._state.reset();return self
-    def __len__(self)->int:return len(self._state)
+    def value(self) -> float | None:
+        """Return latest cumulative WAD, or ``None`` before the second bar."""
+        return self._state.value
+
+    def compute(self) -> np.ndarray:
+        """Return aligned WAD history with the seed position as ``NaN``."""
+        return self._state.compute()
+
+    def reset(self) -> "WilliamsAccumulationDistribution":
+        """Clear previous-close and cumulative state, then return self."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the number of bars stored by native state."""
+        return len(self._state)

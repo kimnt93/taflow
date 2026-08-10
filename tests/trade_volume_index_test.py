@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import TradeVolumeIndex
-def test_trade_volume_index_lifecycle():
-    s=TradeVolumeIndex(np.array([],float),np.array([],float));s.extend([1,2],[10,10]);assert s.value is not None;s.reset();assert len(s)==0
+"""External correctness for TradeVolumeIndex."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_trade_volume_index_matches_wickra() -> None:
+    """Match Wickra TradeVolumeIndex, including minimum-tick direction."""
+    assert_registered_oracle_match("TradeVolumeIndex")

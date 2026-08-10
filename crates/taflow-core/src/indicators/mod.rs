@@ -1391,11 +1391,11 @@ mod twiggs_money_flow_test;
 mod williams_accumulation_distribution;
 #[cfg(test)]
 mod williams_accumulation_distribution_test;
-pub use average_true_range_bands::AverageTrueRangeBands;
-pub use double_bollinger_bands::DoubleBollingerBands;
-pub use linear_regression_channel::LinearRegressionChannel;
+pub use average_true_range_bands::{AverageTrueRangeBands, AverageTrueRangeBandsValue};
+pub use double_bollinger_bands::{DoubleBollingerBands, DoubleBollingerBandsValue};
+pub use linear_regression_channel::{LinearRegressionChannel, LinearRegressionChannelValue};
 pub use market_facilitation_index::MarketFacilitationIndex;
-pub use moving_average_envelope::MovingAverageEnvelope;
+pub use moving_average_envelope::{MovingAverageEnvelope, MovingAverageEnvelopeValue};
 pub use projection_bands::ProjectionBands;
 mod adaptive_cycle;
 #[cfg(test)]
@@ -1436,7 +1436,7 @@ pub use hurst_channel::HurstChannel;
 pub use instantaneous_trendline::InstantaneousTrendline;
 pub use inverse_fisher_transform::InverseFisherTransform;
 pub use roofing_filter::RoofingFilter;
-pub use standard_error_bands::StandardErrorBands;
+pub use standard_error_bands::{StandardErrorBands, StandardErrorBandsValue};
 pub use super_smoother::SuperSmoother;
 pub use time_segmented_volume::TimeSegmentedVolume;
 pub use twiggs_money_flow::TwiggsMoneyFlow;
@@ -1474,14 +1474,14 @@ mod zig_zag;
 #[cfg(test)]
 mod zig_zag_test;
 pub use average_daily_range::AverageDailyRange;
-pub use day_of_week_return_profile::DayOfWeekReturnProfile;
+pub use day_of_week_return_profile::{DayOfWeekReturnProfile, DayOfWeekReturnProfileValue};
 pub use empirical_mode_decomposition::EmpiricalModeDecomposition;
 pub use hilbert_dominant_cycle::HilbertDominantCycle;
 pub use overnight_gap::OvernightGap;
 pub use overnight_intraday_return::{OvernightIntradayReturn, OvernightIntradayReturnValue};
-pub use session_range::SessionRange;
+pub use session_range::{SessionRange, SessionRangeValue};
 pub use session_volume_weighted_average_price::SessionVolumeWeightedAveragePrice;
-pub use time_of_day_return_profile::TimeOfDayReturnProfile;
+pub use time_of_day_return_profile::{TimeOfDayReturnProfile, TimeOfDayReturnProfileValue};
 pub use zig_zag::{ZigZag, ZigZagValue};
 mod absolute_breadth_index;
 #[cfg(test)]
@@ -1517,12 +1517,12 @@ pub use absolute_breadth_index::AbsoluteBreadthIndex;
 pub use bullish_percent_index::BullishPercentIndex;
 pub use cumulative_volume_index::CumulativeVolumeIndex;
 pub use high_low_index::HighLowIndex;
-pub use intraday_volatility_profile::IntradayVolatilityProfile;
+pub use intraday_volatility_profile::{IntradayVolatilityProfile, IntradayVolatilityProfileValue};
 pub use median_channel::{MedianChannel, MedianChannelValue};
 pub use percent_above_moving_average::PercentAboveMovingAverage;
 pub use quartile_bands::{QuartileBands, QuartileBandsValue};
 pub use up_down_volume_ratio::UpDownVolumeRatio;
-pub use volume_by_time_profile::VolumeByTimeProfile;
+pub use volume_by_time_profile::{VolumeByTimeProfile, VolumeByTimeProfileValue};
 mod arms_index;
 #[cfg(test)]
 mod arms_index_test;

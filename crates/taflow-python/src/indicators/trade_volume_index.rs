@@ -9,9 +9,11 @@ pub struct TradeVolumeIndex {
 #[pymethods]
 impl TradeVolumeIndex {
     #[new]
-    fn new() -> PyResult<Self> {
+    #[pyo3(signature = (min_tick=0.25))]
+    fn new(min_tick: f64) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new().unwrap(),
+            inner: State::new(min_tick)
+                .map_err(|error| pyo3::exceptions::PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

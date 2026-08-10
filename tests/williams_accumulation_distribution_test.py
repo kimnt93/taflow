@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import WilliamsAccumulationDistribution
-def test_williams_accumulation_distribution_lifecycle():
-    s=WilliamsAccumulationDistribution(np.array([],float),np.array([],float),np.array([],float));s.extend([2],[1],[1.5]);assert s.value is not None;s.reset();assert len(s)==0
+"""External correctness for WilliamsAccumulationDistribution."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_williams_accumulation_distribution_matches_wickra() -> None:
+    """Match Wickra WAD across batch and streaming paths."""
+    assert_registered_oracle_match("WilliamsAccumulationDistribution")

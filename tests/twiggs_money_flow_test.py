@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import TwiggsMoneyFlow
-def test_twiggs_money_flow_lifecycle():
-    s=TwiggsMoneyFlow(np.array([],float),np.array([],float),np.array([],float),np.array([],float),2);s.extend([2,2],[1,1],[1.5,1.5],[10,10]);assert s.value is not None;s.reset();assert len(s)==0
+"""External correctness for TwiggsMoneyFlow."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_twiggs_money_flow_matches_wickra() -> None:
+    """Match Wickra TwiggsMoneyFlow across all lifecycle paths."""
+    assert_registered_oracle_match("TwiggsMoneyFlow")

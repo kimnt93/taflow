@@ -1,3 +1,5 @@
-from taflow import VolumeByTimeProfile
-def test_lifecycle():
- x=VolumeByTimeProfile([1.],[1.],[1.],[1.],[4.],[0]);assert x.value==4.;x.reset();assert len(x)==0
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_volume_by_time_profile_matches_wickra() -> None:
+    assert_registered_oracle_match("VolumeByTimeProfile")
