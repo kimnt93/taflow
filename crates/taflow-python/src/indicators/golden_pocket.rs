@@ -26,14 +26,14 @@ impl GoldenPocket {
     fn append(&mut self, high: f64, low: f64) -> Option<(f64, f64, f64)> {
         let result = self.inner.append(high, low);
         let value = result.unwrap_or(GoldenPocketValue {
-            lower: f64::NAN,
-            midpoint: f64::NAN,
-            upper: f64::NAN,
+            low: f64::NAN,
+            mid: f64::NAN,
+            high: f64::NAN,
         });
-        self.lower.push(value.lower);
-        self.midpoint.push(value.midpoint);
-        self.upper.push(value.upper);
-        result.map(|value| (value.lower, value.midpoint, value.upper))
+        self.lower.push(value.low);
+        self.midpoint.push(value.mid);
+        self.upper.push(value.high);
+        result.map(|value| (value.low, value.mid, value.high))
     }
 
     fn extend(
@@ -76,7 +76,7 @@ impl GoldenPocket {
     fn value(&self) -> Option<(f64, f64, f64)> {
         self.inner
             .value()
-            .map(|value| (value.lower, value.midpoint, value.upper))
+            .map(|value| (value.low, value.mid, value.high))
     }
 
     fn reset(&mut self) {

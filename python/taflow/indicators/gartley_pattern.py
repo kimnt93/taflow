@@ -11,8 +11,10 @@ class GartleyPattern:
 
     Rust owns the bounded persistent window, pattern arithmetic, warm-up, and
     output history. The required input order is open, high, low, close. Scalar
-    output is 1.0 for a bullish reversal, -1.0 for a bearish reversal, and 0.0
-    when no pattern is present; the first 5 aligned positions are NaN.
+    output is 1.0 for a bullish completion, -1.0 for a bearish completion, and
+    0.0 otherwise, including before five confirmed alternating pivots exist.
+    Wickra's XA, AB, BC, CD, and AD ratio ranges are evaluated only when a new
+    pivot is confirmed, so historical signals are causal and do not repaint.
     append, extend, and reset mutate and return this adapter. The external name
     mapping is Wickra 0.9.9 Gartley; TA-Lib has no equivalent pattern function.
     """

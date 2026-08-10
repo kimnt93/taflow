@@ -1,20 +1,68 @@
-use crate::error::TaResult;
 use super::pattern_swing::{ratios_in, xabcd, SwingTracker, SWING_THRESHOLD};
+use crate::error::TaResult;
 
 /// Bat X-A-B-C-D harmonic completion signal.
 #[derive(Debug, Clone)]
-pub struct BatPattern { swing: SwingTracker, count: usize, value: Option<f64> }
+pub struct BatPattern {
+    swing: SwingTracker,
+    count: usize,
+    value: Option<f64>,
+}
+
 impl BatPattern {
     /// Create a detector retaining five confirmed pivots.
-    pub fn new()->TaResult<Self>{Ok(Self{swing:SwingTracker::new(SWING_THRESHOLD,5),count:0,value:None})}
+    pub fn new() -> TaResult<Self> {
+        Ok(Self {
+            swing: SwingTracker::new(SWING_THRESHOLD, 5),
+            count: 0,
+            value: None,
+        })
+    }
+
     /// Append one OHLC bar and return the latest harmonic signal.
-    pub fn append(&mut self,_open:f64,high:f64,low:f64,_close:f64)->Option<f64>{self.count+=1;self.value=Some(0.0);if !self.swing.append(high,low)||self.swing.pivots().len()<5{return self.value;}let p=xabcd(self.swing.pivots());let xa=(p.a-p.x).abs();let ab=(p.b-p.a).abs();let bc=(p.c-p.b).abs();let cd=(p.d-p.c).abs();let ad=(p.d-p.a).abs();if ratios_in(&[(ab/xa,.382,.50),(bc/ab,.382,.886),(cd/bc,1.618,2.618),(ad/xa,.84,.93)]){self.value=Some(if p.bullish{1.0}else{-1.0});}self.value}
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
+        self.count += 1;
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) || self.swing.pivots().len() < 5 {
+            return self.value;
+        }
+
+        let points = xabcd(self.swing.pivots());
+        let xa = (points.a - points.x).abs();
+        let ab = (points.b - points.a).abs();
+        let bc = (points.c - points.b).abs();
+        let cd = (points.d - points.c).abs();
+        let ad = (points.d - points.a).abs();
+        if ratios_in(&[
+            (ab / xa, 0.382, 0.500),
+            (bc / ab, 0.382, 0.886),
+            (cd / bc, 1.618, 2.618),
+            (ad / xa, 0.840, 0.930),
+        ]) {
+            self.value = Some(if points.bullish { 1.0 } else { -1.0 });
+        }
+        self.value
+    }
+
     /// Return the latest signal.
-    pub fn value(&self)->Option<f64>{self.value}
+    pub fn value(&self) -> Option<f64> {
+        self.value
+    }
+
     /// Return the processed-bar count.
-    pub fn len(&self)->usize{self.count}
+    pub fn len(&self) -> usize {
+        self.count
+    }
+
     /// Return whether no bars were processed.
-    pub fn is_empty(&self)->bool{self.count==0}
+    pub fn is_empty(&self) -> bool {
+        self.count == 0
+    }
+
     /// Clear pivots and output.
-    pub fn reset(&mut self){self.swing.reset();self.count=0;self.value=None;}
+    pub fn reset(&mut self) {
+        self.swing.reset();
+        self.count = 0;
+        self.value = None;
+    }
 }

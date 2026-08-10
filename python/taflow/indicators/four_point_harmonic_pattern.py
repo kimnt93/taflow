@@ -11,8 +11,10 @@ class FourPointHarmonicPattern:
 
     Rust owns the bounded persistent window, pattern arithmetic, warm-up, and
     output history. The required input order is open, high, low, close. Scalar
-    output is 1.0 for a bullish reversal, -1.0 for a bearish reversal, and 0.0
-    when no pattern is present; the first 4 aligned positions are NaN.
+    output is 1.0 for a bullish completion, -1.0 for a bearish completion, and
+    0.0 otherwise, including before four confirmed alternating pivots exist.
+    The BC/AB and CD/BC intervals plus the AB=CD tolerance follow Wickra and
+    are evaluated only when a pivot is confirmed.
     append, extend, and reset mutate and return this adapter. The external name
     mapping is Wickra 0.9.9 Abcd; TA-Lib has no equivalent pattern function.
     """
