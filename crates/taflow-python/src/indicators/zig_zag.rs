@@ -4,8 +4,8 @@ use taflow::indicators::{ZigZag as State, ZigZagValue};
 #[pyclass]
 pub struct ZigZag {
     inner: State,
-    high: Vec<f64>,
-    low: Vec<f64>,
+    swing: Vec<f64>,
+    direction: Vec<f64>,
 }
 #[pymethods]
 impl ZigZag {
@@ -15,19 +15,19 @@ impl ZigZag {
         Ok(Self {
             inner: State::new(threshold)
                 .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?,
-            high: Vec::new(),
-            low: Vec::new(),
+            swing: Vec::new(),
+            direction: Vec::new(),
         })
     }
     fn append(&mut self, high: f64, low: f64) -> Option<(f64, f64)> {
         let x = self.inner.append(high, low);
-        let v = x.unwrap_or(ZigZagValue {
-            high: f64::NAN,
-            low: f64::NAN,
+        let value = x.unwrap_or(ZigZagValue {
+            swing: f64::NAN,
+            direction: f64::NAN,
         });
-        self.high.push(v.high);
-        self.low.push(v.low);
-        x.map(|v| (v.high, v.low))
+        self.swing.push(value.swing);
+        self.direction.push(value.direction);
+        x.map(|value| (value.swing, value.direction))
     }
     fn extend(
         &mut self,
@@ -53,20 +53,22 @@ impl ZigZag {
         py: Python<'py>,
     ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
         (
-            PyArray1::from_vec(py, self.high.clone()),
-            PyArray1::from_vec(py, self.low.clone()),
+            PyArray1::from_vec(py, self.swing.clone()),
+            PyArray1::from_vec(py, self.direction.clone()),
         )
     }
     #[getter]
     fn value(&self) -> Option<(f64, f64)> {
-        self.inner.value().map(|v| (v.high, v.low))
+        self.inner
+            .value()
+            .map(|value| (value.swing, value.direction))
     }
     fn reset(&mut self) {
         self.inner.reset();
-        self.high.clear();
-        self.low.clear();
+        self.swing.clear();
+        self.direction.clear();
     }
     fn __len__(&self) -> usize {
-        self.high.len()
+        self.swing.len()
     }
 }
