@@ -1,12 +1,25 @@
 {
   "function": "jma",
   "taflow_class": "JurikMovingAverage",
-  "oracle": null,
-  "oracle_name": null,
+  "oracle": "Wickra",
+  "oracle_name": "JMA",
+  "variant": "TAFlow follows the pandas-ta-classic adaptive-volatility Jurik reconstruction; Wickra implements the simpler three-stage open-source reconstruction.",
+  "batch_vs_oracle": {
+    "passed": false,
+    "nan_mismatches": 6,
+    "infinity_mismatches": 0,
+    "max_abs_error": 5.125592583720817
+  },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
     "1": true,
     "10": true,
     "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": false,
+    "nan_mismatches": 6,
+    "infinity_mismatches": 0,
+    "max_abs_error": 5.125592583720817
   }
 }
