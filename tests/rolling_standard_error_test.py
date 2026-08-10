@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import RollingStandardError
-def test_rolling_standard_error_lifecycle():
-    s=RollingStandardError(np.array([],float),2);s.extend([1,2]);assert s.value is not None;s.reset();assert len(s)==0
+"""External correctness for RollingStandardError."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_rolling_standard_error_matches_wickra() -> None:
+    """Match Wickra StandardError across all lifecycle paths."""
+    assert_registered_oracle_match("RollingStandardError")

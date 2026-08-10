@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import RollingGrangerCausality
-def test_rolling_granger_causality_lifecycle():
-    state=RollingGrangerCausality(np.array([],dtype=float),np.array([],dtype=float),3,1);state.extend([1,2,3],[2,3,4]);assert state.value is not None;state.reset();assert len(state)==0
+"""External correctness for RollingGrangerCausality."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_rolling_granger_causality_matches_wickra() -> None:
+    """Match Wickra GrangerCausality across batch and streaming paths."""
+    assert_registered_oracle_match("RollingGrangerCausality")

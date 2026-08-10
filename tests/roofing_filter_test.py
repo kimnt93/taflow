@@ -1,4 +1,5 @@
-import numpy as np
-from taflow import RoofingFilter
-def test_roofing_filter_lifecycle():
-    s=RoofingFilter(np.array([],float),3,5);s.extend([1]);assert s.value is not None;s.reset();assert len(s)==0
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_roofing_filter_matches_wickra() -> None:
+    assert_registered_oracle_match("RoofingFilter")

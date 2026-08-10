@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import RollingPairwiseBeta
-def test_rolling_pairwise_beta_lifecycle():
-    s=RollingPairwiseBeta(np.array([],float),np.array([],float),2);s.extend([1,2],[2,4]);assert s.value is not None;s.reset();assert len(s)==0
+"""External correctness for RollingPairwiseBeta."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_rolling_pairwise_beta_matches_wickra() -> None:
+    """Match Wickra PairwiseBeta across batch and streaming paths."""
+    assert_registered_oracle_match("RollingPairwiseBeta")
