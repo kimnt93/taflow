@@ -343,6 +343,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::BetterVolume>()?;
     m.add_class::<indicators::IntradayIntensity>()?;
     m.add_class::<indicators::TradeVolumeIndex>()?;
+    m.add_class::<indicators::TwiggsMoneyFlow>()?;
+    m.add_class::<indicators::WilliamsAccumulationDistribution>()?;
+    m.add_class::<indicators::MarketFacilitationIndex>()?;
+    m.add_class::<indicators::TimeSegmentedVolume>()?;
+    m.add_class::<indicators::MovingAverageEnvelope>()?;
+    m.add_class::<indicators::AverageTrueRangeBands>()?;
+    m.add_class::<indicators::LinearRegressionChannel>()?;
+    m.add_class::<indicators::StandardErrorBands>()?;
+    m.add_class::<indicators::DoubleBollingerBands>()?;
+    m.add_class::<indicators::ProjectionBands>()?;
 
     Ok(())
 }

@@ -380,6 +380,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | better_volume | better_volume | _ |
 | [ ] | intraday_intensity | intraday_intensity | _ |
 | [ ] | trade_volume_index | trade_volume_index | _ |
+| [ ] | twiggs_money_flow | twiggs_money_flow | _ |
+| [ ] | williams_accumulation_distribution | williams_accumulation_distribution | _ |
+| [ ] | market_facilitation_index | market_facilitation_index | _ |
+| [ ] | time_segmented_volume | time_segmented_volume | _ |
+| [ ] | moving_average_envelope | moving_average_envelope | _ |
+| [ ] | average_true_range_bands | average_true_range_bands | _ |
+| [ ] | linear_regression_channel | linear_regression_channel | _ |
+| [ ] | standard_error_bands | standard_error_bands | _ |
+| [ ] | double_bollinger_bands | double_bollinger_bands | _ |
+| [ ] | projection_bands | projection_bands | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

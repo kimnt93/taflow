@@ -1361,5 +1361,45 @@ pub use rolling_spearman_correlation::RollingSpearmanCorrelation;
 pub use rolling_standard_error::RollingStandardError;
 pub use rolling_variance_ratio::RollingVarianceRatio;
 pub use trade_volume_index::TradeVolumeIndex;
+mod average_true_range_bands;
+#[cfg(test)]
+mod average_true_range_bands_test;
+mod double_bollinger_bands;
+#[cfg(test)]
+mod double_bollinger_bands_test;
+mod linear_regression_channel;
+#[cfg(test)]
+mod linear_regression_channel_test;
+mod market_facilitation_index;
+#[cfg(test)]
+mod market_facilitation_index_test;
+mod moving_average_envelope;
+#[cfg(test)]
+mod moving_average_envelope_test;
+mod projection_bands;
+#[cfg(test)]
+mod projection_bands_test;
+mod standard_error_bands;
+#[cfg(test)]
+mod standard_error_bands_test;
+mod time_segmented_volume;
+#[cfg(test)]
+mod time_segmented_volume_test;
+mod twiggs_money_flow;
+#[cfg(test)]
+mod twiggs_money_flow_test;
+mod williams_accumulation_distribution;
+#[cfg(test)]
+mod williams_accumulation_distribution_test;
+pub use average_true_range_bands::AverageTrueRangeBands;
+pub use double_bollinger_bands::DoubleBollingerBands;
+pub use linear_regression_channel::LinearRegressionChannel;
+pub use market_facilitation_index::MarketFacilitationIndex;
+pub use moving_average_envelope::MovingAverageEnvelope;
+pub use projection_bands::ProjectionBands;
+pub use standard_error_bands::StandardErrorBands;
+pub use time_segmented_volume::TimeSegmentedVolume;
+pub use twiggs_money_flow::TwiggsMoneyFlow;
 pub use volume_relative_strength_index::VolumeRelativeStrengthIndex;
 pub use volume_weighted_moving_average_convergence_divergence::VolumeWeightedMovingAverageConvergenceDivergence;
+pub use williams_accumulation_distribution::WilliamsAccumulationDistribution;

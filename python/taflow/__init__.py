@@ -8,6 +8,9 @@ from .indicators import VolumeRelativeStrengthIndex, RollingAverageDrawdown
 from .indicators import RollingLeadLagCrossCorrelation, RollingPairwiseBeta, RollingBetaNeutralSpread
 from .indicators import RollingMedianAbsoluteDeviation, RollingStandardError, RollingCoefficientOfDetermination
 from .indicators import VolumeWeightedMovingAverageConvergenceDivergence, BetterVolume, IntradayIntensity, TradeVolumeIndex
+from .indicators import TwiggsMoneyFlow, WilliamsAccumulationDistribution, MarketFacilitationIndex, TimeSegmentedVolume
+from .indicators import MovingAverageEnvelope, AverageTrueRangeBands, LinearRegressionChannel, StandardErrorBands
+from .indicators import DoubleBollingerBands, ProjectionBands
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -498,6 +501,16 @@ __all__ = [
     "BetterVolume",
     "IntradayIntensity",
     "TradeVolumeIndex",
+    "TwiggsMoneyFlow",
+    "WilliamsAccumulationDistribution",
+    "MarketFacilitationIndex",
+    "TimeSegmentedVolume",
+    "MovingAverageEnvelope",
+    "AverageTrueRangeBands",
+    "LinearRegressionChannel",
+    "StandardErrorBands",
+    "DoubleBollingerBands",
+    "ProjectionBands",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",
