@@ -21,11 +21,11 @@ fn assert_same_bits(left: &[f64], right: &[f64]) {
 
 #[test]
 fn variable_index_dynamic_average_matches_known_values() {
-    let mut state = VariableIndexDynamicAverage::new(3, 0.5).unwrap();
+    let mut state = VariableIndexDynamicAverage::new(14, 3, 0.5).unwrap();
     let actual = [1.0, 2.0, 3.0, 2.0, 4.0, 4.0].map(|input| state.append(input));
     assert_eq!(actual[0], None);
     assert_eq!(actual[1], None);
-    assert_eq!(actual[2], Some(2.0));
+    assert_eq!(actual[2], None);
     assert_eq!(actual[3], Some(2.0));
     assert_eq!(actual[4], Some(2.5));
     assert_eq!(actual[5], Some(2.75));
@@ -36,12 +36,12 @@ fn variable_index_dynamic_average_matches_known_values() {
 fn variable_index_dynamic_average_bulk_chunking_and_reset_are_bitwise_invariant() {
     let input = deterministic_series(5_000);
     for length in [1_usize, 2, 5, 14, 30] {
-        let mut batch = VariableIndexDynamicAverage::new(length, 0.2).unwrap();
+        let mut batch = VariableIndexDynamicAverage::new(length, 9, 0.2).unwrap();
         let mut expected = Vec::new();
         batch.extend_slice_into(&input, &mut expected);
 
         for chunk_length in [1_usize, 7, 97, 5_000] {
-            let mut chunked = VariableIndexDynamicAverage::new(length, 0.2).unwrap();
+            let mut chunked = VariableIndexDynamicAverage::new(length, 9, 0.2).unwrap();
             let mut actual = Vec::new();
             for chunk in input.chunks(chunk_length) {
                 chunked.extend_slice_into(chunk, &mut actual);
@@ -63,18 +63,19 @@ fn variable_index_dynamic_average_bulk_chunking_and_reset_are_bitwise_invariant(
 
 #[test]
 fn variable_index_dynamic_average_validates_configuration() {
-    assert!(VariableIndexDynamicAverage::new(0, 0.5).is_err());
+    assert!(VariableIndexDynamicAverage::new(0, 9, 0.5).is_err());
+    assert!(VariableIndexDynamicAverage::new(14, 0, 0.5).is_err());
     for invalid_alpha in [0.0, -0.1, 1.1, f64::NAN, f64::INFINITY] {
-        assert!(VariableIndexDynamicAverage::new(14, invalid_alpha).is_err());
+        assert!(VariableIndexDynamicAverage::new(14, 9, invalid_alpha).is_err());
     }
 }
 
 #[test]
 fn variable_index_dynamic_average_preserves_oracle_zero_momentum_semantics() {
-    let mut state = VariableIndexDynamicAverage::new(3, 0.5).unwrap();
+    let mut state = VariableIndexDynamicAverage::new(14, 3, 0.5).unwrap();
+    assert_eq!(state.append(5.0), None);
     assert_eq!(state.append(5.0), None);
     assert_eq!(state.append(5.0), None);
     assert_eq!(state.append(5.0), Some(5.0));
-    assert!(state.append(5.0).unwrap().is_nan());
-    assert!(state.append(6.0).unwrap().is_nan());
+    assert_eq!(state.append(6.0), Some(5.5));
 }

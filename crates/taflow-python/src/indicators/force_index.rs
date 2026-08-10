@@ -12,11 +12,12 @@ pub struct ForceIndexOperator {
 #[pymethods]
 impl ForceIndexOperator {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: ForceIndex::new(),
+    fn new(period: usize) -> PyResult<Self> {
+        Ok(Self {
+            inner: ForceIndex::new(period)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
-        }
+        })
     }
     fn append(&mut self, close: f64, volume: f64) -> Option<f64> {
         let value = self.inner.append(close, volume);
@@ -50,5 +51,8 @@ impl ForceIndexOperator {
     fn reset(&mut self) {
         self.inner.reset();
         self.outputs.clear();
+    }
+    fn __len__(&self) -> usize {
+        self.inner.len()
     }
 }

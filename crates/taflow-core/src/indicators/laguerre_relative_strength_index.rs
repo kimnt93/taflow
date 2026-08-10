@@ -13,13 +13,13 @@ pub struct LaguerreRelativeStrengthIndex {
 }
 
 impl LaguerreRelativeStrengthIndex {
-    /// Creates an oscillator with `gamma` in the half-open interval `[0, 1)`.
+    /// Creates an oscillator with `gamma` in the closed interval `[0, 1]`.
     pub fn new(gamma: f64) -> TaResult<Self> {
-        if !(0.0..1.0).contains(&gamma) {
+        if !gamma.is_finite() || !(0.0..=1.0).contains(&gamma) {
             return Err(TaError::InvalidParameter {
                 name: "gamma",
                 value: gamma.to_string(),
-                reason: "must be in [0, 1)",
+                reason: "must be finite and in [0, 1]",
             });
         }
         Ok(Self {
@@ -38,7 +38,9 @@ impl StreamingIndicator for LaguerreRelativeStrengthIndex {
         if !self.initialized {
             self.stages = [input; 4];
             self.initialized = true;
-            self.value = Some(0.0);
+            // Equal Laguerre stages have neither upward nor downward energy;
+            // the conventional oscillator value is the neutral midpoint.
+            self.value = Some(50.0);
             return self.value;
         }
 
@@ -58,7 +60,7 @@ impl StreamingIndicator for LaguerreRelativeStrengthIndex {
         self.stages = [stage_zero, stage_one, stage_two, stage_three];
         let total = upward + downward;
         self.value = Some(if total == 0.0 {
-            0.0
+            50.0
         } else {
             100.0 * upward / total
         });

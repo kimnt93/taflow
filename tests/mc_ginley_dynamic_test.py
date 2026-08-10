@@ -1,5 +1,10 @@
 import numpy as np
 from taflow import McGinleyDynamic
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_mcginley_dynamic_matches_registered_wickra_oracle() -> None:
+    assert_registered_oracle_match("McGinleyDynamic")
 
 
 def test_mcginley_dynamic_lifecycle() -> None:
@@ -8,4 +13,3 @@ def test_mcginley_dynamic_lifecycle() -> None:
     first = state.compute()
     state.reset().extend(close)
     np.testing.assert_array_equal(state.compute(), first)
-

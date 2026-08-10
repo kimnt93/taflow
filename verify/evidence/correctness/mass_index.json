@@ -1,12 +1,24 @@
 {
   "function": "mass_index",
   "taflow_class": "MassIndex",
-  "oracle": null,
-  "oracle_name": null,
+  "oracle": "Wickra",
+  "oracle_name": "MassIndex",
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 4.618527782440651e-14
+  },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
     "1": true,
     "10": true,
     "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 4.618527782440651e-14
   }
 }

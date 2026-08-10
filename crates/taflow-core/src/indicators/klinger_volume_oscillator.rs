@@ -1,88 +1,58 @@
-//! Stateful Klinger volume oscillator.
-
 use super::invalid_period;
 use crate::error::TaResult;
+use crate::indicators::ExponentialMovingAverage;
+use crate::stream::StreamingIndicator;
 
-/// Fast/slow EMA difference and signal for one bar.
+/// Klinger volume-force oscillator and its signal EMA.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct KlingerVolumeOscillatorValue {
     pub oscillator: f64,
     pub signal: f64,
 }
 
-/// Fast/slow EMA difference of signed volume force and its signal EMA.
+/// Trend-aware cumulative-money-flow volume oscillator.
 #[derive(Debug, Clone)]
 pub struct KlingerVolumeOscillator {
-    previous_typical_price: Option<f64>,
-    fast_average: SeededEma,
-    slow_average: SeededEma,
-    signal_average: SeededEma,
+    previous_measurement: Option<f64>,
+    trend: i8,
+    cumulative_measurement: f64,
+    fast_average: ExponentialMovingAverage,
+    slow_average: ExponentialMovingAverage,
+    signal_average: ExponentialMovingAverage,
     oscillator_output: f64,
     signal_output: f64,
     value: Option<KlingerVolumeOscillatorValue>,
 }
 
-#[derive(Debug, Clone)]
-struct SeededEma {
-    period: usize,
-    count: usize,
-    sum: f64,
-    value: Option<f64>,
-}
-
-impl SeededEma {
-    fn new(period: usize) -> Self {
-        Self {
-            period,
-            count: 0,
-            sum: 0.0,
-            value: None,
-        }
-    }
-
-    fn append(&mut self, input: f64) -> Option<f64> {
-        self.count += 1;
-        self.value = if self.count < self.period {
-            self.sum += input;
-            None
-        } else if self.count == self.period {
-            self.sum += input;
-            Some(self.sum / self.period as f64)
-        } else {
-            let alpha = 2.0 / (self.period as f64 + 1.0);
-            self.value
-                .map(|previous| previous + alpha * (input - previous))
-        };
-        self.value
-    }
-
-    fn reset(&mut self) {
-        self.count = 0;
-        self.sum = 0.0;
-        self.value = None;
-    }
-}
-
 impl KlingerVolumeOscillator {
-    /// Creates the oscillator with positive fast, slow, and signal periods.
+    /// Create Klinger and signal lines with positive fast/slow/signal periods.
     pub fn new(fast: usize, slow: usize, signal: usize) -> TaResult<Self> {
         for (name, period) in [("fast", fast), ("slow", slow), ("signal", signal)] {
-            if period < 1 {
+            if period == 0 {
                 return Err(invalid_period(name, period, 1));
             }
         }
+        if fast >= slow {
+            return Err(crate::error::TaError::InvalidParameter {
+                name: "fast",
+                value: fast.to_string(),
+                reason: "must be less than slow",
+            });
+        }
         Ok(Self {
-            previous_typical_price: None,
-            fast_average: SeededEma::new(fast),
-            slow_average: SeededEma::new(slow),
-            signal_average: SeededEma::new(signal),
+            previous_measurement: None,
+            trend: 0,
+            cumulative_measurement: 0.0,
+            fast_average: ExponentialMovingAverage::new(fast)?,
+            slow_average: ExponentialMovingAverage::new(slow)?,
+            signal_average: ExponentialMovingAverage::new(signal)?,
             oscillator_output: f64::NAN,
             signal_output: f64::NAN,
             value: None,
         })
     }
 
-    /// Appends one OHLCV bar and returns oscillator and signal values.
+    /// Append one high/low/close/volume bar and update both output lines.
     pub fn append(
         &mut self,
         high: f64,
@@ -90,46 +60,58 @@ impl KlingerVolumeOscillator {
         close: f64,
         volume: f64,
     ) -> Option<KlingerVolumeOscillatorValue> {
-        let typical_price = (high + low + close) / 3.0;
-        let trend = self.previous_typical_price.map_or(1.0, |previous| {
-            if typical_price > previous {
-                1.0
-            } else if typical_price < previous {
-                -1.0
-            } else {
-                0.0
-            }
-        });
-        let force = trend * volume;
-        self.previous_typical_price = Some(typical_price);
-        let fast_average = self.fast_average.append(force);
-        let slow_average = self.slow_average.append(force);
-        let oscillator = fast_average
-            .zip(slow_average)
-            .map_or(f64::NAN, |(fast, slow)| fast - slow);
-        let signal_average = if oscillator.is_nan() {
+        let measurement = high + low + close;
+        let Some(previous) = self.previous_measurement.replace(measurement) else {
+            return None;
+        };
+        let next_trend = if measurement > previous {
+            1
+        } else if measurement < previous {
+            -1
+        } else {
+            self.trend
+        };
+        if next_trend != self.trend || self.trend == 0 {
+            self.cumulative_measurement = previous + measurement;
+        } else {
+            self.cumulative_measurement += measurement;
+        }
+        self.trend = next_trend;
+        let force = if self.cumulative_measurement == 0.0 {
+            0.0
+        } else {
+            volume
+                * (2.0 * (measurement / self.cumulative_measurement - 1.0)).abs()
+                * f64::from(next_trend)
+                * 100.0
+        };
+
+        let fast = self.fast_average.append(force);
+        let slow = self.slow_average.append(force);
+        self.oscillator_output = fast.zip(slow).map_or(f64::NAN, |(a, b)| a - b);
+        self.signal_output = if self.oscillator_output.is_nan() {
             f64::NAN
         } else {
-            self.signal_average.append(oscillator).unwrap_or(f64::NAN)
+            self.signal_average
+                .append(self.oscillator_output)
+                .unwrap_or(f64::NAN)
         };
-        self.oscillator_output = oscillator;
-        self.signal_output = signal_average;
-        let result = signal_average
+        self.value = self
+            .signal_output
             .is_finite()
             .then_some(KlingerVolumeOscillatorValue {
-                oscillator,
-                signal: signal_average,
+                oscillator: self.oscillator_output,
+                signal: self.signal_output,
             });
-        self.value = result;
-        result
+        self.value
     }
 
-    /// Returns aligned oscillator and signal outputs for the latest bar.
+    /// Return aligned oscillator and signal scalars, using NaN during warm-up.
     pub fn outputs(&self) -> (f64, f64) {
         (self.oscillator_output, self.signal_output)
     }
 
-    /// Extends aligned OHLCV slices through the scalar state machine.
+    /// Extend aligned OHLCV slices through the same scalar state machine.
     pub fn extend_slice_into(
         &mut self,
         high: &[f64],
@@ -154,13 +136,16 @@ impl KlingerVolumeOscillator {
         Ok(())
     }
 
-    /// Returns the latest oscillator and signal pair.
+    /// Return both lines once the signal EMA has warmed.
     pub fn value(&self) -> Option<KlingerVolumeOscillatorValue> {
         self.value
     }
-    /// Clears all EMA and previous-price state.
+
+    /// Clear all trend, cumulative measurement, EMA, and output state.
     pub fn reset(&mut self) {
-        self.previous_typical_price = None;
+        self.previous_measurement = None;
+        self.trend = 0;
+        self.cumulative_measurement = 0.0;
         self.fast_average.reset();
         self.slow_average.reset();
         self.signal_average.reset();

@@ -10,7 +10,7 @@ pub struct McGinleyDynamicOperator {
 #[pymethods]
 impl McGinleyDynamicOperator {
     #[new]
-    #[pyo3(signature = (length=10, c=1.0))]
+    #[pyo3(signature = (length=10, c=0.6))]
     fn new(length: usize, c: f64) -> PyResult<Self> {
         Ok(Self {
             inner: McGinleyDynamic::new(length, c)
@@ -18,10 +18,10 @@ impl McGinleyDynamicOperator {
             values: Vec::new(),
         })
     }
-    fn append(&mut self, close: f64) -> f64 {
-        let v = self.inner.append(close).unwrap();
-        self.values.push(v);
-        v
+    fn append(&mut self, close: f64) -> Option<f64> {
+        let value = self.inner.append(close);
+        self.values.push(value.unwrap_or(f64::NAN));
+        value
     }
     fn extend(&mut self, py: Python<'_>, close: PyReadonlyArray1<f64>) -> PyResult<()> {
         let close = close.as_slice()?;
@@ -42,5 +42,8 @@ impl McGinleyDynamicOperator {
     fn reset(&mut self) {
         self.inner.reset();
         self.values.clear();
+    }
+    fn __len__(&self) -> usize {
+        self.values.len()
     }
 }

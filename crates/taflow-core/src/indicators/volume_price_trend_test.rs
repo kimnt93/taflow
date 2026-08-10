@@ -21,3 +21,9 @@ fn volume_price_trend_replays_after_reset() {
             .collect::<Vec<_>>()
     );
 }
+
+#[test]
+fn volume_price_trend_starts_at_zero() {
+    let mut state = VolumePriceTrend::new();
+    assert_eq!(state.append(100.0, 1_000.0), Some(0.0));
+}

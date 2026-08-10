@@ -1,7 +1,6 @@
 use crate::error::TaResult;
-use crate::indicators::RollingSum;
-use crate::stream::operator_states::*;
-use crate::stream::*;
+use crate::indicators::{ExponentialMovingAverage, RollingSum};
+use crate::stream::{validate_period, StreamingIndicator};
 
 /// Stateful Mass Index (Dorsey): rolling sum of the ratio between a short EMA
 /// of the high-low range and an EMA of that EMA.
@@ -11,8 +10,8 @@ use crate::stream::*;
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct MassIndex {
-    ema_range: MassEma,
-    ema_signal: MassEma,
+    ema_range: ExponentialMovingAverage,
+    ema_signal: ExponentialMovingAverage,
     ratio_sum: RollingSum,
     value: Option<f64>,
 }
@@ -27,8 +26,8 @@ impl MassIndex {
         validate_period(ema_period)?;
         validate_period(sum_period)?;
         Ok(Self {
-            ema_range: MassEma::new(ema_period),
-            ema_signal: MassEma::new(ema_period),
+            ema_range: ExponentialMovingAverage::new(ema_period)?,
+            ema_signal: ExponentialMovingAverage::new(ema_period)?,
             ratio_sum: RollingSum::new(sum_period)?,
             value: None,
         })

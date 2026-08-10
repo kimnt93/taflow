@@ -17,20 +17,18 @@ class LaguerreRelativeStrengthIndex:
         Initial chronological close prices. Pass an empty series for a fresh
         streaming state.
     gamma : float, default 0.5
-        Laguerre smoothing coefficient in the interval ``[0, 1)``.
+        Laguerre smoothing coefficient in the interval ``[0, 1]``.
 
     Notes
     -----
     Rust initializes all four filter stages from the first close. Each later
     bar updates the stages causally and returns ``100 * upward / (upward +
-    downward)``. A zero denominator produces zero, so there is no scalar
-    warm-up: a non-empty state always has a value and ``compute`` returns one
-    aligned value per close. Rust owns all filter arithmetic, state, and output
-    history. The independent oracle/name mapping is
-    ``LaguerreRelativeStrengthIndex`` to pandas-ta-classic ``lrsi``; its
-    ``length`` argument only validates source input size and is not part of the
-    recurrence. ``append``, ``extend``, and ``reset`` mutate and return this
-    adapter.
+    downward)``. A zero denominator produces the neutral value 50, so there is
+    no scalar warm-up: a non-empty state always has a value and ``compute``
+    returns one aligned value per close. Rust owns all filter arithmetic,
+    state, and output history. The independent oracle/name mapping is
+    ``LaguerreRelativeStrengthIndex`` to Wickra ``LaguerreRSI``. ``append``,
+    ``extend``, and ``reset`` mutate and return this adapter.
     """
 
     def __init__(self, close: Any, gamma: float = 0.5) -> None:
@@ -75,7 +73,7 @@ class LaguerreRelativeStrengthIndex:
         Returns
         -------
         numpy.ndarray
-            One oscillator value per processed close; the first value is zero.
+            One oscillator value per processed close; the first value is 50.
         """
         return self._state.compute()
 

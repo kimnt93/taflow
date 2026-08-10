@@ -1,71 +1,74 @@
-//! Stateful implementation for `rolling_covariance`.
-
 use crate::error::{TaError, TaResult};
-use crate::stream::validate_period;
 use std::collections::VecDeque;
 
+/// Population covariance of trailing one-bar changes in two level series.
 #[derive(Debug, Clone)]
-/// Persistent Rust state for `RollingCovariance`.
-///
-/// The state consumes chronological inputs causally, preserves warm-up
-/// values, and exposes the current result through its public API.
 pub struct RollingCovariance {
-    values: VecDeque<(f64, f64)>,
-    timeperiod: usize,
+    period: usize,
+    previous: Option<(f64, f64)>,
+    changes: VecDeque<(f64, f64)>,
+    sum_left: f64,
+    sum_right: f64,
+    sum_product: f64,
     value: Option<f64>,
 }
 
 impl RollingCovariance {
-    /// Computes or updates `new` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
-    pub fn new(timeperiod: usize) -> TaResult<Self> {
-        validate_period(timeperiod)?;
+    /// Create a return-covariance window containing at least two changes.
+    pub fn new(period: usize) -> TaResult<Self> {
+        if period < 2 {
+            return Err(TaError::InvalidParameter {
+                name: "timeperiod",
+                value: period.to_string(),
+                reason: "must be >= 2",
+            });
+        }
         Ok(Self {
-            values: VecDeque::with_capacity(timeperiod),
-            timeperiod,
+            period,
+            previous: None,
+            changes: VecDeque::with_capacity(period),
+            sum_left: 0.0,
+            sum_right: 0.0,
+            sum_product: 0.0,
             value: None,
         })
     }
-    /// Computes or updates `append` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+
+    /// Append one level pair and return covariance after `period + 1` levels.
     pub fn append(&mut self, left: f64, right: f64) -> Option<f64> {
-        if self.values.len() == self.timeperiod {
-            self.values.pop_front();
-        }
-        self.values.push_back((left, right));
-        self.value = if self.values.len() == self.timeperiod {
-            let n = self.timeperiod as f64;
-            let left_mean = self.values.iter().map(|&(left, _)| left).sum::<f64>() / n;
-            let right_mean = self.values.iter().map(|&(_, right)| right).sum::<f64>() / n;
-            Some(
-                self.values
-                    .iter()
-                    .map(|&(left, right)| (left - left_mean) * (right - right_mean))
-                    .sum::<f64>()
-                    / n,
-            )
-        } else {
-            None
+        let Some((previous_left, previous_right)) = self.previous.replace((left, right)) else {
+            return None;
         };
+        let change = (left - previous_left, right - previous_right);
+        if self.changes.len() == self.period {
+            let expired = self.changes.pop_front().expect("full covariance window");
+            self.sum_left -= expired.0;
+            self.sum_right -= expired.1;
+            self.sum_product -= expired.0 * expired.1;
+        }
+        self.changes.push_back(change);
+        self.sum_left += change.0;
+        self.sum_right += change.1;
+        self.sum_product += change.0 * change.1;
+        self.value = (self.changes.len() == self.period).then(|| {
+            let count = self.period as f64;
+            self.sum_product / count - (self.sum_left / count) * (self.sum_right / count)
+        });
         self.value
     }
-    /// Computes or updates `value` through the native Rust kernel.
-    ///
-    /// Parameters are the typed series and configuration values in the signature.
-    ///
-    /// Returns the computed value, aligned history, or a validation error.
+
+    /// Return the latest covariance, or `None` during warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
-    /// Reset the persistent state and clear the latest value.
+
+    /// Restore the newly constructed state without reallocating its window.
     pub fn reset(&mut self) {
-        self.values.clear();
+        self.previous = None;
+        self.changes.clear();
+        self.sum_left = 0.0;
+        self.sum_right = 0.0;
+        self.sum_product = 0.0;
         self.value = None;
     }
 }

@@ -73,4 +73,8 @@ impl KalmanHedgeRatioOperator {
         self.inner.reset();
         self.output.clear();
     }
+
+    fn __len__(&self) -> usize {
+        self.output.len()
+    }
 }

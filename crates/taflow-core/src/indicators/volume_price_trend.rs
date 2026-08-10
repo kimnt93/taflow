@@ -30,12 +30,12 @@ impl VolumePriceTrend {
     ///
     pub fn append(&mut self, close: f64, volume: f64) -> Option<f64> {
         let previous = self.previous_close.replace(close);
-        self.value = previous.map(|previous| {
+        self.value = Some(previous.map_or(0.0, |previous| {
             if previous != 0.0 {
                 self.total += volume * (close - previous) / previous;
             }
             self.total
-        });
+        }));
         self.value
     }
     /// Computes or updates `value` through the native Rust kernel.

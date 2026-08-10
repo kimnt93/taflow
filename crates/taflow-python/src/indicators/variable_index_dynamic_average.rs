@@ -14,11 +14,11 @@ pub struct VariableIndexDynamicAverage {
 #[pymethods]
 impl VariableIndexDynamicAverage {
     #[new]
-    #[pyo3(signature = (length=14, alpha=None))]
-    fn new(length: usize, alpha: Option<f64>) -> PyResult<Self> {
+    #[pyo3(signature = (length=14, cmo_period=9, alpha=None))]
+    fn new(length: usize, cmo_period: usize, alpha: Option<f64>) -> PyResult<Self> {
         let alpha = alpha.unwrap_or(2.0 / (length as f64 + 1.0));
         Ok(Self {
-            inner: VariableIndexDynamicAverageState::new(length, alpha)
+            inner: VariableIndexDynamicAverageState::new(length, cmo_period, alpha)
                 .map_err(|error| PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })

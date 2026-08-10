@@ -2,7 +2,7 @@ use super::force_index::ForceIndex;
 
 #[test]
 fn lifecycle_is_causal_and_resettable() {
-    let mut state = ForceIndex::new();
+    let mut state = ForceIndex::new(1).unwrap();
     assert_eq!(state.append(10.0, 2.0), None);
     assert_eq!(state.append(11.0, 2.0), Some(2.0));
     state.reset();

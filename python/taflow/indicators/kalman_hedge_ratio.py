@@ -6,21 +6,42 @@ from .._series import as_float64_series
 
 
 class KalmanHedgeRatio:
-    """Online Kalman estimate of beta in y = alpha + beta*x.
-    delta controls process noise and observation_variance controls observation
-    noise. Outputs are causal.
+    """Estimate the causal hedge ratio in ``y = alpha + beta * x``.
+
+    The two-state random-walk Kalman filter uses transition variance
+    ``delta / (1 - delta)`` and the supplied observation variance. It emits
+    beta from the first pair; the zero diffuse prior therefore emits ``0`` on
+    that first observation. Rust owns state, history, and arithmetic. The
+    independent oracle/name mapping is Wickra ``KalmanHedgeRatio`` with its
+    ``a`` target mapped to ``y`` and ``b`` regressor mapped to ``x``.
+
+    Args:
+        x: Required chronological regressor series.
+        y: Required aligned target series.
+        delta: State-drift ratio in ``(0, 1)``; default ``1e-4``.
+        observation_variance: Positive measurement-noise variance; default
+            ``1e-3``.
+
+    Raises:
+        ValueError: If inputs are misaligned or configuration is invalid.
     """
     def __init__(self, x: Any, y: Any, delta: float = 1e-4,
                  observation_variance: float = 1e-3) -> None:
-        self._state = _Native(float(delta), float(observation_variance)); self._length = 0
+        """Initialize the filter and process aligned historical pairs."""
+        self._state = _Native(float(delta), float(observation_variance))
         self.extend(x, y)
     def append(self, x: float, y: float) -> "KalmanHedgeRatio":
-        self._state.append(float(x), float(y)); self._length += 1; return self
+        """Append one regressor/target pair and return this adapter."""
+        self._state.append(float(x), float(y))
+        return self
     def extend(self, x: Any, y: Any) -> "KalmanHedgeRatio":
         x_values = as_float64_series(x); y_values = as_float64_series(y)
-        if x_values.shape != y_values.shape: raise ValueError("x and y must have equal lengths")
-        self._state.extend(x_values, y_values); self._length += len(x_values); return self
+        if x_values.shape != y_values.shape:
+            raise ValueError("x and y must have equal lengths")
+        self._state.extend(x_values, y_values)
+        return self
     def compute(self) -> np.ndarray:
+        """Return the aligned native beta history."""
         return self._state.compute()
     @property
     def value(self) -> float | None:
@@ -35,6 +56,9 @@ class KalmanHedgeRatio:
     def std(self) -> float | None:
         return self._state.std
     def reset(self) -> "KalmanHedgeRatio":
-        self._state.reset(); self._length = 0; return self
+        """Reset the filter and clear history, then return this adapter."""
+        self._state.reset()
+        return self
     def __len__(self) -> int:
-        return self._length
+        """Return the processed-pair count delegated to native state."""
+        return len(self._state)

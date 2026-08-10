@@ -24,7 +24,7 @@ fn laguerre_relative_strength_index_matches_known_values() {
     let mut state = LaguerreRelativeStrengthIndex::new(0.5).unwrap();
     let actual = [1.0, 2.0, 3.0, 2.0, 4.0, 4.0].map(|input| state.append(input).unwrap());
     let expected = [
-        0.0,
+        50.0,
         71.42857142857143,
         80.0,
         66.66666666666667,
@@ -70,14 +70,15 @@ fn laguerre_relative_strength_index_bulk_chunking_and_reset_are_bitwise_invarian
 fn laguerre_relative_strength_index_handles_constant_and_single_input_series() {
     let mut state = LaguerreRelativeStrengthIndex::new(0.5).unwrap();
     for _ in 0..32 {
-        assert_eq!(state.append(42.0), Some(0.0));
+        assert_eq!(state.append(42.0), Some(50.0));
     }
 }
 
 #[test]
 fn laguerre_relative_strength_index_validates_gamma() {
-    for invalid in [-0.1, 1.0, 1.1, f64::NAN, f64::INFINITY] {
+    for invalid in [-0.1, 1.1, f64::NAN, f64::INFINITY] {
         assert!(LaguerreRelativeStrengthIndex::new(invalid).is_err());
     }
     assert!(LaguerreRelativeStrengthIndex::new(0.0).is_ok());
+    assert!(LaguerreRelativeStrengthIndex::new(1.0).is_ok());
 }

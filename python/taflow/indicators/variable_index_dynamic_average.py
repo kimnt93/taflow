@@ -17,31 +17,31 @@ class VariableIndexDynamicAverage:
         Initial chronological close prices. Pass an empty series for a fresh
         streaming state.
     length : int, default 14
-        Positive number of close changes in the rolling Chande Momentum
-        Oscillator weight and prices in the initial simple-average seed.
+        EMA-equivalent period used to derive ``2 / (length + 1)``.
+    cmo_period : int, default 9
+        Number of close changes in the rolling Chande Momentum Oscillator.
     alpha : float or None, default None
         Exponential smoothing factor in ``(0, 1]``. ``None`` selects
-        ``2 / (length + 1)``, matching pandas-ta-classic ``vidya``.
+        ``2 / (length + 1)``, matching Wickra ``VIDYA``.
 
     Notes
     -----
-    Rust seeds the first output after ``length`` bars with their simple mean.
-    Later values apply ``alpha * abs(CMO)`` as the exponential weight, where
-    CMO is computed from the latest ``length`` close changes. Scalar warm-up is
-    ``None`` and ``compute`` contains NaN at the same positions. Rust owns the
-    bounded rolling state, arithmetic, warm-up, and aligned output history.
-    The independent oracle/name mapping is ``VariableIndexDynamicAverage`` to
-    pandas-ta-classic ``vidya``. ``append``, ``extend``, and ``reset`` mutate
-    and return this adapter.
+    The first output is the close that completes the CMO warm-up. Later values
+    apply ``alpha * abs(CMO) / 100`` as the exponential weight. Scalar warm-up
+    is ``None`` and aligned history contains NaN. Rust owns all bounded rolling
+    state and arithmetic. The independent oracle/name mapping is
+    ``VariableIndexDynamicAverage`` to Wickra ``VIDYA``.
     """
 
     def __init__(
         self,
         close: Any,
         length: int = 14,
+        cmo_period: int = 9,
         alpha: float | None = None,
     ) -> None:
-        self._state = _NativeVariableIndexDynamicAverage(length, alpha)
+        """Initialize and process a chronological close-price history."""
+        self._state = _NativeVariableIndexDynamicAverage(length, cmo_period, alpha)
         self.extend(close)
 
     def append(self, close: float) -> "VariableIndexDynamicAverage":
@@ -83,7 +83,7 @@ class VariableIndexDynamicAverage:
         -------
         numpy.ndarray
             One value per processed close, with NaN during the first
-            ``length - 1`` warm-up bars.
+            ``cmo_period`` warm-up bars.
         """
         return self._state.compute()
 

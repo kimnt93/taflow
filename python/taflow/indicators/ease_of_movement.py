@@ -1,5 +1,4 @@
 """Native-backed Ease of Movement adapter."""
-
 from typing import Any
 
 import numpy as np
@@ -9,24 +8,32 @@ from .._series import as_float64_series
 
 
 class EaseOfMovement:
-    """Compute high-low midpoint movement normalized by volume and range.
+    """Average range-scaled midpoint movement per unit of volume.
 
     ``high``, ``low``, and ``volume`` are required equal-length chronological
     series and may all be empty for a fresh stream. Rust owns midpoint change,
-    box ratio, warm-up, and aligned output. ``compute`` returns one float
+    rolling mean, warm-up, and aligned output. The raw movement is
+    ``midpoint_change * range * divisor / volume`` and is averaged over
+    ``period`` bars. Wickra ``EaseOfMovement`` is the oracle. ``compute`` returns one float
     array, ``value`` is the latest scalar or ``None`` during warm-up, and
     lifecycle mutators return ``self``. The oracle is pandas-ta-classic ``eom``.
     """
 
-    def __init__(self, high: Any, low: Any, volume: Any) -> None:
-        self._state = _Native()
-        self._length = 0
+    def __init__(
+        self,
+        high: Any,
+        low: Any,
+        volume: Any,
+        period: int = 14,
+        divisor: float = 100_000_000.0,
+    ) -> None:
+        """Initialize aligned histories, averaging period, and output scale."""
+        self._state = _Native(period, divisor)
         self.extend(high, low, volume)
 
     def append(self, high: float, low: float, volume: float) -> "EaseOfMovement":
         """Append one high/low/volume bar and return this adapter."""
         self._state.append(float(high), float(low), float(volume))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any, volume: Any) -> "EaseOfMovement":
@@ -35,7 +42,6 @@ class EaseOfMovement:
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, and volume must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -50,12 +56,8 @@ class EaseOfMovement:
     def reset(self) -> "EaseOfMovement":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
-
-
-__all__ = ["EaseOfMovement"]
+        return len(self._state)

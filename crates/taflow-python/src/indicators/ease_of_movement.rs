@@ -12,11 +12,12 @@ pub struct EaseOfMovementOperator {
 #[pymethods]
 impl EaseOfMovementOperator {
     #[new]
-    fn new() -> Self {
-        Self {
-            inner: EaseOfMovement::new(),
+    fn new(period: usize, divisor: f64) -> PyResult<Self> {
+        Ok(Self {
+            inner: EaseOfMovement::new(period, divisor)
+                .map_err(|error| PyValueError::new_err(error.to_string()))?,
             outputs: Vec::new(),
-        }
+        })
     }
     fn append(&mut self, high: f64, low: f64, volume: f64) -> Option<f64> {
         let value = self.inner.append(high, low, volume);
@@ -51,5 +52,8 @@ impl EaseOfMovementOperator {
     fn reset(&mut self) {
         self.inner.reset();
         self.outputs.clear();
+    }
+    fn __len__(&self) -> usize {
+        self.inner.len()
     }
 }

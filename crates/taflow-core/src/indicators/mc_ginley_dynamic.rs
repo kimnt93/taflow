@@ -1,6 +1,5 @@
 use crate::error::{TaError, TaResult};
-use crate::stream::operator_states::*;
-use crate::stream::*;
+use crate::stream::validate_period;
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `McGinleyDynamic`.
@@ -10,6 +9,8 @@ use crate::stream::*;
 pub struct McGinleyDynamic {
     length: usize,
     c: f64,
+    seed_count: usize,
+    seed_sum: f64,
     value: Option<f64>,
 }
 
@@ -31,6 +32,8 @@ impl McGinleyDynamic {
         Ok(Self {
             length,
             c,
+            seed_count: 0,
+            seed_sum: 0.0,
             value: None,
         })
     }
@@ -40,17 +43,23 @@ impl McGinleyDynamic {
     ///
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, close: f64) -> Option<f64> {
-        self.value = Some(match self.value {
-            None => close,
-            Some(previous) if previous != 0.0 => {
-                let mut denominator = self.c * self.length as f64 * (close / previous).powi(4);
-                if denominator < 1e-10 {
-                    denominator = 1e-10;
-                }
-                previous + (close - previous) / denominator
+        if !close.is_finite() {
+            return self.value;
+        }
+        if self.value.is_none() {
+            self.seed_count += 1;
+            self.seed_sum += close;
+            if self.seed_count == self.length {
+                self.value = Some(self.seed_sum / self.length as f64);
             }
-            Some(_) => close,
-        });
+            return self.value;
+        }
+
+        let previous = self.value.expect("McGinley state is seeded");
+        if previous > 0.0 && close > 0.0 {
+            let denominator = self.c * self.length as f64 * (close / previous).powi(4);
+            self.value = Some(previous + (close - previous) / denominator);
+        }
         self.value
     }
     /// Computes or updates `value` through the native Rust kernel.
@@ -64,5 +73,7 @@ impl McGinleyDynamic {
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
         self.value = None;
+        self.seed_count = 0;
+        self.seed_sum = 0.0;
     }
 }

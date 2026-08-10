@@ -12,15 +12,15 @@ from .._series import as_float64_series
 class McGinleyDynamic:
     """Compute the causal McGinley Dynamic moving average.
 
-    ``close`` is the required chronological price history and may be empty
-    for a fresh stream. ``length`` defaults to 10 and ``c`` defaults to 1.0;
-    both are validated by Rust. Rust owns the recurrence, warm-up, and aligned
-    output. ``compute`` returns one float array, ``value`` is ``None`` before
-    the first bar, and lifecycle mutators return ``self``. The independent
-    oracle/name mapping is pandas-ta-classic ``mcginley``.
+    The state is seeded by the simple mean of the first ``length`` closes.
+    Later bars use ``previous + (close - previous) / (c * length *
+    (close / previous) ** 4)``. ``c`` defaults to John McGinley's constant
+    ``0.6``. Rust owns arithmetic and warm-up; aligned history contains NaN
+    before the seed is complete. The independent oracle is Wickra
+    ``McGinleyDynamic``. Lifecycle mutators return this adapter.
     """
 
-    def __init__(self, close: Any, length: int = 10, c: float = 1.0) -> None:
+    def __init__(self, close: Any, length: int = 10, c: float = 0.6) -> None:
         """Initialize and process the supplied close history.
 
         Parameters
@@ -29,8 +29,8 @@ class McGinleyDynamic:
             Required chronological close prices; empty creates a fresh state.
         length : int, default 10
             Positive recurrence length.
-        c : float, default 1.0
-            Positive McGinley adjustment constant.
+        c : float, default 0.6
+            Positive adjustment constant; ``0.6`` matches Wickra.
         """
         self._state = _Native(int(length), float(c))
         self.extend(close)
@@ -51,7 +51,7 @@ class McGinleyDynamic:
 
     @property
     def value(self) -> float | None:
-        """Return the latest average, or ``None`` while empty."""
+        """Return the latest average, or ``None`` during seed warm-up."""
         return self._state.value
 
     def reset(self) -> "McGinleyDynamic":
