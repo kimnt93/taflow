@@ -7,11 +7,12 @@ from .._series import as_float64_series
 
 
 class FibonacciProjection:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Project an A-to-B measured move from the latest confirmed pivot C.
 
-    Rust owns the persistent extrema, level arithmetic, warm-up, history, and
-    processed-bar count. Required input order is high then low. The 4 output
-    arrays are ordered as: 100.0%, 127.2%, 161.8%, 200.0%. The first 2 positions are NaN.
+    Rust owns the bounded pivot state, arithmetic, warm-up, history, and
+    processed-bar count. Required input order is high then low. The four output
+    arrays are the 61.8%, 100.0%, 161.8%, and 261.8% projections, in that order.
+    They are NaN until three alternating pivots establish A, B, and C.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     FibProjection; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.

@@ -3,10 +3,15 @@ use super::fibonacci_extension::FibonacciExtension;
 #[test]
 fn lifecycle_is_aligned_and_resettable() {
     let mut state = FibonacciExtension::new().unwrap();
-    for index in 0..2 {
-        state.append(10.0 + index as f64, 5.0 - index as f64);
+    for (high, low) in [
+        (100.0, 99.0),
+        (110.0, 108.0),
+        (104.0, 100.0),
+        (107.0, 105.0),
+    ] {
+        state.append(high, low);
     }
-    assert_eq!(state.len(), 2);
+    assert_eq!(state.len(), 4);
     assert!(state.value().is_some());
     state.reset();
     assert!(state.is_empty());

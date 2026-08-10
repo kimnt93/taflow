@@ -7,11 +7,13 @@ from .._series import as_float64_series
 
 
 class FibonacciTimeZones:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Track Fibonacci bar distances from the latest confirmed swing pivot.
 
     Rust owns the persistent extrema, level arithmetic, warm-up, history, and
-    processed-bar count. Required input order is high then low. The 2 output
-    arrays are ordered as: current zone index, next zone index. The first 1 positions are NaN.
+    processed-bar count. Required input order is high then low. Outputs are
+    ``(on_zone, bars_to_next)``: the first item is 1.0 on a Fibonacci offset
+    and 0.0 otherwise, while the second gives the remaining bars to the next
+    offset. Both are NaN until the first reversal confirms an anchor pivot.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     FibTimeZones; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.

@@ -24,12 +24,12 @@ impl FibonacciConfluence {
     fn append(&mut self, high: f64, low: f64) -> Option<(f64, f64)> {
         let result = self.inner.append(high, low);
         let value = result.unwrap_or(FibonacciConfluenceValue {
-            retracement: f64::NAN,
-            extension: f64::NAN,
+            price: f64::NAN,
+            strength: f64::NAN,
         });
-        self.retracement.push(value.retracement);
-        self.extension.push(value.extension);
-        result.map(|value| (value.retracement, value.extension))
+        self.retracement.push(value.price);
+        self.extension.push(value.strength);
+        result.map(|value| (value.price, value.strength))
     }
 
     fn extend(
@@ -67,7 +67,7 @@ impl FibonacciConfluence {
     fn value(&self) -> Option<(f64, f64)> {
         self.inner
             .value()
-            .map(|value| (value.retracement, value.extension))
+            .map(|value| (value.price, value.strength))
     }
 
     fn reset(&mut self) {

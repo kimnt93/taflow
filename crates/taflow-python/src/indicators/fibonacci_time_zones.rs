@@ -24,12 +24,12 @@ impl FibonacciTimeZones {
     fn append(&mut self, high: f64, low: f64) -> Option<(f64, f64)> {
         let result = self.inner.append(high, low);
         let value = result.unwrap_or(FibonacciTimeZonesValue {
-            current_zone: f64::NAN,
-            next_zone: f64::NAN,
+            on_zone: f64::NAN,
+            bars_to_next: f64::NAN,
         });
-        self.current_zone.push(value.current_zone);
-        self.next_zone.push(value.next_zone);
-        result.map(|value| (value.current_zone, value.next_zone))
+        self.current_zone.push(value.on_zone);
+        self.next_zone.push(value.bars_to_next);
+        result.map(|value| (value.on_zone, value.bars_to_next))
     }
 
     fn extend(
@@ -67,7 +67,7 @@ impl FibonacciTimeZones {
     fn value(&self) -> Option<(f64, f64)> {
         self.inner
             .value()
-            .map(|value| (value.current_zone, value.next_zone))
+            .map(|value| (value.on_zone, value.bars_to_next))
     }
 
     fn reset(&mut self) {

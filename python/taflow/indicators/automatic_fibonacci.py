@@ -7,11 +7,13 @@ from .._series import as_float64_series
 
 
 class AutomaticFibonacci:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Retrace the largest of the five most recent confirmed swing legs.
 
-    Rust owns the persistent extrema, level arithmetic, warm-up, history, and
-    processed-bar count. Required input order is high then low. The 7 output
-    arrays are ordered as: 0.0%, 23.6%, 38.2%, 50.0%, 61.8%, 78.6%, 100.0%. The first 1 positions are NaN.
+    Rust owns the bounded pivot state, level arithmetic, warm-up, history, and
+    processed-bar count. Required input order is high then low. The seven output
+    arrays are ordered as 0.0%, 23.6%, 38.2%, 50.0%, 61.8%, 78.6%, and 100.0%
+    from the dominant leg's end back to its start. They are NaN until two
+    alternating pivots confirm a complete leg.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     AutoFib; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.

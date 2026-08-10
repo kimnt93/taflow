@@ -7,11 +7,13 @@ from .._series import as_float64_series
 
 
 class FibonacciConfluence:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Find the densest recent cluster of causal Fibonacci retracements.
 
     Rust owns the persistent extrema, level arithmetic, warm-up, history, and
-    processed-bar count. Required input order is high then low. The 2 output
-    arrays are ordered as: 61.8% retracement, 61.8% extension. The first 2 positions are NaN.
+    processed-bar count. Required input order is high then low. Outputs are
+    ``(price, strength)`` for the mean price and member count of the densest
+    cluster across at most five confirmed swing legs. Both are NaN until three
+    pivots provide two legs.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     FibConfluence; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.

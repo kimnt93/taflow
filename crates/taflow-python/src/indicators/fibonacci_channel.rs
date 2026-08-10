@@ -28,21 +28,21 @@ impl FibonacciChannel {
     fn append(&mut self, high: f64, low: f64) -> Option<(f64, f64, f64, f64)> {
         let result = self.inner.append(high, low);
         let value = result.unwrap_or(FibonacciChannelValue {
-            lower: f64::NAN,
-            retracement_382: f64::NAN,
-            retracement_618: f64::NAN,
-            upper: f64::NAN,
+            base: f64::NAN,
+            level_618: f64::NAN,
+            level_1000: f64::NAN,
+            level_1618: f64::NAN,
         });
-        self.lower.push(value.lower);
-        self.retracement_382.push(value.retracement_382);
-        self.retracement_618.push(value.retracement_618);
-        self.upper.push(value.upper);
+        self.lower.push(value.base);
+        self.retracement_382.push(value.level_618);
+        self.retracement_618.push(value.level_1000);
+        self.upper.push(value.level_1618);
         result.map(|value| {
             (
-                value.lower,
-                value.retracement_382,
-                value.retracement_618,
-                value.upper,
+                value.base,
+                value.level_618,
+                value.level_1000,
+                value.level_1618,
             )
         })
     }
@@ -89,10 +89,10 @@ impl FibonacciChannel {
     fn value(&self) -> Option<(f64, f64, f64, f64)> {
         self.inner.value().map(|value| {
             (
-                value.lower,
-                value.retracement_382,
-                value.retracement_618,
-                value.upper,
+                value.base,
+                value.level_618,
+                value.level_1000,
+                value.level_1618,
             )
         })
     }

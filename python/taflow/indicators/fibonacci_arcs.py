@@ -7,11 +7,12 @@ from .._series import as_float64_series
 
 
 class FibonacciArcs:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Evaluate causal Fibonacci arcs from the latest confirmed swing leg.
 
     Rust owns the persistent extrema, level arithmetic, warm-up, history, and
-    processed-bar count. Required input order is high then low. The 3 output
-    arrays are ordered as: 38.2% radius, 50.0% radius, 61.8% radius. The first 1 positions are NaN.
+    processed-bar count. Required input order is high then low. Outputs are the
+    current prices of the 38.2%, 50.0%, and 61.8% semicircular arcs, in that
+    order. They are NaN until two alternating pivots establish a swing leg.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     FibArcs; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.

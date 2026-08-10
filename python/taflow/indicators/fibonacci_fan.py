@@ -7,11 +7,13 @@ from .._series import as_float64_series
 
 
 class FibonacciFan:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Evaluate causal Fibonacci fan lines from a confirmed swing leg.
 
     Rust owns the persistent extrema, level arithmetic, warm-up, history, and
     processed-bar count. Required input order is high then low. The 3 output
-    arrays are ordered as: 38.2% fan, 50.0% fan, 61.8% fan. The first 1 positions are NaN.
+    arrays are ordered as the 38.2%, 50.0%, and 61.8% fan-line prices. They are
+    NaN until two alternating pivots establish the leg; later values extend
+    those lines to the current bar without revising earlier history.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     FibFan; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.

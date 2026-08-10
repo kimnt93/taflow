@@ -26,14 +26,14 @@ impl FibonacciArcs {
     fn append(&mut self, high: f64, low: f64) -> Option<(f64, f64, f64)> {
         let result = self.inner.append(high, low);
         let value = result.unwrap_or(FibonacciArcsValue {
-            radius_382: f64::NAN,
-            radius_500: f64::NAN,
-            radius_618: f64::NAN,
+            arc_382: f64::NAN,
+            arc_500: f64::NAN,
+            arc_618: f64::NAN,
         });
-        self.radius_382.push(value.radius_382);
-        self.radius_500.push(value.radius_500);
-        self.radius_618.push(value.radius_618);
-        result.map(|value| (value.radius_382, value.radius_500, value.radius_618))
+        self.radius_382.push(value.arc_382);
+        self.radius_500.push(value.arc_500);
+        self.radius_618.push(value.arc_618);
+        result.map(|value| (value.arc_382, value.arc_500, value.arc_618))
     }
 
     fn extend(
@@ -76,7 +76,7 @@ impl FibonacciArcs {
     fn value(&self) -> Option<(f64, f64, f64)> {
         self.inner
             .value()
-            .map(|value| (value.radius_382, value.radius_500, value.radius_618))
+            .map(|value| (value.arc_382, value.arc_500, value.arc_618))
     }
 
     fn reset(&mut self) {

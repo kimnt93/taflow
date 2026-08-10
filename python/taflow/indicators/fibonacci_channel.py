@@ -7,11 +7,12 @@ from .._series import as_float64_series
 
 
 class FibonacciChannel:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Evaluate a causal sloped Fibonacci channel from confirmed pivots.
 
     Rust owns the persistent extrema, level arithmetic, warm-up, history, and
-    processed-bar count. Required input order is high then low. The 4 output
-    arrays are ordered as: lower, 38.2% retracement, 61.8% retracement, upper. The first 2 positions are NaN.
+    processed-bar count. Required input order is high then low. Outputs are
+    ``(base, level_618, level_1000, level_1618)`` at the current bar. All four
+    are NaN until three alternating pivots establish the channel and its width.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     FibChannel; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.

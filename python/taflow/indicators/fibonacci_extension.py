@@ -7,11 +7,13 @@ from .._series import as_float64_series
 
 
 class FibonacciExtension:
-    """Causal Fibonacci chart levels from aligned high and low series.
+    """Extend the latest confirmed swing leg at Fibonacci multiples.
 
-    Rust owns the persistent extrema, level arithmetic, warm-up, history, and
-    processed-bar count. Required input order is high then low. The 5 output
-    arrays are ordered as: 100.0%, 127.2%, 161.8%, 200.0%, 261.8%. The first 1 positions are NaN.
+    Rust owns the bounded pivot state, arithmetic, warm-up, history, and
+    processed-bar count. Required input order is high then low. The five output
+    arrays are the 127.2%, 141.4%, 161.8%, 200.0%, and 261.8% continuation
+    targets, in that order. They are NaN until two alternating pivots establish
+    a complete leg.
     append, extend, and reset are fluent. The external mapping is Wickra 0.9.9
     FibExtension; TA-Lib has no equivalent chart-level function. TAFlow emits
     causal levels at each bar rather than a mutable chart annotation object.
