@@ -1,3 +1,5 @@
-from taflow import IntradayVolatilityProfile
-def test_lifecycle():
- x=IntradayVolatilityProfile([1.,1.],[1.,2.],[1.,1.],[1.,2.],[1.,1.],[0,1]);assert len(x)==2;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_intraday_volatility_profile_matches_wickra() -> None:
+    assert_registered_oracle_match("IntradayVolatilityProfile")
