@@ -1,3 +1,5 @@
-from taflow import McClellanSummationIndex
-def test_lifecycle():
- x=McClellanSummationIndex([1.],[0.],[0.],[0.]);assert len(x)==1;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_mc_clellan_summation_index_matches_wickra() -> None:
+    assert_registered_oracle_match("McClellanSummationIndex")

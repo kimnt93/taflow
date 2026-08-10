@@ -1,3 +1,5 @@
-from taflow import PercentAboveMovingAverage
-def test_lifecycle():
- x=PercentAboveMovingAverage([0.],[0.],[0.],[0.],[.4]);assert x.value==40.;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_percent_above_moving_average_matches_wickra() -> None:
+    assert_registered_oracle_match("PercentAboveMovingAverage")

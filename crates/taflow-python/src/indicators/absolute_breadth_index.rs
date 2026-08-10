@@ -16,31 +16,26 @@ impl AbsoluteBreadthIndex {
             output: Vec::new(),
         })
     }
-    fn append(&mut self, a: f64, b: f64, c: f64, d: f64) -> Option<f64> {
-        let x = self.inner.append(a, b, c, d);
+    fn append(&mut self, advancers: f64, decliners: f64) -> Option<f64> {
+        let x = self.inner.append(advancers, decliners);
         self.output.push(x.unwrap_or(f64::NAN));
         x
     }
     fn extend(
         &mut self,
         py: Python<'_>,
-        a: PyReadonlyArray1<f64>,
-        b: PyReadonlyArray1<f64>,
-        c: PyReadonlyArray1<f64>,
-        d: PyReadonlyArray1<f64>,
+        advancers: PyReadonlyArray1<f64>,
+        decliners: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (a, b, c, d) = (a.as_slice()?, b.as_slice()?, c.as_slice()?, d.as_slice()?);
-        if [a.len(), b.len(), c.len(), d.len()]
-            .windows(2)
-            .any(|x| x[0] != x[1])
-        {
+        let (advancers, decliners) = (advancers.as_slice()?, decliners.as_slice()?);
+        if advancers.len() != decliners.len() {
             return Err(pyo3::exceptions::PyValueError::new_err(
                 "breadth inputs must have equal lengths",
             ));
         }
         py.allow_threads(|| {
-            for i in 0..a.len() {
-                self.append(a[i], b[i], c[i], d[i]);
+            for i in 0..advancers.len() {
+                self.append(advancers[i], decliners[i]);
             }
         });
         Ok(())

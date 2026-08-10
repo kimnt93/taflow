@@ -1,3 +1,5 @@
-from taflow import BreadthThrust
-def test_lifecycle():
- x=BreadthThrust([1.,-1.],[0.,0.],[0.,0.],[0.,0.],2);assert x.value is not None;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_breadth_thrust_matches_wickra() -> None:
+    assert_registered_oracle_match("BreadthThrust")

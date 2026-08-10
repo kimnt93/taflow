@@ -1,17 +1,58 @@
+"""Python adapter for the native McClellan Oscillator."""
+
 from typing import Any
 import numpy as np
 from .._native import McClellanOscillator as _Native
 from .._series import as_float64_series
+
+
 class McClellanOscillator:
-    """Difference between fast and slow exponential breadth averages."""
-    def __init__(self,change:Any,volume:Any,new_high:Any,new_low:Any)->None:self._state=_Native();self.extend(change,volume,new_high,new_low)
-    def append(self,change:float,volume:float,new_high:float,new_low:float)->"McClellanOscillator":self._state.append(float(change),float(volume),float(new_high),float(new_low));return self
-    def extend(self,change:Any,volume:Any,new_high:Any,new_low:Any)->"McClellanOscillator":
-        a=tuple(as_float64_series(x) for x in(change,volume,new_high,new_low))
-        if len({len(x) for x in a})!=1:raise ValueError("breadth inputs must have equal lengths")
-        self._state.extend(*a);return self
-    def compute(self)->np.ndarray:return self._state.compute()
+    """Subtract slow from fast EMA of ratio-adjusted net advances.
+
+    Ratio-adjusted net advances are ``1000 * (advancers - decliners) /
+    max(advancers + decliners, 1)``. The native 19/39 EMA pair is seeded on the
+    first tick, which emits zero. This maps to Wickra ``McClellanOscillator``.
+
+    Args:
+        advancers: Number of advancing issues at each tick.
+        decliners: Number of declining issues at each aligned tick.
+
+    Raises:
+        ValueError: If the two histories have different lengths.
+    """
+
+    def __init__(self, advancers: Any, decliners: Any) -> None:
+        """Initialize native EMA state and process aligned breadth histories."""
+        self._state = _Native()
+        self.extend(advancers, decliners)
+
+    def append(self, advancers: float, decliners: float) -> "McClellanOscillator":
+        """Append one breadth tick and return this adapter."""
+        self._state.append(float(advancers), float(decliners))
+        return self
+
+    def extend(self, advancers: Any, decliners: Any) -> "McClellanOscillator":
+        """Append aligned breadth histories after length validation."""
+        arrays = as_float64_series(advancers), as_float64_series(decliners)
+        if len(arrays[0]) != len(arrays[1]):
+            raise ValueError("advancers and decliners must have equal lengths")
+        self._state.extend(*arrays)
+        return self
+
     @property
-    def value(self)->float|None:return self._state.value
-    def reset(self)->"McClellanOscillator":self._state.reset();return self
-    def __len__(self)->int:return len(self._state)
+    def value(self) -> float | None:
+        """Return the latest oscillator value, or ``None`` before input."""
+        return self._state.value
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned oscillator history."""
+        return self._state.compute()
+
+    def reset(self) -> "McClellanOscillator":
+        """Reset both EMA states and return this adapter."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the processed-tick count delegated to native state."""
+        return len(self._state)

@@ -1,3 +1,5 @@
-from taflow import BullishPercentIndex
-def test_lifecycle():
- x=BullishPercentIndex([0.],[0.],[0.],[0.],[.5]);assert x.value==50.;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_bullish_percent_index_matches_wickra() -> None:
+    assert_registered_oracle_match("BullishPercentIndex")

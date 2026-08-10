@@ -1,3 +1,5 @@
-from taflow import CumulativeVolumeIndex
-def test_lifecycle():
- x=CumulativeVolumeIndex([1.],[3.],[0.],[0.]);assert x.value==3.;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_cumulative_volume_index_matches_wickra() -> None:
+    assert_registered_oracle_match("CumulativeVolumeIndex")

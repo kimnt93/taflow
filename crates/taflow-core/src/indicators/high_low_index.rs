@@ -1,14 +1,16 @@
 use crate::error::{TaError, TaResult};
 use std::collections::VecDeque;
+/// Simple mean of the percentage of new extremes that are new highs.
 #[derive(Debug, Clone)]
 pub struct HighLowIndex {
     period: usize,
-    rows: VecDeque<(f64, f64)>,
-    highs: f64,
-    lows: f64,
+    rows: VecDeque<f64>,
+    sum: f64,
+    count: usize,
     value: Option<f64>,
 }
 impl HighLowIndex {
+    /// Create a rolling state with a positive smoothing period.
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(TaError::InvalidParameter {
@@ -20,38 +22,36 @@ impl HighLowIndex {
         Ok(Self {
             period,
             rows: VecDeque::with_capacity(period),
-            highs: 0.0,
-            lows: 0.0,
+            sum: 0.0,
+            count: 0,
             value: None,
         })
     }
-    pub fn append(
-        &mut self,
-        _change: f64,
-        _volume: f64,
-        new_high: f64,
-        new_low: f64,
-    ) -> Option<f64> {
+    /// Append aggregate new-high and new-low counts for one market tick.
+    pub fn append(&mut self, new_highs: f64, new_lows: f64) -> Option<f64> {
+        self.count += 1;
+        let percent = 100.0 * new_highs / (new_highs + new_lows).max(1.0);
         if self.rows.len() == self.period {
-            let (h, l) = self.rows.pop_front().expect("full window");
-            self.highs -= h;
-            self.lows -= l;
+            self.sum -= self.rows.pop_front().expect("full window");
         }
-        self.rows.push_back((new_high, new_low));
-        self.highs += new_high;
-        self.lows += new_low;
-        let total = self.highs + self.lows;
-        self.value =
-            (self.rows.len() == self.period && total != 0.0).then(|| 100.0 * self.highs / total);
+        self.rows.push_back(percent);
+        self.sum += percent;
+        self.value = (self.rows.len() == self.period).then(|| self.sum / self.period as f64);
         self.value
     }
+    /// Return the number of processed market ticks.
+    pub fn len(&self) -> usize {
+        self.count
+    }
+    /// Return the latest smoothed percentage, or `None` during warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+    /// Clear the rolling window while retaining its allocation.
     pub fn reset(&mut self) {
         self.rows.clear();
-        self.highs = 0.0;
-        self.lows = 0.0;
+        self.sum = 0.0;
+        self.count = 0;
         self.value = None;
     }
 }

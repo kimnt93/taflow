@@ -3,5 +3,22 @@
   "taflow_class": "BreadthThrust",
   "oracle": "Wickra",
   "oracle_name": "BreadthThrust",
-  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 1.1102230246251565e-16
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+    "1": true,
+    "10": true,
+    "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 1.1102230246251565e-16
+  }
 }

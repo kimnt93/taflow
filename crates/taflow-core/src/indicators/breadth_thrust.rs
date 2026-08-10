@@ -1,15 +1,16 @@
 use crate::error::{TaError, TaResult};
 use std::collections::VecDeque;
+/// Simple mean of the cross-sectional advancing-issues share.
 #[derive(Debug, Clone)]
 pub struct BreadthThrust {
     period: usize,
-    rows: VecDeque<(f64, f64)>,
-    advances: f64,
-    total: f64,
+    rows: VecDeque<f64>,
+    sum: f64,
     count: usize,
     value: Option<f64>,
 }
 impl BreadthThrust {
+    /// Create a rolling state with a positive smoothing period.
     pub fn new(period: usize) -> TaResult<Self> {
         if period == 0 {
             return Err(TaError::InvalidParameter {
@@ -21,47 +22,39 @@ impl BreadthThrust {
         Ok(Self {
             period,
             rows: VecDeque::with_capacity(period),
-            advances: 0.0,
-            total: 0.0,
+            sum: 0.0,
             count: 0,
             value: None,
         })
     }
-    pub fn append(
-        &mut self,
-        change: f64,
-        _volume: f64,
-        _new_high: f64,
-        _new_low: f64,
-    ) -> Option<f64> {
+    /// Append aggregate advancing and declining issue counts.
+    pub fn append(&mut self, advancers: f64, decliners: f64) -> Option<f64> {
         self.count += 1;
-        let a = change.max(0.0);
-        let t = change.abs();
+        let share = advancers / (advancers + decliners).max(1.0);
         if self.rows.len() == self.period {
-            let (x, y) = self.rows.pop_front().expect("full window");
-            self.advances -= x;
-            self.total -= y;
+            self.sum -= self.rows.pop_front().expect("full window");
         }
-        self.rows.push_back((a, t));
-        self.advances += a;
-        self.total += t;
-        self.value = (self.rows.len() == self.period && self.total != 0.0)
-            .then(|| self.advances / self.total);
+        self.rows.push_back(share);
+        self.sum += share;
+        self.value = (self.rows.len() == self.period).then(|| self.sum / self.period as f64);
         self.value
     }
+    /// Return the latest smoothed advancing share, or `None` in warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+    /// Return the number of processed market ticks.
     pub fn len(&self) -> usize {
         self.count
     }
+    /// Return whether no market ticks have been processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
+    /// Clear the rolling window while retaining its allocation.
     pub fn reset(&mut self) {
         self.rows.clear();
-        self.advances = 0.0;
-        self.total = 0.0;
+        self.sum = 0.0;
         self.count = 0;
         self.value = None;
     }

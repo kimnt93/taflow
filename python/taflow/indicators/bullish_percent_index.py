@@ -1,17 +1,61 @@
+"""Python adapter for the native Bullish Percent Index."""
+
 from typing import Any
 import numpy as np
 from .._native import BullishPercentIndex as _Native
 from .._series import as_float64_series
+
+
 class BullishPercentIndex:
-    """Percentage of the supplied universe currently on a buy signal."""
-    def __init__(self,change:Any,volume:Any,new_high:Any,new_low:Any,on_buy_signal:Any)->None:self._state=_Native();self.extend(change,volume,new_high,new_low,on_buy_signal)
-    def append(self,change:float,volume:float,new_high:float,new_low:float,on_buy_signal:float)->"BullishPercentIndex":self._state.append(float(change),float(volume),float(new_high),float(new_low),float(on_buy_signal));return self
-    def extend(self,change:Any,volume:Any,new_high:Any,new_low:Any,on_buy_signal:Any)->"BullishPercentIndex":
-        a=tuple(as_float64_series(x) for x in(change,volume,new_high,new_low,on_buy_signal))
-        if len({len(x) for x in a})!=1:raise ValueError("breadth inputs must have equal lengths")
-        self._state.extend(*a);return self
-    def compute(self)->np.ndarray:return self._state.compute()
+    """Return the percentage of a universe on point-and-figure buy signals.
+
+    The result is ``100 * on_buy_signal_count / universe_size`` and maps to
+    Wickra ``BullishPercentIndex``.
+
+    Args:
+        on_buy_signal_count: Number of constituent buy signals at each tick.
+        universe_size: Number of constituents at each aligned tick.
+
+    Raises:
+        ValueError: If the input histories have different lengths.
+    """
+
+    def __init__(self, on_buy_signal_count: Any, universe_size: Any) -> None:
+        """Initialize native state and process aligned count histories."""
+        self._state = _Native()
+        self.extend(on_buy_signal_count, universe_size)
+
+    def append(
+        self, on_buy_signal_count: float, universe_size: float
+    ) -> "BullishPercentIndex":
+        """Append one market-wide count pair and return this adapter."""
+        self._state.append(float(on_buy_signal_count), float(universe_size))
+        return self
+
+    def extend(
+        self, on_buy_signal_count: Any, universe_size: Any
+    ) -> "BullishPercentIndex":
+        """Append aligned count histories after validating their lengths."""
+        arrays = as_float64_series(on_buy_signal_count), as_float64_series(universe_size)
+        if len(arrays[0]) != len(arrays[1]):
+            raise ValueError("signal count and universe size must have equal lengths")
+        self._state.extend(*arrays)
+        return self
+
     @property
-    def value(self)->float|None:return self._state.value
-    def reset(self)->"BullishPercentIndex":self._state.reset();return self
-    def __len__(self)->int:return len(self._state)
+    def value(self) -> float | None:
+        """Return the latest percentage, or ``None`` before input."""
+        return self._state.value
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned percentage history."""
+        return self._state.compute()
+
+    def reset(self) -> "BullishPercentIndex":
+        """Reset native state and return this adapter."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the processed-tick count delegated to native state."""
+        return len(self._state)

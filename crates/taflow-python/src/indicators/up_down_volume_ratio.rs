@@ -16,31 +16,27 @@ impl UpDownVolumeRatio {
             output: Vec::new(),
         })
     }
-    fn append(&mut self, a: f64, b: f64, c: f64, d: f64) -> Option<f64> {
-        let x = self.inner.append(a, b, c, d);
+    fn append(&mut self, advancing_volume: f64, declining_volume: f64) -> Option<f64> {
+        let x = self.inner.append(advancing_volume, declining_volume);
         self.output.push(x.unwrap_or(f64::NAN));
         x
     }
     fn extend(
         &mut self,
         py: Python<'_>,
-        a: PyReadonlyArray1<f64>,
-        b: PyReadonlyArray1<f64>,
-        c: PyReadonlyArray1<f64>,
-        d: PyReadonlyArray1<f64>,
+        advancing_volume: PyReadonlyArray1<f64>,
+        declining_volume: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (a, b, c, d) = (a.as_slice()?, b.as_slice()?, c.as_slice()?, d.as_slice()?);
-        if [a.len(), b.len(), c.len(), d.len()]
-            .windows(2)
-            .any(|x| x[0] != x[1])
-        {
+        let (advancing_volume, declining_volume) =
+            (advancing_volume.as_slice()?, declining_volume.as_slice()?);
+        if advancing_volume.len() != declining_volume.len() {
             return Err(pyo3::exceptions::PyValueError::new_err(
                 "breadth inputs must have equal lengths",
             ));
         }
         py.allow_threads(|| {
-            for i in 0..a.len() {
-                self.append(a[i], b[i], c[i], d[i]);
+            for i in 0..advancing_volume.len() {
+                self.append(advancing_volume[i], declining_volume[i]);
             }
         });
         Ok(())
