@@ -1,15 +1,32 @@
-use crate::error::TaResult;
+use crate::error::{TaError, TaResult};
 use crate::indicators::rolling_statistic_helpers::RollingValues;
-use crate::stream::StreamingIndicator;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MovingAverageEnvelopeValue {
+    pub upper: f64,
+    pub middle: f64,
+    pub lower: f64,
+}
+
+/// Simple moving average wrapped by fixed percentage envelopes.
 #[derive(Debug, Clone)]
 pub struct MovingAverageEnvelope {
     period: usize,
     percent: f64,
     values: RollingValues,
-    value: Option<f64>,
+    value: Option<MovingAverageEnvelopeValue>,
 }
+
 impl MovingAverageEnvelope {
+    /// Create an envelope with positive period and percentage.
     pub fn new(period: usize, percent: f64) -> TaResult<Self> {
+        if !percent.is_finite() || percent <= 0.0 {
+            return Err(TaError::InvalidParameter {
+                name: "percent",
+                value: percent.to_string(),
+                reason: "must be finite and positive",
+            });
+        }
         Ok(Self {
             period,
             percent,
@@ -17,30 +34,28 @@ impl MovingAverageEnvelope {
             value: None,
         })
     }
-    pub fn append(&mut self, x: f64) -> Option<f64> {
-        self.values.push(x);
-        self.value = (self.values.is_full()).then(|| {
-            self.values.window().iter().sum::<f64>() / self.period as f64 * (1.0 + self.percent)
+
+    /// Append one price and return upper, middle, and lower bands.
+    pub fn append(&mut self, input: f64) -> Option<MovingAverageEnvelopeValue> {
+        self.values.push(input);
+        self.value = self.values.is_full().then(|| {
+            let middle = self.values.iter().sum::<f64>() / self.period as f64;
+            MovingAverageEnvelopeValue {
+                upper: middle * (1.0 + self.percent),
+                middle,
+                lower: middle * (1.0 - self.percent),
+            }
         });
         self.value
     }
-    pub fn value(&self) -> Option<f64> {
+
+    /// Return the latest three bands, or `None` while the window is incomplete.
+    pub fn value(&self) -> Option<MovingAverageEnvelopeValue> {
         self.value
     }
+    /// Restore fresh-state behavior while retaining rolling storage.
     pub fn reset(&mut self) {
         self.values.clear();
         self.value = None;
-    }
-}
-impl StreamingIndicator for MovingAverageEnvelope {
-    type Output = f64;
-    fn append(&mut self, x: f64) -> Option<f64> {
-        Self::append(self, x)
-    }
-    fn value(&self) -> Option<f64> {
-        self.value
-    }
-    fn reset(&mut self) {
-        Self::reset(self)
     }
 }

@@ -9,6 +9,7 @@ pub struct MedianChannelValue {
 #[derive(Debug, Clone)]
 pub struct MedianChannel {
     window: SortedRing,
+    deviations: Vec<f64>,
     multiplier: f64,
     value: Option<MedianChannelValue>,
 }
@@ -21,22 +22,27 @@ impl MedianChannel {
                 reason: "must be positive",
             });
         }
-        if !multiplier.is_finite() || multiplier < 0.0 {
+        if !multiplier.is_finite() || multiplier <= 0.0 {
             return Err(TaError::InvalidParameter {
                 name: "multiplier",
                 value: multiplier.to_string(),
-                reason: "must be finite and non-negative",
+                reason: "must be finite and positive",
             });
         }
         Ok(Self {
             window: SortedRing::new(period),
+            deviations: Vec::with_capacity(period),
             multiplier,
             value: None,
         })
     }
     pub fn append(&mut self, x: f64) -> Option<MedianChannelValue> {
         self.window.push(x);
-        self.value = self.window.is_full().then(|| {
+        if !self.window.is_full() {
+            self.value = None;
+            return None;
+        }
+        self.value = Some({
             let s = self.window.sorted();
             let n = s.len();
             let m = if n % 2 == 1 {
@@ -44,7 +50,16 @@ impl MedianChannel {
             } else {
                 (s[n / 2 - 1] + s[n / 2]) * 0.5
             };
-            let width = (s[n - 1] - s[0]) * 0.5 * self.multiplier;
+            self.deviations.clear();
+            self.deviations
+                .extend(s.iter().map(|value| (value - m).abs()));
+            self.deviations.sort_by(f64::total_cmp);
+            let mad = if n % 2 == 1 {
+                self.deviations[n / 2]
+            } else {
+                (self.deviations[n / 2 - 1] + self.deviations[n / 2]) * 0.5
+            };
+            let width = mad * self.multiplier;
             MedianChannelValue {
                 upper: m + width,
                 middle: m,
@@ -58,6 +73,7 @@ impl MedianChannel {
     }
     pub fn reset(&mut self) {
         self.window.clear();
+        self.deviations.clear();
         self.value = None;
     }
 }

@@ -1,3 +1,5 @@
-from taflow import OvernightIntradayReturn
-def test_lifecycle():
-    x=OvernightIntradayReturn([1.0,2.0],[1.0,3.0],[1.0,2.0],[2.0,3.0],[1.0,1.0],[0,1]);assert len(x)==2;x.reset();assert x.value is None
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_overnight_intraday_return_matches_wickra() -> None:
+    assert_registered_oracle_match("OvernightIntradayReturn")

@@ -1,4 +1,5 @@
-import numpy as np
-from taflow import MovingAverageEnvelope
-def test_moving_average_envelope_lifecycle():
-    s=MovingAverageEnvelope(np.array([],float),2,.1);s.extend([1,2]);assert s.value is not None;s.reset();assert len(s)==0
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_moving_average_envelope_matches_wickra() -> None:
+    assert_registered_oracle_match("MovingAverageEnvelope")

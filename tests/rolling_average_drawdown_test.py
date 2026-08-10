@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import RollingAverageDrawdown
-def test_rolling_average_drawdown_lifecycle():
-    state=RollingAverageDrawdown(np.array([],dtype=float),3);state.extend([3,2,1]);assert state.value is not None;state.reset();assert len(state)==0
+"""External correctness for RollingAverageDrawdown."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_rolling_average_drawdown_matches_wickra() -> None:
+    """Match Wickra AverageDrawdown across batch and streaming paths."""
+    assert_registered_oracle_match("RollingAverageDrawdown")
