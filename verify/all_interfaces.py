@@ -24,15 +24,21 @@ open_ = close + 0.2
 volume = np.linspace(100_000.0, 200_000.0, N)
 benchmark = close * 1.01
 periods = np.full(N, 10, dtype=np.int64)
+timestamp = np.arange(N, dtype=np.int64) * 3_600 + 1_700_000_000
 condition = (np.arange(N) % 11) == 0
 new_session = (np.arange(N) % 16) == 0
 ARRAYS = {
     "_input": close, "input": close, "values": close, "price": close,
+    "prices": close,
     "change": close, "value": close, "equity": close,
     "left": close, "right": benchmark, "x": close, "y": benchmark,
     "benchmark": benchmark, "close": close, "high": high, "low": low,
+    "a": close, "b": benchmark,
     "h": high, "l": low,
     "_open": open_, "open": open_, "volume": volume, "periods": periods,
+    "timestamp": timestamp,
+    "new_high": high, "new_low": low,
+    "on_buy_signal": condition, "above_moving_average": close > np.mean(close),
     "condition": condition, "new_session": new_session, "anchor": new_session,
     "entry": condition, "_exit": ~condition, "exit": ~condition,
     "position": close,

@@ -880,6 +880,402 @@
     "status": "PASS"
   },
   {
+    "name": "RollingOmegaRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingValueAtRisk",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingConditionalValueAtRisk",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingProfitFactor",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingKellyCriterion",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingRecoveryFactor",
+    "status": "PASS"
+  },
+  {
+    "name": "VolumeRelativeStrengthIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingLeadLagCrossCorrelation",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingPairwiseBeta",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingBetaNeutralSpread",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingMedianAbsoluteDeviation",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingStandardError",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingCoefficientOfDetermination",
+    "status": "PASS"
+  },
+  {
+    "name": "VolumeWeightedMovingAverageConvergenceDivergence",
+    "status": "PASS"
+  },
+  {
+    "name": "BetterVolume",
+    "status": "PASS"
+  },
+  {
+    "name": "IntradayIntensity",
+    "status": "PASS"
+  },
+  {
+    "name": "TradeVolumeIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "TwiggsMoneyFlow",
+    "status": "PASS"
+  },
+  {
+    "name": "WilliamsAccumulationDistribution",
+    "status": "PASS"
+  },
+  {
+    "name": "MarketFacilitationIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "TimeSegmentedVolume",
+    "status": "PASS"
+  },
+  {
+    "name": "MovingAverageEnvelope",
+    "status": "PASS"
+  },
+  {
+    "name": "AverageTrueRangeBands",
+    "status": "PASS"
+  },
+  {
+    "name": "LinearRegressionChannel",
+    "status": "PASS"
+  },
+  {
+    "name": "StandardErrorBands",
+    "status": "PASS"
+  },
+  {
+    "name": "DoubleBollingerBands",
+    "status": "PASS"
+  },
+  {
+    "name": "ProjectionBands",
+    "status": "PASS"
+  },
+  {
+    "name": "HurstChannel",
+    "status": "PASS"
+  },
+  {
+    "name": "SuperSmoother",
+    "status": "PASS"
+  },
+  {
+    "name": "InverseFisherTransform",
+    "status": "PASS"
+  },
+  {
+    "name": "Decycler",
+    "status": "PASS"
+  },
+  {
+    "name": "DecyclerOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "RoofingFilter",
+    "status": "PASS"
+  },
+  {
+    "name": "CenterOfGravity",
+    "status": "PASS"
+  },
+  {
+    "name": "InstantaneousTrendline",
+    "status": "PASS"
+  },
+  {
+    "name": "AdaptiveCycle",
+    "status": "PASS"
+  },
+  {
+    "name": "EhlersStochastic",
+    "status": "PASS"
+  },
+  {
+    "name": "HilbertDominantCycle",
+    "status": "PASS"
+  },
+  {
+    "name": "EmpiricalModeDecomposition",
+    "status": "PASS"
+  },
+  {
+    "name": "ZigZag",
+    "status": "PASS"
+  },
+  {
+    "name": "SessionVolumeWeightedAveragePrice",
+    "status": "PASS"
+  },
+  {
+    "name": "SessionRange",
+    "status": "PASS"
+  },
+  {
+    "name": "OvernightGap",
+    "status": "PASS"
+  },
+  {
+    "name": "OvernightIntradayReturn",
+    "status": "PASS"
+  },
+  {
+    "name": "AverageDailyRange",
+    "status": "PASS"
+  },
+  {
+    "name": "TimeOfDayReturnProfile",
+    "status": "PASS"
+  },
+  {
+    "name": "DayOfWeekReturnProfile",
+    "status": "PASS"
+  },
+  {
+    "name": "IntradayVolatilityProfile",
+    "status": "PASS"
+  },
+  {
+    "name": "VolumeByTimeProfile",
+    "status": "PASS"
+  },
+  {
+    "name": "QuartileBands",
+    "status": "PASS"
+  },
+  {
+    "name": "MedianChannel",
+    "status": "PASS"
+  },
+  {
+    "name": "AbsoluteBreadthIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "CumulativeVolumeIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "BullishPercentIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "UpDownVolumeRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "PercentAboveMovingAverage",
+    "status": "PASS"
+  },
+  {
+    "name": "HighLowIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "NewHighsNewLows",
+    "status": "PASS"
+  },
+  {
+    "name": "BreadthThrust",
+    "status": "PASS"
+  },
+  {
+    "name": "ArmsIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "McClellanSummationIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "McClellanOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "CupAndHandle",
+    "status": "PASS"
+  },
+  {
+    "name": "RectangleRange",
+    "status": "PASS"
+  },
+  {
+    "name": "FlagPennant",
+    "status": "PASS"
+  },
+  {
+    "name": "WedgePattern",
+    "status": "PASS"
+  },
+  {
+    "name": "TrianglePattern",
+    "status": "PASS"
+  },
+  {
+    "name": "HeadAndShoulders",
+    "status": "PASS"
+  },
+  {
+    "name": "TripleTopBottom",
+    "status": "PASS"
+  },
+  {
+    "name": "ThreeDrives",
+    "status": "PASS"
+  },
+  {
+    "name": "CypherPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "SharkPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "CrabPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "BatPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "ButterflyPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "GartleyPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "FourPointHarmonicPattern",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciTimeZones",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciChannel",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciArcs",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciFan",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciConfluence",
+    "status": "PASS"
+  },
+  {
+    "name": "GoldenPocket",
+    "status": "PASS"
+  },
+  {
+    "name": "AutomaticFibonacci",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciProjection",
+    "status": "PASS"
+  },
+  {
+    "name": "FibonacciExtension",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingAverageDrawdown",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingDrawdownDuration",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingGainLossRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingPainIndex",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingVarianceRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingSpearmanCorrelation",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingKendallRankCorrelation",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingCointegration",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingGrangerCausality",
+    "status": "PASS"
+  },
+  {
+    "name": "RollingTreynorRatio",
+    "status": "PASS"
+  },
+  {
+    "name": "VolumeOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "VolumeZoneOscillator",
+    "status": "PASS"
+  },
+  {
+    "name": "DemandIndex",
+    "status": "PASS"
+  },
+  {
     "name": "RollingMaximumDrawdown",
     "status": "PASS"
   },
