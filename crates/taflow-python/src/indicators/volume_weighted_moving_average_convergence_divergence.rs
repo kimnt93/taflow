@@ -1,57 +1,89 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::indicators::VolumeWeightedMovingAverageConvergenceDivergence as State;
+use taflow::indicators::{
+    VolumeWeightedMovingAverageConvergenceDivergence as State,
+    VolumeWeightedMovingAverageConvergenceDivergenceValue as Value,
+};
+
 #[pyclass]
 pub struct VolumeWeightedMovingAverageConvergenceDivergence {
     inner: State,
-    output: Vec<f64>,
+    convergence_divergence: Vec<f64>,
+    signal: Vec<f64>,
+    histogram: Vec<f64>,
 }
+
 #[pymethods]
 impl VolumeWeightedMovingAverageConvergenceDivergence {
     #[new]
-    fn new(fast: usize, slow: usize) -> PyResult<Self> {
+    fn new(fast: usize, slow: usize, signal: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new(fast, slow)
-                .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?,
-            output: Vec::new(),
+            inner: State::new(fast, slow, signal)
+                .map_err(|error| pyo3::exceptions::PyValueError::new_err(error.to_string()))?,
+            convergence_divergence: Vec::new(),
+            signal: Vec::new(),
+            histogram: Vec::new(),
         })
     }
-    fn append(&mut self, c: f64, v: f64) -> Option<f64> {
-        let x = self.inner.append(c, v);
-        self.output.push(x.unwrap_or(f64::NAN));
-        x
+    fn append(&mut self, close: f64, volume: f64) -> Option<(f64, f64, f64)> {
+        let result = self.inner.append(close, volume);
+        let value = result.unwrap_or(Value {
+            convergence_divergence: f64::NAN,
+            signal: f64::NAN,
+            histogram: f64::NAN,
+        });
+        self.convergence_divergence
+            .push(value.convergence_divergence);
+        self.signal.push(value.signal);
+        self.histogram.push(value.histogram);
+        result.map(|value| (value.convergence_divergence, value.signal, value.histogram))
     }
     fn extend(
         &mut self,
         py: Python<'_>,
-        c: PyReadonlyArray1<f64>,
-        v: PyReadonlyArray1<f64>,
+        close: PyReadonlyArray1<f64>,
+        volume: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (c, v) = (c.as_slice()?, v.as_slice()?);
-        if c.len() != v.len() {
+        let (close, volume) = (close.as_slice()?, volume.as_slice()?);
+        if close.len() != volume.len() {
             return Err(pyo3::exceptions::PyValueError::new_err(
-                "close and volume must have equal lengths",
+                "close and volume inputs must have equal lengths",
             ));
         }
         py.allow_threads(|| {
-            for (&a, &b) in c.iter().zip(v) {
-                self.append(a, b);
+            for index in 0..close.len() {
+                self.append(close[index], volume[index]);
             }
         });
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
-        PyArray1::from_vec(py, self.output.clone())
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+        Bound<'py, PyArray1<f64>>,
+    ) {
+        (
+            PyArray1::from_vec(py, self.convergence_divergence.clone()),
+            PyArray1::from_vec(py, self.signal.clone()),
+            PyArray1::from_vec(py, self.histogram.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|value| (value.convergence_divergence, value.signal, value.histogram))
     }
     fn reset(&mut self) {
         self.inner.reset();
-        self.output.clear();
+        self.convergence_divergence.clear();
+        self.signal.clear();
+        self.histogram.clear();
     }
     fn __len__(&self) -> usize {
-        self.output.len()
+        self.convergence_divergence.len()
     }
 }
