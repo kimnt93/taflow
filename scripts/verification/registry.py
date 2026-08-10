@@ -45,6 +45,7 @@ class WickraBinding:
     name: str
     parameter_names: tuple[str, ...]
     prepend_zero_close: bool = False
+    cross_section: str | None = None
     variant: str | None = None
     rtol: float = 1e-8
     atol: float = 1e-10
@@ -149,17 +150,35 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "VolumeByTimeProfile": WickraBinding("VolumeByTimeProfile", ()),
     "QuartileBands": WickraBinding("QuartileBands", ()),
     "MedianChannel": WickraBinding("MedianChannel", ()),
-    "AbsoluteBreadthIndex": WickraBinding("AbsoluteBreadthIndex", ()),
-    "CumulativeVolumeIndex": WickraBinding("CumulativeVolumeIndex", ()),
-    "BullishPercentIndex": WickraBinding("BullishPercentIndex", ()),
-    "UpDownVolumeRatio": WickraBinding("UpDownVolumeRatio", ()),
-    "PercentAboveMovingAverage": WickraBinding("PercentAboveMa", ()),
-    "HighLowIndex": WickraBinding("HighLowIndex", ()),
-    "NewHighsNewLows": WickraBinding("NewHighsNewLows", ()),
-    "BreadthThrust": WickraBinding("BreadthThrust", ()),
-    "ArmsIndex": WickraBinding("Trin", ()),
-    "McClellanSummationIndex": WickraBinding("McClellanSummationIndex", ()),
-    "McClellanOscillator": WickraBinding("McClellanOscillator", ()),
+    "AbsoluteBreadthIndex": WickraBinding(
+        "AbsoluteBreadthIndex", (), cross_section="advance_decline"
+    ),
+    "CumulativeVolumeIndex": WickraBinding(
+        "CumulativeVolumeIndex", (), cross_section="volume"
+    ),
+    "BullishPercentIndex": WickraBinding(
+        "BullishPercentIndex", (), cross_section="buy_signal"
+    ),
+    "UpDownVolumeRatio": WickraBinding(
+        "UpDownVolumeRatio", (), cross_section="volume"
+    ),
+    "PercentAboveMovingAverage": WickraBinding(
+        "PercentAboveMa", (), cross_section="above_ma"
+    ),
+    "HighLowIndex": WickraBinding("HighLowIndex", (), cross_section="extrema"),
+    "NewHighsNewLows": WickraBinding(
+        "NewHighsNewLows", (), cross_section="extrema"
+    ),
+    "BreadthThrust": WickraBinding(
+        "BreadthThrust", (), cross_section="advance_decline"
+    ),
+    "ArmsIndex": WickraBinding("Trin", (), cross_section="trin"),
+    "McClellanSummationIndex": WickraBinding(
+        "McClellanSummationIndex", (), cross_section="advance_decline"
+    ),
+    "McClellanOscillator": WickraBinding(
+        "McClellanOscillator", (), cross_section="advance_decline"
+    ),
     "CupAndHandle": WickraBinding("CupAndHandle", ()),
     "RectangleRange": WickraBinding("RectangleRange", ()),
     "FlagPennant": WickraBinding("FlagPennant", ()),
@@ -493,6 +512,35 @@ class Spec:
     # -- data --------------------------------------------------------------
 
     def arrays(self, data: dict, n: int) -> list[np.ndarray]:
+        if self.wickra and self.wickra.cross_section:
+            index = np.arange(n, dtype=np.int64)
+            advancers = (1 + index % 4).astype(np.float64)
+            decliners = (1 + (index * 3) % 3).astype(np.float64)
+            mode = self.wickra.cross_section
+            if mode == "volume":
+                return [
+                    np.ascontiguousarray(advancers * (10 + index % 5)),
+                    np.ascontiguousarray(decliners * (8 + (index * 2) % 7)),
+                ]
+            if mode in {"buy_signal", "above_ma"}:
+                return [
+                    np.ascontiguousarray((index % 9).astype(np.float64)),
+                    np.full(n, 8.0, dtype=np.float64),
+                ]
+            if mode == "extrema":
+                return [
+                    np.ascontiguousarray((index % 4).astype(np.float64)),
+                    np.ascontiguousarray(((index * 2) % 4).astype(np.float64)),
+                ]
+            if mode == "trin":
+                return [
+                    np.ascontiguousarray(advancers),
+                    np.ascontiguousarray(decliners),
+                    np.ascontiguousarray(advancers * (10 + index % 5)),
+                    np.ascontiguousarray(decliners * (8 + (index * 2) % 7)),
+                ]
+            return [np.ascontiguousarray(advancers), np.ascontiguousarray(decliners)]
+
         out = []
         for role in self.input_roles:
             if (self.cls and self.cls.__name__ == "Sessions"

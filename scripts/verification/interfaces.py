@@ -28,6 +28,11 @@ timestamp = (
 )
 condition = (np.arange(N) % 11) == 0
 new_session = (np.arange(N) % 16) == 0
+advancers = (1 + np.arange(N) % 4).astype(np.float64)
+decliners = (1 + (np.arange(N) * 3) % 3).astype(np.float64)
+new_highs = (np.arange(N) % 4).astype(np.float64)
+new_lows = ((np.arange(N) * 2) % 4).astype(np.float64)
+universe_size = np.full(N, 8.0)
 ARRAYS = {
     "_input": close, "input": close, "values": close, "price": close,
     "prices": close,
@@ -45,6 +50,13 @@ ARRAYS = {
     "condition": condition, "new_session": new_session, "anchor": new_session,
     "entry": condition, "_exit": ~condition, "exit": ~condition,
     "position": close,
+    "advancers": advancers, "decliners": decliners,
+    "advancing_volume": advancers * 12.0,
+    "declining_volume": decliners * 10.0,
+    "new_highs": new_highs, "new_lows": new_lows,
+    "on_buy_signal_count": (np.arange(N) % 9).astype(np.float64),
+    "above_moving_average_count": (np.arange(N) % 9).astype(np.float64),
+    "universe_size": universe_size,
     "input0": close, "input1": benchmark,
     "_input0": close, "_input1": benchmark,
 }

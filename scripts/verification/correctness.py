@@ -187,6 +187,8 @@ def wickra_oracle(spec: Spec, arrays):
             )
     oracle = oracle_class(**kwargs)
     batch_arrays = list(arrays)
+    if binding.cross_section:
+        batch_arrays = cross_section_oracle_arrays(binding.cross_section, arrays)
     for index, name in enumerate(spec.series_args):
         if name == "timestamp":
             # TAFlow exposes Unix nanoseconds; Wickra Candle uses milliseconds.
@@ -206,6 +208,60 @@ def wickra_oracle(spec: Spec, arrays):
                 return matrix
             return tuple(matrix[:, index] for index in range(matrix.shape[1]))
     return result
+
+
+def cross_section_oracle_arrays(mode: str, arrays):
+    """Expand aggregate TAFlow breadth inputs into Wickra constituent rows."""
+    bars = len(arrays[0])
+    if mode == "volume":
+        advancing, declining = arrays
+        change = np.tile(np.array([1.0, -1.0]), (bars, 1))
+        volume = np.column_stack((advancing, declining))
+        flags = np.zeros((bars, 2), dtype=np.bool_)
+        return [change, volume, flags, flags.copy()]
+
+    universe = 8
+    member = np.arange(universe)[None, :]
+    changes = np.zeros((bars, universe), dtype=np.float64)
+    volume = np.ones((bars, universe), dtype=np.float64)
+    new_high = np.zeros((bars, universe), dtype=np.bool_)
+    new_low = np.zeros((bars, universe), dtype=np.bool_)
+
+    if mode in {"advance_decline", "trin"}:
+        advancers, decliners = arrays[:2]
+        changes[member < advancers[:, None]] = 1.0
+        declining = (member >= advancers[:, None]) & (
+            member < (advancers + decliners)[:, None]
+        )
+        changes[declining] = -1.0
+        if mode == "trin":
+            advancing_volume, declining_volume = arrays[2:]
+            advancing = changes > 0.0
+            volume[advancing] = np.repeat(
+                advancing_volume / advancers, advancers.astype(np.int64)
+            )
+            volume[declining] = np.repeat(
+                declining_volume / decliners, decliners.astype(np.int64)
+            )
+        return [changes, volume, new_high, new_low]
+
+    if mode == "extrema":
+        highs, lows = arrays
+        new_high = member < highs[:, None]
+        new_low = (member >= highs[:, None]) & (
+            member < (highs + lows)[:, None]
+        )
+        return [changes, volume, new_high, new_low]
+
+    selected, totals = arrays
+    signal = member < selected[:, None]
+    # ``totals`` is fixed at eight in generated evidence, but retain this mask
+    # so the conversion remains correct for smaller explicit universes.
+    active = member < totals[:, None]
+    volume[~active] = 0.0
+    if mode == "buy_signal":
+        return [changes, volume, new_high, new_low, signal]
+    return [changes, volume, new_high, new_low, signal]
 
 
 def numpy_oracle(spec: Spec, arrays):
