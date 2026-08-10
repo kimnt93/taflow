@@ -1,52 +1,67 @@
 use crate::error::TaResult;
-use std::collections::VecDeque;
+
+use super::pattern_swing::{
+    approximately_equal, recent_legs, SwingTracker, LEVEL_TOLERANCE, SWING_THRESHOLD,
+};
+
+/// Causal horizontal support-and-resistance range detector.
 #[derive(Debug, Clone)]
 pub struct RectangleRange {
-    rows: VecDeque<(f64, f64, f64, f64)>,
+    swing: SwingTracker,
     count: usize,
     value: Option<f64>,
 }
+
 impl RectangleRange {
+    /// Create a detector using Wickra's fixed swing and level tolerances.
     pub fn new() -> TaResult<Self> {
         Ok(Self {
-            rows: VecDeque::with_capacity(20),
+            swing: SwingTracker::new(SWING_THRESHOLD, 4),
             count: 0,
             value: None,
         })
     }
-    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<f64> {
+
+    /// Append one OHLC bar and return the latest range-touch signal.
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
         self.count += 1;
-        if self.rows.len() == 20 {
-            self.rows.pop_front();
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) {
+            return self.value;
         }
-        self.rows.push_back((o, h, l, c));
-        self.value = (self.rows.len() == 20).then(|| {
-            let hi = self
-                .rows
-                .iter()
-                .map(|x| x.1)
-                .fold(f64::NEG_INFINITY, f64::max);
-            let lo = self.rows.iter().map(|x| x.2).fold(f64::INFINITY, f64::min);
-            let mean = self.rows.iter().map(|x| x.3).sum::<f64>() / 20.0;
-            if mean != 0.0 && (hi - lo) / mean.abs() < 0.05 {
-                1.0
-            } else {
-                0.0
-            }
-        });
+        let pivots = self.swing.pivots();
+        if pivots.len() < 4 {
+            return self.value;
+        }
+
+        let (old_high, new_high, old_low, new_low) = recent_legs(pivots);
+        let flat_highs = approximately_equal(old_high, new_high, LEVEL_TOLERANCE);
+        let flat_lows = approximately_equal(old_low, new_low, LEVEL_TOLERANCE);
+        if flat_highs && flat_lows {
+            let last_is_high = pivots[pivots.len() - 1].direction > 0.0;
+            self.value = Some(if last_is_high { -1.0 } else { 1.0 });
+        }
         self.value
     }
+
+    /// Return the signal produced for the latest bar.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+
+    /// Return the number of processed bars.
     pub fn len(&self) -> usize {
         self.count
     }
+
+    /// Return whether no bars have been processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
+
+    /// Clear pivots and restore fresh-state behaviour.
     pub fn reset(&mut self) {
-        self.rows.clear();
+        self.swing.reset();
         self.count = 0;
         self.value = None;
     }
