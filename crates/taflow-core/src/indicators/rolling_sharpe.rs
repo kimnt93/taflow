@@ -33,7 +33,7 @@ impl RollingSharpe {
                 .iter()
                 .map(|&value| (value - average).powi(2))
                 .sum::<f64>()
-                / self.timeperiod as f64;
+                / (self.timeperiod - 1) as f64;
             if variance > 0.0 {
                 average / variance.sqrt()
             } else {

@@ -40,33 +40,20 @@ impl RollingAutocorr {
         self.scratch[..front.len()].copy_from_slice(front);
         self.scratch[front.len()..].copy_from_slice(back);
         let window = &self.scratch[..];
-        let left = &window[..self.period - 1];
-        let right = &window[1..];
-        let n = (self.period - 1) as f64;
-        let mut left_sum = 0.0;
-        let mut right_sum = 0.0;
-        for &value in left {
-            left_sum += value;
+        let mean = window.iter().sum::<f64>() / self.period as f64;
+        let mut denominator = 0.0;
+        let mut numerator = 0.0;
+        for &value in window {
+            let deviation = value - mean;
+            denominator += deviation * deviation;
         }
-        for &value in right {
-            right_sum += value;
-        }
-        let left_mean = left_sum / n;
-        let right_mean = right_sum / n;
-        let mut left_variance = 0.0;
-        let mut right_variance = 0.0;
-        let mut covariance = 0.0;
         for index in 0..self.period - 1 {
-            let left_delta = left[index] - left_mean;
-            let right_delta = right[index] - right_mean;
-            left_variance += left_delta * left_delta;
-            right_variance += right_delta * right_delta;
-            covariance += left_delta * right_delta;
+            numerator += (window[index] - mean) * (window[index + 1] - mean);
         }
-        self.value = Some(if left_variance == 0.0 || right_variance == 0.0 {
+        self.value = Some(if denominator == 0.0 {
             0.0
         } else {
-            covariance / (left_variance * right_variance).sqrt()
+            numerator / denominator
         });
         self.value
     }

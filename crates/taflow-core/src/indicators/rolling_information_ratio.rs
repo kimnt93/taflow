@@ -31,7 +31,7 @@ impl RollingInformationRatio {
                 .iter()
                 .map(|&value| (value - mean).powi(2))
                 .sum::<f64>()
-                / n;
+                / (n - 1.0);
             if variance > 0.0 {
                 mean / variance.sqrt()
             } else {

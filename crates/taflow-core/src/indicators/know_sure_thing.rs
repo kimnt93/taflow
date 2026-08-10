@@ -28,6 +28,7 @@ pub struct KnowSureThingValue {
 pub struct KnowSureThing {
     rocs: [KstRocSma; 4],
     nsig: usize,
+    signal_count: usize,
     signal_state: RollingMeanMin0,
     value: Option<KnowSureThingValue>,
 }
@@ -66,6 +67,7 @@ impl KnowSureThing {
                 KstRocSma::new(roc4, sma4)?,
             ],
             nsig,
+            signal_count: 0,
             signal_state: RollingMeanMin0::new(nsig)?,
             value: None,
         })
@@ -83,7 +85,14 @@ impl KnowSureThing {
         let rocma4 = self.rocs[3].append(close).unwrap_or(f64::NAN);
         let kst = 100.0 * (rocma1 + 2.0 * rocma2 + 3.0 * rocma3 + 4.0 * rocma4);
         let signal = self.signal_state.append(kst).unwrap_or(f64::NAN);
-        let value = KnowSureThingValue { kst, signal };
+        if kst.is_finite() {
+            self.signal_count += 1;
+        }
+        let warmed = self.signal_count >= self.nsig;
+        let value = KnowSureThingValue {
+            kst: if warmed { kst } else { f64::NAN },
+            signal: if warmed { signal } else { f64::NAN },
+        };
         self.value = Some(value);
         value
     }
@@ -107,6 +116,7 @@ impl KnowSureThing {
             roc.reset();
         }
         self.signal_state.reset();
+        self.signal_count = 0;
         self.value = None;
     }
 
@@ -206,14 +216,20 @@ impl KnowSureThing {
 
             kst = 100.0 * (rocma1 + 2.0 * rocma2 + 3.0 * rocma3 + 4.0 * rocma4);
             signal = self.signal_state.append(kst).unwrap_or(f64::NAN);
-            kst_out.push(kst);
-            signal_out.push(signal);
+            self.signal_count += 1;
+            let warmed = self.signal_count >= self.nsig;
+            kst_out.push(if warmed { kst } else { f64::NAN });
+            signal_out.push(if warmed { signal } else { f64::NAN });
         }
 
         chain1.sma.store_bulk_state(sum1, Some(rocma1));
         chain2.sma.store_bulk_state(sum2, Some(rocma2));
         chain3.sma.store_bulk_state(sum3, Some(rocma3));
         chain4.sma.store_bulk_state(sum4, Some(rocma4));
-        self.value = Some(KnowSureThingValue { kst, signal });
+        let warmed = self.signal_count >= self.nsig;
+        self.value = Some(KnowSureThingValue {
+            kst: if warmed { kst } else { f64::NAN },
+            signal: if warmed { signal } else { f64::NAN },
+        });
     }
 }
