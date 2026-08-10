@@ -62,6 +62,16 @@ from .rectangle_range import RectangleRange
 from .flag_pennant import FlagPennant
 from .wedge_pattern import WedgePattern
 from .triangle_pattern import TrianglePattern
+from .head_and_shoulders import HeadAndShoulders
+from .triple_top_bottom import TripleTopBottom
+from .three_drives import ThreeDrives
+from .cypher_pattern import CypherPattern
+from .shark_pattern import SharkPattern
+from .crab_pattern import CrabPattern
+from .bat_pattern import BatPattern
+from .butterfly_pattern import ButterflyPattern
+from .gartley_pattern import GartleyPattern
+from .four_point_harmonic_pattern import FourPointHarmonicPattern
 from .rolling_average_drawdown import RollingAverageDrawdown
 from .rolling_drawdown_duration import RollingDrawdownDuration
 from .rolling_gain_loss_ratio import RollingGainLossRatio
@@ -638,6 +648,16 @@ __all__ = [
     "FlagPennant",
     "WedgePattern",
     "TrianglePattern",
+    "HeadAndShoulders",
+    "TripleTopBottom",
+    "ThreeDrives",
+    "CypherPattern",
+    "SharkPattern",
+    "CrabPattern",
+    "BatPattern",
+    "ButterflyPattern",
+    "GartleyPattern",
+    "FourPointHarmonicPattern",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

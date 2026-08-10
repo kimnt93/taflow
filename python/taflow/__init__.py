@@ -22,6 +22,9 @@ from .indicators import UpDownVolumeRatio, PercentAboveMovingAverage, HighLowInd
 from .indicators import NewHighsNewLows, BreadthThrust, ArmsIndex
 from .indicators import McClellanSummationIndex, McClellanOscillator
 from .indicators import CupAndHandle, RectangleRange, FlagPennant, WedgePattern, TrianglePattern
+from .indicators import HeadAndShoulders, TripleTopBottom, ThreeDrives
+from .indicators import CypherPattern, SharkPattern, CrabPattern, BatPattern
+from .indicators import ButterflyPattern, GartleyPattern, FourPointHarmonicPattern
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -562,6 +565,16 @@ __all__ = [
     "FlagPennant",
     "WedgePattern",
     "TrianglePattern",
+    "HeadAndShoulders",
+    "TripleTopBottom",
+    "ThreeDrives",
+    "CypherPattern",
+    "SharkPattern",
+    "CrabPattern",
+    "BatPattern",
+    "ButterflyPattern",
+    "GartleyPattern",
+    "FourPointHarmonicPattern",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

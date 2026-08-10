@@ -430,6 +430,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | flag_pennant | flag_pennant | _ |
 | [ ] | wedge_pattern | wedge_pattern | _ |
 | [ ] | triangle_pattern | triangle_pattern | _ |
+| [ ] | head_and_shoulders | head_and_shoulders | _ |
+| [ ] | triple_top_bottom | triple_top_bottom | _ |
+| [ ] | three_drives | three_drives | _ |
+| [ ] | cypher_pattern | cypher_pattern | _ |
+| [ ] | shark_pattern | shark_pattern | _ |
+| [ ] | crab_pattern | crab_pattern | _ |
+| [ ] | bat_pattern | bat_pattern | _ |
+| [ ] | butterfly_pattern | butterfly_pattern | _ |
+| [ ] | gartley_pattern | gartley_pattern | _ |
+| [ ] | four_point_harmonic_pattern | four_point_harmonic_pattern | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 375,
+    "indicators": 385,
     "native_functions": 0,
-    "native_state_classes": 374,
+    "native_state_classes": 384,
     "pandas_ta_symbols": 427,
-    "python_exports": 377,
-    "rust_exports": 785,
+    "python_exports": 387,
+    "rust_exports": 805,
     "smc_functions": 8,
-    "structure": 375,
+    "structure": 385,
     "talib_functions": 161
   },
   "rows": [
@@ -4203,6 +4203,156 @@
       "native_binding": true,
       "native_symbols": [
         "TrianglePattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "head_and_shoulders",
+      "name": "HeadAndShoulders",
+      "native_binding": true,
+      "native_symbols": [
+        "HeadAndShoulders",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "triple_top_bottom",
+      "name": "TripleTopBottom",
+      "native_binding": true,
+      "native_symbols": [
+        "TripleTopBottom",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "three_drives",
+      "name": "ThreeDrives",
+      "native_binding": true,
+      "native_symbols": [
+        "ThreeDrives",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "cypher_pattern",
+      "name": "CypherPattern",
+      "native_binding": true,
+      "native_symbols": [
+        "CypherPattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "shark_pattern",
+      "name": "SharkPattern",
+      "native_binding": true,
+      "native_symbols": [
+        "SharkPattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "crab_pattern",
+      "name": "CrabPattern",
+      "native_binding": true,
+      "native_symbols": [
+        "CrabPattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "bat_pattern",
+      "name": "BatPattern",
+      "native_binding": true,
+      "native_symbols": [
+        "BatPattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "butterfly_pattern",
+      "name": "ButterflyPattern",
+      "native_binding": true,
+      "native_symbols": [
+        "ButterflyPattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "gartley_pattern",
+      "name": "GartleyPattern",
+      "native_binding": true,
+      "native_symbols": [
+        "GartleyPattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "four_point_harmonic_pattern",
+      "name": "FourPointHarmonicPattern",
+      "native_binding": true,
+      "native_symbols": [
+        "FourPointHarmonicPattern",
         "_Native"
       ],
       "pandas_ta_reference": false,

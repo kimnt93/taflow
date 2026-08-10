@@ -393,6 +393,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::FlagPennant>()?;
     m.add_class::<indicators::WedgePattern>()?;
     m.add_class::<indicators::TrianglePattern>()?;
+    m.add_class::<indicators::HeadAndShoulders>()?;
+    m.add_class::<indicators::TripleTopBottom>()?;
+    m.add_class::<indicators::ThreeDrives>()?;
+    m.add_class::<indicators::CypherPattern>()?;
+    m.add_class::<indicators::SharkPattern>()?;
+    m.add_class::<indicators::CrabPattern>()?;
+    m.add_class::<indicators::BatPattern>()?;
+    m.add_class::<indicators::ButterflyPattern>()?;
+    m.add_class::<indicators::GartleyPattern>()?;
+    m.add_class::<indicators::FourPointHarmonicPattern>()?;
 
     Ok(())
 }

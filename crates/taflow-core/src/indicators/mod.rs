@@ -1563,3 +1563,43 @@ pub use new_highs_new_lows::NewHighsNewLows;
 pub use rectangle_range::RectangleRange;
 pub use triangle_pattern::TrianglePattern;
 pub use wedge_pattern::WedgePattern;
+mod bat_pattern;
+#[cfg(test)]
+mod bat_pattern_test;
+mod butterfly_pattern;
+#[cfg(test)]
+mod butterfly_pattern_test;
+mod crab_pattern;
+#[cfg(test)]
+mod crab_pattern_test;
+mod cypher_pattern;
+#[cfg(test)]
+mod cypher_pattern_test;
+mod four_point_harmonic_pattern;
+#[cfg(test)]
+mod four_point_harmonic_pattern_test;
+mod gartley_pattern;
+#[cfg(test)]
+mod gartley_pattern_test;
+mod head_and_shoulders;
+#[cfg(test)]
+mod head_and_shoulders_test;
+mod shark_pattern;
+#[cfg(test)]
+mod shark_pattern_test;
+mod three_drives;
+#[cfg(test)]
+mod three_drives_test;
+mod triple_top_bottom;
+#[cfg(test)]
+mod triple_top_bottom_test;
+pub use bat_pattern::BatPattern;
+pub use butterfly_pattern::ButterflyPattern;
+pub use crab_pattern::CrabPattern;
+pub use cypher_pattern::CypherPattern;
+pub use four_point_harmonic_pattern::FourPointHarmonicPattern;
+pub use gartley_pattern::GartleyPattern;
+pub use head_and_shoulders::HeadAndShoulders;
+pub use shark_pattern::SharkPattern;
+pub use three_drives::ThreeDrives;
+pub use triple_top_bottom::TripleTopBottom;
