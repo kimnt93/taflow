@@ -63,23 +63,77 @@ class ExternalBinding:
     variant: str | None = None
 
 
+@dataclass(frozen=True)
+class PandasTaBinding:
+    """Describe an exact pandas-ta-classic callable and output projection."""
+
+    name: str
+    actual_indices: tuple[int, ...] | None = None
+    oracle_indices: tuple[int, ...] | None = None
+    extra_kwargs: tuple[tuple[str, object], ...] = ()
+    variant: str | None = None
+    rtol: float = 1e-8
+    atol: float = 1e-10
+
+
 WICKRA_BINDINGS: dict[str, WickraBinding] = {
+    "RollingMedian": WickraBinding("MedianMA", ("timeperiod",)),
+    "RollingZScore": WickraBinding("ZScore", ("timeperiod",)),
+    "RollingSkew": WickraBinding(
+        "Skewness", ("timeperiod",), atol=1e-6
+    ),
+    "RollingKurtosis": WickraBinding(
+        "Kurtosis", ("timeperiod",), atol=3e-4
+    ),
+    "RollingInterquartileRange": WickraBinding(
+        "RollingIqr", ("timeperiod",)
+    ),
+    "RollingSharpe": WickraBinding("SharpeRatio", ("timeperiod",)),
+    "RollingSortino": WickraBinding("SortinoRatio", ("timeperiod",)),
+    "HullMovingAverage": WickraBinding("HMA", ("timeperiod",)),
+    "VolumeWeightedMovingAverage": WickraBinding("VWMA", ("timeperiod",)),
+    "ZeroLagExponentialMovingAverage": WickraBinding(
+        "ZLEMA", ("timeperiod",)
+    ),
+    "ArnaudLegouxMovingAverage": WickraBinding(
+        "ALMA", ("timeperiod", "offset", "sigma")
+    ),
+    "TrueStrengthIndex": WickraBinding("TSI", ("slow", "fast")),
+    "KeltnerChannels": WickraBinding(
+        "Keltner", ("timeperiod", "timeperiod", "multiplier")
+    ),
+    "RollingAutocorr": WickraBinding(
+        "Autocorrelation", ("timeperiod",)
+    ),
+    "Hurst": WickraBinding("HurstExponent", ("timeperiod", "chunks")),
+    "RollingAlpha": WickraBinding("Alpha", ("timeperiod",), atol=3e-8),
+    "RollingInformationRatio": WickraBinding(
+        "InformationRatio", ("timeperiod",)
+    ),
+    "KnowSureThing": WickraBinding(
+        "KST",
+        ("roc1", "roc2", "roc3", "roc4", "sma1", "sma2", "sma3", "sma4", "signal"),
+    ),
+    "NegativeVolumeIndex": WickraBinding("NVI", ()),
+    "PositiveVolumeIndex": WickraBinding("PVI", ()),
+    "Parkinson": WickraBinding("ParkinsonVolatility", ("timeperiod",)),
+    "GarmanKlass": WickraBinding("GarmanKlassVolatility", ("timeperiod",)),
+    "RogersSatchell": WickraBinding(
+        "RogersSatchellVolatility", ("timeperiod",)
+    ),
+    "YangZhang": WickraBinding("YangZhangVolatility", ("timeperiod",)),
+    "Amihud": WickraBinding(
+        "AmihudIlliquidity", ("timeperiod",), input_mode="trade_pair"
+    ),
+    "TomDeMarkSequential": WickraBinding(
+        "TDSequential", (), input_mode="triple_close"
+    ),
     "LogReturn": WickraBinding("LogReturn", ("timeperiod",)),
     "RollingQuantile": WickraBinding(
         "RollingQuantile", ("timeperiod", "quantile")
     ),
     "RollingCovariance": WickraBinding("RollingCovariance", ("timeperiod",)),
     "AwesomeOscillator": WickraBinding("AwesomeOscillator", ("fast", "slow")),
-    "FisherTransform": WickraBinding(
-        "FisherTransform",
-        ("timeperiod",),
-        input_mode="high_low_midpoint",
-        variant=(
-            "TAFlow implements the classic high/low Fisher Transform with "
-            "recursive Fisher smoothing; Wickra accepts one price series and "
-            "uses a different normalization recurrence."
-        ),
-    ),
     "Donchian": WickraBinding(
         "Donchian", ("timeperiod",), oracle_indices=(0, 2, 1)
     ),
@@ -92,23 +146,6 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     ),
     "ForceIndex": WickraBinding("ForceIndex", ()),
     "EaseOfMovement": WickraBinding("EaseOfMovement", ()),
-    "Supertrend": WickraBinding(
-        "SuperTrend",
-        ("timeperiod", "multiplier"),
-        actual_indices=(0, 1),
-        variant=(
-            "TAFlow follows pandas-ta-classic RMA seeding and also exposes "
-            "long/short bands; Wickra uses its own ATR seed convention."
-        ),
-    ),
-    "Ichimoku": WickraBinding(
-        "Ichimoku",
-        ("tenkan", "kijun", "senkou"),
-        variant=(
-            "TAFlow emits raw causal cloud values for caller-side plotting; "
-            "Wickra emits Senkou and Chikou values displaced by 26 bars."
-        ),
-    ),
     "Vortex": WickraBinding("Vortex", ("window",)),
     "MassIndex": WickraBinding("MassIndex", ("ema_period", "sum_period")),
     "ChaikinMoneyFlow": WickraBinding("ChaikinMoneyFlow", ("period",)),
@@ -121,15 +158,6 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
         "VIDYA", ("length", "cmo_period")
     ),
     "LaguerreRelativeStrengthIndex": WickraBinding("LaguerreRSI", ("gamma",)),
-    "JurikMovingAverage": WickraBinding(
-        "JMA",
-        ("length", "phase"),
-        variant=(
-            "TAFlow follows the pandas-ta-classic adaptive-volatility Jurik "
-            "reconstruction; Wickra implements the simpler three-stage "
-            "open-source reconstruction."
-        ),
-    ),
     "HeikinAshi": WickraBinding("HeikinAshi", ()),
     "KalmanHedgeRatio": WickraBinding(
         "KalmanHedgeRatio",
@@ -146,14 +174,6 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     ),
     "RollingProfitFactor": WickraBinding("ProfitFactor", ("timeperiod",)),
     "RollingKellyCriterion": WickraBinding("KellyCriterion", ("timeperiod",)),
-    "RollingRecoveryFactor": WickraBinding(
-        "RecoveryFactor",
-        (),
-        variant=(
-            "TAFlow is a causal fixed-window recovery factor; Wickra tracks "
-            "recovery cumulatively over the complete stream."
-        ),
-    ),
     "RollingTreynorRatio": WickraBinding("TreynorRatio", ("timeperiod",)),
     "VolumeOscillator": WickraBinding("VolumeOscillator", ("fast", "slow")),
     "VolumeZoneOscillator": WickraBinding("VZO", ("timeperiod",)),
@@ -282,6 +302,91 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
 }
 
 NUMPY_BINDINGS: dict[str, ExternalBinding] = {
+    "BreakOfStructureChangeOfCharacter": ExternalBinding(
+        "NumPy", "causal BOS and CHOCH events"
+    ),
+    "OrderBlock": ExternalBinding("NumPy", "causal dual-scale order blocks"),
+    "Liquidity": ExternalBinding("NumPy", "causal liquidity pools"),
+    "EqualHighsLows": ExternalBinding("NumPy", "causal equal pivot levels"),
+    "SwingHighLow": ExternalBinding("NumPy", "causal confirmed swing pivots"),
+    "SmoothedTrendChannel": ExternalBinding("NumPy", "smoothed trend channel"),
+    "PositionHold": ExternalBinding("NumPy", "nonzero position hold"),
+    "EntryExit": ExternalBinding("NumPy", "entry-exit position state"),
+    "SessionExtrema": ExternalBinding("NumPy", "explicit-session extrema"),
+    "PreviousHighLow": ExternalBinding("NumPy", "previous-session high-low"),
+    "Retracements": ExternalBinding("NumPy", "causal swing retracements"),
+    "PremiumDiscount": ExternalBinding("NumPy", "rolling premium-discount zone"),
+    "FibonacciRetracement": ExternalBinding("NumPy", "rolling Fibonacci levels"),
+    "AnchoredVolumeWeightedAveragePrice": ExternalBinding(
+        "NumPy", "anchored VWAP deviation bands"
+    ),
+    "PivotPoints": ExternalBinding("NumPy", "anchored classic pivot points"),
+    "OpeningRange": ExternalBinding("NumPy", "anchored opening range"),
+    "SessionVolumeLevels": ExternalBinding("NumPy", "anchored volume levels"),
+    "HedgeRatio": ExternalBinding("NumPy", "rolling OLS hedge ratio"),
+    "RollingEntropy": ExternalBinding("NumPy", "rolling Shannon entropy"),
+    "FractalDimension": ExternalBinding("NumPy", "two-chunk rescaled-range dimension"),
+    "OrnsteinUhlenbeckHalfLife": ExternalBinding("NumPy", "rolling OU half life"),
+    "SpreadZScore": ExternalBinding("NumPy", "rolling hedged-spread z-score"),
+    "CumulativeSumControlChart": ExternalBinding("NumPy", "CUSUM event filter"),
+    "FracDiff": ExternalBinding("NumPy", "fixed-width fractional differencing"),
+    "RollSpread": ExternalBinding("NumPy", "rolling Roll spread estimator"),
+    "RollingPercentile": ExternalBinding("NumPy", "rolling percentile"),
+    "Cross": ExternalBinding("NumPy", "causal cross event"),
+    "GarmanKlassYangZhang": ExternalBinding(
+        "NumPy", "annualized Garman-Klass-Yang-Zhang volatility"
+    ),
+    "CloseToCloseSigma": ExternalBinding(
+        "NumPy", "annualized close-to-close volatility"
+    ),
+    "TimeSeriesRank": ExternalBinding("NumPy", "rolling percentile rank"),
+    "DecayLinear": ExternalBinding("NumPy", "linear decay weighted mean"),
+    "CumulativeCount": ExternalBinding("NumPy", "one-based cumulative count"),
+    "ExponentiallyWeightedSum": ExternalBinding("NumPy", "exponentially weighted sum"),
+    "AverageDailyDollarValue": ExternalBinding(
+        "NumPy", "rolling average dollar volume"
+    ),
+    "LowerLow": ExternalBinding("NumPy", "lower low relation"),
+    "InsideBar": ExternalBinding("NumPy", "inside bar relation"),
+    "OutsideBar": ExternalBinding("NumPy", "outside bar relation"),
+    "GapUp": ExternalBinding("NumPy", "gap up relation"),
+    "GapDown": ExternalBinding("NumPy", "gap down relation"),
+    "BarsSince": ExternalBinding("NumPy", "bars since condition"),
+    "ValueWhen": ExternalBinding("NumPy", "last value when condition"),
+    "HighestSince": ExternalBinding("NumPy", "highest since condition"),
+    "LowestSince": ExternalBinding("NumPy", "lowest since condition"),
+    "SignalDelay": ExternalBinding("NumPy", "signal delay"),
+    "Drawdown": ExternalBinding("NumPy", "drawdown from cumulative maximum"),
+    "CumulativeMaximum": ExternalBinding("NumPy", "numpy.maximum.accumulate"),
+    "CumulativeMinimum": ExternalBinding("NumPy", "numpy.minimum.accumulate"),
+    "RollingCoefficientOfDetermination": ExternalBinding(
+        "NumPy", "rolling squared correlation"
+    ),
+    "ProjectionBands": ExternalBinding("NumPy", "rolling projection mean"),
+    "Crossover": ExternalBinding("NumPy", "causal crossover"),
+    "Crossunder": ExternalBinding("NumPy", "causal crossunder"),
+    "Rising": ExternalBinding("NumPy", "period-over-period rising"),
+    "Falling": ExternalBinding("NumPy", "period-over-period falling"),
+    "HigherHigh": ExternalBinding("NumPy", "higher high relation"),
+    "Lag": ExternalBinding("NumPy", "causal lag"),
+    "CumulativeSum": ExternalBinding("NumPy", "numpy.cumsum"),
+    "CumulativeProduct": ExternalBinding("NumPy", "numpy.cumprod"),
+    "RollingMode": ExternalBinding("NumPy", "rolling mode"),
+    "RollingRank": ExternalBinding("NumPy", "rolling percentile rank"),
+    "RollingWinsorize": ExternalBinding("NumPy", "rolling winsorize"),
+    "ExponentiallyWeightedVariance": ExternalBinding("NumPy", "ewm variance"),
+    "ExponentiallyWeightedStandardDeviation": ExternalBinding(
+        "NumPy", "ewm standard deviation"
+    ),
+    "ExponentiallyWeightedCovariance": ExternalBinding("NumPy", "ewm covariance"),
+    "ExponentiallyWeightedCorrelation": ExternalBinding(
+        "NumPy", "ewm correlation"
+    ),
+    "RollingCalmar": ExternalBinding("NumPy", "rolling calmar on equity"),
+    "RollingRecoveryFactor": ExternalBinding(
+        "NumPy", "rolling recovery factor on equity"
+    ),
+    "Ichimoku": ExternalBinding("NumPy", "causal ichimoku components"),
     "MathAbs": ExternalBinding("NumPy", "numpy.abs"),
     "MathAcosh": ExternalBinding("NumPy", "numpy.arccosh"),
     "MathAsinh": ExternalBinding("NumPy", "numpy.arcsinh"),
@@ -295,6 +400,73 @@ NUMPY_BINDINGS: dict[str, ExternalBinding] = {
 }
 
 NUMPY_DOMAINS = {
+    "BreakOfStructureChangeOfCharacter": "prices",
+    "OrderBlock": "prices",
+    "Liquidity": "prices",
+    "EqualHighsLows": "prices",
+    "SwingHighLow": "prices",
+    "SmoothedTrendChannel": "prices",
+    "PositionHold": "centered",
+    "EntryExit": "prices",
+    "SessionExtrema": "prices",
+    "PreviousHighLow": "prices",
+    "Retracements": "prices",
+    "PremiumDiscount": "prices",
+    "FibonacciRetracement": "prices",
+    "AnchoredVolumeWeightedAveragePrice": "prices",
+    "PivotPoints": "prices",
+    "OpeningRange": "prices",
+    "SessionVolumeLevels": "prices",
+    "HedgeRatio": "centered",
+    "RollingEntropy": "centered",
+    "FractalDimension": "prices",
+    "OrnsteinUhlenbeckHalfLife": "prices",
+    "SpreadZScore": "centered",
+    "CumulativeSumControlChart": "centered",
+    "FracDiff": "centered",
+    "RollSpread": "prices",
+    "RollingPercentile": "centered",
+    "Cross": "centered",
+    "GarmanKlassYangZhang": "prices",
+    "CloseToCloseSigma": "prices",
+    "TimeSeriesRank": "centered",
+    "DecayLinear": "centered",
+    "CumulativeCount": "centered",
+    "ExponentiallyWeightedSum": "centered",
+    "AverageDailyDollarValue": "prices",
+    "LowerLow": "prices",
+    "InsideBar": "prices",
+    "OutsideBar": "prices",
+    "GapUp": "prices",
+    "GapDown": "prices",
+    "BarsSince": "prices",
+    "ValueWhen": "prices",
+    "HighestSince": "prices",
+    "LowestSince": "prices",
+    "SignalDelay": "centered",
+    "Drawdown": "equity",
+    "CumulativeMaximum": "centered",
+    "CumulativeMinimum": "centered",
+    "RollingCoefficientOfDetermination": "centered",
+    "ProjectionBands": "prices",
+    "Crossover": "centered",
+    "Crossunder": "centered",
+    "Rising": "centered",
+    "Falling": "centered",
+    "HigherHigh": "prices",
+    "Lag": "centered",
+    "CumulativeSum": "centered",
+    "CumulativeProduct": "unit",
+    "RollingMode": "centered",
+    "RollingRank": "centered",
+    "RollingWinsorize": "centered",
+    "ExponentiallyWeightedVariance": "centered",
+    "ExponentiallyWeightedStandardDeviation": "centered",
+    "ExponentiallyWeightedCovariance": "centered",
+    "ExponentiallyWeightedCorrelation": "centered",
+    "RollingCalmar": "equity",
+    "RollingRecoveryFactor": "equity",
+    "Ichimoku": "prices",
     "MathAbs": "centered",
     "MathAcosh": "positive",
     "MathAsinh": "centered",
@@ -305,6 +477,22 @@ NUMPY_DOMAINS = {
     "MathLog1p": "log_domain",
     "MathRadians": "angle",
     "SignedPower": "centered",
+}
+
+PANDAS_TA_BINDINGS: dict[str, PandasTaBinding] = {
+    "FisherTransform": PandasTaBinding("fisher", oracle_indices=(0,)),
+    "Supertrend": PandasTaBinding(
+        "supertrend", actual_indices=(2, 3), oracle_indices=(2, 3)
+    ),
+    "SchaffTrendCycle": PandasTaBinding("stc", atol=2e-6),
+    "DetrendedPriceOscillator": PandasTaBinding(
+        "dpo", extra_kwargs=(("centered", False),)
+    ),
+    "JurikMovingAverage": PandasTaBinding("jma"),
+    "EvenBetterSinewave": PandasTaBinding("ebsw"),
+    "Squeeze": PandasTaBinding("squeeze"),
+    "SqueezePro": PandasTaBinding("squeeze_pro"),
+    "ParabolicMovingAverageStop": PandasTaBinding("pmax", actual_indices=(0,)),
 }
 
 SMC_BINDINGS: dict[str, ExternalBinding] = {
@@ -469,6 +657,7 @@ class Spec:
     warnings: list = field(default_factory=list)
     lookback: int = 0
     wickra: WickraBinding | None = None
+    pandas_ta: PandasTaBinding | None = None
     numpy: ExternalBinding | None = None
     smc: ExternalBinding | None = None
 
@@ -482,6 +671,7 @@ class Spec:
             spec.error = "no matching taflow class"
             return spec
         spec.wickra = WICKRA_BINDINGS.get(spec.cls.__name__)
+        spec.pandas_ta = PANDAS_TA_BINDINGS.get(spec.cls.__name__)
         spec.numpy = NUMPY_BINDINGS.get(spec.cls.__name__)
         spec.smc = SMC_BINDINGS.get(spec.cls.__name__)
         if spec.numpy:
@@ -526,6 +716,8 @@ class Spec:
             return "TA-Lib"
         if self.wickra:
             return "Wickra"
+        if self.pandas_ta:
+            return "pandas-ta-classic"
         if self.numpy:
             return "NumPy"
         if self.smc:
@@ -537,13 +729,13 @@ class Spec:
         """Return the selected external callable name."""
         if self.talib_name:
             return self.talib_name
-        binding = self.wickra or self.numpy or self.smc
+        binding = self.wickra or self.pandas_ta or self.numpy or self.smc
         return binding.name if binding else None
 
     @property
     def oracle_variant(self) -> str | None:
         """Return a documented semantic difference for the selected oracle."""
-        binding = self.wickra or self.numpy or self.smc
+        binding = self.wickra or self.pandas_ta or self.numpy or self.smc
         return binding.variant if binding else None
 
     def _bind_talib(self, name: str, ctor_params: set[str]) -> None:

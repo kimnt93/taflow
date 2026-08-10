@@ -180,6 +180,9 @@ def wickra_oracle(spec: Spec, arrays):
         "max_lag": ("lag",),
         "lp_period": ("low_period",),
         "hp_period": ("high_period",),
+        "long": ("slow",),
+        "short": ("fast",),
+        "schaff_period": ("tclength",),
     }
     if binding.name in {"McGinleyDynamic", "VIDYA", "JMA"}:
         synonyms["period"] = ("length", "timeperiod", "period")
@@ -204,6 +207,10 @@ def wickra_oracle(spec: Spec, arrays):
         batch_arrays = [(np.asarray(arrays[0]) + np.asarray(arrays[1])) * 0.5]
     elif binding.input_mode == "swap_pair":
         batch_arrays = [arrays[1], arrays[0]]
+    elif binding.input_mode == "trade_pair":
+        batch_arrays = [arrays[0], arrays[1], np.ones(len(arrays[0]), dtype=np.bool_)]
+    elif binding.input_mode == "triple_close":
+        batch_arrays = [arrays[0], arrays[0], arrays[0]]
     for index, name in enumerate(spec.series_args):
         if name == "timestamp":
             # TAFlow exposes Unix nanoseconds; Wickra Candle uses milliseconds.
@@ -211,6 +218,10 @@ def wickra_oracle(spec: Spec, arrays):
     if binding.prepend_zero_close:
         batch_arrays.insert(0, np.zeros_like(arrays[0]))
     result = oracle.batch(*batch_arrays)
+    if binding.name == "TDSequential":
+        matrix = np.asarray(result.tolist(), dtype=np.float64)
+        setup = np.nan_to_num(matrix[:, 0], nan=0.0)
+        return np.maximum(setup, 0.0), np.maximum(-setup, 0.0)
     if hasattr(result, "tolist") and hasattr(result, "shape"):
         matrix = np.asarray(result.tolist(), dtype=np.float64)
         if matrix.ndim == 2:
@@ -223,6 +234,48 @@ def wickra_oracle(spec: Spec, arrays):
                 return matrix
             return tuple(matrix[:, index] for index in range(matrix.shape[1]))
     return result
+
+
+def pandas_ta_oracle(spec: Spec, arrays):
+    """Execute an explicitly registered pandas-ta-classic batch reference."""
+    import pandas as pd
+    import pandas_ta_classic as pandas_ta
+
+    binding = spec.pandas_ta
+    if binding is None:
+        raise LookupError(f"no pandas-ta-classic binding for {spec.cls.__name__}")
+    function = getattr(pandas_ta, binding.name)
+    constructor = inspect.signature(spec.cls.__init__).parameters
+    aliases = {
+        "length": ("length", "timeperiod", "period"),
+        "signal": ("signal",),
+        "tclength": ("tclength",),
+        "fast": ("fast",),
+        "slow": ("slow",),
+        "factor": ("factor",),
+        "phase": ("phase",),
+        "multiplier": ("multiplier",),
+        "roc1": ("roc1",), "roc2": ("roc2",),
+        "roc3": ("roc3",), "roc4": ("roc4",),
+        "sma1": ("sma1",), "sma2": ("sma2",),
+        "sma3": ("sma3",), "sma4": ("sma4",),
+    }
+    kwargs = dict(binding.extra_kwargs)
+    for oracle_name, candidates in aliases.items():
+        target = next((name for name in candidates if name in constructor), None)
+        if target is not None:
+            kwargs[oracle_name] = constructor_value(spec, target)
+    series_names = set(spec.series_args)
+    for name in inspect.signature(function).parameters:
+        if name in constructor and name not in series_names and name not in kwargs:
+            kwargs[name] = constructor_value(spec, name)
+    result = function(*(pd.Series(array) for array in arrays), **kwargs)
+    if result is None:
+        raise ValueError(f"{binding.name} returned no output")
+    matrix = result.to_numpy(dtype=np.float64)
+    if matrix.ndim == 2:
+        return tuple(matrix[:, index] for index in range(matrix.shape[1]))
+    return matrix
 
 
 def cross_section_oracle_arrays(mode: str, arrays):
@@ -281,7 +334,703 @@ def cross_section_oracle_arrays(mode: str, arrays):
 
 def numpy_oracle(spec: Spec, arrays):
     """Execute one explicit NumPy ufunc override on the supplied arrays."""
+    def trailing_windows(values: np.ndarray, period: int) -> np.ndarray:
+        return np.lib.stride_tricks.sliding_window_view(values, period)
+
+    def align_warm(values: np.ndarray, period: int) -> np.ndarray:
+        output = np.full(len(arrays[0]), np.nan)
+        output[period - 1:] = values
+        return output
+
+    def lag():
+        period = int(constructor_value(spec, "timeperiod"))
+        output = np.full(len(arrays[0]), np.nan)
+        if len(output) > period:
+            output[period:] = arrays[0][:-period]
+        return output
+
+    def rolling_mode():
+        period = int(constructor_value(spec, "timeperiod"))
+        windows = trailing_windows(np.asarray(arrays[0]), period)
+        values = []
+        for window in windows:
+            finite = window[~np.isnan(window)]
+            if not len(finite):
+                values.append(np.nan)
+                continue
+            unique, counts = np.unique(finite, return_counts=True)
+            maximum = counts.max()
+            winners = set(unique[counts == maximum].tolist())
+            values.append(next(value for value in window if value in winners))
+        return align_warm(np.asarray(values), period)
+
+    def rolling_rank():
+        period = int(constructor_value(spec, "timeperiod"))
+        windows = trailing_windows(np.asarray(arrays[0]), period)
+        last = windows[:, -1]
+        ranks = ((windows < last[:, None]).sum(axis=1)
+                 + (windows == last[:, None]).sum(axis=1)) / period
+        return align_warm(ranks, period)
+
+    def rolling_winsorize():
+        period = int(constructor_value(spec, "timeperiod"))
+        windows = trailing_windows(np.asarray(arrays[0]), period)
+        lower = np.quantile(windows, constructor_value(spec, "lower"), axis=1)
+        upper = np.quantile(windows, constructor_value(spec, "upper"), axis=1)
+        return align_warm(np.clip(windows[:, -1], lower, upper), period)
+
+    def ewm_components():
+        period = int(constructor_value(spec, "timeperiod"))
+        alpha = 2.0 / (period + 1.0)
+        left = np.asarray(arrays[0], dtype=np.float64)
+        right = np.asarray(arrays[1] if len(arrays) > 1 else arrays[0], dtype=np.float64)
+        variance_left = np.zeros(len(left))
+        variance_right = np.zeros(len(left))
+        covariance = np.zeros(len(left))
+        mean_left, mean_right = left[0], right[0]
+        for index in range(1, len(left)):
+            delta_left = left[index] - mean_left
+            delta_right = right[index] - mean_right
+            mean_left += alpha * delta_left
+            mean_right += alpha * delta_right
+            variance_left[index] = (1.0 - alpha) * (
+                variance_left[index - 1] + alpha * delta_left * delta_left
+            )
+            variance_right[index] = (1.0 - alpha) * (
+                variance_right[index - 1] + alpha * delta_right * delta_right
+            )
+            covariance[index] = (1.0 - alpha) * (
+                covariance[index - 1] + alpha * delta_left * delta_right
+            )
+        return variance_left, variance_right, covariance
+
+    def ewm_correlation():
+        left, right, covariance = ewm_components()
+        denominator = np.sqrt(left * right)
+        return np.divide(covariance, denominator, out=np.zeros_like(covariance),
+                         where=denominator > 0.0)
+
+    def drawdown():
+        values = np.asarray(arrays[0])
+        peaks = np.maximum.accumulate(values)
+        return np.divide(values, peaks, out=np.zeros_like(values), where=peaks != 0.0) - 1.0
+
+    def rolling_r_squared():
+        period = int(constructor_value(spec, "period"))
+        left = trailing_windows(np.asarray(arrays[0]), period)
+        right = trailing_windows(np.asarray(arrays[1]), period)
+        left_centered = left - left.mean(axis=1, keepdims=True)
+        right_centered = right - right.mean(axis=1, keepdims=True)
+        numerator = np.sum(left_centered * right_centered, axis=1)
+        denominator = np.sqrt(
+            np.sum(left_centered**2, axis=1) * np.sum(right_centered**2, axis=1)
+        )
+        correlation = np.divide(
+            numerator, denominator, out=np.zeros_like(numerator), where=denominator != 0.0
+        )
+        return align_warm(correlation**2, period)
+
+    def rolling_projection_mean():
+        period = int(constructor_value(spec, "period"))
+        return align_warm(trailing_windows(np.asarray(arrays[0]), period).mean(axis=1), period)
+
+    def crossing(over: bool):
+        left, right = map(np.asarray, arrays)
+        output = np.zeros(len(left))
+        if over:
+            output[1:] = ((left[:-1] <= right[:-1]) & (left[1:] > right[1:])).astype(float)
+        else:
+            output[1:] = ((left[:-1] >= right[:-1]) & (left[1:] < right[1:])).astype(float)
+        return output
+
+    def direction(rising: bool):
+        period = int(constructor_value(spec, "timeperiod"))
+        values = np.asarray(arrays[0])
+        output = np.full(len(values), np.nan)
+        relation = values[period:] > values[:-period]
+        if not rising:
+            relation = values[period:] < values[:-period]
+        output[period:] = relation.astype(float)
+        return output
+
+    def higher_high():
+        high = np.asarray(arrays[0])
+        output = np.full(len(high), np.nan)
+        output[1:] = (high[1:] > high[:-1]).astype(float)
+        return output
+
+    def bar_relation(kind: str):
+        high, low = map(np.asarray, arrays)
+        output = np.full(len(high), np.nan)
+        relations = {
+            "lower": low[1:] < low[:-1],
+            "inside": (high[1:] < high[:-1]) & (low[1:] > low[:-1]),
+            "outside": (high[1:] > high[:-1]) & (low[1:] < low[:-1]),
+            "gap_up": low[1:] > high[:-1],
+            "gap_down": high[1:] < low[:-1],
+        }
+        output[1:] = relations[kind].astype(float)
+        return output
+
+    def bars_since():
+        condition = np.asarray(arrays[0], dtype=bool)
+        output = np.zeros(len(condition))
+        count = None
+        for index, active in enumerate(condition):
+            count = 0 if active else (0 if count is None else count + 1)
+            output[index] = count
+        return output
+
+    def event_memory(kind: str):
+        condition = np.asarray(arrays[0], dtype=bool)
+        values = np.asarray(arrays[1], dtype=np.float64)
+        output = np.full(len(values), np.nan)
+        current = None
+        for index, (active, value) in enumerate(zip(condition, values)):
+            if kind == "value":
+                if active:
+                    current = value
+            elif active or current is None:
+                current = value
+            elif kind == "highest":
+                current = max(current, value)
+            else:
+                current = min(current, value)
+            if current is not None:
+                output[index] = current
+        return output
+
+    def rolling_mean_series(values: np.ndarray, period: int, offset: int = 0):
+        output = np.full(len(arrays[0]), np.nan)
+        means = trailing_windows(values, period).mean(axis=1)
+        output[period - 1 + offset:period - 1 + offset + len(means)] = means
+        return output
+
+    def annualized_garman_klass_yang_zhang():
+        open_, high, low, close = map(np.asarray, arrays)
+        term = (0.5 * np.log(high[1:] / low[1:]) ** 2
+                - (2.0 * np.log(2.0) - 1.0) * np.log(close[1:] / open_[1:]) ** 2
+                + np.log(open_[1:] / close[:-1]) ** 2)
+        period = int(constructor_value(spec, "timeperiod"))
+        output = np.full(len(close), np.nan)
+        output[period:] = np.sqrt(trailing_windows(term, period).mean(axis=1)) * np.sqrt(252.0) * 100.0
+        return output
+
+    def annualized_close_to_close():
+        close = np.asarray(arrays[0])
+        returns = np.log(close[1:] / close[:-1])
+        period = int(constructor_value(spec, "timeperiod"))
+        windows = trailing_windows(returns, period)
+        output = np.full(len(close), np.nan)
+        output[period:] = np.sqrt(
+            np.maximum((windows**2).mean(axis=1) - windows.mean(axis=1) ** 2, 0.0)
+        ) * np.sqrt(252.0) * 100.0
+        return output
+
+    def linear_decay():
+        period = int(constructor_value(spec, "timeperiod"))
+        weights = np.arange(1.0, period + 1.0)
+        values = trailing_windows(np.asarray(arrays[0]), period) @ weights / weights.sum()
+        return align_warm(values, period)
+
+    def exponentially_weighted_sum():
+        period = int(constructor_value(spec, "timeperiod"))
+        decay = 1.0 - 2.0 / (period + 1.0)
+        output = np.empty(len(arrays[0]))
+        previous = 0.0
+        for index, value in enumerate(arrays[0]):
+            previous = value + decay * previous
+            output[index] = previous
+        return output
+
+    def average_daily_dollar_value():
+        period = int(constructor_value(spec, "timeperiod"))
+        products = np.asarray(arrays[0]) * np.asarray(arrays[1])
+        return align_warm(trailing_windows(products, period).mean(axis=1), period)
+
+    def rolling_hedge_ratio():
+        period = int(constructor_value(spec, "timeperiod"))
+        x = trailing_windows(np.asarray(arrays[0]), period)
+        y = trailing_windows(np.asarray(arrays[1]), period)
+        xc = x - x.mean(axis=1, keepdims=True)
+        yc = y - y.mean(axis=1, keepdims=True)
+        variance = np.sum(xc * xc, axis=1)
+        beta = np.divide(np.sum(xc * yc, axis=1), variance,
+                         out=np.zeros(len(x)), where=variance > 0.0)
+        return align_warm(beta, period)
+
+    def rolling_entropy():
+        period = int(constructor_value(spec, "timeperiod"))
+        values = []
+        for window in trailing_windows(np.asarray(arrays[0]), period):
+            _, counts = np.unique(window[~np.isnan(window)], return_counts=True)
+            probabilities = counts.astype(float) / period
+            values.append(-np.sum(probabilities * np.log(probabilities)))
+        return align_warm(np.asarray(values), period)
+
+    def fractal_dimension():
+        period = int(constructor_value(spec, "timeperiod"))
+
+        def rescaled_range(values):
+            deviations = values - values.mean()
+            cumulative = np.cumsum(deviations)
+            spread = cumulative.max() - cumulative.min()
+            deviation = np.sqrt(np.mean(deviations**2))
+            return spread / deviation if spread > 0.0 and deviation > 0.0 else None
+
+        results = []
+        for window in trailing_windows(np.asarray(arrays[0]), period):
+            points = []
+            for chunk_count in (1, 2):
+                size = period // chunk_count
+                ranges = [rescaled_range(window[i * size:(i + 1) * size])
+                          for i in range(chunk_count)]
+                ranges = [value for value in ranges if value is not None]
+                if ranges:
+                    points.append((np.log(size), np.log(np.mean(ranges))))
+            hurst = 0.5 if len(points) < 2 else np.clip(
+                (points[1][1] - points[0][1]) / (points[1][0] - points[0][0]), 0.0, 1.0
+            )
+            results.append(2.0 - hurst)
+        return align_warm(np.asarray(results), period)
+
+    def rolling_ou_half_life():
+        period = int(constructor_value(spec, "timeperiod"))
+        price = np.asarray(arrays[0])
+        previous = price[:-1]
+        change = np.diff(price)
+        output = np.full(len(price), np.nan)
+        for end, (x, y) in enumerate(zip(
+            trailing_windows(change, period), trailing_windows(previous, period)
+        ), start=period):
+            xc, yc = x - x.mean(), y - y.mean()
+            variance = np.mean(yc * yc)
+            covariance = np.mean(xc * yc)
+            rate = -covariance / variance if variance > 0.0 else 0.0
+            if rate > 0.0:
+                output[end] = np.log(2.0) / rate
+        return output
+
+    def rolling_spread_zscore():
+        period = int(constructor_value(spec, "timeperiod"))
+        x = trailing_windows(np.asarray(arrays[0]), period)
+        y = trailing_windows(np.asarray(arrays[1]), period)
+        xc, yc = x - x.mean(axis=1, keepdims=True), y - y.mean(axis=1, keepdims=True)
+        variance = np.sum(xc * xc, axis=1)
+        beta = np.divide(np.sum(xc * yc, axis=1), variance,
+                         out=np.zeros(len(x)), where=variance > 0.0)
+        spread = y - beta[:, None] * x
+        deviation = spread.std(axis=1)
+        score = np.divide(spread[:, -1] - spread.mean(axis=1), deviation,
+                          out=np.zeros(len(x)), where=deviation > 0.0)
+        return align_warm(score, period)
+
+    def cusum():
+        threshold = float(constructor_value(spec, "threshold"))
+        output = np.zeros(len(arrays[0])); positive = negative = 0.0
+        for index, change in enumerate(arrays[0]):
+            positive = max(positive + change, 0.0)
+            negative = max(negative - change, 0.0)
+            if positive > threshold:
+                positive = 0.0; output[index] = 1.0
+            elif negative > threshold:
+                negative = 0.0; output[index] = -1.0
+        return output
+
+    def fractional_difference():
+        d = float(constructor_value(spec, "d")); threshold = float(constructor_value(spec, "threshold"))
+        weights = [1.0]
+        while True:
+            k = len(weights); weight = -weights[-1] * (d - k + 1.0) / k
+            if abs(weight) < threshold: break
+            weights.append(weight)
+        width = len(weights); output = np.full(len(arrays[0]), np.nan)
+        windows = trailing_windows(np.asarray(arrays[0]), width)
+        output[width - 1:] = windows[:, ::-1] @ np.asarray(weights)
+        return output
+
+    def roll_spread():
+        period = int(constructor_value(spec, "timeperiod")); delta = np.diff(arrays[0], prepend=arrays[0][0])
+        left, right = delta[1:], delta[:-1]; output = np.full(len(delta), np.nan)
+        for end, (x, y) in enumerate(zip(trailing_windows(left, period), trailing_windows(right, period)), start=period):
+            covariance = np.sum((x - x.mean()) * (y - y.mean())) / (period - 1)
+            output[end] = 2.0 * np.sqrt(max(-covariance, 0.0))
+        return output
+
+    def rolling_percentile():
+        period = int(constructor_value(spec, "timeperiod"))
+        q = float(constructor_value(spec, "percentile")) / 100.0
+        return align_warm(np.quantile(trailing_windows(np.asarray(arrays[0]), period), q, axis=1), period)
+
+    def premium_discount():
+        close = np.asarray(arrays[0]); period = int(constructor_value(spec, "window"))
+        zone = np.empty(len(close)); equilibrium = np.empty(len(close))
+        for index, value in enumerate(close):
+            window = close[max(0, index + 1 - period):index + 1]
+            equilibrium[index] = (window.max() + window.min()) * 0.5
+            zone[index] = np.sign(value - equilibrium[index])
+        return zone, equilibrium
+
+    def fibonacci_levels():
+        close = np.asarray(arrays[0]); period = int(constructor_value(spec, "window"))
+        outputs = [np.empty(len(close)) for _ in range(7)]
+        ratios = (0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0)
+        for index in range(len(close)):
+            window = close[max(0, index + 1 - period):index + 1]
+            high, low = np.nanmax(window), np.nanmin(window); span = high - low
+            for output, ratio in zip(outputs, ratios): output[index] = high - span * ratio
+        return tuple(outputs)
+
+    def anchored_vwap():
+        high, low, close, volume, anchor = arrays; multiplier = float(constructor_value(spec, "standard_deviation_multiplier"))
+        outputs = [np.empty(len(close)) for _ in range(3)]; wp = ws = total = 0.0
+        for i, values in enumerate(zip(high, low, close, volume, anchor)):
+            h, l, c, v, reset = values
+            if reset: wp = ws = total = 0.0
+            typical = (h + l + c) / 3.0; wp += typical * v; ws += typical * typical * v; total += v
+            mean = wp / total if total else np.nan; deviation = multiplier * np.sqrt(max(ws / total - mean * mean, 0.0)) if total else np.nan
+            outputs[0][i], outputs[1][i], outputs[2][i] = mean, mean + deviation, mean - deviation
+        return tuple(outputs)
+
+    def pivot_points():
+        high, low, close, anchor = arrays; outputs = [np.full(len(close), np.nan) for _ in range(5)]
+        running_high = running_low = running_close = None; levels = [np.nan] * 5
+        for i, (h, l, c, reset) in enumerate(zip(high, low, close, anchor)):
+            if reset:
+                if running_high is not None:
+                    pivot = (running_high + running_low + running_close) / 3.0; span = running_high - running_low
+                    levels = [pivot, 2 * pivot - running_low, 2 * pivot - running_high, pivot - span, pivot + span]
+                running_high, running_low, running_close = h, l, c
+            else:
+                running_high = h if running_high is None else max(running_high, h); running_low = l if running_low is None else min(running_low, l); running_close = c
+            for output, value in zip(outputs, levels): output[i] = value
+        return tuple(outputs)
+
+    def opening_range():
+        high, low, close, anchor = arrays; bars = int(constructor_value(spec, "bars")); outputs = [np.empty(len(close)) for _ in range(3)]
+        count = 0; range_high = -np.inf; range_low = np.inf
+        for i, (h, l, c, reset) in enumerate(zip(high, low, close, anchor)):
+            if reset: count = 0; range_high = -np.inf; range_low = np.inf
+            if count < bars: range_high = max(range_high, h); range_low = min(range_low, l); count += 1
+            outputs[0][i], outputs[1][i] = range_high, range_low; outputs[2][i] = 1 if c > range_high else -1 if c < range_low else 0
+        return tuple(outputs)
+
+    def session_volume_levels():
+        high, low, close, volume, anchor = arrays; bins = int(constructor_value(spec, "bins")); area = float(constructor_value(spec, "value_area")); outputs = [np.empty(len(close)) for _ in range(3)]
+        histogram = np.zeros(bins); session_low = None; step = 1.0
+        for i, (h, l, c, v, reset) in enumerate(zip(high, low, close, volume, anchor)):
+            if reset or session_low is None: session_low = l; step = max((h - l) / bins, 1e-12); histogram.fill(0.0)
+            session_low = min(session_low, l); index = int(np.clip(int((c - session_low) / step), 0, bins - 1)); histogram[index] += v
+            poc = int(np.argmax(histogram)); left = right = poc; accumulated = histogram[poc]; target = histogram.sum() * area
+            while accumulated < target and (left > 0 or right + 1 < bins):
+                if left == 0: right += 1
+                elif right + 1 == bins or histogram[left - 1] >= histogram[right + 1]: left -= 1
+                else: right += 1
+                accumulated = histogram[left:right + 1].sum()
+            outputs[0][i] = (poc + .5) * step + session_low; outputs[1][i] = (right + .5) * step + session_low; outputs[2][i] = (left + .5) * step + session_low
+        return tuple(outputs)
+
+    def confirmed_swings(high, low, length):
+        high, low = map(np.asarray, (high, low)); width = 2 * length + 1
+        outputs = [np.full(len(high), np.nan) for _ in range(3)]; since = None
+        for index in range(width - 1, len(high)):
+            center = index - length; high_window = high[index - width + 1:index + 1]; low_window = low[index - width + 1:index + 1]
+            is_high, is_low = high[center] >= high_window.max(), low[center] <= low_window.min()
+            if is_high and not is_low: signal, level = 1.0, high[center]
+            elif is_low and not is_high: signal, level = -1.0, low[center]
+            else: signal = level = np.nan
+            since = (since + 1 if since is not None else None) if np.isnan(signal) else 0
+            outputs[0][index], outputs[1][index], outputs[2][index] = signal, level, np.nan if since is None else since
+        return tuple(outputs)
+
+    def swing_values():
+        return confirmed_swings(
+            arrays[0], arrays[1], int(constructor_value(spec, "swing_length"))
+        )
+
+    def smoothed_trend_channel():
+        high, low, close = map(np.asarray, arrays); period = int(constructor_value(spec, "length")); outputs = [np.full(len(close), np.nan) for _ in range(2)]; side = 1
+        high_mean = trailing_windows(high, period).mean(axis=1); low_mean = trailing_windows(low, period).mean(axis=1)
+        for index in range(period - 1, len(close)):
+            ah, al = high_mean[index - period + 1], low_mean[index - period + 1]
+            if close[index] > ah: side = 1
+            elif close[index] < al: side = -1
+            outputs[0][index], outputs[1][index] = (al, ah) if side > 0 else (ah, al)
+        return tuple(outputs)
+
+    def position_hold():
+        output = np.empty(len(arrays[0])); position = 0.0
+        for index, value in enumerate(arrays[0]):
+            if value != 0.0: position = value
+            output[index] = position
+        return output
+
+    def entry_exit():
+        entry, exit_ = (np.asarray(value, dtype=bool) for value in arrays); output = np.empty(len(entry)); position = 0.0
+        for index, (enter, leave) in enumerate(zip(entry, exit_)):
+            if enter and not leave: position = 1.0
+            elif leave and not enter: position = -1.0
+            output[index] = position
+        return output
+
+    def session_extrema():
+        reset, high, low = arrays; outputs = [np.empty(len(high)) for _ in range(2)]; current_high = current_low = None
+        for index, (new, h, l) in enumerate(zip(reset, high, low)):
+            if new or current_high is None: current_high, current_low = h, l
+            else: current_high, current_low = max(current_high, h), min(current_low, l)
+            outputs[0][index], outputs[1][index] = current_high, current_low
+        return tuple(outputs)
+
+    def previous_high_low():
+        reset, high, low = arrays; outputs = [np.full(len(high), np.nan) for _ in range(4)]; running_high = running_low = previous_high = previous_low = None
+        for index, (new, h, l) in enumerate(zip(reset, high, low)):
+            if new:
+                if running_high is not None: previous_high, previous_low = running_high, running_low
+                running_high, running_low = h, l
+            else: running_high = h if running_high is None else max(running_high, h); running_low = l if running_low is None else min(running_low, l)
+            if previous_high is not None:
+                outputs[0][index], outputs[1][index] = previous_high, previous_low
+                if h > previous_high: outputs[2][index] = 1.0
+                if l < previous_low: outputs[3][index] = 1.0
+        return tuple(outputs)
+
+    def retracements():
+        swing_spec = spec; signals, levels, _ = swing_values(); close = np.asarray(arrays[2]); outputs = [np.full(len(close), np.nan) for _ in range(3)]
+        last_high = last_low = leg_high = leg_low = direction_value = None; deepest = 0.0
+        for index, (signal, level, value) in enumerate(zip(signals, levels, close)):
+            if signal > 0:
+                last_high = level
+                if last_low is not None: leg_high, leg_low, direction_value, deepest = level, last_low, 1.0, 0.0
+            elif signal < 0:
+                last_low = level
+                if last_high is not None: leg_high, leg_low, direction_value, deepest = last_high, level, -1.0, 0.0
+            if direction_value is not None:
+                outputs[0][index] = direction_value
+            if direction_value is not None and leg_high > leg_low:
+                current = max((leg_high - value if direction_value > 0 else value - leg_low) / (leg_high - leg_low) * 100.0, 0.0); deepest = max(deepest, current)
+                outputs[1][index], outputs[2][index] = current, deepest
+        return tuple(outputs)
+
+    def average_true_range(high, low, close, period):
+        result = np.full(len(close), np.nan); true_range = np.full(len(close), np.nan)
+        true_range[1:] = np.maximum.reduce((high[1:] - low[1:], np.abs(high[1:] - close[:-1]), np.abs(low[1:] - close[:-1])))
+        if len(close) > period:
+            result[period] = np.mean(true_range[1:period + 1])
+            for index in range(period + 1, len(close)):
+                result[index] = (result[index - 1] * (period - 1) + true_range[index]) / period
+        return result
+
+    def bos_choch():
+        high, low, close = map(np.asarray, arrays); length = int(constructor_value(spec, "swing_length")); signals, levels, _ = confirmed_swings(high, low, length)
+        outputs = [np.full(len(close), np.nan) for _ in range(4)]; recent = []; pending = None; trend = None
+        for index, (signal, swing_level, value) in enumerate(zip(signals, levels, close)):
+            if pending is not None and ((pending[0] > 0 and value > pending[1]) or (pending[0] < 0 and value < pending[1])):
+                outputs[3][index], outputs[2][index] = pending; trend = pending[0]; pending = None
+            if index >= 2 * length:
+                recent.append((signal, swing_level)); recent = recent[-4:]
+                if len(recent) == 4:
+                    bullish = recent[0][0] < 0 < recent[1][0] and recent[2][0] < 0 < recent[3][0] and recent[0][1] < recent[2][1] and recent[1][1] < recent[3][1]
+                    bearish = recent[0][0] > 0 > recent[1][0] and recent[2][0] > 0 > recent[3][0] and recent[0][1] > recent[2][1] and recent[1][1] > recent[3][1]
+                    direction_value = 1.0 if bullish else -1.0 if bearish else None
+                    if direction_value is not None:
+                        outputs[0][index] = direction_value
+                        if trend is not None and trend != direction_value: outputs[1][index] = direction_value
+                        outputs[2][index] = recent[1][1]; pending = (direction_value, recent[1][1])
+        return tuple(outputs)
+
+    def equal_highs_lows():
+        high, low, close = map(np.asarray, arrays); length = int(constructor_value(spec, "eq_len")); atr_period = int(constructor_value(spec, "atr_period")); threshold = float(constructor_value(spec, "eq_threshold"))
+        signals, levels, _ = confirmed_swings(high, low, length); atr = average_true_range(high, low, close, atr_period); outputs = [np.full(len(close), np.nan) for _ in range(3)]; previous_high = previous_low = None
+        for index, (signal, level) in enumerate(zip(signals, levels)):
+            if signal > 0:
+                if previous_high is not None and np.isfinite(atr[index]) and abs(level - previous_high) < atr[index] * threshold: outputs[0][index], outputs[2][index] = 1.0, level
+                previous_high = level
+            elif signal < 0:
+                if previous_low is not None and np.isfinite(atr[index]) and abs(level - previous_low) < atr[index] * threshold: outputs[1][index], outputs[2][index] = 1.0, level
+                previous_low = level
+        return tuple(outputs)
+
+    def liquidity_pools():
+        high, low = map(np.asarray, arrays); length = int(constructor_value(spec, "swing_length")); tolerance = float(constructor_value(spec, "range_percent")); signals, levels, _ = confirmed_swings(high, low, length)
+        outputs = [np.full(len(high), np.nan) for _ in range(3)]; pools = []; sequence = 0
+        for index, (signal, level, h, l) in enumerate(zip(signals, levels, high, low)):
+            if signal != 0 and np.isfinite(signal):
+                side = 1 if signal > 0 else -1; choices = [(i, abs(pool["level"] - level), pool["seq"]) for i, pool in enumerate(pools) if pool["side"] == side and abs(pool["level"] - level) <= tolerance * pool["level"]]
+                if choices:
+                    slot = min(choices, key=lambda item: (item[1], item[2]))[0]; pool = pools[slot]; pool["level"] = max(pool["level"], level) if side > 0 else min(pool["level"], level); pool["count"] += 1
+                    if pool["count"] >= 2: outputs[0][index], outputs[1][index] = side, pool["level"]
+                else: pools.append({"side": side, "level": level, "count": 1, "seq": sequence}); sequence += 1
+            retained = []
+            for pool in pools:
+                swept = pool["count"] >= 2 and ((pool["side"] > 0 and h >= pool["level"]) or (pool["side"] < 0 and l <= pool["level"]))
+                if swept: outputs[2][index], outputs[1][index] = pool["side"], pool["level"]
+                else: retained.append(pool)
+            pools = retained
+        return tuple(outputs)
+
+    def order_blocks():
+        high, low, close, volume = map(np.asarray, arrays); structure_length = int(constructor_value(spec, "swing_length")); internal_length = int(constructor_value(spec, "internal_length")); atr_period = int(constructor_value(spec, "atr_period")); threshold = float(constructor_value(spec, "threshold"))
+        structure_signal, structure_level, _ = confirmed_swings(high, low, structure_length); internal_signal, internal_level, _ = confirmed_swings(high, low, internal_length); atr = average_true_range(high, low, close, atr_period)
+        outputs = [np.full(len(close), np.nan) for _ in range(5)]; internal_high = internal_low = structure_high = structure_low = None; zones = []
+        for index in range(len(close)):
+            volatile = np.isfinite(atr[index]) and high[index] - low[index] >= threshold * atr[index]
+            signal, level = internal_signal[index], internal_level[index]
+            if signal > 0:
+                internal_high = (level, volume[index], volatile)
+                if structure_high is not None and internal_low is not None and not internal_low[2] and level > structure_high:
+                    outputs[0][index], outputs[1][index], outputs[2][index], outputs[3][index] = 1.0, level, internal_low[0], internal_low[1]; zones.append((1.0, level, internal_low[0])); structure_high = level
+            elif signal < 0:
+                internal_low = (level, volume[index], volatile)
+                if structure_low is not None and internal_high is not None and not internal_high[2] and level < structure_low:
+                    outputs[0][index], outputs[1][index], outputs[2][index], outputs[3][index] = -1.0, internal_high[0], level, internal_high[1]; zones.append((-1.0, internal_high[0], level)); structure_low = level
+            if structure_signal[index] > 0: structure_high = structure_level[index]
+            elif structure_signal[index] < 0: structure_low = structure_level[index]
+            retained = []
+            for direction_value, top, bottom in zones:
+                filled = (direction_value > 0 and low[index] <= bottom) or (direction_value < 0 and high[index] >= top)
+                if filled: outputs[4][index] = direction_value
+                else: retained.append((direction_value, top, bottom))
+            zones = retained
+        return tuple(outputs)
+
+    def rolling_calmar():
+        period = int(constructor_value(spec, "timeperiod"))
+        values = np.asarray(arrays[0], dtype=np.float64)
+        output = np.full(values.shape, np.nan)
+        if len(values) < period:
+            return output
+        windows = np.lib.stride_tricks.sliding_window_view(values, period)
+        peaks = np.maximum.accumulate(windows, axis=1)
+        drawdowns = np.min(
+            np.divide(
+                windows,
+                peaks,
+                out=np.zeros_like(windows),
+                where=peaks != 0.0,
+            )
+            - 1.0,
+            axis=1,
+        )
+        averages = np.mean(windows, axis=1)
+        output[period - 1:] = np.divide(
+            averages,
+            -drawdowns,
+            out=np.zeros_like(averages),
+            where=drawdowns < 0.0,
+        )
+        return output
+
+    def rolling_recovery_factor():
+        period = int(constructor_value(spec, "timeperiod"))
+        values = np.asarray(arrays[0], dtype=np.float64)
+        output = np.full(values.shape, np.nan)
+        if len(values) < period:
+            return output
+        windows = np.lib.stride_tricks.sliding_window_view(values, period)
+        peaks = np.maximum.accumulate(windows, axis=1)
+        drawdowns = np.max(
+            np.divide(
+                peaks - windows,
+                peaks,
+                out=np.zeros_like(windows),
+                where=peaks != 0.0,
+            ),
+            axis=1,
+        )
+        changes = windows[:, -1] - windows[:, 0]
+        output[period - 1:] = np.divide(
+            changes,
+            drawdowns,
+            out=np.zeros_like(changes),
+            where=drawdowns > 0.0,
+        )
+        return output
+
+    def causal_ichimoku():
+        high, low, close = (np.asarray(array, dtype=np.float64) for array in arrays)
+
+        def midpoint(period_name: str) -> np.ndarray:
+            period = int(constructor_value(spec, period_name))
+            output = np.full(high.shape, np.nan)
+            if len(high) >= period:
+                highs = np.lib.stride_tricks.sliding_window_view(high, period)
+                lows = np.lib.stride_tricks.sliding_window_view(low, period)
+                output[period - 1:] = (highs.max(axis=1) + lows.min(axis=1)) * 0.5
+            return output
+
+        tenkan = midpoint("tenkan")
+        kijun = midpoint("kijun")
+        span_a = (tenkan + kijun) * 0.5
+        span_b = midpoint("senkou")
+        return tenkan, kijun, span_a, span_b, close.copy()
+
     functions = {
+        "causal lag": lag,
+        "numpy.cumsum": lambda: np.cumsum(arrays[0]),
+        "numpy.cumprod": lambda: np.cumprod(arrays[0]),
+        "rolling mode": rolling_mode,
+        "rolling percentile rank": rolling_rank,
+        "rolling winsorize": rolling_winsorize,
+        "ewm variance": lambda: ewm_components()[0],
+        "ewm standard deviation": lambda: np.sqrt(ewm_components()[0]),
+        "ewm covariance": lambda: ewm_components()[2],
+        "ewm correlation": ewm_correlation,
+        "drawdown from cumulative maximum": drawdown,
+        "numpy.maximum.accumulate": lambda: np.maximum.accumulate(arrays[0]),
+        "numpy.minimum.accumulate": lambda: np.minimum.accumulate(arrays[0]),
+        "rolling squared correlation": rolling_r_squared,
+        "rolling projection mean": rolling_projection_mean,
+        "causal crossover": lambda: crossing(True),
+        "causal crossunder": lambda: crossing(False),
+        "period-over-period rising": lambda: direction(True),
+        "period-over-period falling": lambda: direction(False),
+        "higher high relation": higher_high,
+        "lower low relation": lambda: bar_relation("lower"),
+        "inside bar relation": lambda: bar_relation("inside"),
+        "outside bar relation": lambda: bar_relation("outside"),
+        "gap up relation": lambda: bar_relation("gap_up"),
+        "gap down relation": lambda: bar_relation("gap_down"),
+        "bars since condition": bars_since,
+        "last value when condition": lambda: event_memory("value"),
+        "highest since condition": lambda: event_memory("highest"),
+        "lowest since condition": lambda: event_memory("lowest"),
+        "signal delay": lag,
+        "annualized Garman-Klass-Yang-Zhang volatility": annualized_garman_klass_yang_zhang,
+        "annualized close-to-close volatility": annualized_close_to_close,
+        "linear decay weighted mean": linear_decay,
+        "one-based cumulative count": lambda: np.arange(1.0, len(arrays[0]) + 1.0),
+        "exponentially weighted sum": exponentially_weighted_sum,
+        "rolling average dollar volume": average_daily_dollar_value,
+        "rolling OLS hedge ratio": rolling_hedge_ratio,
+        "rolling Shannon entropy": rolling_entropy,
+        "two-chunk rescaled-range dimension": fractal_dimension,
+        "rolling OU half life": rolling_ou_half_life,
+        "rolling hedged-spread z-score": rolling_spread_zscore,
+        "CUSUM event filter": cusum,
+        "fixed-width fractional differencing": fractional_difference,
+        "rolling Roll spread estimator": roll_spread,
+        "rolling percentile": rolling_percentile,
+        "causal cross event": lambda: np.maximum(crossing(True), crossing(False)),
+        "rolling premium-discount zone": premium_discount,
+        "rolling Fibonacci levels": fibonacci_levels,
+        "anchored VWAP deviation bands": anchored_vwap,
+        "anchored classic pivot points": pivot_points,
+        "anchored opening range": opening_range,
+        "anchored volume levels": session_volume_levels,
+        "causal confirmed swing pivots": swing_values,
+        "smoothed trend channel": smoothed_trend_channel,
+        "nonzero position hold": position_hold,
+        "entry-exit position state": entry_exit,
+        "explicit-session extrema": session_extrema,
+        "previous-session high-low": previous_high_low,
+        "causal swing retracements": retracements,
+        "causal BOS and CHOCH events": bos_choch,
+        "causal dual-scale order blocks": order_blocks,
+        "causal liquidity pools": liquidity_pools,
+        "causal equal pivot levels": equal_highs_lows,
+        "rolling calmar on equity": rolling_calmar,
+        "rolling recovery factor on equity": rolling_recovery_factor,
+        "causal ichimoku components": causal_ichimoku,
         "numpy.abs": lambda: np.abs(arrays[0]),
         "numpy.arccosh": lambda: np.arccosh(arrays[0]),
         "numpy.arcsinh": lambda: np.arcsinh(arrays[0]),
@@ -373,6 +1122,8 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
             expected = talib_oracle(spec, arrays)
         elif spec.wickra:
             expected = wickra_oracle(spec, arrays)
+        elif spec.pandas_ta:
+            expected = pandas_ta_oracle(spec, arrays)
         elif spec.numpy:
             expected = numpy_oracle(spec, arrays)
         elif spec.smc:
@@ -387,15 +1138,22 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
     if expected is not None:
         if spec.wickra:
             tolerance = {"rtol": spec.wickra.rtol, "atol": spec.wickra.atol}
+        elif spec.pandas_ta:
+            tolerance = {
+                "rtol": spec.pandas_ta.rtol,
+                "atol": spec.pandas_ta.atol,
+            }
         elif spec.smc and spec.cls.__name__ == "Sessions":
             tolerance = {"atol": 2e-5}
         else:
             tolerance = {}
         selected_actual = actual_indices or (
-            spec.wickra.actual_indices if spec.wickra else None
+            spec.wickra.actual_indices if spec.wickra else
+            spec.pandas_ta.actual_indices if spec.pandas_ta else None
         )
         selected_expected = (
-            spec.wickra.oracle_indices if spec.wickra else None
+            spec.wickra.oracle_indices if spec.wickra else
+            spec.pandas_ta.oracle_indices if spec.pandas_ta else None
         )
         row["batch_vs_oracle"] = compare(
             batch,
