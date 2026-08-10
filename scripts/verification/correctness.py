@@ -335,6 +335,8 @@ def cross_section_oracle_arrays(mode: str, arrays):
 def numpy_oracle(spec: Spec, arrays):
     """Execute one explicit NumPy ufunc override on the supplied arrays."""
     def trailing_windows(values: np.ndarray, period: int) -> np.ndarray:
+        if len(values) < period:
+            return np.empty((0, period), dtype=np.asarray(values).dtype)
         return np.lib.stride_tricks.sliding_window_view(values, period)
 
     def align_warm(values: np.ndarray, period: int) -> np.ndarray:
@@ -351,7 +353,12 @@ def numpy_oracle(spec: Spec, arrays):
 
     def rolling_mode():
         period = int(constructor_value(spec, "timeperiod"))
-        windows = trailing_windows(np.asarray(arrays[0]), period)
+        source = np.asarray(arrays[0])
+        if source.size < period:
+            return np.full(source.size, np.nan)
+        if np.unique(source).size == source.size:
+            return align_warm(source[:source.size - period + 1], period)
+        windows = trailing_windows(source, period)
         values = []
         for window in windows:
             finite = window[~np.isnan(window)]
@@ -561,8 +568,13 @@ def numpy_oracle(spec: Spec, arrays):
 
     def rolling_entropy():
         period = int(constructor_value(spec, "timeperiod"))
+        source = np.asarray(arrays[0])
+        if source.size < period:
+            return np.full(source.size, np.nan)
+        if np.unique(source).size == source.size:
+            return align_warm(np.full(source.size - period + 1, np.log(period)), period)
         values = []
-        for window in trailing_windows(np.asarray(arrays[0]), period):
+        for window in trailing_windows(source, period):
             _, counts = np.unique(window[~np.isnan(window)], return_counts=True)
             probabilities = counts.astype(float) / period
             values.append(-np.sum(probabilities * np.log(probabilities)))
@@ -570,45 +582,44 @@ def numpy_oracle(spec: Spec, arrays):
 
     def fractal_dimension():
         period = int(constructor_value(spec, "timeperiod"))
+        windows = trailing_windows(np.asarray(arrays[0]), period)
+        if not len(windows):
+            return np.full(len(arrays[0]), np.nan)
 
-        def rescaled_range(values):
-            deviations = values - values.mean()
-            cumulative = np.cumsum(deviations)
-            spread = cumulative.max() - cumulative.min()
-            deviation = np.sqrt(np.mean(deviations**2))
-            return spread / deviation if spread > 0.0 and deviation > 0.0 else None
+        def ranges(values):
+            deviations = values - values.mean(axis=-1, keepdims=True)
+            cumulative = np.cumsum(deviations, axis=-1)
+            spread = cumulative.max(axis=-1) - cumulative.min(axis=-1)
+            deviation = np.sqrt(np.mean(deviations**2, axis=-1))
+            return np.divide(spread, deviation, out=np.full_like(spread, np.nan),
+                             where=(spread > 0.0) & (deviation > 0.0))
 
-        results = []
-        for window in trailing_windows(np.asarray(arrays[0]), period):
-            points = []
-            for chunk_count in (1, 2):
-                size = period // chunk_count
-                ranges = [rescaled_range(window[i * size:(i + 1) * size])
-                          for i in range(chunk_count)]
-                ranges = [value for value in ranges if value is not None]
-                if ranges:
-                    points.append((np.log(size), np.log(np.mean(ranges))))
-            hurst = 0.5 if len(points) < 2 else np.clip(
-                (points[1][1] - points[0][1]) / (points[1][0] - points[0][0]), 0.0, 1.0
-            )
-            results.append(2.0 - hurst)
-        return align_warm(np.asarray(results), period)
+        whole = ranges(windows)
+        half = period // 2
+        halves = np.nanmean(
+            np.column_stack((ranges(windows[:, :half]), ranges(windows[:, half:2 * half]))),
+            axis=1,
+        )
+        hurst = np.clip(
+            (np.log(halves) - np.log(whole)) / (np.log(half) - np.log(period)),
+            0.0,
+            1.0,
+        )
+        hurst[~np.isfinite(hurst)] = 0.5
+        return align_warm(2.0 - hurst, period)
 
     def rolling_ou_half_life():
         period = int(constructor_value(spec, "timeperiod"))
+        if len(price) <= period:
+            return np.full(len(price), np.nan)
         price = np.asarray(arrays[0])
         previous = price[:-1]
         change = np.diff(price)
-        output = np.full(len(price), np.nan)
-        for end, (x, y) in enumerate(zip(
-            trailing_windows(change, period), trailing_windows(previous, period)
-        ), start=period):
-            xc, yc = x - x.mean(), y - y.mean()
-            variance = np.mean(yc * yc)
-            covariance = np.mean(xc * yc)
-            rate = -covariance / variance if variance > 0.0 else 0.0
-            if rate > 0.0:
-                output[end] = np.log(2.0) / rate
+        output = np.full(len(price), np.nan); x = trailing_windows(change, period); y = trailing_windows(previous, period)
+        xc, yc = x - x.mean(axis=1, keepdims=True), y - y.mean(axis=1, keepdims=True)
+        variance = np.mean(yc * yc, axis=1); covariance = np.mean(xc * yc, axis=1)
+        rate = np.divide(-covariance, variance, out=np.zeros_like(covariance), where=variance > 0.0)
+        output[period:] = np.divide(np.log(2.0), rate, out=np.full_like(rate, np.nan), where=rate > 0.0)
         return output
 
     def rolling_spread_zscore():
@@ -651,10 +662,11 @@ def numpy_oracle(spec: Spec, arrays):
 
     def roll_spread():
         period = int(constructor_value(spec, "timeperiod")); delta = np.diff(arrays[0], prepend=arrays[0][0])
-        left, right = delta[1:], delta[:-1]; output = np.full(len(delta), np.nan)
-        for end, (x, y) in enumerate(zip(trailing_windows(left, period), trailing_windows(right, period)), start=period):
-            covariance = np.sum((x - x.mean()) * (y - y.mean())) / (period - 1)
-            output[end] = 2.0 * np.sqrt(max(-covariance, 0.0))
+        if len(delta) <= period:
+            return np.full(len(delta), np.nan)
+        left, right = trailing_windows(delta[1:], period), trailing_windows(delta[:-1], period); output = np.full(len(delta), np.nan)
+        covariance = np.sum((left - left.mean(axis=1, keepdims=True)) * (right - right.mean(axis=1, keepdims=True)), axis=1) / (period - 1)
+        output[period:] = 2.0 * np.sqrt(np.maximum(-covariance, 0.0))
         return output
 
     def rolling_percentile():

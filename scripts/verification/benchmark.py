@@ -25,6 +25,7 @@ import numpy as np
 
 from correctness import (
     numpy_oracle,
+    pandas_ta_oracle,
     smc_oracle,
     talib_oracle,
     verdict,
@@ -52,6 +53,13 @@ def oracle_call(spec: Spec, arrays: list[np.ndarray]):
         return talib_oracle(spec, arrays)
     if spec.wickra:
         return wickra_oracle(spec, arrays)
+    if spec.pandas_ta:
+        try:
+            return pandas_ta_oracle(spec, arrays)
+        except ValueError as error:
+            if "returned no output" in str(error):
+                return None
+            raise
     if spec.numpy:
         return numpy_oracle(spec, arrays)
     if spec.smc:
