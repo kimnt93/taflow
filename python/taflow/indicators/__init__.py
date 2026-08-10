@@ -72,6 +72,15 @@ from .bat_pattern import BatPattern
 from .butterfly_pattern import ButterflyPattern
 from .gartley_pattern import GartleyPattern
 from .four_point_harmonic_pattern import FourPointHarmonicPattern
+from .fibonacci_time_zones import FibonacciTimeZones
+from .fibonacci_channel import FibonacciChannel
+from .fibonacci_arcs import FibonacciArcs
+from .fibonacci_fan import FibonacciFan
+from .fibonacci_confluence import FibonacciConfluence
+from .golden_pocket import GoldenPocket
+from .automatic_fibonacci import AutomaticFibonacci
+from .fibonacci_projection import FibonacciProjection
+from .fibonacci_extension import FibonacciExtension
 from .rolling_average_drawdown import RollingAverageDrawdown
 from .rolling_drawdown_duration import RollingDrawdownDuration
 from .rolling_gain_loss_ratio import RollingGainLossRatio
@@ -658,6 +667,15 @@ __all__ = [
     "ButterflyPattern",
     "GartleyPattern",
     "FourPointHarmonicPattern",
+    "FibonacciTimeZones",
+    "FibonacciChannel",
+    "FibonacciArcs",
+    "FibonacciFan",
+    "FibonacciConfluence",
+    "GoldenPocket",
+    "AutomaticFibonacci",
+    "FibonacciProjection",
+    "FibonacciExtension",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

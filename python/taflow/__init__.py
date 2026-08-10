@@ -25,6 +25,9 @@ from .indicators import CupAndHandle, RectangleRange, FlagPennant, WedgePattern,
 from .indicators import HeadAndShoulders, TripleTopBottom, ThreeDrives
 from .indicators import CypherPattern, SharkPattern, CrabPattern, BatPattern
 from .indicators import ButterflyPattern, GartleyPattern, FourPointHarmonicPattern
+from .indicators import FibonacciTimeZones, FibonacciChannel, FibonacciArcs
+from .indicators import FibonacciFan, FibonacciConfluence, GoldenPocket
+from .indicators import AutomaticFibonacci, FibonacciProjection, FibonacciExtension
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -575,6 +578,15 @@ __all__ = [
     "ButterflyPattern",
     "GartleyPattern",
     "FourPointHarmonicPattern",
+    "FibonacciTimeZones",
+    "FibonacciChannel",
+    "FibonacciArcs",
+    "FibonacciFan",
+    "FibonacciConfluence",
+    "GoldenPocket",
+    "AutomaticFibonacci",
+    "FibonacciProjection",
+    "FibonacciExtension",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

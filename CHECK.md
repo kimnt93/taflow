@@ -440,6 +440,15 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | butterfly_pattern | butterfly_pattern | _ |
 | [ ] | gartley_pattern | gartley_pattern | _ |
 | [ ] | four_point_harmonic_pattern | four_point_harmonic_pattern | _ |
+| [ ] | fibonacci_time_zones | fibonacci_time_zones | _ |
+| [ ] | fibonacci_channel | fibonacci_channel | _ |
+| [ ] | fibonacci_arcs | fibonacci_arcs | _ |
+| [ ] | fibonacci_fan | fibonacci_fan | _ |
+| [ ] | fibonacci_confluence | fibonacci_confluence | _ |
+| [ ] | golden_pocket | golden_pocket | _ |
+| [ ] | automatic_fibonacci | automatic_fibonacci | _ |
+| [ ] | fibonacci_projection | fibonacci_projection | _ |
+| [ ] | fibonacci_extension | fibonacci_extension | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

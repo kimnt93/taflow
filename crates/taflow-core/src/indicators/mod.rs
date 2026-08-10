@@ -1603,3 +1603,39 @@ pub use head_and_shoulders::HeadAndShoulders;
 pub use shark_pattern::SharkPattern;
 pub use three_drives::ThreeDrives;
 pub use triple_top_bottom::TripleTopBottom;
+mod automatic_fibonacci;
+#[cfg(test)]
+mod automatic_fibonacci_test;
+mod fibonacci_arcs;
+#[cfg(test)]
+mod fibonacci_arcs_test;
+mod fibonacci_channel;
+#[cfg(test)]
+mod fibonacci_channel_test;
+mod fibonacci_confluence;
+#[cfg(test)]
+mod fibonacci_confluence_test;
+mod fibonacci_extension;
+#[cfg(test)]
+mod fibonacci_extension_test;
+mod fibonacci_fan;
+#[cfg(test)]
+mod fibonacci_fan_test;
+mod fibonacci_projection;
+#[cfg(test)]
+mod fibonacci_projection_test;
+mod fibonacci_time_zones;
+#[cfg(test)]
+mod fibonacci_time_zones_test;
+mod golden_pocket;
+#[cfg(test)]
+mod golden_pocket_test;
+pub use automatic_fibonacci::{AutomaticFibonacci, AutomaticFibonacciValue};
+pub use fibonacci_arcs::{FibonacciArcs, FibonacciArcsValue};
+pub use fibonacci_channel::{FibonacciChannel, FibonacciChannelValue};
+pub use fibonacci_confluence::{FibonacciConfluence, FibonacciConfluenceValue};
+pub use fibonacci_extension::{FibonacciExtension, FibonacciExtensionValue};
+pub use fibonacci_fan::{FibonacciFan, FibonacciFanValue};
+pub use fibonacci_projection::{FibonacciProjection, FibonacciProjectionValue};
+pub use fibonacci_time_zones::{FibonacciTimeZones, FibonacciTimeZonesValue};
+pub use golden_pocket::{GoldenPocket, GoldenPocketValue};

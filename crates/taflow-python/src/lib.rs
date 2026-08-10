@@ -403,6 +403,15 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::ButterflyPattern>()?;
     m.add_class::<indicators::GartleyPattern>()?;
     m.add_class::<indicators::FourPointHarmonicPattern>()?;
+    m.add_class::<indicators::FibonacciTimeZones>()?;
+    m.add_class::<indicators::FibonacciChannel>()?;
+    m.add_class::<indicators::FibonacciArcs>()?;
+    m.add_class::<indicators::FibonacciFan>()?;
+    m.add_class::<indicators::FibonacciConfluence>()?;
+    m.add_class::<indicators::GoldenPocket>()?;
+    m.add_class::<indicators::AutomaticFibonacci>()?;
+    m.add_class::<indicators::FibonacciProjection>()?;
+    m.add_class::<indicators::FibonacciExtension>()?;
 
     Ok(())
 }

@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 385,
+    "indicators": 394,
     "native_functions": 0,
-    "native_state_classes": 384,
+    "native_state_classes": 393,
     "pandas_ta_symbols": 427,
-    "python_exports": 387,
-    "rust_exports": 805,
+    "python_exports": 396,
+    "rust_exports": 832,
     "smc_functions": 8,
-    "structure": 385,
+    "structure": 394,
     "talib_functions": 161
   },
   "rows": [
@@ -4353,6 +4353,141 @@
       "native_binding": true,
       "native_symbols": [
         "FourPointHarmonicPattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "fibonacci_time_zones",
+      "name": "FibonacciTimeZones",
+      "native_binding": true,
+      "native_symbols": [
+        "FibonacciTimeZones",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "fibonacci_channel",
+      "name": "FibonacciChannel",
+      "native_binding": true,
+      "native_symbols": [
+        "FibonacciChannel",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "fibonacci_arcs",
+      "name": "FibonacciArcs",
+      "native_binding": true,
+      "native_symbols": [
+        "FibonacciArcs",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "fibonacci_fan",
+      "name": "FibonacciFan",
+      "native_binding": true,
+      "native_symbols": [
+        "FibonacciFan",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "fibonacci_confluence",
+      "name": "FibonacciConfluence",
+      "native_binding": true,
+      "native_symbols": [
+        "FibonacciConfluence",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "golden_pocket",
+      "name": "GoldenPocket",
+      "native_binding": true,
+      "native_symbols": [
+        "GoldenPocket",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "automatic_fibonacci",
+      "name": "AutomaticFibonacci",
+      "native_binding": true,
+      "native_symbols": [
+        "AutomaticFibonacci",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "fibonacci_projection",
+      "name": "FibonacciProjection",
+      "native_binding": true,
+      "native_symbols": [
+        "FibonacciProjection",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "fibonacci_extension",
+      "name": "FibonacciExtension",
+      "native_binding": true,
+      "native_symbols": [
+        "FibonacciExtension",
         "_Native"
       ],
       "pandas_ta_reference": false,
