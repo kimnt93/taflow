@@ -7,7 +7,7 @@
     "passed": true,
     "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 1.3869794202037156e-11
+    "max_abs_error": 7.65965069149388e-12
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -19,6 +19,6 @@
     "passed": true,
     "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 1.3869794202037156e-11
+    "max_abs_error": 7.65965069149388e-12
   }
 }

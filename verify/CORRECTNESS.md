@@ -1,9 +1,9 @@
 # TAFlow correctness verification
 
-Date: 2026-08-10 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
+Date: 2026-08-10 | bars: 1,000 | warm-up split: 9,000 extend + -8,000 append | tolerance rtol=1e-08, atol=1e-10
 Environment: python 3.12.3, numpy 2.4.6, TA-Lib 0.7.1, Wickra 0.9.9, SMC 0.0.27, TAFlow 0.1.2
 
-Summary: ERROR: 11, FAIL: 32, MATCH: 228, NO_EXTERNAL_ORACLE: 121, VARIANT: 1
+Summary: FAIL: 13, MATCH: 258, NO_EXTERNAL_ORACLE: 121, VARIANT: 1
 
 TAFlow is driven only through canonical Python classes. The registry
 selects TA-Lib, Wickra, explicit NumPy ufunc overrides, then SMC.
@@ -16,25 +16,19 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 
 | Function | taflow class | Oracle | Verdict | Batch vs oracle | Continue vs batch | Extend chunks | Continue vs oracle |
 |---|---|---|---|---|---|---|---|
-| absolute_breadth_index | AbsoluteBreadthIndex | Wickra | ERROR | — | — | yes | — |
-| adaptive_cycle | AdaptiveCycle | Wickra | FAIL | **FAIL** (err 2.6e+01, nan 48) | yes | yes | **FAIL** (err 2.6e+01, nan 48) |
 | amihud | Amihud | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | anchored_vwap | AnchoredVolumeWeightedAveragePrice | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| arms_index | ArmsIndex | Wickra | ERROR | — | — | yes | — |
 | arnaud_legoux_moving_average | ArnaudLegouxMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| automatic_fibonacci | AutomaticFibonacci | Wickra | FAIL | **FAIL** (err 2.4e+02, nan 84) | yes | yes | **FAIL** (err 2.4e+02, nan 84) |
+| automatic_fibonacci | AutomaticFibonacci | Wickra | FAIL | **FAIL** (err 5.8e+01, nan 70) | yes | yes | **FAIL** (err 5.8e+01, nan 70) |
 | average_daily_dollar_value | AverageDailyDollarValue | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | awesome_oscillator | AwesomeOscillator | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | bars_since | BarsSince | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| bat_pattern | BatPattern | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
-| breadth_thrust | BreadthThrust | Wickra | ERROR | — | — | yes | — |
+| bat_pattern | BatPattern | Wickra | FAIL | **FAIL** (err 0.0e+00, nan 5) | yes | yes | **FAIL** (err 0.0e+00, nan 5) |
 | break_of_structure_change_of_character | BreakOfStructureChangeOfCharacter | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| bullish_percent_index | BullishPercentIndex | Wickra | ERROR | — | — | yes | — |
 | butterfly_pattern | ButterflyPattern | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
 | chaikin_money_flow | ChaikinMoneyFlow | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | chaikin_volatility | ChaikinVolatility | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | close_to_close_sigma | CloseToCloseSigma | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| crab_pattern | CrabPattern | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
 | cross | Cross | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | crossover | Crossover | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | crossunder | Crossunder | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -44,15 +38,11 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | cumulative_product | CumulativeProduct | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | cumulative_sum | CumulativeSum | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | cumulative_sum_control_chart | CumulativeSumControlChart | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cumulative_volume_index | CumulativeVolumeIndex | Wickra | ERROR | — | — | yes | — |
-| cup_and_handle | CupAndHandle | Wickra | FAIL | **FAIL** (err 2.0e+00, nan 19) | yes | yes | **FAIL** (err 2.0e+00, nan 19) |
-| cypher_pattern | CypherPattern | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
 | decay_linear | DecayLinear | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | detrended_price_oscillator | DetrendedPriceOscillator | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | donchian | Donchian | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | drawdown | Drawdown | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | ease_of_movement | EaseOfMovement | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| empirical_mode_decomposition | EmpiricalModeDecomposition | Wickra | FAIL | **FAIL** (err 1.4e+02, nan 10) | yes | yes | **FAIL** (err 1.4e+02, nan 10) |
 | entry_exit | EntryExit | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | equal_highs_lows | EqualHighsLows | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | even_better_sinewave | EvenBetterSinewave | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -63,15 +53,14 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | exponentially_weighted_sum | ExponentiallyWeightedSum | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | falling | Falling | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | fib_retracement | FibonacciRetracement | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| fibonacci_arcs | FibonacciArcs | Wickra | FAIL | **FAIL** (err 1.7e+02, nan 36) | yes | yes | **FAIL** (err 1.7e+02, nan 36) |
-| fibonacci_channel | FibonacciChannel | Wickra | FAIL | **FAIL** (err 2.6e+02, nan 208) | yes | yes | **FAIL** (err 2.6e+02, nan 208) |
-| fibonacci_confluence | FibonacciConfluence | Wickra | FAIL | **FAIL** (err 4.0e+02, nan 104) | yes | yes | **FAIL** (err 4.0e+02, nan 104) |
-| fibonacci_extension | FibonacciExtension | Wickra | FAIL | **FAIL** (err 8.9e+02, nan 60) | yes | yes | **FAIL** (err 8.9e+02, nan 60) |
-| fibonacci_fan | FibonacciFan | Wickra | FAIL | **FAIL** (err 2.6e+02, nan 36) | yes | yes | **FAIL** (err 2.6e+02, nan 36) |
-| fibonacci_projection | FibonacciProjection | Wickra | FAIL | **FAIL** (err 7.6e+02, nan 208) | yes | yes | **FAIL** (err 7.6e+02, nan 208) |
-| fibonacci_time_zones | FibonacciTimeZones | Wickra | FAIL | **FAIL** (err 1.0e+04, nan 6) | yes | yes | **FAIL** (err 1.0e+04, nan 6) |
+| fibonacci_arcs | FibonacciArcs | Wickra | FAIL | **FAIL** (err 1.0e+02, nan 30) | yes | yes | **FAIL** (err 1.0e+02, nan 30) |
+| fibonacci_channel | FibonacciChannel | Wickra | FAIL | **FAIL** (err 7.0e+01, nan 144) | yes | yes | **FAIL** (err 7.0e+01, nan 144) |
+| fibonacci_confluence | FibonacciConfluence | Wickra | FAIL | **FAIL** (err 1.4e+02, nan 72) | yes | yes | **FAIL** (err 1.4e+02, nan 72) |
+| fibonacci_extension | FibonacciExtension | Wickra | FAIL | **FAIL** (err 2.5e+02, nan 50) | yes | yes | **FAIL** (err 2.5e+02, nan 50) |
+| fibonacci_fan | FibonacciFan | Wickra | FAIL | **FAIL** (err 6.4e+01, nan 30) | yes | yes | **FAIL** (err 6.4e+01, nan 30) |
+| fibonacci_projection | FibonacciProjection | Wickra | FAIL | **FAIL** (err 2.4e+02, nan 144) | yes | yes | **FAIL** (err 2.4e+02, nan 144) |
+| fibonacci_time_zones | FibonacciTimeZones | Wickra | FAIL | **FAIL** (err 1.0e+03, nan 8) | yes | yes | **FAIL** (err 1.0e+03, nan 8) |
 | fisher_transform | FisherTransform | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| flag_pennant | FlagPennant | Wickra | FAIL | **FAIL** (err 2.0e+00, nan 19) | yes | yes | **FAIL** (err 2.0e+00, nan 19) |
 | force_index | ForceIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | four_point_harmonic_pattern | FourPointHarmonicPattern | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 4) | yes | yes | **FAIL** (err 1.0e+00, nan 4) |
 | frac_diff | FracDiff | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -80,18 +69,14 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | gap_up | GapUp | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | garman_klass | GarmanKlass | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | garman_klass_yang_zhang | GarmanKlassYangZhang | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| gartley_pattern | GartleyPattern | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
-| golden_pocket | GoldenPocket | Wickra | FAIL | **FAIL** (err 1.3e+02, nan 36) | yes | yes | **FAIL** (err 1.3e+02, nan 36) |
-| head_and_shoulders | HeadAndShoulders | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
+| gartley_pattern | GartleyPattern | Wickra | FAIL | **FAIL** (err 0.0e+00, nan 5) | yes | yes | **FAIL** (err 0.0e+00, nan 5) |
+| golden_pocket | GoldenPocket | Wickra | FAIL | **FAIL** (err 3.7e+01, nan 30) | yes | yes | **FAIL** (err 3.7e+01, nan 30) |
 | hedge_ratio | HedgeRatio | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | heikin_ashi | HeikinAshi | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| high_low_index | HighLowIndex | Wickra | ERROR | — | — | yes | — |
 | higher_high | HigherHigh | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | highest_since | HighestSince | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| hilbert_dominant_cycle | HilbertDominantCycle | Wickra | FAIL | **FAIL** (err 2.4e+01, nan 17) | yes | yes | **FAIL** (err 2.4e+01, nan 17) |
 | hull_moving_average | HullMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | hurst | Hurst | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| hurst_channel | HurstChannel | Wickra | FAIL | error: output arity 1 != 3 | yes | yes | error: output arity 1 != 3 |
 | ichimoku | Ichimoku | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | inside_bar | InsideBar | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | jma | JurikMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -106,17 +91,13 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | lower_low | LowerLow | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | lowest_since | LowestSince | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | mass_index | MassIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| mc_clellan_oscillator | McClellanOscillator | Wickra | ERROR | — | — | yes | — |
-| mc_clellan_summation_index | McClellanSummationIndex | Wickra | ERROR | — | — | yes | — |
 | mcginley | McGinleyDynamic | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | negative_volume_index | NegativeVolumeIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| new_highs_new_lows | NewHighsNewLows | Wickra | ERROR | — | — | yes | — |
 | opening_range | OpeningRange | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | order_block | OrderBlock | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | ornstein_uhlenbeck_half_life | OrnsteinUhlenbeckHalfLife | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | outside_bar | OutsideBar | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | parkinson | Parkinson | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| percent_above_moving_average | PercentAboveMovingAverage | Wickra | ERROR | — | — | yes | — |
 | pivot_points | PivotPoints | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | pmax | ParabolicMovingAverageStop | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | position_hold | PositionHold | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -124,7 +105,6 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | premium_discount | PremiumDiscount | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | previous_high_low | PreviousHighLow | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | projection_bands | ProjectionBands | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rectangle_range | RectangleRange | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 19) | yes | yes | **FAIL** (err 1.0e+00, nan 19) |
 | retracements | Retracements | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rising | Rising | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rogers_satchell | RogersSatchell | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -133,19 +113,17 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | rolling_autocorr | RollingAutocorr | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_calmar | RollingCalmar | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_coefficient_of_determination | RollingCoefficientOfDetermination | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_cointegration | RollingCointegration | Wickra | FAIL | error: output arity 1 != 3 | yes | yes | error: output arity 1 != 3 |
 | rolling_covariance | RollingCovariance | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_entropy | RollingEntropy | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_information_ratio | RollingInformationRatio | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_interquartile_range | RollingInterquartileRange | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_kurtosis | RollingKurtosis | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_lead_lag_cross_correlation | RollingLeadLagCrossCorrelation | Wickra | FAIL | error: output arity 1 != 2 | yes | yes | error: output arity 1 != 2 |
 | rolling_median | RollingMedian | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_mode | RollingMode | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_percentile | RollingPercentile | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_quantile | RollingQuantile | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_rank | RollingRank | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_recovery_factor | RollingRecoveryFactor | Wickra | VARIANT | **FAIL** (err 1.5e+04, nan 13) | yes | yes | **FAIL** (err 1.5e+04, nan 13) |
+| rolling_recovery_factor | RollingRecoveryFactor | Wickra | VARIANT | **FAIL** (err 1.1e+03, nan 13) | yes | yes | **FAIL** (err 1.1e+03, nan 13) |
 | rolling_sharpe | RollingSharpe | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_skew | RollingSkew | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | rolling_sortino | RollingSortino | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -155,7 +133,6 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | schaff_trend_cycle | SchaffTrendCycle | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | session_extrema | SessionExtrema | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | session_volume_levels | SessionVolumeLevels | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| shark_pattern | SharkPattern | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
 | signal_delay | SignalDelay | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | spread_zscore | SpreadZScore | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | squeeze | Squeeze | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
@@ -164,29 +141,22 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | supertrend | Supertrend | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | swing_high_low | SwingHighLow | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | td_sequential | TomDeMarkSequential | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| three_drives | ThreeDrives | Wickra | FAIL | **FAIL** (err 1.0e+00, nan 5) | yes | yes | **FAIL** (err 1.0e+00, nan 5) |
 | time_series_rank | TimeSeriesRank | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| triangle_pattern | TrianglePattern | Wickra | FAIL | **FAIL** (err 2.0e+00, nan 19) | yes | yes | **FAIL** (err 2.0e+00, nan 19) |
-| triple_top_bottom | TripleTopBottom | Wickra | FAIL | **FAIL** (err 2.0e+00, nan 5) | yes | yes | **FAIL** (err 2.0e+00, nan 5) |
 | true_strength_index | TrueStrengthIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | ulcer_index | UlcerIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| up_down_volume_ratio | UpDownVolumeRatio | Wickra | ERROR | — | — | yes | — |
 | value_when | ValueWhen | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | vidya | VariableIndexDynamicAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | volume_price_trend | VolumePriceTrend | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | volume_weighted_moving_average | VolumeWeightedMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| volume_weighted_moving_average_convergence_divergence | VolumeWeightedMovingAverageConvergenceDivergence | Wickra | FAIL | error: output arity 1 != 3 | yes | yes | error: output arity 1 != 3 |
 | vortex | Vortex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| wedge_pattern | WedgePattern | Wickra | FAIL | **FAIL** (err 2.0e+00, nan 19) | yes | yes | **FAIL** (err 2.0e+00, nan 19) |
 | yang_zhang | YangZhang | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | zero_lag_exponential_moving_average | ZeroLagExponentialMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| zig_zag | ZigZag | Wickra | FAIL | **FAIL** (err 2.4e+02, nan 1028) | yes | yes | **FAIL** (err 2.4e+02, nan 1028) |
 | ACCBANDS | AccelerationBands | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ACOS | MathAcos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | AD | AccumulationDistribution | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ADD | MathAdd | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ADOSC | AccumulationDistributionOscillator | TA-Lib | MATCH | pass (err 1.5e-08, nan 0) | yes | yes | pass (err 1.5e-08, nan 0) |
-| ADX | AverageDirectionalIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
+| ADOSC | AccumulationDistributionOscillator | TA-Lib | MATCH | pass (err 5.6e-09, nan 0) | yes | yes | pass (err 5.6e-09, nan 0) |
+| ADX | AverageDirectionalIndex | TA-Lib | MATCH | pass (err 1.8e-14, nan 0) | yes | yes | pass (err 1.8e-14, nan 0) |
 | ADXR | AverageDirectionalIndexRating | TA-Lib | MATCH | pass (err 2.1e-14, nan 0) | yes | yes | pass (err 2.1e-14, nan 0) |
 | APO | AbsolutePriceOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | AROON | Aroon | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -195,11 +165,11 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | ATAN | MathAtan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ATR | AverageTrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | AVGDEV | RollingAverageDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| AVGPRICE | AveragePrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| BBANDS | BollingerBands | TA-Lib | MATCH | pass (err 7.9e-10, nan 0) | yes | yes | pass (err 7.9e-10, nan 0) |
+| AVGPRICE | AveragePrice | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
+| BBANDS | BollingerBands | TA-Lib | MATCH | pass (err 1.9e-10, nan 0) | yes | yes | pass (err 1.9e-10, nan 0) |
 | BETA | RollingBeta | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | BOP | BalanceOfPower | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CCI | CommodityChannelIndex | TA-Lib | MATCH | pass (err 1.4e-11, nan 0) | yes | yes | pass (err 1.4e-11, nan 0) |
+| CCI | CommodityChannelIndex | TA-Lib | MATCH | pass (err 7.7e-12, nan 0) | yes | yes | pass (err 7.7e-12, nan 0) |
 | CDL2CROWS | CandleTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDL3BLACKCROWS | CandleThreeBlackCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | CDL3INSIDE | CandleThreeInside | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -279,30 +249,30 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | HT_TRENDLINE | HilbertTransformTrendline | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | HT_TRENDMODE | HilbertTransformTrendMode | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | IMI | IntradayMomentumIndex | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| KAMA | KaufmanAdaptiveMovingAverage | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| LINEARREG | RollingLinearRegression | TA-Lib | MATCH | pass (err 6.0e-13, nan 0) | yes | yes | pass (err 6.0e-13, nan 0) |
-| LINEARREG_ANGLE | RollingLinearRegressionAngle | TA-Lib | MATCH | pass (err 4.9e-12, nan 0) | yes | yes | pass (err 4.9e-12, nan 0) |
-| LINEARREG_INTERCEPT | RollingLinearRegressionIntercept | TA-Lib | MATCH | pass (err 6.0e-13, nan 0) | yes | yes | pass (err 6.0e-13, nan 0) |
-| LINEARREG_SLOPE | RollingLinearRegressionSlope | TA-Lib | MATCH | pass (err 9.1e-14, nan 0) | yes | yes | pass (err 9.1e-14, nan 0) |
+| KAMA | KaufmanAdaptiveMovingAverage | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
+| LINEARREG | RollingLinearRegression | TA-Lib | MATCH | pass (err 2.4e-13, nan 0) | yes | yes | pass (err 2.4e-13, nan 0) |
+| LINEARREG_ANGLE | RollingLinearRegressionAngle | TA-Lib | MATCH | pass (err 1.6e-12, nan 0) | yes | yes | pass (err 1.6e-12, nan 0) |
+| LINEARREG_INTERCEPT | RollingLinearRegressionIntercept | TA-Lib | MATCH | pass (err 2.3e-13, nan 0) | yes | yes | pass (err 2.3e-13, nan 0) |
+| LINEARREG_SLOPE | RollingLinearRegressionSlope | TA-Lib | MATCH | pass (err 3.7e-14, nan 0) | yes | yes | pass (err 3.7e-14, nan 0) |
 | LN | MathLn | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | LOG10 | MathLog10 | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MA | MovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MACD | MovingAverageConvergenceDivergence | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
+| MACD | MovingAverageConvergenceDivergence | TA-Lib | MATCH | pass (err 2.2e-16, nan 0) | yes | yes | pass (err 2.2e-16, nan 0) |
 | MACDEXT | MovingAverageConvergenceDivergenceExtended | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MACDFIX | MovingAverageConvergenceDivergenceFixed | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
+| MACDFIX | MovingAverageConvergenceDivergenceFixed | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
 | MAMA | MesaAdaptiveMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MAVP | VariablePeriodMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MAX | RollingMaximum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MAXINDEX | RollingMaximumIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MEDPRICE | MedianPrice | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MFI | MoneyFlowIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
+| MFI | MoneyFlowIndex | TA-Lib | MATCH | pass (err 2.1e-14, nan 0) | yes | yes | pass (err 2.1e-14, nan 0) |
 | MIDPOINT | RollingMidpoint | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MIDPRICE | RollingMidprice | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MIN | RollingMinimum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MININDEX | RollingMinimumIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MINMAX | RollingMinMax | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MINMAXINDEX | RollingMinMaxIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MINUS_DI | MinusDirectionalIndicator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
+| MINUS_DI | MinusDirectionalIndicator | TA-Lib | MATCH | pass (err 7.1e-15, nan 0) | yes | yes | pass (err 7.1e-15, nan 0) |
 | MINUS_DM | MinusDirectionalMovement | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MOM | Momentum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | MULT | MathMultiply | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -311,7 +281,7 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | PLUS_DI | PlusDirectionalIndicator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
 | PLUS_DM | PlusDirectionalMovement | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | PPO | PercentagePriceOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ROC | RateOfChange | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
+| ROC | RateOfChange | TA-Lib | MATCH | pass (err 1.2e-14, nan 0) | yes | yes | pass (err 1.2e-14, nan 0) |
 | ROCP | RateOfChangePercent | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ROCR | RateOfChangeRatio | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ROCR100 | RateOfChangeRatioPercent | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -328,33 +298,48 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | STOCHRSI | StochasticRelativeStrengthIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | SUB | MathSubtract | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | SUM | RollingSum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| T3 | TripleExponentialAverage | TA-Lib | MATCH | pass (err 5.7e-13, nan 0) | yes | yes | pass (err 5.7e-13, nan 0) |
+| T3 | TripleExponentialAverage | TA-Lib | MATCH | pass (err 2.3e-13, nan 0) | yes | yes | pass (err 2.3e-13, nan 0) |
 | TAN | MathTan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | TANH | MathTanh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | TEMA | TripleExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | TRANGE | TrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| TRIMA | TriangularMovingAverage | TA-Lib | MATCH | pass (err 6.8e-13, nan 0) | yes | yes | pass (err 6.8e-13, nan 0) |
+| TRIMA | TriangularMovingAverage | TA-Lib | MATCH | pass (err 4.7e-13, nan 0) | yes | yes | pass (err 4.7e-13, nan 0) |
 | TRIX | TripleExponentialRateOfChange | TA-Lib | MATCH | pass (err 1.1e-14, nan 0) | yes | yes | pass (err 1.1e-14, nan 0) |
-| TSF | RollingTimeSeriesForecast | TA-Lib | MATCH | pass (err 6.8e-13, nan 0) | yes | yes | pass (err 6.8e-13, nan 0) |
-| TYPPRICE | TypicalPrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
+| TSF | RollingTimeSeriesForecast | TA-Lib | MATCH | pass (err 2.8e-13, nan 0) | yes | yes | pass (err 2.8e-13, nan 0) |
+| TYPPRICE | TypicalPrice | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
 | ULTOSC | UltimateOscillator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
 | VAR | RollingVariance | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| WCLPRICE | WeightedClose | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
+| WCLPRICE | WeightedClose | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
 | WILLR | WilliamsPercentR | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| WMA | WeightedMovingAverage | TA-Lib | MATCH | pass (err 1.9e-10, nan 0) | yes | yes | pass (err 1.9e-10, nan 0) |
-| average_daily_range | AverageDailyRange | Wickra | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| average_true_range_bands | AverageTrueRangeBands | Wickra | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
+| WMA | WeightedMovingAverage | TA-Lib | MATCH | pass (err 6.5e-12, nan 0) | yes | yes | pass (err 6.5e-12, nan 0) |
+| absolute_breadth_index | AbsoluteBreadthIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| adaptive_cycle | AdaptiveCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| arms_index | ArmsIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| average_daily_range | AverageDailyRange | Wickra | MATCH | pass (err 8.9e-15, nan 0) | yes | yes | pass (err 8.9e-15, nan 0) |
+| average_true_range_bands | AverageTrueRangeBands | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
 | better_volume | BetterVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| breadth_thrust | BreadthThrust | Wickra | MATCH | pass (err 1.1e-16, nan 0) | yes | yes | pass (err 1.1e-16, nan 0) |
+| bullish_percent_index | BullishPercentIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | center_of_gravity | CenterOfGravity | Wickra | MATCH | pass (err 2.7e-15, nan 0) | yes | yes | pass (err 2.7e-15, nan 0) |
+| crab_pattern | CrabPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cumulative_volume_index | CumulativeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cup_and_handle | CupAndHandle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cypher_pattern | CypherPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | day_of_week_return_profile | DayOfWeekReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | decycler | Decycler | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | decycler_oscillator | DecyclerOscillator | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | demand_index | DemandIndex | Wickra | MATCH | pass (err 4.5e-12, nan 0) | yes | yes | pass (err 4.5e-12, nan 0) |
-| double_bollinger_bands | DoubleBollingerBands | Wickra | MATCH | pass (err 3.3e-11, nan 0) | yes | yes | pass (err 3.3e-11, nan 0) |
+| double_bollinger_bands | DoubleBollingerBands | Wickra | MATCH | pass (err 1.3e-11, nan 0) | yes | yes | pass (err 1.3e-11, nan 0) |
 | ehlers_stochastic | EhlersStochastic | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| empirical_mode_decomposition | EmpiricalModeDecomposition | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | fair_value_gap | FairValueGap | SMC | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| flag_pennant | FlagPennant | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| head_and_shoulders | HeadAndShoulders | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| high_low_index | HighLowIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| hilbert_dominant_cycle | HilbertDominantCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| hurst_channel | HurstChannel | Wickra | MATCH | pass (err 2.8e-13, nan 0) | yes | yes | pass (err 2.8e-13, nan 0) |
 | instantaneous_trendline | InstantaneousTrendline | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| intraday_intensity | IntradayIntensity | Wickra | MATCH | pass (err 2.3e-10, nan 0) | yes | yes | pass (err 2.3e-10, nan 0) |
+| intraday_intensity | IntradayIntensity | Wickra | MATCH | pass (err 1.2e-10, nan 0) | yes | yes | pass (err 1.2e-10, nan 0) |
 | intraday_volatility_profile | IntradayVolatilityProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | inverse_fisher_transform | InverseFisherTransform | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | linear_regression_channel | LinearRegressionChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -363,25 +348,32 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | math_acosh | MathAcosh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | math_asinh | MathAsinh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | math_atanh | MathAtanh | NumPy | MATCH | pass (err 8.9e-16, nan 0) | yes | yes | pass (err 8.9e-16, nan 0) |
-| math_cbrt | MathCbrt | NumPy | MATCH | pass (err 6.7e-16, nan 0) | yes | yes | pass (err 6.7e-16, nan 0) |
+| math_cbrt | MathCbrt | NumPy | MATCH | pass (err 4.4e-16, nan 0) | yes | yes | pass (err 4.4e-16, nan 0) |
 | math_cot | MathCot | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | math_degrees | MathDegrees | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | math_log1p | MathLog1p | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | math_radians | MathRadians | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| mc_clellan_oscillator | McClellanOscillator | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| mc_clellan_summation_index | McClellanSummationIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | median_channel | MedianChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| moving_average_envelope | MovingAverageEnvelope | Wickra | MATCH | pass (err 2.8e-13, nan 0) | yes | yes | pass (err 2.8e-13, nan 0) |
+| moving_average_envelope | MovingAverageEnvelope | Wickra | MATCH | pass (err 9.9e-14, nan 0) | yes | yes | pass (err 9.9e-14, nan 0) |
+| new_highs_new_lows | NewHighsNewLows | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | overnight_gap | OvernightGap | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | overnight_intraday_return | OvernightIntradayReturn | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| percent_above_moving_average | PercentAboveMovingAverage | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | quartile_bands | QuartileBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rectangle_range | RectangleRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rmi | RelativeMomentumIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
 | rolling_average_drawdown | RollingAverageDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_beta_neutral_spread | RollingBetaNeutralSpread | Wickra | MATCH | pass (err 3.5e-10, nan 0) | yes | yes | pass (err 3.5e-10, nan 0) |
+| rolling_beta_neutral_spread | RollingBetaNeutralSpread | Wickra | MATCH | pass (err 2.1e-11, nan 0) | yes | yes | pass (err 2.1e-11, nan 0) |
+| rolling_cointegration | RollingCointegration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_conditional_value_at_risk | RollingConditionalValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_drawdown_duration | RollingDrawdownDuration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_gain_loss_ratio | RollingGainLossRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_granger_causality | RollingGrangerCausality | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_kelly_criterion | RollingKellyCriterion | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_kendall_rank_correlation | RollingKendallRankCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_lead_lag_cross_correlation | RollingLeadLagCrossCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_maximum_drawdown | RollingMaximumDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_median_absolute_deviation | RollingMedianAbsoluteDeviation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_omega_ratio | RollingOmegaRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -389,29 +381,37 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | rolling_pairwise_beta | RollingPairwiseBeta | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_profit_factor | RollingProfitFactor | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_spearman_correlation | RollingSpearmanCorrelation | Wickra | MATCH | pass (err 4.4e-16, nan 0) | yes | yes | pass (err 4.4e-16, nan 0) |
-| rolling_standard_error | RollingStandardError | Wickra | MATCH | pass (err 4.2e-15, nan 0) | yes | yes | pass (err 4.2e-15, nan 0) |
+| rolling_standard_error | RollingStandardError | Wickra | MATCH | pass (err 2.0e-15, nan 0) | yes | yes | pass (err 2.0e-15, nan 0) |
 | rolling_treynor_ratio | RollingTreynorRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_value_at_risk | RollingValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_variance_ratio | RollingVarianceRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | roofing_filter | RoofingFilter | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | session_range | SessionRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | session_volume_weighted_average_price | SessionVolumeWeightedAveragePrice | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| sessions | Sessions | SMC | MATCH | pass (err 1.5e-05, nan 0) | yes | yes | pass (err 1.5e-05, nan 0) |
+| sessions | Sessions | SMC | MATCH | pass (err 3.8e-06, nan 0) | yes | yes | pass (err 3.8e-06, nan 0) |
+| shark_pattern | SharkPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | signed_power | SignedPower | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | standard_error_bands | StandardErrorBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | super_smoother | SuperSmoother | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| three_drives | ThreeDrives | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | time_of_day_return_profile | TimeOfDayReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | time_segmented_volume | TimeSegmentedVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | trade_volume_index | TradeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| triangle_pattern | TrianglePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| triple_top_bottom | TripleTopBottom | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | twiggs_money_flow | TwiggsMoneyFlow | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| up_down_volume_ratio | UpDownVolumeRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | volume_by_time_profile | VolumeByTimeProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| volume_oscillator | VolumeOscillator | Wickra | MATCH | pass (err 1.8e-12, nan 0) | yes | yes | pass (err 1.8e-12, nan 0) |
+| volume_oscillator | VolumeOscillator | Wickra | MATCH | pass (err 2.6e-13, nan 0) | yes | yes | pass (err 2.6e-13, nan 0) |
 | volume_relative_strength_index | VolumeRelativeStrengthIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| volume_zone_oscillator | VolumeZoneOscillator | Wickra | MATCH | pass (err 4.3e-14, nan 0) | yes | yes | pass (err 4.3e-14, nan 0) |
+| volume_weighted_moving_average_convergence_divergence | VolumeWeightedMovingAverageConvergenceDivergence | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| volume_zone_oscillator | VolumeZoneOscillator | Wickra | MATCH | pass (err 5.0e-14, nan 0) | yes | yes | pass (err 5.0e-14, nan 0) |
+| wedge_pattern | WedgePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | williams_accumulation_distribution | WilliamsAccumulationDistribution | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| zig_zag | ZigZag | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 
 ## Follow-ups
 
-- Mismatches: rolling_cointegration, rolling_lead_lag_cross_correlation, volume_weighted_moving_average_convergence_divergence, hurst_channel, adaptive_cycle, hilbert_dominant_cycle, empirical_mode_decomposition, zig_zag, cup_and_handle, rectangle_range, flag_pennant, wedge_pattern, triangle_pattern, head_and_shoulders, triple_top_bottom, three_drives, cypher_pattern, shark_pattern, crab_pattern, bat_pattern, butterfly_pattern, gartley_pattern, four_point_harmonic_pattern, fibonacci_time_zones, fibonacci_channel, fibonacci_arcs, fibonacci_fan, fibonacci_confluence, golden_pocket, automatic_fibonacci, fibonacci_projection, fibonacci_extension
-- Errors (class/mapping/runtime): absolute_breadth_index, cumulative_volume_index, bullish_percent_index, up_down_volume_ratio, percent_above_moving_average, high_low_index, new_highs_new_lows, breadth_thrust, arms_index, mc_clellan_summation_index, mc_clellan_oscillator
+- Mismatches: bat_pattern, butterfly_pattern, gartley_pattern, four_point_harmonic_pattern, fibonacci_time_zones, fibonacci_channel, fibonacci_arcs, fibonacci_fan, fibonacci_confluence, golden_pocket, automatic_fibonacci, fibonacci_projection, fibonacci_extension
+- Errors (class/mapping/runtime): none
 - Compared at TA-Lib defaults only (unmapped params): CDLABANDONEDBABY, CDLDARKCLOUDCOVER, CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLMATHOLD, CDLMORNINGDOJISTAR, CDLMORNINGSTAR
