@@ -22,6 +22,16 @@ from .linear_regression_channel import LinearRegressionChannel
 from .standard_error_bands import StandardErrorBands
 from .double_bollinger_bands import DoubleBollingerBands
 from .projection_bands import ProjectionBands
+from .hurst_channel import HurstChannel
+from .super_smoother import SuperSmoother
+from .inverse_fisher_transform import InverseFisherTransform
+from .decycler import Decycler
+from .decycler_oscillator import DecyclerOscillator
+from .roofing_filter import RoofingFilter
+from .center_of_gravity import CenterOfGravity
+from .instantaneous_trendline import InstantaneousTrendline
+from .adaptive_cycle import AdaptiveCycle
+from .ehlers_stochastic import EhlersStochastic
 from .rolling_average_drawdown import RollingAverageDrawdown
 from .rolling_drawdown_duration import RollingDrawdownDuration
 from .rolling_gain_loss_ratio import RollingGainLossRatio
@@ -558,6 +568,16 @@ __all__ = [
     "StandardErrorBands",
     "DoubleBollingerBands",
     "ProjectionBands",
+    "HurstChannel",
+    "SuperSmoother",
+    "InverseFisherTransform",
+    "Decycler",
+    "DecyclerOscillator",
+    "RoofingFilter",
+    "CenterOfGravity",
+    "InstantaneousTrendline",
+    "AdaptiveCycle",
+    "EhlersStochastic",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

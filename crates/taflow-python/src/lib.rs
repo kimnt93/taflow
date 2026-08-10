@@ -353,6 +353,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::StandardErrorBands>()?;
     m.add_class::<indicators::DoubleBollingerBands>()?;
     m.add_class::<indicators::ProjectionBands>()?;
+    m.add_class::<indicators::HurstChannel>()?;
+    m.add_class::<indicators::SuperSmoother>()?;
+    m.add_class::<indicators::InverseFisherTransform>()?;
+    m.add_class::<indicators::Decycler>()?;
+    m.add_class::<indicators::DecyclerOscillator>()?;
+    m.add_class::<indicators::RoofingFilter>()?;
+    m.add_class::<indicators::CenterOfGravity>()?;
+    m.add_class::<indicators::InstantaneousTrendline>()?;
+    m.add_class::<indicators::AdaptiveCycle>()?;
+    m.add_class::<indicators::EhlersStochastic>()?;
 
     Ok(())
 }

@@ -11,6 +11,8 @@ from .indicators import VolumeWeightedMovingAverageConvergenceDivergence, Better
 from .indicators import TwiggsMoneyFlow, WilliamsAccumulationDistribution, MarketFacilitationIndex, TimeSegmentedVolume
 from .indicators import MovingAverageEnvelope, AverageTrueRangeBands, LinearRegressionChannel, StandardErrorBands
 from .indicators import DoubleBollingerBands, ProjectionBands
+from .indicators import HurstChannel, SuperSmoother, InverseFisherTransform, Decycler, DecyclerOscillator
+from .indicators import RoofingFilter, CenterOfGravity, InstantaneousTrendline, AdaptiveCycle, EhlersStochastic
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -511,6 +513,16 @@ __all__ = [
     "StandardErrorBands",
     "DoubleBollingerBands",
     "ProjectionBands",
+    "HurstChannel",
+    "SuperSmoother",
+    "InverseFisherTransform",
+    "Decycler",
+    "DecyclerOscillator",
+    "RoofingFilter",
+    "CenterOfGravity",
+    "InstantaneousTrendline",
+    "AdaptiveCycle",
+    "EhlersStochastic",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

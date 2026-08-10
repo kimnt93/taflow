@@ -390,6 +390,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | standard_error_bands | standard_error_bands | _ |
 | [ ] | double_bollinger_bands | double_bollinger_bands | _ |
 | [ ] | projection_bands | projection_bands | _ |
+| [ ] | hurst_channel | hurst_channel | _ |
+| [ ] | super_smoother | super_smoother | _ |
+| [ ] | inverse_fisher_transform | inverse_fisher_transform | _ |
+| [ ] | decycler | decycler | _ |
+| [ ] | decycler_oscillator | decycler_oscillator | _ |
+| [ ] | roofing_filter | roofing_filter | _ |
+| [ ] | center_of_gravity | center_of_gravity | _ |
+| [ ] | instantaneous_trendline | instantaneous_trendline | _ |
+| [ ] | adaptive_cycle | adaptive_cycle | _ |
+| [ ] | ehlers_stochastic | ehlers_stochastic | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 335,
+    "indicators": 345,
     "native_functions": 0,
-    "native_state_classes": 334,
+    "native_state_classes": 344,
     "pandas_ta_symbols": 427,
-    "python_exports": 337,
-    "rust_exports": 701,
+    "python_exports": 347,
+    "rust_exports": 721,
     "smc_functions": 8,
-    "structure": 335,
+    "structure": 345,
     "talib_functions": 161
   },
   "rows": [
@@ -3603,6 +3603,156 @@
       "native_binding": true,
       "native_symbols": [
         "ProjectionBands",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "hurst_channel",
+      "name": "HurstChannel",
+      "native_binding": true,
+      "native_symbols": [
+        "HurstChannel",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "super_smoother",
+      "name": "SuperSmoother",
+      "native_binding": true,
+      "native_symbols": [
+        "SuperSmoother",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "inverse_fisher_transform",
+      "name": "InverseFisherTransform",
+      "native_binding": true,
+      "native_symbols": [
+        "InverseFisherTransform",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "decycler",
+      "name": "Decycler",
+      "native_binding": true,
+      "native_symbols": [
+        "Decycler",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "decycler_oscillator",
+      "name": "DecyclerOscillator",
+      "native_binding": true,
+      "native_symbols": [
+        "DecyclerOscillator",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "roofing_filter",
+      "name": "RoofingFilter",
+      "native_binding": true,
+      "native_symbols": [
+        "RoofingFilter",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "center_of_gravity",
+      "name": "CenterOfGravity",
+      "native_binding": true,
+      "native_symbols": [
+        "CenterOfGravity",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "instantaneous_trendline",
+      "name": "InstantaneousTrendline",
+      "native_binding": true,
+      "native_symbols": [
+        "InstantaneousTrendline",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "adaptive_cycle",
+      "name": "AdaptiveCycle",
+      "native_binding": true,
+      "native_symbols": [
+        "AdaptiveCycle",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "ehlers_stochastic",
+      "name": "EhlersStochastic",
+      "native_binding": true,
+      "native_symbols": [
+        "EhlersStochastic",
         "_Native"
       ],
       "pandas_ta_reference": false,

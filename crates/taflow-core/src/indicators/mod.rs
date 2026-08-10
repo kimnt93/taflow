@@ -1397,7 +1397,47 @@ pub use linear_regression_channel::LinearRegressionChannel;
 pub use market_facilitation_index::MarketFacilitationIndex;
 pub use moving_average_envelope::MovingAverageEnvelope;
 pub use projection_bands::ProjectionBands;
+mod adaptive_cycle;
+#[cfg(test)]
+mod adaptive_cycle_test;
+mod center_of_gravity;
+#[cfg(test)]
+mod center_of_gravity_test;
+mod decycler;
+mod decycler_oscillator;
+#[cfg(test)]
+mod decycler_oscillator_test;
+#[cfg(test)]
+mod decycler_test;
+mod ehlers_stochastic;
+#[cfg(test)]
+mod ehlers_stochastic_test;
+mod hurst_channel;
+#[cfg(test)]
+mod hurst_channel_test;
+mod instantaneous_trendline;
+#[cfg(test)]
+mod instantaneous_trendline_test;
+mod inverse_fisher_transform;
+#[cfg(test)]
+mod inverse_fisher_transform_test;
+mod roofing_filter;
+#[cfg(test)]
+mod roofing_filter_test;
+mod super_smoother;
+#[cfg(test)]
+mod super_smoother_test;
+pub use adaptive_cycle::AdaptiveCycle;
+pub use center_of_gravity::CenterOfGravity;
+pub use decycler::Decycler;
+pub use decycler_oscillator::DecyclerOscillator;
+pub use ehlers_stochastic::EhlersStochastic;
+pub use hurst_channel::HurstChannel;
+pub use instantaneous_trendline::InstantaneousTrendline;
+pub use inverse_fisher_transform::InverseFisherTransform;
+pub use roofing_filter::RoofingFilter;
 pub use standard_error_bands::StandardErrorBands;
+pub use super_smoother::SuperSmoother;
 pub use time_segmented_volume::TimeSegmentedVolume;
 pub use twiggs_money_flow::TwiggsMoneyFlow;
 pub use volume_relative_strength_index::VolumeRelativeStrengthIndex;
