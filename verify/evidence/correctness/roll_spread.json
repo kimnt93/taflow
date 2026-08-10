@@ -1,12 +1,24 @@
 {
   "function": "roll_spread",
   "taflow_class": "RollSpread",
-  "oracle": null,
-  "oracle_name": null,
+  "oracle": "NumPy",
+  "oracle_name": "rolling Roll spread estimator",
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 9.631184738623233e-15
+  },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
     "1": true,
     "10": true,
     "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 9.631184738623233e-15
   }
 }

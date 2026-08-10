@@ -1,14 +1,13 @@
 {
   "function": "ichimoku",
   "taflow_class": "Ichimoku",
-  "oracle": "Wickra",
-  "oracle_name": "Ichimoku",
-  "variant": "TAFlow emits raw causal cloud values for caller-side plotting; Wickra emits Senkou and Chikou values displaced by 26 bars.",
+  "oracle": "NumPy",
+  "oracle_name": "causal ichimoku components",
   "batch_vs_oracle": {
-    "passed": false,
-    "nan_mismatches": 75,
+    "passed": true,
+    "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 55.88491713692494
+    "max_abs_error": 0.0
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -17,9 +16,9 @@
     "1000": true
   },
   "continue_vs_oracle": {
-    "passed": false,
-    "nan_mismatches": 75,
+    "passed": true,
+    "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 55.88491713692494
+    "max_abs_error": 0.0
   }
 }

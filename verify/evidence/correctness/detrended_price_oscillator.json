@@ -1,12 +1,24 @@
 {
   "function": "detrended_price_oscillator",
   "taflow_class": "DetrendedPriceOscillator",
-  "oracle": null,
-  "oracle_name": null,
+  "oracle": "pandas-ta-classic",
+  "oracle_name": "dpo",
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 3.694822225952521e-13
+  },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
     "1": true,
     "10": true,
     "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 3.694822225952521e-13
   }
 }

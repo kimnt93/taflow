@@ -1,12 +1,24 @@
 {
   "function": "schaff_trend_cycle",
   "taflow_class": "SchaffTrendCycle",
-  "oracle": null,
-  "oracle_name": null,
+  "oracle": "pandas-ta-classic",
+  "oracle_name": "stc",
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 1.3599999988400668e-06
+  },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
     "1": true,
     "10": true,
     "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 1.3599999988400668e-06
   }
 }

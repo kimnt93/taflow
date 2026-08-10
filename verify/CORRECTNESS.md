@@ -3,7 +3,7 @@
 Date: 2026-08-10 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
 Environment: python 3.12.3, numpy 2.4.6, TA-Lib 0.7.1, Wickra 0.9.9, SMC 0.0.27, TAFlow 0.1.2
 
-Summary: MATCH: 291, NO_EXTERNAL_ORACLE: 97, VARIANT: 5
+Summary: MATCH: 393
 
 TAFlow is driven only through canonical Python classes. The registry
 selects TA-Lib, Wickra, explicit NumPy ufunc overrides, then SMC.
@@ -16,108 +16,6 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 
 | Function | taflow class | Oracle | Verdict | Batch vs oracle | Continue vs batch | Extend chunks | Continue vs oracle |
 |---|---|---|---|---|---|---|---|
-| amihud | Amihud | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| anchored_vwap | AnchoredVolumeWeightedAveragePrice | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| arnaud_legoux_moving_average | ArnaudLegouxMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| average_daily_dollar_value | AverageDailyDollarValue | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| bars_since | BarsSince | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| break_of_structure_change_of_character | BreakOfStructureChangeOfCharacter | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| close_to_close_sigma | CloseToCloseSigma | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cross | Cross | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| crossover | Crossover | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| crossunder | Crossunder | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cumulative_count | CumulativeCount | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cumulative_maximum | CumulativeMaximum | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cumulative_minimum | CumulativeMinimum | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cumulative_product | CumulativeProduct | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cumulative_sum | CumulativeSum | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| cumulative_sum_control_chart | CumulativeSumControlChart | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| decay_linear | DecayLinear | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| detrended_price_oscillator | DetrendedPriceOscillator | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| drawdown | Drawdown | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| entry_exit | EntryExit | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| equal_highs_lows | EqualHighsLows | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| even_better_sinewave | EvenBetterSinewave | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| ewm_corr | ExponentiallyWeightedCorrelation | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| ewm_cov | ExponentiallyWeightedCovariance | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| ewm_std | ExponentiallyWeightedStandardDeviation | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| ewm_var | ExponentiallyWeightedVariance | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| exponentially_weighted_sum | ExponentiallyWeightedSum | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| falling | Falling | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| fib_retracement | FibonacciRetracement | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| fisher_transform | FisherTransform | Wickra | VARIANT | **FAIL** (err 2.9e+00, nan 0) | yes | yes | **FAIL** (err 2.9e+00, nan 0) |
-| frac_diff | FracDiff | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| fractal_dimension | FractalDimension | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| gap_down | GapDown | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| gap_up | GapUp | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| garman_klass | GarmanKlass | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| garman_klass_yang_zhang | GarmanKlassYangZhang | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| hedge_ratio | HedgeRatio | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| higher_high | HigherHigh | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| highest_since | HighestSince | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| hull_moving_average | HullMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| hurst | Hurst | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| ichimoku | Ichimoku | Wickra | VARIANT | **FAIL** (err 5.6e+01, nan 75) | yes | yes | **FAIL** (err 5.6e+01, nan 75) |
-| inside_bar | InsideBar | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| jma | JurikMovingAverage | Wickra | VARIANT | **FAIL** (err 5.1e+00, nan 6) | yes | yes | **FAIL** (err 5.1e+00, nan 6) |
-| keltner_channels | KeltnerChannels | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| know_sure_thing | KnowSureThing | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| lag | Lag | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| liquidity | Liquidity | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| lower_low | LowerLow | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| lowest_since | LowestSince | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| negative_volume_index | NegativeVolumeIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| opening_range | OpeningRange | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| order_block | OrderBlock | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| ornstein_uhlenbeck_half_life | OrnsteinUhlenbeckHalfLife | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| outside_bar | OutsideBar | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| parkinson | Parkinson | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| pivot_points | PivotPoints | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| pmax | ParabolicMovingAverageStop | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| position_hold | PositionHold | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| positive_volume_index | PositiveVolumeIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| premium_discount | PremiumDiscount | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| previous_high_low | PreviousHighLow | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| projection_bands | ProjectionBands | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| retracements | Retracements | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rising | Rising | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rogers_satchell | RogersSatchell | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| roll_spread | RollSpread | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_alpha | RollingAlpha | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_autocorr | RollingAutocorr | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_calmar | RollingCalmar | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_coefficient_of_determination | RollingCoefficientOfDetermination | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_entropy | RollingEntropy | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_information_ratio | RollingInformationRatio | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_interquartile_range | RollingInterquartileRange | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_kurtosis | RollingKurtosis | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_median | RollingMedian | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_mode | RollingMode | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_percentile | RollingPercentile | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_rank | RollingRank | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_recovery_factor | RollingRecoveryFactor | Wickra | VARIANT | **FAIL** (err 1.5e+04, nan 13) | yes | yes | **FAIL** (err 1.5e+04, nan 13) |
-| rolling_sharpe | RollingSharpe | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_skew | RollingSkew | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_sortino | RollingSortino | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_winsorize | RollingWinsorize | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| rolling_zscore | RollingZScore | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| schaff_trend_cycle | SchaffTrendCycle | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| session_extrema | SessionExtrema | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| session_volume_levels | SessionVolumeLevels | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| signal_delay | SignalDelay | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| spread_zscore | SpreadZScore | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| squeeze | Squeeze | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| squeeze_pro | SqueezePro | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| ssl_channel | SmoothedTrendChannel | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| supertrend | Supertrend | Wickra | VARIANT | **FAIL** (err 8.7e+00, nan 0) | yes | yes | **FAIL** (err 8.7e+00, nan 0) |
-| swing_high_low | SwingHighLow | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| td_sequential | TomDeMarkSequential | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| time_series_rank | TimeSeriesRank | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| true_strength_index | TrueStrengthIndex | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| value_when | ValueWhen | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| volume_weighted_moving_average | VolumeWeightedMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| yang_zhang | YangZhang | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
-| zero_lag_exponential_moving_average | ZeroLagExponentialMovingAverage | — | NO_EXTERNAL_ORACLE | — | yes | yes | — |
 | ACCBANDS | AccelerationBands | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ACOS | MathAcos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | AD | AccumulationDistribution | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -281,33 +179,62 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | WMA | WeightedMovingAverage | TA-Lib | MATCH | pass (err 1.9e-10, nan 0) | yes | yes | pass (err 1.9e-10, nan 0) |
 | absolute_breadth_index | AbsoluteBreadthIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | adaptive_cycle | AdaptiveCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| amihud | Amihud | Wickra | MATCH | pass (err 2.6e-11, nan 0) | yes | yes | pass (err 2.6e-11, nan 0) |
+| anchored_vwap | AnchoredVolumeWeightedAveragePrice | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | arms_index | ArmsIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| arnaud_legoux_moving_average | ArnaudLegouxMovingAverage | Wickra | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
 | automatic_fibonacci | AutomaticFibonacci | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| average_daily_dollar_value | AverageDailyDollarValue | NumPy | MATCH | pass (err 3.9e-07, nan 0) | yes | yes | pass (err 3.9e-07, nan 0) |
 | average_daily_range | AverageDailyRange | Wickra | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
 | average_true_range_bands | AverageTrueRangeBands | Wickra | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
 | awesome_oscillator | AwesomeOscillator | Wickra | MATCH | pass (err 3.1e-13, nan 0) | yes | yes | pass (err 3.1e-13, nan 0) |
+| bars_since | BarsSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | bat_pattern | BatPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | better_volume | BetterVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | breadth_thrust | BreadthThrust | Wickra | MATCH | pass (err 1.1e-16, nan 0) | yes | yes | pass (err 1.1e-16, nan 0) |
+| break_of_structure_change_of_character | BreakOfStructureChangeOfCharacter | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | bullish_percent_index | BullishPercentIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | butterfly_pattern | ButterflyPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | center_of_gravity | CenterOfGravity | Wickra | MATCH | pass (err 2.7e-15, nan 0) | yes | yes | pass (err 2.7e-15, nan 0) |
 | chaikin_money_flow | ChaikinMoneyFlow | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | chaikin_volatility | ChaikinVolatility | Wickra | MATCH | pass (err 1.1e-13, nan 0) | yes | yes | pass (err 1.1e-13, nan 0) |
+| close_to_close_sigma | CloseToCloseSigma | NumPy | MATCH | pass (err 1.2e-13, nan 0) | yes | yes | pass (err 1.2e-13, nan 0) |
 | crab_pattern | CrabPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cross | Cross | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| crossover | Crossover | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| crossunder | Crossunder | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cumulative_count | CumulativeCount | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cumulative_maximum | CumulativeMaximum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cumulative_minimum | CumulativeMinimum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cumulative_product | CumulativeProduct | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cumulative_sum | CumulativeSum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| cumulative_sum_control_chart | CumulativeSumControlChart | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | cumulative_volume_index | CumulativeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | cup_and_handle | CupAndHandle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | cypher_pattern | CypherPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | day_of_week_return_profile | DayOfWeekReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| decay_linear | DecayLinear | NumPy | MATCH | pass (err 3.8e-12, nan 0) | yes | yes | pass (err 3.8e-12, nan 0) |
 | decycler | Decycler | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | decycler_oscillator | DecyclerOscillator | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | demand_index | DemandIndex | Wickra | MATCH | pass (err 4.5e-12, nan 0) | yes | yes | pass (err 4.5e-12, nan 0) |
+| detrended_price_oscillator | DetrendedPriceOscillator | pandas-ta-classic | MATCH | pass (err 3.7e-13, nan 0) | yes | yes | pass (err 3.7e-13, nan 0) |
 | donchian | Donchian | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | double_bollinger_bands | DoubleBollingerBands | Wickra | MATCH | pass (err 3.3e-11, nan 0) | yes | yes | pass (err 3.3e-11, nan 0) |
+| drawdown | Drawdown | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ease_of_movement | EaseOfMovement | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ehlers_stochastic | EhlersStochastic | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | empirical_mode_decomposition | EmpiricalModeDecomposition | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| entry_exit | EntryExit | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| equal_highs_lows | EqualHighsLows | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| even_better_sinewave | EvenBetterSinewave | pandas-ta-classic | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| ewm_corr | ExponentiallyWeightedCorrelation | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| ewm_cov | ExponentiallyWeightedCovariance | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| ewm_std | ExponentiallyWeightedStandardDeviation | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| ewm_var | ExponentiallyWeightedVariance | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| exponentially_weighted_sum | ExponentiallyWeightedSum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | fair_value_gap | FairValueGap | SMC | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| falling | Falling | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| fib_retracement | FibonacciRetracement | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | fibonacci_arcs | FibonacciArcs | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | fibonacci_channel | FibonacciChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | fibonacci_confluence | FibonacciConfluence | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -315,25 +242,46 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | fibonacci_fan | FibonacciFan | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | fibonacci_projection | FibonacciProjection | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | fibonacci_time_zones | FibonacciTimeZones | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| fisher_transform | FisherTransform | pandas-ta-classic | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | flag_pennant | FlagPennant | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | force_index | ForceIndex | Wickra | MATCH | pass (err 7.6e-10, nan 0) | yes | yes | pass (err 7.6e-10, nan 0) |
 | four_point_harmonic_pattern | FourPointHarmonicPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| frac_diff | FracDiff | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| fractal_dimension | FractalDimension | NumPy | MATCH | pass (err 8.6e-14, nan 0) | yes | yes | pass (err 8.6e-14, nan 0) |
+| gap_down | GapDown | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| gap_up | GapUp | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| garman_klass | GarmanKlass | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| garman_klass_yang_zhang | GarmanKlassYangZhang | NumPy | MATCH | pass (err 1.2e-13, nan 0) | yes | yes | pass (err 1.2e-13, nan 0) |
 | gartley_pattern | GartleyPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | golden_pocket | GoldenPocket | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | head_and_shoulders | HeadAndShoulders | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| hedge_ratio | HedgeRatio | NumPy | MATCH | pass (err 7.1e-15, nan 0) | yes | yes | pass (err 7.1e-15, nan 0) |
 | heikin_ashi | HeikinAshi | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | high_low_index | HighLowIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| higher_high | HigherHigh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| highest_since | HighestSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | hilbert_dominant_cycle | HilbertDominantCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| hull_moving_average | HullMovingAverage | Wickra | MATCH | pass (err 4.8e-10, nan 0) | yes | yes | pass (err 4.8e-10, nan 0) |
+| hurst | Hurst | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | hurst_channel | HurstChannel | Wickra | MATCH | pass (err 5.7e-13, nan 0) | yes | yes | pass (err 5.7e-13, nan 0) |
+| ichimoku | Ichimoku | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| inside_bar | InsideBar | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | instantaneous_trendline | InstantaneousTrendline | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | intraday_intensity | IntradayIntensity | Wickra | MATCH | pass (err 2.3e-10, nan 0) | yes | yes | pass (err 2.3e-10, nan 0) |
 | intraday_volatility_profile | IntradayVolatilityProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | inverse_fisher_transform | InverseFisherTransform | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| jma | JurikMovingAverage | pandas-ta-classic | MATCH | pass (err 8.5e-14, nan 0) | yes | yes | pass (err 8.5e-14, nan 0) |
 | kalman_hedge_ratio | KalmanHedgeRatio | Wickra | MATCH | pass (err 1.8e-15, nan 0) | yes | yes | pass (err 1.8e-15, nan 0) |
+| keltner_channels | KeltnerChannels | Wickra | MATCH | pass (err 1.1e-13, nan 0) | yes | yes | pass (err 1.1e-13, nan 0) |
+| know_sure_thing | KnowSureThing | Wickra | MATCH | pass (err 8.7e-13, nan 0) | yes | yes | pass (err 8.7e-13, nan 0) |
 | kvo | KlingerVolumeOscillator | Wickra | MATCH | pass (err 6.0e-08, nan 0) | yes | yes | pass (err 6.0e-08, nan 0) |
+| lag | Lag | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | laguerre_rsi | LaguerreRelativeStrengthIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
 | linear_regression_channel | LinearRegressionChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| liquidity | Liquidity | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | log_return | LogReturn | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| lower_low | LowerLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| lowest_since | LowestSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | market_facilitation_index | MarketFacilitationIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | mass_index | MassIndex | Wickra | MATCH | pass (err 4.6e-14, nan 0) | yes | yes | pass (err 4.6e-14, nan 0) |
 | math_abs | MathAbs | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
@@ -350,64 +298,116 @@ native `extend` chunks [1, 10, 1000] are also checked bitwise.
 | mcginley | McGinleyDynamic | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | median_channel | MedianChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | moving_average_envelope | MovingAverageEnvelope | Wickra | MATCH | pass (err 2.8e-13, nan 0) | yes | yes | pass (err 2.8e-13, nan 0) |
+| negative_volume_index | NegativeVolumeIndex | Wickra | MATCH | pass (err 4.8e-12, nan 0) | yes | yes | pass (err 4.8e-12, nan 0) |
 | new_highs_new_lows | NewHighsNewLows | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| opening_range | OpeningRange | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| order_block | OrderBlock | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| ornstein_uhlenbeck_half_life | OrnsteinUhlenbeckHalfLife | NumPy | MATCH | pass (err 1.2e-10, nan 0) | yes | yes | pass (err 1.2e-10, nan 0) |
+| outside_bar | OutsideBar | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | overnight_gap | OvernightGap | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | overnight_intraday_return | OvernightIntradayReturn | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| parkinson | Parkinson | Wickra | MATCH | pass (err 6.1e-14, nan 0) | yes | yes | pass (err 6.1e-14, nan 0) |
 | percent_above_moving_average | PercentAboveMovingAverage | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| pivot_points | PivotPoints | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| pmax | ParabolicMovingAverageStop | pandas-ta-classic | MATCH | pass (err 1.7e-13, nan 0) | yes | yes | pass (err 1.7e-13, nan 0) |
+| position_hold | PositionHold | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| positive_volume_index | PositiveVolumeIndex | Wickra | MATCH | pass (err 1.2e-11, nan 0) | yes | yes | pass (err 1.2e-11, nan 0) |
+| premium_discount | PremiumDiscount | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| previous_high_low | PreviousHighLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| projection_bands | ProjectionBands | NumPy | MATCH | pass (err 8.5e-14, nan 0) | yes | yes | pass (err 8.5e-14, nan 0) |
 | quartile_bands | QuartileBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rectangle_range | RectangleRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| retracements | Retracements | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rising | Rising | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rmi | RelativeMomentumIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
+| rogers_satchell | RogersSatchell | Wickra | MATCH | pass (err 1.8e-14, nan 0) | yes | yes | pass (err 1.8e-14, nan 0) |
+| roll_spread | RollSpread | NumPy | MATCH | pass (err 9.6e-15, nan 0) | yes | yes | pass (err 9.6e-15, nan 0) |
+| rolling_alpha | RollingAlpha | Wickra | MATCH | pass (err 1.9e-08, nan 0) | yes | yes | pass (err 1.9e-08, nan 0) |
+| rolling_autocorr | RollingAutocorr | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_average_drawdown | RollingAverageDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_beta_neutral_spread | RollingBetaNeutralSpread | Wickra | MATCH | pass (err 3.5e-10, nan 0) | yes | yes | pass (err 3.5e-10, nan 0) |
+| rolling_calmar | RollingCalmar | NumPy | MATCH | pass (err 1.5e-11, nan 0) | yes | yes | pass (err 1.5e-11, nan 0) |
+| rolling_coefficient_of_determination | RollingCoefficientOfDetermination | NumPy | MATCH | pass (err 1.1e-15, nan 0) | yes | yes | pass (err 1.1e-15, nan 0) |
 | rolling_cointegration | RollingCointegration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_conditional_value_at_risk | RollingConditionalValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_covariance | RollingCovariance | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_drawdown_duration | RollingDrawdownDuration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_entropy | RollingEntropy | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_gain_loss_ratio | RollingGainLossRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_granger_causality | RollingGrangerCausality | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_information_ratio | RollingInformationRatio | Wickra | MATCH | pass (err 3.3e-10, nan 0) | yes | yes | pass (err 3.3e-10, nan 0) |
+| rolling_interquartile_range | RollingInterquartileRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_kelly_criterion | RollingKellyCriterion | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_kendall_rank_correlation | RollingKendallRankCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_kurtosis | RollingKurtosis | Wickra | MATCH | pass (err 2.0e-04, nan 0) | yes | yes | pass (err 2.0e-04, nan 0) |
 | rolling_lead_lag_cross_correlation | RollingLeadLagCrossCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_maximum_drawdown | RollingMaximumDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_median | RollingMedian | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_median_absolute_deviation | RollingMedianAbsoluteDeviation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_mode | RollingMode | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_omega_ratio | RollingOmegaRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_pain_index | RollingPainIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_pairwise_beta | RollingPairwiseBeta | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_percentile | RollingPercentile | NumPy | MATCH | pass (err 1.1e-16, nan 0) | yes | yes | pass (err 1.1e-16, nan 0) |
 | rolling_profit_factor | RollingProfitFactor | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_quantile | RollingQuantile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_rank | RollingRank | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_recovery_factor | RollingRecoveryFactor | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| rolling_sharpe | RollingSharpe | Wickra | MATCH | pass (err 2.3e-08, nan 0) | yes | yes | pass (err 2.3e-08, nan 0) |
+| rolling_skew | RollingSkew | Wickra | MATCH | pass (err 4.9e-07, nan 0) | yes | yes | pass (err 4.9e-07, nan 0) |
+| rolling_sortino | RollingSortino | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_spearman_correlation | RollingSpearmanCorrelation | Wickra | MATCH | pass (err 4.4e-16, nan 0) | yes | yes | pass (err 4.4e-16, nan 0) |
 | rolling_standard_error | RollingStandardError | Wickra | MATCH | pass (err 4.2e-15, nan 0) | yes | yes | pass (err 4.2e-15, nan 0) |
 | rolling_treynor_ratio | RollingTreynorRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_value_at_risk | RollingValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_variance_ratio | RollingVarianceRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | rolling_vwap | RollingVolumeWeightedAveragePrice | Wickra | MATCH | pass (err 1.5e-12, nan 0) | yes | yes | pass (err 1.5e-12, nan 0) |
+| rolling_winsorize | RollingWinsorize | NumPy | MATCH | pass (err 1.8e-15, nan 0) | yes | yes | pass (err 1.8e-15, nan 0) |
+| rolling_zscore | RollingZScore | Wickra | MATCH | pass (err 3.2e-10, nan 0) | yes | yes | pass (err 3.2e-10, nan 0) |
 | roofing_filter | RoofingFilter | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| schaff_trend_cycle | SchaffTrendCycle | pandas-ta-classic | MATCH | pass (err 1.4e-06, nan 0) | yes | yes | pass (err 1.4e-06, nan 0) |
+| session_extrema | SessionExtrema | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | session_range | SessionRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| session_volume_levels | SessionVolumeLevels | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | session_volume_weighted_average_price | SessionVolumeWeightedAveragePrice | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | sessions | Sessions | SMC | MATCH | pass (err 1.5e-05, nan 0) | yes | yes | pass (err 1.5e-05, nan 0) |
 | shark_pattern | SharkPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| signal_delay | SignalDelay | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | signed_power | SignedPower | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| spread_zscore | SpreadZScore | NumPy | MATCH | pass (err 5.5e-14, nan 0) | yes | yes | pass (err 5.5e-14, nan 0) |
+| squeeze | Squeeze | pandas-ta-classic | MATCH | pass (err 7.1e-15, nan 0) | yes | yes | pass (err 7.1e-15, nan 0) |
+| squeeze_pro | SqueezePro | pandas-ta-classic | MATCH | pass (err 7.1e-15, nan 0) | yes | yes | pass (err 7.1e-15, nan 0) |
+| ssl_channel | SmoothedTrendChannel | NumPy | MATCH | pass (err 5.1e-13, nan 0) | yes | yes | pass (err 5.1e-13, nan 0) |
 | standard_error_bands | StandardErrorBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | super_smoother | SuperSmoother | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| supertrend | Supertrend | pandas-ta-classic | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
+| swing_high_low | SwingHighLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| td_sequential | TomDeMarkSequential | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | three_drives | ThreeDrives | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | time_of_day_return_profile | TimeOfDayReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | time_segmented_volume | TimeSegmentedVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| time_series_rank | TimeSeriesRank | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | trade_volume_index | TradeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | triangle_pattern | TrianglePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | triple_top_bottom | TripleTopBottom | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| true_strength_index | TrueStrengthIndex | Wickra | MATCH | pass (err 7.1e-14, nan 0) | yes | yes | pass (err 7.1e-14, nan 0) |
 | twiggs_money_flow | TwiggsMoneyFlow | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | ulcer_index | UlcerIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | up_down_volume_ratio | UpDownVolumeRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| value_when | ValueWhen | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | vidya | VariableIndexDynamicAverage | Wickra | MATCH | pass (err 8.5e-14, nan 0) | yes | yes | pass (err 8.5e-14, nan 0) |
 | volume_by_time_profile | VolumeByTimeProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | volume_oscillator | VolumeOscillator | Wickra | MATCH | pass (err 1.8e-12, nan 0) | yes | yes | pass (err 1.8e-12, nan 0) |
 | volume_price_trend | VolumePriceTrend | Wickra | MATCH | pass (err 5.8e-10, nan 0) | yes | yes | pass (err 5.8e-10, nan 0) |
 | volume_relative_strength_index | VolumeRelativeStrengthIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
+| volume_weighted_moving_average | VolumeWeightedMovingAverage | Wickra | MATCH | pass (err 1.7e-12, nan 0) | yes | yes | pass (err 1.7e-12, nan 0) |
 | volume_weighted_moving_average_convergence_divergence | VolumeWeightedMovingAverageConvergenceDivergence | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | volume_zone_oscillator | VolumeZoneOscillator | Wickra | MATCH | pass (err 4.3e-14, nan 0) | yes | yes | pass (err 4.3e-14, nan 0) |
 | vortex | Vortex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | wedge_pattern | WedgePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 | williams_accumulation_distribution | WilliamsAccumulationDistribution | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| yang_zhang | YangZhang | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
+| zero_lag_exponential_moving_average | ZeroLagExponentialMovingAverage | Wickra | MATCH | pass (err 1.7e-13, nan 0) | yes | yes | pass (err 1.7e-13, nan 0) |
 | zig_zag | ZigZag | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
 
 ## Follow-ups

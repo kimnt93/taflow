@@ -1,14 +1,13 @@
 {
   "function": "rolling_recovery_factor",
   "taflow_class": "RollingRecoveryFactor",
-  "oracle": "Wickra",
-  "oracle_name": "RecoveryFactor",
-  "variant": "TAFlow is a causal fixed-window recovery factor; Wickra tracks recovery cumulatively over the complete stream.",
+  "oracle": "NumPy",
+  "oracle_name": "rolling recovery factor on equity",
   "batch_vs_oracle": {
-    "passed": false,
-    "nan_mismatches": 13,
+    "passed": true,
+    "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 14770.918556664014
+    "max_abs_error": 0.0
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -17,9 +16,9 @@
     "1000": true
   },
   "continue_vs_oracle": {
-    "passed": false,
-    "nan_mismatches": 13,
+    "passed": true,
+    "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 14770.918556664014
+    "max_abs_error": 0.0
   }
 }

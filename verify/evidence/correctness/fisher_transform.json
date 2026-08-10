@@ -1,14 +1,13 @@
 {
   "function": "fisher_transform",
   "taflow_class": "FisherTransform",
-  "oracle": "Wickra",
-  "oracle_name": "FisherTransform",
-  "variant": "TAFlow implements the classic high/low Fisher Transform with recursive Fisher smoothing; Wickra accepts one price series and uses a different normalization recurrence.",
+  "oracle": "pandas-ta-classic",
+  "oracle_name": "fisher",
   "batch_vs_oracle": {
-    "passed": false,
+    "passed": true,
     "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 2.913216522011509
+    "max_abs_error": 0.0
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -17,9 +16,9 @@
     "1000": true
   },
   "continue_vs_oracle": {
-    "passed": false,
+    "passed": true,
     "nan_mismatches": 0,
     "infinity_mismatches": 0,
-    "max_abs_error": 2.913216522011509
+    "max_abs_error": 0.0
   }
 }
