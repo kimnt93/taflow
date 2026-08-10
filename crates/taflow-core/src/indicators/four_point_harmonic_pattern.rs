@@ -1,65 +1,26 @@
 use crate::error::TaResult;
-use std::collections::VecDeque;
+use super::pattern_swing::{approximately_equal, ratios_in, SwingTracker, SWING_THRESHOLD};
 
+/// Four-point AB=CD harmonic completion signal.
 #[derive(Debug, Clone)]
-pub struct FourPointHarmonicPattern {
-    rows: VecDeque<[f64; 4]>,
-    count: usize,
-    value: Option<f64>,
-}
-
+pub struct FourPointHarmonicPattern { swing: SwingTracker, count: usize, value: Option<f64> }
 impl FourPointHarmonicPattern {
-    pub fn new() -> TaResult<Self> {
-        Ok(Self {
-            rows: VecDeque::with_capacity(5),
-            count: 0,
-            value: None,
-        })
-    }
-
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.count += 1;
-        if self.rows.len() == 5 {
-            self.rows.pop_front();
-        }
-        self.rows.push_back([open, high, low, close]);
-        self.value = (self.rows.len() == 5).then(|| Self::signal(&self.rows));
+    /// Create a detector retaining four confirmed pivots.
+    pub fn new()->TaResult<Self>{Ok(Self{swing:SwingTracker::new(SWING_THRESHOLD,4),count:0,value:None})}
+    /// Append one OHLC bar and return the latest harmonic signal.
+    pub fn append(&mut self,_open:f64,high:f64,low:f64,_close:f64)->Option<f64>{
+        self.count+=1;self.value=Some(0.0);
+        if !self.swing.append(high,low)||self.swing.pivots().len()<4{return self.value;}
+        let p=self.swing.pivots();let n=p.len();let ab=(p[n-3].price-p[n-4].price).abs();let bc=(p[n-2].price-p[n-3].price).abs();let cd=(p[n-1].price-p[n-2].price).abs();
+        if ratios_in(&[(bc/ab,.382,.886),(cd/bc,1.13,2.618)])&&approximately_equal(ab,cd,.10){self.value=Some(if p[n-1].direction<0.0{1.0}else{-1.0});}
         self.value
     }
-
-    fn signal(rows: &VecDeque<[f64; 4]>) -> f64 {
-        let a = rows[1][3] - rows[0][3];
-        let b = rows[2][3] - rows[1][3];
-        let c = rows[3][3] - rows[2][3];
-        let d = rows[4][3] - rows[3][3];
-        if a == 0.0 || b == 0.0 || c == 0.0 {
-            return 0.0;
-        }
-        let alternating =
-            a.signum() != b.signum() && b.signum() != c.signum() && c.signum() != d.signum();
-        let reciprocal = (b.abs() / a.abs() - d.abs() / c.abs()).abs() <= 0.15;
-        if alternating && reciprocal {
-            -d.signum()
-        } else {
-            0.0
-        }
-    }
-
-    pub fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    pub fn len(&self) -> usize {
-        self.count
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.count == 0
-    }
-
-    pub fn reset(&mut self) {
-        self.rows.clear();
-        self.count = 0;
-        self.value = None;
-    }
+    /// Return the latest signal.
+    pub fn value(&self)->Option<f64>{self.value}
+    /// Return the processed-bar count.
+    pub fn len(&self)->usize{self.count}
+    /// Return whether no bars were processed.
+    pub fn is_empty(&self)->bool{self.count==0}
+    /// Clear pivots and output.
+    pub fn reset(&mut self){self.swing.reset();self.count=0;self.value=None;}
 }
