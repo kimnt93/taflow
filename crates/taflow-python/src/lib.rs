@@ -363,6 +363,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::InstantaneousTrendline>()?;
     m.add_class::<indicators::AdaptiveCycle>()?;
     m.add_class::<indicators::EhlersStochastic>()?;
+    m.add_class::<indicators::HilbertDominantCycle>()?;
+    m.add_class::<indicators::EmpiricalModeDecomposition>()?;
+    m.add_class::<indicators::ZigZag>()?;
+    m.add_class::<indicators::SessionVolumeWeightedAveragePrice>()?;
+    m.add_class::<indicators::SessionRange>()?;
+    m.add_class::<indicators::OvernightGap>()?;
+    m.add_class::<indicators::OvernightIntradayReturn>()?;
+    m.add_class::<indicators::AverageDailyRange>()?;
+    m.add_class::<indicators::TimeOfDayReturnProfile>()?;
+    m.add_class::<indicators::DayOfWeekReturnProfile>()?;
 
     Ok(())
 }

@@ -13,6 +13,9 @@ from .indicators import MovingAverageEnvelope, AverageTrueRangeBands, LinearRegr
 from .indicators import DoubleBollingerBands, ProjectionBands
 from .indicators import HurstChannel, SuperSmoother, InverseFisherTransform, Decycler, DecyclerOscillator
 from .indicators import RoofingFilter, CenterOfGravity, InstantaneousTrendline, AdaptiveCycle, EhlersStochastic
+from .indicators import HilbertDominantCycle, EmpiricalModeDecomposition, ZigZag
+from .indicators import SessionVolumeWeightedAveragePrice, SessionRange, OvernightGap, OvernightIntradayReturn
+from .indicators import AverageDailyRange, TimeOfDayReturnProfile, DayOfWeekReturnProfile
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -523,6 +526,16 @@ __all__ = [
     "InstantaneousTrendline",
     "AdaptiveCycle",
     "EhlersStochastic",
+    "HilbertDominantCycle",
+    "EmpiricalModeDecomposition",
+    "ZigZag",
+    "SessionVolumeWeightedAveragePrice",
+    "SessionRange",
+    "OvernightGap",
+    "OvernightIntradayReturn",
+    "AverageDailyRange",
+    "TimeOfDayReturnProfile",
+    "DayOfWeekReturnProfile",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

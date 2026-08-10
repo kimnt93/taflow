@@ -32,6 +32,16 @@ from .center_of_gravity import CenterOfGravity
 from .instantaneous_trendline import InstantaneousTrendline
 from .adaptive_cycle import AdaptiveCycle
 from .ehlers_stochastic import EhlersStochastic
+from .hilbert_dominant_cycle import HilbertDominantCycle
+from .empirical_mode_decomposition import EmpiricalModeDecomposition
+from .zig_zag import ZigZag
+from .session_volume_weighted_average_price import SessionVolumeWeightedAveragePrice
+from .session_range import SessionRange
+from .overnight_gap import OvernightGap
+from .overnight_intraday_return import OvernightIntradayReturn
+from .average_daily_range import AverageDailyRange
+from .time_of_day_return_profile import TimeOfDayReturnProfile
+from .day_of_week_return_profile import DayOfWeekReturnProfile
 from .rolling_average_drawdown import RollingAverageDrawdown
 from .rolling_drawdown_duration import RollingDrawdownDuration
 from .rolling_gain_loss_ratio import RollingGainLossRatio
@@ -578,6 +588,16 @@ __all__ = [
     "InstantaneousTrendline",
     "AdaptiveCycle",
     "EhlersStochastic",
+    "HilbertDominantCycle",
+    "EmpiricalModeDecomposition",
+    "ZigZag",
+    "SessionVolumeWeightedAveragePrice",
+    "SessionRange",
+    "OvernightGap",
+    "OvernightIntradayReturn",
+    "AverageDailyRange",
+    "TimeOfDayReturnProfile",
+    "DayOfWeekReturnProfile",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

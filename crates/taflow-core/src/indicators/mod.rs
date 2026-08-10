@@ -1443,3 +1443,43 @@ pub use twiggs_money_flow::TwiggsMoneyFlow;
 pub use volume_relative_strength_index::VolumeRelativeStrengthIndex;
 pub use volume_weighted_moving_average_convergence_divergence::VolumeWeightedMovingAverageConvergenceDivergence;
 pub use williams_accumulation_distribution::WilliamsAccumulationDistribution;
+mod average_daily_range;
+#[cfg(test)]
+mod average_daily_range_test;
+mod day_of_week_return_profile;
+#[cfg(test)]
+mod day_of_week_return_profile_test;
+mod empirical_mode_decomposition;
+#[cfg(test)]
+mod empirical_mode_decomposition_test;
+mod hilbert_dominant_cycle;
+#[cfg(test)]
+mod hilbert_dominant_cycle_test;
+mod overnight_gap;
+#[cfg(test)]
+mod overnight_gap_test;
+mod overnight_intraday_return;
+#[cfg(test)]
+mod overnight_intraday_return_test;
+mod session_range;
+#[cfg(test)]
+mod session_range_test;
+mod session_volume_weighted_average_price;
+#[cfg(test)]
+mod session_volume_weighted_average_price_test;
+mod time_of_day_return_profile;
+#[cfg(test)]
+mod time_of_day_return_profile_test;
+mod zig_zag;
+#[cfg(test)]
+mod zig_zag_test;
+pub use average_daily_range::AverageDailyRange;
+pub use day_of_week_return_profile::DayOfWeekReturnProfile;
+pub use empirical_mode_decomposition::EmpiricalModeDecomposition;
+pub use hilbert_dominant_cycle::HilbertDominantCycle;
+pub use overnight_gap::OvernightGap;
+pub use overnight_intraday_return::{OvernightIntradayReturn, OvernightIntradayReturnValue};
+pub use session_range::SessionRange;
+pub use session_volume_weighted_average_price::SessionVolumeWeightedAveragePrice;
+pub use time_of_day_return_profile::TimeOfDayReturnProfile;
+pub use zig_zag::{ZigZag, ZigZagValue};

@@ -400,6 +400,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | instantaneous_trendline | instantaneous_trendline | _ |
 | [ ] | adaptive_cycle | adaptive_cycle | _ |
 | [ ] | ehlers_stochastic | ehlers_stochastic | _ |
+| [ ] | hilbert_dominant_cycle | hilbert_dominant_cycle | _ |
+| [ ] | empirical_mode_decomposition | empirical_mode_decomposition | _ |
+| [ ] | zig_zag | zig_zag | _ |
+| [ ] | session_volume_weighted_average_price | session_volume_weighted_average_price | _ |
+| [ ] | session_range | session_range | _ |
+| [ ] | overnight_gap | overnight_gap | _ |
+| [ ] | overnight_intraday_return | overnight_intraday_return | _ |
+| [ ] | average_daily_range | average_daily_range | _ |
+| [ ] | time_of_day_return_profile | time_of_day_return_profile | _ |
+| [ ] | day_of_week_return_profile | day_of_week_return_profile | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

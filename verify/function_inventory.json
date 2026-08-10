@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 345,
+    "indicators": 355,
     "native_functions": 0,
-    "native_state_classes": 344,
+    "native_state_classes": 354,
     "pandas_ta_symbols": 427,
-    "python_exports": 347,
-    "rust_exports": 721,
+    "python_exports": 357,
+    "rust_exports": 743,
     "smc_functions": 8,
-    "structure": 345,
+    "structure": 355,
     "talib_functions": 161
   },
   "rows": [
@@ -3753,6 +3753,156 @@
       "native_binding": true,
       "native_symbols": [
         "EhlersStochastic",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "hilbert_dominant_cycle",
+      "name": "HilbertDominantCycle",
+      "native_binding": true,
+      "native_symbols": [
+        "HilbertDominantCycle",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "empirical_mode_decomposition",
+      "name": "EmpiricalModeDecomposition",
+      "native_binding": true,
+      "native_symbols": [
+        "EmpiricalModeDecomposition",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "zig_zag",
+      "name": "ZigZag",
+      "native_binding": true,
+      "native_symbols": [
+        "ZigZag",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "session_volume_weighted_average_price",
+      "name": "SessionVolumeWeightedAveragePrice",
+      "native_binding": true,
+      "native_symbols": [
+        "SessionVolumeWeightedAveragePrice",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "session_range",
+      "name": "SessionRange",
+      "native_binding": true,
+      "native_symbols": [
+        "SessionRange",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "overnight_gap",
+      "name": "OvernightGap",
+      "native_binding": true,
+      "native_symbols": [
+        "OvernightGap",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "overnight_intraday_return",
+      "name": "OvernightIntradayReturn",
+      "native_binding": true,
+      "native_symbols": [
+        "OvernightIntradayReturn",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "average_daily_range",
+      "name": "AverageDailyRange",
+      "native_binding": true,
+      "native_symbols": [
+        "AverageDailyRange",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "time_of_day_return_profile",
+      "name": "TimeOfDayReturnProfile",
+      "native_binding": true,
+      "native_symbols": [
+        "TimeOfDayReturnProfile",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "day_of_week_return_profile",
+      "name": "DayOfWeekReturnProfile",
+      "native_binding": true,
+      "native_symbols": [
+        "DayOfWeekReturnProfile",
         "_Native"
       ],
       "pandas_ta_reference": false,
