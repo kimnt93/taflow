@@ -53,11 +53,12 @@ as `VARIANT` during oracle verification.
 
 ## Implementation checklist
 
-Implementation progress: the first twenty unchecked high-priority/medium-
-priority entries below have canonical Rust states, separate Rust tests, PyO3
-bindings, Python adapters, exports, and lifecycle tests. Their external correctness and
-performance gates remain pending by request; the roadmap checkboxes therefore
-stay unchecked until those gates are run.
+Implementation progress: the first eleven high-priority entries after maximum
+drawdown have now been structurally audited. Ten match Wickra 0.9.9 through
+the public Python class API; `RollingRecoveryFactor` is a documented fixed-
+window variant of Wickra's cumulative tracker. Focused performance gates and
+the remaining roadmap audits are still pending, so their checkboxes remain
+unchecked.
 
 Every row remains unchecked until it has a canonical Rust state, native Python
 adapter, one aligned output per input bar, scalar continuation, reset/chunk

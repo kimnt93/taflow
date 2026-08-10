@@ -1,7 +1,7 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::indicators::{DemandIndex as State, DemandIndexValue};
+use taflow::indicators::DemandIndex as State;
 #[pyclass]
 pub struct DemandIndex {
     inner: State,
@@ -10,17 +10,17 @@ pub struct DemandIndex {
 #[pymethods]
 impl DemandIndex {
     #[new]
-    fn new() -> PyResult<Self> {
+    #[pyo3(signature=(timeperiod=10))]
+    fn new(timeperiod: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new().map_err(|e| PyValueError::new_err(e.to_string()))?,
+            inner: State::new(timeperiod).map_err(|e| PyValueError::new_err(e.to_string()))?,
             output: Vec::new(),
         })
     }
     fn append(&mut self, high: f64, low: f64, close: f64, volume: f64) -> Option<f64> {
         let v = self.inner.append(high, low, close, volume);
-        self.output
-            .push(v.map(|x: DemandIndexValue| x.demand).unwrap_or(f64::NAN));
-        v.map(|x| x.demand)
+        self.output.push(v.unwrap_or(f64::NAN));
+        v
     }
     fn extend(
         &mut self,
@@ -53,7 +53,7 @@ impl DemandIndex {
     }
     #[getter]
     fn value(&self) -> Option<f64> {
-        self.inner.value().map(|x| x.demand)
+        self.inner.value()
     }
     fn reset(&mut self) {
         self.inner.reset();

@@ -1,27 +1,79 @@
-"""Native-backed rolling Treynor ratio adapter."""
+"""Public adapter for the native rolling Treynor ratio state."""
+
 from typing import Any
+
 import numpy as np
+
 from .._native import RollingTreynorRatio as _Native
 from .._series import as_float64_series
 
-class RollingTreynorRatio:
-    """Rolling mean return divided by covariance-based benchmark beta.
 
-    Required aligned inputs are ``values`` and ``benchmark`` in that order;
-    ``timeperiod`` defaults to 14. Native Rust owns validation, warm-up, and
-    arithmetic; lifecycle mutators return ``self`` and ``compute`` returns one
-    float64 array. Oracle mapping: Wickra ``TreynorRatio``.
+class RollingTreynorRatio:
+    """Measure rolling mean asset return relative to benchmark beta.
+
+    Rust derives beta from population covariance and benchmark variance, then
+    divides mean asset return by that beta. Output remains ``NaN`` until the
+    window is full. This maps to Wickra ``TreynorRatio`` 0.9.9 with its default
+    zero risk-free rate; TA-Lib has no direct equivalent.
+
+    Args:
+        values: Initial chronological asset-return series.
+        benchmark: Initial benchmark-return series aligned with ``values``.
+        timeperiod: Rolling window length. Defaults to 14.
+
+    Raises:
+        ValueError: If the inputs are misaligned or the period is zero.
     """
-    def __init__(self, values: Any, benchmark: Any, timeperiod: int = 14) -> None:
-        self._state = _Native(int(timeperiod)); self.extend(values, benchmark)
-    def append(self, values: float, benchmark: float) -> "RollingTreynorRatio": self._state.append(float(values), float(benchmark)); return self
+
+    def __init__(
+        self,
+        values: Any,
+        benchmark: Any,
+        timeperiod: int = 14,
+    ) -> None:
+        """Initialize the ratio and process aligned return histories."""
+        self._state = _Native(int(timeperiod))
+        self.extend(values, benchmark)
+
+    def append(
+        self,
+        value: float,
+        benchmark: float,
+    ) -> "RollingTreynorRatio":
+        """Append one asset/benchmark return pair and return this instance."""
+        self._state.append(float(value), float(benchmark))
+        return self
+
     def extend(self, values: Any, benchmark: Any) -> "RollingTreynorRatio":
-        arrays = (as_float64_series(values), as_float64_series(benchmark))
-        if len(arrays[0]) != len(arrays[1]): raise ValueError("values and benchmark must have equal lengths")
-        self._state.extend(*arrays); return self
-    def compute(self) -> np.ndarray: return self._state.compute()
+        """Append aligned asset and benchmark return series.
+
+        Raises:
+            ValueError: If the two series have different lengths.
+        """
+        value_series = as_float64_series(values)
+        benchmark_series = as_float64_series(benchmark)
+        if len(value_series) != len(benchmark_series):
+            raise ValueError("values and benchmark must have equal lengths")
+        self._state.extend(value_series, benchmark_series)
+        return self
+
     @property
-    def value(self) -> float | None: return self._state.value
-    def reset(self) -> "RollingTreynorRatio": self._state.reset(); return self
-    def __len__(self) -> int: return len(self._state)
+    def value(self) -> float | None:
+        """Return the latest ratio, or ``None`` during warm-up."""
+        return self._state.value
+
+    def compute(self) -> np.ndarray:
+        """Return aligned ratio values, including warm-up ``NaN``."""
+        return self._state.compute()
+
+    def reset(self) -> "RollingTreynorRatio":
+        """Restore fresh-state behavior and return this instance."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the number of aligned pairs processed by Rust."""
+        return len(self._state)
+
+
 __all__ = ["RollingTreynorRatio"]

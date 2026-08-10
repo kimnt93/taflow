@@ -237,13 +237,13 @@ separate same-named Rust and Python tests exist, an independent source reports
 | [ ] | `RollingSharpe` | `rolling_sharpe` | yes | yes | yes | yes | MATCH | TODO |
 | [ ] | `RollingSortino` | `rolling_sortino` | yes | yes | yes | yes | MATCH | TODO |
 | [ ] | `RollingCalmar` | `rolling_calmar` | yes | yes | yes | yes | MATCH | TODO |
-| [ ] | `RollingOmegaRatio` | `rolling_omega_ratio` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `RollingValueAtRisk` | `rolling_value_at_risk` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `RollingConditionalValueAtRisk` | `rolling_conditional_value_at_risk` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `RollingProfitFactor` | `rolling_profit_factor` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `RollingKellyCriterion` | `rolling_kelly_criterion` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `RollingRecoveryFactor` | `rolling_recovery_factor` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `VolumeRelativeStrengthIndex` | `volume_relative_strength_index` | yes | yes | yes | yes | MISSING | TODO |
+| [ ] | `RollingOmegaRatio` | `rolling_omega_ratio` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `RollingValueAtRisk` | `rolling_value_at_risk` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `RollingConditionalValueAtRisk` | `rolling_conditional_value_at_risk` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `RollingProfitFactor` | `rolling_profit_factor` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `RollingKellyCriterion` | `rolling_kelly_criterion` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `RollingRecoveryFactor` | `rolling_recovery_factor` | yes | yes | yes | yes | VARIANT (fixed-window vs cumulative Wickra 0.9.9) | TODO |
+| [ ] | `VolumeRelativeStrengthIndex` | `volume_relative_strength_index` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
 | [ ] | `RollingLeadLagCrossCorrelation` | `rolling_lead_lag_cross_correlation` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `RollingPairwiseBeta` | `rolling_pairwise_beta` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `RollingBetaNeutralSpread` | `rolling_beta_neutral_spread` | yes | yes | yes | yes | MISSING | TODO |
@@ -332,10 +332,10 @@ separate same-named Rust and Python tests exist, an independent source reports
 | [ ] | `RollingKendallRankCorrelation` | `rolling_kendall_rank_correlation` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `RollingCointegration` | `rolling_cointegration` | yes | yes | yes | yes | MISSING | TODO |
 | [ ] | `RollingGrangerCausality` | `rolling_granger_causality` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `RollingTreynorRatio` | `rolling_treynor_ratio` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `VolumeOscillator` | `volume_oscillator` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `VolumeZoneOscillator` | `volume_zone_oscillator` | yes | yes | yes | yes | MISSING | TODO |
-| [ ] | `DemandIndex` | `demand_index` | yes | yes | yes | yes | MISSING | TODO |
+| [ ] | `RollingTreynorRatio` | `rolling_treynor_ratio` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `VolumeOscillator` | `volume_oscillator` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `VolumeZoneOscillator` | `volume_zone_oscillator` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
+| [ ] | `DemandIndex` | `demand_index` | yes | yes | yes | yes | MATCH (Wickra 0.9.9) | TODO |
 | [x] | `RollingMaximumDrawdown` | `rolling_maximum_drawdown` | yes | yes | yes | yes | MATCH | yes |
 | [ ] | `HullMovingAverage` | `hull_moving_average` | yes | yes | yes | yes | MATCH | TODO |
 | [ ] | `VolumeWeightedMovingAverage` | `volume_weighted_moving_average` | yes | yes | yes | yes | MATCH | TODO |

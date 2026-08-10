@@ -2,18 +2,21 @@ use crate::error::TaResult;
 use crate::indicators::rolling_statistic_helpers::RollingValues;
 use crate::stream::StreamingIndicator;
 
+/// Rolling net equity change divided by maximum fractional drawdown.
 #[derive(Debug, Clone)]
 pub struct RollingRecoveryFactor {
     values: RollingValues,
     value: Option<f64>,
 }
 impl RollingRecoveryFactor {
+    /// Creates the rolling variant with a positive period.
     pub fn new(timeperiod: usize) -> TaResult<Self> {
         Ok(Self {
             values: RollingValues::new(timeperiod)?,
             value: None,
         })
     }
+    /// Appends one equity value and returns the latest warm recovery factor.
     pub fn append(&mut self, input: f64) -> Option<f64> {
         self.values.push(input);
         self.value = self.values.is_full().then(|| {
@@ -35,9 +38,11 @@ impl RollingRecoveryFactor {
         });
         self.value
     }
+    /// Returns the latest factor, or `None` during warm-up.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+    /// Clears the rolling equity window and latest factor.
     pub fn reset(&mut self) {
         self.values.clear();
         self.value = None;

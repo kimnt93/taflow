@@ -1,26 +1,73 @@
-"""Native-backed Volume Zone Oscillator adapter."""
+"""Public adapter for the native Volume Zone Oscillator state."""
+
 from typing import Any
+
 import numpy as np
+
 from .._native import VolumeZoneOscillator as _Native
 from .._series import as_float64_series
 
-class VolumeZoneOscillator:
-    """Causal signed-volume percentage oscillator from close and volume.
 
-    Required aligned inputs are ``close`` and ``volume`` in that order;
-    ``timeperiod`` defaults to 14. Rust owns state and arithmetic, while
-    lifecycle mutators return ``self`` and ``compute`` returns float64. Oracle
-    mapping: Wickra ``VZO``/``VolumeZoneOscillator``.
+class VolumeZoneOscillator:
+    """Measure EMA-smoothed signed volume as a percentage of total volume.
+
+    Volume is signed from each close change, then the signed and unsigned
+    streams are independently EMA-smoothed. The first close establishes
+    direction, so output remains ``NaN`` for ``timeperiod`` additional bars.
+    This definition maps to Wickra ``VZO`` 0.9.9; TA-Lib has no equivalent.
+
+    Args:
+        close: Initial chronological closing-price series.
+        volume: Initial chronological volume series aligned with ``close``.
+        timeperiod: EMA smoothing period. Defaults to 14.
+
+    Raises:
+        ValueError: If the input lengths differ or ``timeperiod`` is zero.
     """
-    def __init__(self, close: Any, volume: Any, timeperiod: int = 14) -> None: self._state = _Native(int(timeperiod)); self.extend(close, volume)
-    def append(self, close: float, volume: float) -> "VolumeZoneOscillator": self._state.append(float(close), float(volume)); return self
+
+    def __init__(self, close: Any, volume: Any, timeperiod: int = 14) -> None:
+        """Initialize the oscillator and process aligned close/volume history."""
+        self._state = _Native(int(timeperiod))
+        self.extend(close, volume)
+
+    def append(self, close: float, volume: float) -> "VolumeZoneOscillator":
+        """Append one close/volume bar and return this instance."""
+        self._state.append(float(close), float(volume))
+        return self
+
     def extend(self, close: Any, volume: Any) -> "VolumeZoneOscillator":
-        arrays=(as_float64_series(close),as_float64_series(volume))
-        if len(arrays[0])!=len(arrays[1]): raise ValueError("close and volume must have equal lengths")
-        self._state.extend(*arrays); return self
-    def compute(self) -> np.ndarray: return self._state.compute()
+        """Append aligned close and volume series.
+
+        Returns:
+            This instance, allowing method chaining.
+
+        Raises:
+            ValueError: If ``close`` and ``volume`` have different lengths.
+        """
+        close_values = as_float64_series(close)
+        volume_values = as_float64_series(volume)
+        if len(close_values) != len(volume_values):
+            raise ValueError("close and volume must have equal lengths")
+        self._state.extend(close_values, volume_values)
+        return self
+
     @property
-    def value(self) -> float | None: return self._state.value
-    def reset(self) -> "VolumeZoneOscillator": self._state.reset(); return self
-    def __len__(self) -> int: return len(self._state)
-__all__=["VolumeZoneOscillator"]
+    def value(self) -> float | None:
+        """Return the latest oscillator value, or ``None`` during warm-up."""
+        return self._state.value
+
+    def compute(self) -> np.ndarray:
+        """Return aligned oscillator values, including warm-up ``NaN``."""
+        return self._state.compute()
+
+    def reset(self) -> "VolumeZoneOscillator":
+        """Clear close direction and EMA state, then return this instance."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the number of aligned bars processed by Rust."""
+        return len(self._state)
+
+
+__all__ = ["VolumeZoneOscillator"]

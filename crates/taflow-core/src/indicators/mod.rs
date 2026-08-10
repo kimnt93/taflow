@@ -614,7 +614,7 @@ pub use balance_of_power::BalanceOfPower;
 pub use cumulative_count::CumulativeCount;
 pub use cumulative_product::CumulativeProduct;
 pub use cumulative_sum::CumulativeSum;
-pub use demand_index::{DemandIndex, DemandIndexValue};
+pub use demand_index::DemandIndex;
 pub use directional_movement_index::DirectionalMovementIndex;
 pub use drawdown::Drawdown;
 pub use even_better_sinewave::EvenBetterSinewave;
