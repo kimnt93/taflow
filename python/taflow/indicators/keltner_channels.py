@@ -14,11 +14,11 @@ class KeltnerChannels:
     ``high``, ``low``, and ``close`` are required equal-length chronological
     histories in that order and may all be empty for a fresh stream.
     ``timeperiod`` defaults to 20 and ``multiplier`` to 2.0. The native state
-    uses EMA typical price and EMA high-low range; ``compute`` returns
+    uses a seeded EMA of typical price and Wilder average true range;
+    ``compute`` returns
     ``(upper, middle, lower)`` arrays. Lifecycle mutators return ``self`` and
-    ``value`` exposes the latest tuple or ``None``. The pandas-ta-classic
-    Keltner definition is the independent oracle and any seeding difference is
-    reported as VARIANT.
+    ``value`` exposes the latest tuple or ``None``. The formula, output order,
+    and warm-up match Wickra ``Keltner``.
     """
 
     def __init__(

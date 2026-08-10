@@ -1,9 +1,8 @@
 //! Persistent `KeltnerChannels` state.
 
-use super::*;
-use crate::error::{TaError, TaResult};
-use crate::stream::operator_states::*;
-use std::collections::{HashMap, HashSet, VecDeque};
+use crate::error::TaResult;
+use crate::indicators::ExponentialMovingAverage;
+use crate::stream::{operator_states::validate_period, StreamingIndicator};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Persistent Rust state or aligned output type for `KeltnerValue`.
@@ -24,9 +23,11 @@ pub struct KeltnerValue {
 pub struct KeltnerChannels {
     period: usize,
     multiplier: f64,
-    ema: Option<f64>,
-    range_ema: Option<f64>,
-    alpha: f64,
+    ema: ExponentialMovingAverage,
+    previous_close: Option<f64>,
+    atr_count: usize,
+    atr_sum: f64,
+    atr: Option<f64>,
     value: Option<KeltnerValue>,
 }
 
@@ -38,9 +39,11 @@ impl KeltnerChannels {
         Ok(Self {
             period,
             multiplier,
-            ema: None,
-            range_ema: None,
-            alpha: 2.0 / (period as f64 + 1.0),
+            ema: ExponentialMovingAverage::new(period)?,
+            previous_close: None,
+            atr_count: 0,
+            atr_sum: 0.0,
+            atr: None,
             value: None,
         })
     }
@@ -48,17 +51,29 @@ impl KeltnerChannels {
     ///
     pub fn append(&mut self, high: f64, low: f64, close: f64) -> Option<KeltnerValue> {
         let typical = (high + low + close) / 3.0;
-        let range = high - low;
-        let ema = self.ema.map_or(typical, |v| v + self.alpha * (typical - v));
-        let re = self
-            .range_ema
-            .map_or(range, |v| v + self.alpha * (range - v));
-        self.ema = Some(ema);
-        self.range_ema = Some(re);
-        self.value = Some(KeltnerValue {
-            upper: ema + self.multiplier * re,
-            middle: ema,
-            lower: ema - self.multiplier * re,
+        let middle = self.ema.append(typical);
+        let true_range = self
+            .previous_close
+            .replace(close)
+            .map_or(high - low, |previous| {
+                (high - low)
+                    .max((high - previous).abs())
+                    .max((low - previous).abs())
+            });
+        self.atr_count += 1;
+        if let Some(previous) = self.atr {
+            let period = self.period as f64;
+            self.atr = Some((previous * (period - 1.0) + true_range) / period);
+        } else {
+            self.atr_sum += true_range;
+            if self.atr_count == self.period {
+                self.atr = Some(self.atr_sum / self.period as f64);
+            }
+        }
+        self.value = middle.zip(self.atr).map(|(middle, atr)| KeltnerValue {
+            upper: middle + self.multiplier * atr,
+            middle,
+            lower: middle - self.multiplier * atr,
         });
         self.value
     }
@@ -70,8 +85,11 @@ impl KeltnerChannels {
     /// Reset the state and clear its accumulated history.
     ///
     pub fn reset(&mut self) {
-        self.ema = None;
-        self.range_ema = None;
+        self.ema.reset();
+        self.previous_close = None;
+        self.atr_count = 0;
+        self.atr_sum = 0.0;
+        self.atr = None;
         self.value = None;
     }
 }

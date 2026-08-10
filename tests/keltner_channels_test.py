@@ -1,6 +1,7 @@
 import numpy as np
 
 from taflow import KeltnerChannels
+from tests.oracle_assertions import assert_registered_oracle_match
 
 
 def test_keltner_outputs_are_aligned_and_resettable() -> None:
@@ -12,8 +13,12 @@ def test_keltner_outputs_are_aligned_and_resettable() -> None:
         2.0,
     )
     upper, middle, lower = indicator.compute()
-    np.testing.assert_allclose(middle, [10.0, 10.6666666667, 11.5555555556])
-    np.testing.assert_allclose(upper - middle, [8.0, 8.0, 8.0])
+    np.testing.assert_allclose(middle, [np.nan, 10.5, 11.5], equal_nan=True)
+    np.testing.assert_allclose(upper - middle, [np.nan, 8.0, 8.0], equal_nan=True)
     np.testing.assert_allclose(middle - lower, upper - middle)
     assert len(indicator) == 3
     assert indicator.reset().value is None
+
+
+def test_keltner_channels_match_wickra() -> None:
+    assert_registered_oracle_match("KeltnerChannels")
