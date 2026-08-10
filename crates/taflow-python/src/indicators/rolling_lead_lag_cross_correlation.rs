@@ -1,57 +1,77 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::indicators::RollingLeadLagCrossCorrelation as State;
+use taflow::indicators::{
+    RollingLeadLagCrossCorrelation as State, RollingLeadLagCrossCorrelationValue,
+};
+
 #[pyclass]
 pub struct RollingLeadLagCrossCorrelation {
     inner: State,
-    output: Vec<f64>,
+    lag: Vec<f64>,
+    correlation: Vec<f64>,
 }
+
 #[pymethods]
 impl RollingLeadLagCrossCorrelation {
     #[new]
-    fn new(period: usize, lag: usize) -> PyResult<Self> {
+    fn new(window: usize, max_lag: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new(period, lag)
-                .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?,
-            output: Vec::new(),
+            inner: State::new(window, max_lag)
+                .map_err(|error| pyo3::exceptions::PyValueError::new_err(error.to_string()))?,
+            lag: Vec::new(),
+            correlation: Vec::new(),
         })
     }
-    fn append(&mut self, x: f64, y: f64) -> Option<f64> {
-        let v = self.inner.append(x, y);
-        self.output.push(v.unwrap_or(f64::NAN));
-        v
+    fn append(&mut self, left: f64, right: f64) -> Option<(f64, f64)> {
+        let result = self.inner.append(left, right);
+        let value = result.unwrap_or(RollingLeadLagCrossCorrelationValue {
+            lag: f64::NAN,
+            correlation: f64::NAN,
+        });
+        self.lag.push(value.lag);
+        self.correlation.push(value.correlation);
+        result.map(|value| (value.lag, value.correlation))
     }
     fn extend(
         &mut self,
         py: Python<'_>,
-        x: PyReadonlyArray1<f64>,
-        y: PyReadonlyArray1<f64>,
+        left: PyReadonlyArray1<f64>,
+        right: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
-        let (x, y) = (x.as_slice()?, y.as_slice()?);
-        if x.len() != y.len() {
+        let (left, right) = (left.as_slice()?, right.as_slice()?);
+        if left.len() != right.len() {
             return Err(pyo3::exceptions::PyValueError::new_err(
-                "x and y must have equal lengths",
+                "left and right inputs must have equal lengths",
             ));
         }
         py.allow_threads(|| {
-            for (&a, &b) in x.iter().zip(y) {
-                self.append(a, b);
+            for index in 0..left.len() {
+                self.append(left[index], right[index]);
             }
         });
         Ok(())
     }
-    fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
-        PyArray1::from_vec(py, self.output.clone())
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>) {
+        (
+            PyArray1::from_vec(py, self.lag.clone()),
+            PyArray1::from_vec(py, self.correlation.clone()),
+        )
     }
     #[getter]
-    fn value(&self) -> Option<f64> {
-        self.inner.value()
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner
+            .value()
+            .map(|value| (value.lag, value.correlation))
     }
     fn reset(&mut self) {
         self.inner.reset();
-        self.output.clear();
+        self.lag.clear();
+        self.correlation.clear();
     }
     fn __len__(&self) -> usize {
-        self.output.len()
+        self.lag.len()
     }
 }

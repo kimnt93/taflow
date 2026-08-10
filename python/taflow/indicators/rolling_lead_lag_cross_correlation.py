@@ -3,15 +3,20 @@ import numpy as np
 from .._native import RollingLeadLagCrossCorrelation as _Native
 from .._series import as_float64_series
 class RollingLeadLagCrossCorrelation:
-    """Rolling correlation of one series against a lagged second series."""
-    def __init__(self,x:Any,y:Any,period:int=20,lag:int=1)->None:self._state=_Native(period,lag);self.extend(x,y)
-    def append(self,x:float,y:float)->"RollingLeadLagCrossCorrelation":self._state.append(float(x),float(y));return self
-    def extend(self,x:Any,y:Any)->"RollingLeadLagCrossCorrelation":
-        a,b=as_float64_series(x),as_float64_series(y)
-        if len(a)!=len(b):raise ValueError("x and y must have equal lengths")
+    """Find the strongest signed correlation across bounded lead/lag offsets.
+
+    Output is ``(lag, correlation)``; positive lag means ``left`` leads
+    ``right``. Zero lag is checked first so ties prefer the smallest absolute
+    offset, matching Wickra ``LeadLagCrossCorrelation``.
+    """
+    def __init__(self,left:Any,right:Any,window:int=20,max_lag:int=10)->None:self._state=_Native(window,max_lag);self.extend(left,right)
+    def append(self,left:float,right:float)->"RollingLeadLagCrossCorrelation":self._state.append(float(left),float(right));return self
+    def extend(self,left:Any,right:Any)->"RollingLeadLagCrossCorrelation":
+        a,b=as_float64_series(left),as_float64_series(right)
+        if len(a)!=len(b):raise ValueError("left and right inputs must have equal lengths")
         self._state.extend(a,b);return self
-    def compute(self)->np.ndarray:return self._state.compute()
+    def compute(self)->tuple[np.ndarray,np.ndarray]:return self._state.compute()
     @property
-    def value(self)->float|None:return self._state.value
+    def value(self)->tuple[float,float]|None:return self._state.value
     def reset(self)->"RollingLeadLagCrossCorrelation":self._state.reset();return self
     def __len__(self)->int:return len(self._state)

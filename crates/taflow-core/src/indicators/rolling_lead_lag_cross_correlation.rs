@@ -1,53 +1,111 @@
 use crate::error::TaResult;
+use crate::stream::invalid_period;
 use std::collections::VecDeque;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RollingLeadLagCrossCorrelationValue {
+    pub lag: f64,
+    pub correlation: f64,
+}
+
+/// Search a bounded rolling pair history for the strongest lagged correlation.
 #[derive(Debug, Clone)]
 pub struct RollingLeadLagCrossCorrelation {
-    period: usize,
-    lag: usize,
-    pairs: VecDeque<(f64, f64)>,
-    value: Option<f64>,
+    window: usize,
+    max_lag: usize,
+    capacity: usize,
+    left: VecDeque<f64>,
+    right: VecDeque<f64>,
+    value: Option<RollingLeadLagCrossCorrelationValue>,
 }
+
 impl RollingLeadLagCrossCorrelation {
-    pub fn new(period: usize, lag: usize) -> TaResult<Self> {
+    /// Create a search over `-max_lag..=max_lag` using `window` observations.
+    pub fn new(window: usize, max_lag: usize) -> TaResult<Self> {
+        if window < 2 {
+            return Err(invalid_period("window", window, 2));
+        }
+        if max_lag == 0 {
+            return Err(invalid_period("max_lag", max_lag, 1));
+        }
+        let capacity = window + 2 * max_lag;
         Ok(Self {
-            period,
-            lag,
-            pairs: VecDeque::with_capacity(period + lag),
+            window,
+            max_lag,
+            capacity,
+            left: VecDeque::with_capacity(capacity),
+            right: VecDeque::with_capacity(capacity),
             value: None,
         })
     }
-    pub fn append(&mut self, x: f64, y: f64) -> Option<f64> {
-        self.pairs.push_back((x, y));
-        if self.pairs.len() > self.period + self.lag {
-            self.pairs.pop_front();
+
+    fn correlation(&self, left_start: usize, right_start: usize) -> f64 {
+        let n = self.window as f64;
+        let (mut sx, mut sy, mut sxx, mut syy, mut sxy) = (0.0, 0.0, 0.0, 0.0, 0.0);
+        for index in 0..self.window {
+            let x = self.left[left_start + index];
+            let y = self.right[right_start + index];
+            sx += x;
+            sy += y;
+            sxx += x * x;
+            syy += y * y;
+            sxy += x * y;
         }
-        self.value = (self.pairs.len() == self.period + self.lag).then(|| {
-            let n = self.period;
-            let a: Vec<_> = self.pairs.iter().skip(self.lag).map(|p| p.0).collect();
-            let b: Vec<_> = self.pairs.iter().take(n).map(|p| p.1).collect();
-            let ma = a.iter().sum::<f64>() / n as f64;
-            let mb = b.iter().sum::<f64>() / n as f64;
-            let (mut c, mut va, mut vb) = (0.0, 0.0, 0.0);
-            for i in 0..n {
-                let u = a[i] - ma;
-                let v = b[i] - mb;
-                c += u * v;
-                va += u * u;
-                vb += v * v;
+        let mx = sx / n;
+        let my = sy / n;
+        let denominator = ((sxx / n - mx * mx).max(0.0) * (syy / n - my * my).max(0.0)).sqrt();
+        if denominator == 0.0 {
+            0.0
+        } else {
+            ((sxy / n - mx * my) / denominator).clamp(-1.0, 1.0)
+        }
+    }
+
+    /// Append one synchronized pair and return best lag and signed correlation.
+    pub fn append(&mut self, left: f64, right: f64) -> Option<RollingLeadLagCrossCorrelationValue> {
+        if self.left.len() == self.capacity {
+            self.left.pop_front();
+            self.right.pop_front();
+        }
+        self.left.push_back(left);
+        self.right.push_back(right);
+        if self.left.len() < self.capacity {
+            self.value = None;
+            return None;
+        }
+        let center = self.max_lag;
+        let mut best_lag = 0.0;
+        let mut best = self.correlation(center, center);
+        let mut magnitude = best.abs();
+        for distance in 1..=self.max_lag {
+            for (lag, start) in [
+                (-(distance as f64), center - distance),
+                (distance as f64, center + distance),
+            ] {
+                let correlation = self.correlation(center, start);
+                if correlation.abs() > magnitude {
+                    magnitude = correlation.abs();
+                    best = correlation;
+                    best_lag = lag;
+                }
             }
-            if va * vb == 0.0 {
-                0.0
-            } else {
-                c / (va * vb).sqrt()
-            }
+        }
+        self.value = Some(RollingLeadLagCrossCorrelationValue {
+            lag: best_lag,
+            correlation: best,
         });
         self.value
     }
-    pub fn value(&self) -> Option<f64> {
+
+    /// Return the latest best lag/correlation pair.
+    pub fn value(&self) -> Option<RollingLeadLagCrossCorrelationValue> {
         self.value
     }
+
+    /// Clear both bounded histories and the latest output.
     pub fn reset(&mut self) {
-        self.pairs.clear();
+        self.left.clear();
+        self.right.clear();
         self.value = None;
     }
 }
