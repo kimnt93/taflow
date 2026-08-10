@@ -403,6 +403,7 @@ mod parabolic_sar_extended;
 mod parabolic_sar_extended_test;
 #[cfg(test)]
 mod parabolic_sar_test;
+mod pattern_swing;
 mod pivot_points;
 #[cfg(test)]
 mod pivot_points_test;
@@ -1314,7 +1315,7 @@ mod volume_relative_strength_index;
 #[cfg(test)]
 mod volume_relative_strength_index_test;
 pub use rolling_average_drawdown::RollingAverageDrawdown;
-pub use rolling_cointegration::RollingCointegration;
+pub use rolling_cointegration::{RollingCointegration, RollingCointegrationValue};
 pub use rolling_drawdown_duration::RollingDrawdownDuration;
 pub use rolling_gain_loss_ratio::RollingGainLossRatio;
 pub use rolling_granger_causality::RollingGrangerCausality;
@@ -1353,7 +1354,9 @@ pub use intraday_intensity::IntradayIntensity;
 pub use rolling_beta_neutral_spread::RollingBetaNeutralSpread;
 pub use rolling_coefficient_of_determination::RollingCoefficientOfDetermination;
 pub use rolling_kendall_rank_correlation::RollingKendallRankCorrelation;
-pub use rolling_lead_lag_cross_correlation::RollingLeadLagCrossCorrelation;
+pub use rolling_lead_lag_cross_correlation::{
+    RollingLeadLagCrossCorrelation, RollingLeadLagCrossCorrelationValue,
+};
 pub use rolling_median_absolute_deviation::RollingMedianAbsoluteDeviation;
 pub use rolling_pain_index::RollingPainIndex;
 pub use rolling_pairwise_beta::RollingPairwiseBeta;
@@ -1432,7 +1435,7 @@ pub use center_of_gravity::CenterOfGravity;
 pub use decycler::Decycler;
 pub use decycler_oscillator::DecyclerOscillator;
 pub use ehlers_stochastic::EhlersStochastic;
-pub use hurst_channel::HurstChannel;
+pub use hurst_channel::{HurstChannel, HurstChannelValue};
 pub use instantaneous_trendline::InstantaneousTrendline;
 pub use inverse_fisher_transform::InverseFisherTransform;
 pub use roofing_filter::RoofingFilter;
@@ -1441,7 +1444,10 @@ pub use super_smoother::SuperSmoother;
 pub use time_segmented_volume::TimeSegmentedVolume;
 pub use twiggs_money_flow::TwiggsMoneyFlow;
 pub use volume_relative_strength_index::VolumeRelativeStrengthIndex;
-pub use volume_weighted_moving_average_convergence_divergence::VolumeWeightedMovingAverageConvergenceDivergence;
+pub use volume_weighted_moving_average_convergence_divergence::{
+    VolumeWeightedMovingAverageConvergenceDivergence,
+    VolumeWeightedMovingAverageConvergenceDivergenceValue,
+};
 pub use williams_accumulation_distribution::WilliamsAccumulationDistribution;
 mod average_daily_range;
 #[cfg(test)]
