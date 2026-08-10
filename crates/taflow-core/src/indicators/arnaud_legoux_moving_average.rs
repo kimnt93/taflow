@@ -29,10 +29,10 @@ impl ArnaudLegouxMovingAverage {
             });
         }
         let m = offset * (period - 1) as f64;
+        let scale = period as f64 / sigma;
+        let denominator = 2.0 * scale * scale;
         let weights = (0..period)
-            .map(|i| {
-                ((-(i as f64 - m).powi(2) / (2.0 * sigma.powi(2) * (period as f64).powi(2))).exp())
-            })
+            .map(|i| (-(i as f64 - m).powi(2) / denominator).exp())
             .collect();
         Ok(Self {
             values: VecDeque::with_capacity(period),
