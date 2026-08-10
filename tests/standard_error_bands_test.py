@@ -1,4 +1,5 @@
-import numpy as np
-from taflow import StandardErrorBands
-def test_standard_error_bands_lifecycle():
-    s=StandardErrorBands(np.array([],float),2);s.extend([1,2]);assert s.value is not None;s.reset();assert len(s)==0
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_standard_error_bands_matches_wickra() -> None:
+    assert_registered_oracle_match("StandardErrorBands")

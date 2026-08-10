@@ -9,9 +9,11 @@ pub struct TimeSegmentedVolume {
 #[pymethods]
 impl TimeSegmentedVolume {
     #[new]
-    fn new() -> PyResult<Self> {
+    #[pyo3(signature = (period=18))]
+    fn new(period: usize) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new().unwrap(),
+            inner: State::new(period)
+                .map_err(|error| pyo3::exceptions::PyValueError::new_err(error.to_string()))?,
             output: Vec::new(),
         })
     }

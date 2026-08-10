@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import TimeSegmentedVolume
-def test_time_segmented_volume_lifecycle():
-    s=TimeSegmentedVolume(np.array([],float),np.array([],float));s.extend([1,2],[10,10]);assert s.value is not None;s.reset();assert len(s)==0
+"""External correctness for TimeSegmentedVolume."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_time_segmented_volume_matches_wickra() -> None:
+    """Match Wickra TSV through the canonical Python class."""
+    assert_registered_oracle_match("TimeSegmentedVolume")

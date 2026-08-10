@@ -1,3 +1,5 @@
-from taflow import TimeOfDayReturnProfile
-def test_lifecycle():
-    x=TimeOfDayReturnProfile([1.0,1.0],[1.0,2.0],[1.0,1.0],[1.0,2.0],[1.0,1.0],[0,1]);assert len(x)==2;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_time_of_day_return_profile_matches_wickra() -> None:
+    assert_registered_oracle_match("TimeOfDayReturnProfile")
