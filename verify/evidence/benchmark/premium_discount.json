@@ -1,0 +1,552 @@
+{
+  "schema_version": 3,
+  "canonical_class": "PremiumDiscount",
+  "snake_name": "premium_discount",
+  "oracle": "NumPy",
+  "oracle_name": "rolling premium-discount zone",
+  "environment": {
+    "date": "2026-08-10",
+    "platform": "Linux-6.18.7-76061807-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "numpy": "2.4.6",
+    "taflow": "0.1.2",
+    "talib": "0.7.1",
+    "wickra": "0.9.9",
+    "smartmoneyconcepts": "0.0.27"
+  },
+  "protocol": {
+    "sizes": [
+      1000,
+      10000,
+      100000,
+      1000000
+    ],
+    "warmup_sizes": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "threads": [
+      1,
+      5,
+      10
+    ],
+    "repeats": 3
+  },
+  "correctness": {
+    "verdict": "MATCH",
+    "evidence": {
+      "function": "premium_discount",
+      "taflow_class": "PremiumDiscount",
+      "oracle": "NumPy",
+      "oracle_name": "rolling premium-discount zone",
+      "batch_vs_oracle": {
+        "passed": true,
+        "nan_mismatches": 0,
+        "infinity_mismatches": 0,
+        "max_abs_error": 0.0
+      },
+      "continue_vs_batch_bitwise": true,
+      "chunk_invariance": {
+        "1": true,
+        "10": true,
+        "1000": true
+      },
+      "continue_vs_oracle": {
+        "passed": true,
+        "nan_mismatches": 0,
+        "infinity_mismatches": 0,
+        "max_abs_error": 0.0
+      }
+    }
+  },
+  "vector": [
+    {
+      "bars": 1000,
+      "taflow_api": {
+        "mean_ms": 0.022074386718750002,
+        "median_ms": 0.022097765624999998,
+        "min_ms": 0.0219731953125,
+        "iterations_per_sample": 256,
+        "samples_s": [
+          2.215219921875e-05,
+          2.19731953125e-05,
+          2.2097765625e-05
+        ],
+        "bars_per_second": 45301371.799860656
+      },
+      "taflow_kernel": {
+        "mean_ms": 0.02095951041666667,
+        "median_ms": 0.020928867187500002,
+        "min_ms": 0.020922796875,
+        "iterations_per_sample": 256,
+        "samples_s": [
+          2.10268671875e-05,
+          2.0922796875e-05,
+          2.09288671875e-05
+        ],
+        "bars_per_second": 47711038.09776091
+      },
+      "reference": {
+        "mean_ms": 3.258710166666667,
+        "median_ms": 3.255608,
+        "min_ms": 3.1872494999999996,
+        "iterations_per_sample": 2,
+        "samples_s": [
+          0.003255608,
+          0.003333273,
+          0.0031872495
+        ]
+      },
+      "api_speedup": 147.62404084815256,
+      "kernel_speedup": 155.4764449113941
+    },
+    {
+      "bars": 10000,
+      "taflow_api": {
+        "mean_ms": 0.2660129270833333,
+        "median_ms": 0.2660638125,
+        "min_ms": 0.26331628125,
+        "iterations_per_sample": 32,
+        "samples_s": [
+          0.0002660638125,
+          0.00026331628125,
+          0.0002686586875
+        ],
+        "bars_per_second": 37592158.056541815
+      },
+      "taflow_kernel": {
+        "mean_ms": 0.25418871875000004,
+        "median_ms": 0.254003625,
+        "min_ms": 0.25216571875,
+        "iterations_per_sample": 32,
+        "samples_s": [
+          0.000254003625,
+          0.0002563968125,
+          0.00025216571875
+        ],
+        "bars_per_second": 39340848.99273288
+      },
+      "reference": {
+        "mean_ms": 32.31456466666666,
+        "median_ms": 32.54947,
+        "min_ms": 31.659793999999998,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.03254947,
+          0.031659794,
+          0.03273443
+        ]
+      },
+      "api_speedup": 121.47742224776749,
+      "kernel_speedup": 127.12824088172346
+    },
+    {
+      "bars": 100000,
+      "taflow_api": {
+        "mean_ms": 2.5061343333333332,
+        "median_ms": 2.4988425,
+        "min_ms": 2.496359,
+        "iterations_per_sample": 2,
+        "samples_s": [
+          0.0025232015,
+          0.002496359,
+          0.0024988425
+        ],
+        "bars_per_second": 39902090.909465745
+      },
+      "taflow_kernel": {
+        "mean_ms": 2.776116666666667,
+        "median_ms": 2.7566935,
+        "min_ms": 2.7512974999999997,
+        "iterations_per_sample": 4,
+        "samples_s": [
+          0.002820359,
+          0.0027512975,
+          0.0027566935
+        ],
+        "bars_per_second": 36021540.88144711
+      },
+      "reference": {
+        "mean_ms": 330.98467066666666,
+        "median_ms": 331.448247,
+        "min_ms": 326.059379,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.335446386,
+          0.331448247,
+          0.326059379
+        ]
+      },
+      "api_speedup": 132.06980418580915,
+      "kernel_speedup": 119.22577845551639
+    },
+    {
+      "bars": 1000000,
+      "taflow_api": {
+        "mean_ms": 27.522636666666667,
+        "median_ms": 27.380008,
+        "min_ms": 27.188638,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.027188638,
+          0.027999264,
+          0.027380008
+        ],
+        "bars_per_second": 36333728.200217254
+      },
+      "taflow_kernel": {
+        "mean_ms": 25.770541999999995,
+        "median_ms": 25.59966,
+        "min_ms": 25.135966999999997,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.025135967,
+          0.02559966,
+          0.026575999
+        ],
+        "bars_per_second": 38803995.662955016
+      },
+      "reference": {
+        "mean_ms": 3297.730759,
+        "median_ms": 3287.475879,
+        "min_ms": 3286.872125,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          3.286872125,
+          3.318844273,
+          3.287475879
+        ]
+      },
+      "api_speedup": 119.81885307500214,
+      "kernel_speedup": 127.96513006982937
+    }
+  ],
+  "warmup": [
+    {
+      "bars": 1,
+      "threads": 1,
+      "taflow": {
+        "mean_ms": 0.17467666666666665,
+        "median_ms": 0.1938,
+        "min_ms": 0.10540200000000001,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000224828,
+          0.0001938,
+          0.000105402
+        ]
+      },
+      "reference": {
+        "mean_ms": 0.14051833333333333,
+        "median_ms": 0.118798,
+        "min_ms": 0.114489,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000188268,
+          0.000118798,
+          0.000114489
+        ]
+      },
+      "speedup": 0.8044482186134382
+    },
+    {
+      "bars": 1,
+      "threads": 5,
+      "taflow": {
+        "mean_ms": 0.30888533333333335,
+        "median_ms": 0.33102099999999995,
+        "min_ms": 0.229935,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.0003657,
+          0.000331021,
+          0.000229935
+        ]
+      },
+      "reference": {
+        "mean_ms": 0.48745633333333327,
+        "median_ms": 0.476892,
+        "min_ms": 0.472031,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000513446,
+          0.000472031,
+          0.000476892
+        ]
+      },
+      "speedup": 1.5781142085088746
+    },
+    {
+      "bars": 1,
+      "threads": 10,
+      "taflow": {
+        "mean_ms": 0.47739066666666663,
+        "median_ms": 0.475973,
+        "min_ms": 0.453901,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000502298,
+          0.000453901,
+          0.000475973
+        ]
+      },
+      "reference": {
+        "mean_ms": 0.9851256666666669,
+        "median_ms": 0.953257,
+        "min_ms": 0.9244490000000001,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.001077671,
+          0.000924449,
+          0.000953257
+        ]
+      },
+      "speedup": 2.063562896076729
+    },
+    {
+      "bars": 10,
+      "threads": 1,
+      "taflow": {
+        "mean_ms": 0.05229,
+        "median_ms": 0.053773,
+        "min_ms": 0.047976000000000005,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          5.5121e-05,
+          5.3773e-05,
+          4.7976e-05
+        ]
+      },
+      "reference": {
+        "mean_ms": 0.1417236666666667,
+        "median_ms": 0.13578099999999999,
+        "min_ms": 0.13079000000000002,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.0001586,
+          0.000135781,
+          0.00013079
+        ]
+      },
+      "speedup": 2.7103397717855553
+    },
+    {
+      "bars": 10,
+      "threads": 5,
+      "taflow": {
+        "mean_ms": 0.23141899999999999,
+        "median_ms": 0.225482,
+        "min_ms": 0.224411,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000244364,
+          0.000225482,
+          0.000224411
+        ]
+      },
+      "reference": {
+        "mean_ms": 0.6187456666666666,
+        "median_ms": 0.619155,
+        "min_ms": 0.599788,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000637294,
+          0.000599788,
+          0.000619155
+        ]
+      },
+      "speedup": 2.673702965904557
+    },
+    {
+      "bars": 10,
+      "threads": 10,
+      "taflow": {
+        "mean_ms": 0.4880006666666667,
+        "median_ms": 0.490476,
+        "min_ms": 0.46976599999999996,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.00050376,
+          0.000469766,
+          0.000490476
+        ]
+      },
+      "reference": {
+        "mean_ms": 1.2577156666666667,
+        "median_ms": 1.2588110000000001,
+        "min_ms": 1.2088999999999999,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.001305436,
+          0.001258811,
+          0.0012089
+        ]
+      },
+      "speedup": 2.5772826813078122
+    },
+    {
+      "bars": 100,
+      "threads": 1,
+      "taflow": {
+        "mean_ms": 0.051232666666666676,
+        "median_ms": 0.0491,
+        "min_ms": 0.047086,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          5.7512e-05,
+          4.91e-05,
+          4.7086e-05
+        ]
+      },
+      "reference": {
+        "mean_ms": 0.419913,
+        "median_ms": 0.420812,
+        "min_ms": 0.407852,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000407852,
+          0.000420812,
+          0.000431075
+        ]
+      },
+      "speedup": 8.196196437168991
+    },
+    {
+      "bars": 100,
+      "threads": 5,
+      "taflow": {
+        "mean_ms": 0.22938466666666665,
+        "median_ms": 0.232533,
+        "min_ms": 0.220273,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000235348,
+          0.000220273,
+          0.000232533
+        ]
+      },
+      "reference": {
+        "mean_ms": 2.051619666666667,
+        "median_ms": 2.029163,
+        "min_ms": 2.024029,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.002101667,
+          0.002029163,
+          0.002024029
+        ]
+      },
+      "speedup": 8.944013985241677
+    },
+    {
+      "bars": 100,
+      "threads": 10,
+      "taflow": {
+        "mean_ms": 0.4921606666666666,
+        "median_ms": 0.484516,
+        "min_ms": 0.459289,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000532677,
+          0.000459289,
+          0.000484516
+        ]
+      },
+      "reference": {
+        "mean_ms": 4.138127333333333,
+        "median_ms": 4.13761,
+        "min_ms": 4.126811999999999,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.00414996,
+          0.00413761,
+          0.004126812
+        ]
+      },
+      "speedup": 8.408082184544073
+    },
+    {
+      "bars": 1000,
+      "threads": 1,
+      "taflow": {
+        "mean_ms": 0.08370366666666666,
+        "median_ms": 0.082596,
+        "min_ms": 0.075204,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          9.3311e-05,
+          7.5204e-05,
+          8.2596e-05
+        ]
+      },
+      "reference": {
+        "mean_ms": 3.3714003333333333,
+        "median_ms": 3.37939,
+        "min_ms": 3.346219,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.00337939,
+          0.003388592,
+          0.003346219
+        ]
+      },
+      "speedup": 40.27780941495992
+    },
+    {
+      "bars": 1000,
+      "threads": 5,
+      "taflow": {
+        "mean_ms": 0.2501363333333333,
+        "median_ms": 0.249242,
+        "min_ms": 0.24683399999999997,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000254333,
+          0.000249242,
+          0.000246834
+        ]
+      },
+      "reference": {
+        "mean_ms": 16.75990666666667,
+        "median_ms": 16.739966,
+        "min_ms": 16.701563999999998,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.01683819,
+          0.016701564,
+          0.016739966
+        ]
+      },
+      "speedup": 67.00308764953515
+    },
+    {
+      "bars": 1000,
+      "threads": 10,
+      "taflow": {
+        "mean_ms": 0.5614543333333334,
+        "median_ms": 0.530233,
+        "min_ms": 0.484826,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.000669304,
+          0.000530233,
+          0.000484826
+        ]
+      },
+      "reference": {
+        "mean_ms": 36.37783133333333,
+        "median_ms": 33.991936,
+        "min_ms": 33.714418,
+        "iterations_per_sample": 1,
+        "samples_s": [
+          0.033714418,
+          0.033991936,
+          0.04142714
+        ]
+      },
+      "speedup": 64.79214634850088
+    }
+  ]
+}
