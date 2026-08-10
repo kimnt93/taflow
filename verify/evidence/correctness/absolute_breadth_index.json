@@ -1,0 +1,7 @@
+{
+  "function": "absolute_breadth_index",
+  "taflow_class": "AbsoluteBreadthIndex",
+  "oracle": "Wickra",
+  "oracle_name": "AbsoluteBreadthIndex",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

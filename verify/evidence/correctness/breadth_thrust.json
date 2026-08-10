@@ -1,0 +1,7 @@
+{
+  "function": "breadth_thrust",
+  "taflow_class": "BreadthThrust",
+  "oracle": "Wickra",
+  "oracle_name": "BreadthThrust",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

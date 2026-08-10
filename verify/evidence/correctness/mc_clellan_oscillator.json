@@ -1,0 +1,7 @@
+{
+  "function": "mc_clellan_oscillator",
+  "taflow_class": "McClellanOscillator",
+  "oracle": "Wickra",
+  "oracle_name": "McClellanOscillator",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

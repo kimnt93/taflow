@@ -1,0 +1,7 @@
+{
+  "function": "high_low_index",
+  "taflow_class": "HighLowIndex",
+  "oracle": "Wickra",
+  "oracle_name": "HighLowIndex",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

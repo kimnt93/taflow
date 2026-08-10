@@ -1,0 +1,7 @@
+{
+  "function": "new_highs_new_lows",
+  "taflow_class": "NewHighsNewLows",
+  "oracle": "Wickra",
+  "oracle_name": "NewHighsNewLows",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

@@ -1,0 +1,7 @@
+{
+  "function": "mc_clellan_summation_index",
+  "taflow_class": "McClellanSummationIndex",
+  "oracle": "Wickra",
+  "oracle_name": "McClellanSummationIndex",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

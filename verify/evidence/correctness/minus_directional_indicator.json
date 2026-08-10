@@ -1,0 +1,24 @@
+{
+  "function": "MINUS_DI",
+  "taflow_class": "MinusDirectionalIndicator",
+  "oracle": "TA-Lib",
+  "oracle_name": "MINUS_DI",
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 7.105427357601002e-15
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+    "1": true,
+    "10": true,
+    "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 7.105427357601002e-15
+  }
+}

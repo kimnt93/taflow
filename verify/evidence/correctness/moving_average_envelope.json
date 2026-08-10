@@ -1,0 +1,24 @@
+{
+  "function": "moving_average_envelope",
+  "taflow_class": "MovingAverageEnvelope",
+  "oracle": "Wickra",
+  "oracle_name": "MaEnvelope",
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 9.947598300641403e-14
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+    "1": true,
+    "10": true,
+    "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 9.947598300641403e-14
+  }
+}

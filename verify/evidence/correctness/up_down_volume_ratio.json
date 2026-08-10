@@ -1,0 +1,7 @@
+{
+  "function": "up_down_volume_ratio",
+  "taflow_class": "UpDownVolumeRatio",
+  "oracle": "Wickra",
+  "oracle_name": "UpDownVolumeRatio",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

@@ -1,0 +1,7 @@
+{
+  "function": "cumulative_volume_index",
+  "taflow_class": "CumulativeVolumeIndex",
+  "oracle": "Wickra",
+  "oracle_name": "CumulativeVolumeIndex",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

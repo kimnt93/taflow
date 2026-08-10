@@ -1,0 +1,7 @@
+{
+  "function": "percent_above_moving_average",
+  "taflow_class": "PercentAboveMovingAverage",
+  "oracle": "Wickra",
+  "oracle_name": "PercentAboveMa",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

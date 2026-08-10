@@ -1,0 +1,24 @@
+{
+  "function": "demand_index",
+  "taflow_class": "DemandIndex",
+  "oracle": "Wickra",
+  "oracle_name": "DemandIndex",
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 4.547473508864641e-12
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+    "1": true,
+    "10": true,
+    "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 4.547473508864641e-12
+  }
+}

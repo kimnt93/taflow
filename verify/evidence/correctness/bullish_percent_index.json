@@ -1,0 +1,7 @@
+{
+  "function": "bullish_percent_index",
+  "taflow_class": "BullishPercentIndex",
+  "oracle": "Wickra",
+  "oracle_name": "BullishPercentIndex",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

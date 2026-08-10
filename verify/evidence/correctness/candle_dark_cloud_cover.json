@@ -1,0 +1,27 @@
+{
+  "function": "CDLDARKCLOUDCOVER",
+  "taflow_class": "CandleDarkCloudCover",
+  "oracle": "TA-Lib",
+  "oracle_name": "CDLDARKCLOUDCOVER",
+  "warnings": [
+    "talib param 'penetration' (default 0.5) has no constructor counterpart \u2014 compared at defaults only"
+  ],
+  "batch_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 0.0
+  },
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+    "1": true,
+    "10": true,
+    "1000": true
+  },
+  "continue_vs_oracle": {
+    "passed": true,
+    "nan_mismatches": 0,
+    "infinity_mismatches": 0,
+    "max_abs_error": 0.0
+  }
+}

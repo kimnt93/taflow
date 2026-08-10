@@ -1,0 +1,7 @@
+{
+  "function": "arms_index",
+  "taflow_class": "ArmsIndex",
+  "oracle": "Wickra",
+  "oracle_name": "Trin",
+  "error": "oracle failed: 'float64' object is not an instance of 'Sequence'"
+}

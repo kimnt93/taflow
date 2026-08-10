@@ -1,0 +1,12 @@
+{
+  "function": "cumulative_minimum",
+  "taflow_class": "CumulativeMinimum",
+  "oracle": null,
+  "oracle_name": null,
+  "continue_vs_batch_bitwise": true,
+  "chunk_invariance": {
+    "1": true,
+    "10": true,
+    "1000": true
+  }
+}
