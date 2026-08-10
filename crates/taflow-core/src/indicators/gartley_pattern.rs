@@ -1,70 +1,20 @@
 use crate::error::TaResult;
-use std::collections::VecDeque;
+use super::pattern_swing::{ratios_in, xabcd, SwingTracker, SWING_THRESHOLD};
 
+/// Gartley X-A-B-C-D harmonic completion signal.
 #[derive(Debug, Clone)]
-pub struct GartleyPattern {
-    rows: VecDeque<[f64; 4]>,
-    count: usize,
-    value: Option<f64>,
-}
-
+pub struct GartleyPattern { swing: SwingTracker, count: usize, value: Option<f64> }
 impl GartleyPattern {
-    pub fn new() -> TaResult<Self> {
-        Ok(Self {
-            rows: VecDeque::with_capacity(6),
-            count: 0,
-            value: None,
-        })
-    }
-
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
-        self.count += 1;
-        if self.rows.len() == 6 {
-            self.rows.pop_front();
-        }
-        self.rows.push_back([open, high, low, close]);
-        self.value = (self.rows.len() == 6).then(|| Self::signal(&self.rows));
-        self.value
-    }
-
-    fn signal(rows: &VecDeque<[f64; 4]>) -> f64 {
-        let x = rows[1][3];
-        let a = rows[2][3];
-        let b = rows[3][3];
-        let c = rows[4][3];
-        let d = rows[5][3];
-        let xa = (a - x).abs();
-        let ab = (b - a).abs();
-        let bc = (c - b).abs();
-        let cd = (d - c).abs();
-        if xa == 0.0 || ab == 0.0 || bc == 0.0 {
-            return 0.0;
-        }
-        let valid = (0.55..=0.7).contains(&(ab / xa))
-            && (0.382..=0.886).contains(&(bc / ab))
-            && (0.7..=0.86).contains(&(cd / bc));
-        if valid {
-            -(d - c).signum()
-        } else {
-            0.0
-        }
-    }
-
-    pub fn value(&self) -> Option<f64> {
-        self.value
-    }
-
-    pub fn len(&self) -> usize {
-        self.count
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.count == 0
-    }
-
-    pub fn reset(&mut self) {
-        self.rows.clear();
-        self.count = 0;
-        self.value = None;
-    }
+    /// Create a detector retaining five confirmed pivots.
+    pub fn new()->TaResult<Self>{Ok(Self{swing:SwingTracker::new(SWING_THRESHOLD,5),count:0,value:None})}
+    /// Append one OHLC bar and return the latest harmonic signal.
+    pub fn append(&mut self,_open:f64,high:f64,low:f64,_close:f64)->Option<f64>{self.count+=1;self.value=Some(0.0);if !self.swing.append(high,low)||self.swing.pivots().len()<5{return self.value;}let p=xabcd(self.swing.pivots());let xa=(p.a-p.x).abs();let ab=(p.b-p.a).abs();let bc=(p.c-p.b).abs();let cd=(p.d-p.c).abs();let ad=(p.d-p.a).abs();if ratios_in(&[(ab/xa,.55,.70),(bc/ab,.382,.886),(cd/bc,1.13,1.618),(ad/xa,.74,.84)]){self.value=Some(if p.bullish{1.0}else{-1.0});}self.value}
+    /// Return the latest signal.
+    pub fn value(&self)->Option<f64>{self.value}
+    /// Return the processed-bar count.
+    pub fn len(&self)->usize{self.count}
+    /// Return whether no bars were processed.
+    pub fn is_empty(&self)->bool{self.count==0}
+    /// Clear pivots and output.
+    pub fn reset(&mut self){self.swing.reset();self.count=0;self.value=None;}
 }
