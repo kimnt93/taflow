@@ -1,28 +1,34 @@
 use crate::error::TaResult;
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+/// Mean close returns ordered from Monday through Sunday.
+pub struct DayOfWeekReturnProfileValue {
+    pub bins: [f64; 7],
+}
+
+/// Running mean close return for Monday through Sunday.
 #[derive(Debug, Clone)]
 pub struct DayOfWeekReturnProfile {
     offset_minutes: i32,
-    sums: [f64; 7],
-    counts: [usize; 7],
     previous_close: Option<f64>,
-    value: Option<f64>,
+    sums: [f64; 7],
+    counts: [u64; 7],
+    value: Option<DayOfWeekReturnProfileValue>,
 }
+
 impl DayOfWeekReturnProfile {
+    /// Create an empty weekday profile with a fixed UTC offset.
     pub fn new(utc_offset_minutes: i32) -> TaResult<Self> {
         Ok(Self {
             offset_minutes: utc_offset_minutes,
+            previous_close: None,
             sums: [0.0; 7],
             counts: [0; 7],
-            previous_close: None,
             value: None,
         })
     }
-    fn weekday(&self, timestamp: i64) -> usize {
-        let day = (timestamp + self.offset_minutes as i64 * 60_000_000_000)
-            .div_euclid(86_400_000_000_000);
-        (day + 3).rem_euclid(7) as usize
-    }
+
+    /// Append one OHLCV bar and Unix-nanosecond timestamp.
     pub fn append(
         &mut self,
         _open: f64,
@@ -31,23 +37,38 @@ impl DayOfWeekReturnProfile {
         close: f64,
         _volume: f64,
         timestamp: i64,
-    ) -> Option<f64> {
-        let day = self.weekday(timestamp);
-        self.value = self.previous_close.filter(|x| *x != 0.0).map(|previous| {
-            self.sums[day] += close / previous - 1.0;
-            self.counts[day] += 1;
-            self.sums[day] / self.counts[day] as f64
-        });
-        self.previous_close = Some(close);
+    ) -> Option<DayOfWeekReturnProfileValue> {
+        let Some(previous) = self.previous_close.replace(close) else {
+            return None;
+        };
+        let local_seconds =
+            timestamp.div_euclid(1_000_000_000) + i64::from(self.offset_minutes) * 60;
+        let weekday = (local_seconds.div_euclid(86_400) + 3).rem_euclid(7) as usize;
+        self.sums[weekday] += if previous == 0.0 {
+            0.0
+        } else {
+            close / previous - 1.0
+        };
+        self.counts[weekday] += 1;
+        let mut bins = [0.0; 7];
+        for index in 0..7 {
+            if self.counts[index] > 0 {
+                bins[index] = self.sums[index] / self.counts[index] as f64;
+            }
+        }
+        self.value = Some(DayOfWeekReturnProfileValue { bins });
         self.value
     }
-    pub fn value(&self) -> Option<f64> {
+
+    /// Return Monday-to-Sunday means after the first return exists.
+    pub fn value(&self) -> Option<DayOfWeekReturnProfileValue> {
         self.value
     }
+    /// Restore fresh-state behavior and clear all weekday accumulators.
     pub fn reset(&mut self) {
-        self.sums.fill(0.0);
-        self.counts.fill(0);
         self.previous_close = None;
+        self.sums = [0.0; 7];
+        self.counts = [0; 7];
         self.value = None;
     }
 }

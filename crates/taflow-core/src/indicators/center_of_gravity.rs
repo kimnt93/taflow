@@ -26,6 +26,7 @@ impl CenterOfGravity {
                     .values
                     .window()
                     .iter()
+                    .rev()
                     .enumerate()
                     .map(|(i, v)| (i + 1) as f64 * v)
                     .sum::<f64>()

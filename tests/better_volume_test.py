@@ -1,4 +1,8 @@
-import numpy as np
-from taflow import BetterVolume
-def test_better_volume_lifecycle():
-    s=BetterVolume(np.array([],float),np.array([],float),np.array([],float),np.array([],float));s.extend([2],[1],[1.5],[10]);assert s.value is not None;s.reset();assert len(s)==0
+"""External correctness for BetterVolume."""
+
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_better_volume_matches_wickra() -> None:
+    """Match Wickra BetterVolume through the canonical Python class."""
+    assert_registered_oracle_match("BetterVolume")

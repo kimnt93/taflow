@@ -1,4 +1,5 @@
-import numpy as np
-from taflow import CenterOfGravity
-def test_center_of_gravity_lifecycle():
-    s=CenterOfGravity(np.array([],float),2);s.extend([1,2]);assert s.value is not None;s.reset();assert len(s)==0
+from oracle_assertions import assert_registered_oracle_match
+
+
+def test_center_of_gravity_matches_wickra() -> None:
+    assert_registered_oracle_match("CenterOfGravity")

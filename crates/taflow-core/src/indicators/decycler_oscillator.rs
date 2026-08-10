@@ -1,44 +1,54 @@
 use crate::error::TaResult;
-use crate::stream::StreamingIndicator;
+use crate::indicators::Decycler;
+use crate::stream::{invalid_period, StreamingIndicator};
+
+/// Difference between fast and slow Ehlers decyclers.
 #[derive(Debug, Clone)]
 pub struct DecyclerOscillator {
-    fast_alpha: f64,
-    slow_alpha: f64,
-    fast: Option<f64>,
-    slow: Option<f64>,
+    fast: Decycler,
+    slow: Decycler,
     value: Option<f64>,
 }
+
 impl DecyclerOscillator {
+    /// Create an oscillator requiring non-zero periods and `fast < slow`.
     pub fn new(fast: usize, slow: usize) -> TaResult<Self> {
+        if fast == 0 {
+            return Err(invalid_period("fast", fast, 1));
+        }
+        if slow <= fast {
+            return Err(invalid_period("slow", slow, fast + 1));
+        }
         Ok(Self {
-            fast_alpha: 2.0 / (fast as f64 + 1.0),
-            slow_alpha: 2.0 / (slow as f64 + 1.0),
-            fast: None,
-            slow: None,
+            fast: Decycler::new(fast)?,
+            slow: Decycler::new(slow)?,
             value: None,
         })
     }
-    pub fn append(&mut self, x: f64) -> Option<f64> {
-        let f = self.fast.map_or(x, |v| v + self.fast_alpha * (x - v));
-        let s = self.slow.map_or(x, |v| v + self.slow_alpha * (x - v));
-        self.fast = Some(f);
-        self.slow = Some(s);
-        self.value = Some(f - s);
+
+    /// Append one sample and return fast decycler minus slow decycler.
+    pub fn append(&mut self, input: f64) -> Option<f64> {
+        self.value = Some(self.fast.append(input)? - self.slow.append(input)?);
         self.value
     }
+
+    /// Return the latest oscillator value.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+
+    /// Reset both child filters and the latest value.
     pub fn reset(&mut self) {
-        self.fast = None;
-        self.slow = None;
+        self.fast.reset();
+        self.slow.reset();
         self.value = None;
     }
 }
+
 impl StreamingIndicator for DecyclerOscillator {
     type Output = f64;
-    fn append(&mut self, x: f64) -> Option<f64> {
-        Self::append(self, x)
+    fn append(&mut self, input: f64) -> Option<f64> {
+        Self::append(self, input)
     }
     fn value(&self) -> Option<f64> {
         self.value
