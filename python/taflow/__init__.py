@@ -198,6 +198,16 @@ from .indicators import Drawdown
 from .indicators import RollingSharpe
 from .indicators import RollingSortino
 from .indicators import RollingCalmar
+from .indicators import RollingOmegaRatio
+from .indicators import RollingValueAtRisk
+from .indicators import RollingConditionalValueAtRisk
+from .indicators import RollingProfitFactor
+from .indicators import RollingKellyCriterion
+from .indicators import RollingRecoveryFactor
+from .indicators import RollingTreynorRatio
+from .indicators import VolumeOscillator
+from .indicators import VolumeZoneOscillator
+from .indicators import DemandIndex
 from .indicators import RollingMaximumDrawdown
 from .indicators import HullMovingAverage
 from .indicators import VolumeWeightedMovingAverage
@@ -463,6 +473,16 @@ __all__ = [
     "RollingSharpe",
     "RollingSortino",
     "RollingCalmar",
+    "RollingOmegaRatio",
+    "RollingValueAtRisk",
+    "RollingConditionalValueAtRisk",
+    "RollingProfitFactor",
+    "RollingKellyCriterion",
+    "RollingRecoveryFactor",
+    "RollingTreynorRatio",
+    "VolumeOscillator",
+    "VolumeZoneOscillator",
+    "DemandIndex",
     "RollingMaximumDrawdown",
     "HullMovingAverage",
     "VolumeWeightedMovingAverage",

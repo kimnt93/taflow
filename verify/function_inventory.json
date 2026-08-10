@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 295,
+    "indicators": 305,
     "native_functions": 0,
-    "native_state_classes": 294,
+    "native_state_classes": 304,
     "pandas_ta_symbols": 427,
-    "python_exports": 297,
-    "rust_exports": 620,
-    "smc_functions": 0,
-    "structure": 295,
+    "python_exports": 307,
+    "rust_exports": 641,
+    "smc_functions": 8,
+    "structure": 305,
     "talib_functions": 161
   },
   "rows": [
@@ -3208,6 +3208,156 @@
     {
       "exported": true,
       "kind": "class",
+      "module": "rolling_omega_ratio",
+      "name": "RollingOmegaRatio",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingOmegaRatio",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_value_at_risk",
+      "name": "RollingValueAtRisk",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingValueAtRisk",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_conditional_value_at_risk",
+      "name": "RollingConditionalValueAtRisk",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingConditionalValueAtRisk",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_profit_factor",
+      "name": "RollingProfitFactor",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingProfitFactor",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_kelly_criterion",
+      "name": "RollingKellyCriterion",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingKellyCriterion",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_recovery_factor",
+      "name": "RollingRecoveryFactor",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingRecoveryFactor",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_treynor_ratio",
+      "name": "RollingTreynorRatio",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingTreynorRatio",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "volume_oscillator",
+      "name": "VolumeOscillator",
+      "native_binding": true,
+      "native_symbols": [
+        "VolumeOscillator",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "volume_zone_oscillator",
+      "name": "VolumeZoneOscillator",
+      "native_binding": true,
+      "native_symbols": [
+        "VolumeZoneOscillator",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "demand_index",
+      "name": "DemandIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "DemandIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
       "module": "rolling_maximum_drawdown",
       "name": "RollingMaximumDrawdown",
       "native_binding": true,
@@ -3718,7 +3868,7 @@
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
-      "smc_reference": false,
+      "smc_reference": true,
       "talib_alias": ""
     },
     {
@@ -3763,7 +3913,7 @@
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
-      "smc_reference": false,
+      "smc_reference": true,
       "talib_alias": ""
     },
     {
@@ -3838,7 +3988,7 @@
       ],
       "pandas_ta_reference": false,
       "rust_export": true,
-      "smc_reference": false,
+      "smc_reference": true,
       "talib_alias": ""
     },
     {
@@ -4450,7 +4600,16 @@
       "talib_alias": ""
     }
   ],
-  "smc_functions": [],
+  "smc_functions": [
+    "bos_choch",
+    "fvg",
+    "liquidity",
+    "ob",
+    "previous_high_low",
+    "retracements",
+    "sessions",
+    "swing_highs_lows"
+  ],
   "talib_functions": [
     "HT_DCPERIOD",
     "HT_DCPHASE",

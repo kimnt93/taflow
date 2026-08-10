@@ -142,6 +142,16 @@ from .drawdown import Drawdown
 from .rolling_sharpe import RollingSharpe
 from .rolling_sortino import RollingSortino
 from .rolling_calmar import RollingCalmar
+from .rolling_omega_ratio import RollingOmegaRatio
+from .rolling_value_at_risk import RollingValueAtRisk
+from .rolling_conditional_value_at_risk import RollingConditionalValueAtRisk
+from .rolling_profit_factor import RollingProfitFactor
+from .rolling_kelly_criterion import RollingKellyCriterion
+from .rolling_recovery_factor import RollingRecoveryFactor
+from .rolling_treynor_ratio import RollingTreynorRatio
+from .volume_oscillator import VolumeOscillator
+from .volume_zone_oscillator import VolumeZoneOscillator
+from .demand_index import DemandIndex
 from .rolling_maximum_drawdown import RollingMaximumDrawdown
 from .hull_moving_average import HullMovingAverage
 from .volume_weighted_moving_average import VolumeWeightedMovingAverage
@@ -491,6 +501,16 @@ __all__ = [
     "RollingSharpe",
     "RollingSortino",
     "RollingCalmar",
+    "RollingOmegaRatio",
+    "RollingValueAtRisk",
+    "RollingConditionalValueAtRisk",
+    "RollingProfitFactor",
+    "RollingKellyCriterion",
+    "RollingRecoveryFactor",
+    "RollingTreynorRatio",
+    "VolumeOscillator",
+    "VolumeZoneOscillator",
+    "DemandIndex",
     "RollingMaximumDrawdown",
     "HullMovingAverage",
     "VolumeWeightedMovingAverage",

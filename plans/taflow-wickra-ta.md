@@ -53,6 +53,12 @@ as `VARIANT` during oracle verification.
 
 ## Implementation checklist
 
+Implementation progress: the first ten unchecked high-priority entries below
+now have canonical Rust states, separate Rust tests, PyO3 bindings, Python
+adapters, exports, and lifecycle tests. Their external correctness and
+performance gates remain pending by request; the roadmap checkboxes therefore
+stay unchecked until those gates are run.
+
 Every row remains unchecked until it has a canonical Rust state, native Python
 adapter, one aligned output per input bar, scalar continuation, reset/chunk
 invariance, external-oracle comparison where available, and a focused

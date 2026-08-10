@@ -262,6 +262,9 @@ mod cumulative_product_test;
 mod cumulative_sum;
 #[cfg(test)]
 mod cumulative_sum_test;
+mod demand_index;
+#[cfg(test)]
+mod demand_index_test;
 mod directional_movement_index;
 #[cfg(test)]
 mod directional_movement_index_test;
@@ -427,6 +430,9 @@ mod rolling_beta_test;
 mod rolling_calmar;
 #[cfg(test)]
 mod rolling_calmar_test;
+mod rolling_conditional_value_at_risk;
+#[cfg(test)]
+mod rolling_conditional_value_at_risk_test;
 mod rolling_correlation;
 #[cfg(test)]
 mod rolling_correlation_test;
@@ -439,6 +445,9 @@ mod rolling_entropy_test;
 mod rolling_interquartile_range;
 #[cfg(test)]
 mod rolling_interquartile_range_test;
+mod rolling_kelly_criterion;
+#[cfg(test)]
+mod rolling_kelly_criterion_test;
 mod rolling_kurtosis;
 #[cfg(test)]
 mod rolling_kurtosis_test;
@@ -487,15 +496,24 @@ mod rolling_minimum_test;
 mod rolling_mode;
 #[cfg(test)]
 mod rolling_mode_test;
+mod rolling_omega_ratio;
+#[cfg(test)]
+mod rolling_omega_ratio_test;
 mod rolling_percentile;
 #[cfg(test)]
 mod rolling_percentile_test;
+mod rolling_profit_factor;
+#[cfg(test)]
+mod rolling_profit_factor_test;
 mod rolling_quantile;
 #[cfg(test)]
 mod rolling_quantile_test;
 mod rolling_rank;
 #[cfg(test)]
 mod rolling_rank_test;
+mod rolling_recovery_factor;
+#[cfg(test)]
+mod rolling_recovery_factor_test;
 mod rolling_sharpe;
 #[cfg(test)]
 mod rolling_sharpe_test;
@@ -508,12 +526,19 @@ mod rolling_sortino_test;
 mod rolling_standard_deviation;
 #[cfg(test)]
 mod rolling_standard_deviation_test;
+mod rolling_statistic_helpers;
 mod rolling_sum;
 #[cfg(test)]
 mod rolling_sum_test;
 mod rolling_time_series_forecast;
 #[cfg(test)]
 mod rolling_time_series_forecast_test;
+mod rolling_treynor_ratio;
+#[cfg(test)]
+mod rolling_treynor_ratio_test;
+mod rolling_value_at_risk;
+#[cfg(test)]
+mod rolling_value_at_risk_test;
 mod rolling_variance;
 #[cfg(test)]
 mod rolling_variance_test;
@@ -541,9 +566,15 @@ mod typical_price_test;
 mod variable_period_moving_average;
 #[cfg(test)]
 mod variable_period_moving_average_test;
+mod volume_oscillator;
+#[cfg(test)]
+mod volume_oscillator_test;
 mod volume_weighted_moving_average;
 #[cfg(test)]
 mod volume_weighted_moving_average_test;
+mod volume_zone_oscillator;
+#[cfg(test)]
+mod volume_zone_oscillator_test;
 mod weighted_close;
 #[cfg(test)]
 mod weighted_close_test;
@@ -583,6 +614,7 @@ pub use balance_of_power::BalanceOfPower;
 pub use cumulative_count::CumulativeCount;
 pub use cumulative_product::CumulativeProduct;
 pub use cumulative_sum::CumulativeSum;
+pub use demand_index::{DemandIndex, DemandIndexValue};
 pub use directional_movement_index::DirectionalMovementIndex;
 pub use drawdown::Drawdown;
 pub use even_better_sinewave::EvenBetterSinewave;
@@ -640,10 +672,12 @@ pub use rate_of_change_ratio_percent::RateOfChangeRatioPercent;
 pub use rolling_average_deviation::RollingAverageDeviation;
 pub use rolling_beta::RollingBeta;
 pub use rolling_calmar::RollingCalmar;
+pub use rolling_conditional_value_at_risk::RollingConditionalValueAtRisk;
 pub use rolling_correlation::RollingCorrelation;
 pub use rolling_covariance::RollingCovariance;
 pub use rolling_entropy::RollingEntropy;
 pub use rolling_interquartile_range::RollingInterquartileRange;
+pub use rolling_kelly_criterion::RollingKellyCriterion;
 pub use rolling_kurtosis::RollingKurtosis;
 pub use rolling_linear_regression::RollingLinearRegression;
 pub use rolling_linear_regression_angle::RollingLinearRegressionAngle;
@@ -660,15 +694,20 @@ pub use rolling_min_max_index::{RollingMinMaxIndex, RollingMinMaxIndexValue};
 pub use rolling_minimum::RollingMinimum;
 pub use rolling_minimum_index::RollingMinimumIndex;
 pub use rolling_mode::RollingMode;
+pub use rolling_omega_ratio::RollingOmegaRatio;
 pub use rolling_percentile::RollingPercentile;
+pub use rolling_profit_factor::RollingProfitFactor;
 pub use rolling_quantile::RollingQuantile;
 pub use rolling_rank::RollingRank;
+pub use rolling_recovery_factor::RollingRecoveryFactor;
 pub use rolling_sharpe::RollingSharpe;
 pub use rolling_skew::RollingSkew;
 pub use rolling_sortino::RollingSortino;
 pub use rolling_standard_deviation::RollingStandardDeviation;
 pub use rolling_sum::RollingSum;
 pub use rolling_time_series_forecast::RollingTimeSeriesForecast;
+pub use rolling_treynor_ratio::RollingTreynorRatio;
+pub use rolling_value_at_risk::RollingValueAtRisk;
 pub use rolling_variance::RollingVariance;
 pub use rolling_winsorize::RollingWinsorize;
 pub use session_volume_levels::{SessionVolumeLevels, SessionVolumeLevelsValue};
@@ -678,7 +717,9 @@ pub use true_range::TrueRange;
 pub use true_strength_index::TrueStrengthIndex;
 pub use typical_price::TypicalPrice;
 pub use variable_period_moving_average::VariablePeriodMovingAverage;
+pub use volume_oscillator::VolumeOscillator;
 pub use volume_weighted_moving_average::VolumeWeightedMovingAverage;
+pub use volume_zone_oscillator::VolumeZoneOscillator;
 pub use weighted_close::WeightedClose;
 pub use williams_percent_r::WilliamsPercentR;
 pub use zero_lag_exponential_moving_average::ZeroLagExponentialMovingAverage;

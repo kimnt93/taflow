@@ -350,6 +350,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [x] | rolling_sortino | rolling_sortino | _ |
 | [x] | rolling_calmar | rolling_calmar | _ |
 | [x] | rolling_maximum_drawdown | rolling_maximum_drawdown | _ |
+| [ ] | rolling_omega_ratio | rolling_omega_ratio | _ |
+| [ ] | rolling_value_at_risk | rolling_value_at_risk | _ |
+| [ ] | rolling_conditional_value_at_risk | rolling_conditional_value_at_risk | _ |
+| [ ] | rolling_profit_factor | rolling_profit_factor | _ |
+| [ ] | rolling_kelly_criterion | rolling_kelly_criterion | _ |
+| [ ] | rolling_recovery_factor | rolling_recovery_factor | _ |
+| [ ] | rolling_treynor_ratio | rolling_treynor_ratio | _ |
+| [ ] | volume_oscillator | volume_oscillator | _ |
+| [ ] | volume_zone_oscillator | volume_zone_oscillator | _ |
+| [ ] | demand_index | demand_index | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

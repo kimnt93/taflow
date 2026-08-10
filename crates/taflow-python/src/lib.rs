@@ -129,6 +129,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::RollingSharpe>()?;
     m.add_class::<indicators::RollingSortino>()?;
     m.add_class::<indicators::RollingCalmar>()?;
+    m.add_class::<indicators::RollingOmegaRatio>()?;
+    m.add_class::<indicators::RollingValueAtRisk>()?;
+    m.add_class::<indicators::RollingConditionalValueAtRisk>()?;
+    m.add_class::<indicators::RollingProfitFactor>()?;
+    m.add_class::<indicators::RollingKellyCriterion>()?;
+    m.add_class::<indicators::RollingRecoveryFactor>()?;
+    m.add_class::<indicators::RollingTreynorRatio>()?;
+    m.add_class::<indicators::VolumeOscillator>()?;
+    m.add_class::<indicators::VolumeZoneOscillator>()?;
+    m.add_class::<indicators::DemandIndex>()?;
     m.add_class::<indicators::RollingMaximumDrawdown>()?;
     m.add_class::<indicators::HullMovingAverage>()?;
     m.add_class::<indicators::VolumeWeightedMovingAverage>()?;
