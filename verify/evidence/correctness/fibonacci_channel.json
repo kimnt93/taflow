@@ -5,9 +5,9 @@
   "oracle_name": "FibChannel",
   "batch_vs_oracle": {
     "passed": false,
-    "nan_mismatches": 144,
+    "nan_mismatches": 208,
     "infinity_mismatches": 0,
-    "max_abs_error": 69.93226363931568
+    "max_abs_error": 256.51154127844364
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -17,8 +17,8 @@
   },
   "continue_vs_oracle": {
     "passed": false,
-    "nan_mismatches": 144,
+    "nan_mismatches": 208,
     "infinity_mismatches": 0,
-    "max_abs_error": 69.93226363931568
+    "max_abs_error": 256.51154127844364
   }
 }

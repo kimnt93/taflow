@@ -5,9 +5,9 @@
   "oracle_name": "ZigZag",
   "batch_vs_oracle": {
     "passed": false,
-    "nan_mismatches": 102,
+    "nan_mismatches": 1028,
     "infinity_mismatches": 0,
-    "max_abs_error": 106.66739492988853
+    "max_abs_error": 240.564368171315
   },
   "continue_vs_batch_bitwise": true,
   "chunk_invariance": {
@@ -17,8 +17,8 @@
   },
   "continue_vs_oracle": {
     "passed": false,
-    "nan_mismatches": 102,
+    "nan_mismatches": 1028,
     "infinity_mismatches": 0,
-    "max_abs_error": 106.66739492988853
+    "max_abs_error": 240.564368171315
   }
 }
