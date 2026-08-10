@@ -46,6 +46,9 @@ class WickraBinding:
     parameter_names: tuple[str, ...]
     prepend_zero_close: bool = False
     cross_section: str | None = None
+    input_mode: str | None = None
+    actual_indices: tuple[int, ...] | None = None
+    oracle_indices: tuple[int, ...] | None = None
     variant: str | None = None
     rtol: float = 1e-8
     atol: float = 1e-10
@@ -61,6 +64,79 @@ class ExternalBinding:
 
 
 WICKRA_BINDINGS: dict[str, WickraBinding] = {
+    "LogReturn": WickraBinding("LogReturn", ("timeperiod",)),
+    "RollingQuantile": WickraBinding(
+        "RollingQuantile", ("timeperiod", "quantile")
+    ),
+    "RollingCovariance": WickraBinding("RollingCovariance", ("timeperiod",)),
+    "AwesomeOscillator": WickraBinding("AwesomeOscillator", ("fast", "slow")),
+    "FisherTransform": WickraBinding(
+        "FisherTransform",
+        ("timeperiod",),
+        input_mode="high_low_midpoint",
+        variant=(
+            "TAFlow implements the classic high/low Fisher Transform with "
+            "recursive Fisher smoothing; Wickra accepts one price series and "
+            "uses a different normalization recurrence."
+        ),
+    ),
+    "Donchian": WickraBinding(
+        "Donchian", ("timeperiod",), oracle_indices=(0, 2, 1)
+    ),
+    "ChaikinVolatility": WickraBinding(
+        "ChaikinVolatility", ("timeperiod", "roc_period")
+    ),
+    "UlcerIndex": WickraBinding("UlcerIndex", ("timeperiod",)),
+    "RollingVolumeWeightedAveragePrice": WickraBinding(
+        "RollingVWAP", ("timeperiod",)
+    ),
+    "ForceIndex": WickraBinding("ForceIndex", ()),
+    "EaseOfMovement": WickraBinding("EaseOfMovement", ()),
+    "Supertrend": WickraBinding(
+        "SuperTrend",
+        ("timeperiod", "multiplier"),
+        actual_indices=(0, 1),
+        variant=(
+            "TAFlow follows pandas-ta-classic RMA seeding and also exposes "
+            "long/short bands; Wickra uses its own ATR seed convention."
+        ),
+    ),
+    "Ichimoku": WickraBinding(
+        "Ichimoku",
+        ("tenkan", "kijun", "senkou"),
+        variant=(
+            "TAFlow emits raw causal cloud values for caller-side plotting; "
+            "Wickra emits Senkou and Chikou values displaced by 26 bars."
+        ),
+    ),
+    "Vortex": WickraBinding("Vortex", ("window",)),
+    "MassIndex": WickraBinding("MassIndex", ("ema_period", "sum_period")),
+    "ChaikinMoneyFlow": WickraBinding("ChaikinMoneyFlow", ("period",)),
+    "KlingerVolumeOscillator": WickraBinding(
+        "KVO", ("fast", "slow"), actual_indices=(0,)
+    ),
+    "VolumePriceTrend": WickraBinding("VolumePriceTrend", ()),
+    "McGinleyDynamic": WickraBinding("McGinleyDynamic", ("length",)),
+    "VariableIndexDynamicAverage": WickraBinding(
+        "VIDYA", ("length", "cmo_period")
+    ),
+    "LaguerreRelativeStrengthIndex": WickraBinding("LaguerreRSI", ("gamma",)),
+    "JurikMovingAverage": WickraBinding(
+        "JMA",
+        ("length", "phase"),
+        variant=(
+            "TAFlow follows the pandas-ta-classic adaptive-volatility Jurik "
+            "reconstruction; Wickra implements the simpler three-stage "
+            "open-source reconstruction."
+        ),
+    ),
+    "HeikinAshi": WickraBinding("HeikinAshi", ()),
+    "KalmanHedgeRatio": WickraBinding(
+        "KalmanHedgeRatio",
+        ("delta", "observation_variance"),
+        input_mode="swap_pair",
+        oracle_indices=(0,),
+    ),
     "RelativeMomentumIndex": WickraBinding("RMI", ("timeperiod", "momentum")),
     "RollingMaximumDrawdown": WickraBinding("MaxDrawdown", ("timeperiod",)),
     "RollingOmegaRatio": WickraBinding("OmegaRatio", ("timeperiod", "threshold")),

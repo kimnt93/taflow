@@ -66,10 +66,13 @@ def as_tuple(result) -> tuple:
 
 
 def compare(actual, expected, actual_indices: tuple[int, ...] | None = None,
+            expected_indices: tuple[int, ...] | None = None,
             rtol: float = RTOL, atol: float = ATOL) -> dict:
     actuals, expecteds = as_tuple(actual), as_tuple(expected)
     if actual_indices is not None:
         actuals = tuple(actuals[index] for index in actual_indices)
+    if expected_indices is not None:
+        expecteds = tuple(expecteds[index] for index in expected_indices)
     if len(actuals) != len(expecteds):
         return {"passed": False,
                 "error": f"output arity {len(actuals)} != {len(expecteds)}"}
@@ -168,10 +171,18 @@ def wickra_oracle(spec: Spec, arrays):
     synonyms = {
         "period": ("timeperiod", "period"),
         "window": ("period", "timeperiod"),
+        "atr_period": ("timeperiod",),
+        "tenkan_period": ("tenkan",),
+        "kijun_period": ("kijun",),
+        "senkou_b_period": ("senkou",),
+        "ema_period": ("timeperiod",),
+        "observation_var": ("observation_variance",),
         "max_lag": ("lag",),
         "lp_period": ("low_period",),
         "hp_period": ("high_period",),
     }
+    if binding.name in {"McGinleyDynamic", "VIDYA", "JMA"}:
+        synonyms["period"] = ("length", "timeperiod", "period")
     kwargs = {}
     for name, parameter in inspect.signature(oracle_class).parameters.items():
         candidates = (name, *synonyms.get(name, ()))
@@ -189,6 +200,10 @@ def wickra_oracle(spec: Spec, arrays):
     batch_arrays = list(arrays)
     if binding.cross_section:
         batch_arrays = cross_section_oracle_arrays(binding.cross_section, arrays)
+    elif binding.input_mode == "high_low_midpoint":
+        batch_arrays = [(np.asarray(arrays[0]) + np.asarray(arrays[1])) * 0.5]
+    elif binding.input_mode == "swap_pair":
+        batch_arrays = [arrays[1], arrays[0]]
     for index, name in enumerate(spec.series_args):
         if name == "timestamp":
             # TAFlow exposes Unix nanoseconds; Wickra Candle uses milliseconds.
@@ -376,8 +391,18 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
             tolerance = {"atol": 2e-5}
         else:
             tolerance = {}
+        selected_actual = actual_indices or (
+            spec.wickra.actual_indices if spec.wickra else None
+        )
+        selected_expected = (
+            spec.wickra.oracle_indices if spec.wickra else None
+        )
         row["batch_vs_oracle"] = compare(
-            batch, expected, actual_indices, **tolerance
+            batch,
+            expected,
+            selected_actual,
+            selected_expected,
+            **tolerance,
         )
 
     try:
@@ -392,7 +417,11 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
     }
     if expected is not None:
         row["continue_vs_oracle"] = compare(
-            stitched, expected, actual_indices, **tolerance
+            stitched,
+            expected,
+            selected_actual,
+            selected_expected,
+            **tolerance,
         )
     return row
 
