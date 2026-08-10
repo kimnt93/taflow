@@ -47,9 +47,7 @@ wheel: ## Produce a distributable wheel in dist/
 
 check: ## Verify the Python implementation: unit tests (incl. doc examples) + oracle parity
 	uv run pytest -q
-	cd verify && uv sync --extra extra-oracles && uv run python verify.py $(ARGS)
-	cd verify && uv run python external_oracles.py
-	cd verify && uv run python source_comparison.py
+	uv run python scripts/verification/correctness.py $(ARGS)
 
 test: test-rust test-python ## Run the Rust and Python unit test suites
 
@@ -59,17 +57,15 @@ test-rust: ## Rust unit and integration tests
 test-python: ## Python unit tests (pipelines, adapters, API surface)
 	uv run pytest -q
 
-verify: ## Oracle parity only (TA-Lib / pandas); narrow with ARGS="EMA ATR"
-	cd verify && uv sync && uv run python verify.py $(ARGS)
+verify: ## Oracle parity (TA-Lib, then Wickra); narrow with ARGS="EMA ATR"
+	uv run python scripts/verification/correctness.py $(ARGS)
 
-verify-external: ## pandas-ta-classic, Polars, and SmartMoneyConcepts parity
-	cd verify && uv sync --extra extra-oracles && uv run python external_oracles.py $(ARGS)
-	cd verify && uv run python source_comparison.py
+verify-external: verify ## Compatibility alias for the unified oracle registry
 
 # ------------------------------------------------------------- benchmarks ----
 
 bench: ## Benchmark against TA-Lib; narrow with ARGS="SMA MAX"
-	cd verify && uv sync && uv run python benchmark.py $(ARGS)
+	uv run python scripts/verification/benchmark.py $(ARGS)
 
 # ------------------------------------------------------------- housekeeping ----
 

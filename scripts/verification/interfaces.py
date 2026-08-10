@@ -1,6 +1,6 @@
 """Lifecycle and self-consistency checks for every public indicator adapter.
 
-This complements ``verify.py``: TA-Lib functions use an external oracle there,
+This complements ``correctness.py``: external parity is established there,
 while this pass exercises the canonical state API and checks that constructor,
 bulk, and scalar histories are identical.  It also enforces the documented
 fluent lifecycle so interface drift is visible in the generated report.
@@ -8,8 +8,6 @@ fluent lifecycle so interface drift is visible in the generated report.
 from __future__ import annotations
 
 import inspect
-import json
-from pathlib import Path
 
 import numpy as np
 
@@ -24,7 +22,10 @@ open_ = close + 0.2
 volume = np.linspace(100_000.0, 200_000.0, N)
 benchmark = close * 1.01
 periods = np.full(N, 10, dtype=np.int64)
-timestamp = np.arange(N, dtype=np.int64) * 3_600 + 1_700_000_000
+timestamp = (
+    np.arange(N, dtype=np.int64) * 3_600_000_000_000
+    + 1_700_000_000_000_000_000
+)
 condition = (np.arange(N) % 11) == 0
 new_session = (np.arange(N) % 16) == 0
 ARRAYS = {
@@ -32,7 +33,9 @@ ARRAYS = {
     "prices": close,
     "change": close, "value": close, "equity": close,
     "left": close, "right": benchmark, "x": close, "y": benchmark,
-    "benchmark": benchmark, "close": close, "high": high, "low": low,
+    "benchmark": benchmark, "asset": close,
+    "dependent": close, "predictor": benchmark,
+    "close": close, "high": high, "low": low,
     "a": close, "b": benchmark,
     "h": high, "l": low,
     "_open": open_, "open": open_, "volume": volume, "periods": periods,
@@ -179,23 +182,8 @@ def main() -> None:
             rows.append({"name": name, "status": "PASS"})
         except Exception as exc:  # report every interface; one failure must not hide others
             rows.append({"name": name, "status": "FAIL", "error": f"{type(exc).__name__}: {exc}"})
-    out = Path(__file__).parent / "ALL_INTERFACES.json"
-    out.write_text(json.dumps(rows, indent=2) + "\n")
     passed = sum(row["status"] == "PASS" for row in rows)
     failed = len(rows) - passed
-    markdown = [
-        "# Canonical taflow interface correctness",
-        "",
-        "Indicator invariant: constructor history == native `extend` history == one-bar `append` history. Stateful adapters must also provide fluent `append`, `extend`, and `reset`, plus an exact `len()`. Helper functions receive smoke checks.",
-        "",
-        f"- Passed: **{passed}**",
-        f"- Failed: **{failed}**",
-        "",
-        "| Interface | Status | Error |",
-        "|---|---|---|",
-    ]
-    markdown.extend(f"| `{row['name']}` | {row['status']} | {row.get('error', '')} |" for row in rows)
-    (Path(__file__).parent / "ALL_INTERFACES.md").write_text("\n".join(markdown) + "\n")
     print(f"{passed}/{len(rows)} public taflow interfaces passed; {failed} failed")
     if failed:
         for row in rows:

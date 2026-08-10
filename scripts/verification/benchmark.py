@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""Benchmark canonical taflow states against independent reference libraries.
+"""Benchmark correctness-gated TAFlow classes against registered oracles.
 
-The benchmark never imports a TA-Lib compatibility module from taflow.  It
-maps descriptive taflow classes to external TA-Lib function names through the
-shared CHECK.md registry and measures the Python-visible native vector path,
-warm-up, continuation, and independent-stream thread scaling.
+The target priority is TA-Lib, Wickra, explicit NumPy overrides, then SMC.
+Every per-indicator report includes whole-vector API/kernel measurements and
+fresh-state warm-up at 1, 5, and 10 threads. Raw samples remain in JSON.
 """
 
 from __future__ import annotations
 
 import argparse
 import gc
+import importlib.metadata
 import json
-import os
 import platform
 import statistics
 import sys
@@ -20,381 +19,130 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
-from pathlib import Path
 from typing import Callable
 
 import numpy as np
 
-from registry import Spec, build_registry, make_data, resolve_specs
-from verify import pandas_oracles, verdict, verify_function
+from correctness import (
+    numpy_oracle,
+    smc_oracle,
+    talib_oracle,
+    verdict,
+    verify_function,
+    wickra_oracle,
+)
+from registry import (
+    BENCHMARK_EVIDENCE_DIR,
+    VERIFY_DIR,
+    Spec,
+    build_registry,
+    make_data,
+    resolve_specs,
+)
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 3
 DEFAULT_SIZES = (1_000, 10_000, 100_000, 1_000_000)
-DEFAULT_THREADS = (1, 5, 10)
 DEFAULT_WARMUP_SIZES = (1, 10, 100, 1_000)
-DEFAULT_CHUNKS = (1, 10, 1_000)
-DEFAULT_SCENARIOS = ("correctness", "vector", "warmup", "continue", "threads")
-MIN_SAMPLE_SECONDS = 0.02
+DEFAULT_THREADS = (1, 5, 10)
 
 
-def talib_call(spec: Spec, arrays: list[np.ndarray]):
-    import talib
-    from talib import abstract
-
-    params = dict(abstract.Function(spec.talib_name).info["parameters"])
-    return getattr(talib, spec.talib_name)(*arrays, **params)
-
-
-def selected_reference(spec: Spec) -> dict:
-    path = Path(__file__).parent / "SOURCE_COMPARISON.json"
-    if not path.exists() or not spec.cls:
-        return {}
-    rows = json.loads(path.read_text())
-    return next((row for row in rows if row["class"] == spec.cls.__name__), {})
+def oracle_call(spec: Spec, arrays: list[np.ndarray]):
+    """Invoke the highest-priority external batch implementation."""
+    if spec.talib_name:
+        return talib_oracle(spec, arrays)
+    if spec.wickra:
+        return wickra_oracle(spec, arrays)
+    if spec.numpy:
+        return numpy_oracle(spec, arrays)
+    if spec.smc:
+        return smc_oracle(spec, arrays)
+    raise LookupError(f"no external oracle for {spec.cls.__name__}")
 
 
-def external_reference_call(spec: Spec, arrays: list[np.ndarray], reference: dict):
-    """Invoke timed external references currently supported by the harness."""
-    source = reference.get("source")
-    if source == "TA-Lib":
-        return talib_call(spec, arrays)
-    if source == "NumPy":
-        functions = {
-            "math_abs": np.abs,
-            "math_acosh": np.arccosh,
-            "math_asinh": np.arcsinh,
-            "math_atanh": np.arctanh,
-            "math_cbrt": np.cbrt,
-            "math_cot": lambda value: 1.0 / np.tan(value),
-            "math_degrees": np.degrees,
-            "math_log1p": np.log1p,
-            "math_radians": np.radians,
-            "signed_power": lambda value: np.sign(value) * np.abs(value) ** 2.0,
-        }
-        return functions[spec.snake](arrays[0])
-    if source == "Polars":
-        import polars as pl
-        series = pl.Series(arrays[0])
-        functions = {
-            "cumulative_maximum": lambda: series.cum_max(),
-            "cumulative_minimum": lambda: series.cum_min(),
-            "cumulative_product": lambda: series.cum_prod(),
-            "cumulative_sum": lambda: series.cum_sum(),
-            "ewm_var": lambda: series.ewm_var(
-                span=spec.ctor_kwargs.get("timeperiod", 14), adjust=False, bias=True),
-        }
-        return functions[spec.snake]()
-    if source == "pandas" and spec.snake == "fib_retracement":
-        import pandas as pd
-        series = pd.Series(arrays[0])
-        window = spec.ctor_kwargs.get("window", 120)
-        high = series.rolling(window, min_periods=1).max()
-        low = series.rolling(window, min_periods=1).min()
-        span = high - low
-        return tuple(
-            (high - span * ratio).to_numpy()
-            for ratio in (0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0)
-        )
-    if source == "pandas" and spec.snake == "anchored_vwap":
-        import pandas as pd
-        high, low, close, volume = (pd.Series(array) for array in arrays[:4])
-        groups = pd.Series(arrays[4], dtype=bool).cumsum()
-        typical = (high + low + close) / 3.0
-        cumulative_volume = volume.groupby(groups, sort=False).cumsum()
-        cumulative_weighted = (typical * volume).groupby(
-            groups, sort=False
-        ).cumsum()
-        cumulative_weighted_square = (typical * typical * volume).groupby(
-            groups, sort=False
-        ).cumsum()
-        average = cumulative_weighted / cumulative_volume
-        variance = (
-            cumulative_weighted_square / cumulative_volume - average * average
-        ).clip(lower=0.0)
-        multiplier = spec.ctor_kwargs.get("standard_deviation_multiplier", 1.0)
-        deviation = variance.pow(0.5) * multiplier
-        return (
-            average.to_numpy(),
-            (average + deviation).to_numpy(),
-            (average - deviation).to_numpy(),
-        )
-    if source == "pandas" and spec.snake == "lag":
-        import pandas as pd
-        return pd.Series(arrays[0]).shift(
-            spec.ctor_kwargs.get("timeperiod", 1)
-        ).to_numpy()
-    if source == "pandas" and spec.snake == "rolling_maximum_drawdown":
-        import pandas as pd
-        period = spec.ctor_kwargs.get("timeperiod", 14)
-        return pd.Series(arrays[0]).rolling(period).apply(
-            lambda window: np.max(np.divide(
-                np.maximum.accumulate(window) - window,
-                np.maximum.accumulate(window),
-                out=np.zeros_like(window),
-                where=np.maximum.accumulate(window) > 0.0,
-            )),
-            raw=True,
-        ).to_numpy()
-    if source == "pandas-ta-classic" and spec.snake == "log_return":
-        import pandas as pd
-        import pandas_ta_classic as pta
-        return pta.log_return(
-            pd.Series(arrays[0]),
-            length=spec.ctor_kwargs.get("timeperiod", 1),
-        ).to_numpy()
-    if source == "pandas-ta-classic" and spec.snake == "heikin_ashi":
-        import pandas as pd
-        import pandas_ta_classic as pta
-        frame = pta.ha(*(pd.Series(array) for array in arrays))
-        return tuple(frame[column].to_numpy() for column in frame.columns)
-    if source == "pandas-ta-classic" and spec.snake == "vidya":
-        import pandas as pd
-        import pandas_ta_classic as pta
-        result = pta.vidya(
-            pd.Series(arrays[0]),
-            length=spec.ctor_kwargs.get("length", 14),
-        )
-        return None if result is None else result.to_numpy()
-    if source == "pandas-ta-classic" and spec.snake == "laguerre_rsi":
-        import pandas as pd
-        import pandas_ta_classic as pta
-        result = pta.lrsi(
-            pd.Series(arrays[0]),
-            length=1,
-            gamma=spec.ctor_kwargs.get("gamma", 0.5),
-        )
-        return None if result is None else result.to_numpy()
-    if source == "pandas-ta-classic" and spec.snake == "pmax":
-        import pandas as pd
-        import pandas_ta_classic as pta
-        result = pta.pmax(
-            pd.Series(arrays[0]),
-            pd.Series(arrays[1]),
-            pd.Series(arrays[2]),
-            length=spec.ctor_kwargs.get("length", 10),
-            multiplier=spec.ctor_kwargs.get("multiplier", 3.0),
-        )
-        return None if result is None else result.to_numpy()
-    if source == "pandas-ta-classic" and spec.snake == "jma":
-        import pandas as pd
-        import pandas_ta_classic as pta
-        result = pta.jma(
-            pd.Series(arrays[0]),
-            length=spec.ctor_kwargs.get("length", 7),
-            phase=spec.ctor_kwargs.get("phase", 0.0),
-        )
-        return None if result is None else result.to_numpy()
-    if source == "Wickra" and spec.snake == "rmi":
-        import wickra
-        return np.asarray(wickra.RMI(
-            spec.ctor_kwargs.get("timeperiod", 14),
-            spec.ctor_kwargs.get("momentum", 5),
-        ).batch(arrays[0].tolist()))
-    raise KeyError(source)
+def taflow_api_call(spec: Spec, arrays: list[np.ndarray]):
+    """Run construct, public ``extend``, and public ``compute``."""
+    state = spec.new_state()
+    state.extend(*arrays)
+    return state.compute()
 
 
-def has_timed_reference(reference: dict) -> bool:
-    return reference.get("source") in {
-        "TA-Lib", "NumPy", "Polars", "pandas", "pandas-ta-classic", "Wickra"
-    }
-
-
-def timed(fn: Callable[[], object], repeats: int,
-          min_seconds: float = MIN_SAMPLE_SECONDS) -> dict:
-    """Warm once, autorange, then return seconds-per-call samples."""
-    fn()
-    iterations = 1
-    while True:
-        start = time.perf_counter_ns()
-        for _ in range(iterations):
-            fn()
-        elapsed = (time.perf_counter_ns() - start) / 1e9
-        if elapsed >= min_seconds or iterations >= 1 << 18:
-            break
-        multiplier = max(2, int(min_seconds / max(elapsed, 1e-9)))
-        iterations = min(iterations * multiplier, 1 << 18)
-    samples = []
-    for _ in range(repeats):
-        gc.disable()
-        start = time.perf_counter_ns()
-        for _ in range(iterations):
-            fn()
-        samples.append((time.perf_counter_ns() - start) / 1e9 / iterations)
-        gc.enable()
-    return sample_stats(samples)
-
-
-def sample_stats(samples: list[float], units: int | None = None) -> dict:
-    ordered = sorted(samples)
-    mean = statistics.fmean(samples)
-    block = {
-        "mean_ms": mean * 1e3,
-        "min_ms": ordered[0] * 1e3,
-        "p50_ms": statistics.median(ordered) * 1e3,
-        "p99_ms": float(np.percentile(ordered, 99)) * 1e3,
-        "samples_s": samples,
-    }
-    if units is not None:
-        block["units_per_second"] = units / mean
-    return block
-
-
-def full_vector(spec: Spec, arrays: list[np.ndarray]):
-    return Spec.extend(spec.new_state(), arrays)
-
-
-def native_vector(spec: Spec, arrays: list[np.ndarray]):
-    """Run the compiled state directly, excluding Python history bookkeeping."""
+def taflow_kernel_call(spec: Spec, arrays: list[np.ndarray]):
+    """Run the bound native state's bulk method without history conversion."""
     state = spec.new_state()
     native = getattr(state, "_state", state)
     return native.extend(*arrays)
 
 
-def vector_rows(spec: Spec, data: dict, sizes: tuple[int, ...],
-                repeats: int) -> list[dict]:
-    reference = selected_reference(spec)
-    rows = []
-    for size in sizes:
-        arrays = spec.arrays(data, size)
-        row = {
-            "bars": size,
-            "taflow_canonical_vector": timed(
-                lambda: full_vector(spec, arrays), repeats),
-            "taflow_native_kernel": timed(
-                lambda: native_vector(spec, arrays), repeats),
-        }
-        for key in ("taflow_canonical_vector", "taflow_native_kernel"):
-            row[key]["bars_per_second"] = size / (row[key]["mean_ms"] / 1e3)
-        if has_timed_reference(reference):
-            row["external_reference"] = timed(
-                lambda: external_reference_call(spec, arrays, reference), repeats)
-            row["external_reference"]["bars_per_second"] = (
-                size / (row["external_reference"]["mean_ms"] / 1e3))
-            row["speedup_canonical"] = (row["external_reference"]["mean_ms"]
-                                         / row["taflow_canonical_vector"]["mean_ms"])
-            row["speedup_kernel"] = (row["external_reference"]["mean_ms"]
-                                      / row["taflow_native_kernel"]["mean_ms"])
-        rows.append(row)
-    return rows
+def _summary(samples: list[float], iterations: int = 1) -> dict:
+    """Summarize seconds-per-call samples while preserving their raw values."""
+    return {
+        "mean_ms": statistics.fmean(samples) * 1_000.0,
+        "median_ms": statistics.median(samples) * 1_000.0,
+        "min_ms": min(samples) * 1_000.0,
+        "iterations_per_sample": iterations,
+        "samples_s": samples,
+    }
 
 
-def warmup_rows(spec: Spec, data: dict, sizes: tuple[int, ...],
-                thread_counts: tuple[int, ...], repeats: int) -> list[dict]:
-    """Construct fresh independent states at each bar/thread matrix point."""
-    rows = []
-    reference = selected_reference(spec)
-    for bars in sizes:
-        arrays = spec.arrays(data, bars)
-        for count in thread_counts:
-            native_samples = []
-            reference_samples = []
-            for _ in range(min(repeats, 3)):
-                native_samples.append(_thread_wall([
-                    lambda a=arrays: native_vector(spec, a) for _ in range(count)
-                ]))
-                if has_timed_reference(reference):
-                    reference_samples.append(_thread_wall([
-                        lambda a=arrays: external_reference_call(spec, a, reference)
-                        for _ in range(count)
-                    ]))
-            row = {
-                "bars": bars,
-                "threads": count,
-                "taflow_native_warmup": sample_stats(native_samples, count * bars),
-            }
-            if reference_samples:
-                row["reference_warmup"] = sample_stats(reference_samples, count * bars)
-                row["speedup"] = (row["reference_warmup"]["mean_ms"]
-                                  / row["taflow_native_warmup"]["mean_ms"])
-            rows.append(row)
-    return rows
-
-
-def _continue_taflow(spec: Spec, base_arrays: list[np.ndarray],
-                     update_arrays: list[np.ndarray], chunk: int,
-                     repeats: int, kernel: bool = False) -> dict:
+def timed(call: Callable[[], object], repeats: int) -> dict:
+    """Warm, autorange short calls, and retain per-call timing samples."""
+    call()
+    iterations = 1
+    while True:
+        start = time.perf_counter_ns()
+        for _ in range(iterations):
+            call()
+        elapsed = (time.perf_counter_ns() - start) / 1e9
+        if elapsed >= 0.005 or iterations >= 1 << 16:
+            break
+        iterations *= 2
     samples = []
-    calls = (len(update_arrays[0]) + chunk - 1) // chunk
     for _ in range(repeats):
-        state = spec.new_state()
-        target = getattr(state, "_state", state) if kernel else state
-        target.extend(*base_arrays)
         gc.disable()
         start = time.perf_counter_ns()
-        if chunk == 1:
-            for bar in zip(*update_arrays):
-                target.append(*bar)
-        else:
-            for offset in range(0, len(update_arrays[0]), chunk):
-                target.extend(*[a[offset:offset + chunk]
-                                for a in update_arrays])
-        samples.append((time.perf_counter_ns() - start) / 1e9)
+        for _ in range(iterations):
+            call()
+        samples.append((time.perf_counter_ns() - start) / 1e9 / iterations)
         gc.enable()
-    result = sample_stats(samples)
-    mean_s = result["mean_ms"] / 1e3
-    result.update({
-        "calls": calls,
-        "bars": len(update_arrays[0]),
-        "mean_call_us": mean_s / calls * 1e6,
-        "mean_bar_us": mean_s / len(update_arrays[0]) * 1e6,
-        "bars_per_second": len(update_arrays[0]) / mean_s,
-    })
-    return result
+    return _summary(samples, iterations)
 
 
-def continuation_rows(spec: Spec, data: dict, base: int, updates: int,
-                      chunks: tuple[int, ...], repeats: int) -> list[dict]:
-    reference = selected_reference(spec)
-    arrays = spec.arrays(data, base + updates)
-    base_arrays = [a[:base] for a in arrays]
-    update_arrays = [a[base:] for a in arrays]
+def vector_results(
+    spec: Spec,
+    data: dict[str, np.ndarray],
+    sizes: tuple[int, ...],
+    repeats: int,
+) -> list[dict]:
+    """Measure public API, native kernel, and reference batch paths."""
     rows = []
-    for chunk in chunks:
-        row = {
-            "base_bars": base,
-            "update_bars": updates,
-            "chunk": chunk,
-            "taflow_canonical_continue": _continue_taflow(
-                spec, base_arrays, update_arrays, chunk, repeats),
-            "taflow_native_continue": _continue_taflow(
-                spec, base_arrays, update_arrays, chunk, repeats, kernel=True),
-        }
-        if has_timed_reference(reference):
-            full = [a[:base + chunk] for a in arrays]
-            row["external_full_recompute"] = timed(
-                lambda: external_reference_call(spec, full, reference),
-                min(repeats, 3),
-            )
-            tf_us = row["taflow_native_continue"]["mean_call_us"]
-            row["speedup_vs_full"] = (
-                row["external_full_recompute"]["mean_ms"] * 1e3 / tf_us)
-
-        # A bounded tail is only a valid substitute for a full recomputation
-        # for the stateless TA-Lib vector functions. Recursive references such
-        # as pandas-ta-classic Heikin-Ashi require the complete prior state.
-        if reference.get("source") == "TA-Lib":
-            tail_bars = min(base + chunk, spec.lookback + chunk + 1)
-            tail = [a[base + chunk - tail_bars:base + chunk] for a in arrays]
-            row["external_tail_recompute"] = timed(
-                lambda: external_reference_call(spec, tail, reference),
-                min(repeats, 3),
-            )
-            tf_us = row["taflow_native_continue"]["mean_call_us"]
-            row["speedup_vs_tail"] = (
-                row["external_tail_recompute"]["mean_ms"] * 1e3 / tf_us)
-        rows.append(row)
+    for bars in sizes:
+        arrays = spec.arrays(data, bars)
+        api = timed(lambda: taflow_api_call(spec, arrays), repeats)
+        kernel = timed(lambda: taflow_kernel_call(spec, arrays), repeats)
+        reference = timed(lambda: oracle_call(spec, arrays), repeats)
+        api["bars_per_second"] = bars / (api["mean_ms"] / 1_000.0)
+        kernel["bars_per_second"] = bars / (kernel["mean_ms"] / 1_000.0)
+        rows.append({
+            "bars": bars,
+            "taflow_api": api,
+            "taflow_kernel": kernel,
+            "reference": reference,
+            "api_speedup": reference["mean_ms"] / api["mean_ms"],
+            "kernel_speedup": reference["mean_ms"] / kernel["mean_ms"],
+        })
     return rows
 
 
-def _thread_wall(workers: list[Callable[[], None]]) -> float:
-    barrier = threading.Barrier(len(workers) + 1)
+def _thread_wall(calls: list[Callable[[], object]]) -> float:
+    """Measure independent calls released simultaneously from one barrier."""
+    barrier = threading.Barrier(len(calls) + 1)
 
-    def run(worker):
+    def run(call: Callable[[], object]) -> None:
         barrier.wait()
-        worker()
+        call()
 
-    with ThreadPoolExecutor(max_workers=len(workers)) as pool:
-        futures = [pool.submit(run, worker) for worker in workers]
+    with ThreadPoolExecutor(max_workers=len(calls)) as pool:
+        futures = [pool.submit(run, call) for call in calls]
         start = time.perf_counter_ns()
         barrier.wait()
         for future in futures:
@@ -402,451 +150,240 @@ def _thread_wall(workers: list[Callable[[], None]]) -> float:
     return (time.perf_counter_ns() - start) / 1e9
 
 
-def thread_rows(spec: Spec, data: dict, bars: int, updates: int,
-                thread_counts: tuple[int, ...], repeats: int) -> list[dict]:
-    reference = selected_reference(spec)
-    arrays = spec.arrays(data, bars + updates)
-    base_arrays = [a[:bars] for a in arrays]
-    update_arrays = [a[bars:] for a in arrays]
+def warmup_results(
+    spec: Spec,
+    data: dict[str, np.ndarray],
+    sizes: tuple[int, ...],
+    thread_counts: tuple[int, ...],
+    repeats: int,
+) -> list[dict]:
+    """Measure fresh native states and references at each bars/thread point."""
     rows = []
-    for count in thread_counts:
-        row = {"threads": count, "bars": bars, "updates": updates}
-        vector_samples = []
-        native_vector_samples = []
-        reference_samples = []
-        continue_samples = []
-        native_continue_samples = []
-        for _ in range(min(repeats, 3)):
-            vector_samples.append(_thread_wall([
-                lambda a=arrays: full_vector(spec, a) for _ in range(count)
-            ]))
-            native_vector_samples.append(_thread_wall([
-                lambda a=arrays: native_vector(spec, a) for _ in range(count)
-            ]))
-            states = [spec.new_state() for _ in range(count)]
-            for state in states:
-                state.extend(*base_arrays)
-            continue_samples.append(_thread_wall([
-                lambda state=state: [state.append(*bar)
-                                     for bar in zip(*update_arrays)]
-                for state in states
-            ]))
-            native_states = [spec.new_state() for _ in range(count)]
-            for state in native_states:
-                getattr(state, "_state", state).extend(*base_arrays)
-            native_continue_samples.append(_thread_wall([
-                lambda state=state: [getattr(state, "_state", state).append(*bar)
-                                     for bar in zip(*update_arrays)]
-                for state in native_states
-            ]))
-            if has_timed_reference(reference):
-                reference_samples.append(_thread_wall([
-                    lambda a=arrays: external_reference_call(spec, a, reference)
-                    for _ in range(count)
-                ]))
-        row["taflow_canonical_vector"] = sample_stats(
-            vector_samples, count * bars)
-        row["taflow_native_vector"] = sample_stats(
-            native_vector_samples, count * bars)
-        row["taflow_canonical_continue"] = sample_stats(
-            continue_samples, count * updates)
-        row["taflow_native_continue"] = sample_stats(
-            native_continue_samples, count * updates)
-        if reference_samples:
-            row["external_reference_vector"] = sample_stats(
-                reference_samples, count * bars)
-            row["vector_speedup"] = (
-                row["external_reference_vector"]["mean_ms"]
-                / row["taflow_native_vector"]["mean_ms"])
-        rows.append(row)
-    one = next((row for row in rows if row["threads"] == 1), None)
-    if one:
-        for row in rows:
-            row["taflow_vector_scaling"] = (
-                row["taflow_native_vector"]["units_per_second"]
-                / one["taflow_native_vector"]["units_per_second"])
-            row["taflow_continue_scaling"] = (
-                row["taflow_native_continue"]["units_per_second"]
-                / one["taflow_native_continue"]["units_per_second"])
-            if "external_reference_vector" in row:
-                row["reference_vector_scaling"] = (
-                    row["external_reference_vector"]["units_per_second"]
-                    / one["external_reference_vector"]["units_per_second"])
+    for bars in sizes:
+        arrays = spec.arrays(data, bars)
+        for threads in thread_counts:
+            taflow_samples = [
+                _thread_wall([
+                    lambda: taflow_kernel_call(spec, arrays)
+                    for _ in range(threads)
+                ])
+                for _ in range(min(repeats, 3))
+            ]
+            reference_samples = [
+                _thread_wall([
+                    lambda: oracle_call(spec, arrays)
+                    for _ in range(threads)
+                ])
+                for _ in range(min(repeats, 3))
+            ]
+            taflow = _summary(taflow_samples)
+            reference = _summary(reference_samples)
+            rows.append({
+                "bars": bars,
+                "threads": threads,
+                "taflow": taflow,
+                "reference": reference,
+                "speedup": reference["mean_ms"] / taflow["mean_ms"],
+            })
     return rows
 
 
 def environment() -> dict:
+    """Record dependency and host versions needed to interpret timings."""
     import taflow
-    try:
-        import talib
-        talib_version = talib.__version__
-    except ImportError:
-        talib_version = None
-    cpu = ""
-    try:
-        cpu = next(line.split(":", 1)[1].strip()
-                   for line in Path("/proc/cpuinfo").read_text().splitlines()
-                   if line.startswith("model name"))
-    except (OSError, StopIteration):
-        pass
+    import talib
+    import wickra
+
     return {
         "date": date.today().isoformat(),
         "platform": platform.platform(),
         "python": platform.python_version(),
         "numpy": np.__version__,
         "taflow": getattr(taflow, "__version__", "unknown"),
-        "talib": talib_version,
-        "cpu": cpu,
-        "rustflags": os.environ.get("RUSTFLAGS", ""),
-        "native_vector_note": (
-            "taflow class.extend over contiguous NumPy arrays; this exercises "
-            "the compiled Rust bulk/SIMD-capable path. SIMD availability and "
-            "target features depend on the installed wheel/build flags."
-        ),
+        "talib": talib.__version__,
+        "wickra": wickra.__version__,
+        "smartmoneyconcepts": importlib.metadata.version("smartmoneyconcepts"),
     }
 
 
-def fmt_rate(value: float | None) -> str:
-    if value is None:
-        return "—"
+def _rate(value: float) -> str:
+    """Format a bars-per-second value with a compact SI suffix."""
     for suffix, scale in (("G", 1e9), ("M", 1e6), ("K", 1e3)):
         if value >= scale:
             return f"{value / scale:.2f}{suffix}"
     return f"{value:.1f}"
 
 
-def render(report: dict) -> str:
-    title = report["canonical_class"]
-    alias = report.get("talib_name")
-    lines = [f"# {title} benchmark" + (f" (`{alias}` oracle)" if alias else ""), ""]
-    correctness = report.get("correctness")
-    if correctness:
-        lines += [f"Correctness: **{verdict(correctness)}**.", ""]
-    lines += [report["environment"]["native_vector_note"], ""]
-    if report.get("vector"):
-        lines += ["## Whole-vector performance", "",
-                  "| Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | Reference ms | API speedup | Kernel speedup |",
-                  "|---:|---:|---:|---:|---:|---:|---:|---:|"]
-        for row in report["vector"]:
-            api = row["taflow_canonical_vector"]
-            kernel = row["taflow_native_kernel"]
-            ta = row.get("external_reference", {})
-            lines.append(f"| {row['bars']:,} | {api['mean_ms']:.3f} | "
-                         f"{fmt_rate(api['bars_per_second'])} | "
-                         f"{kernel['mean_ms']:.3f} | "
-                         f"{fmt_rate(kernel['bars_per_second'])} | "
-                         f"{ta.get('mean_ms', float('nan')):.3f} | "
-                         + (f"{row['speedup_canonical']:.2f}×" if "speedup_canonical" in row else "—")
-                         + " | " + (f"{row['speedup_kernel']:.2f}×" if "speedup_kernel" in row else "—") + " |")
-        lines.append("")
-    if report.get("warmup"):
-        lines += ["## Fresh-state warm-up", "",
-                  "| Bars | Threads | TAFlow ms | Reference ms | Speedup |",
-                  "|---:|---:|---:|---:|---:|"]
-        for row in report["warmup"]:
-            reference = row.get("reference_warmup", {})
-            lines.append(
-                f"| {row['bars']:,} | {row['threads']} | "
-                f"{row['taflow_native_warmup']['mean_ms']:.3f} | "
-                f"{reference.get('mean_ms', float('nan')):.3f} | "
-                + (f"{row['speedup']:.2f}× |" if "speedup" in row else "— |"))
-        lines.append("")
-    if report.get("continuation"):
-        has_tail = any("external_tail_recompute" in row
-                       for row in report["continuation"])
-        lines += ["## Warmed continuation", ""]
-        if has_tail:
-            lines += [
-                "| Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | Reference full µs | vs full | vs bounded tail |",
-                "|---:|---:|---:|---:|---:|---:|---:|---:|",
-            ]
-        else:
-            lines += [
-                "| Base | Chunk | API µs/call | Kernel µs/call | Kernel bars/s | Reference full µs | vs full |",
-                "|---:|---:|---:|---:|---:|---:|---:|",
-            ]
-        for row in report["continuation"]:
-            api = row["taflow_canonical_continue"]
-            tf = row["taflow_native_continue"]
-            full = row["external_full_recompute"]
-            cells = [
-                f"{row['base_bars']:,}",
-                f"{row['chunk']:,}",
-                f"{api['mean_call_us']:.3f}",
-                f"{tf['mean_call_us']:.3f}",
-                fmt_rate(tf["bars_per_second"]),
-                f"{full['mean_ms'] * 1e3:.3f}",
-                f"{row['speedup_vs_full']:.2f}×",
-            ]
-            if has_tail:
-                cells.append(f"{row['speedup_vs_tail']:.2f}×")
-            lines.append("| " + " | ".join(cells) + " |")
-        lines.append("")
-    if report.get("threads"):
-        lines += ["## Independent-stream threads", "",
-                  "| Threads | API vector/s | Kernel vector/s | Kernel vector scaling | API continue/s | Kernel continue/s | Kernel continue scaling | Reference vector/s |",
-                  "|---:|---:|---:|---:|---:|---:|---:|---:|"]
-        for row in report["threads"]:
-            reference = row["external_reference_vector"]
-            lines.append(f"| {row['threads']} | "
-                         f"{fmt_rate(row['taflow_canonical_vector']['units_per_second'])} | "
-                         f"{fmt_rate(row['taflow_native_vector']['units_per_second'])} | "
-                         f"{row['taflow_vector_scaling']:.2f}× | "
-                         f"{fmt_rate(row['taflow_canonical_continue']['units_per_second'])} | "
-                         f"{fmt_rate(row['taflow_native_continue']['units_per_second'])} | "
-                         f"{row['taflow_continue_scaling']:.2f}× | "
-                         f"{fmt_rate(reference['units_per_second'])} |")
-        lines.append("")
-    lines += ["---", "Times include Python conversion/binding overhead. Raw samples are retained in JSON.", ""]
+def render_evidence(report: dict) -> str:
+    """Render one complete per-indicator benchmark report."""
+    alias = report["oracle_name"]
+    lines = [
+        f"# {report['canonical_class']} benchmark (`{alias}` oracle)",
+        "",
+        "Correctness: **MATCH**.",
+        "",
+        "taflow class.extend over contiguous NumPy arrays; this exercises the "
+        "compiled Rust bulk/SIMD-capable path. SIMD availability and target "
+        "features depend on the installed wheel/build flags.",
+        "",
+        "## Whole-vector performance",
+        "",
+        "| Bars | TAFlow API ms | API bars/s | TAFlow kernel ms | Kernel bars/s | "
+        "Reference ms | API speedup | Kernel speedup |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for row in report["vector"]:
+        lines.append(
+            f"| {row['bars']:,} | {row['taflow_api']['mean_ms']:.3f} | "
+            f"{_rate(row['taflow_api']['bars_per_second'])} | "
+            f"{row['taflow_kernel']['mean_ms']:.3f} | "
+            f"{_rate(row['taflow_kernel']['bars_per_second'])} | "
+            f"{row['reference']['mean_ms']:.3f} | "
+            f"{row['api_speedup']:.2f}× | {row['kernel_speedup']:.2f}× |"
+        )
+    lines += [
+        "",
+        "## Fresh-state warm-up",
+        "",
+        "| Bars | Threads | TAFlow ms | Reference ms | Speedup |",
+        "|---:|---:|---:|---:|---:|",
+    ]
+    for row in report["warmup"]:
+        lines.append(
+            f"| {row['bars']:,} | {row['threads']} | "
+            f"{row['taflow']['mean_ms']:.3f} | "
+            f"{row['reference']['mean_ms']:.3f} | {row['speedup']:.2f}× |"
+        )
+    lines += [
+        "", "---",
+        "Times include Python conversion/binding overhead. Raw samples are retained in JSON.",
+        "",
+    ]
     return "\n".join(lines)
 
 
-def run_spec(spec: Spec, args, data: dict, env: dict) -> dict:
-    report = {
-        "schema_version": SCHEMA_VERSION,
-        "canonical_class": spec.cls.__name__ if spec.cls else spec.snake,
-        "snake_name": spec.snake,
-        "talib_name": spec.talib_name,
-        "constructor_kwargs": spec.ctor_kwargs,
-        "inputs": spec.input_roles,
-        "environment": env,
-        "protocol": {
-            "repeats": args.repeats,
-            "sizes": args.sizes,
-            "warmup_sizes": args.warmup_sizes,
-            "continue_base": args.continue_base,
-            "continue_bars": args.continue_bars,
-            "chunks": args.chunks,
-            "threads": args.threads,
-        },
-    }
-    if spec.error:
-        report["error"] = spec.error
-        return report
-    scenarios = set(args.scenarios)
-    if "correctness" in scenarios:
-        oracle = pandas_oracles().get(spec.snake)
-        reference = selected_reference(spec)
-        check_spec = spec
-        if oracle and not spec.talib_name:
-            check_spec = Spec.build(spec.snake, None)
-            check_spec.ctor_kwargs.update(oracle["kwargs"])
-            check_spec.input_roles = oracle["inputs"]
-        oracle_fn = oracle["oracle"] if oracle else None
-        if not spec.talib_name and not oracle_fn and has_timed_reference(reference):
-            oracle_fn = lambda arrays: external_reference_call(
-                check_spec, arrays, reference
-            )
-        report["correctness"] = verify_function(
-            check_spec, data, args.correctness_bars,
-            min(args.continue_base, args.correctness_bars - 1),
-            oracle_fn=oracle_fn,
-            actual_indices=(0,) if spec.snake == "pmax" else None)
-        if oracle_fn and reference:
-            report["correctness"]["oracle"] = reference["source"]
-            if spec.snake == "pmax":
-                report["correctness"]["oracle_output"] = "stop (output 0)"
-    if "vector" in scenarios:
-        report["vector"] = vector_rows(spec, data, args.sizes, args.repeats)
-    if "warmup" in scenarios:
-        report["warmup"] = warmup_rows(
-            spec, data, args.warmup_sizes, args.threads, args.repeats)
-    if "continue" in scenarios:
-        report["continuation"] = continuation_rows(
-            spec, data, args.continue_base, args.continue_bars,
-            args.chunks, args.repeats)
-    if "threads" in scenarios:
-        report["threads"] = thread_rows(
-            spec, data, min(args.thread_bars, args.continue_base),
-            min(args.continue_bars, 1_000), args.threads, args.repeats)
-    return report
-
-
-def aggregate(reports: list[dict]) -> str:
-    selected_path = Path(__file__).parent / "SOURCE_COMPARISON.json"
-    selected_rows = json.loads(selected_path.read_text()) if selected_path.exists() else []
-    selected_by_class: dict[str, list[dict]] = {}
-    for row in selected_rows:
-        selected_by_class.setdefault(row["class"], []).append(row)
-    lines = ["# Correctness and performance", "",
-             f"Generated {date.today().isoformat()} from {len(reports)} indicator implementations.", "",
-             "Every correctness row uses an external implementation. `VARIANT` means the "
-             "external calculation was executed and the documented causal or initialization "
-             "difference was observed; it is not a failed comparison. Speedups are "
-             "`reference time / TAFlow native-kernel time`, so values above 1× favor TAFlow. "
-             "A dash means that reference is correctness-only in the timing harness.", "",
-             "## 1. Correctness", "",
-             "| Class | Reference | Correctness | Max error |",
-             "|---|---|---:|---:|"]
-    report_by_class = {report["canonical_class"]: report for report in reports}
-    for class_name in sorted(selected_by_class):
-        evidence = selected_by_class[class_name]
-        first = evidence[0]
-        reference = (f"[{first['source']}: `{first['oracle_api']}`]"
-                     f"({first['url']})")
-        correctness = ("FAIL" if any(row["verdict"] == "FAIL" for row in evidence) else
-                       "VARIANT" if any(row["verdict"] == "VARIANT" for row in evidence) else
-                       "MATCH")
-        max_error = max(row.get("error", 0.0) for row in evidence)
-        lines.append(f"| {class_name} | {reference} | {correctness} | `{max_error:.3e}` |")
-
-    lines += ["", "## 2. Performance on vector", "",
-              "| Class | Reference | 1k bars | 10k bars | 100k bars | 1m bars |",
-              "|---|---|---:|---:|---:|---:|"]
-    for report in reports:
-        evidence = selected_by_class.get(report["canonical_class"], [{}])
-        selected = evidence[0]
-        reference = (f"[{selected['source']}: `{selected['oracle_api']}`]({selected['url']})"
-                     if selected else "—")
-        vector_by_size = {row["bars"]: row for row in report.get("vector", [])}
+def render_aggregate(reports: list[dict], env: dict) -> str:
+    """Render the authoritative cross-indicator benchmark summary."""
+    lines = [
+        "# TAFlow benchmark", "",
+        f"Generated {env['date']} with Python {env['python']}, NumPy "
+        f"{env['numpy']}, TA-Lib {env['talib']}, Wickra {env['wickra']}, "
+        f"SMC {env['smartmoneyconcepts']}, and TAFlow {env['taflow']}.", "",
+        "Only `MATCH` indicators are timed. Speedup is reference time divided "
+        "by TAFlow time; values above 1× favor TAFlow. Each cell is API/kernel.",
+        "",
+        "| Class | Target | 1k | 10k | 100k | 1m |",
+        "|---|---|---:|---:|---:|---:|",
+    ]
+    for report in sorted(reports, key=lambda item: item["canonical_class"]):
+        by_size = {row["bars"]: row for row in report["vector"]}
         cells = []
         for size in DEFAULT_SIZES:
-            row = vector_by_size.get(size)
-            cells.append(f"{row['speedup_kernel']:.2f}×"
-                         if row and "speedup_kernel" in row else "—")
-        lines.append(f"| {report['canonical_class']} | {reference} | "
-                     + " | ".join(cells) + " |")
-
-    lines += ["", "## 3. Warm up", "",
-              "Fresh independent states are constructed and fed the stated number of bars. "
-              "Thread columns measure that many states concurrently.", ""]
-    for bars in DEFAULT_WARMUP_SIZES:
-        lines += [f"### {bars:,} bar" + ("s" if bars != 1 else ""), "",
-                  "| Class | Reference | 1 thread | 5 threads | 10 threads |",
-                  "|---|---|---:|---:|---:|"]
-        for class_name in sorted(report_by_class):
-            report = report_by_class[class_name]
-            selected = selected_by_class.get(class_name, [{}])[0]
-            reference = (f"[{selected['source']}: `{selected['oracle_api']}`]({selected['url']})"
-                         if selected else "—")
-            by_threads = {row["threads"]: row for row in report.get("warmup", [])
-                          if row["bars"] == bars}
-            cells = [f"{by_threads[count]['speedup']:.2f}×"
-                     if count in by_threads and "speedup" in by_threads[count] else "—"
-                     for count in DEFAULT_THREADS]
-            lines.append(f"| {class_name} | {reference} | " + " | ".join(cells) + " |")
-        lines.append("")
-    return "\n".join(lines).rstrip() + "\n"
+            row = by_size.get(size)
+            cells.append(
+                f"{row['api_speedup']:.2f}×/{row['kernel_speedup']:.2f}×"
+                if row else "—"
+            )
+        lines.append(
+            f"| {report['canonical_class']} | {report['oracle']} "
+            f"`{report['oracle_name']}` | " + " | ".join(cells) + " |"
+        )
+    lines += [
+        "", "Complete vector and warm-up/thread tables plus raw samples are "
+        "stored under `verify/evidence/benchmark/`.",
+    ]
+    return "\n".join(lines) + "\n"
 
 
-def write_aggregate(reports: list[dict], reports_dir: Path) -> None:
-    """Write the single canonical report to docs and the report artifact dir."""
-    content = aggregate(reports)
-    (reports_dir / "BENCHMARK.md").write_text(content)
-    docs_report = Path(__file__).resolve().parent.parent / "docs" / "CORRECTNESS.md"
-    docs_report.write_text(content)
-
-
-def ints(value: str) -> tuple[int, ...]:
+def parse_ints(value: str) -> tuple[int, ...]:
+    """Parse a comma-separated integer command-line option."""
     return tuple(int(item.replace("_", "")) for item in value.split(",") if item)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("functions", nargs="*",
-                        help="TA-Lib, snake, or canonical class names; default all")
+    parser.add_argument("functions", nargs="*")
+    parser.add_argument("--sizes", type=parse_ints, default=DEFAULT_SIZES)
+    parser.add_argument("--warmup-sizes", type=parse_ints,
+                        default=DEFAULT_WARMUP_SIZES)
+    parser.add_argument("--threads", type=parse_ints, default=DEFAULT_THREADS)
+    parser.add_argument("--repeats", type=int, default=3)
+    parser.add_argument("--correctness-bars", type=int, default=10_000)
     parser.add_argument("--quick", action="store_true")
-    parser.add_argument("--list", action="store_true")
-    parser.add_argument("--repeats", type=int, default=7)
-    parser.add_argument("--sizes", type=ints, default=DEFAULT_SIZES)
-    parser.add_argument("--correctness-bars", type=int, default=100_000)
-    parser.add_argument("--warmup-sizes", type=ints, default=DEFAULT_WARMUP_SIZES)
-    parser.add_argument("--continue-base", type=int, default=100_000)
-    parser.add_argument("--continue-bars", type=int, default=1_000)
-    parser.add_argument("--thread-bars", type=int, default=100_000)
-    parser.add_argument("--chunks", type=ints, default=DEFAULT_CHUNKS)
-    parser.add_argument("--threads", type=ints, default=DEFAULT_THREADS)
-    parser.add_argument("--scenarios", type=lambda value: tuple(value.split(",")),
-                        default=DEFAULT_SCENARIOS)
-    parser.add_argument("--reports-dir", type=Path,
-                        default=Path(__file__).parent / "benchmark_reports")
-    parser.add_argument("--aggregate-only", action="store_true",
-                        help="regenerate BENCHMARK.md from existing JSON reports")
+    parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     if args.quick:
-        args.repeats = min(args.repeats, 3)
-        args.sizes = tuple(size for size in (1_000, 10_000) if size <= max(args.sizes))
-        # Keep the oracle pass at the same 10k scale as verify.py; only the
-        # performance matrix is reduced by --quick.
-        args.correctness_bars = min(args.correctness_bars, 10_000)
-        args.warmup_sizes = tuple(size for size in DEFAULT_WARMUP_SIZES if size <= 1_000)
-        args.continue_base = min(args.continue_base, 1_500)
-        args.continue_bars = min(args.continue_bars, 100)
-        args.thread_bars = min(args.thread_bars, 1_000)
-        args.chunks = tuple(sorted({min(chunk, args.continue_bars)
-                                   for chunk in args.chunks}))
+        args.sizes = (1_000, 10_000)
+        args.repeats = min(args.repeats, 2)
 
     registry = build_registry()
-    if args.aggregate_only:
-        reports = []
-        for path in sorted(args.reports_dir.glob("*.json")):
-            try:
-                candidate = json.loads(path.read_text())
-            except json.JSONDecodeError:
-                continue
-            if candidate.get("schema_version") == SCHEMA_VERSION:
-                reports.append(candidate)
-        args.reports_dir.mkdir(parents=True, exist_ok=True)
-        write_aggregate(reports, args.reports_dir)
-        print(f"wrote {args.reports_dir / 'BENCHMARK.md'} from {len(reports)} reports")
-        return 0
-    if args.list:
-        for spec in registry.values():
-            print(f"{spec.cls.__name__ if spec.cls else spec.snake:48s} "
-                  f"{spec.talib_name or '-':20s} {spec.error or 'ready'}")
-        return 0
     specs, unknown = (resolve_specs(args.functions, registry)
                       if args.functions else (list(registry.values()), []))
     if unknown:
         print("unknown functions: " + ", ".join(unknown), file=sys.stderr)
         return 2
-    required = max((*args.sizes, args.correctness_bars,
-                    max(args.warmup_sizes), args.continue_base + args.continue_bars,
-                    args.thread_bars + min(args.continue_bars, 1_000)))
+    specs = [spec for spec in specs
+             if spec.oracle_source and not spec.oracle_variant]
+    required = max(*args.sizes, *args.warmup_sizes, args.correctness_bars)
     data = make_data(required)
     env = environment()
-    args.reports_dir.mkdir(parents=True, exist_ok=True)
-    reports = []
+    BENCHMARK_EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+    failures = 0
     for index, spec in enumerate(specs, 1):
-        label = spec.cls.__name__ if spec.cls else spec.snake
-        start = time.perf_counter()
-        try:
-            report = run_spec(spec, args, data, env)
-        except Exception as exc:
-            report = {
-                "schema_version": SCHEMA_VERSION,
-                "canonical_class": label,
-                "snake_name": spec.snake,
-                "talib_name": spec.talib_name,
-                "environment": env,
-                "error": f"{type(exc).__name__}: {exc}",
-            }
-        reports.append(report)
-        stem = spec.talib_name or spec.snake
-        (args.reports_dir / f"{stem}.json").write_text(
-            json.dumps(report, indent=2, default=float) + "\n")
-        (args.reports_dir / f"{stem}.md").write_text(render(report))
-        status = (verdict(report["correctness"])
-                  if report.get("correctness") else
-                  ("ERROR" if report.get("error") else "DONE"))
-        print(f"[{index}/{len(specs)}] {label}: {status} "
-              f"({time.perf_counter() - start:.2f}s)")
-    # Aggregate the complete on-disk inventory, so a focused rerun (for
-    # example `EMA ATR`) refreshes those rows without dropping other reports.
-    all_reports = []
-    for path in sorted(args.reports_dir.glob("*.json")):
-        try:
-            candidate = json.loads(path.read_text())
-        except json.JSONDecodeError:
+        evidence_json = BENCHMARK_EVIDENCE_DIR / f"{spec.snake}.json"
+        if args.resume and evidence_json.exists():
+            prior = json.loads(evidence_json.read_text())
+            vector_sizes = {row["bars"] for row in prior.get("vector", [])}
+            warmup_points = {(row["bars"], row["threads"])
+                             for row in prior.get("warmup", [])}
+            expected_points = {(bars, threads) for bars in args.warmup_sizes
+                               for threads in args.threads}
+            if (prior.get("schema_version") == SCHEMA_VERSION
+                    and set(args.sizes).issubset(vector_sizes)
+                    and expected_points.issubset(warmup_points)):
+                print(f"[{index}/{len(specs)}] {spec.cls.__name__}: reused")
+                continue
+        check = verify_function(
+            spec, data, args.correctness_bars,
+            args.correctness_bars * 9 // 10,
+        )
+        status = verdict(check)
+        if status != "MATCH":
+            failures += 1
+            print(f"[{index}/{len(specs)}] {spec.cls.__name__}: {status}; not timed")
             continue
+        report = {
+            "schema_version": SCHEMA_VERSION,
+            "canonical_class": spec.cls.__name__,
+            "snake_name": spec.snake,
+            "oracle": spec.oracle_source,
+            "oracle_name": spec.oracle_name,
+            "environment": env,
+            "protocol": {
+                "sizes": args.sizes,
+                "warmup_sizes": args.warmup_sizes,
+                "threads": args.threads,
+                "repeats": args.repeats,
+            },
+            "correctness": {"verdict": status, "evidence": check},
+            "vector": vector_results(spec, data, args.sizes, args.repeats),
+            "warmup": warmup_results(
+                spec, data, args.warmup_sizes, args.threads, args.repeats
+            ),
+        }
+        evidence_json.write_text(json.dumps(report, indent=2, default=float) + "\n")
+        (BENCHMARK_EVIDENCE_DIR / f"{spec.snake}.md").write_text(
+            render_evidence(report)
+        )
+        print(f"[{index}/{len(specs)}] {spec.cls.__name__}: benchmarked")
+
+    reports = []
+    for path in sorted(BENCHMARK_EVIDENCE_DIR.glob("*.json")):
+        candidate = json.loads(path.read_text())
         if candidate.get("schema_version") == SCHEMA_VERSION:
-            all_reports.append(candidate)
-    write_aggregate(all_reports, args.reports_dir)
-    failures = sum(report.get("error") is not None or
-                   (report.get("correctness") is not None
-                    and verdict(report["correctness"]) != "MATCH")
-                   for report in reports)
-    print(f"wrote {args.reports_dir}; {failures} functions need attention")
+            reports.append(candidate)
+    (VERIFY_DIR / "BENCHMARK.md").write_text(render_aggregate(reports, env))
+    print(f"wrote {VERIFY_DIR / 'BENCHMARK.md'} ({len(reports)} indicators)")
     return 1 if failures else 0
 
 

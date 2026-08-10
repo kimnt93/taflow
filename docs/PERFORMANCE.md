@@ -7,7 +7,7 @@ implemented, measured, found to change low-order bits, and thrown away.
 
 This page describes the methods, the measured results, and the things that were
 deliberately *not* done. Raw numbers live in
-[`../verify/benchmark_reports/`](../verify/benchmark_reports/BENCHMARK.md); the
+[`../verify/BENCHMARK.md`](../verify/BENCHMARK.md); the
 per-function work list is
 [`../plans/optimize-checklist.md`](../plans/optimize-checklist.md).
 
@@ -192,7 +192,7 @@ Kernel throughput vs TA-Lib at 10,000 bars, before and after:
 153 of the 161 TA-Lib-mapped functions now meet or beat the C implementation
 at 10k bars (median **1.61×**, mean **2.01×**). Per-function
 numbers across 1k/10k/100k/1M bars, plus append latency and thread scaling, are
-in [the benchmark reports](../verify/benchmark_reports/BENCHMARK.md).
+in [the benchmark report](../verify/BENCHMARK.md).
 
 The independently corrected extension paths retain high throughput through the
 canonical Python interface at 10,000 bars:

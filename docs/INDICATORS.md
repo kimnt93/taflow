@@ -39,7 +39,7 @@ MoneyFlowIndex(high, low, close, volume, timeperiod=14)
 The `Constructor order` column below is authoritative — it is introspected from
 the live signature. Passing data by keyword always works.
 
-Correctness uses the highest-priority available external oracle in [../verify/SOURCE_COMPARISON.md](../verify/SOURCE_COMPARISON.md); throughput is in [../verify/benchmark_reports/BENCHMARK.md](../verify/benchmark_reports/BENCHMARK.md).
+Correctness is reported in [../verify/CORRECTNESS.md](../verify/CORRECTNESS.md); throughput is in [../verify/BENCHMARK.md](../verify/BENCHMARK.md).
 
 ## Contents
 

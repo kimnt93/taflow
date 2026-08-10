@@ -4,7 +4,7 @@ Working checklist for delegated implementation agents. Derived from
 [optimize-methods.md](optimize-methods.md) (methods background),
 [optimize-implementation-plan.md](optimize-implementation-plan.md) (current-state
 analysis, file:line citations, family taxonomy) and
-`verify/benchmark_reports/BENCHMARK.md` (2026-08-08 run, 287 functions).
+`verify/BENCHMARK.md` (the current aggregate benchmark).
 
 How to use: pick a work package (§3) or a set of rows with the same method code, do the
 work following §2, verify per §4, then flip `[ ]` → `[x]` and record the new speedup.
@@ -56,10 +56,9 @@ CORREL and BETA needed *different* orderings, so they no longer share a moments
 struct. Reseeding was removed from both, which also dropped a `period/64`
 per-bar tax.
 
-`RollingZScore` was never wrong: verified against 50-digit Decimal, taflow was
-within 3.7e-15 while the pandas oracle was off by 2.3e-08 (its rolling `std`
-accumulator degrades on low-variance windows). The **oracle** was replaced with
-a fresh per-window numpy computation, documented in `verify/verify.py`.
+`RollingZScore` had a historical high-precision investigation, but the current
+external gate intentionally reports `NO_EXTERNAL_ORACLE`: only TA-Lib and
+Wickra may establish parity.
 
 An FMA concern was raised — that `-C target-cpu=native` might contract mul+add
 and break the new bitwise parity. Tested both ways at 1M bars: identical. Rust
@@ -163,7 +162,7 @@ R8. Bulk loops index the input slice directly (evicted element = `inputs[i-p]`) 
    (`crates/taflow-python/src/`), then the Python wrapper (`python/taflow/`).
 4. `maturin develop --release` (with `RUSTFLAGS="-C target-cpu=native"` only for local
    measurement; never commit flags into wheel config — G2 handles distribution).
-5. `python verify/benchmark.py` (at minimum for the touched functions); confirm every
+5. `uv run python scripts/verification/benchmark.py` (at minimum for the touched functions); confirm every
    touched function's JSON correctness block is green and speedup improved.
 6. Update this checklist: `[x]`, new speedup in the Perf column (keep the old one as
    `old→new`), and note deviations.

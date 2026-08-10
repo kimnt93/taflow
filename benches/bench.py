@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Compatibility launcher for the canonical verification benchmark.
 
-The implementation lives in ``verify/benchmark.py`` so correctness and
-performance use one CHECK.md-derived TA-Lib-to-taflow registry.
+The implementation lives in ``scripts/verification/benchmark.py`` so
+correctness and performance use one TA-Lib/Wickra registry.
 """
 
 from __future__ import annotations
@@ -13,6 +13,6 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERIFY = ROOT / "verify"
-sys.path.insert(0, str(VERIFY))
-runpy.run_path(str(VERIFY / "benchmark.py"), run_name="__main__")
+SCRIPTS = ROOT / "scripts" / "verification"
+sys.path.insert(0, str(SCRIPTS))
+runpy.run_path(str(SCRIPTS / "benchmark.py"), run_name="__main__")

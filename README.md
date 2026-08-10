@@ -271,7 +271,7 @@ make bench ARGS="SMA MAX"    # a subset
 
 The complete [correctness and performance report](docs/CORRECTNESS.md) contains
 all per-class matrices; raw repeated timing samples remain in
-[`verify/benchmark_reports/`](verify/benchmark_reports/). Figures here are
+[`verify/evidence/benchmark/`](verify/evidence/benchmark/). Figures here are
 arithmetic means; individual functions vary by a few percent between runs.
 
 `make build-native` builds with `-C target-cpu=native` for local measurement.

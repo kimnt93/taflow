@@ -2,7 +2,7 @@
 
 Successor to [optimize-methods.md](optimize-methods.md). That document proposed methods;
 this one is grounded in what is **actually in the tree today** and in the measured
-benchmark reports (`verify/benchmark_reports/*.md`, generated 2026-08-08, 287 functions).
+benchmark evidence (`verify/evidence/benchmark/*.md`, generated 2026-08-08, 287 functions).
 It is written so an implementing agent can execute it top-to-bottom without re-deriving
 the analysis. Every claim cites a file:line in the current tree.
 
@@ -86,7 +86,7 @@ exists, absolute bars/s otherwise).
 
 Sweep procedure for the implementing agent:
 
-1. Generate the work list from `verify/benchmark_reports/BENCHMARK.md` (287 rows).
+1. Generate the work list from `verify/BENCHMARK.md`.
 2. Tag each row with a family (most are obvious from the core file's structure; the
    table above seeds ~200 of them).
 3. Apply the family recipe: streaming state → ring-buffer form; bulk kernel →
@@ -103,7 +103,7 @@ cheap — but skip bespoke kernel work for them.
 
 The benchmark separates `TAFlow API ms` (public Python class: construct → `extend` →
 `compute`) from `TAFlow kernel ms` (raw PyO3 object `extend`, no wrapper bookkeeping, no
-`compute`) — see `verify/benchmark.py:87-108` and `verify/registry.py:286-294`. Two
+`compute`) — see `scripts/verification/benchmark.py`. Two
 independent problems fall out:
 
 1. **The Python wrapper layer** is 3–12× slower than its own Rust kernel for ~55 classes.
@@ -313,7 +313,7 @@ lazy `__getattr__`, low priority.
 1. **Correctness**: `continue_vs_batch_bitwise: true`, chunk invariance (1/10/1000),
    TA-Lib `max_abs_error` within existing tolerance — all 287 green after every phase.
 2. **API ≈ kernel**: `TAFlow API ms` within ~10% of `TAFlow kernel ms` at ≥10k bars
-   (update `verify/registry.py:290-294` if `extend` stops returning arrays for Family B).
+   (update `scripts/verification/registry.py` if `extend` stops returning arrays for Family B).
 3. **Kernel vs TA-Lib**: every TA-Lib-mapped function ≥ 1× at 10k bars for F1–F6/F9/F12;
    ≥ 0.8× where TA-Lib's C is doing identical serial work (F8, ULTOSC-style multi-window).
    Custom functions (no oracle): no function below 20M bars/s without a written
@@ -321,7 +321,7 @@ lazy `__getattr__`, low priority.
 4. **No hidden costs**: zero per-bar allocation in any `append` (verify with a
    heap-profiling spot check on the F11 set); `reset()` never reallocates.
 5. **Benchmark discipline**: current reports only cover 1k/10k (`protocol.sizes`).
-   Run 100k and 1M too (`verify/benchmark.py` supports it) — wrapper overhead vanishes
+   Run 100k and 1M too (`scripts/verification/benchmark.py` supports it) — wrapper overhead vanishes
    and kernel quality dominates at 1M; both regimes matter. Keep recording `rustflags`.
 
 ## Guardrails (read before writing code)
@@ -350,6 +350,7 @@ lazy `__getattr__`, low priority.
 | 5 | Phase 4 (family worked examples, then sweep each family via §B) | 3–5 days | F4/F6/F7/F9/F10/F11 to gates |
 | 6 | Phase 5.3–5.5, Phase 6 | as scheduled | GIL scaling, drift safety, cleanup |
 
-After each phase: `maturin develop --release`, `python verify/benchmark.py`, diff
-reports against `verify/benchmark_reports/`, confirm every JSON correctness block is
+After each phase: `maturin develop --release`, run
+`uv run python scripts/verification/benchmark.py`, diff evidence under
+`verify/evidence/benchmark/`, and confirm every JSON correctness block is
 green before moving on.

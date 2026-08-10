@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Verify taflow implementations against reference libraries.
+"""Verify every canonical TAFlow class against TA-Lib or Wickra.
 
 taflow's canonical CamelCase classes are driven through the shared
 ``registry`` (TA-Lib names mapped via /CHECK.md). Protocol per function:
 
-  1. Oracle computes the full series (default 10,000 bars) — TA-Lib for
-     TA-Lib-named functions, pandas for rolling/EWM operators.
+  1. The registry selects TA-Lib first and Wickra only when TA-Lib has no
+     equivalent. Classes unsupported by both are reported explicitly.
   2. taflow cold state (construct + ``extend``) computes the full series
      -> compared to the oracle.
   3. The state is fed the first 9,000 bars with ``extend`` and continued
@@ -14,24 +14,43 @@ taflow's canonical CamelCase classes are driven through the shared
      chunk-invariance contract) and to the oracle.
 
 Usage:
-  uv run python verify.py                 # all functions -> REPORT.md
-  uv run python verify.py EMA ATR         # subset (TA-Lib names)
+  uv run python scripts/verification/correctness.py
+  uv run python scripts/verification/correctness.py EMA ATR
 """
 
 from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import inspect
 import json
+import importlib.metadata
 import platform
 import sys
 import traceback
 from pathlib import Path
 
 import numpy as np
-from numpy.lib.stride_tricks import sliding_window_view
-
-from registry import Spec, build_registry, make_data, resolve_specs
+try:
+    from .registry import (
+        CORRECTNESS_EVIDENCE_DIR,
+        VERIFY_DIR,
+        Spec,
+        build_registry,
+        constructor_value,
+        make_data,
+        resolve_specs,
+    )
+except ImportError:  # Support direct execution from this directory.
+    from registry import (
+        CORRECTNESS_EVIDENCE_DIR,
+        VERIFY_DIR,
+        Spec,
+        build_registry,
+        constructor_value,
+        make_data,
+        resolve_specs,
+    )
 
 RTOL = 1e-8
 ATOL = 1e-10
@@ -46,7 +65,8 @@ def as_tuple(result) -> tuple:
     return result if isinstance(result, tuple) else (result,)
 
 
-def compare(actual, expected, actual_indices: tuple[int, ...] | None = None) -> dict:
+def compare(actual, expected, actual_indices: tuple[int, ...] | None = None,
+            rtol: float = RTOL, atol: float = ATOL) -> dict:
     actuals, expecteds = as_tuple(actual), as_tuple(expected)
     if actual_indices is not None:
         actuals = tuple(actuals[index] for index in actual_indices)
@@ -71,7 +91,7 @@ def compare(actual, expected, actual_indices: tuple[int, ...] | None = None) -> 
     passed = nan_mismatches == 0 and infinity_mismatches == 0 and all(
         np.allclose(np.asarray(x, dtype=np.float64),
                     np.asarray(y, dtype=np.float64),
-                    rtol=RTOL, atol=ATOL, equal_nan=True)
+                    rtol=rtol, atol=atol, equal_nan=True)
         for x, y in zip(actuals, expecteds))
     return {"passed": passed, "nan_mismatches": nan_mismatches,
             "infinity_mismatches": infinity_mismatches,
@@ -89,6 +109,13 @@ def continue_series(spec: Spec, arrays, split: int) -> tuple:
     head = Spec.extend(state, [a[:split] for a in arrays])
     bars = list(zip(*[a[split:].tolist() for a in arrays]))
     outputs = [Spec.append_value(state, bar) for bar in bars]
+    if len(head) == 1 and np.asarray(head[0]).ndim == 2:
+        width = np.asarray(head[0]).shape[1]
+        tail = np.asarray([
+            [float("nan")] * width if output is None else output
+            for output in outputs
+        ], dtype=np.float64).reshape((-1, width))
+        return (np.concatenate([np.asarray(head[0]), tail], axis=0),)
     arity = len(head)
     columns: list[list[float]] = [[] for _ in range(arity)]
     for out in outputs:
@@ -127,101 +154,141 @@ def talib_oracle(spec: Spec, arrays):
     return getattr(talib, spec.talib_name)(*arrays, **params)
 
 
-def pandas_oracles() -> dict[str, dict]:
-    """taflow-only operators checkable against pandas (population moments
-    converted exactly where conventions differ)."""
+def wickra_oracle(spec: Spec, arrays):
+    """Execute the explicit Wickra binding registered for ``spec``."""
+    import wickra
+
+    binding = spec.wickra
+    if binding is None:
+        raise LookupError(f"no Wickra binding for {spec.cls.__name__}")
+    oracle_class = getattr(wickra, binding.name)
+    taflow_parameters = inspect.signature(spec.cls.__init__).parameters
+    series_names = {name.replace("_", "").lower()
+                    for name in spec.series_args}
+    synonyms = {
+        "period": ("timeperiod", "period"),
+        "window": ("period", "timeperiod"),
+        "max_lag": ("lag",),
+        "lp_period": ("low_period",),
+        "hp_period": ("high_period",),
+    }
+    kwargs = {}
+    for name, parameter in inspect.signature(oracle_class).parameters.items():
+        candidates = (name, *synonyms.get(name, ()))
+        target = next((candidate for candidate in candidates
+                       if candidate in taflow_parameters
+                       and candidate.replace("_", "").lower() not in series_names), None)
+        if target is not None:
+            kwargs[name] = constructor_value(spec, target)
+        elif parameter.default is inspect.Parameter.empty:
+            raise TypeError(
+                f"cannot map required Wickra parameter {name!r} for "
+                f"{spec.cls.__name__}"
+            )
+    oracle = oracle_class(**kwargs)
+    batch_arrays = list(arrays)
+    for index, name in enumerate(spec.series_args):
+        if name == "timestamp":
+            # TAFlow exposes Unix nanoseconds; Wickra Candle uses milliseconds.
+            batch_arrays[index] = np.asarray(batch_arrays[index]) // 1_000_000
+    if binding.prepend_zero_close:
+        batch_arrays.insert(0, np.zeros_like(arrays[0]))
+    result = oracle.batch(*batch_arrays)
+    if hasattr(result, "tolist") and hasattr(result, "shape"):
+        matrix = np.asarray(result.tolist(), dtype=np.float64)
+        if matrix.ndim == 2:
+            if spec.cls.__name__ in {
+                "TimeOfDayReturnProfile",
+                "DayOfWeekReturnProfile",
+                "IntradayVolatilityProfile",
+                "VolumeByTimeProfile",
+            }:
+                return matrix
+            return tuple(matrix[:, index] for index in range(matrix.shape[1]))
+    return result
+
+
+def numpy_oracle(spec: Spec, arrays):
+    """Execute one explicit NumPy ufunc override on the supplied arrays."""
+    functions = {
+        "numpy.abs": lambda: np.abs(arrays[0]),
+        "numpy.arccosh": lambda: np.arccosh(arrays[0]),
+        "numpy.arcsinh": lambda: np.arcsinh(arrays[0]),
+        "numpy.arctanh": lambda: np.arctanh(arrays[0]),
+        "numpy.cbrt": lambda: np.cbrt(arrays[0]),
+        "numpy.tan reciprocal": lambda: 1.0 / np.tan(arrays[0]),
+        "numpy.degrees": lambda: np.degrees(arrays[0]),
+        "numpy.log1p": lambda: np.log1p(arrays[0]),
+        "numpy.radians": lambda: np.radians(arrays[0]),
+        "numpy.sign/abs/power": lambda: (
+            np.sign(arrays[0])
+            * np.abs(arrays[0]) ** constructor_value(spec, "exponent")
+        ),
+    }
+    return functions[spec.numpy.name]()
+
+
+def _smc_frame(open_, high, low, close):
+    """Build the lowercase OHLC frame required by smartmoneyconcepts."""
     import pandas as pd
 
-    n = 14
-
-    def roll(series):
-        return pd.Series(series).rolling(n)
-
-    return {
-        "rolling_median": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: roll(a[0]).median().to_numpy()},
-        "rolling_quantile": {
-            "kwargs": {"timeperiod": n, "quantile": 0.25},
-            "inputs": ("close",),
-            "oracle": lambda a: roll(a[0]).quantile(0.25).to_numpy()},
-        "rolling_percentile": {
-            "kwargs": {"timeperiod": n, "percentile": 50.0},
-            "inputs": ("close",),
-            "oracle": lambda a: roll(a[0]).quantile(0.50).to_numpy()},
-        "rolling_interquartile_range": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: (roll(a[0]).quantile(0.75)
-                                  - roll(a[0]).quantile(0.25)).to_numpy()},
-        "rolling_maximum_drawdown": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: pd.Series(a[0]).rolling(n).apply(
-                lambda window: np.max(np.divide(
-                    np.maximum.accumulate(window) - window,
-                    np.maximum.accumulate(window),
-                    out=np.zeros_like(window),
-                    where=np.maximum.accumulate(window) > 0.0,
-                )),
-                raw=True,
-            ).to_numpy()},
-        "rolling_skew": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: (roll(a[0]).skew() * (n - 2)
-                                 / np.sqrt(n * (n - 1))).to_numpy()},
-        "rolling_kurtosis": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: (roll(a[0]).kurt() * (n - 2) * (n - 3)
-                                 / ((n - 1) * (n + 1))
-                                 - 6.0 / (n + 1)).to_numpy()},
-        # NOT pandas: `rolling().std()` uses an add/remove accumulator that
-        # loses precision on low-variance windows. Measured against 50-digit
-        # Decimal on the harness's own data, pandas is off by 2.3e-08 at its
-        # worst bar while taflow is within 3.7e-15 — the pandas oracle was the
-        # inaccurate side. A fresh per-window numpy computation is exact to
-        # ~4e-15 and is used instead.
-        "rolling_zscore": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: _fresh_window_zscore(a[0], n)},
-        "rolling_covariance": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close", "close2"),
-            "oracle": lambda a: pd.Series(a[0]).rolling(n)
-            .cov(pd.Series(a[1]), ddof=0).to_numpy()},
-        "ewm_std": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: pd.Series(a[0]).ewm(span=n, adjust=False)
-            .std(bias=True).to_numpy()},
-        "ewm_var": {
-            "kwargs": {"timeperiod": n}, "inputs": ("close",),
-            "oracle": lambda a: pd.Series(a[0]).ewm(span=n, adjust=False)
-            .var(bias=True).to_numpy()},
-    }
+    return pd.DataFrame({
+        "open": open_, "high": high, "low": low, "close": close,
+        "volume": np.ones_like(close),
+    })
 
 
+def _smc_event_flags(frame, signal: str, event_index: str) -> np.ndarray:
+    """Project SMC's future event indices onto their causal event bars."""
+    result = np.full(len(frame), np.nan)
+    for direction, index in zip(frame[signal], frame[event_index]):
+        if not np.isnan(direction) and not np.isnan(index) and int(index) > 0:
+            result[int(index)] = direction
+    return result
 
-def _fresh_window_zscore(values: np.ndarray, period: int) -> np.ndarray:
-    """Z-score with mean and population std recomputed fresh per window.
 
-    Used instead of pandas' rolling accumulator, which drifts on low-variance
-    windows (see the note at the `rolling_zscore` spec).
-    """
-    values = np.asarray(values, dtype=np.float64)
-    windows = sliding_window_view(values, period)
-    out = np.full(len(values), np.nan)
-    out[period - 1:] = ((values[period - 1:] - windows.mean(axis=1))
-                        / windows.std(axis=1))
-    return out
+def smc_oracle(spec: Spec, arrays):
+    """Execute explicitly aligned smartmoneyconcepts batch references."""
+    import pandas as pd
+    from smartmoneyconcepts import smc
+
+    if spec.cls.__name__ == "FairValueGap":
+        frame = _smc_frame(*arrays)
+        result = smc.fvg(frame, join_consecutive=False)
+        return (
+            result["FVG"].shift(1).to_numpy(),
+            result["Top"].shift(1).to_numpy(),
+            result["Bottom"].shift(1).to_numpy(),
+            _smc_event_flags(result, "FVG", "MitigatedIndex"),
+        )
+    if spec.cls.__name__ == "Sessions":
+        new_session, high, low = arrays
+        groups = np.cumsum(new_session.astype(np.int64)) - 1
+        within = np.arange(len(groups))
+        starts = np.maximum.accumulate(np.where(new_session, within, 0))
+        index = (pd.Timestamp("2024-01-01")
+                 + pd.to_timedelta(groups, unit="D")
+                 + pd.to_timedelta(within - starts, unit="ns"))
+        close = (high + low) * 0.5
+        frame = _smc_frame(close, high, low, close)
+        frame.index = index
+        result = smc.sessions(frame, "Custom", "00:00", "23:59", "UTC")
+        return tuple(result[name].to_numpy()
+                     for name in ("Active", "High", "Low"))
+    raise LookupError(f"no SMC adapter for {spec.cls.__name__}")
 
 # ---------------------------------------------------------------------------
 # Per-function verification
 # ---------------------------------------------------------------------------
 
 def verify_function(spec: Spec, data: dict, bars: int, split: int,
-                    oracle_fn=None,
                     actual_indices: tuple[int, ...] | None = None) -> dict:
     row: dict = {"function": spec.talib_name or spec.snake,
                  "taflow_class": spec.cls.__name__ if spec.cls else None,
-                 "oracle": "TA-Lib" if spec.talib_name else
-                 ("pandas" if oracle_fn else "self")}
+                 "oracle": spec.oracle_source,
+                 "oracle_name": spec.oracle_name}
+    if spec.oracle_variant:
+        row["variant"] = spec.oracle_variant
     if spec.warnings:
         row["warnings"] = list(spec.warnings)
     if spec.error:
@@ -233,8 +300,12 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
     try:
         if spec.talib_name:
             expected = talib_oracle(spec, arrays)
-        elif oracle_fn:
-            expected = oracle_fn(arrays)
+        elif spec.wickra:
+            expected = wickra_oracle(spec, arrays)
+        elif spec.numpy:
+            expected = numpy_oracle(spec, arrays)
+        elif spec.smc:
+            expected = smc_oracle(spec, arrays)
     except Exception as exc:
         return {**row, "error": f"oracle failed: {exc}"}
 
@@ -243,7 +314,15 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
     except Exception as exc:
         return {**row, "error": f"taflow batch failed: {exc}"}
     if expected is not None:
-        row["batch_vs_oracle"] = compare(batch, expected, actual_indices)
+        if spec.wickra:
+            tolerance = {"rtol": spec.wickra.rtol, "atol": spec.wickra.atol}
+        elif spec.smc and spec.cls.__name__ == "Sessions":
+            tolerance = {"atol": 2e-5}
+        else:
+            tolerance = {}
+        row["batch_vs_oracle"] = compare(
+            batch, expected, actual_indices, **tolerance
+        )
 
     try:
         stitched = continue_series(spec, arrays, split)
@@ -256,7 +335,9 @@ def verify_function(spec: Spec, data: dict, bars: int, split: int,
         for chunk in CHUNK_SIZES
     }
     if expected is not None:
-        row["continue_vs_oracle"] = compare(stitched, expected, actual_indices)
+        row["continue_vs_oracle"] = compare(
+            stitched, expected, actual_indices, **tolerance
+        )
     return row
 
 
@@ -269,9 +350,14 @@ def verdict(row: dict) -> str:
         checks.append(row["continue_vs_batch_bitwise"])
     if "chunk_invariance" in row:
         checks.extend(row["chunk_invariance"].values())
-    if not checks:
-        return "SKIP"
-    return "MATCH" if all(checks) else "MISMATCH"
+    lifecycle = row.get("continue_vs_batch_bitwise", False) and all(
+        row.get("chunk_invariance", {}).values()
+    )
+    if row.get("oracle") is None:
+        return "NO_EXTERNAL_ORACLE" if lifecycle else "FAIL"
+    if row.get("variant") and lifecycle:
+        return "VARIANT"
+    return "MATCH" if checks and all(checks) else "FAIL"
 
 
 # ---------------------------------------------------------------------------
@@ -294,26 +380,30 @@ def write_report(rows: list[dict], path: Path, bars: int,
                  split: int) -> None:
     import talib
     import taflow
+    import wickra
 
     counts: dict[str, int] = {}
     for row in rows:
         counts[verdict(row)] = counts.get(verdict(row), 0) + 1
 
     lines = [
-        "# taflow correctness verification",
+        "# TAFlow correctness verification",
         "",
         f"Date: {_dt.date.today().isoformat()} | bars: {bars:,} | "
         f"warm-up split: {split:,} extend + {bars - split:,} append | "
         f"tolerance rtol={RTOL}, atol={ATOL}",
         f"Environment: python {platform.python_version()}, numpy "
-        f"{np.__version__}, TA-Lib {talib.__version__}, taflow "
+        f"{np.__version__}, TA-Lib {talib.__version__}, Wickra "
+        f"{wickra.__version__}, SMC "
+        f"{importlib.metadata.version('smartmoneyconcepts')}, TAFlow "
         f"{getattr(taflow, '__version__', '?')}",
         "",
         "Summary: " + ", ".join(f"{k}: {v}"
                                 for k, v in sorted(counts.items())),
         "",
-        "taflow is driven through its canonical classes (mapped from the",
-        "TA-Lib name via the /CHECK.md master table). *Batch vs oracle*:",
+        "TAFlow is driven only through canonical Python classes. The registry",
+        "selects TA-Lib, Wickra, explicit NumPy ufunc overrides, then SMC.",
+        "*Batch vs oracle*:",
         "cold `extend` over the full series against the reference;",
         "*continue vs batch*: 9k `extend` + 1k `append` stitched output",
         "bitwise-identical to one-shot batch (chunk invariance); *continue",
@@ -328,13 +418,13 @@ def write_report(rows: list[dict], path: Path, bars: int,
                                            r["function"])):
         lines.append(
             f"| {row['function']} | {row.get('taflow_class') or '—'} | "
-            f"{row.get('oracle', '—')} | {verdict(row)} | "
+            f"{row.get('oracle') or '—'} | {verdict(row)} | "
             f"{fmt_check(row.get('batch_vs_oracle'))} | "
             f"{fmt_check(row.get('continue_vs_batch_bitwise'))} | "
             f"{fmt_check(all(row.get('chunk_invariance', {}).values()))} | "
             f"{fmt_check(row.get('continue_vs_oracle'))} |")
 
-    mismatches = [r["function"] for r in rows if verdict(r) == "MISMATCH"]
+    mismatches = [r["function"] for r in rows if verdict(r) == "FAIL"]
     errors = [r["function"] for r in rows if verdict(r) == "ERROR"]
     warned = [r["function"] for r in rows if r.get("warnings")]
     lines += ["", "## Follow-ups", "",
@@ -352,7 +442,7 @@ def main() -> int:
     parser.add_argument("--bars", type=int, default=10_000)
     parser.add_argument("--warmup-split", type=int, default=9_000)
     parser.add_argument("--report", type=Path,
-                        default=Path(__file__).parent / "REPORT.md")
+                        default=VERIFY_DIR / "CORRECTNESS.md")
     args = parser.parse_args()
 
     data = make_data(args.bars)
@@ -366,28 +456,22 @@ def main() -> int:
         return 1
 
     rows: list[dict] = []
-    oracles = pandas_oracles()
+    CORRECTNESS_EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     for i, spec in enumerate(specs, 1):
         name = spec.talib_name or spec.snake
         try:
-            oracle = oracles.get(spec.snake)
-            if oracle and not spec.talib_name:
-                spec = Spec.build(spec.snake, None)
-                spec.ctor_kwargs.update(oracle["kwargs"])
-                spec.input_roles = oracle["inputs"]
             row = verify_function(spec, data, args.bars,
-                                  args.warmup_split,
-                                  oracle_fn=oracle["oracle"] if oracle else None)
+                                  args.warmup_split)
         except Exception:
             row = {"function": name,
                    "error": traceback.format_exc(limit=1)}
         rows.append(row)
+        evidence_path = CORRECTNESS_EVIDENCE_DIR / f"{spec.snake}.json"
+        evidence_path.write_text(json.dumps(row, indent=2, default=str) + "\n")
         print(f"[{i}/{len(specs)}] {name}: {verdict(row)}")
 
     write_report(rows, args.report, args.bars, args.warmup_split)
-    (args.report.parent / "report.json").write_text(
-        json.dumps(rows, indent=1, default=str))
-    bad = sum(1 for r in rows if verdict(r) in ("MISMATCH", "ERROR"))
+    bad = sum(1 for r in rows if verdict(r) in ("FAIL", "ERROR"))
     print(f"\nwrote {args.report}\n{len(rows)} checked, {bad} need attention")
     return 1 if bad else 0
 

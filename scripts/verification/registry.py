@@ -25,7 +25,197 @@ from pathlib import Path
 
 import numpy as np
 
-CHECK_MD = Path(__file__).resolve().parent.parent / "CHECK.md"
+ROOT = Path(__file__).resolve().parents[2]
+CHECK_MD = ROOT / "CHECK.md"
+VERIFY_DIR = ROOT / "verify"
+CORRECTNESS_EVIDENCE_DIR = VERIFY_DIR / "evidence" / "correctness"
+BENCHMARK_EVIDENCE_DIR = VERIFY_DIR / "evidence" / "benchmark"
+
+
+@dataclass(frozen=True)
+class WickraBinding:
+    """Describe one explicit canonical-class to Wickra oracle mapping.
+
+    ``parameter_names`` are read from the TAFlow constructor and passed to the
+    Wickra constructor in order. ``prepend_zero_close`` documents Wickra's
+    two-input ``VolumeRsi`` batch API; TAFlow intentionally exposes only the
+    volume series because Wickra does not use the close argument.
+    """
+
+    name: str
+    parameter_names: tuple[str, ...]
+    prepend_zero_close: bool = False
+    variant: str | None = None
+    rtol: float = 1e-8
+    atol: float = 1e-10
+
+
+@dataclass(frozen=True)
+class ExternalBinding:
+    """Describe a non-TA-Lib batch oracle selected by explicit override."""
+
+    source: str
+    name: str
+    variant: str | None = None
+
+
+WICKRA_BINDINGS: dict[str, WickraBinding] = {
+    "RelativeMomentumIndex": WickraBinding("RMI", ("timeperiod", "momentum")),
+    "RollingMaximumDrawdown": WickraBinding("MaxDrawdown", ("timeperiod",)),
+    "RollingOmegaRatio": WickraBinding("OmegaRatio", ("timeperiod", "threshold")),
+    "RollingValueAtRisk": WickraBinding("ValueAtRisk", ("timeperiod", "confidence")),
+    "RollingConditionalValueAtRisk": WickraBinding(
+        "ConditionalValueAtRisk", ("timeperiod", "confidence")
+    ),
+    "RollingProfitFactor": WickraBinding("ProfitFactor", ("timeperiod",)),
+    "RollingKellyCriterion": WickraBinding("KellyCriterion", ("timeperiod",)),
+    "RollingRecoveryFactor": WickraBinding(
+        "RecoveryFactor",
+        (),
+        variant=(
+            "TAFlow is a causal fixed-window recovery factor; Wickra tracks "
+            "recovery cumulatively over the complete stream."
+        ),
+    ),
+    "RollingTreynorRatio": WickraBinding("TreynorRatio", ("timeperiod",)),
+    "VolumeOscillator": WickraBinding("VolumeOscillator", ("fast", "slow")),
+    "VolumeZoneOscillator": WickraBinding("VZO", ("timeperiod",)),
+    "DemandIndex": WickraBinding("DemandIndex", ("timeperiod",)),
+    "VolumeRelativeStrengthIndex": WickraBinding(
+        "VolumeRsi", ("period",), prepend_zero_close=True
+    ),
+    "RollingAverageDrawdown": WickraBinding("AverageDrawdown", ()),
+    "RollingDrawdownDuration": WickraBinding("DrawdownDuration", ()),
+    "RollingGainLossRatio": WickraBinding("GainLossRatio", ()),
+    "RollingPainIndex": WickraBinding("PainIndex", ()),
+    "RollingVarianceRatio": WickraBinding("VarianceRatio", ()),
+    "RollingSpearmanCorrelation": WickraBinding("SpearmanCorrelation", ()),
+    "RollingKendallRankCorrelation": WickraBinding("KendallTau", ()),
+    "RollingCointegration": WickraBinding("Cointegration", ()),
+    "RollingGrangerCausality": WickraBinding("GrangerCausality", ()),
+    "RollingLeadLagCrossCorrelation": WickraBinding(
+        "LeadLagCrossCorrelation", ()
+    ),
+    "RollingPairwiseBeta": WickraBinding("PairwiseBeta", ()),
+    "RollingBetaNeutralSpread": WickraBinding("BetaNeutralSpread", ()),
+    "RollingMedianAbsoluteDeviation": WickraBinding(
+        "MedianAbsoluteDeviation", ()
+    ),
+    # Both implementations use the same O(1) regression recurrence. Near a
+    # perfectly linear series, cancellation leaves sub-nanounit RSS noise.
+    "RollingStandardError": WickraBinding(
+        "StandardError", (), atol=1e-9
+    ),
+    "VolumeWeightedMovingAverageConvergenceDivergence": WickraBinding(
+        "VolumeWeightedMacd", ()
+    ),
+    "BetterVolume": WickraBinding("BetterVolume", ()),
+    "IntradayIntensity": WickraBinding("IntradayIntensity", ()),
+    "TradeVolumeIndex": WickraBinding("TradeVolumeIndex", ()),
+    "TwiggsMoneyFlow": WickraBinding("TwiggsMoneyFlow", ()),
+    "WilliamsAccumulationDistribution": WickraBinding("Wad", ()),
+    "MarketFacilitationIndex": WickraBinding("MarketFacilitationIndex", ()),
+    "TimeSegmentedVolume": WickraBinding("TSV", ()),
+    "MovingAverageEnvelope": WickraBinding("MaEnvelope", ()),
+    "AverageTrueRangeBands": WickraBinding("AtrBands", ()),
+    "LinearRegressionChannel": WickraBinding("LinRegChannel", ()),
+    "StandardErrorBands": WickraBinding("StandardErrorBands", ()),
+    "DoubleBollingerBands": WickraBinding("DoubleBollinger", ()),
+    "HurstChannel": WickraBinding("HurstChannel", ()),
+    "SuperSmoother": WickraBinding("SuperSmoother", ()),
+    "InverseFisherTransform": WickraBinding("InverseFisherTransform", ()),
+    "Decycler": WickraBinding("Decycler", ()),
+    "DecyclerOscillator": WickraBinding("DecyclerOscillator", ()),
+    "RoofingFilter": WickraBinding("RoofingFilter", ()),
+    "CenterOfGravity": WickraBinding("CenterOfGravity", ()),
+    "InstantaneousTrendline": WickraBinding("InstantaneousTrendline", ()),
+    "AdaptiveCycle": WickraBinding("AdaptiveCycle", ()),
+    "EhlersStochastic": WickraBinding("EhlersStochastic", ()),
+    "HilbertDominantCycle": WickraBinding("HilbertDominantCycle", ()),
+    "EmpiricalModeDecomposition": WickraBinding(
+        "EmpiricalModeDecomposition", ()
+    ),
+    "ZigZag": WickraBinding("ZigZag", ()),
+    "SessionVolumeWeightedAveragePrice": WickraBinding("SessionVwap", ()),
+    "SessionRange": WickraBinding("SessionRange", ()),
+    "OvernightGap": WickraBinding("OvernightGap", ()),
+    "OvernightIntradayReturn": WickraBinding("OvernightIntradayReturn", ()),
+    "AverageDailyRange": WickraBinding("AverageDailyRange", ()),
+    "TimeOfDayReturnProfile": WickraBinding("TimeOfDayReturnProfile", ()),
+    "DayOfWeekReturnProfile": WickraBinding("DayOfWeekProfile", ()),
+    "IntradayVolatilityProfile": WickraBinding(
+        "IntradayVolatilityProfile", ()
+    ),
+    "VolumeByTimeProfile": WickraBinding("VolumeByTimeProfile", ()),
+    "QuartileBands": WickraBinding("QuartileBands", ()),
+    "MedianChannel": WickraBinding("MedianChannel", ()),
+    "AbsoluteBreadthIndex": WickraBinding("AbsoluteBreadthIndex", ()),
+    "CumulativeVolumeIndex": WickraBinding("CumulativeVolumeIndex", ()),
+    "BullishPercentIndex": WickraBinding("BullishPercentIndex", ()),
+    "UpDownVolumeRatio": WickraBinding("UpDownVolumeRatio", ()),
+    "PercentAboveMovingAverage": WickraBinding("PercentAboveMa", ()),
+    "HighLowIndex": WickraBinding("HighLowIndex", ()),
+    "NewHighsNewLows": WickraBinding("NewHighsNewLows", ()),
+    "BreadthThrust": WickraBinding("BreadthThrust", ()),
+    "ArmsIndex": WickraBinding("Trin", ()),
+    "McClellanSummationIndex": WickraBinding("McClellanSummationIndex", ()),
+    "McClellanOscillator": WickraBinding("McClellanOscillator", ()),
+    "CupAndHandle": WickraBinding("CupAndHandle", ()),
+    "RectangleRange": WickraBinding("RectangleRange", ()),
+    "FlagPennant": WickraBinding("FlagPennant", ()),
+    "WedgePattern": WickraBinding("Wedge", ()),
+    "TrianglePattern": WickraBinding("Triangle", ()),
+    "HeadAndShoulders": WickraBinding("HeadAndShoulders", ()),
+    "TripleTopBottom": WickraBinding("TripleTopBottom", ()),
+    "ThreeDrives": WickraBinding("ThreeDrives", ()),
+    "CypherPattern": WickraBinding("Cypher", ()),
+    "SharkPattern": WickraBinding("Shark", ()),
+    "CrabPattern": WickraBinding("Crab", ()),
+    "BatPattern": WickraBinding("Bat", ()),
+    "ButterflyPattern": WickraBinding("Butterfly", ()),
+    "GartleyPattern": WickraBinding("Gartley", ()),
+    "FourPointHarmonicPattern": WickraBinding("Abcd", ()),
+    "FibonacciTimeZones": WickraBinding("FibTimeZones", ()),
+    "FibonacciChannel": WickraBinding("FibChannel", ()),
+    "FibonacciArcs": WickraBinding("FibArcs", ()),
+    "FibonacciFan": WickraBinding("FibFan", ()),
+    "FibonacciConfluence": WickraBinding("FibConfluence", ()),
+    "GoldenPocket": WickraBinding("GoldenPocket", ()),
+    "AutomaticFibonacci": WickraBinding("AutoFib", ()),
+    "FibonacciProjection": WickraBinding("FibProjection", ()),
+    "FibonacciExtension": WickraBinding("FibExtension", ()),
+}
+
+NUMPY_BINDINGS: dict[str, ExternalBinding] = {
+    "MathAbs": ExternalBinding("NumPy", "numpy.abs"),
+    "MathAcosh": ExternalBinding("NumPy", "numpy.arccosh"),
+    "MathAsinh": ExternalBinding("NumPy", "numpy.arcsinh"),
+    "MathAtanh": ExternalBinding("NumPy", "numpy.arctanh"),
+    "MathCbrt": ExternalBinding("NumPy", "numpy.cbrt"),
+    "MathCot": ExternalBinding("NumPy", "numpy.tan reciprocal"),
+    "MathDegrees": ExternalBinding("NumPy", "numpy.degrees"),
+    "MathLog1p": ExternalBinding("NumPy", "numpy.log1p"),
+    "MathRadians": ExternalBinding("NumPy", "numpy.radians"),
+    "SignedPower": ExternalBinding("NumPy", "numpy.sign/abs/power"),
+}
+
+NUMPY_DOMAINS = {
+    "MathAbs": "centered",
+    "MathAcosh": "positive",
+    "MathAsinh": "centered",
+    "MathAtanh": "unit",
+    "MathCbrt": "centered",
+    "MathCot": "angle",
+    "MathDegrees": "angle",
+    "MathLog1p": "log_domain",
+    "MathRadians": "angle",
+    "SignedPower": "centered",
+}
+
+SMC_BINDINGS: dict[str, ExternalBinding] = {
+    "FairValueGap": ExternalBinding("SMC", "smartmoneyconcepts.smc.fvg"),
+    "Sessions": ExternalBinding("SMC", "smartmoneyconcepts.smc.sessions"),
+}
 
 # Whole-name replacements for table rows whose class names expand
 # differently than token-by-token camel-casing.
@@ -112,6 +302,12 @@ def _norm(name: str) -> str:
     return name.replace("_", "").lower()
 
 
+def _snake_case(name: str) -> str:
+    """Convert a canonical CamelCase class name to its module spelling."""
+    first = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", first).lower()
+
+
 def scalar_default(name: str, default=inspect.Parameter.empty):
     """Deterministic constructor value for required non-series parameters."""
     if default is not inspect.Parameter.empty:
@@ -177,6 +373,9 @@ class Spec:
     error: str | None = None
     warnings: list = field(default_factory=list)
     lookback: int = 0
+    wickra: WickraBinding | None = None
+    numpy: ExternalBinding | None = None
+    smc: ExternalBinding | None = None
 
     # -- construction ------------------------------------------------------
 
@@ -187,6 +386,11 @@ class Spec:
         if spec.cls is None:
             spec.error = "no matching taflow class"
             return spec
+        spec.wickra = WICKRA_BINDINGS.get(spec.cls.__name__)
+        spec.numpy = NUMPY_BINDINGS.get(spec.cls.__name__)
+        spec.smc = SMC_BINDINGS.get(spec.cls.__name__)
+        if spec.numpy:
+            spec.domain = NUMPY_DOMAINS[spec.cls.__name__]
         try:
             sig = inspect.signature(spec.cls.__init__)
         except (TypeError, ValueError):
@@ -214,11 +418,38 @@ class Spec:
                 for a in spec.series_args)
             spec.domain = SNAKE_DOMAIN_OVERRIDES.get(snake, spec.domain)
         for name, parameter in ctor_params.items():
-            if (name not in SERIES_PARAM_NAMES
+            if (_norm(name) not in {_norm(item) for item in spec.series_args}
                     and name not in spec.ctor_kwargs
                     and parameter.default is inspect.Parameter.empty):
                 spec.ctor_kwargs[name] = scalar_default(name)
         return spec
+
+    @property
+    def oracle_source(self) -> str | None:
+        """Return the selected source in TA-Lib/Wickra/NumPy/SMC priority."""
+        if self.talib_name:
+            return "TA-Lib"
+        if self.wickra:
+            return "Wickra"
+        if self.numpy:
+            return "NumPy"
+        if self.smc:
+            return "SMC"
+        return None
+
+    @property
+    def oracle_name(self) -> str | None:
+        """Return the selected external callable name."""
+        if self.talib_name:
+            return self.talib_name
+        binding = self.wickra or self.numpy or self.smc
+        return binding.name if binding else None
+
+    @property
+    def oracle_variant(self) -> str | None:
+        """Return a documented semantic difference for the selected oracle."""
+        binding = self.wickra or self.numpy or self.smc
+        return binding.variant if binding else None
 
     def _bind_talib(self, name: str, ctor_params: set[str]) -> None:
         from talib import abstract
@@ -264,9 +495,12 @@ class Spec:
     def arrays(self, data: dict, n: int) -> list[np.ndarray]:
         out = []
         for role in self.input_roles:
-            if role in ("_input", "input", "values", "price", "real",
+            if (self.cls and self.cls.__name__ == "Sessions"
+                    and role == "new_session"):
+                key = "one_session"
+            elif role in ("_input", "input", "values", "price", "real",
                         "close", "change", "value", "equity"):
-                key = "unit" if self.domain == "unit" else "close"
+                key = self.domain if self.domain in data else "close"
             elif role in ("price0", "left", "x", "input0", "_input0"):
                 key = "close"
             elif role in ("price1", "right", "y", "benchmark", "input1",
@@ -288,7 +522,10 @@ class Spec:
     # -- state adapters (handle fluent and value-returning APIs) -----------
 
     def new_state(self):
-        boolean_roles = {"condition", "new_session", "anchor", "entry", "_exit"}
+        boolean_roles = {
+            "condition", "new_session", "anchor", "entry", "_exit",
+            "on_buy_signal", "above_moving_average",
+        }
         empty_series = [
             np.empty(0, dtype=np.bool_ if role in boolean_roles else np.float64)
             for role in self.input_roles
@@ -311,13 +548,32 @@ class Spec:
 
 
 def build_registry() -> dict[str, Spec]:
-    """All rows from the master table keyed by TA-Lib name or snake name."""
+    """Return every public lifecycle class, including CHECK.md mappings."""
+    import taflow
+
     specs: dict[str, Spec] = {}
     for snake, talib_name in parse_master_table():
         key = talib_name if talib_name != "_" else snake
         specs[key] = Spec.build(snake,
                                 talib_name if talib_name != "_" else None)
+    registered = {spec.cls for spec in specs.values() if spec.cls is not None}
+    for name in getattr(taflow, "__all__", ()):
+        candidate = getattr(taflow, name, None)
+        if (not isinstance(candidate, type) or candidate in registered
+                or not all(hasattr(candidate, method)
+                           for method in ("append", "extend", "compute", "reset"))):
+            continue
+        snake = _snake_case(name)
+        specs[snake] = Spec.build(snake, None)
     return specs
+
+
+def constructor_value(spec: Spec, name: str):
+    """Return the configured or documented default constructor value."""
+    if name in spec.ctor_kwargs:
+        return spec.ctor_kwargs[name]
+    parameter = inspect.signature(spec.cls.__init__).parameters[name]
+    return scalar_default(name, parameter.default)
 
 
 def resolve_specs(names: list[str], registry: dict[str, Spec]) -> tuple[list[Spec], list[str]]:
@@ -368,6 +624,7 @@ def make_data(n: int, seed: int = 42) -> dict[str, np.ndarray]:
     low = close - rng.uniform(0.0, 1.0, n) * spread
     open_ = low + rng.uniform(0.0, 1.0, n) * (high - low)
     unit_noise = np.random.default_rng(seed + 2000).normal(0.0, 0.05, n)
+    centered = (ar1(5000) - 100.0) / 10.0
     return {
         "open": open_, "high": high, "low": low, "close": close,
         "volume": rng.uniform(1e5, 1e6, n),
@@ -377,8 +634,19 @@ def make_data(n: int, seed: int = 42) -> dict[str, np.ndarray]:
         "periods": np.random.default_rng(seed + 4000).integers(
             2, 31, n).astype(np.float64),
         "unit": np.clip(np.cumsum(unit_noise) % 1.8 - 0.9, -0.99, 0.99),
+        "centered": centered,
+        "positive": np.abs(centered) + 1.0,
+        "angle": centered + 0.25,
+        "log_domain": np.abs(centered),
         "condition": np.arange(n) % 11 == 0,
+        "on_buy_signal": np.arange(n) % 7 == 0,
+        "above_moving_average": close > np.mean(close),
+        # TAFlow's public timestamp contract is Unix nanoseconds. Oracle
+        # adapters convert units when an external library uses milliseconds.
+        "timestamp": 1_700_000_000_000_000_000
+        + np.arange(n, dtype=np.int64) * 3_600_000_000_000,
         "new_session": np.arange(n) % 32 == 0,
+        "one_session": np.arange(n) == 0,
         "anchor": np.arange(n) % 64 == 0,
         "entry": np.arange(n) % 17 == 0,
         "_exit": np.arange(n) % 19 == 0,

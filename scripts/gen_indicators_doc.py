@@ -32,7 +32,7 @@ CATEGORIES = [
 
 def load_metadata():
     meta = {}
-    for path in glob.glob(str(ROOT / "verify/benchmark_reports/*.json")):
+    for path in glob.glob(str(ROOT / "verify/evidence/benchmark/*.json")):
         with open(path) as handle:
             data = json.load(handle)
         meta[data["canonical_class"]] = {"talib": data.get("talib_name"),
@@ -153,9 +153,8 @@ MoneyFlowIndex(high, low, close, volume, timeperiod=14)
 The `Constructor order` column below is authoritative — it is introspected from
 the live signature. Passing data by keyword always works.
 """,
-        "Correctness uses the highest-priority available external oracle in "
-        "[../verify/SOURCE_COMPARISON.md](../verify/SOURCE_COMPARISON.md); throughput is in "
-        "[../verify/benchmark_reports/BENCHMARK.md](../verify/benchmark_reports/BENCHMARK.md).\n",
+        "Correctness is reported in [../verify/CORRECTNESS.md](../verify/CORRECTNESS.md); "
+        "throughput is in [../verify/BENCHMARK.md](../verify/BENCHMARK.md).\n",
         "## Contents\n",
     ]
     for cat in CATEGORIES:

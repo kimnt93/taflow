@@ -353,8 +353,8 @@ benchmarking. Before repository-wide completion, run:
 cargo test --workspace
 uv run pytest -q
 make check
-cd verify && uv run python all_interfaces.py
-cd verify && uv run python benchmark.py  # only with explicit user authorization
+uv run python scripts/verification/interfaces.py
+uv run python scripts/verification/benchmark.py  # only with explicit user authorization
 cargo fmt --all --check
 git diff --check
 ```
@@ -426,10 +426,11 @@ class EqualHighsLows:
         return self
 ```
 
-- Before each batch, reread this file, inspect `verify/FUNCTION_CHECKLIST.md`,
-  scan all aliases with `rg`, select ten remaining or structurally nonconforming
-  functions, refactor them, run correctness and interface/style checks, update
-  the checklist, and push the verified commit to `main`. Do not run benchmark
+- Before each batch, reread this file and the active plan, scan all aliases
+  with `rg`, select ten remaining or structurally nonconforming functions,
+  refactor them, and run correctness plus interface/style checks. Verification
+  executables live under `scripts/verification/`; `verify/` contains only the
+  two aggregate reports and per-indicator evidence. Do not run benchmark
   commands unless the user explicitly changes that instruction.
 - Python correctness tests must compare the canonical class API against the
   selected independent target library. Generate deterministic random series
