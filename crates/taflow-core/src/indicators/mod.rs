@@ -1483,3 +1483,43 @@ pub use session_range::SessionRange;
 pub use session_volume_weighted_average_price::SessionVolumeWeightedAveragePrice;
 pub use time_of_day_return_profile::TimeOfDayReturnProfile;
 pub use zig_zag::{ZigZag, ZigZagValue};
+mod absolute_breadth_index;
+#[cfg(test)]
+mod absolute_breadth_index_test;
+mod bullish_percent_index;
+#[cfg(test)]
+mod bullish_percent_index_test;
+mod cumulative_volume_index;
+#[cfg(test)]
+mod cumulative_volume_index_test;
+mod high_low_index;
+#[cfg(test)]
+mod high_low_index_test;
+mod intraday_volatility_profile;
+#[cfg(test)]
+mod intraday_volatility_profile_test;
+mod median_channel;
+#[cfg(test)]
+mod median_channel_test;
+mod percent_above_moving_average;
+#[cfg(test)]
+mod percent_above_moving_average_test;
+mod quartile_bands;
+#[cfg(test)]
+mod quartile_bands_test;
+mod up_down_volume_ratio;
+#[cfg(test)]
+mod up_down_volume_ratio_test;
+mod volume_by_time_profile;
+#[cfg(test)]
+mod volume_by_time_profile_test;
+pub use absolute_breadth_index::AbsoluteBreadthIndex;
+pub use bullish_percent_index::BullishPercentIndex;
+pub use cumulative_volume_index::CumulativeVolumeIndex;
+pub use high_low_index::HighLowIndex;
+pub use intraday_volatility_profile::IntradayVolatilityProfile;
+pub use median_channel::{MedianChannel, MedianChannelValue};
+pub use percent_above_moving_average::PercentAboveMovingAverage;
+pub use quartile_bands::{QuartileBands, QuartileBandsValue};
+pub use up_down_volume_ratio::UpDownVolumeRatio;
+pub use volume_by_time_profile::VolumeByTimeProfile;

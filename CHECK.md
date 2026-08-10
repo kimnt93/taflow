@@ -410,6 +410,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | average_daily_range | average_daily_range | _ |
 | [ ] | time_of_day_return_profile | time_of_day_return_profile | _ |
 | [ ] | day_of_week_return_profile | day_of_week_return_profile | _ |
+| [ ] | intraday_volatility_profile | intraday_volatility_profile | _ |
+| [ ] | volume_by_time_profile | volume_by_time_profile | _ |
+| [ ] | quartile_bands | quartile_bands | _ |
+| [ ] | median_channel | median_channel | _ |
+| [ ] | absolute_breadth_index | absolute_breadth_index | _ |
+| [ ] | cumulative_volume_index | cumulative_volume_index | _ |
+| [ ] | bullish_percent_index | bullish_percent_index | _ |
+| [ ] | up_down_volume_ratio | up_down_volume_ratio | _ |
+| [ ] | percent_above_moving_average | percent_above_moving_average | _ |
+| [ ] | high_low_index | high_low_index | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

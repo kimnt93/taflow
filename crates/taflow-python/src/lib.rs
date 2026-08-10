@@ -373,6 +373,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::AverageDailyRange>()?;
     m.add_class::<indicators::TimeOfDayReturnProfile>()?;
     m.add_class::<indicators::DayOfWeekReturnProfile>()?;
+    m.add_class::<indicators::IntradayVolatilityProfile>()?;
+    m.add_class::<indicators::VolumeByTimeProfile>()?;
+    m.add_class::<indicators::QuartileBands>()?;
+    m.add_class::<indicators::MedianChannel>()?;
+    m.add_class::<indicators::AbsoluteBreadthIndex>()?;
+    m.add_class::<indicators::CumulativeVolumeIndex>()?;
+    m.add_class::<indicators::BullishPercentIndex>()?;
+    m.add_class::<indicators::UpDownVolumeRatio>()?;
+    m.add_class::<indicators::PercentAboveMovingAverage>()?;
+    m.add_class::<indicators::HighLowIndex>()?;
 
     Ok(())
 }

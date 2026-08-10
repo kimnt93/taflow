@@ -16,6 +16,9 @@ from .indicators import RoofingFilter, CenterOfGravity, InstantaneousTrendline, 
 from .indicators import HilbertDominantCycle, EmpiricalModeDecomposition, ZigZag
 from .indicators import SessionVolumeWeightedAveragePrice, SessionRange, OvernightGap, OvernightIntradayReturn
 from .indicators import AverageDailyRange, TimeOfDayReturnProfile, DayOfWeekReturnProfile
+from .indicators import IntradayVolatilityProfile, VolumeByTimeProfile, QuartileBands, MedianChannel
+from .indicators import AbsoluteBreadthIndex, CumulativeVolumeIndex, BullishPercentIndex
+from .indicators import UpDownVolumeRatio, PercentAboveMovingAverage, HighLowIndex
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -536,6 +539,16 @@ __all__ = [
     "AverageDailyRange",
     "TimeOfDayReturnProfile",
     "DayOfWeekReturnProfile",
+    "IntradayVolatilityProfile",
+    "VolumeByTimeProfile",
+    "QuartileBands",
+    "MedianChannel",
+    "AbsoluteBreadthIndex",
+    "CumulativeVolumeIndex",
+    "BullishPercentIndex",
+    "UpDownVolumeRatio",
+    "PercentAboveMovingAverage",
+    "HighLowIndex",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

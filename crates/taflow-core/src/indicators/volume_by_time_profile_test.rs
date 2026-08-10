@@ -1,0 +1,8 @@
+use super::volume_by_time_profile::VolumeByTimeProfile;
+#[test]
+fn lifecycle() {
+    let mut s = VolumeByTimeProfile::new(24, 0).unwrap();
+    assert_eq!(s.append(1., 1., 1., 1., 4., 0), Some(4.));
+    s.reset();
+    assert!(s.value().is_none());
+}

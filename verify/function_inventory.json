@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 355,
+    "indicators": 365,
     "native_functions": 0,
-    "native_state_classes": 354,
+    "native_state_classes": 364,
     "pandas_ta_symbols": 427,
-    "python_exports": 357,
-    "rust_exports": 743,
+    "python_exports": 367,
+    "rust_exports": 765,
     "smc_functions": 8,
-    "structure": 355,
+    "structure": 365,
     "talib_functions": 161
   },
   "rows": [
@@ -3903,6 +3903,156 @@
       "native_binding": true,
       "native_symbols": [
         "DayOfWeekReturnProfile",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "intraday_volatility_profile",
+      "name": "IntradayVolatilityProfile",
+      "native_binding": true,
+      "native_symbols": [
+        "IntradayVolatilityProfile",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "volume_by_time_profile",
+      "name": "VolumeByTimeProfile",
+      "native_binding": true,
+      "native_symbols": [
+        "VolumeByTimeProfile",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "quartile_bands",
+      "name": "QuartileBands",
+      "native_binding": true,
+      "native_symbols": [
+        "QuartileBands",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "median_channel",
+      "name": "MedianChannel",
+      "native_binding": true,
+      "native_symbols": [
+        "MedianChannel",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "absolute_breadth_index",
+      "name": "AbsoluteBreadthIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "AbsoluteBreadthIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "cumulative_volume_index",
+      "name": "CumulativeVolumeIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "CumulativeVolumeIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "bullish_percent_index",
+      "name": "BullishPercentIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "BullishPercentIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "up_down_volume_ratio",
+      "name": "UpDownVolumeRatio",
+      "native_binding": true,
+      "native_symbols": [
+        "UpDownVolumeRatio",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "percent_above_moving_average",
+      "name": "PercentAboveMovingAverage",
+      "native_binding": true,
+      "native_symbols": [
+        "PercentAboveMovingAverage",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "high_low_index",
+      "name": "HighLowIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "HighLowIndex",
         "_Native"
       ],
       "pandas_ta_reference": false,
