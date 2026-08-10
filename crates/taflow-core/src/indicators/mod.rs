@@ -1283,3 +1283,43 @@ pub use variable_index_dynamic_average::VariableIndexDynamicAverage;
 pub use vortex::{Vortex, VortexValue};
 pub use weighted_moving_average::WeightedMovingAverage;
 pub use yang_zhang::YangZhang;
+mod rolling_average_drawdown;
+#[cfg(test)]
+mod rolling_average_drawdown_test;
+mod rolling_cointegration;
+#[cfg(test)]
+mod rolling_cointegration_test;
+mod rolling_drawdown_duration;
+#[cfg(test)]
+mod rolling_drawdown_duration_test;
+mod rolling_gain_loss_ratio;
+#[cfg(test)]
+mod rolling_gain_loss_ratio_test;
+mod rolling_granger_causality;
+#[cfg(test)]
+mod rolling_granger_causality_test;
+mod rolling_kendall_rank_correlation;
+#[cfg(test)]
+mod rolling_kendall_rank_correlation_test;
+mod rolling_pain_index;
+#[cfg(test)]
+mod rolling_pain_index_test;
+mod rolling_spearman_correlation;
+#[cfg(test)]
+mod rolling_spearman_correlation_test;
+mod rolling_variance_ratio;
+#[cfg(test)]
+mod rolling_variance_ratio_test;
+mod volume_relative_strength_index;
+#[cfg(test)]
+mod volume_relative_strength_index_test;
+pub use rolling_average_drawdown::RollingAverageDrawdown;
+pub use rolling_cointegration::RollingCointegration;
+pub use rolling_drawdown_duration::RollingDrawdownDuration;
+pub use rolling_gain_loss_ratio::RollingGainLossRatio;
+pub use rolling_granger_causality::RollingGrangerCausality;
+pub use rolling_kendall_rank_correlation::RollingKendallRankCorrelation;
+pub use rolling_pain_index::RollingPainIndex;
+pub use rolling_spearman_correlation::RollingSpearmanCorrelation;
+pub use rolling_variance_ratio::RollingVarianceRatio;
+pub use volume_relative_strength_index::VolumeRelativeStrengthIndex;

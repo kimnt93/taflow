@@ -4,6 +4,11 @@ __version__ = "0.1.2"
 
 from .ma_type import MaType
 from .indicators import AccelerationBands
+from .indicators import VolumeRelativeStrengthIndex, RollingAverageDrawdown
+from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
+from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
+from .indicators import RollingKendallRankCorrelation, RollingCointegration
+from .indicators import RollingGrangerCausality
 from .indicators import AverageTrueRange
 from .indicators import DoubleExponentialMovingAverage
 from .indicators.kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
@@ -479,6 +484,16 @@ __all__ = [
     "RollingProfitFactor",
     "RollingKellyCriterion",
     "RollingRecoveryFactor",
+    "VolumeRelativeStrengthIndex",
+    "RollingAverageDrawdown",
+    "RollingDrawdownDuration",
+    "RollingGainLossRatio",
+    "RollingPainIndex",
+    "RollingVarianceRatio",
+    "RollingSpearmanCorrelation",
+    "RollingKendallRankCorrelation",
+    "RollingCointegration",
+    "RollingGrangerCausality",
     "RollingTreynorRatio",
     "VolumeOscillator",
     "VolumeZoneOscillator",

@@ -1,6 +1,16 @@
 "Canonical namespace for persistent TAFlow indicators."
 
 from .absolute_price_oscillator import AbsolutePriceOscillator
+from .volume_relative_strength_index import VolumeRelativeStrengthIndex
+from .rolling_average_drawdown import RollingAverageDrawdown
+from .rolling_drawdown_duration import RollingDrawdownDuration
+from .rolling_gain_loss_ratio import RollingGainLossRatio
+from .rolling_pain_index import RollingPainIndex
+from .rolling_variance_ratio import RollingVarianceRatio
+from .rolling_spearman_correlation import RollingSpearmanCorrelation
+from .rolling_kendall_rank_correlation import RollingKendallRankCorrelation
+from .rolling_cointegration import RollingCointegration
+from .rolling_granger_causality import RollingGrangerCausality
 from .amihud import Amihud
 from .anchored_volume_weighted_average_price import AnchoredVolumeWeightedAveragePrice
 from .average_daily_dollar_value import AverageDailyDollarValue
@@ -507,6 +517,16 @@ __all__ = [
     "RollingProfitFactor",
     "RollingKellyCriterion",
     "RollingRecoveryFactor",
+    "VolumeRelativeStrengthIndex",
+    "RollingAverageDrawdown",
+    "RollingDrawdownDuration",
+    "RollingGainLossRatio",
+    "RollingPainIndex",
+    "RollingVarianceRatio",
+    "RollingSpearmanCorrelation",
+    "RollingKendallRankCorrelation",
+    "RollingCointegration",
+    "RollingGrangerCausality",
     "RollingTreynorRatio",
     "VolumeOscillator",
     "VolumeZoneOscillator",

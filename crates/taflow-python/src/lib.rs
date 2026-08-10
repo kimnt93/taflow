@@ -323,6 +323,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::AccelerationBands>()?;
     m.add_class::<indicators::ParabolicSar>()?;
     m.add_class::<indicators::ParabolicSarExtended>()?;
+    m.add_class::<indicators::VolumeRelativeStrengthIndex>()?;
+    m.add_class::<indicators::RollingAverageDrawdown>()?;
+    m.add_class::<indicators::RollingDrawdownDuration>()?;
+    m.add_class::<indicators::RollingGainLossRatio>()?;
+    m.add_class::<indicators::RollingPainIndex>()?;
+    m.add_class::<indicators::RollingVarianceRatio>()?;
+    m.add_class::<indicators::RollingSpearmanCorrelation>()?;
+    m.add_class::<indicators::RollingKendallRankCorrelation>()?;
+    m.add_class::<indicators::RollingCointegration>()?;
+    m.add_class::<indicators::RollingGrangerCausality>()?;
 
     Ok(())
 }

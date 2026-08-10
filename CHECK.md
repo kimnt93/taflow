@@ -360,6 +360,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | volume_oscillator | volume_oscillator | _ |
 | [ ] | volume_zone_oscillator | volume_zone_oscillator | _ |
 | [ ] | demand_index | demand_index | _ |
+| [ ] | volume_relative_strength_index | volume_relative_strength_index | _ |
+| [ ] | rolling_average_drawdown | rolling_average_drawdown | _ |
+| [ ] | rolling_drawdown_duration | rolling_drawdown_duration | _ |
+| [ ] | rolling_gain_loss_ratio | rolling_gain_loss_ratio | _ |
+| [ ] | rolling_pain_index | rolling_pain_index | _ |
+| [ ] | rolling_variance_ratio | rolling_variance_ratio | _ |
+| [ ] | rolling_spearman_correlation | rolling_spearman_correlation | _ |
+| [ ] | rolling_kendall_rank_correlation | rolling_kendall_rank_correlation | _ |
+| [ ] | rolling_cointegration | rolling_cointegration | _ |
+| [ ] | rolling_granger_causality | rolling_granger_causality | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |

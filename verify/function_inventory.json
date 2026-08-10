@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 305,
+    "indicators": 315,
     "native_functions": 0,
-    "native_state_classes": 304,
+    "native_state_classes": 314,
     "pandas_ta_symbols": 427,
-    "python_exports": 307,
-    "rust_exports": 641,
+    "python_exports": 317,
+    "rust_exports": 661,
     "smc_functions": 8,
-    "structure": 305,
+    "structure": 315,
     "talib_functions": 161
   },
   "rows": [
@@ -3288,6 +3288,156 @@
       "native_binding": true,
       "native_symbols": [
         "RollingRecoveryFactor",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "volume_relative_strength_index",
+      "name": "VolumeRelativeStrengthIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "VolumeRelativeStrengthIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_average_drawdown",
+      "name": "RollingAverageDrawdown",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingAverageDrawdown",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_drawdown_duration",
+      "name": "RollingDrawdownDuration",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingDrawdownDuration",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_gain_loss_ratio",
+      "name": "RollingGainLossRatio",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingGainLossRatio",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_pain_index",
+      "name": "RollingPainIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingPainIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_variance_ratio",
+      "name": "RollingVarianceRatio",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingVarianceRatio",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_spearman_correlation",
+      "name": "RollingSpearmanCorrelation",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingSpearmanCorrelation",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_kendall_rank_correlation",
+      "name": "RollingKendallRankCorrelation",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingKendallRankCorrelation",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_cointegration",
+      "name": "RollingCointegration",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingCointegration",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rolling_granger_causality",
+      "name": "RollingGrangerCausality",
+      "native_binding": true,
+      "native_symbols": [
+        "RollingGrangerCausality",
         "_Native"
       ],
       "pandas_ta_reference": false,
