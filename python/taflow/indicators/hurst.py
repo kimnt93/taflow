@@ -7,100 +7,60 @@ from .._series import as_float64_series
 
 
 class Hurst:
-    """Causal rolling rescaled-range Hurst estimate.
+    """Estimate the rolling Hurst exponent with rescaled-range analysis.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    Each trailing ``timeperiod`` window is divided into ``chunks`` equal
+    segments. The native Rust state regresses log rescaled ranges on log chunk
+    sizes, matching Wickra ``HurstExponent``. Output is ``NaN`` until a complete
+    window is available. ``append``, ``extend``, and ``reset`` return this
+    instance; ``value`` exposes the latest scalar and ``compute`` returns the
+    aligned history.
+
+    Args:
+        _input: Required chronological price series. An empty series creates a
+            fresh streaming state.
+        timeperiod: Trailing window length. Must be at least ``chunks * 2``.
+        chunks: Number of rescaled-range segments. Must be at least two.
+
+    Raises:
+        ValueError: If the native configuration is invalid.
+    """
 
     def __init__(
         self,
         _input: Any,
         timeperiod: int = 20,
+        chunks: int = 4,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-        timeperiod : object
-            Trailing window length in bars.
-
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
-        self._state = _Native(timeperiod)
-        self._length = 0
+        """Initialize the estimator and process the supplied price history."""
+        self._state = _Native(timeperiod, chunks)
         self.extend(_input)
 
     def append(self, _input: float) -> "Hurst":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append one price observation and return this estimator."""
         self._state.append(float(_input))
-        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "Hurst":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Append a chronological price series and return this estimator."""
         values = as_float64_series(_input)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the aligned Hurst-exponent history as a NumPy array."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest estimate, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "Hurst":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Restore fresh native state and return this estimator."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
-        return self._length
+        """Return the processed-observation count from native state."""
+        return len(self._state)

@@ -11,7 +11,7 @@ pub struct FractalDimension {
 impl FractalDimension {
     pub fn new(period: usize) -> TaResult<Self> {
         Ok(Self {
-            hurst: Hurst::new(period)?,
+            hurst: Hurst::new(period, 2)?,
             value: None,
         })
     }
