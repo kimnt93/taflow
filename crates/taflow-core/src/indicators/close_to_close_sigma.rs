@@ -46,7 +46,9 @@ impl CloseToCloseSigma {
                 let _ = self.mean.append(log_return);
                 let _ = self.squares.append(log_return * log_return);
                 self.value = match (self.mean.value(), self.squares.value()) {
-                    (Some(mean), Some(squares)) => Some((squares - mean * mean).max(0.0).sqrt()),
+                    (Some(mean), Some(squares)) => {
+                        Some((squares - mean * mean).max(0.0).sqrt() * 252.0_f64.sqrt() * 100.0)
+                    }
                     _ => None,
                 };
             }

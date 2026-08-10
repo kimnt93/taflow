@@ -9,6 +9,7 @@ pub struct YangZhang {
     head: usize,
     len: usize,
     sums: [f64; 3],
+    square_sums: [f64; 2],
     means: Option<[f64; 3]>,
     timeperiod: usize,
     /// `0.34 / (1.34 + (n + 1) / (n - 1))`, constant for the state's lifetime.
@@ -38,6 +39,7 @@ impl YangZhang {
             head: 0,
             len: 0,
             sums: [0.0; 3],
+            square_sums: [0.0; 2],
             means: None,
             timeperiod,
             k: 0.34 / (1.34 + (n + 1.0) / (n - 1.0)),
@@ -57,6 +59,8 @@ impl YangZhang {
             for component in 0..3 {
                 self.sums[component] -= evicted[component];
             }
+            self.square_sums[0] -= evicted[0] * evicted[0];
+            self.square_sums[1] -= evicted[1] * evicted[1];
             self.window[self.head] = sample;
             self.head += 1;
             if self.head == capacity {
@@ -73,11 +77,14 @@ impl YangZhang {
         for component in 0..3 {
             self.sums[component] += sample[component];
         }
+        self.square_sums[0] += sample[0] * sample[0];
+        self.square_sums[1] += sample[1] * sample[1];
         self.means = (self.len == capacity).then(|| {
+            let n = self.timeperiod as f64;
             [
-                self.sums[0] / self.timeperiod as f64,
-                self.sums[1] / self.timeperiod as f64,
-                self.sums[2] / self.timeperiod as f64,
+                (self.square_sums[0] - self.sums[0] * self.sums[0] / n) / (n - 1.0),
+                (self.square_sums[1] - self.sums[1] * self.sums[1] / n) / (n - 1.0),
+                self.sums[2] / n,
             ]
         });
     }
@@ -92,8 +99,8 @@ impl YangZhang {
         if open > 0.0 && high > 0.0 && low > 0.0 && close > 0.0 {
             if let Some(previous_close) = previous_close {
                 if previous_close > 0.0 {
-                    let overnight = (open / previous_close).ln().powi(2);
-                    let open_close = (close / open).ln().powi(2);
+                    let overnight = (open / previous_close).ln();
+                    let open_close = (close / open).ln();
                     let rs = (high / close).ln() * (high / open).ln()
                         + (low / close).ln() * (low / open).ln();
                     self.push([overnight, open_close, rs]);
@@ -101,9 +108,9 @@ impl YangZhang {
             }
         }
         let k = self.k;
-        self.value = self
-            .means
-            .map(|[on, oc, rs]| (on + k * oc + (1.0 - k) * rs).max(0.0).sqrt());
+        self.value = self.means.map(|[on, oc, rs]| {
+            (on + k * oc + (1.0 - k) * rs).max(0.0).sqrt() * 252.0_f64.sqrt() * 100.0
+        });
         self.value
     }
 
@@ -121,6 +128,7 @@ impl YangZhang {
         self.head = 0;
         self.len = 0;
         self.sums = [0.0; 3];
+        self.square_sums = [0.0; 2];
         self.means = None;
         self.previous_close = None;
         self.value = None;

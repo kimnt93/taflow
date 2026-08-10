@@ -30,7 +30,12 @@ impl Parkinson {
         } else {
             0.0
         };
-        self.value = self.mean.append(term).map(|mean| mean.sqrt());
+        // Wickra reports annualized percentage volatility for 252 trading
+        // sessions, rather than the raw per-bar standard deviation.
+        self.value = self
+            .mean
+            .append(term)
+            .map(|mean| mean.sqrt() * 252.0_f64.sqrt() * 100.0);
         self.value
     }
 

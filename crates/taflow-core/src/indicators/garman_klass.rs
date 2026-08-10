@@ -31,7 +31,10 @@ impl GarmanKlass {
         } else {
             0.0
         };
-        self.value = self.mean.append(term).map(|mean| mean.sqrt());
+        self.value = self
+            .mean
+            .append(term)
+            .map(|mean| mean.sqrt() * 252.0_f64.sqrt() * 100.0);
         self.value
     }
 
