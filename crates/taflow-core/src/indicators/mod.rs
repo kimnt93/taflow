@@ -1523,3 +1523,43 @@ pub use percent_above_moving_average::PercentAboveMovingAverage;
 pub use quartile_bands::{QuartileBands, QuartileBandsValue};
 pub use up_down_volume_ratio::UpDownVolumeRatio;
 pub use volume_by_time_profile::VolumeByTimeProfile;
+mod arms_index;
+#[cfg(test)]
+mod arms_index_test;
+mod breadth_thrust;
+#[cfg(test)]
+mod breadth_thrust_test;
+mod cup_and_handle;
+#[cfg(test)]
+mod cup_and_handle_test;
+mod flag_pennant;
+#[cfg(test)]
+mod flag_pennant_test;
+mod mc_clellan_oscillator;
+#[cfg(test)]
+mod mc_clellan_oscillator_test;
+mod mc_clellan_summation_index;
+#[cfg(test)]
+mod mc_clellan_summation_index_test;
+mod new_highs_new_lows;
+#[cfg(test)]
+mod new_highs_new_lows_test;
+mod rectangle_range;
+#[cfg(test)]
+mod rectangle_range_test;
+mod triangle_pattern;
+#[cfg(test)]
+mod triangle_pattern_test;
+mod wedge_pattern;
+#[cfg(test)]
+mod wedge_pattern_test;
+pub use arms_index::ArmsIndex;
+pub use breadth_thrust::BreadthThrust;
+pub use cup_and_handle::CupAndHandle;
+pub use flag_pennant::FlagPennant;
+pub use mc_clellan_oscillator::McClellanOscillator;
+pub use mc_clellan_summation_index::McClellanSummationIndex;
+pub use new_highs_new_lows::NewHighsNewLows;
+pub use rectangle_range::RectangleRange;
+pub use triangle_pattern::TrianglePattern;
+pub use wedge_pattern::WedgePattern;

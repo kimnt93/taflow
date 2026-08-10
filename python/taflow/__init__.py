@@ -19,6 +19,9 @@ from .indicators import AverageDailyRange, TimeOfDayReturnProfile, DayOfWeekRetu
 from .indicators import IntradayVolatilityProfile, VolumeByTimeProfile, QuartileBands, MedianChannel
 from .indicators import AbsoluteBreadthIndex, CumulativeVolumeIndex, BullishPercentIndex
 from .indicators import UpDownVolumeRatio, PercentAboveMovingAverage, HighLowIndex
+from .indicators import NewHighsNewLows, BreadthThrust, ArmsIndex
+from .indicators import McClellanSummationIndex, McClellanOscillator
+from .indicators import CupAndHandle, RectangleRange, FlagPennant, WedgePattern, TrianglePattern
 from .indicators import RollingDrawdownDuration, RollingGainLossRatio, RollingPainIndex
 from .indicators import RollingVarianceRatio, RollingSpearmanCorrelation
 from .indicators import RollingKendallRankCorrelation, RollingCointegration
@@ -549,6 +552,16 @@ __all__ = [
     "UpDownVolumeRatio",
     "PercentAboveMovingAverage",
     "HighLowIndex",
+    "NewHighsNewLows",
+    "BreadthThrust",
+    "ArmsIndex",
+    "McClellanSummationIndex",
+    "McClellanOscillator",
+    "CupAndHandle",
+    "RectangleRange",
+    "FlagPennant",
+    "WedgePattern",
+    "TrianglePattern",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

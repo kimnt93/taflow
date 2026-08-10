@@ -3,14 +3,14 @@
     "benchmark": 187,
     "complete": 187,
     "correctness": 271,
-    "indicators": 365,
+    "indicators": 375,
     "native_functions": 0,
-    "native_state_classes": 364,
+    "native_state_classes": 374,
     "pandas_ta_symbols": 427,
-    "python_exports": 367,
-    "rust_exports": 765,
+    "python_exports": 377,
+    "rust_exports": 785,
     "smc_functions": 8,
-    "structure": 365,
+    "structure": 375,
     "talib_functions": 161
   },
   "rows": [
@@ -4053,6 +4053,156 @@
       "native_binding": true,
       "native_symbols": [
         "HighLowIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "new_highs_new_lows",
+      "name": "NewHighsNewLows",
+      "native_binding": true,
+      "native_symbols": [
+        "NewHighsNewLows",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "breadth_thrust",
+      "name": "BreadthThrust",
+      "native_binding": true,
+      "native_symbols": [
+        "BreadthThrust",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "arms_index",
+      "name": "ArmsIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "ArmsIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "mc_clellan_summation_index",
+      "name": "McClellanSummationIndex",
+      "native_binding": true,
+      "native_symbols": [
+        "McClellanSummationIndex",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "mc_clellan_oscillator",
+      "name": "McClellanOscillator",
+      "native_binding": true,
+      "native_symbols": [
+        "McClellanOscillator",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "cup_and_handle",
+      "name": "CupAndHandle",
+      "native_binding": true,
+      "native_symbols": [
+        "CupAndHandle",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "rectangle_range",
+      "name": "RectangleRange",
+      "native_binding": true,
+      "native_symbols": [
+        "RectangleRange",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "flag_pennant",
+      "name": "FlagPennant",
+      "native_binding": true,
+      "native_symbols": [
+        "FlagPennant",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "wedge_pattern",
+      "name": "WedgePattern",
+      "native_binding": true,
+      "native_symbols": [
+        "WedgePattern",
+        "_Native"
+      ],
+      "pandas_ta_reference": false,
+      "rust_export": true,
+      "smc_reference": false,
+      "talib_alias": ""
+    },
+    {
+      "exported": true,
+      "kind": "class",
+      "module": "triangle_pattern",
+      "name": "TrianglePattern",
+      "native_binding": true,
+      "native_symbols": [
+        "TrianglePattern",
         "_Native"
       ],
       "pandas_ta_reference": false,

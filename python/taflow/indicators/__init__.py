@@ -52,6 +52,16 @@ from .bullish_percent_index import BullishPercentIndex
 from .up_down_volume_ratio import UpDownVolumeRatio
 from .percent_above_moving_average import PercentAboveMovingAverage
 from .high_low_index import HighLowIndex
+from .new_highs_new_lows import NewHighsNewLows
+from .breadth_thrust import BreadthThrust
+from .arms_index import ArmsIndex
+from .mc_clellan_summation_index import McClellanSummationIndex
+from .mc_clellan_oscillator import McClellanOscillator
+from .cup_and_handle import CupAndHandle
+from .rectangle_range import RectangleRange
+from .flag_pennant import FlagPennant
+from .wedge_pattern import WedgePattern
+from .triangle_pattern import TrianglePattern
 from .rolling_average_drawdown import RollingAverageDrawdown
 from .rolling_drawdown_duration import RollingDrawdownDuration
 from .rolling_gain_loss_ratio import RollingGainLossRatio
@@ -618,6 +628,16 @@ __all__ = [
     "UpDownVolumeRatio",
     "PercentAboveMovingAverage",
     "HighLowIndex",
+    "NewHighsNewLows",
+    "BreadthThrust",
+    "ArmsIndex",
+    "McClellanSummationIndex",
+    "McClellanOscillator",
+    "CupAndHandle",
+    "RectangleRange",
+    "FlagPennant",
+    "WedgePattern",
+    "TrianglePattern",
     "RollingAverageDrawdown",
     "RollingDrawdownDuration",
     "RollingGainLossRatio",

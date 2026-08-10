@@ -383,6 +383,16 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<indicators::UpDownVolumeRatio>()?;
     m.add_class::<indicators::PercentAboveMovingAverage>()?;
     m.add_class::<indicators::HighLowIndex>()?;
+    m.add_class::<indicators::NewHighsNewLows>()?;
+    m.add_class::<indicators::BreadthThrust>()?;
+    m.add_class::<indicators::ArmsIndex>()?;
+    m.add_class::<indicators::McClellanSummationIndex>()?;
+    m.add_class::<indicators::McClellanOscillator>()?;
+    m.add_class::<indicators::CupAndHandle>()?;
+    m.add_class::<indicators::RectangleRange>()?;
+    m.add_class::<indicators::FlagPennant>()?;
+    m.add_class::<indicators::WedgePattern>()?;
+    m.add_class::<indicators::TrianglePattern>()?;
 
     Ok(())
 }

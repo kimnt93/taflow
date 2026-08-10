@@ -420,6 +420,16 @@ as functions land; regenerate statuses any time by running the checks in
 | [ ] | up_down_volume_ratio | up_down_volume_ratio | _ |
 | [ ] | percent_above_moving_average | percent_above_moving_average | _ |
 | [ ] | high_low_index | high_low_index | _ |
+| [ ] | new_highs_new_lows | new_highs_new_lows | _ |
+| [ ] | breadth_thrust | breadth_thrust | _ |
+| [ ] | arms_index | arms_index | _ |
+| [ ] | mc_clellan_summation_index | mc_clellan_summation_index | _ |
+| [ ] | mc_clellan_oscillator | mc_clellan_oscillator | _ |
+| [ ] | cup_and_handle | cup_and_handle | _ |
+| [ ] | rectangle_range | rectangle_range | _ |
+| [ ] | flag_pennant | flag_pennant | _ |
+| [ ] | wedge_pattern | wedge_pattern | _ |
+| [ ] | triangle_pattern | triangle_pattern | _ |
 | [x] | hull_moving_average | hull_moving_average | _ |
 | [x] | volume_weighted_moving_average | volume_weighted_moving_average | _ |
 | [x] | zero_lag_exponential_moving_average | zero_lag_exponential_moving_average | _ |
