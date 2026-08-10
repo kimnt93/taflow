@@ -2,7 +2,9 @@ use super::hilbert_dominant_cycle::HilbertDominantCycle;
 #[test]
 fn lifecycle() {
     let mut s = HilbertDominantCycle::new().unwrap();
-    for i in 0..40 {
+    // Wickra's Hilbert transform contract withholds values for 50 bars while
+    // the recursive phasor estimates settle.
+    for i in 0..60 {
         s.append(i as f64);
     }
     assert!(s.value().is_some());

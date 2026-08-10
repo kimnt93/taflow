@@ -1,15 +1,54 @@
+"""Python adapter for the native Hilbert dominant-cycle estimator."""
+
 from typing import Any
+
 import numpy as np
+
 from .._native import HilbertDominantCycle as _Native
 from .._series import as_float64_series
 
+
 class HilbertDominantCycle:
-    """Causal Hilbert-transform dominant-cycle period with native warm-up."""
-    def __init__(self, prices: Any) -> None: self._state = _Native(); self.extend(prices)
-    def append(self, price: float) -> "HilbertDominantCycle": self._state.append(float(price)); return self
-    def extend(self, prices: Any) -> "HilbertDominantCycle": self._state.extend(as_float64_series(prices)); return self
-    def compute(self) -> np.ndarray: return self._state.compute()
+    """Estimate the dominant market-cycle period using a Hilbert transform.
+
+    The native recursive homodyne discriminator constrains its period estimate
+    to 6–50 bars and emits ``NaN`` for the first 50 aligned observations. The
+    implementation maps directly to Wickra ``HilbertDominantCycle``.
+
+    Args:
+        prices: Required chronological price history. Pass an empty series to
+            construct a fresh streaming estimator.
+    """
+
+    def __init__(self, prices: Any) -> None:
+        """Initialize the estimator and process the supplied history."""
+        self._state = _Native()
+        self.extend(prices)
+
+    def append(self, price: float) -> "HilbertDominantCycle":
+        """Append one price and return this adapter."""
+        self._state.append(float(price))
+        return self
+
+    def extend(self, prices: Any) -> "HilbertDominantCycle":
+        """Append a chronological price series through native Rust."""
+        self._state.extend(as_float64_series(prices))
+        return self
+
     @property
-    def value(self) -> float | None: return self._state.value
-    def reset(self) -> "HilbertDominantCycle": self._state.reset(); return self
-    def __len__(self) -> int: return len(self._state)
+    def value(self) -> float | None:
+        """Return the latest estimated period, or ``None`` during warm-up."""
+        return self._state.value
+
+    def compute(self) -> np.ndarray:
+        """Return the aligned dominant-period history."""
+        return self._state.compute()
+
+    def reset(self) -> "HilbertDominantCycle":
+        """Reset all recursive phasor state and return this adapter."""
+        self._state.reset()
+        return self
+
+    def __len__(self) -> int:
+        """Return the processed-price count delegated to native state."""
+        return len(self._state)
