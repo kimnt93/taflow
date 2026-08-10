@@ -17,8 +17,7 @@ class TrueStrengthIndex:
     differences, absolute differences, double EMA smoothing, warm-up, and
     aligned output. ``compute`` returns one float array, ``value`` is the latest
     scalar or ``None`` during warm-up, and lifecycle mutators return ``self``.
-    The oracle is pandas-ta-classic ``tsi``; TAFlow records its seeding variant
-    where applicable.
+    The formula and warm-up match Wickra ``TSI``.
     """
 
     def __init__(self, _input: Any, fast: int = 13, slow: int = 25) -> None:
