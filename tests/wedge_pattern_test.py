@@ -1,3 +1,5 @@
-from taflow import WedgePattern
-def test_lifecycle():
- x=WedgePattern([1.]*20,list(range(3,23)),list(range(1,21)),[2.]*20);assert x.value is not None;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_wedge_pattern_matches_wickra() -> None:
+    assert_registered_oracle_match("WedgePattern")

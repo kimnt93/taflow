@@ -1,69 +1,61 @@
+use super::pattern_swing::{ratios_in, xabcd, SwingTracker, SWING_THRESHOLD};
 use crate::error::TaResult;
-use std::collections::VecDeque;
 
+/// Crab X-A-B-C-D harmonic completion signal.
 #[derive(Debug, Clone)]
 pub struct CrabPattern {
-    rows: VecDeque<[f64; 4]>,
+    swing: SwingTracker,
     count: usize,
     value: Option<f64>,
 }
 
 impl CrabPattern {
+    /// Create a detector retaining the five newest confirmed pivots.
     pub fn new() -> TaResult<Self> {
         Ok(Self {
-            rows: VecDeque::with_capacity(6),
+            swing: SwingTracker::new(SWING_THRESHOLD, 5),
             count: 0,
             value: None,
         })
     }
-
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+    /// Append one OHLC bar and return the latest harmonic signal.
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
         self.count += 1;
-        if self.rows.len() == 6 {
-            self.rows.pop_front();
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) || self.swing.pivots().len() < 5 {
+            return self.value;
         }
-        self.rows.push_back([open, high, low, close]);
-        self.value = (self.rows.len() == 6).then(|| Self::signal(&self.rows));
+        let p = xabcd(self.swing.pivots());
+        let xa = (p.a - p.x).abs();
+        let ab = (p.b - p.a).abs();
+        let bc = (p.c - p.b).abs();
+        let cd = (p.d - p.c).abs();
+        let ad = (p.d - p.a).abs();
+        if ratios_in(&[
+            (ab / xa, 0.382, 0.618),
+            (bc / ab, 0.382, 0.886),
+            (cd / bc, 2.24, 3.618),
+            (ad / xa, 1.55, 1.65),
+        ]) {
+            self.value = Some(if p.bullish { 1.0 } else { -1.0 });
+        }
         self.value
     }
-
-    fn signal(rows: &VecDeque<[f64; 4]>) -> f64 {
-        let x = rows[1][3];
-        let a = rows[2][3];
-        let b = rows[3][3];
-        let c = rows[4][3];
-        let d = rows[5][3];
-        let xa = (a - x).abs();
-        let ab = (b - a).abs();
-        let bc = (c - b).abs();
-        let cd = (d - c).abs();
-        if xa == 0.0 || ab == 0.0 || bc == 0.0 {
-            return 0.0;
-        }
-        let valid = (0.382..=0.618).contains(&(ab / xa))
-            && (0.382..=0.886).contains(&(bc / ab))
-            && (1.55..=1.7).contains(&(cd / bc));
-        if valid {
-            -(d - c).signum()
-        } else {
-            0.0
-        }
-    }
-
+    /// Return the signal for the latest bar.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
-
+    /// Return the number of processed bars.
     pub fn len(&self) -> usize {
         self.count
     }
-
+    /// Return whether no bars were processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
-
+    /// Clear pivots and latest output.
     pub fn reset(&mut self) {
-        self.rows.clear();
+        self.swing.reset();
         self.count = 0;
         self.value = None;
     }

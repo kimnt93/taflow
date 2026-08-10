@@ -1,48 +1,61 @@
+use super::pattern_swing::{SwingTracker, SWING_THRESHOLD};
 use crate::error::TaResult;
-use std::collections::VecDeque;
+
+/// Causal flag/pennant continuation signal from three confirmed pivots.
 #[derive(Debug, Clone)]
 pub struct FlagPennant {
-    rows: VecDeque<(f64, f64, f64, f64)>,
+    swing: SwingTracker,
     count: usize,
     value: Option<f64>,
 }
+
 impl FlagPennant {
+    /// Create a detector with Wickra's fixed 5% swing threshold.
     pub fn new() -> TaResult<Self> {
         Ok(Self {
-            rows: VecDeque::with_capacity(20),
+            swing: SwingTracker::new(SWING_THRESHOLD, 3),
             count: 0,
             value: None,
         })
     }
-    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<f64> {
+    /// Append one OHLC bar and return `1`, `-1`, or `0`.
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
         self.count += 1;
-        if self.rows.len() == 20 {
-            self.rows.pop_front();
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) {
+            return self.value;
         }
-        self.rows.push_back((o, h, l, c));
-        self.value = (self.rows.len() == 20).then(|| {
-            let impulse = self.rows[5].3 - self.rows[0].3;
-            let early = self.rows[10].1 - self.rows[10].2;
-            let late = self.rows[19].1 - self.rows[19].2;
-            if impulse.abs() > early && late < early {
-                impulse.signum()
+        let pivots = self.swing.pivots();
+        if pivots.len() < 3 {
+            return self.value;
+        }
+        let n = pivots.len();
+        let pole = (pivots[n - 2].price - pivots[n - 3].price).abs();
+        let pullback = (pivots[n - 1].price - pivots[n - 2].price).abs();
+        if pole > 0.0 && pullback < 0.5 * pole {
+            self.value = Some(if pivots[n - 2].direction > 0.0 {
+                1.0
             } else {
-                0.0
-            }
-        });
+                -1.0
+            });
+        }
         self.value
     }
+    /// Return the signal for the latest bar.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+    /// Return the number of processed bars.
     pub fn len(&self) -> usize {
         self.count
     }
+    /// Return whether no bars were processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
+    /// Clear pivots and latest output.
     pub fn reset(&mut self) {
-        self.rows.clear();
+        self.swing.reset();
         self.count = 0;
         self.value = None;
     }

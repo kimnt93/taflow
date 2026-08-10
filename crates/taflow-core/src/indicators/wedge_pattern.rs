@@ -1,48 +1,57 @@
+use super::pattern_swing::{recent_legs, SwingTracker, SWING_THRESHOLD};
 use crate::error::TaResult;
-use std::collections::VecDeque;
+
+/// Rising/falling wedge reversal signal from four confirmed pivots.
 #[derive(Debug, Clone)]
 pub struct WedgePattern {
-    rows: VecDeque<(f64, f64, f64, f64)>,
+    swing: SwingTracker,
     count: usize,
     value: Option<f64>,
 }
+
 impl WedgePattern {
+    /// Create a detector with Wickra's fixed 5% swing threshold.
     pub fn new() -> TaResult<Self> {
         Ok(Self {
-            rows: VecDeque::with_capacity(20),
+            swing: SwingTracker::new(SWING_THRESHOLD, 4),
             count: 0,
             value: None,
         })
     }
-    pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<f64> {
+    /// Append one OHLC bar and return `1`, `-1`, or `0`.
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
         self.count += 1;
-        if self.rows.len() == 20 {
-            self.rows.pop_front();
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) || self.swing.pivots().len() < 4 {
+            return self.value;
         }
-        self.rows.push_back((o, h, l, c));
-        self.value = (self.rows.len() == 20).then(|| {
-            let high_slope = self.rows[19].1 - self.rows[0].1;
-            let low_slope = self.rows[19].2 - self.rows[0].2;
-            let narrowing = (self.rows[19].1 - self.rows[19].2) < (self.rows[0].1 - self.rows[0].2);
-            if narrowing && high_slope * low_slope > 0.0 {
-                high_slope.signum()
-            } else {
-                0.0
-            }
-        });
+        let (old_high, new_high, old_low, new_low) = recent_legs(self.swing.pivots());
+        let high_slope = new_high - old_high;
+        let low_slope = new_low - old_low;
+        self.value = if high_slope > 0.0 && low_slope > high_slope {
+            Some(-1.0)
+        } else if high_slope < low_slope && low_slope < 0.0 {
+            Some(1.0)
+        } else {
+            Some(0.0)
+        };
         self.value
     }
+    /// Return the signal for the latest bar.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
+    /// Return the number of processed bars.
     pub fn len(&self) -> usize {
         self.count
     }
+    /// Return whether no bars were processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
+    /// Clear pivots and latest output.
     pub fn reset(&mut self) {
-        self.rows.clear();
+        self.swing.reset();
         self.count = 0;
         self.value = None;
     }

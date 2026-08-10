@@ -1,62 +1,54 @@
+use super::pattern_swing::{approximately_equal, SwingTracker, LEVEL_TOLERANCE, SWING_THRESHOLD};
 use crate::error::TaResult;
-use std::collections::VecDeque;
 
+/// Triple-top and triple-bottom reversal signal from five pivots.
 #[derive(Debug, Clone)]
 pub struct TripleTopBottom {
-    rows: VecDeque<[f64; 4]>,
+    swing: SwingTracker,
     count: usize,
     value: Option<f64>,
 }
 
 impl TripleTopBottom {
+    /// Create a detector with Wickra's fixed swing geometry.
     pub fn new() -> TaResult<Self> {
         Ok(Self {
-            rows: VecDeque::with_capacity(6),
+            swing: SwingTracker::new(SWING_THRESHOLD, 5),
             count: 0,
             value: None,
         })
     }
-
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+    /// Append one OHLC bar and return the latest directional signal.
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
         self.count += 1;
-        if self.rows.len() == 6 {
-            self.rows.pop_front();
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) || self.swing.pivots().len() < 5 {
+            return self.value;
         }
-        self.rows.push_back([open, high, low, close]);
-        self.value = (self.rows.len() == 6).then(|| Self::signal(&self.rows));
+        let p = self.swing.pivots();
+        let n = p.len();
+        if approximately_equal(p[n - 5].price, p[n - 3].price, LEVEL_TOLERANCE)
+            && approximately_equal(p[n - 3].price, p[n - 1].price, LEVEL_TOLERANCE)
+        {
+            self.value = Some(if p[n - 1].direction > 0.0 { -1.0 } else { 1.0 });
+        }
         self.value
     }
-
-    fn signal(rows: &VecDeque<[f64; 4]>) -> f64 {
-        let highs = [rows[1][1], rows[3][1], rows[5][1]];
-        let lows = [rows[1][2], rows[3][2], rows[5][2]];
-        let high_span = highs.iter().copied().fold(f64::NEG_INFINITY, f64::max)
-            - highs.iter().copied().fold(f64::INFINITY, f64::min);
-        let low_span = lows.iter().copied().fold(f64::NEG_INFINITY, f64::max)
-            - lows.iter().copied().fold(f64::INFINITY, f64::min);
-        if high_span / highs[0].abs().max(1.0) <= 0.02 {
-            -1.0
-        } else if low_span / lows[0].abs().max(1.0) <= 0.02 {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
+    /// Return the signal for the latest bar.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
-
+    /// Return the number of processed bars.
     pub fn len(&self) -> usize {
         self.count
     }
-
+    /// Return whether no bars were processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
-
+    /// Clear pivots and latest output.
     pub fn reset(&mut self) {
-        self.rows.clear();
+        self.swing.reset();
         self.count = 0;
         self.value = None;
     }

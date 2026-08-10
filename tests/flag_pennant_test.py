@@ -1,3 +1,5 @@
-from taflow import FlagPennant
-def test_lifecycle():
- x=FlagPennant([1.]*20,[3.]*20,[0.]*20,list(range(20)));assert x.value is not None;x.reset();assert x.value is None
+from tests.oracle_assertions import assert_registered_oracle_match
+
+
+def test_flag_pennant_matches_wickra() -> None:
+    assert_registered_oracle_match("FlagPennant")

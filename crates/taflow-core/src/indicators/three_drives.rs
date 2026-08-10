@@ -1,61 +1,58 @@
+use super::pattern_swing::{approximately_equal, ratios_in, xabcd, SwingTracker, SWING_THRESHOLD};
 use crate::error::TaResult;
-use std::collections::VecDeque;
 
+/// Three-Drives harmonic completion signal.
 #[derive(Debug, Clone)]
 pub struct ThreeDrives {
-    rows: VecDeque<[f64; 4]>,
+    swing: SwingTracker,
     count: usize,
     value: Option<f64>,
 }
 
 impl ThreeDrives {
+    /// Create a detector retaining the five newest confirmed pivots.
     pub fn new() -> TaResult<Self> {
         Ok(Self {
-            rows: VecDeque::with_capacity(6),
+            swing: SwingTracker::new(SWING_THRESHOLD, 5),
             count: 0,
             value: None,
         })
     }
-
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+    /// Append one OHLC bar and return the latest harmonic signal.
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
         self.count += 1;
-        if self.rows.len() == 6 {
-            self.rows.pop_front();
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) || self.swing.pivots().len() < 5 {
+            return self.value;
         }
-        self.rows.push_back([open, high, low, close]);
-        self.value = (self.rows.len() == 6).then(|| Self::signal(&self.rows));
+        let p = xabcd(self.swing.pivots());
+        let xa = (p.a - p.x).abs();
+        let ab = (p.b - p.a).abs();
+        let bc = (p.c - p.b).abs();
+        let cd = (p.d - p.c).abs();
+        if ratios_in(&[(ab / xa, 1.13, 1.75), (cd / bc, 1.13, 1.75)])
+            && approximately_equal(ab, cd, 0.20)
+            && approximately_equal(xa, bc, 0.30)
+        {
+            self.value = Some(if p.bullish { 1.0 } else { -1.0 });
+        }
         self.value
     }
-
-    fn signal(rows: &VecDeque<[f64; 4]>) -> f64 {
-        let first = rows[1][3] - rows[0][3];
-        let second = rows[3][3] - rows[2][3];
-        let third = rows[5][3] - rows[4][3];
-        let same_direction = first.signum() == second.signum() && second.signum() == third.signum();
-        let comparable = first != 0.0
-            && (second.abs() / first.abs() - 1.272).abs() <= 0.35
-            && (third.abs() / second.abs() - 1.272).abs() <= 0.35;
-        if same_direction && comparable {
-            -third.signum()
-        } else {
-            0.0
-        }
-    }
-
+    /// Return the signal for the latest bar.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
-
+    /// Return the number of processed bars.
     pub fn len(&self) -> usize {
         self.count
     }
-
+    /// Return whether no bars were processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
-
+    /// Clear pivots and latest output.
     pub fn reset(&mut self) {
-        self.rows.clear();
+        self.swing.reset();
         self.count = 0;
         self.value = None;
     }

@@ -1,69 +1,71 @@
+use super::pattern_swing::{approximately_equal, SwingTracker, LEVEL_TOLERANCE, SWING_THRESHOLD};
 use crate::error::TaResult;
-use std::collections::VecDeque;
 
+/// Head-and-shoulders and inverse reversal signal from five pivots.
 #[derive(Debug, Clone)]
 pub struct HeadAndShoulders {
-    rows: VecDeque<[f64; 4]>,
+    swing: SwingTracker,
     count: usize,
     value: Option<f64>,
 }
 
 impl HeadAndShoulders {
+    /// Create a detector with Wickra's fixed swing geometry.
     pub fn new() -> TaResult<Self> {
         Ok(Self {
-            rows: VecDeque::with_capacity(6),
+            swing: SwingTracker::new(SWING_THRESHOLD, 5),
             count: 0,
             value: None,
         })
     }
-
-    pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<f64> {
+    /// Append one OHLC bar and return the latest directional signal.
+    pub fn append(&mut self, _open: f64, high: f64, low: f64, _close: f64) -> Option<f64> {
         self.count += 1;
-        if self.rows.len() == 6 {
-            self.rows.pop_front();
+        self.value = Some(0.0);
+        if !self.swing.append(high, low) || self.swing.pivots().len() < 5 {
+            return self.value;
         }
-        self.rows.push_back([open, high, low, close]);
-        self.value = (self.rows.len() == 6).then(|| Self::signal(&self.rows));
+        let p = self.swing.pivots();
+        let n = p.len();
+        let left = p[n - 5];
+        let neck1 = p[n - 4];
+        let head = p[n - 3];
+        let neck2 = p[n - 2];
+        let right = p[n - 1];
+        let frame = approximately_equal(left.price, right.price, LEVEL_TOLERANCE)
+            && approximately_equal(neck1.price, neck2.price, LEVEL_TOLERANCE);
+        self.value = if right.direction > 0.0
+            && frame
+            && head.price > left.price
+            && head.price > right.price
+        {
+            Some(-1.0)
+        } else if right.direction < 0.0
+            && frame
+            && head.price < left.price
+            && head.price < right.price
+        {
+            Some(1.0)
+        } else {
+            Some(0.0)
+        };
         self.value
     }
-
-    fn signal(rows: &VecDeque<[f64; 4]>) -> f64 {
-        let left_shoulder = rows[1][1];
-        let head = rows[3][1];
-        let right_shoulder = rows[5][1];
-        let scale = head.abs().max(1.0);
-        let bearish = head > left_shoulder
-            && head > right_shoulder
-            && (left_shoulder - right_shoulder).abs() / scale <= 0.03;
-        let left_trough = rows[1][2];
-        let bottom = rows[3][2];
-        let right_trough = rows[5][2];
-        let bullish = bottom < left_trough
-            && bottom < right_trough
-            && (left_trough - right_trough).abs() / bottom.abs().max(1.0) <= 0.03;
-        if bearish {
-            -1.0
-        } else if bullish {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
+    /// Return the signal for the latest bar.
     pub fn value(&self) -> Option<f64> {
         self.value
     }
-
+    /// Return the number of processed bars.
     pub fn len(&self) -> usize {
         self.count
     }
-
+    /// Return whether no bars were processed.
     pub fn is_empty(&self) -> bool {
         self.count == 0
     }
-
+    /// Clear pivots and latest output.
     pub fn reset(&mut self) {
-        self.rows.clear();
+        self.swing.reset();
         self.count = 0;
         self.value = None;
     }

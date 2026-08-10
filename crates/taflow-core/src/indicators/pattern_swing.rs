@@ -9,12 +9,14 @@ pub(crate) const LEVEL_TOLERANCE: f64 = 0.03;
 pub(crate) struct Pivot {
     pub(crate) price: f64,
     pub(crate) direction: f64,
+    pub(crate) bar: usize,
 }
 
 #[derive(Debug, Clone, Copy)]
 struct RunningSwing {
     direction: f64,
     extreme: f64,
+    extreme_bar: usize,
 }
 
 /// Bounded swing history shared by geometric chart-pattern detectors.
@@ -22,6 +24,7 @@ struct RunningSwing {
 pub(crate) struct SwingTracker {
     threshold: f64,
     capacity: usize,
+    bars_seen: usize,
     state: Option<RunningSwing>,
     pivots: Vec<Pivot>,
 }
@@ -32,6 +35,7 @@ impl SwingTracker {
         Self {
             threshold,
             capacity,
+            bars_seen: 0,
             state: None,
             pivots: Vec::with_capacity(capacity),
         }
@@ -39,10 +43,13 @@ impl SwingTracker {
 
     /// Append one high/low bar and report whether a pivot was confirmed.
     pub(crate) fn append(&mut self, high: f64, low: f64) -> bool {
+        let bar = self.bars_seen;
+        self.bars_seen += 1;
         let Some(state) = self.state else {
             self.state = Some(RunningSwing {
                 direction: 1.0,
                 extreme: high,
+                extreme_bar: bar,
             });
             return false;
         };
@@ -52,6 +59,7 @@ impl SwingTracker {
                 self.state = Some(RunningSwing {
                     direction: 1.0,
                     extreme: high,
+                    extreme_bar: bar,
                 });
                 return false;
             }
@@ -59,10 +67,12 @@ impl SwingTracker {
                 self.push(Pivot {
                     price: state.extreme,
                     direction: 1.0,
+                    bar: state.extreme_bar,
                 });
                 self.state = Some(RunningSwing {
                     direction: -1.0,
                     extreme: low,
+                    extreme_bar: bar,
                 });
                 return true;
             }
@@ -72,6 +82,7 @@ impl SwingTracker {
                 self.state = Some(RunningSwing {
                     direction: -1.0,
                     extreme: low,
+                    extreme_bar: bar,
                 });
                 return false;
             }
@@ -79,10 +90,12 @@ impl SwingTracker {
                 self.push(Pivot {
                     price: state.extreme,
                     direction: -1.0,
+                    bar: state.extreme_bar,
                 });
                 self.state = Some(RunningSwing {
                     direction: 1.0,
                     extreme: high,
+                    extreme_bar: bar,
                 });
                 return true;
             }
@@ -94,7 +107,13 @@ impl SwingTracker {
         &self.pivots
     }
 
+    /// Return the zero-based index of the latest processed bar.
+    pub(crate) fn current_bar(&self) -> usize {
+        self.bars_seen.saturating_sub(1)
+    }
+
     pub(crate) fn reset(&mut self) {
+        self.bars_seen = 0;
         self.state = None;
         self.pivots.clear();
     }
@@ -131,4 +150,35 @@ pub(crate) fn recent_legs(pivots: &[Pivot]) -> (f64, f64, f64, f64) {
 pub(crate) fn approximately_equal(left: f64, right: f64, tolerance: f64) -> bool {
     let scale = left.abs().max(right.abs()).max(f64::MIN_POSITIVE);
     (left - right).abs() <= tolerance * scale
+}
+
+/// Last five alternating pivots interpreted as harmonic X-A-B-C-D points.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Xabcd {
+    pub(crate) x: f64,
+    pub(crate) a: f64,
+    pub(crate) b: f64,
+    pub(crate) c: f64,
+    pub(crate) d: f64,
+    pub(crate) bullish: bool,
+}
+
+/// Read the five newest pivots as an X-A-B-C-D harmonic frame.
+pub(crate) fn xabcd(pivots: &[Pivot]) -> Xabcd {
+    let length = pivots.len();
+    Xabcd {
+        x: pivots[length - 5].price,
+        a: pivots[length - 4].price,
+        b: pivots[length - 3].price,
+        c: pivots[length - 2].price,
+        d: pivots[length - 1].price,
+        bullish: pivots[length - 1].direction < 0.0,
+    }
+}
+
+/// Return whether every harmonic ratio lies inside its inclusive interval.
+pub(crate) fn ratios_in(checks: &[(f64, f64, f64)]) -> bool {
+    checks
+        .iter()
+        .all(|&(value, minimum, maximum)| value >= minimum && value <= maximum)
 }
