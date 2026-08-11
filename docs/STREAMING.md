@@ -9,7 +9,7 @@ All examples on this page are executed as part of the docs check.
 
 ## The lifecycle
 
-Every one of the 299 classes exposes the same six operations:
+Every one of the 393 indicator classes exposes the same six operations:
 
 ```python
 from taflow import ExponentialMovingAverage
@@ -87,7 +87,7 @@ for start in range(0, len(close), 37):
 (whole.compute() == split.compute()).all()     # True, bitwise
 ```
 
-The verification harness asserts this for all 287 functions at chunk sizes 1,
+The verification harness asserts this for all 393 indicators at chunk sizes 1,
 10, and 1000 on every run, alongside a 9,000-bar backfill followed by 1,000
 live `append` calls compared against the reference implementation.
 

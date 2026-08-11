@@ -18,10 +18,9 @@
 6. [Performance](#performance)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/functions-300-blue" alt="300 public exports" />
+  <img src="https://img.shields.io/badge/indicators-393-blue" alt="393 indicators" />
   <img src="https://img.shields.io/badge/TA--Lib_parity-161-blue" alt="161 TA-Lib functions" />
-  <img src="https://img.shields.io/badge/correctness-287%2F287_checked-brightgreen" alt="287/287 externally checked" />
-  <img src="https://img.shields.io/badge/vector_speedup-1.81%C3%97_mean-blue" alt="1.81x mean vector speedup at 10k bars" />
+  <img src="https://img.shields.io/badge/correctness-393%2F393_MATCH-brightgreen" alt="393/393 externally matched" />
   <img src="https://img.shields.io/badge/unsafe-zero-brightgreen" alt="zero unsafe" />
   <img src="https://img.shields.io/badge/C_deps-zero-orange" alt="zero C deps" />
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT" />
@@ -29,9 +28,9 @@
 
 ## What it is
 
-**298 indicator classes** (300 public exports) in one library: the complete 161-function TA-Lib surface
+**393 indicator classes** in one library: the complete 161-function TA-Lib surface
 (overlap, momentum, volume, volatility, statistics, cycles, and all 61 candle
-patterns) plus 138 extended operators — rolling statistics, EWM operators,
+patterns) plus 232 extended operators — rolling statistics, EWM operators,
 Smart Money Concepts, volatility estimators, and signal helpers. Pure Rust
 kernels, PyO3 bindings, no C compiler and no TA-Lib installation.
 
@@ -42,7 +41,7 @@ Three things make it different from a batch TA library:
   costs the same on bar 10 and bar 10,000,000.
 - **Chunk invariance is a tested contract.** Feeding 10,000 bars at once, in
   chunks of 7, or one at a time produces **bitwise identical** output and
-  internal state — asserted for all 287 functions on every run.
+  internal state — asserted for all 393 indicators by the verification registry.
 - **The full history is free.** `compute()` returns the entire aligned series
   from a Rust-side cache — no recomputation, one memcpy.
 
@@ -204,75 +203,32 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 
 | Document | What it covers |
 |---|---|
-| [Indicators](docs/INDICATORS.md) | All 298 classes by category — TA-Lib name, parameters, constructor order, the shared class contract |
+| [Indicators](docs/INDICATORS.md) | Indicator classes by category — TA-Lib name, parameters, constructor order, the shared class contract |
 | [Streaming](docs/STREAMING.md) | Live updates, warm-up, backfill-then-stream, chunk invariance, `reset`, threading, per-tick cost |
 | [Pipelines](docs/PIPELINES.md) | Building causal graphs, expressions, evaluate-once semantics, custom nodes, when not to use one |
 | [Data in / out](docs/DATA.md) | Every accepted input container, output converters, dataframes, the adapter gateway, `RollingApply`, `SessionFlags` |
-| [Correctness + performance](docs/CORRECTNESS.md) | External reference, correctness/error, vector speedup, and fresh-state warm-up matrices for every class |
+| [Correctness](verify/CORRECTNESS.md) | External oracle and lifecycle result for all 393 registered indicators |
+| [Benchmarks](verify/BENCHMARK.md) | Correctness-gated vector timings for all 393 registered indicators |
 | [Optimization notes](docs/PERFORMANCE.md) | What was optimized, the bit-exactness contract, and which optimizations were rejected |
 
 ## Performance
 
-The performance figures below are the last committed benchmark artifact. Per the
-current normalization pass, no benchmark was rerun; correctness and lifecycle
-checks were rerun after every refactor.
+The authoritative benchmark was generated on 2026-08-11 after every registered
+indicator passed its selected external oracle. It covers all 393 indicators at
+1k, 10k, 100k, and 1m bars, plus fresh-state runs at 1, 5, and 10 concurrent
+threads. Each row reports Python API and native-kernel speedup against the same
+reference used for correctness.
 
-Measured 2026-08-09 on an Intel i7-10750H, Python 3.12, against TA-Lib 0.7.1,
-NumPy 2.4.6, and Polars 1.43.2 over identical contiguous arrays. **A stock portable build** — no
-`target-cpu=native`, no platform-specific flags — because that is what
-`pip install` gives you. Correctness is checked before anything is timed.
-
-### Average vector speedup
-
-Across the 176 classes whose selected external reference has a direct vector
-timing adapter. Speedup is reference time divided by TAFlow native-kernel time.
-
-| 1k bars | 10k bars | 100k bars | 1m bars |
-|---:|---:|---:|---:|
-| **4.70×** | **1.81×** | **1.21×** | **1.13×** |
-
-### Average fresh-state warm-up speedup
-
-Each cell constructs and feeds independent states; columns are concurrent
-thread counts.
-
-| Bars | 1 thread | 5 threads | 10 threads |
-|---:|---:|---:|---:|
-| 1 | **1.33×** | **1.66×** | **1.89×** |
-| 10 | **1.79×** | **1.89×** | **1.88×** |
-| 100 | **1.77×** | **1.84×** | **1.86×** |
-| 1,000 | **1.71×** | **2.07×** | **2.09×** |
-
-### Live updates — where the design pays off
-
-This is the number that matters for a running feed. After a 100,000-bar
-backfill, feeding 1,000 more bars one at a time:
-
-| | |
-|---|---|
-| Per `append` | **0.24 µs** median (p90 0.34 µs) |
-| vs TA-Lib recomputing the current history | **172×** median |
-
-TAFlow's per-tick cost is flat because state is bounded; a batch library redoes
-work proportional to its window on every tick, so this gap widens with history
-length rather than being a fixed constant.
-
-### Threading
-
-Bulk kernels release the GIL, so independent indicators can run concurrently.
-Per-function thread-scaling results are recorded in the benchmark artifacts.
+See [verify/BENCHMARK.md](verify/BENCHMARK.md) for the aggregate vector table.
+Complete warm-up/thread matrices and raw repeated samples are retained under
+[`verify/evidence/benchmark/`](verify/evidence/benchmark/).
 
 ### Reproduce it
 
 ```bash
-make bench                   # all 287 functions, 1k/10k/100k/1M bars
+make bench                   # all 393 indicators, 1k/10k/100k/1M bars
 make bench ARGS="SMA MAX"    # a subset
 ```
-
-The complete [correctness and performance report](docs/CORRECTNESS.md) contains
-all per-class matrices; raw repeated timing samples remain in
-[`verify/evidence/benchmark/`](verify/evidence/benchmark/). Figures here are
-arithmetic means; individual functions vary by a few percent between runs.
 
 `make build-native` builds with `-C target-cpu=native` for local measurement.
 It must never be shipped, since the resulting binary may use instructions that
@@ -282,27 +238,25 @@ are unavailable on older CPUs.
 
 Correctness is verified before performance is measured, on every run.
 
-- **Oracle verification** — every function is checked against TA-Lib, NumPy,
-  pandas, pandas-ta-classic, Polars, or smartmoneyconcepts. Current status:
-  **287/287 primary checks passed** with zero failures. The supplementary
-  external-oracle run reports **204 matches, 38 documented variants, and zero
-  failures**; the shared lifecycle gate checks continuation and bitwise chunk
-  invariance.
+- **Oracle verification** — all 393 indicators match their selected independent
+  TA-Lib, Wickra, pandas-ta-classic, NumPy, or smartmoneyconcepts reference.
+  The same run checks cold batch, warmed continuation, reset/replay, and repeated
+  native `extend` chunks of 1, 10, and 1,000 bars.
 - Four functions — VAR, STDDEV, CORREL and BETA — reproduce TA-Lib
   **bitwise**, byte for byte at 1M bars, by replicating its exact accumulation
   order.
 - Every public class is also checked for constructor backfill, empty-state
   startup, scalar append, chunked continuation, fluent identity, length, and
-  reset behavior. Current status: **304/304 public interfaces pass**.
+  reset behavior. Current status: **400/400 public interfaces pass**.
 
 ```bash
-make check                   # unit tests + oracle parity for all 287 functions
+make check                   # unit tests + oracle parity for all 393 indicators
 make verify ARGS="EMA ATR"   # oracle parity for a subset
 ```
 
-See the unified [correctness and performance report](docs/CORRECTNESS.md) for
-every class and [docs/PERFORMANCE.md](docs/PERFORMANCE.md) for optimization
-methods and rejected trade-offs.
+See [verify/CORRECTNESS.md](verify/CORRECTNESS.md) for every registered class,
+[verify/BENCHMARK.md](verify/BENCHMARK.md) for timings, and
+[docs/PERFORMANCE.md](docs/PERFORMANCE.md) for optimization methods.
 
 ## Development
 

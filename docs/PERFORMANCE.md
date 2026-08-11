@@ -13,7 +13,7 @@ per-function work list is
 
 ## The contract
 
-Three properties are asserted on every verification run, for all 287 functions:
+Three properties are asserted on every verification run, for all 393 indicators:
 
 1. **Batch matches the oracle** — TA-Lib for the 161 TA-Lib functions, pandas
    for the rolling and EWM operators.

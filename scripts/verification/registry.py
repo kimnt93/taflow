@@ -79,22 +79,14 @@ class PandasTaBinding:
 WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "RollingMedian": WickraBinding("MedianMA", ("timeperiod",)),
     "RollingZScore": WickraBinding("ZScore", ("timeperiod",)),
-    "RollingSkew": WickraBinding(
-        "Skewness", ("timeperiod",), atol=1e-6
-    ),
-    "RollingKurtosis": WickraBinding(
-        "Kurtosis", ("timeperiod",), atol=3e-4
-    ),
-    "RollingInterquartileRange": WickraBinding(
-        "RollingIqr", ("timeperiod",)
-    ),
+    "RollingSkew": WickraBinding("Skewness", ("timeperiod",), atol=1e-6),
+    "RollingKurtosis": WickraBinding("Kurtosis", ("timeperiod",), atol=3e-4),
+    "RollingInterquartileRange": WickraBinding("RollingIqr", ("timeperiod",)),
     "RollingSharpe": WickraBinding("SharpeRatio", ("timeperiod",)),
     "RollingSortino": WickraBinding("SortinoRatio", ("timeperiod",)),
     "HullMovingAverage": WickraBinding("HMA", ("timeperiod",)),
     "VolumeWeightedMovingAverage": WickraBinding("VWMA", ("timeperiod",)),
-    "ZeroLagExponentialMovingAverage": WickraBinding(
-        "ZLEMA", ("timeperiod",)
-    ),
+    "ZeroLagExponentialMovingAverage": WickraBinding("ZLEMA", ("timeperiod",)),
     "ArnaudLegouxMovingAverage": WickraBinding(
         "ALMA", ("timeperiod", "offset", "sigma")
     ),
@@ -102,14 +94,10 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "KeltnerChannels": WickraBinding(
         "Keltner", ("timeperiod", "timeperiod", "multiplier")
     ),
-    "RollingAutocorr": WickraBinding(
-        "Autocorrelation", ("timeperiod",)
-    ),
+    "RollingAutocorr": WickraBinding("Autocorrelation", ("timeperiod",)),
     "Hurst": WickraBinding("HurstExponent", ("timeperiod", "chunks")),
     "RollingAlpha": WickraBinding("Alpha", ("timeperiod",), atol=3e-8),
-    "RollingInformationRatio": WickraBinding(
-        "InformationRatio", ("timeperiod",)
-    ),
+    "RollingInformationRatio": WickraBinding("InformationRatio", ("timeperiod",)),
     "KnowSureThing": WickraBinding(
         "KST",
         ("roc1", "roc2", "roc3", "roc4", "sma1", "sma2", "sma3", "sma4", "signal"),
@@ -118,32 +106,22 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "PositiveVolumeIndex": WickraBinding("PVI", ()),
     "Parkinson": WickraBinding("ParkinsonVolatility", ("timeperiod",)),
     "GarmanKlass": WickraBinding("GarmanKlassVolatility", ("timeperiod",)),
-    "RogersSatchell": WickraBinding(
-        "RogersSatchellVolatility", ("timeperiod",)
-    ),
+    "RogersSatchell": WickraBinding("RogersSatchellVolatility", ("timeperiod",)),
     "YangZhang": WickraBinding("YangZhangVolatility", ("timeperiod",)),
     "Amihud": WickraBinding(
         "AmihudIlliquidity", ("timeperiod",), input_mode="trade_pair"
     ),
-    "TomDeMarkSequential": WickraBinding(
-        "TDSequential", (), input_mode="triple_close"
-    ),
+    "TomDeMarkSequential": WickraBinding("TDSequential", (), input_mode="triple_close"),
     "LogReturn": WickraBinding("LogReturn", ("timeperiod",)),
-    "RollingQuantile": WickraBinding(
-        "RollingQuantile", ("timeperiod", "quantile")
-    ),
+    "RollingQuantile": WickraBinding("RollingQuantile", ("timeperiod", "quantile")),
     "RollingCovariance": WickraBinding("RollingCovariance", ("timeperiod",)),
     "AwesomeOscillator": WickraBinding("AwesomeOscillator", ("fast", "slow")),
-    "Donchian": WickraBinding(
-        "Donchian", ("timeperiod",), oracle_indices=(0, 2, 1)
-    ),
+    "Donchian": WickraBinding("Donchian", ("timeperiod",), oracle_indices=(0, 2, 1)),
     "ChaikinVolatility": WickraBinding(
         "ChaikinVolatility", ("timeperiod", "roc_period")
     ),
     "UlcerIndex": WickraBinding("UlcerIndex", ("timeperiod",)),
-    "RollingVolumeWeightedAveragePrice": WickraBinding(
-        "RollingVWAP", ("timeperiod",)
-    ),
+    "RollingVolumeWeightedAveragePrice": WickraBinding("RollingVWAP", ("timeperiod",)),
     "ForceIndex": WickraBinding("ForceIndex", ()),
     "EaseOfMovement": WickraBinding("EaseOfMovement", ()),
     "Vortex": WickraBinding("Vortex", ("window",)),
@@ -154,9 +132,7 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     ),
     "VolumePriceTrend": WickraBinding("VolumePriceTrend", ()),
     "McGinleyDynamic": WickraBinding("McGinleyDynamic", ("length",)),
-    "VariableIndexDynamicAverage": WickraBinding(
-        "VIDYA", ("length", "cmo_period")
-    ),
+    "VariableIndexDynamicAverage": WickraBinding("VIDYA", ("length", "cmo_period")),
     "LaguerreRelativeStrengthIndex": WickraBinding("LaguerreRSI", ("gamma",)),
     "HeikinAshi": WickraBinding("HeikinAshi", ()),
     "KalmanHedgeRatio": WickraBinding(
@@ -190,19 +166,13 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "RollingKendallRankCorrelation": WickraBinding("KendallTau", ()),
     "RollingCointegration": WickraBinding("Cointegration", ()),
     "RollingGrangerCausality": WickraBinding("GrangerCausality", ()),
-    "RollingLeadLagCrossCorrelation": WickraBinding(
-        "LeadLagCrossCorrelation", ()
-    ),
+    "RollingLeadLagCrossCorrelation": WickraBinding("LeadLagCrossCorrelation", ()),
     "RollingPairwiseBeta": WickraBinding("PairwiseBeta", ()),
     "RollingBetaNeutralSpread": WickraBinding("BetaNeutralSpread", ()),
-    "RollingMedianAbsoluteDeviation": WickraBinding(
-        "MedianAbsoluteDeviation", ()
-    ),
+    "RollingMedianAbsoluteDeviation": WickraBinding("MedianAbsoluteDeviation", ()),
     # Both implementations use the same O(1) regression recurrence. Near a
     # perfectly linear series, cancellation leaves sub-nanounit RSS noise.
-    "RollingStandardError": WickraBinding(
-        "StandardError", (), atol=1e-9
-    ),
+    "RollingStandardError": WickraBinding("StandardError", (), atol=1e-9),
     "VolumeWeightedMovingAverageConvergenceDivergence": WickraBinding(
         "VolumeWeightedMacd", ()
     ),
@@ -229,9 +199,7 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "AdaptiveCycle": WickraBinding("AdaptiveCycle", ()),
     "EhlersStochastic": WickraBinding("EhlersStochastic", ()),
     "HilbertDominantCycle": WickraBinding("HilbertDominantCycle", ()),
-    "EmpiricalModeDecomposition": WickraBinding(
-        "EmpiricalModeDecomposition", ()
-    ),
+    "EmpiricalModeDecomposition": WickraBinding("EmpiricalModeDecomposition", ()),
     "ZigZag": WickraBinding("ZigZag", ()),
     "SessionVolumeWeightedAveragePrice": WickraBinding("SessionVwap", ()),
     "SessionRange": WickraBinding("SessionRange", ()),
@@ -240,9 +208,7 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "AverageDailyRange": WickraBinding("AverageDailyRange", ()),
     "TimeOfDayReturnProfile": WickraBinding("TimeOfDayReturnProfile", ()),
     "DayOfWeekReturnProfile": WickraBinding("DayOfWeekProfile", ()),
-    "IntradayVolatilityProfile": WickraBinding(
-        "IntradayVolatilityProfile", ()
-    ),
+    "IntradayVolatilityProfile": WickraBinding("IntradayVolatilityProfile", ()),
     "VolumeByTimeProfile": WickraBinding("VolumeByTimeProfile", ()),
     "QuartileBands": WickraBinding("QuartileBands", ()),
     "MedianChannel": WickraBinding("MedianChannel", ()),
@@ -255,16 +221,12 @@ WICKRA_BINDINGS: dict[str, WickraBinding] = {
     "BullishPercentIndex": WickraBinding(
         "BullishPercentIndex", (), cross_section="buy_signal"
     ),
-    "UpDownVolumeRatio": WickraBinding(
-        "UpDownVolumeRatio", (), cross_section="volume"
-    ),
+    "UpDownVolumeRatio": WickraBinding("UpDownVolumeRatio", (), cross_section="volume"),
     "PercentAboveMovingAverage": WickraBinding(
         "PercentAboveMa", (), cross_section="above_ma"
     ),
     "HighLowIndex": WickraBinding("HighLowIndex", (), cross_section="extrema"),
-    "NewHighsNewLows": WickraBinding(
-        "NewHighsNewLows", (), cross_section="extrema"
-    ),
+    "NewHighsNewLows": WickraBinding("NewHighsNewLows", (), cross_section="extrema"),
     "BreadthThrust": WickraBinding(
         "BreadthThrust", (), cross_section="advance_decline"
     ),
@@ -379,9 +341,7 @@ NUMPY_BINDINGS: dict[str, ExternalBinding] = {
         "NumPy", "ewm standard deviation"
     ),
     "ExponentiallyWeightedCovariance": ExternalBinding("NumPy", "ewm covariance"),
-    "ExponentiallyWeightedCorrelation": ExternalBinding(
-        "NumPy", "ewm correlation"
-    ),
+    "ExponentiallyWeightedCorrelation": ExternalBinding("NumPy", "ewm correlation"),
     "RollingCalmar": ExternalBinding("NumPy", "rolling calmar on equity"),
     "RollingRecoveryFactor": ExternalBinding(
         "NumPy", "rolling recovery factor on equity"
@@ -503,13 +463,25 @@ SMC_BINDINGS: dict[str, ExternalBinding] = {
 # Whole-name replacements for table rows whose class names expand
 # differently than token-by-token camel-casing.
 WHOLE_NAME = {
-    "acos": "math_acos", "asin": "math_asin", "atan": "math_atan",
-    "ceil": "math_ceil", "cos": "math_cos", "cosh": "math_cosh",
-    "exp": "math_exp", "floor": "math_floor", "ln": "math_ln",
-    "log10": "math_log10", "sin": "math_sin", "sinh": "math_sinh",
-    "sqrt": "math_sqrt", "tan": "math_tan", "tanh": "math_tanh",
-    "add": "math_add", "sub": "math_subtract",
-    "mult": "math_multiply", "div": "math_divide",
+    "acos": "math_acos",
+    "asin": "math_asin",
+    "atan": "math_atan",
+    "ceil": "math_ceil",
+    "cos": "math_cos",
+    "cosh": "math_cosh",
+    "exp": "math_exp",
+    "floor": "math_floor",
+    "ln": "math_ln",
+    "log10": "math_log10",
+    "sin": "math_sin",
+    "sinh": "math_sinh",
+    "sqrt": "math_sqrt",
+    "tan": "math_tan",
+    "tanh": "math_tanh",
+    "add": "math_add",
+    "sub": "math_subtract",
+    "mult": "math_multiply",
+    "div": "math_divide",
     "avg_price": "average_price",
     "kvo": "klinger_volume_oscillator",
     "mcginley": "mcginley_dynamic",
@@ -573,11 +545,39 @@ SNAKE_DOMAIN_OVERRIDES = {"math_atanh": "unit"}
 
 # Series-typed constructor/extend parameter names (never mapped as params).
 SERIES_PARAM_NAMES = {
-    "_input", "input", "values", "close", "high", "low", "open", "_open",
-    "volume", "left", "right", "periods", "period", "real", "price", "column",
-    "x", "y", "benchmark", "condition", "new_session", "anchor", "entry",
-    "_exit", "input0", "input1", "_input0", "_input1", "h", "l", "change",
-    "value", "equity",
+    "_input",
+    "input",
+    "values",
+    "close",
+    "high",
+    "low",
+    "open",
+    "_open",
+    "volume",
+    "left",
+    "right",
+    "periods",
+    "period",
+    "real",
+    "price",
+    "column",
+    "x",
+    "y",
+    "benchmark",
+    "condition",
+    "new_session",
+    "anchor",
+    "entry",
+    "_exit",
+    "input0",
+    "input1",
+    "_input0",
+    "_input1",
+    "h",
+    "l",
+    "change",
+    "value",
+    "equity",
 }
 
 
@@ -621,7 +621,10 @@ def parse_master_table() -> list[tuple[str, str]]:
         (m.group(1), m.group(2))
         for m in re.finditer(
             r"^\| \[(?:x| )\] \| ([a-z0-9_]+) \| [a-z0-9_]+ "
-            r"\| ([A-Z0-9_]+|_) \|", text, re.M)
+            r"\| ([A-Z0-9_]+|_) \|",
+            text,
+            re.M,
+        )
     ]
 
 
@@ -634,7 +637,8 @@ def resolve_class(snake: str):
     if snake in WHOLE_NAME:
         candidates.append(WHOLE_NAME[snake])
     candidates.append(
-        "_".join(TOKEN_SYNONYMS.get(tok, tok) for tok in snake.split("_")))
+        "_".join(TOKEN_SYNONYMS.get(tok, tok) for tok in snake.split("_"))
+    )
     for cand in candidates:
         hit = by_norm.get(_norm(cand))
         if hit:
@@ -647,7 +651,7 @@ class Spec:
     """One function: taflow class + TA-Lib translation."""
 
     snake: str
-    talib_name: str | None            # None => taflow-only
+    talib_name: str | None  # None => taflow-only
     cls: type | None
     ctor_kwargs: dict = field(default_factory=dict)
     series_args: tuple[str, ...] = ()  # extend arg names, in call order
@@ -665,8 +669,7 @@ class Spec:
 
     @classmethod
     def build(cls, snake: str, talib_name: str | None) -> "Spec":
-        spec = cls(snake=snake, talib_name=talib_name,
-                   cls=resolve_class(snake))
+        spec = cls(snake=snake, talib_name=talib_name, cls=resolve_class(snake))
         if spec.cls is None:
             spec.error = "no matching taflow class"
             return spec
@@ -681,16 +684,21 @@ class Spec:
         except (TypeError, ValueError):
             spec.error = "constructor signature unavailable"
             return spec
-        ctor_params = {p: value for p, value in sig.parameters.items()
-                       if p != "self" and value.kind not in
-                       (value.VAR_POSITIONAL, value.VAR_KEYWORD)}
+        ctor_params = {
+            p: value
+            for p, value in sig.parameters.items()
+            if p != "self"
+            and value.kind not in (value.VAR_POSITIONAL, value.VAR_KEYWORD)
+        }
 
         try:
             ext_sig = inspect.signature(spec.cls.extend)
             # Ignore optional dataframe-column selector kwargs.
             spec.series_args = tuple(
-                p for p in ext_sig.parameters
-                if p != "self" and not p.endswith("column"))
+                p
+                for p in ext_sig.parameters
+                if p != "self" and not p.endswith("column")
+            )
         except (AttributeError, TypeError, ValueError):
             spec.error = "no extend method"
             return spec
@@ -700,12 +708,15 @@ class Spec:
         else:
             spec.input_roles = tuple(
                 "close" if a in ("_input", "input", "values") else a
-                for a in spec.series_args)
+                for a in spec.series_args
+            )
             spec.domain = SNAKE_DOMAIN_OVERRIDES.get(snake, spec.domain)
         for name, parameter in ctor_params.items():
-            if (_norm(name) not in {_norm(item) for item in spec.series_args}
-                    and name not in spec.ctor_kwargs
-                    and parameter.default is inspect.Parameter.empty):
+            if (
+                _norm(name) not in {_norm(item) for item in spec.series_args}
+                and name not in spec.ctor_kwargs
+                and parameter.default is inspect.Parameter.empty
+            ):
                 spec.ctor_kwargs[name] = scalar_default(name)
         return spec
 
@@ -752,13 +763,13 @@ class Spec:
             else:
                 roles.append(role if role.startswith("price") else value)
         if len(roles) != len(self.series_args):
-            self.error = (f"input arity mismatch: talib {roles} vs "
-                          f"extend{self.series_args}")
+            self.error = (
+                f"input arity mismatch: talib {roles} vs extend{self.series_args}"
+            )
             return
         self.input_roles = tuple(roles)
 
-        norm_ctor = {_norm(p): p for p in ctor_params
-                     if p not in SERIES_PARAM_NAMES}
+        norm_ctor = {_norm(p): p for p in ctor_params if p not in SERIES_PARAM_NAMES}
         for talib_param, value in info["parameters"].items():
             target = None
             for cand in PARAM_SYNONYMS.get(talib_param, ()):
@@ -773,7 +784,8 @@ class Spec:
                 # is still valid; record a warning instead of failing.
                 self.warnings.append(
                     f"talib param {talib_param!r} (default {value!r}) has no "
-                    "constructor counterpart — compared at defaults only")
+                    "constructor counterpart — compared at defaults only"
+                )
                 continue
             self.ctor_kwargs[target] = value
 
@@ -811,16 +823,25 @@ class Spec:
 
         out = []
         for role in self.input_roles:
-            if (self.cls and self.cls.__name__ == "Sessions"
-                    and role == "new_session"):
+            if self.cls and self.cls.__name__ == "Sessions" and role == "new_session":
                 key = "one_session"
-            elif role in ("_input", "input", "values", "price", "real",
-                        "close", "change", "value", "equity"):
+            elif role == "exit":
+                key = "_exit"
+            elif role in (
+                "_input",
+                "input",
+                "values",
+                "price",
+                "real",
+                "close",
+                "change",
+                "value",
+                "equity",
+            ):
                 key = self.domain if self.domain in data else "close"
             elif role in ("price0", "left", "x", "input0", "_input0"):
                 key = "close"
-            elif role in ("price1", "right", "y", "benchmark", "input1",
-                          "_input1"):
+            elif role in ("price1", "right", "y", "benchmark", "input1", "_input1"):
                 key = "close2"
             elif role in ("period", "periods"):
                 key = "periods"
@@ -839,8 +860,14 @@ class Spec:
 
     def new_state(self):
         boolean_roles = {
-            "condition", "new_session", "anchor", "entry", "_exit",
-            "on_buy_signal", "above_moving_average",
+            "condition",
+            "new_session",
+            "anchor",
+            "entry",
+            "_exit",
+            "exit",
+            "on_buy_signal",
+            "above_moving_average",
         }
         empty_series = [
             np.empty(0, dtype=np.bool_ if role in boolean_roles else np.float64)
@@ -870,14 +897,18 @@ def build_registry() -> dict[str, Spec]:
     specs: dict[str, Spec] = {}
     for snake, talib_name in parse_master_table():
         key = talib_name if talib_name != "_" else snake
-        specs[key] = Spec.build(snake,
-                                talib_name if talib_name != "_" else None)
+        specs[key] = Spec.build(snake, talib_name if talib_name != "_" else None)
     registered = {spec.cls for spec in specs.values() if spec.cls is not None}
     for name in getattr(taflow, "__all__", ()):
         candidate = getattr(taflow, name, None)
-        if (not isinstance(candidate, type) or candidate in registered
-                or not all(hasattr(candidate, method)
-                           for method in ("append", "extend", "compute", "reset"))):
+        if (
+            not isinstance(candidate, type)
+            or candidate in registered
+            or not all(
+                hasattr(candidate, method)
+                for method in ("append", "extend", "compute", "reset")
+            )
+        ):
             continue
         snake = _snake_case(name)
         specs[snake] = Spec.build(snake, None)
@@ -892,13 +923,18 @@ def constructor_value(spec: Spec, name: str):
     return scalar_default(name, parameter.default)
 
 
-def resolve_specs(names: list[str], registry: dict[str, Spec]) -> tuple[list[Spec], list[str]]:
+def resolve_specs(
+    names: list[str], registry: dict[str, Spec]
+) -> tuple[list[Spec], list[str]]:
     """Resolve TA-Lib, snake-case, or canonical class names without aliases."""
     indexes: dict[str, Spec] = {}
     for key, spec in registry.items():
-        for candidate in (key, spec.snake,
-                          spec.talib_name or "",
-                          spec.cls.__name__ if spec.cls else ""):
+        for candidate in (
+            key,
+            spec.snake,
+            spec.talib_name or "",
+            spec.cls.__name__ if spec.cls else "",
+        ):
             if candidate:
                 indexes[_norm(candidate)] = spec
     resolved, unknown = [], []
@@ -915,6 +951,7 @@ def resolve_specs(names: list[str], registry: dict[str, Spec]) -> tuple[list[Spe
 # Shared deterministic data generator (mean-reverting log-price OHLCV)
 # ---------------------------------------------------------------------------
 
+
 def make_data(n: int, seed: int = 42) -> dict[str, np.ndarray]:
     def ar1(offset: int) -> np.ndarray:
         rng = np.random.default_rng(seed + offset)
@@ -926,10 +963,10 @@ def make_data(n: int, seed: int = 42) -> dict[str, np.ndarray]:
         x = np.empty(n)
         carry = 0.0
         for start in range(0, n, block):
-            chunk = noise[start:start + block]
+            chunk = noise[start : start + block]
             m = len(chunk)
             conv = pows[:m] * np.cumsum(chunk * inv_pows[:m])
-            x[start:start + m] = conv + carry * decay * pows[:m]
+            x[start : start + m] = conv + carry * decay * pows[:m]
             carry = x[start + m - 1]
         return 100.0 * np.exp(x)
 
@@ -942,13 +979,17 @@ def make_data(n: int, seed: int = 42) -> dict[str, np.ndarray]:
     unit_noise = np.random.default_rng(seed + 2000).normal(0.0, 0.05, n)
     centered = (ar1(5000) - 100.0) / 10.0
     return {
-        "open": open_, "high": high, "low": low, "close": close,
+        "open": open_,
+        "high": high,
+        "low": low,
+        "close": close,
         "volume": rng.uniform(1e5, 1e6, n),
         "close2": ar1(3000),
         # TA-Lib's MAVP Python binding requires a float64 periods array even
         # though the values represent integral periods.
-        "periods": np.random.default_rng(seed + 4000).integers(
-            2, 31, n).astype(np.float64),
+        "periods": np.random.default_rng(seed + 4000)
+        .integers(2, 31, n)
+        .astype(np.float64),
         "unit": np.clip(np.cumsum(unit_noise) % 1.8 - 0.9, -0.99, 0.99),
         "centered": centered,
         "positive": np.abs(centered) + 1.0,

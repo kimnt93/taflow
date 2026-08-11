@@ -5,6 +5,7 @@ while this pass exercises the canonical state API and checks that constructor,
 bulk, and scalar histories are identical.  It also enforces the documented
 fluent lifecycle so interface drift is visible in the generated report.
 """
+
 from __future__ import annotations
 
 import inspect
@@ -22,10 +23,7 @@ open_ = close + 0.2
 volume = np.linspace(100_000.0, 200_000.0, N)
 benchmark = close * 1.01
 periods = np.full(N, 10, dtype=np.int64)
-timestamp = (
-    np.arange(N, dtype=np.int64) * 3_600_000_000_000
-    + 1_700_000_000_000_000_000
-)
+timestamp = np.arange(N, dtype=np.int64) * 3_600_000_000_000 + 1_700_000_000_000_000_000
 condition = (np.arange(N) % 11) == 0
 new_session = (np.arange(N) % 16) == 0
 advancers = (1 + np.arange(N) % 4).astype(np.float64)
@@ -34,34 +32,62 @@ new_highs = (np.arange(N) % 4).astype(np.float64)
 new_lows = ((np.arange(N) * 2) % 4).astype(np.float64)
 universe_size = np.full(N, 8.0)
 ARRAYS = {
-    "_input": close, "input": close, "values": close, "price": close,
+    "_input": close,
+    "input": close,
+    "values": close,
+    "price": close,
     "prices": close,
-    "change": close, "value": close, "equity": close,
-    "left": close, "right": benchmark, "x": close, "y": benchmark,
-    "benchmark": benchmark, "asset": close,
-    "dependent": close, "predictor": benchmark,
-    "close": close, "high": high, "low": low,
-    "a": close, "b": benchmark,
-    "h": high, "l": low,
-    "_open": open_, "open": open_, "volume": volume, "periods": periods,
+    "change": close,
+    "value": close,
+    "equity": close,
+    "left": close,
+    "right": benchmark,
+    "x": close,
+    "y": benchmark,
+    "benchmark": benchmark,
+    "asset": close,
+    "dependent": close,
+    "predictor": benchmark,
+    "close": close,
+    "high": high,
+    "low": low,
+    "a": close,
+    "b": benchmark,
+    "h": high,
+    "l": low,
+    "_open": open_,
+    "open": open_,
+    "volume": volume,
+    "periods": periods,
     "timestamp": timestamp,
-    "new_high": high, "new_low": low,
-    "on_buy_signal": condition, "above_moving_average": close > np.mean(close),
-    "condition": condition, "new_session": new_session, "anchor": new_session,
-    "entry": condition, "_exit": ~condition, "exit": ~condition,
+    "new_high": high,
+    "new_low": low,
+    "on_buy_signal": condition,
+    "above_moving_average": close > np.mean(close),
+    "condition": condition,
+    "new_session": new_session,
+    "anchor": new_session,
+    "entry": condition,
+    "_exit": ~condition,
+    "exit": ~condition,
     "position": close,
-    "advancers": advancers, "decliners": decliners,
+    "advancers": advancers,
+    "decliners": decliners,
     "advancing_volume": advancers * 12.0,
     "declining_volume": decliners * 10.0,
-    "new_highs": new_highs, "new_lows": new_lows,
+    "new_highs": new_highs,
+    "new_lows": new_lows,
     "on_buy_signal_count": (np.arange(N) % 9).astype(np.float64),
     "above_moving_average_count": (np.arange(N) % 9).astype(np.float64),
     "universe_size": universe_size,
-    "input0": close, "input1": benchmark,
-    "_input0": close, "_input1": benchmark,
+    "input0": close,
+    "input1": benchmark,
+    "_input0": close,
+    "_input1": benchmark,
 }
 SKIP = {
-    "MaType", "ActiveZoneList",
+    "MaType",
+    "ActiveZoneList",
 }
 
 
@@ -102,12 +128,24 @@ def kwargs_for(callable_: object, arrays: bool) -> dict[str, object]:
 
 def equal(left: object, right: object) -> bool:
     if isinstance(left, dict) or isinstance(right, dict):
-        return isinstance(left, dict) and isinstance(right, dict) and left.keys() == right.keys() and all(equal(left[k], right[k]) for k in left)
+        return (
+            isinstance(left, dict)
+            and isinstance(right, dict)
+            and left.keys() == right.keys()
+            and all(equal(left[k], right[k]) for k in left)
+        )
     if isinstance(left, (tuple, list)) or isinstance(right, (tuple, list)):
-        return isinstance(left, (tuple, list)) and isinstance(right, (tuple, list)) and len(left) == len(right) and all(equal(a, b) for a, b in zip(left, right))
+        return (
+            isinstance(left, (tuple, list))
+            and isinstance(right, (tuple, list))
+            and len(left) == len(right)
+            and all(equal(a, b) for a, b in zip(left, right))
+        )
     try:
         a, b = np.asarray(left, dtype=float), np.asarray(right, dtype=float)
-        return a.shape == b.shape and np.allclose(a, b, equal_nan=True, rtol=1e-8, atol=1e-10)
+        return a.shape == b.shape and np.allclose(
+            a, b, equal_nan=True, rtol=1e-8, atol=1e-10
+        )
     except (TypeError, ValueError):
         return left == right
 
@@ -139,8 +177,12 @@ def main() -> None:
     # Public functional helpers are not stateful indicator classes, but still
     # belong to the all-interface correctness pass.
     helpers = {
-        "RollingApply": lambda: executions.RollingApply(close, 5, lambda window: float(np.mean(window))),
-        "SessionFlags": lambda: executions.SessionFlags(np.repeat(np.arange(8), N // 8)),
+        "RollingApply": lambda: executions.RollingApply(
+            close, 5, lambda window: float(np.mean(window))
+        ),
+        "SessionFlags": lambda: executions.SessionFlags(
+            np.repeat(np.arange(8), N // 8)
+        ),
         "AdaptInput": lambda: executions.AdaptInput(close.tolist()),
         "AdaptOutput": lambda: executions.AdaptOutput(close, adapter="numpy"),
         "ToNumpy": lambda: executions.ToNumpy(close),
@@ -154,12 +196,22 @@ def main() -> None:
                 raise AssertionError(f"unexpected output shape {result.shape}")
             rows.append({"name": name, "status": "PASS"})
         except Exception as exc:
-            rows.append({"name": name, "status": "FAIL", "error": f"{type(exc).__name__}: {exc}"})
+            rows.append(
+                {
+                    "name": name,
+                    "status": "FAIL",
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
     for name in taflow.__all__:
         cls = getattr(taflow, name, None)
         if not isinstance(cls, type) or name.startswith("_") or name in SKIP:
             continue
         try:
+            if "self._length" in inspect.getsource(cls):
+                raise TypeError(
+                    "adapter duplicates native length in Python with self._length"
+                )
             full = cls(**kwargs_for(cls, arrays=True))
             expected = output(full)
             require_length(full, N)
@@ -175,25 +227,48 @@ def main() -> None:
             require_length(state, N)
             actual = output(state)
             if not equal(expected, actual):
-                raise AssertionError("constructor history differs from native extend history")
+                raise AssertionError(
+                    "constructor history differs from native extend history"
+                )
             live = cls(**kwargs_for(cls, arrays=False))
             append_params = tuple(inspect.signature(live.append).parameters.values())
             for index in range(N):
                 row_kwargs = {}
                 for parameter in append_params:
-                    if parameter.kind in (parameter.VAR_POSITIONAL, parameter.VAR_KEYWORD):
+                    if parameter.kind in (
+                        parameter.VAR_POSITIONAL,
+                        parameter.VAR_KEYWORD,
+                    ):
                         continue
-                    value = periods if parameter.name == "period" else ARRAYS.get(parameter.name)
-                    row_kwargs[parameter.name] = value[index] if isinstance(value, np.ndarray) else scalar(parameter.name, parameter.default)
+                    value = (
+                        periods
+                        if parameter.name == "period"
+                        else ARRAYS.get(parameter.name)
+                    )
+                    row_kwargs[parameter.name] = (
+                        value[index]
+                        if isinstance(value, np.ndarray)
+                        else scalar(parameter.name, parameter.default)
+                    )
                 require_fluent(live.append(**row_kwargs), live, "append")
                 require_length(live, index + 1)
             if not equal(expected, output(live)):
-                raise AssertionError("constructor history differs from one-bar append history")
+                raise AssertionError(
+                    "constructor history differs from one-bar append history"
+                )
             require_fluent(live.reset(), live, "reset")
             require_length(live, 0)
             rows.append({"name": name, "status": "PASS"})
-        except Exception as exc:  # report every interface; one failure must not hide others
-            rows.append({"name": name, "status": "FAIL", "error": f"{type(exc).__name__}: {exc}"})
+        except (
+            Exception
+        ) as exc:  # report every interface; one failure must not hide others
+            rows.append(
+                {
+                    "name": name,
+                    "status": "FAIL",
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
     passed = sum(row["status"] == "PASS" for row in rows)
     failed = len(rows) - passed
     print(f"{passed}/{len(rows)} public taflow interfaces passed; {failed} failed")

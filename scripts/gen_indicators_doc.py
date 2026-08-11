@@ -8,36 +8,60 @@ verification harness's benchmark metadata.
     python scripts/gen_indicators_doc.py
 """
 
-import glob
 import inspect
-import json
 import pathlib
 import re
 
-import taflow
+from verification.registry import build_registry
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SERIES = {"_input", "values", "price", "close", "high", "low", "open", "_open",
-          "volume", "real", "input", "series", "x", "y", "periods", "condition",
-          "new_session", "session_id"}
+SERIES = {
+    "_input",
+    "values",
+    "price",
+    "close",
+    "high",
+    "low",
+    "open",
+    "_open",
+    "volume",
+    "real",
+    "input",
+    "series",
+    "x",
+    "y",
+    "periods",
+    "condition",
+    "new_session",
+    "session_id",
+}
 
 CATEGORIES = [
-    "Moving averages & overlap", "Momentum & trend", "Volatility & bands",
-    "Volume", "Price transforms", "Rolling & statistical operators",
-    "Cycle (Hilbert transform)", "Math transforms", "Candlestick patterns",
-    "Market structure & sessions", "Quant & econometrics",
+    "Moving averages & overlap",
+    "Momentum & trend",
+    "Volatility & bands",
+    "Volume",
+    "Price transforms",
+    "Rolling & statistical operators",
+    "Cycle (Hilbert transform)",
+    "Math transforms",
+    "Candlestick patterns",
+    "Market structure & sessions",
+    "Quant & econometrics",
     "Signal & series operators",
 ]
 
 
 def load_metadata():
-    meta = {}
-    for path in glob.glob(str(ROOT / "verify/evidence/benchmark/*.json")):
-        with open(path) as handle:
-            data = json.load(handle)
-        meta[data["canonical_class"]] = {"talib": data.get("talib_name"),
-                                         "inputs": data.get("inputs", [])}
-    return meta
+    """Return canonical indicator metadata from the verification registry."""
+    return {
+        spec.cls.__name__: {
+            "class": spec.cls,
+            "talib": spec.talib_name,
+            "inputs": list(spec.series_args),
+        }
+        for spec in build_registry().values()
+    }
 
 
 def signature(cls):
@@ -46,45 +70,164 @@ def signature(cls):
     except (TypeError, ValueError):
         return None
     config = [p for p in params if p.name not in SERIES]
-    cfg = ", ".join(
-        f"{p.name}={p.default!r}" if p.default is not inspect.Parameter.empty else p.name
-        for p in config) or "—"
-    return {"cfg": cfg,
-            "order": ", ".join(p.name for p in params),
-            "series_first": bool(params) and params[0].name in SERIES}
+    cfg = (
+        ", ".join(
+            f"{p.name}={p.default!r}"
+            if p.default is not inspect.Parameter.empty
+            else p.name
+            for p in config
+        )
+        or "—"
+    )
+    return {
+        "cfg": cfg,
+        "order": ", ".join(p.name for p in params),
+        "series_first": bool(params) and params[0].name in SERIES,
+    }
 
 
 def category(name, talib):
     checks = [
         ("Candlestick patterns", name.startswith("Candle")),
-        ("Math transforms", name.startswith("Math") or talib in {"ADD", "SUB", "MULT", "DIV"}),
+        (
+            "Math transforms",
+            name.startswith("Math") or talib in {"ADD", "SUB", "MULT", "DIV"},
+        ),
         ("Cycle (Hilbert transform)", name.startswith("HilbertTransform")),
-        ("Rolling & statistical operators",
-         name.startswith("Rolling") or name.startswith("ExponentiallyWeighted")),
-        ("Moving averages & overlap", any(k in name for k in (
-            "MovingAverage", "Ema", "Sma", "McGinley", "Vidya", "Jurik", "Trima",
-            "Kama", "Mama", "TripleExponential", "DoubleExponential", "ZeroLag",
-            "Arnaud", "Hull"))),
-        ("Volume", any(k in name for k in (
-            "Volume", "Obv", "Amihud", "Klinger", "Accumulation", "Force",
-            "EaseOfMovement", "ChaikinMoneyFlow", "MoneyFlow"))),
-        ("Volatility & bands", any(k in name for k in (
-            "TrueRange", "Volatility", "Bands", "Keltner", "Donchian", "Ulcer",
-            "Parkinson", "GarmanKlass", "RogersSatchell", "YangZhang", "Squeeze",
-            "Supertrend", "CloseToCloseSigma"))),
-        ("Market structure & sessions", any(k in name for k in (
-            "OrderBlock", "Liquidity", "FairValueGap", "Swing", "BreakOfStructure",
-            "PremiumDiscount", "EqualHighs", "Retracement", "Fibonacci",
-            "PreviousHighLow", "InsideBar", "OutsideBar", "HigherHigh", "LowerLow",
-            "GapUp", "GapDown", "OpeningRange", "Session", "PivotPoints"))),
-        ("Quant & econometrics", any(k in name for k in (
-            "Kalman", "Ornstein", "SpreadZScore", "FracDiff", "RollSpread", "Hurst",
-            "FractalDimension", "HedgeRatio", "CumulativeSumControlChart"))),
-        ("Signal & series operators", any(k in name for k in (
-            "Cumulative", "Crossover", "Crossunder", "Rising", "Falling", "BarsSince",
-            "ValueWhen", "Lag", "SignalDelay", "SignedPower", "TimeSeriesRank",
-            "Drawdown", "HighestSince", "LowestSince", "DecayLinear", "LogReturn",
-            "EntryExit", "PositionHold"))),
+        (
+            "Rolling & statistical operators",
+            name.startswith("Rolling") or name.startswith("ExponentiallyWeighted"),
+        ),
+        (
+            "Moving averages & overlap",
+            any(
+                k in name
+                for k in (
+                    "MovingAverage",
+                    "Ema",
+                    "Sma",
+                    "McGinley",
+                    "Vidya",
+                    "Jurik",
+                    "Trima",
+                    "Kama",
+                    "Mama",
+                    "TripleExponential",
+                    "DoubleExponential",
+                    "ZeroLag",
+                    "Arnaud",
+                    "Hull",
+                )
+            ),
+        ),
+        (
+            "Volume",
+            any(
+                k in name
+                for k in (
+                    "Volume",
+                    "Obv",
+                    "Amihud",
+                    "Klinger",
+                    "Accumulation",
+                    "Force",
+                    "EaseOfMovement",
+                    "ChaikinMoneyFlow",
+                    "MoneyFlow",
+                )
+            ),
+        ),
+        (
+            "Volatility & bands",
+            any(
+                k in name
+                for k in (
+                    "TrueRange",
+                    "Volatility",
+                    "Bands",
+                    "Keltner",
+                    "Donchian",
+                    "Ulcer",
+                    "Parkinson",
+                    "GarmanKlass",
+                    "RogersSatchell",
+                    "YangZhang",
+                    "Squeeze",
+                    "Supertrend",
+                    "CloseToCloseSigma",
+                )
+            ),
+        ),
+        (
+            "Market structure & sessions",
+            any(
+                k in name
+                for k in (
+                    "OrderBlock",
+                    "Liquidity",
+                    "FairValueGap",
+                    "Swing",
+                    "BreakOfStructure",
+                    "PremiumDiscount",
+                    "EqualHighs",
+                    "Retracement",
+                    "Fibonacci",
+                    "PreviousHighLow",
+                    "InsideBar",
+                    "OutsideBar",
+                    "HigherHigh",
+                    "LowerLow",
+                    "GapUp",
+                    "GapDown",
+                    "OpeningRange",
+                    "Session",
+                    "PivotPoints",
+                )
+            ),
+        ),
+        (
+            "Quant & econometrics",
+            any(
+                k in name
+                for k in (
+                    "Kalman",
+                    "Ornstein",
+                    "SpreadZScore",
+                    "FracDiff",
+                    "RollSpread",
+                    "Hurst",
+                    "FractalDimension",
+                    "HedgeRatio",
+                    "CumulativeSumControlChart",
+                )
+            ),
+        ),
+        (
+            "Signal & series operators",
+            any(
+                k in name
+                for k in (
+                    "Cumulative",
+                    "Crossover",
+                    "Crossunder",
+                    "Rising",
+                    "Falling",
+                    "BarsSince",
+                    "ValueWhen",
+                    "Lag",
+                    "SignalDelay",
+                    "SignedPower",
+                    "TimeSeriesRank",
+                    "Drawdown",
+                    "HighestSince",
+                    "LowestSince",
+                    "DecayLinear",
+                    "LogReturn",
+                    "EntryExit",
+                    "PositionHold",
+                )
+            ),
+        ),
         ("Price transforms", any(k in name for k in ("Price", "HeikinAshi"))),
     ]
     for label, hit in checks:
@@ -96,10 +239,8 @@ def category(name, talib):
 def main():
     meta = load_metadata()
     rows = []
-    for name in sorted(set(dir(taflow)) | set(meta)):
-        cls = getattr(taflow, name, None)
-        if not inspect.isclass(cls) or name.startswith("_"):
-            continue
+    for name in sorted(meta):
+        cls = meta[name]["class"]
         sig = signature(cls)
         if sig is None:
             continue
@@ -169,14 +310,15 @@ the live signature. Passing data by keyword always works.
         out.append("| Class | TA-Lib | Parameters | Constructor order |")
         out.append("|---|---|---|---|")
         for row in sorted(grouped[cat], key=lambda r: r["cls"]):
-            out.append(f"| `{row['cls']}` | {row['talib'] or '—'} | {row['cfg']} "
-                       f"| `({row['order']})` |")
+            out.append(
+                f"| `{row['cls']}` | {row['talib'] or '—'} | {row['cfg']} "
+                f"| `({row['order']})` |"
+            )
         out.append("")
 
     target = ROOT / "docs/INDICATORS.md"
     target.write_text("\n".join(out))
-    print(f"wrote {target.relative_to(ROOT)}: {len(rows)} classes, "
-          f"{talib_n} TA-Lib")
+    print(f"wrote {target.relative_to(ROOT)}: {len(rows)} classes, {talib_n} TA-Lib")
 
 
 if __name__ == "__main__":

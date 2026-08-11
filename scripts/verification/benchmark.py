@@ -130,14 +130,16 @@ def vector_results(
         reference = timed(lambda: oracle_call(spec, arrays), repeats)
         api["bars_per_second"] = bars / (api["mean_ms"] / 1_000.0)
         kernel["bars_per_second"] = bars / (kernel["mean_ms"] / 1_000.0)
-        rows.append({
-            "bars": bars,
-            "taflow_api": api,
-            "taflow_kernel": kernel,
-            "reference": reference,
-            "api_speedup": reference["mean_ms"] / api["mean_ms"],
-            "kernel_speedup": reference["mean_ms"] / kernel["mean_ms"],
-        })
+        rows.append(
+            {
+                "bars": bars,
+                "taflow_api": api,
+                "taflow_kernel": kernel,
+                "reference": reference,
+                "api_speedup": reference["mean_ms"] / api["mean_ms"],
+                "kernel_speedup": reference["mean_ms"] / kernel["mean_ms"],
+            }
+        )
     return rows
 
 
@@ -171,28 +173,28 @@ def warmup_results(
         arrays = spec.arrays(data, bars)
         for threads in thread_counts:
             taflow_samples = [
-                _thread_wall([
-                    lambda: taflow_kernel_call(spec, arrays)
-                    for _ in range(threads)
-                ])
+                _thread_wall(
+                    [lambda: taflow_kernel_call(spec, arrays) for _ in range(threads)]
+                )
                 for _ in range(min(repeats, 3))
             ]
             reference_samples = [
-                _thread_wall([
-                    lambda: oracle_call(spec, arrays)
-                    for _ in range(threads)
-                ])
+                _thread_wall(
+                    [lambda: oracle_call(spec, arrays) for _ in range(threads)]
+                )
                 for _ in range(min(repeats, 3))
             ]
             taflow = _summary(taflow_samples)
             reference = _summary(reference_samples)
-            rows.append({
-                "bars": bars,
-                "threads": threads,
-                "taflow": taflow,
-                "reference": reference,
-                "speedup": reference["mean_ms"] / taflow["mean_ms"],
-            })
+            rows.append(
+                {
+                    "bars": bars,
+                    "threads": threads,
+                    "taflow": taflow,
+                    "reference": reference,
+                    "speedup": reference["mean_ms"] / taflow["mean_ms"],
+                }
+            )
     return rows
 
 
@@ -210,6 +212,7 @@ def environment() -> dict:
         "taflow": getattr(taflow, "__version__", "unknown"),
         "talib": talib.__version__,
         "wickra": wickra.__version__,
+        "pandas_ta_classic": importlib.metadata.version("pandas-ta-classic"),
         "smartmoneyconcepts": importlib.metadata.version("smartmoneyconcepts"),
     }
 
@@ -263,7 +266,8 @@ def render_evidence(report: dict) -> str:
             f"{row['reference']['mean_ms']:.3f} | {row['speedup']:.2f}× |"
         )
     lines += [
-        "", "---",
+        "",
+        "---",
         "Times include Python conversion/binding overhead. Raw samples are retained in JSON.",
         "",
     ]
@@ -273,10 +277,13 @@ def render_evidence(report: dict) -> str:
 def render_aggregate(reports: list[dict], env: dict) -> str:
     """Render the authoritative cross-indicator benchmark summary."""
     lines = [
-        "# TAFlow benchmark", "",
+        "# TAFlow benchmark",
+        "",
         f"Generated {env['date']} with Python {env['python']}, NumPy "
         f"{env['numpy']}, TA-Lib {env['talib']}, Wickra {env['wickra']}, "
-        f"SMC {env['smartmoneyconcepts']}, and TAFlow {env['taflow']}.", "",
+        f"pandas-ta-classic {env['pandas_ta_classic']}, SMC "
+        f"{env['smartmoneyconcepts']}, and TAFlow {env['taflow']}.",
+        "",
         "Only `MATCH` indicators are timed. Speedup is reference time divided "
         "by TAFlow time; values above 1× favor TAFlow. Each cell is API/kernel.",
         "",
@@ -290,14 +297,16 @@ def render_aggregate(reports: list[dict], env: dict) -> str:
             row = by_size.get(size)
             cells.append(
                 f"{row['api_speedup']:.2f}×/{row['kernel_speedup']:.2f}×"
-                if row else "—"
+                if row
+                else "—"
             )
         lines.append(
             f"| {report['canonical_class']} | {report['oracle']} "
             f"`{report['oracle_name']}` | " + " | ".join(cells) + " |"
         )
     lines += [
-        "", "Complete vector and warm-up/thread tables plus raw samples are "
+        "",
+        "Complete vector and warm-up/thread tables plus raw samples are "
         "stored under `verify/evidence/benchmark/`.",
     ]
     return "\n".join(lines) + "\n"
@@ -312,8 +321,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("functions", nargs="*")
     parser.add_argument("--sizes", type=parse_ints, default=DEFAULT_SIZES)
-    parser.add_argument("--warmup-sizes", type=parse_ints,
-                        default=DEFAULT_WARMUP_SIZES)
+    parser.add_argument("--warmup-sizes", type=parse_ints, default=DEFAULT_WARMUP_SIZES)
     parser.add_argument("--threads", type=parse_ints, default=DEFAULT_THREADS)
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--correctness-bars", type=int, default=10_000)
@@ -325,13 +333,15 @@ def main() -> int:
         args.repeats = min(args.repeats, 2)
 
     registry = build_registry()
-    specs, unknown = (resolve_specs(args.functions, registry)
-                      if args.functions else (list(registry.values()), []))
+    specs, unknown = (
+        resolve_specs(args.functions, registry)
+        if args.functions
+        else (list(registry.values()), [])
+    )
     if unknown:
         print("unknown functions: " + ", ".join(unknown), file=sys.stderr)
         return 2
-    specs = [spec for spec in specs
-             if spec.oracle_source and not spec.oracle_variant]
+    specs = [spec for spec in specs if spec.oracle_source and not spec.oracle_variant]
     required = max(*args.sizes, *args.warmup_sizes, args.correctness_bars)
     data = make_data(required)
     env = environment()
@@ -342,17 +352,25 @@ def main() -> int:
         if args.resume and evidence_json.exists():
             prior = json.loads(evidence_json.read_text())
             vector_sizes = {row["bars"] for row in prior.get("vector", [])}
-            warmup_points = {(row["bars"], row["threads"])
-                             for row in prior.get("warmup", [])}
-            expected_points = {(bars, threads) for bars in args.warmup_sizes
-                               for threads in args.threads}
-            if (prior.get("schema_version") == SCHEMA_VERSION
-                    and set(args.sizes).issubset(vector_sizes)
-                    and expected_points.issubset(warmup_points)):
+            warmup_points = {
+                (row["bars"], row["threads"]) for row in prior.get("warmup", [])
+            }
+            expected_points = {
+                (bars, threads)
+                for bars in args.warmup_sizes
+                for threads in args.threads
+            }
+            if (
+                prior.get("schema_version") == SCHEMA_VERSION
+                and set(args.sizes).issubset(vector_sizes)
+                and expected_points.issubset(warmup_points)
+            ):
                 print(f"[{index}/{len(specs)}] {spec.cls.__name__}: reused")
                 continue
         check = verify_function(
-            spec, data, args.correctness_bars,
+            spec,
+            data,
+            args.correctness_bars,
             args.correctness_bars * 9 // 10,
         )
         status = verdict(check)

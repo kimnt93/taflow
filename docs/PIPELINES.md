@@ -206,7 +206,7 @@ number, that number is used directly. `None` becomes `NaN`.
 
 ## Related
 
-- [Indicator reference](INDICATORS.md) — all 299 classes, parameters, and
+- [Indicator reference](INDICATORS.md) — all 393 classes, parameters, and
   constructor order.
 - Converters (`AdaptInput`, `ToNumpy`, `ToPandas`, `ToPolars`, `ToArrow`,
   `ToList`) live in the same `taflow.op` namespace; see the README.

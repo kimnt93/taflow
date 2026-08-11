@@ -1,12 +1,12 @@
 # TAFlow correctness verification
 
-Date: 2026-08-10 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
-Environment: python 3.12.3, numpy 2.4.6, TA-Lib 0.7.1, Wickra 0.9.9, SMC 0.0.27, TAFlow 0.1.2
+Date: 2026-08-11 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
+Environment: python 3.12.3, numpy 2.4.6, TA-Lib 0.7.1, Wickra 0.9.9, pandas-ta-classic 0.6.52, SMC 0.0.27, TAFlow 0.1.2
 
 Summary: MATCH: 393
 
 TAFlow is driven only through canonical Python classes. The registry
-selects TA-Lib, Wickra, explicit NumPy ufunc overrides, then SMC.
+selects TA-Lib, Wickra, pandas-ta-classic, explicit NumPy formula oracles, then SMC.
 *Batch vs oracle*:
 cold `extend` over the full series against the reference;
 *continue vs batch*: 9k `extend` + 1k `append` stitched output
