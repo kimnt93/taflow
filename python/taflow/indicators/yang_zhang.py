@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import YangZhangOperator as _Native
 from .._series import as_float64_series
 
@@ -40,10 +41,11 @@ class YangZhang:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
         self.extend(_open, high, low, close)
 
-    def append(self, _open: float, high: float, low: float, close: float) -> "YangZhang":
+    def append(
+        self, _open: float, high: float, low: float, close: float
+    ) -> "YangZhang":
         """Append one observation or aligned bar to the native Rust state.
 
         Parameters
@@ -63,7 +65,6 @@ class YangZhang:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(_open), float(high), float(low), float(close))
-        self._length += 1
         return self
 
     def extend(self, _open: Any, high: Any, low: Any, close: Any) -> "YangZhang":
@@ -89,7 +90,6 @@ class YangZhang:
         if not all(array.shape == arrays[0].shape for array in arrays[1:]):
             raise ValueError("_open, high, low, and close must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -122,9 +122,8 @@ class YangZhang:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
