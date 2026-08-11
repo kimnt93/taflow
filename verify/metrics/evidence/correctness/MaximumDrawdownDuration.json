@@ -1,0 +1,225 @@
+{
+  "cases": [
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "singleton",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 2,
+      "dataset": "two_observations",
+      "expected": 2.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "all_zero",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_positive",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 33,
+      "dataset": "constant_negative",
+      "expected": 33.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 64,
+      "dataset": "alternating",
+      "expected": 64.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 5,
+      "dataset": "deep_early_drawdown",
+      "expected": 5.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 2,
+      "dataset": "deep_late_drawdown",
+      "expected": 2.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 3,
+      "dataset": "terminal_total_loss",
+      "expected": 3.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "near_zero_variance",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 302,
+      "dataset": "normal_seed_20260811",
+      "expected": 302.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 493,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": 493.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 349,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": 349.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 12,
+      "dataset": "nan_omit",
+      "expected": 12.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    }
+  ],
+  "class": "MaximumDrawdownDuration",
+  "max_absolute_error": 0.0,
+  "max_relative_error": 0.0,
+  "oracle": {
+    "distribution": "numpy",
+    "function": "max",
+    "source": "https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz",
+    "version": "2.4.6"
+  },
+  "passed": true,
+  "verdict": "VARIANT"
+}

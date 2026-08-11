@@ -1,0 +1,210 @@
+{
+  "cases": [
+    {
+      "absolute_error": 4.336808689942018e-19,
+      "actual": -0.003283899865165311,
+      "dataset": "two_observations",
+      "expected": -0.0032838998651653116,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 1.3206275672244662e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "all_zero",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_positive",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_negative",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 2.6020852139652106e-18,
+      "actual": -0.004490832554797541,
+      "dataset": "alternating",
+      "expected": -0.004490832554797539,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 5.794215620855009e-16
+    },
+    {
+      "absolute_error": 1.3877787807814457e-17,
+      "actual": -0.10451142084846714,
+      "dataset": "deep_early_drawdown",
+      "expected": -0.10451142084846712,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 1.327872848263741e-16
+    },
+    {
+      "absolute_error": 2.7755575615628914e-17,
+      "actual": -0.10573046156822628,
+      "dataset": "deep_late_drawdown",
+      "expected": -0.10573046156822626,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 2.625125739919206e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -0.3494969115027124,
+      "dataset": "terminal_total_loss",
+      "expected": -0.3494969115027124,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 3.030836523976177e-07,
+      "actual": -19159.177760804898,
+      "dataset": "near_zero_variance",
+      "expected": -19159.177760501814,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 1.581924110660161e-11
+    },
+    {
+      "absolute_error": 1.3877787807814457e-17,
+      "actual": 0.06304833561855519,
+      "dataset": "normal_seed_20260811",
+      "expected": 0.06304833561855518,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 2.2011346805053824e-16
+    },
+    {
+      "absolute_error": 8.326672684688674e-17,
+      "actual": -0.20860833388606723,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": -0.2086083338860673,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 3.9915340531104264e-16
+    },
+    {
+      "absolute_error": 1.9081958235744878e-17,
+      "actual": -0.015077016373553149,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": -0.015077016373553168,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 1.2656322552794226e-15
+    },
+    {
+      "absolute_error": 3.469446951953614e-18,
+      "actual": 0.015815429069759995,
+      "dataset": "nan_omit",
+      "expected": 0.015815429069759992,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "quantstats_equivalent_subset",
+      "passed": true,
+      "relative_error": 2.1937102917981505e-16
+    }
+  ],
+  "class": "TreynorRatio",
+  "max_absolute_error": 3.030836523976177e-07,
+  "max_relative_error": 1.581924110660161e-11,
+  "oracle": {
+    "distribution": "quantstats",
+    "function": "treynor_ratio",
+    "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
+    "version": "0.0.81"
+  },
+  "passed": true,
+  "verdict": "VARIANT"
+}

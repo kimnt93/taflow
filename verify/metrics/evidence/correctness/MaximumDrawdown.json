@@ -1,0 +1,225 @@
+{
+  "cases": [
+    {
+      "absolute_error": 0.0,
+      "actual": 0.0,
+      "dataset": "singleton",
+      "expected": 0.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "actual": -0.020000000000000018,
+      "dataset": "two_observations",
+      "expected": -0.019999999999999962,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 2.7755575615628965e-15
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 0.0,
+      "dataset": "all_zero",
+      "expected": 0.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 0.0,
+      "dataset": "constant_positive",
+      "expected": 0.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "actual": -0.2750196640421466,
+      "dataset": "constant_negative",
+      "expected": -0.27501966404214656,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 2.0184429875076417e-16
+    },
+    {
+      "absolute_error": 9.020562075079397e-17,
+      "actual": -0.032079369138708125,
+      "dataset": "alternating",
+      "expected": -0.032079369138708215,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 2.8119512064203394e-15
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -0.44999999999999996,
+      "dataset": "deep_early_drawdown",
+      "expected": -0.44999999999999996,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "actual": -0.44999999999999996,
+      "dataset": "deep_late_drawdown",
+      "expected": -0.4499999999999999,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 1.2335811384723965e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -1.0,
+      "dataset": "terminal_total_loss",
+      "expected": -1.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 0.0,
+      "dataset": "near_zero_variance",
+      "expected": 0.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.1102230246251565e-16,
+      "actual": -0.23617427310327666,
+      "dataset": "normal_seed_20260811",
+      "expected": -0.23617427310327654,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 4.700863519286318e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -0.601706636421217,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": -0.601706636421217,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "actual": -0.3862057688192754,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": -0.38620576881927543,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 1.4373465057492244e-16
+    },
+    {
+      "absolute_error": 2.0816681711721685e-17,
+      "actual": -0.044713576293368695,
+      "dataset": "nan_omit",
+      "expected": -0.044713576293368675,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 4.655561786232907e-16
+    }
+  ],
+  "class": "MaximumDrawdown",
+  "max_absolute_error": 1.1102230246251565e-16,
+  "max_relative_error": 2.8119512064203394e-15,
+  "oracle": {
+    "distribution": "empyrical-reloaded",
+    "function": "max_drawdown",
+    "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
+    "version": "0.5.12"
+  },
+  "passed": true,
+  "verdict": "MATCH"
+}

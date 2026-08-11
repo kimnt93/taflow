@@ -1,0 +1,600 @@
+{
+  "cases": [
+    {
+      "absolute_error": 4.440892098500626e-16,
+      "actual": -3.7118128125589873,
+      "dataset": "two_observations",
+      "expected": -3.7118128125589878,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 1.1964213506335193e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "all_zero",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_positive",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_negative",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.734723475976807e-16,
+      "actual": 0.03140667325307968,
+      "dataset": "alternating",
+      "expected": 0.031406673253079505,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 5.523423197350942e-15
+    },
+    {
+      "absolute_error": 1.3322676295501878e-15,
+      "actual": -2.746374930219856,
+      "dataset": "deep_early_drawdown",
+      "expected": -2.7463749302198575,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 4.851004190616956e-16
+    },
+    {
+      "absolute_error": 4.440892098500626e-16,
+      "actual": -2.7463749302198566,
+      "dataset": "deep_late_drawdown",
+      "expected": -2.746374930219857,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 1.6170013968723188e-16
+    },
+    {
+      "absolute_error": 1.7763568394002505e-15,
+      "actual": -9.024252029945762,
+      "dataset": "terminal_total_loss",
+      "expected": -9.02425202994576,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 1.9684255642524727e-16
+    },
+    {
+      "absolute_error": 1.2938166037201881e-05,
+      "actual": 1699003.3122749568,
+      "dataset": "near_zero_variance",
+      "expected": 1699003.3122620187,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 7.615150567291284e-12
+    },
+    {
+      "absolute_error": 4.440892098500626e-16,
+      "actual": 0.5606963793471997,
+      "dataset": "normal_seed_20260811",
+      "expected": 0.5606963793472002,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 7.920315275927065e-16
+    },
+    {
+      "absolute_error": 2.220446049250313e-16,
+      "actual": -0.9097657321833923,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": -0.9097657321833925,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 2.440678925025405e-16
+    },
+    {
+      "absolute_error": 9.71445146547012e-17,
+      "actual": 0.01893248064251932,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": 0.018932480642519418,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 5.131103339756211e-15
+    },
+    {
+      "absolute_error": 6.661338147750939e-16,
+      "actual": 1.4721279401048872,
+      "dataset": "nan_omit",
+      "expected": 1.4721279401048866,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=-0.01",
+      "passed": true,
+      "relative_error": 4.524972297772115e-16
+    },
+    {
+      "absolute_error": 8.881784197001252e-16,
+      "actual": -3.7416573867739404,
+      "dataset": "two_observations",
+      "expected": -3.7416573867739413,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 2.3737566748887e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "all_zero",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_positive",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_negative",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.2807138162485019e-16,
+      "actual": 1.2807138162485019e-16,
+      "dataset": "alternating",
+      "expected": 0.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 0.001280713816248502
+    },
+    {
+      "absolute_error": 4.440892098500626e-16,
+      "actual": -2.7491159011672472,
+      "dataset": "deep_early_drawdown",
+      "expected": -2.7491159011672477,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 1.6153891862525938e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -2.7491159011672477,
+      "dataset": "deep_late_drawdown",
+      "expected": -2.7491159011672477,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.7763568394002505e-15,
+      "actual": -9.025342769691271,
+      "dataset": "terminal_total_loss",
+      "expected": -9.025342769691273,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 1.9681876741186793e-16
+    },
+    {
+      "absolute_error": 1.2886244803667068e-05,
+      "actual": 1692254.453999994,
+      "dataset": "near_zero_variance",
+      "expected": 1692254.4539871078,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 7.614838757437384e-12
+    },
+    {
+      "absolute_error": 1.1102230246251565e-16,
+      "actual": 0.5078193780210345,
+      "dataset": "normal_seed_20260811",
+      "expected": 0.5078193780210346,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 2.1862557292549192e-16
+    },
+    {
+      "absolute_error": 1.2212453270876722e-15,
+      "actual": -0.9361181763011799,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": -0.9361181763011811,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 1.3045845684922968e-15
+    },
+    {
+      "absolute_error": 1.3877787807814457e-17,
+      "actual": -0.040694837149436246,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": -0.04069483714943623,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 3.410208463755141e-16
+    },
+    {
+      "absolute_error": 6.661338147750939e-16,
+      "actual": 1.4238679977226403,
+      "dataset": "nan_omit",
+      "expected": 1.4238679977226396,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0",
+      "passed": true,
+      "relative_error": 4.678339676434336e-16
+    },
+    {
+      "absolute_error": 4.440892098500626e-16,
+      "actual": -3.8294394482469087,
+      "dataset": "two_observations",
+      "expected": -3.829439448246909,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 1.1596715807932767e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "all_zero",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_positive",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_negative",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.249000902703301e-16,
+      "actual": -0.09237667464466126,
+      "dataset": "alternating",
+      "expected": -0.09237667464466139,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 1.3520738947442542e-15
+    },
+    {
+      "absolute_error": 4.440892098500626e-16,
+      "actual": -2.757177938791457,
+      "dataset": "deep_early_drawdown",
+      "expected": -2.7571779387914566,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 1.6106657593695913e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -2.7571779387914574,
+      "dataset": "deep_late_drawdown",
+      "expected": -2.7571779387914574,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -9.02855097037465,
+      "dataset": "terminal_total_loss",
+      "expected": -9.02855097037465,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.2734904885292053e-05,
+      "actual": 1672403.988461494,
+      "dataset": "near_zero_variance",
+      "expected": 1672403.988448759,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 7.61473003727068e-12
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "actual": 0.35229187250233057,
+      "dataset": "normal_seed_20260811",
+      "expected": 0.3522918725023305,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 1.5757147854976587e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -1.0136288103229423,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": -1.0136288103229423,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.4710455076283324e-15,
+      "actual": -0.21607709719384052,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": -0.216077097193842,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 6.807965891492252e-15
+    },
+    {
+      "absolute_error": 6.661338147750939e-16,
+      "actual": 1.2819206809886798,
+      "dataset": "nan_omit",
+      "expected": 1.2819206809886792,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "risk_free=0.03",
+      "passed": true,
+      "relative_error": 5.19637310368797e-16
+    }
+  ],
+  "class": "SharpeRatio",
+  "max_absolute_error": 1.2938166037201881e-05,
+  "max_relative_error": 0.001280713816248502,
+  "oracle": {
+    "distribution": "empyrical-reloaded",
+    "function": "sharpe_ratio",
+    "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
+    "version": "0.5.12"
+  },
+  "passed": true,
+  "verdict": "MATCH"
+}

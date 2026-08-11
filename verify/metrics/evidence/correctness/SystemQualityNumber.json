@@ -1,0 +1,210 @@
+{
+  "cases": [
+    {
+      "absolute_error": 0.0,
+      "actual": -0.33333333333333337,
+      "dataset": "two_observations",
+      "expected": -0.33333333333333337,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "all_zero",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_positive",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": null,
+      "dataset": "constant_negative",
+      "expected": null,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 0.0,
+      "dataset": "alternating",
+      "expected": 0.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "actual": -0.3872378334355533,
+      "dataset": "deep_early_drawdown",
+      "expected": -0.38723783343555324,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 1.4335156959940065e-16
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "actual": -0.3872378334355533,
+      "dataset": "deep_late_drawdown",
+      "expected": -0.38723783343555324,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 1.4335156959940065e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": -0.9847456289293487,
+      "dataset": "terminal_total_loss",
+      "expected": -0.9847456289293487,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 4.592118784785271e-06,
+      "actual": 603032.0360104933,
+      "dataset": "near_zero_variance",
+      "expected": 603032.0360059012,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 7.615049467687539e-12
+    },
+    {
+      "absolute_error": 9.992007221626409e-16,
+      "actual": 0.7245488665256078,
+      "dataset": "normal_seed_20260811",
+      "expected": 0.7245488665256088,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 1.3790660207006543e-15
+    },
+    {
+      "absolute_error": 2.220446049250313e-16,
+      "actual": -1.335638994746956,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": -1.3356389947469558,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 1.662459734990733e-16
+    },
+    {
+      "absolute_error": 9.020562075079397e-17,
+      "actual": -0.058062766814793415,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": -0.058062766814793325,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 1.5535880513329454e-15
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 0.47462266590754676,
+      "dataset": "nan_omit",
+      "expected": 0.47462266590754676,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    }
+  ],
+  "class": "SystemQualityNumber",
+  "max_absolute_error": 4.592118784785271e-06,
+  "max_relative_error": 7.615049467687539e-12,
+  "oracle": {
+    "distribution": "numpy",
+    "function": "mean",
+    "source": "https://github.com/numpy/numpy/blob/v2.4.6/numpy/_core/fromnumeric.py",
+    "version": "2.4.6"
+  },
+  "passed": true,
+  "verdict": "VARIANT"
+}
