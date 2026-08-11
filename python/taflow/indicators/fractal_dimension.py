@@ -1,106 +1,62 @@
-"""Causal rolling fractal dimension estimate."""
+"""Native-backed causal rolling fractal-dimension adapter."""
 
 from typing import Any
+
 import numpy as np
+
 from .._native import FractalDimensionOperator as _Native
 from .._series import as_float64_series
 
 
 class FractalDimension:
-    """Causal rolling fractal dimension estimate.
+    """Estimate rolling fractal dimension as ``2 - Hurst exponent``.
 
-    This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
+    Rust owns the two-chunk rescaled-range calculation and persistent state.
+    ``prices`` is a required chronological series; an empty array creates a
+    fresh stream. ``timeperiod`` defaults to 20 and must be at least four.
+    Aligned history contains ``NaN`` until one full period is available. The
+    independent formula oracle is the registered NumPy rescaled-range model.
 
-    def __init__(
-        self,
-        _input: Any,
-        timeperiod: int = 20,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
+    Args:
+        prices: Required chronological price history.
+        timeperiod: Trailing rescaled-range window. Defaults to 20.
 
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-        timeperiod : object
-            Trailing window length in bars.
+    Raises:
+        ValueError: If ``timeperiod`` is less than four.
+    """
 
-        Returns
-        -------
-        None
-            The constructor initializes the adapter and returns no value.
-        """
+    def __init__(self, prices: Any, timeperiod: int = 20) -> None:
+        """Initialize native state and process the supplied price history."""
         self._state = _Native(timeperiod)
-        self._length = 0
-        self.extend(_input)
+        self.extend(prices)
 
-    def append(self, _input: float) -> "FractalDimension":
-        """Append one observation or aligned bar to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        self._state.append(float(_input))
-        self._length += 1
+    def append(self, price: float) -> "FractalDimension":
+        """Append one price and return this adapter for method chaining."""
+        self._state.append(float(price))
         return self
 
-    def extend(self, _input: Any) -> "FractalDimension":
-        """Append aligned input series to the native Rust state.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
-        values = as_float64_series(_input)
-        self._state.extend(values)
-        self._length += len(values)
+    def extend(self, prices: Any) -> "FractalDimension":
+        """Append a chronological price series and return this adapter."""
+        self._state.extend(as_float64_series(prices))
         return self
 
     def compute(self) -> np.ndarray:
-        """Return the aligned output history as a NumPy array.
-
-        Returns
-        -------
-        numpy.ndarray or tuple of numpy.ndarray
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return aligned fractal-dimension history as a NumPy array."""
         return self._state.compute()
 
     @property
     def value(self) -> float | None:
-        """Return the latest computed value, or None during warm-up.
-
-        Returns
-        -------
-        float, tuple, or None
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Return the latest dimension, or ``None`` during warm-up."""
         return self._state.value
 
     def reset(self) -> "FractalDimension":
-        """Execute the reset operation through the native Rust implementation.
-
-        Returns
-        -------
-        Self
-            The updated adapter, native value, aligned output array, or execution node.
-        """
+        """Reset native state and return this adapter for method chaining."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
-        return self._length
+        """Return the processed-price count delegated to native state."""
+        return len(self._state)
+
+
+__all__ = ["FractalDimension"]

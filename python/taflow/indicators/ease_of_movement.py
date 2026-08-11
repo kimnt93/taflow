@@ -1,4 +1,5 @@
 """Native-backed Ease of Movement adapter."""
+
 from typing import Any
 
 import numpy as np
@@ -16,7 +17,7 @@ class EaseOfMovement:
     ``midpoint_change * range * divisor / volume`` and is averaged over
     ``period`` bars. Wickra ``EaseOfMovement`` is the oracle. ``compute`` returns one float
     array, ``value`` is the latest scalar or ``None`` during warm-up, and
-    lifecycle mutators return ``self``. The oracle is pandas-ta-classic ``eom``.
+    lifecycle mutators return ``self``.
     """
 
     def __init__(

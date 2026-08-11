@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import HedgeRatioOperator as _Native
 from .._series import as_float64_series
 
@@ -34,7 +35,6 @@ class HedgeRatio:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
         self.extend(x, y)
 
     def append(self, x: float, y: float) -> "HedgeRatio":
@@ -53,7 +53,6 @@ class HedgeRatio:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(x), float(y))
-        self._length += 1
         return self
 
     def extend(self, x: Any, y: Any) -> "HedgeRatio":
@@ -76,7 +75,6 @@ class HedgeRatio:
         if len(x_values) != len(y_values):
             raise ValueError("x and y must have equal lengths")
         self._state.extend(x_values, y_values)
-        self._length += len(x_values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -109,8 +107,7 @@ class HedgeRatio:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
-        return self._length
+        return adapter_length(self)

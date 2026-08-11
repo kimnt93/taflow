@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import EqualHighsLowsOperator as _Native
 from .._series import as_float64_series
 
@@ -43,7 +44,6 @@ class EqualHighsLows:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(eq_len, atr_period, eq_threshold)
-        self._length = 0
         self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "EqualHighsLows":
@@ -64,7 +64,6 @@ class EqualHighsLows:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(high), float(low), float(close))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "EqualHighsLows":
@@ -90,7 +89,6 @@ class EqualHighsLows:
         if not (high_array.shape == low_array.shape == close_array.shape):
             raise ValueError("high, low, and close must have equal lengths")
         self._state.extend(high_array, low_array, close_array)
-        self._length += len(high_array)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -123,9 +121,8 @@ class EqualHighsLows:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)

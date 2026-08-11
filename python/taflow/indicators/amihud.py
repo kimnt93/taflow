@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import AmihudOperator as _Native
 from .._series import as_float64_series
 
@@ -34,7 +35,6 @@ class Amihud:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
         self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "Amihud":
@@ -53,7 +53,6 @@ class Amihud:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(close), float(volume))
-        self._length += 1
         return self
 
     def extend(self, close: Any, volume: Any) -> "Amihud":
@@ -76,7 +75,6 @@ class Amihud:
         if close_array.shape != volume_array.shape:
             raise ValueError("close and volume must have equal lengths")
         self._state.extend(close_array, volume_array)
-        self._length += len(close_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -109,9 +107,8 @@ class Amihud:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
