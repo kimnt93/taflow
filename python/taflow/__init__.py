@@ -128,6 +128,7 @@ from .indicators import PremiumDiscount
 from .indicators import OpeningRange
 from .indicators import PivotPoints
 from . import executions
+from . import metrics
 from . import op
 from .indicators import MathAbs, MathAcos
 from .indicators import MathAcosh
@@ -683,6 +684,7 @@ __all__ = [
     "SignedPower",
     "TimeSeriesRank",
     "op",
+    "metrics",
     "__version__",
 ]
 
