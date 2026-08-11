@@ -1,5 +1,6 @@
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import PlusDirectionalMovement as _Native
 from .._series import as_float64_series
 
@@ -32,7 +33,6 @@ class PlusDirectionalMovement:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
         self.extend(high, low)
 
     def append(self, high: float, low: float) -> "PlusDirectionalMovement":
@@ -51,7 +51,6 @@ class PlusDirectionalMovement:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(high), float(low))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any) -> "PlusDirectionalMovement":
@@ -74,7 +73,6 @@ class PlusDirectionalMovement:
         if len(high_array) != len(low_array):
             raise ValueError("high and low must have equal lengths")
         self._state.extend(high_array, low_array)
-        self._length += len(high_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -107,9 +105,8 @@ class PlusDirectionalMovement:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)

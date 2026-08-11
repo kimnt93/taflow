@@ -16,8 +16,8 @@ class KlingerVolumeOscillator:
     ``signal`` default to 34, 55, and 13. Rust owns signed-volume force,
     exponential smoothing, warm-up, and aligned NaN history. ``compute``
     returns ``(oscillator, signal)`` arrays; lifecycle mutators return ``self``
-    and ``value`` exposes the latest pair. The correctness oracle is
-    ``pandas-ta-classic.kvo``.
+    and ``value`` exposes the latest pair. Wickra ``KVO`` is the correctness
+    oracle for the oscillator; Wickra does not expose TAFlow's signal output.
     """
 
     def __init__(
@@ -30,6 +30,7 @@ class KlingerVolumeOscillator:
         slow: int = 55,
         signal: int = 13,
     ) -> None:
+        """Initialize native KVO state and process aligned OHLCV histories."""
         self._state = _NativeKlingerVolumeOscillator(int(fast), int(slow), int(signal))
         self.extend(high, low, close, volume)
 
@@ -65,6 +66,7 @@ class KlingerVolumeOscillator:
         return self
 
     def __len__(self) -> int:
+        """Return the processed-bar count delegated to native state."""
         return len(self._state)
 
 

@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import PreviousHighLowOperator as _Native
 from .._series import as_float64_series
 
@@ -34,7 +35,6 @@ class PreviousHighLow:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self._length = 0
         self.extend(new_session, high, low)
 
     def append(self, new_session: bool, high: float, low: float) -> "PreviousHighLow":
@@ -55,7 +55,6 @@ class PreviousHighLow:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(bool(new_session), float(high), float(low))
-        self._length += 1
         return self
 
     def extend(self, new_session: Any, high: Any, low: Any) -> "PreviousHighLow":
@@ -81,7 +80,6 @@ class PreviousHighLow:
         if len({len(session_values), len(high_values), len(low_values)}) != 1:
             raise ValueError("new_session, high, and low must have equal lengths")
         self._state.extend(session_values, high_values, low_values)
-        self._length += len(session_values)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -114,8 +112,7 @@ class PreviousHighLow:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
-        return self._length
+        return adapter_length(self)

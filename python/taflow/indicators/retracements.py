@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 
+from .._adapter_protocol import adapter_length
 from .._native import RetracementsOperator as _Native
 from .._series import as_float64_series
 
@@ -19,17 +20,13 @@ class Retracements:
     ``None`` and lifecycle mutators return ``self``.
     """
 
-    def __init__(
-        self, high: Any, low: Any, close: Any, swing_length: int = 5
-    ) -> None:
+    def __init__(self, high: Any, low: Any, close: Any, swing_length: int = 5) -> None:
         self._state = _Native(int(swing_length))
-        self._length = 0
         self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Retracements":
         """Append one OHLC bar and return this adapter."""
         self._state.append(float(high), float(low), float(close))
-        self._length += 1
         return self
 
     def extend(self, high: Any, low: Any, close: Any) -> "Retracements":
@@ -38,7 +35,6 @@ class Retracements:
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, and close must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -53,12 +49,11 @@ class Retracements:
     def reset(self) -> "Retracements":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
 
 
 __all__ = ["Retracements"]

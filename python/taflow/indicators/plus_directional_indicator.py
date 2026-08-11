@@ -1,5 +1,6 @@
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import PlusDirectionalIndicator as _Native
 from .._series import as_float64_series
 
@@ -35,7 +36,6 @@ class PlusDirectionalIndicator:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
         self.extend(high, low, close)
 
     def append(
@@ -58,12 +58,9 @@ class PlusDirectionalIndicator:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(high), float(low), float(close))
-        self._length += 1
         return self
 
-    def extend(
-        self, high: Any, low: Any, close: Any
-    ) -> "PlusDirectionalIndicator":
+    def extend(self, high: Any, low: Any, close: Any) -> "PlusDirectionalIndicator":
         """Append aligned input series to the native Rust state.
 
         Parameters
@@ -84,7 +81,6 @@ class PlusDirectionalIndicator:
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, and close must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -117,9 +113,8 @@ class PlusDirectionalIndicator:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
