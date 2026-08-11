@@ -4,12 +4,27 @@ use pyo3::prelude::*;
 
 mod conversion;
 mod indicators;
+mod metrics;
 mod state_api;
 
 /// Python module entry point for `taflow._native`.
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Metadata API.
+
+    // Whole-history portfolio metrics live in a separate native namespace so
+    // their canonical names cannot collide with aligned rolling indicators.
+    let metrics_module = PyModule::new(m.py(), "metrics")?;
+    metrics::register(&metrics_module)?;
+    m.add_submodule(&metrics_module)?;
+    let native_name = m.name()?;
+    let native_module_name = native_name.to_str()?;
+    let metrics_module_name = format!("{native_module_name}.metrics");
+    metrics_module.setattr("__name__", &metrics_module_name)?;
+    metrics_module.setattr("__package__", native_module_name)?;
+    PyModule::import(m.py(), "sys")?
+        .getattr("modules")?
+        .set_item(metrics_module_name, &metrics_module)?;
 
     // Unified indicator objects. Each TA binding lives in its own module and
     // owns its accumulated outputs so compute() never replays prior input.

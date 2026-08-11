@@ -12,5 +12,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 taflow = { path = "../taflow-core" }
+taflow-metrics = { path = "../taflow-metrics" }
 pyo3 = { version = "0.23", features = ["extension-module"] }
 numpy = "0.23"
