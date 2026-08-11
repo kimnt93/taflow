@@ -1,4 +1,14 @@
 import numpy as np
+
 from taflow import RollingCointegration
+
+
 def test_rolling_cointegration_lifecycle():
-    state=RollingCointegration(np.array([],dtype=float),np.array([],dtype=float),2);state.extend([1,2],[2,4]);assert state.value is not None;state.reset();assert len(state)==0
+    state = RollingCointegration(
+        np.array([], dtype=float), np.array([], dtype=float), period=6
+    )
+    state.extend(np.arange(6.0), 2.0 * np.arange(6.0) + 1.0)
+
+    assert state.value is not None
+    state.reset()
+    assert len(state) == 0

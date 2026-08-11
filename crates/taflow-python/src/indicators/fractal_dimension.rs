@@ -49,4 +49,8 @@ impl FractalDimensionOperator {
         self.inner.reset();
         self.outputs.clear();
     }
+
+    fn __len__(&self) -> usize {
+        self.outputs.len()
+    }
 }

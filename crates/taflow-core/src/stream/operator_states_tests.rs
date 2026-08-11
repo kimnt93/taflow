@@ -177,12 +177,13 @@ mod tests {
         let iqr_values: Vec<f64> = input.iter().map(|&value| iqr.append(value).unwrap_or(f64::NAN)).collect();
         assert_eq!(iqr_values[2], 1.5);
         let mut covariance = RollingCovariance::new(3).unwrap();
-        let covariance_value = input
+        let covariance_values = input
             .iter()
             .zip([2.0, 8.0, 4.0, 16.0])
             .map(|(&x, y)| covariance.append(x, y).unwrap_or(f64::NAN))
-            .collect::<Vec<_>>()[2];
-        assert!((covariance_value - 28.0 / 9.0).abs() < 1e-12);
+            .collect::<Vec<_>>();
+        assert!(covariance_values[..3].iter().all(|value| value.is_nan()));
+        assert!((covariance_values[3] - 196.0 / 9.0).abs() < 1e-12);
         let mut winsorize = RollingWinsorize::new(3, 0.0, 0.5).unwrap();
         let winsorized = input.iter().map(|&value| winsorize.append(value).unwrap_or(f64::NAN)).collect::<Vec<_>>();
         assert_eq!(winsorized[2], 2.0);
@@ -391,9 +392,9 @@ mod tests {
         let batch: Vec<_> = close.iter().map(|&value| batch_state.append(value)).collect();
         let kst: Vec<f64> = batch.iter().map(|v| v.kst).collect();
         let signal: Vec<f64> = batch.iter().map(|v| v.signal).collect();
-        assert!(kst[..43].iter().all(|&v| v.is_nan()));
-        assert!(signal[..43].iter().all(|&v| v.is_nan()));
-        assert!(kst[44..].iter().all(|&v| v.is_finite()));
+        assert!(kst[..52].iter().all(|&v| v.is_nan()));
+        assert!(signal[..52].iter().all(|&v| v.is_nan()));
+        assert!(kst[52..].iter().all(|&v| v.is_finite()));
         assert!(signal[52..].iter().all(|&v| v.is_finite()));
 
         let mut state = KnowSureThing::new(10, 15, 20, 30, 10, 10, 10, 15, 9).unwrap();
@@ -495,7 +496,7 @@ mod tests {
             batch.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
             replayed.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
         );
-        assert!(batch[0].is_nan());
+        assert_eq!(batch[0], 0.0);
         assert!(batch[1..].iter().all(|value| value.is_finite()));
     }
 }

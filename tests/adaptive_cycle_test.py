@@ -1,4 +1,12 @@
 import numpy as np
+
 from taflow import AdaptiveCycle
+
+
 def test_adaptive_cycle_lifecycle():
-    s=AdaptiveCycle(np.array([],float));s.extend([1,2]);assert s.value is not None;s.reset();assert len(s)==0
+    state = AdaptiveCycle(np.array([], dtype=float))
+    state.extend(np.arange(60.0))
+
+    assert state.value is not None
+    state.reset()
+    assert len(state) == 0

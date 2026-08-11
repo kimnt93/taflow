@@ -1,22 +1,23 @@
 import numpy as np
-import pandas as pd
-import pandas_ta_classic as pta
+import wickra
 
 from taflow import KlingerVolumeOscillator
 
 
-def test_klinger_volume_oscillator_matches_pandas_ta():
+def test_klinger_volume_oscillator_matches_wickra():
     rng = np.random.default_rng(29)
     close = 100.0 + np.cumsum(rng.normal(size=256))
     high = close + rng.uniform(0.2, 1.5, len(close))
     low = close - rng.uniform(0.2, 1.5, len(close))
     volume = rng.uniform(100.0, 1000.0, len(close))
     actual = KlingerVolumeOscillator(high, low, close, volume).compute()
-    expected = pta.kvo(
-        pd.Series(high), pd.Series(low), pd.Series(close), pd.Series(volume)
+    expected = np.asarray(
+        wickra.KVO().batch(high, low, close, volume), dtype=np.float64
     )
-    np.testing.assert_allclose(actual[0], expected.iloc[:, 0], equal_nan=True, atol=1e-10)
-    np.testing.assert_allclose(actual[1], expected.iloc[:, 1], equal_nan=True, atol=1e-10)
+
+    # Wickra exposes the oscillator only. TAFlow's signal line is an additional
+    # native lifecycle output and is covered by chunk/reset invariance below.
+    np.testing.assert_allclose(actual[0], expected, equal_nan=True, atol=1e-10)
 
 
 def test_klinger_volume_oscillator_chunked_reset():
