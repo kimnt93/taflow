@@ -1,0 +1,158 @@
+{
+  "class": "InformationRatio",
+  "correctness_gate": "MATCH",
+  "execution_profiles": null,
+  "oracle_distribution": "empyrical-reloaded",
+  "oracle_function": "excess_sharpe",
+  "oracle_version": "0.5.12",
+  "rows": [
+    {
+      "observations": 1000,
+      "oracle": {
+        "iterations_per_sample": 256,
+        "median_absolute_deviation_seconds": 4.384921875000034e-07,
+        "median_seconds": 3.2331609375e-05,
+        "samples_seconds": [
+          3.27701015625e-05,
+          3.264730078125e-05,
+          3.247346875e-05,
+          3.20471875e-05,
+          3.148222265625e-05,
+          3.14115390625e-05,
+          3.10163125e-05,
+          3.2331609375e-05,
+          3.3092953125e-05
+        ]
+      },
+      "speedup": 1.3794373981907917,
+      "taflow_observations_per_second": 42665287.155715294,
+      "taflow_public": {
+        "iterations_per_sample": 256,
+        "median_absolute_deviation_seconds": 3.128906249999985e-07,
+        "median_seconds": 2.34382578125e-05,
+        "samples_seconds": [
+          2.277265234375e-05,
+          2.329061328125e-05,
+          2.3423859375e-05,
+          2.37511484375e-05,
+          2.28181796875e-05,
+          2.349044140625e-05,
+          2.469421484375e-05,
+          2.48882578125e-05,
+          2.34382578125e-05
+        ]
+      }
+    },
+    {
+      "observations": 10000,
+      "oracle": {
+        "iterations_per_sample": 128,
+        "median_absolute_deviation_seconds": 9.076406249999982e-07,
+        "median_seconds": 6.92286875e-05,
+        "samples_seconds": [
+          6.82710625e-05,
+          6.8170640625e-05,
+          6.80358125e-05,
+          6.92286875e-05,
+          6.9821421875e-05,
+          7.18293515625e-05,
+          6.93095546875e-05,
+          6.933553125e-05,
+          6.8321046875e-05
+        ]
+      },
+      "speedup": 0.32254724201999446,
+      "taflow_observations_per_second": 46591558.16293563,
+      "taflow_public": {
+        "iterations_per_sample": 32,
+        "median_absolute_deviation_seconds": 2.255312500000023e-06,
+        "median_seconds": 0.00021463115625,
+        "samples_seconds": [
+          0.00022360140625,
+          0.00022506365625,
+          0.000224234875,
+          0.00021279309375,
+          0.00021238321875,
+          0.00021231384375,
+          0.00021463115625,
+          0.00021237584375,
+          0.00021565671875
+        ]
+      }
+    },
+    {
+      "observations": 100000,
+      "oracle": {
+        "iterations_per_sample": 16,
+        "median_absolute_deviation_seconds": 2.6598125000000224e-06,
+        "median_seconds": 0.0004104271875,
+        "samples_seconds": [
+          0.00041038775,
+          0.0004104271875,
+          0.000407767375,
+          0.0004079546875,
+          0.000421893625,
+          0.0004080175625,
+          0.000414535,
+          0.00043359575,
+          0.000415283125
+        ]
+      },
+      "speedup": 0.18762263491540684,
+      "taflow_observations_per_second": 45713987.920307264,
+      "taflow_public": {
+        "iterations_per_sample": 4,
+        "median_absolute_deviation_seconds": 3.317800000000003e-05,
+        "median_seconds": 0.00218751425,
+        "samples_seconds": [
+          0.00210959325,
+          0.002210905,
+          0.00220500825,
+          0.0022019155,
+          0.00222069225,
+          0.00218751425,
+          0.002147217,
+          0.002119061,
+          0.00208276225
+        ]
+      }
+    },
+    {
+      "observations": 1000000,
+      "oracle": {
+        "iterations_per_sample": 1,
+        "median_absolute_deviation_seconds": 0.00021521099999999987,
+        "median_seconds": 0.004873211,
+        "samples_seconds": [
+          0.004873211,
+          0.004658,
+          0.004965752,
+          0.004831016,
+          0.004898548,
+          0.004555175,
+          0.004472396,
+          0.005510534,
+          0.005678329
+        ]
+      },
+      "speedup": 0.23111632985516656,
+      "taflow_observations_per_second": 47425882.00165488,
+      "taflow_public": {
+        "iterations_per_sample": 1,
+        "median_absolute_deviation_seconds": 0.0001053110000000003,
+        "median_seconds": 0.021085533,
+        "samples_seconds": [
+          0.021022493,
+          0.020980222,
+          0.020999879,
+          0.021085533,
+          0.02132432,
+          0.02213178,
+          0.020843207,
+          0.021190606,
+          0.022148418
+        ]
+      }
+    }
+  ]
+}

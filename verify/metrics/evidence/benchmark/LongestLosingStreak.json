@@ -1,0 +1,158 @@
+{
+  "class": "LongestLosingStreak",
+  "correctness_gate": "MATCH",
+  "execution_profiles": null,
+  "oracle_distribution": "quantstats",
+  "oracle_function": "consecutive_losses",
+  "oracle_version": "0.0.81",
+  "rows": [
+    {
+      "observations": 1000,
+      "oracle": {
+        "iterations_per_sample": 8,
+        "median_absolute_deviation_seconds": 1.3743624999999976e-05,
+        "median_seconds": 0.000770824875,
+        "samples_seconds": [
+          0.0007471115,
+          0.00077315225,
+          0.000789429375,
+          0.00077094825,
+          0.000740236375,
+          0.000770824875,
+          0.00075708125,
+          0.00077869725,
+          0.000756464
+        ]
+      },
+      "speedup": 114.7655561135575,
+      "taflow_observations_per_second": 148886679.49844962,
+      "taflow_public": {
+        "iterations_per_sample": 1024,
+        "median_absolute_deviation_seconds": 1.0181738281250045e-07,
+        "median_seconds": 6.716517578125e-06,
+        "samples_seconds": [
+          6.6147001953125e-06,
+          7.0064169921875e-06,
+          6.716517578125e-06,
+          7.140634765625e-06,
+          6.655619140625e-06,
+          6.8474658203125e-06,
+          6.6549482421875e-06,
+          6.6251025390625e-06,
+          6.9499326171875e-06
+        ]
+      }
+    },
+    {
+      "observations": 10000,
+      "oracle": {
+        "iterations_per_sample": 4,
+        "median_absolute_deviation_seconds": 2.553300000000011e-05,
+        "median_seconds": 0.001298824,
+        "samples_seconds": [
+          0.001273291,
+          0.00129913425,
+          0.0012692105,
+          0.001298824,
+          0.00133722125,
+          0.0013555235,
+          0.00124844825,
+          0.00128419375,
+          0.0013154075
+        ]
+      },
+      "speedup": 18.84670837933551,
+      "taflow_observations_per_second": 145105944.9112082,
+      "taflow_public": {
+        "iterations_per_sample": 128,
+        "median_absolute_deviation_seconds": 1.5147031250000088e-06,
+        "median_seconds": 6.89151640625e-05,
+        "samples_seconds": [
+          6.82304453125e-05,
+          7.04298671875e-05,
+          7.16431484375e-05,
+          6.7692625e-05,
+          7.2538453125e-05,
+          6.72219140625e-05,
+          7.2979765625e-05,
+          6.89151640625e-05,
+          6.7836203125e-05
+        ]
+      }
+    },
+    {
+      "observations": 100000,
+      "oracle": {
+        "iterations_per_sample": 1,
+        "median_absolute_deviation_seconds": 0.0001447829999999999,
+        "median_seconds": 0.007081146,
+        "samples_seconds": [
+          0.007032706,
+          0.006900353,
+          0.007262014,
+          0.007392989,
+          0.007001526,
+          0.006936363,
+          0.007155998,
+          0.007365056,
+          0.007081146
+        ]
+      },
+      "speedup": 10.098241917499806,
+      "taflow_observations_per_second": 142607452.48720768,
+      "taflow_public": {
+        "iterations_per_sample": 8,
+        "median_absolute_deviation_seconds": 5.262125000000061e-06,
+        "median_seconds": 0.000701225625,
+        "samples_seconds": [
+          0.00069410275,
+          0.00070648775,
+          0.000693798125,
+          0.000701225625,
+          0.000707543375,
+          0.000705802375,
+          0.000700677625,
+          0.000707412875,
+          0.00070040875
+        ]
+      }
+    },
+    {
+      "observations": 1000000,
+      "oracle": {
+        "iterations_per_sample": 1,
+        "median_absolute_deviation_seconds": 0.000552933999999991,
+        "median_seconds": 0.071274621,
+        "samples_seconds": [
+          0.071583921,
+          0.073705537,
+          0.069637783,
+          0.069580489,
+          0.070721687,
+          0.070986924,
+          0.071449541,
+          0.071274621,
+          0.072512041
+        ]
+      },
+      "speedup": 10.134443798433905,
+      "taflow_observations_per_second": 142188673.27872434,
+      "taflow_public": {
+        "iterations_per_sample": 1,
+        "median_absolute_deviation_seconds": 0.00010780200000000059,
+        "median_seconds": 0.007032909,
+        "samples_seconds": [
+          0.007061641,
+          0.007277296,
+          0.006983553,
+          0.006925107,
+          0.006896178,
+          0.00694278,
+          0.007213928,
+          0.007195288,
+          0.007032909
+        ]
+      }
+    }
+  ]
+}
