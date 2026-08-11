@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/taflow-core", "crates/taflow-python"]
+members = ["crates/taflow-core", "crates/taflow-metrics", "crates/taflow-python"]
 
 [workspace.package]
 version = "0.1.2"

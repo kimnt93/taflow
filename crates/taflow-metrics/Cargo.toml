@@ -1,0 +1,16 @@
+[package]
+name = "taflow-metrics"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Persistent portfolio and strategy metrics for TAFlow"
+repository.workspace = true
+readme = "../../README.md"
+keywords = ["finance", "metrics", "portfolio", "risk"]
+categories = ["science", "mathematics"]
+
+[dependencies]
+thiserror.workspace = true
+
+[dev-dependencies]
+approx = "0.5"
