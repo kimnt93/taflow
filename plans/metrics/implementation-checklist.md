@@ -1,0 +1,158 @@
+# Metrics implementation checklist for agents
+
+This is the execution document. Before every implementation batch, reread
+`AGENTS.md`, [the API contract](api-and-input-contract.md), the active phase in
+[the metric catalog](metric-catalog.md), and this checklist. The catalog is a
+report, not proof; independently scan the repository before checking a row.
+
+Implement small batches. The first batch should contain the P0 foundation and
+no more than these five metrics: `TotalReturn`, `AnnualizedReturn`,
+`AnnualizedVolatility`, `MaximumDrawdown`, and `SharpeRatio`. Later batches may
+contain up to ten metrics only after shared primitives and verifier gates are
+stable.
+
+## Before editing a metric
+
+- [ ] Resolve the full descriptive canonical class name. Reject abbreviations.
+- [ ] Search every possible existing name/alias in Rust, Python, tests, plans,
+      verification, and docs.
+- [ ] Confirm it is a whole-history scalar metric rather than an existing
+      aligned rolling indicator.
+- [ ] Read the pinned oracle source for the exact function and version.
+- [ ] Write the formula, input domains, annualization/rate convention,
+      estimator/ddof, sign, minimum sample, NaN policy, and edge results in the
+      registry entry before production code.
+- [ ] Mark an unavoidable oracle definition difference `VARIANT` before
+      implementation; do not discover semantics by tuning until arrays match.
+- [ ] Identify reusable primitive state without moving the public formula into
+      a shared helper.
+- [ ] Inspect the working tree and preserve unrelated user changes.
+
+Example scan for Sharpe:
+
+```bash
+rg -n "SharpeRatio|sharpe_ratio|Sharpe|SHARPE|RollingSharpe" \
+  crates python tests scripts verify plans
+rg --files crates/taflow-metrics crates/taflow-python/src/metrics \
+  python/taflow/metrics tests/metrics 2>/dev/null | sort
+```
+
+## File and class work
+
+- [ ] Add exactly one core production file
+      `crates/taflow-metrics/src/metrics/<canonical_name>.rs`.
+- [ ] Add exactly one separate core test file with `_test.rs`.
+- [ ] Add exactly one PyO3 binding file under
+      `crates/taflow-python/src/metrics/`.
+- [ ] Add exactly one Python adapter file under `python/taflow/metrics/`.
+- [ ] Add exactly one Python test file under `tests/metrics/`.
+- [ ] Update Rust/Python module declarations and re-exports only.
+- [ ] Register the native class only under `taflow._native.metrics`.
+- [ ] Export the public class from `taflow.metrics`; do not top-level-export it.
+- [ ] Add one metrics registry record with pinned oracle metadata.
+- [ ] Keep production files free of inline tests and package initializers free
+      of logic.
+
+## Core lifecycle
+
+- [ ] `new(...) -> TaResult<Self>` validates every configuration value.
+- [ ] Associated `from_*` constructors or a validated input-mode constructor
+      select one native semantic domain without duplicating the metric formula.
+- [ ] `append(...)` accepts one observation in the selected domain.
+- [ ] `extend_slices_into`/equivalent bulk method uses the same state and checks
+      paired lengths before mutation.
+- [ ] `value(&self)` returns the current `Option<f64>` or named value.
+- [ ] `compute(&mut/self)` does not replay processed inputs; exact tail metrics
+      may refresh a dirty cache.
+- [ ] `reset(&mut self)` preserves allocation and input configuration.
+- [ ] `len()` reports valid derived metric observations from native state.
+- [ ] Fixed-statistic append performs no allocation after construction.
+- [ ] P&L/equity conversion happens in Rust and supports correct continuation.
+- [ ] Batch, chunks, and scalar replay leave identical post-run state/results.
+
+## Python adapter
+
+- [ ] Normalize each supported container exactly once with shared adapters.
+- [ ] Do not calculate returns, P&L conversion, annualization, missing-value
+      repair, or metric arithmetic in Python.
+- [ ] Release the GIL for native bulk work.
+- [ ] `append`, `extend`, and `reset` return the quoted concrete class type.
+- [ ] `value` and `compute` have `float | None` or explicit named-value types.
+- [ ] `__len__` delegates to native state.
+- [ ] Every accepted factory is documented, including later append semantics.
+- [ ] The docstring names the oracle/function/version and every semantic choice.
+- [ ] Unsupported domains do not appear as factories.
+
+## Correctness gates
+
+- [ ] Rust edge/lifecycle test passes.
+- [ ] Python adapter/lifecycle test passes.
+- [ ] Deterministic dataset matrix passes through public class API.
+- [ ] Parameter matrix passes against the independent oracle.
+- [ ] Return/equity/P&L/log-return equivalence passes when supported.
+- [ ] Scalar, chunked, warmed continuation, and reset/replay are invariant.
+- [ ] NaN and infinity behavior matches the contract.
+- [ ] The registry row says `MATCH` only for numerical parity; otherwise it
+      says `VARIANT` with the exact reason.
+- [ ] Interface audit passes.
+
+## Performance preparation (do not execute without authorization)
+
+- [ ] Add benchmark metadata only after correctness passes.
+- [ ] Choose the same library as the correctness oracle.
+- [ ] Define public end-to-end, native core, append, chunk, and conversion rows.
+- [ ] Ensure exact quantile memory is included.
+- [ ] Keep vectorbt JIT cold/warm rows separate if it is the selected oracle.
+- [ ] Do not write speed claims or generated `BENCHMARK.md` rows before a real
+      authorized run.
+
+## After editing each metric
+
+Adapt the names below:
+
+```bash
+# Review every implementation/binding class occurrence.
+rg -n "(struct|class) SharpeRatio" crates python
+
+# No public/free parallel implementation.
+rg -n "(pub )?fn sharpe_ratio|def sharpe_ratio" \
+  crates python tests scripts verify
+
+# Production and aggregation surfaces contain no tests.
+rg -n "#\[cfg\(test\)\]|#\[test\]|def test_" \
+  crates/taflow-metrics/src/metrics/sharpe_ratio.rs \
+  crates/taflow-python/src/metrics/sharpe_ratio.rs \
+  python/taflow/metrics/sharpe_ratio.py \
+  python/taflow/metrics/__init__.py
+
+# Review external/short aliases; only oracle metadata may retain them.
+rg -n "\bSharpe\b|SHARPE" crates python tests scripts verify docs plans
+```
+
+Then run focused tests/verifiers, `cargo fmt --all --check`,
+`git diff --check`, `git diff --stat`, and inspect the complete diff for
+unrelated/generated changes.
+
+## Batch completion
+
+- [ ] Re-scan class/file names and all aliases independently of the checklist.
+- [ ] Confirm `mod.rs`, `lib.rs`, and `__init__.py` are import surfaces only.
+- [ ] Confirm no production Python arithmetic or per-observation loop exists.
+- [ ] Confirm reports name actual oracle versions and do not mix lifecycle
+      invariance with correctness.
+- [ ] Run all focused metric gates.
+- [ ] Run repository-wide gates when completing a release phase.
+- [ ] Update only rows actually proven complete.
+
+## Decisions that require user/product approval before expansion
+
+Stop and ask before:
+
+- changing the existing indicator names or semantics;
+- exporting metric classes at top-level `taflow`;
+- raising the package's supported Python floor for an oracle dependency;
+- adding automatic timestamp frequency inference;
+- supporting external cash flows or cumulative P&L heuristics;
+- adding portfolio optimization/backtesting/reporting scope;
+- changing signed VaR/drawdown conventions after release;
+- running benchmarks or publishing performance claims.
