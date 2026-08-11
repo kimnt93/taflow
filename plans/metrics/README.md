@@ -2,6 +2,18 @@
 
 Research date: 2026-08-11.
 
+## Core release status
+
+Implemented and verified on 2026-08-11: all 47 P1-P4 metrics in the catalog,
+the separate Rust/native/Python package architecture, semantic factories,
+correctness and interface registries, and the authorized performance suite.
+See [metrics correctness](../../verify/metrics/CORRECTNESS.md) and
+[metrics benchmark](../../verify/metrics/BENCHMARK.md) for generated evidence.
+
+P5 remains an explicitly opt-in research phase. Its estimators require new
+statistical contracts or portfolio/position inputs and are not part of this
+one-series core release.
+
 ## Decision
 
 Add portfolio, strategy, and trade metrics as a separate product domain. Do
@@ -99,5 +111,5 @@ intended.
    are canonical and verified. It may orchestrate or share primitives; it may
    not contain a second implementation of any metric.
 
-No benchmark command is authorized by this planning task. The benchmark plan
-is ready for a later explicit authorization.
+The planning task itself did not authorize benchmarking. The later
+implementation request explicitly authorized the completed benchmark run.

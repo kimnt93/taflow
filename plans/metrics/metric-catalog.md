@@ -6,17 +6,17 @@ file or matching a local formula.
 
 ## P0: foundation
 
-- [ ] Add the `taflow-metrics` workspace crate and one-way dependency graph.
-- [ ] Add return, log-return, equity-level, and period-P&L native input modes.
-- [ ] Add paired benchmark input and pairwise missing-value handling.
-- [ ] Add online moments, paired moments, compounded growth, drawdown,
+- [x] Add the `taflow-metrics` workspace crate and one-way dependency graph.
+- [x] Add return, log-return, equity-level, and period-P&L native input modes.
+- [x] Add paired benchmark input and pairwise missing-value handling.
+- [x] Add online moments, paired moments, compounded growth, drawdown,
       downside-moment, gain/loss, and exact-order-statistic primitives.
-- [ ] Add the native `taflow._native.metrics` submodule.
-- [ ] Add `taflow.metrics` and the class-only adapter template.
-- [ ] Add metrics-specific registry, interface audit, correctness report, and
+- [x] Add the native `taflow._native.metrics` submodule.
+- [x] Add `taflow.metrics` and the class-only adapter template.
+- [x] Add metrics-specific registry, interface audit, correctness report, and
       benchmark harness. The benchmark executable remains disabled until
       explicitly authorized.
-- [ ] Freeze the edge-result matrix and oracle normalization before P1.
+- [x] Freeze the edge-result matrix and oracle normalization before P1.
 
 ## P1: essential return and risk metrics
 
@@ -25,18 +25,18 @@ expect beside a strategy return stream.
 
 | Done | Canonical class | Minimum input | Primary oracle | Exact contract note |
 |:---:|---|---:|---|---|
-| [ ] | `TotalReturn` | 1 return | Empyrical `cum_returns_final` | Compounded simple return, not arithmetic sum. |
-| [ ] | `AnnualizedReturn` | 1 | Empyrical `annual_return` | Geometric CAGR using explicit `periods_per_year`. |
-| [ ] | `AnnualizedVolatility` | 2 | Empyrical `annual_volatility` | Sample standard deviation, Levy alpha fixed at 2. |
-| [ ] | `MaximumDrawdown` | 1 | Empyrical `max_drawdown` | Non-positive fraction from a phantom starting wealth of 1. |
-| [ ] | `DownsideDeviation` | 1 | Empyrical `downside_risk` | Lower partial moment over all observations, annualized. |
-| [ ] | `SharpeRatio` | 2 | Empyrical `sharpe_ratio` | Sample deviation; annual risk-free rate converted by TAFlow. |
-| [ ] | `SortinoRatio` | 2 | Empyrical `sortino_ratio` | Explicit annual minimum acceptable return. |
-| [ ] | `CalmarRatio` | 1 | Empyrical `calmar_ratio` | CAGR divided by absolute maximum drawdown. |
-| [ ] | `OmegaRatio` | 2 | Empyrical `omega_ratio` | Sum above threshold divided by absolute sum below threshold. |
-| [ ] | `HistoricalValueAtRisk` | 1 | Empyrical `value_at_risk` | Signed lower-tail linear quantile; default cutoff 0.05. |
-| [ ] | `HistoricalExpectedShortfall` | 1 | Empyrical `conditional_value_at_risk` | Signed mean of Empyrical's selected lowest order statistics. |
-| [ ] | `TailRatio` | 1 | Empyrical `tail_ratio` | Absolute 95th percentile divided by absolute 5th percentile. |
+| [x] | `TotalReturn` | 1 return | Empyrical `cum_returns_final` | Compounded simple return, not arithmetic sum. |
+| [x] | `AnnualizedReturn` | 1 | Empyrical `annual_return` | Geometric CAGR using explicit `periods_per_year`. |
+| [x] | `AnnualizedVolatility` | 2 | Empyrical `annual_volatility` | Sample standard deviation, Levy alpha fixed at 2. |
+| [x] | `MaximumDrawdown` | 1 | Empyrical `max_drawdown` | Non-positive fraction from a phantom starting wealth of 1. |
+| [x] | `DownsideDeviation` | 1 | Empyrical `downside_risk` | Lower partial moment over all observations, annualized. |
+| [x] | `SharpeRatio` | 2 | Empyrical `sharpe_ratio` | Sample deviation; annual risk-free rate converted by TAFlow. |
+| [x] | `SortinoRatio` | 2 | Empyrical `sortino_ratio` | Explicit annual minimum acceptable return. |
+| [x] | `CalmarRatio` | 1 | Empyrical `calmar_ratio` | CAGR divided by absolute maximum drawdown. |
+| [x] | `OmegaRatio` | 2 | Empyrical `omega_ratio` | Sum above threshold divided by absolute sum below threshold. |
+| [x] | `HistoricalValueAtRisk` | 1 | Empyrical `value_at_risk` | Signed lower-tail linear quantile; default cutoff 0.05. |
+| [x] | `HistoricalExpectedShortfall` | 1 | Empyrical `conditional_value_at_risk` | Signed mean of Empyrical's selected lowest order statistics. |
+| [x] | `TailRatio` | 1 | Empyrical `tail_ratio` | Absolute 95th percentile divided by absolute 5th percentile. |
 
 P1 intentionally omits rolling output. Existing TAFlow indicators own causal
 aligned rolling series. These classes summarize all observations processed by
@@ -49,16 +49,16 @@ parameters of one class, not separate classes.
 
 | Done | Canonical class | Primary oracle | Exact contract note |
 |:---:|---|---|---|
-| [ ] | `TrackingError` | NumPy/pandas plus QuantStats IR denominator | Sample standard deviation of active returns, annualized by default. |
-| [ ] | `InformationRatio` | Empyrical `excess_sharpe` and QuantStats `information_ratio` | Mean active return / tracking error; TAFlow annualizes by default. |
-| [ ] | `Beta` | Empyrical `beta_aligned` | Sample covariance / benchmark sample variance. |
-| [ ] | `Alpha` | Empyrical `alpha_aligned` | Intercept annualized with Empyrical's compounding convention. |
-| [ ] | `CoefficientOfDetermination` | QuantStats `r_squared` | Squared Pearson correlation for a single-factor fit. |
-| [ ] | `CaptureRatio` | Empyrical `capture` | Portfolio CAGR divided by benchmark CAGR. |
-| [ ] | `UpMarketCaptureRatio` | Empyrical `up_capture` | Filter periods where benchmark return is positive. |
-| [ ] | `DownMarketCaptureRatio` | Empyrical `down_capture` | Filter periods where benchmark return is negative. |
-| [ ] | `UpDownCaptureRatio` | Empyrical `up_down_capture` | Up capture divided by down capture. |
-| [ ] | `TreynorRatio` | PerformanceAnalytics `TreynorRatio` cross-check | Annual excess return divided by beta; defer if the exact return convention remains disputed. |
+| [x] | `TrackingError` | NumPy/pandas plus QuantStats IR denominator | Sample standard deviation of active returns, annualized by default. |
+| [x] | `InformationRatio` | Empyrical `excess_sharpe` and QuantStats `information_ratio` | Mean active return / tracking error; TAFlow annualizes by default. |
+| [x] | `Beta` | Empyrical `beta_aligned` | Sample covariance / benchmark sample variance. |
+| [x] | `Alpha` | Empyrical `alpha_aligned` | Intercept annualized with Empyrical's compounding convention. |
+| [x] | `CoefficientOfDetermination` | QuantStats `r_squared` | Squared Pearson correlation for a single-factor fit. |
+| [x] | `CaptureRatio` | Empyrical `capture` | Portfolio CAGR divided by benchmark CAGR. |
+| [x] | `UpMarketCaptureRatio` | Empyrical `up_capture` | Filter periods where benchmark return is positive. |
+| [x] | `DownMarketCaptureRatio` | Empyrical `down_capture` | Filter periods where benchmark return is negative. |
+| [x] | `UpDownCaptureRatio` | Empyrical `up_down_capture` | Up capture divided by down capture. |
+| [x] | `TreynorRatio` | PerformanceAnalytics `TreynorRatio` cross-check | Annual excess return divided by beta; defer if the exact return convention remains disputed. |
 
 Do not infer date alignment from pandas indexes. The metric package accepts
 already aligned ordered arrays and rejects mismatched lengths before mutation.
@@ -67,15 +67,15 @@ already aligned ordered arrays and rejects mismatched lengths before mutation.
 
 | Done | Canonical class | Primary oracle | Exact contract note |
 |:---:|---|---|---|
-| [ ] | `UlcerIndex` | QuantStats `ulcer_index`; PerformanceAnalytics cross-check | RMS percentage drawdown, positive magnitude. Separate namespace avoids collision with indicator `UlcerIndex`. |
-| [ ] | `UlcerPerformanceIndex` | QuantStats `ulcer_performance_index` | Excess return divided by Ulcer Index; freeze arithmetic-vs-compounded numerator first. |
-| [ ] | `RecoveryFactor` | QuantStats `recovery_factor` | Freeze compounded total-return versus arithmetic-sum variant before implementation. |
-| [ ] | `GainToPainRatio` | QuantStats `gain_to_pain_ratio` | Sum gains / absolute sum losses at a declared aggregation resolution. Phase 1 supports input resolution only. |
-| [ ] | `PainIndex` | PerformanceAnalytics `PainIndex` | Mean absolute percentage drawdown. |
-| [ ] | `PainRatio` | PerformanceAnalytics `PainRatio` | Annualized excess return / Pain Index. |
-| [ ] | `AverageDrawdown` | PerformanceAnalytics drawdown functions | Define episode-based average, not average per-bar drawdown. |
-| [ ] | `MaximumDrawdownDuration` | PerformanceAnalytics drawdown table | Count observations, not calendar days, in phase 1. |
-| [ ] | `StabilityOfTimeSeries` | Empyrical `stability_of_timeseries` | R-squared of cumulative log returns against observation index. |
+| [x] | `UlcerIndex` | QuantStats `ulcer_index`; PerformanceAnalytics cross-check | RMS percentage drawdown, positive magnitude. Separate namespace avoids collision with indicator `UlcerIndex`. |
+| [x] | `UlcerPerformanceIndex` | QuantStats `ulcer_performance_index` | Excess return divided by Ulcer Index; freeze arithmetic-vs-compounded numerator first. |
+| [x] | `RecoveryFactor` | QuantStats `recovery_factor` | Freeze compounded total-return versus arithmetic-sum variant before implementation. |
+| [x] | `GainToPainRatio` | QuantStats `gain_to_pain_ratio` | Sum gains / absolute sum losses at a declared aggregation resolution. Phase 1 supports input resolution only. |
+| [x] | `PainIndex` | PerformanceAnalytics `PainIndex` | Mean absolute percentage drawdown. |
+| [x] | `PainRatio` | PerformanceAnalytics `PainRatio` | Annualized excess return / Pain Index. |
+| [x] | `AverageDrawdown` | PerformanceAnalytics drawdown functions | Define episode-based average, not average per-bar drawdown. |
+| [x] | `MaximumDrawdownDuration` | PerformanceAnalytics drawdown table | Count observations, not calendar days, in phase 1. |
+| [x] | `StabilityOfTimeSeries` | Empyrical `stability_of_timeseries` | R-squared of cumulative log returns against observation index. |
 
 Rows with a “freeze” note require a short definition decision record in the
 metric test file or verification registry before coding. QuantStats contains
@@ -89,22 +89,22 @@ or closed trade. Do not annualize closed-trade statistics.
 
 | Done | Canonical class | Accepted domains | Primary oracle | Exact contract note |
 |:---:|---|---|---|---|
-| [ ] | `WinRate` | returns, period P&L, trades | QuantStats `win_rate` | Wins are strictly greater than zero; zero is breakeven. |
-| [ ] | `BreakevenRate` | returns, period P&L, trades | NumPy count reference | Exact zero count / valid observations. |
-| [ ] | `AverageWin` | returns, period P&L, trades | QuantStats `avg_win` | Mean strictly positive observation. |
-| [ ] | `AverageLoss` | returns, period P&L, trades | QuantStats `avg_loss` | Mean strictly negative observation; result stays negative. |
-| [ ] | `PayoffRatio` | returns, period P&L, trades | QuantStats `payoff_ratio` | Average win / absolute average loss. |
-| [ ] | `ProfitFactor` | returns, period P&L, trades | QuantStats `profit_factor`; vectorbt Trades cross-check | Gross positive sum / absolute gross negative sum. |
-| [ ] | `Expectancy` | period P&L, trades | QuantStats components | `P(win)*avg_win + P(loss)*avg_loss`; breakeven contributes zero. |
-| [ ] | `KellyCriterion` | returns, trades | QuantStats `kelly_criterion` | Historical binary Kelly fraction from win probability and payoff ratio, not an order-sizing action. |
-| [ ] | `LongestWinningStreak` | returns, period P&L, trades | QuantStats `consecutive_wins` | Strictly positive observations only. |
-| [ ] | `LongestLosingStreak` | returns, period P&L, trades | QuantStats `consecutive_losses` | Strictly negative observations only. |
-| [ ] | `GrossProfit` | period P&L, trades | NumPy plus QuantStats profit-factor numerator | Sum strictly positive P&L. |
-| [ ] | `GrossLoss` | period P&L, trades | NumPy plus QuantStats profit-factor denominator | Signed sum of strictly negative P&L. |
-| [ ] | `NetProfit` | period P&L, trades | NumPy/QuantStats composition | Gross profit plus signed gross loss. |
-| [ ] | `SystemQualityNumber` | trades | vectorbt `Trades.sqn` | `sqrt(n) * mean(trade_pnl) / sample_std(trade_pnl)`. |
-| [ ] | `CommonSenseRatio` | returns | QuantStats `common_sense_ratio` | Profit factor times tail ratio; lower priority because it is composite. |
-| [ ] | `CpcIndex` | returns, trades | QuantStats `cpc_index` | Profit factor × win rate × payoff ratio; preserve the expanded canonical name in docs if a defensible full name is found before coding. |
+| [x] | `WinRate` | returns, period P&L, trades | QuantStats `win_rate` | Wins are strictly greater than zero; zero is breakeven. |
+| [x] | `BreakevenRate` | returns, period P&L, trades | NumPy count reference | Exact zero count / valid observations. |
+| [x] | `AverageWin` | returns, period P&L, trades | QuantStats `avg_win` | Mean strictly positive observation. |
+| [x] | `AverageLoss` | returns, period P&L, trades | QuantStats `avg_loss` | Mean strictly negative observation; result stays negative. |
+| [x] | `PayoffRatio` | returns, period P&L, trades | QuantStats `payoff_ratio` | Average win / absolute average loss. |
+| [x] | `ProfitFactor` | returns, period P&L, trades | QuantStats `profit_factor`; vectorbt Trades cross-check | Gross positive sum / absolute gross negative sum. |
+| [x] | `Expectancy` | period P&L, trades | QuantStats components | `P(win)*avg_win + P(loss)*avg_loss`; breakeven contributes zero. |
+| [x] | `KellyCriterion` | returns, trades | QuantStats `kelly_criterion` | Historical binary Kelly fraction from win probability and payoff ratio, not an order-sizing action. |
+| [x] | `LongestWinningStreak` | returns, period P&L, trades | QuantStats `consecutive_wins` | Strictly positive observations only. |
+| [x] | `LongestLosingStreak` | returns, period P&L, trades | QuantStats `consecutive_losses` | Strictly negative observations only. |
+| [x] | `GrossProfit` | period P&L, trades | NumPy plus QuantStats profit-factor numerator | Sum strictly positive P&L. |
+| [x] | `GrossLoss` | period P&L, trades | NumPy plus QuantStats profit-factor denominator | Signed sum of strictly negative P&L. |
+| [x] | `NetProfit` | period P&L, trades | NumPy/QuantStats composition | Gross profit plus signed gross loss. |
+| [x] | `SystemQualityNumber` | trades | vectorbt `Trades.sqn` | `sqrt(n) * mean(trade_pnl) / sample_std(trade_pnl)`. |
+| [x] | `CommonSenseRatio` | returns | QuantStats `common_sense_ratio` | Profit factor times tail ratio; lower priority because it is composite. |
+| [x] | `CompositeProfitabilityConsistencyIndex` | returns, trades | QuantStats `cpc_index` | Descriptive TAFlow nomenclature for profit factor × win rate × payoff ratio; it does not claim a historical expansion of the external alias. |
 
 Do not implement a class named `CpcIndex` until the abbreviation is resolved
 to a complete descriptive canonical name, per repository naming rules.

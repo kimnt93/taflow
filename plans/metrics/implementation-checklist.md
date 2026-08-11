@@ -98,12 +98,14 @@ rg --files crates/taflow-metrics crates/taflow-python/src/metrics \
 
 ## Performance preparation (do not execute without authorization)
 
-- [ ] Add benchmark metadata only after correctness passes.
-- [ ] Choose the same library as the correctness oracle.
-- [ ] Define public end-to-end, native core, append, chunk, and conversion rows.
-- [ ] Ensure exact quantile memory is included.
-- [ ] Keep vectorbt JIT cold/warm rows separate if it is the selected oracle.
-- [ ] Do not write speed claims or generated `BENCHMARK.md` rows before a real
+- [x] Add benchmark metadata only after correctness passes.
+- [x] Choose the same library as the correctness oracle.
+- [x] Define public end-to-end, native core, append, chunk, and conversion rows.
+- [x] Ensure exact quantile memory is included.
+- [x] Keep vectorbt JIT cold/warm rows separate if it is the selected oracle.
+      System Quality Number remains benchmark-ineligible because vectorbt is
+      unavailable; no NumPy timing is mislabeled as a vectorbt comparison.
+- [x] Do not write speed claims or generated `BENCHMARK.md` rows before a real
       authorized run.
 
 ## After editing each metric
@@ -135,14 +137,14 @@ unrelated/generated changes.
 
 ## Batch completion
 
-- [ ] Re-scan class/file names and all aliases independently of the checklist.
-- [ ] Confirm `mod.rs`, `lib.rs`, and `__init__.py` are import surfaces only.
-- [ ] Confirm no production Python arithmetic or per-observation loop exists.
-- [ ] Confirm reports name actual oracle versions and do not mix lifecycle
+- [x] Re-scan class/file names and all aliases independently of the checklist.
+- [x] Confirm `mod.rs`, `lib.rs`, and `__init__.py` are import surfaces only.
+- [x] Confirm no production Python arithmetic or per-observation loop exists.
+- [x] Confirm reports name actual oracle versions and do not mix lifecycle
       invariance with correctness.
-- [ ] Run all focused metric gates.
-- [ ] Run repository-wide gates when completing a release phase.
-- [ ] Update only rows actually proven complete.
+- [x] Run all focused metric gates.
+- [x] Run repository-wide gates when completing a release phase.
+- [x] Update only rows actually proven complete.
 
 ## Decisions that require user/product approval before expansion
 
