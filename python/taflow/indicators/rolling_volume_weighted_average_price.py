@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 
+from .._adapter_protocol import adapter_length
 from .._native import RollingVolumeWeightedAveragePriceOperator as _Native
 from .._series import as_float64_series
 
@@ -29,7 +30,6 @@ class RollingVolumeWeightedAveragePrice:
         timeperiod: int = 20,
     ) -> None:
         self._state = _Native(int(timeperiod))
-        self._length = 0
         self.extend(high, low, close, volume)
 
     def append(
@@ -37,18 +37,18 @@ class RollingVolumeWeightedAveragePrice:
     ) -> "RollingVolumeWeightedAveragePrice":
         """Append one OHLCV bar and return this adapter."""
         self._state.append(float(high), float(low), float(close), float(volume))
-        self._length += 1
         return self
 
     def extend(
         self, high: Any, low: Any, close: Any, volume: Any
     ) -> "RollingVolumeWeightedAveragePrice":
         """Append equal-length OHLCV histories."""
-        arrays = tuple(as_float64_series(series) for series in (high, low, close, volume))
+        arrays = tuple(
+            as_float64_series(series) for series in (high, low, close, volume)
+        )
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("high, low, close, and volume must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> np.ndarray:
@@ -63,12 +63,11 @@ class RollingVolumeWeightedAveragePrice:
     def reset(self) -> "RollingVolumeWeightedAveragePrice":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
 
 
 __all__ = ["RollingVolumeWeightedAveragePrice"]

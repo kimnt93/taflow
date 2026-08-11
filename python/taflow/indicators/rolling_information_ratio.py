@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import RollingInformationRatioOperator as _Native
 from .._series import as_float64_series
 
@@ -16,7 +17,7 @@ class RollingInformationRatio:
         _input: Any,
         benchmark: Any,
         timeperiod: int = 20,
-        ) -> None:
+    ) -> None:
         """Initialize this adapter and process the supplied input series.
 
         Parameters
@@ -34,7 +35,6 @@ class RollingInformationRatio:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
         self.extend(_input, benchmark)
 
     def append(self, _input: float, benchmark: float) -> "RollingInformationRatio":
@@ -53,7 +53,6 @@ class RollingInformationRatio:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(_input), float(benchmark))
-        self._length += 1
         return self
 
     def extend(self, _input: Any, benchmark: Any) -> "RollingInformationRatio":
@@ -76,7 +75,6 @@ class RollingInformationRatio:
         if input_array.shape != benchmark_array.shape:
             raise ValueError("_input and benchmark must have equal lengths")
         self._state.extend(input_array, benchmark_array)
-        self._length += len(input_array)
         return self
 
     def compute(self) -> np.ndarray:
@@ -109,9 +107,8 @@ class RollingInformationRatio:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed observations."""
-        return self._length
+        return adapter_length(self)

@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import SchaffTrendCycleOperator as _Native
 from .._series import as_float64_series
 
@@ -40,7 +41,6 @@ class SchaffTrendCycle:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(tclength, fast, slow, factor)
-        self._length = 0
         self.extend(close)
 
     def append(self, close: float) -> "SchaffTrendCycle":
@@ -57,7 +57,6 @@ class SchaffTrendCycle:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(close))
-        self._length += 1
         return self
 
     def extend(self, close: Any) -> "SchaffTrendCycle":
@@ -75,7 +74,6 @@ class SchaffTrendCycle:
         """
         close_array = as_float64_series(close)
         self._state.extend(close_array)
-        self._length += len(close_array)
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -108,9 +106,8 @@ class SchaffTrendCycle:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed closes."""
-        return self._length
+        return adapter_length(self)

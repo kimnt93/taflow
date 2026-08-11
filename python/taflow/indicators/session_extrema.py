@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 
+from .._adapter_protocol import adapter_length
 from .._native import SessionExtremaOperator as _Native
 from .._series import as_bool_series, as_float64_series
 
@@ -20,20 +21,14 @@ class SessionExtrema:
 
     def __init__(self, new_session: Any, high: Any, low: Any) -> None:
         self._state = _Native()
-        self._length = 0
         self.extend(new_session, high, low)
 
-    def append(
-        self, new_session: bool, high: float, low: float
-    ) -> "SessionExtrema":
+    def append(self, new_session: bool, high: float, low: float) -> "SessionExtrema":
         """Append one session/high/low bar and return this adapter."""
         self._state.append(bool(new_session), float(high), float(low))
-        self._length += 1
         return self
 
-    def extend(
-        self, new_session: Any, high: Any, low: Any
-    ) -> "SessionExtrema":
+    def extend(self, new_session: Any, high: Any, low: Any) -> "SessionExtrema":
         """Append equal-length session/high/low histories."""
         arrays = (
             as_bool_series(new_session),
@@ -43,7 +38,6 @@ class SessionExtrema:
         if len({len(array) for array in arrays}) != 1:
             raise ValueError("new_session, high, and low must have equal lengths")
         self._state.extend(*arrays)
-        self._length += len(arrays[0])
         return self
 
     def compute(self) -> tuple[np.ndarray, np.ndarray]:
@@ -58,12 +52,11 @@ class SessionExtrema:
     def reset(self) -> "SessionExtrema":
         """Restore fresh native state and return this adapter."""
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
         """Return the number of processed bars."""
-        return self._length
+        return adapter_length(self)
 
 
 __all__ = ["SessionExtrema"]

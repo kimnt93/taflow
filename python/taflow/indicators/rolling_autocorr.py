@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from .._adapter_protocol import adapter_length
 from .._native import RollingAutocorrOperator as _Native
 from .._series import as_float64_series
 
@@ -31,7 +32,6 @@ class RollingAutocorr:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self._length = 0
         self.extend(_input)
 
     def append(self, _input: float) -> "RollingAutocorr":
@@ -48,7 +48,6 @@ class RollingAutocorr:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.append(float(_input))
-        self._length += 1
         return self
 
     def extend(self, _input: Any) -> "RollingAutocorr":
@@ -66,7 +65,6 @@ class RollingAutocorr:
         """
         values = as_float64_series(_input)
         self._state.extend(values)
-        self._length += len(values)
         return self
 
     def compute(self) -> np.ndarray:
@@ -99,8 +97,7 @@ class RollingAutocorr:
             The updated adapter, native value, aligned output array, or execution node.
         """
         self._state.reset()
-        self._length = 0
         return self
 
     def __len__(self) -> int:
-        return self._length
+        return adapter_length(self)
