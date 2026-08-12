@@ -52,7 +52,7 @@ def _performanceanalytics_modified_sharpe(
 @pytest.mark.parametrize(
     ("returns", "periods_per_year", "annual_risk_free_rate", "confidence_level"),
     [
-        (np.array([0.02, -0.01, 0.03, -0.025, 0.01, -0.04, 0.015]), 252.0, 0.0, 0.95),
+        (np.array([0.02, -0.01, 0.03, -0.025, 0.01, -0.04, 0.03]), 252.0, 0.0, 0.95),
         (np.linspace(-0.04, 0.05, 101), 52.0, -0.01, 0.975),
         (np.array([0.15, -0.1, -0.1, 0.25, -0.3, 0.1]), 12.0, 0.04, 0.99),
         (np.array([np.nan, 0.02, -0.03, np.nan, 0.01]), 252.0, 0.03, 0.95),

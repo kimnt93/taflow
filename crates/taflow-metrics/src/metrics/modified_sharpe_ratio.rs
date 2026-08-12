@@ -46,7 +46,10 @@ impl ModifiedSharpeRatio {
                 reason: "must be finite and strictly between 0.5 and 1",
             });
         }
-        if matches!(input_kind, MetricInputKind::RawPnl | MetricInputKind::Trades) {
+        if matches!(
+            input_kind,
+            MetricInputKind::RawPnl | MetricInputKind::Trades
+        ) {
             return Err(MetricError::InvalidParameter {
                 name: "input_kind",
                 value: format!("{input_kind:?}"),
@@ -54,8 +57,7 @@ impl ModifiedSharpeRatio {
             });
         }
 
-        let period_risk_free_rate =
-            (annual_risk_free_rate.ln_1p() / periods_per_year).exp_m1();
+        let period_risk_free_rate = (annual_risk_free_rate.ln_1p() / periods_per_year).exp_m1();
         if !period_risk_free_rate.is_finite() {
             return Err(MetricError::InvalidParameter {
                 name: "annual_risk_free_rate",
@@ -124,9 +126,9 @@ impl ModifiedSharpeRatio {
         }
 
         let z = self.lower_tail_quantile;
-        let adjusted_quantile = z + (z * z - 1.0) * skewness / 6.0
-            + (z.powi(3) - 3.0 * z) * excess_kurtosis / 24.0
-            - (2.0 * z.powi(3) - 5.0 * z) * skewness * skewness / 36.0;
+        let adjusted_quantile =
+            z + (z * z - 1.0) * skewness / 6.0 + (z.powi(3) - 3.0 * z) * excess_kurtosis / 24.0
+                - (2.0 * z.powi(3) - 5.0 * z) * skewness * skewness / 36.0;
         let mut modified_value_at_risk =
             -self.mean - adjusted_quantile * population_variance.sqrt();
 
@@ -191,11 +193,10 @@ impl ModifiedSharpeRatio {
         let delta_over_count_squared = delta_over_count * delta_over_count;
         let term = delta * delta_over_count * previous_count;
 
-        self.fourth_central_moment += term
-            * delta_over_count_squared
-            * (count * count - 3.0 * count + 3.0)
-            + 6.0 * delta_over_count_squared * self.second_central_moment
-            - 4.0 * delta_over_count * self.third_central_moment;
+        self.fourth_central_moment +=
+            term * delta_over_count_squared * (count * count - 3.0 * count + 3.0)
+                + 6.0 * delta_over_count_squared * self.second_central_moment
+                - 4.0 * delta_over_count * self.third_central_moment;
         self.third_central_moment += term * delta_over_count * (count - 2.0)
             - 3.0 * delta_over_count * self.second_central_moment;
         self.second_central_moment += term;
@@ -238,8 +239,7 @@ impl ModifiedSharpeRatio {
 
         if probability < LOWER_BREAKPOINT {
             let q = (-2.0 * probability.ln()).sqrt();
-            return (((((C[0] * q + C[1]) * q + C[2]) * q + C[3]) * q + C[4]) * q
-                + C[5])
+            return (((((C[0] * q + C[1]) * q + C[2]) * q + C[3]) * q + C[4]) * q + C[5])
                 / ((((D[0] * q + D[1]) * q + D[2]) * q + D[3]) * q + 1.0);
         }
         let q = probability - 0.5;

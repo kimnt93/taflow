@@ -2,15 +2,18 @@ use super::modified_sharpe_ratio::ModifiedSharpeRatio;
 use crate::{MetricInputKind, NanPolicy};
 
 fn assert_close(actual: f64, expected: f64, tolerance: f64) {
-    assert!((actual - expected).abs() <= tolerance, "{actual} != {expected}");
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "{actual} != {expected}"
+    );
 }
 
 #[test]
 fn computes_frozen_cornish_fisher_modified_var_ratio() {
-    let returns = [0.02, -0.01, 0.03, -0.025, 0.01, -0.04, 0.015];
+    let returns = [0.02, -0.01, 0.03, -0.025, 0.01, -0.04, 0.03];
     // Translation of PerformanceAnalytics 2.1.0 SharpeRatio(FUN="VaR",
     // method="modified", annualize=FALSE, geometric=FALSE, invert=FALSE).
-    let expected = 0.050_047_084_125_233_45;
+    let expected = 0.049_235_041_153_778_45;
     let mut state =
         ModifiedSharpeRatio::new(MetricInputKind::Returns, 252.0, 0.0, 0.95, NanPolicy::Omit)
             .unwrap();
@@ -156,20 +159,12 @@ fn validates_configuration_and_semantic_domain() {
         )
         .is_err());
     }
-    assert!(ModifiedSharpeRatio::new(
-        MetricInputKind::RawPnl,
-        252.0,
-        0.0,
-        0.95,
-        NanPolicy::Omit,
-    )
-    .is_err());
-    assert!(ModifiedSharpeRatio::new(
-        MetricInputKind::Trades,
-        252.0,
-        0.0,
-        0.95,
-        NanPolicy::Omit,
-    )
-    .is_err());
+    assert!(
+        ModifiedSharpeRatio::new(MetricInputKind::RawPnl, 252.0, 0.0, 0.95, NanPolicy::Omit,)
+            .is_err()
+    );
+    assert!(
+        ModifiedSharpeRatio::new(MetricInputKind::Trades, 252.0, 0.0, 0.95, NanPolicy::Omit,)
+            .is_err()
+    );
 }

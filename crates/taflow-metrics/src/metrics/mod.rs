@@ -12,9 +12,14 @@ mod capture_ratio;
 mod coefficient_of_determination;
 mod common_sense_ratio;
 mod composite_profitability_consistency_index;
+mod conditional_drawdown_at_risk;
+mod deflated_sharpe_ratio;
 mod down_market_capture_ratio;
 mod downside_deviation;
+mod effective_number_of_bets;
+mod entropic_value_at_risk;
 mod expectancy;
+mod exposure;
 mod gain_to_pain_ratio;
 mod gross_loss;
 mod gross_profit;
@@ -26,11 +31,15 @@ mod longest_losing_streak;
 mod longest_winning_streak;
 mod maximum_drawdown;
 mod maximum_drawdown_duration;
+mod modified_sharpe_ratio;
 mod net_profit;
 mod omega_ratio;
 mod pain_index;
 mod pain_ratio;
+mod parametric_expected_shortfall;
+mod parametric_value_at_risk;
 mod payoff_ratio;
+mod probabilistic_sharpe_ratio;
 mod profit_factor;
 mod recovery_factor;
 mod sharpe_ratio;
@@ -41,6 +50,7 @@ mod tail_ratio;
 mod total_return;
 mod tracking_error;
 mod treynor_ratio;
+mod turnover;
 mod ulcer_index;
 mod ulcer_performance_index;
 mod up_down_capture_ratio;
@@ -59,9 +69,14 @@ pub use capture_ratio::CaptureRatio;
 pub use coefficient_of_determination::CoefficientOfDetermination;
 pub use common_sense_ratio::CommonSenseRatio;
 pub use composite_profitability_consistency_index::CompositeProfitabilityConsistencyIndex;
+pub use conditional_drawdown_at_risk::ConditionalDrawdownAtRisk;
+pub use deflated_sharpe_ratio::DeflatedSharpeRatio;
 pub use down_market_capture_ratio::DownMarketCaptureRatio;
 pub use downside_deviation::DownsideDeviation;
+pub use effective_number_of_bets::EffectiveNumberOfBets;
+pub use entropic_value_at_risk::EntropicValueAtRisk;
 pub use expectancy::Expectancy;
+pub use exposure::{Exposure, ExposureInputKind};
 pub use gain_to_pain_ratio::GainToPainRatio;
 pub use gross_loss::GrossLoss;
 pub use gross_profit::GrossProfit;
@@ -73,11 +88,15 @@ pub use longest_losing_streak::LongestLosingStreak;
 pub use longest_winning_streak::LongestWinningStreak;
 pub use maximum_drawdown::MaximumDrawdown;
 pub use maximum_drawdown_duration::MaximumDrawdownDuration;
+pub use modified_sharpe_ratio::ModifiedSharpeRatio;
 pub use net_profit::NetProfit;
 pub use omega_ratio::OmegaRatio;
 pub use pain_index::PainIndex;
 pub use pain_ratio::PainRatio;
+pub use parametric_expected_shortfall::ParametricExpectedShortfall;
+pub use parametric_value_at_risk::ParametricValueAtRisk;
 pub use payoff_ratio::PayoffRatio;
+pub use probabilistic_sharpe_ratio::ProbabilisticSharpeRatio;
 pub use profit_factor::ProfitFactor;
 pub use recovery_factor::RecoveryFactor;
 pub use sharpe_ratio::SharpeRatio;
@@ -88,6 +107,7 @@ pub use tail_ratio::TailRatio;
 pub use total_return::TotalReturn;
 pub use tracking_error::TrackingError;
 pub use treynor_ratio::TreynorRatio;
+pub use turnover::Turnover;
 pub use ulcer_index::UlcerIndex;
 pub use ulcer_performance_index::UlcerPerformanceIndex;
 pub use up_down_capture_ratio::UpDownCaptureRatio;
@@ -121,11 +141,21 @@ mod common_sense_ratio_test;
 #[cfg(test)]
 mod composite_profitability_consistency_index_test;
 #[cfg(test)]
+mod conditional_drawdown_at_risk_test;
+#[cfg(test)]
+mod deflated_sharpe_ratio_test;
+#[cfg(test)]
 mod down_market_capture_ratio_test;
 #[cfg(test)]
 mod downside_deviation_test;
 #[cfg(test)]
+mod effective_number_of_bets_test;
+#[cfg(test)]
+mod entropic_value_at_risk_test;
+#[cfg(test)]
 mod expectancy_test;
+#[cfg(test)]
+mod exposure_test;
 #[cfg(test)]
 mod gain_to_pain_ratio_test;
 #[cfg(test)]
@@ -149,6 +179,8 @@ mod maximum_drawdown_duration_test;
 #[cfg(test)]
 mod maximum_drawdown_test;
 #[cfg(test)]
+mod modified_sharpe_ratio_test;
+#[cfg(test)]
 mod net_profit_test;
 #[cfg(test)]
 mod omega_ratio_test;
@@ -157,7 +189,13 @@ mod pain_index_test;
 #[cfg(test)]
 mod pain_ratio_test;
 #[cfg(test)]
+mod parametric_expected_shortfall_test;
+#[cfg(test)]
+mod parametric_value_at_risk_test;
+#[cfg(test)]
 mod payoff_ratio_test;
+#[cfg(test)]
+mod probabilistic_sharpe_ratio_test;
 #[cfg(test)]
 mod profit_factor_test;
 #[cfg(test)]
@@ -178,6 +216,8 @@ mod total_return_test;
 mod tracking_error_test;
 #[cfg(test)]
 mod treynor_ratio_test;
+#[cfg(test)]
+mod turnover_test;
 #[cfg(test)]
 mod ulcer_index_test;
 #[cfg(test)]

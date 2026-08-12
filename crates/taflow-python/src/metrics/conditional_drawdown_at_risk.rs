@@ -1,12 +1,14 @@
 use numpy::PyReadonlyArray1;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow_metrics::{metrics::ParametricExpectedShortfall as State, MetricInputKind, NanPolicy};
-fn err(e: impl ToString) -> PyErr {
-    PyValueError::new_err(e.to_string())
+use taflow_metrics::{metrics::ConditionalDrawdownAtRisk as State, MetricInputKind, NanPolicy};
+
+fn value_error(error: impl ToString) -> PyErr {
+    PyValueError::new_err(error.to_string())
 }
-fn kind(name: &str, capital: Option<f64>) -> PyResult<MetricInputKind> {
-    match (name, capital) {
+
+fn input_kind(name: &str, initial_equity: Option<f64>) -> PyResult<MetricInputKind> {
+    match (name, initial_equity) {
         ("returns", None) => Ok(MetricInputKind::Returns),
         ("log_returns", None) => Ok(MetricInputKind::LogReturns),
         ("equity", None) => Ok(MetricInputKind::Equity),
@@ -18,53 +20,61 @@ fn kind(name: &str, capital: Option<f64>) -> PyResult<MetricInputKind> {
             "initial_equity is accepted only for period-P&L input",
         )),
         _ => Err(PyValueError::new_err(
-            "unsupported ParametricExpectedShortfall input mode",
+            "unsupported ConditionalDrawdownAtRisk input mode",
         )),
     }
 }
-/// Native state backing `taflow.metrics.ParametricExpectedShortfall`.
+
+/// Native state backing `taflow.metrics.ConditionalDrawdownAtRisk`.
 #[pyclass(module = "taflow._native.metrics")]
-pub(crate) struct ParametricExpectedShortfall {
+pub(crate) struct ConditionalDrawdownAtRisk {
     inner: State,
 }
+
 #[pymethods]
-impl ParametricExpectedShortfall {
+impl ConditionalDrawdownAtRisk {
     #[new]
-    #[pyo3(signature=(input_mode,cutoff=0.05,initial_equity=None,nan_policy="omit"))]
+    #[pyo3(signature = (input_mode, confidence=0.95, initial_equity=None, nan_policy="omit"))]
     fn new(
         input_mode: &str,
-        cutoff: f64,
+        confidence: f64,
         initial_equity: Option<f64>,
         nan_policy: &str,
     ) -> PyResult<Self> {
         Ok(Self {
             inner: State::new(
-                kind(input_mode, initial_equity)?,
-                cutoff,
-                NanPolicy::try_from(nan_policy).map_err(err)?,
+                input_kind(input_mode, initial_equity)?,
+                confidence,
+                NanPolicy::try_from(nan_policy).map_err(value_error)?,
             )
-            .map_err(err)?,
+            .map_err(value_error)?,
         })
     }
+
     fn append(&mut self, value: f64) -> PyResult<Option<f64>> {
-        self.inner.append(value).map_err(err)
+        self.inner.append(value).map_err(value_error)
     }
+
     fn extend(&mut self, py: Python<'_>, values: PyReadonlyArray1<'_, f64>) -> PyResult<()> {
-        let v = values.as_slice()?;
-        py.allow_threads(|| self.inner.extend(v))
+        let values = values.as_slice()?;
+        py.allow_threads(|| self.inner.extend(values))
             .map(|_| ())
-            .map_err(err)
+            .map_err(value_error)
     }
+
     #[getter]
-    fn value(&self) -> Option<f64> {
+    fn value(&mut self) -> Option<f64> {
         self.inner.value()
     }
-    fn compute(&self) -> Option<f64> {
+
+    fn compute(&mut self) -> Option<f64> {
         self.inner.compute()
     }
+
     fn reset(&mut self) {
-        self.inner.reset()
+        self.inner.reset();
     }
+
     fn __len__(&self) -> usize {
         self.inner.len()
     }
