@@ -121,6 +121,8 @@ def oracle_kwargs(spec: MetricSpec, row: ParameterRow) -> dict[str, Any]:
         return {"rf": 0.0}
     if transform == "quantstats_return_quality":
         return {"prepare_returns": False}
+    if transform == "quantstats_exposure":
+        return {"prepare_returns": False}
     if transform == "active_return_standard_deviation":
         return {"ddof": 1}
     if transform in {"paired_returns", "paired_returns_optional_annualization"}:
@@ -143,6 +145,18 @@ def oracle_kwargs(spec: MetricSpec, row: ParameterRow) -> dict[str, Any]:
     if transform == "paired_treynor_crosscheck":
         return {"periods": annualization, "rf": 0.0}
     if transform == "quantstats_datetime_series":
+        return {}
+    if transform in {
+        "gaussian_value_at_risk",
+        "gaussian_expected_shortfall",
+        "performanceanalytics_modified_sharpe_source",
+        "performanceanalytics_conditional_drawdown_source",
+        "vectorbt_probabilistic_sharpe_source",
+        "vectorbt_deflated_sharpe_source",
+        "mean_absolute_weight_change",
+        "effective_number_of_bets",
+        "riskfolio_entropic_value_at_risk_source",
+    }:
         return {}
     raise ValueError(f"unsupported oracle transform {transform!r}")
 
@@ -177,7 +191,157 @@ def oracle_result(
     """Evaluate one normalized oracle value from already filtered inputs."""
     transform = spec.oracle.argument_transform
     public = row.as_kwargs()
-    if transform == "active_return_standard_deviation":
+    if transform == "effective_number_of_bets":
+        total = float(np.sum(primary))
+        if primary.size == 0 or total <= 0.0:
+            return None
+        probabilities = primary / total
+        positive = probabilities > 0.0
+        result = float(
+            np.exp(-oracle(probabilities[positive] * np.log(probabilities[positive])))
+        )
+    elif transform == "vectorbt_deflated_sharpe_source":
+        if primary.size < 4:
+            return None
+        from scipy.stats import kurtosis, skew
+
+        periods = float(public.get("periods_per_year", 252.0))
+        annual_rate = float(public.get("annual_risk_free_rate", 0.0))
+        trials = int(public["number_of_trials"])
+        annual_variance = float(public["annual_sharpe_ratio_variance"])
+        excess = primary - period_rate(annual_rate, periods)
+        deviation = float(np.std(excess, ddof=1))
+        if deviation == 0.0:
+            return None
+        estimated = float(np.mean(excess) / deviation)
+        gamma = float(np.euler_gamma)
+        expected_maximum = math.sqrt(annual_variance / periods) * (
+            (1.0 - gamma) * oracle.ppf(1.0 - 1.0 / trials)
+            + gamma * oracle.ppf(1.0 - 1.0 / (trials * math.e))
+        )
+        adjustment = 1.0 - float(skew(excess, bias=False)) * estimated + (
+            float(kurtosis(excess, fisher=False, bias=False)) - 1.0
+        ) * estimated * estimated / 4.0
+        if not math.isfinite(adjustment) or adjustment <= 0.0:
+            return None
+        result = float(oracle.cdf((estimated - expected_maximum) * math.sqrt(primary.size - 1.0) / math.sqrt(adjustment)))
+    elif transform == "riskfolio_entropic_value_at_risk_source":
+        if primary.size == 0:
+            return None
+        from scipy import special
+
+        cutoff = float(public.get("cutoff", 0.05))
+        losses = -primary
+        maximum_loss = float(np.max(losses))
+        if np.ptp(losses) == 0.0:
+            return maximum_loss
+        scale = max(float(np.ptp(losses)), np.finfo(np.float64).tiny)
+        objective = lambda log_z: float(np.exp(log_z) * (special.logsumexp(losses / np.exp(log_z)) - np.log(primary.size * cutoff)))
+        optimized = oracle(objective, bounds=(np.log(scale) - 40.0, np.log(scale) + 40.0), method="bounded", options={"xatol": 1e-13, "maxiter": 1000})
+        if not optimized.success:
+            raise RuntimeError("SciPy EVaR oracle failed to converge")
+        result = min(float(optimized.fun), maximum_loss)
+    elif transform == "mean_absolute_weight_change":
+        result = (
+            None
+            if primary.size < 2
+            else float(oracle(np.abs(np.diff(primary))))
+        )
+    elif transform == "vectorbt_probabilistic_sharpe_source":
+        if primary.size < 4:
+            return None
+        from scipy.stats import kurtosis, skew
+
+        periods = float(public.get("periods_per_year", 252.0))
+        annual_rate = float(public.get("annual_risk_free_rate", 0.0))
+        benchmark = float(public.get("annual_benchmark_sharpe_ratio", 0.0))
+        excess = primary - period_rate(annual_rate, periods)
+        deviation = float(np.std(excess, ddof=1))
+        if deviation == 0.0:
+            return None
+        estimated = float(np.mean(excess) / deviation)
+        sample_skewness = float(skew(excess, bias=False))
+        sample_kurtosis = float(kurtosis(excess, fisher=False, bias=False))
+        adjustment = (
+            1.0
+            - sample_skewness * estimated
+            + (sample_kurtosis - 1.0) * estimated * estimated / 4.0
+        )
+        if not math.isfinite(adjustment) or adjustment <= 0.0:
+            return None
+        statistic = (
+            (estimated - benchmark / math.sqrt(periods))
+            * math.sqrt(primary.size - 1.0)
+            / math.sqrt(adjustment)
+        )
+        result = float(oracle.cdf(statistic))
+    elif transform == "gaussian_value_at_risk":
+        if primary.size < 2:
+            return None
+        cutoff = float(public.get("cutoff", 0.05))
+        result = float(
+            np.mean(primary)
+            + oracle.ppf(cutoff) * np.std(primary, ddof=1)
+        )
+    elif transform == "gaussian_expected_shortfall":
+        if primary.size < 2:
+            return None
+        cutoff = float(public.get("cutoff", 0.05))
+        quantile = oracle.ppf(cutoff)
+        result = float(
+            np.mean(primary)
+            - np.std(primary, ddof=1) * oracle.pdf(quantile) / cutoff
+        )
+    elif transform == "performanceanalytics_modified_sharpe_source":
+        if primary.size < 2:
+            return None
+        periods = float(public.get("periods_per_year", 252.0))
+        annual_rate = float(public.get("annual_risk_free_rate", 0.0))
+        excess = primary - period_rate(annual_rate, periods)
+        mean = float(np.mean(excess))
+        centered = excess - mean
+        variance = float(np.mean(centered * centered))
+        if abs(variance) <= math.sqrt(np.finfo(np.float64).eps):
+            skewness = 0.0
+            excess_kurtosis = 0.0
+        else:
+            skewness = float(np.mean(centered**3) / variance**1.5)
+            excess_kurtosis = float(np.mean(centered**4) / variance**2 - 3.0)
+        confidence = float(public.get("confidence_level", 0.95))
+        z = float(oracle.ppf(1.0 - confidence))
+        adjusted = (
+            z
+            + (z * z - 1.0) * skewness / 6.0
+            + (z**3 - 3.0 * z) * excess_kurtosis / 24.0
+            - (2.0 * z**3 - 5.0 * z) * skewness * skewness / 36.0
+        )
+        modified_risk = -mean - adjusted * math.sqrt(variance)
+        if not math.isfinite(modified_risk) or modified_risk <= 0.0:
+            return None
+        result = mean / min(modified_risk, 1.0)
+    elif transform == "performanceanalytics_conditional_drawdown_source":
+        if primary.size == 0:
+            return None
+        wealth = np.cumprod(1.0 + primary)
+        peaks = np.maximum.accumulate(np.r_[1.0, wealth])[1:]
+        drawdowns = wealth / peaks - 1.0
+        episodes: list[float] = []
+        prior_negative = bool(drawdowns[0] < 0.0)
+        trough = float(drawdowns[0])
+        for drawdown in drawdowns[1:]:
+            negative = bool(drawdown < 0.0)
+            if negative == prior_negative:
+                trough = min(trough, float(drawdown))
+            else:
+                episodes.append(trough)
+                prior_negative = negative
+                trough = float(drawdown)
+        episodes.append(trough)
+        confidence = float(public.get("confidence", 0.95))
+        boundary = float(oracle(episodes, 1.0 - confidence, method="linear"))
+        tail = np.asarray(episodes)[np.asarray(episodes) <= boundary]
+        result = -float(np.mean(tail))
+    elif transform == "active_return_standard_deviation":
         if benchmark is None:
             raise ValueError("active-return oracle requires benchmark values")
         result = normalized(oracle(primary - benchmark, **oracle_kwargs(spec, row)))
@@ -284,6 +448,7 @@ def oracle_result(
         "quantstats_ulcer_performance_index",
         "quantstats_return_quality",
         "quantstats_returns_without_preparation",
+        "quantstats_exposure",
     }:
         import pandas as pd
 
@@ -295,7 +460,9 @@ def oracle_result(
             **oracle_kwargs(spec, row),
         )
         oracle_scalar = float(np.asarray(oracle_value).reshape(-1)[0])
-        if spec.class_name in {"WinRate", "ProfitFactor"} and np.count_nonzero(primary) == 0:
+        if spec.class_name == "Exposure" and primary.size == 0:
+            result = None
+        elif spec.class_name in {"WinRate", "ProfitFactor"} and np.count_nonzero(primary) == 0:
             result = None
         elif spec.class_name == "ProfitFactor" and math.isinf(oracle_scalar):
             result = oracle_scalar
@@ -413,11 +580,7 @@ def _actual(
     spec: MetricSpec, values: np.ndarray, kwargs: dict[str, Any]
 ) -> tuple[object, float | None]:
     cls = spec.load_class()
-    factory = (
-        getattr(cls, "from_returns", None)
-        or getattr(cls, "from_pnl", None)
-        or getattr(cls, "from_trades")
-    )
+    factory = getattr(cls, spec.factories[0])
     state = factory(values, **kwargs)
     return state, state.compute()
 
@@ -437,11 +600,7 @@ def _lifecycle(
     spec: MetricSpec, values: np.ndarray, kwargs: dict[str, Any], batch: float | None
 ) -> dict[str, bool]:
     cls = spec.load_class()
-    factory = (
-        getattr(cls, "from_returns", None)
-        or getattr(cls, "from_pnl", None)
-        or getattr(cls, "from_trades")
-    )
+    factory = getattr(cls, spec.factories[0])
     scalar = factory([], **kwargs)
     for value in values:
         if not np.isnan(value):
@@ -513,6 +672,8 @@ def verify_metric(spec: MetricSpec) -> dict[str, Any]:
                 valid_count = int(np.count_nonzero(valid))
             else:
                 values = dataset
+                if spec.class_name == "EffectiveNumberOfBets":
+                    values = np.abs(values)
                 valid_count = int(np.count_nonzero(~np.isnan(values)))
             if valid_count < spec.minimum_observations:
                 continue
@@ -564,8 +725,10 @@ def verify_metric(spec: MetricSpec) -> dict[str, Any]:
             "distribution": spec.oracle.distribution,
             "version": spec.oracle.version,
             "function": spec.oracle.function,
+            "source_function": spec.oracle.source_function_name,
             "source": spec.oracle.source_url,
         },
+        "variant_reason": spec.variant_reason,
         "max_absolute_error": max_absolute,
         "max_relative_error": max_relative,
         "passed": bool(cases) and all(case["passed"] for case in cases),
@@ -601,16 +764,22 @@ def write_results(results: list[dict[str, Any]]) -> None:
         "",
         "Every TAFlow value below came from the public canonical class factory and `compute()`.",
         "",
-        "| Metric | Oracle | Result | Maximum absolute error | Maximum relative error |",
-        "|---|---|---:|---:|---:|",
+        "| Metric | Oracle package | Oracle source function | Result | Maximum absolute error | Maximum relative error |",
+        "|---|---|---|---:|---:|---:|",
     ]
     for result in results:
         oracle = result["oracle"]
         lines.append(
-            f"| `{result['class']}` | {oracle['distribution']} {oracle['version']} "
-            f"`{oracle['function']}` | **{result['verdict']}** | "
+            f"| `{result['class']}` | {oracle['distribution']} {oracle['version']} | "
+            f"[`{oracle['source_function']}`]({oracle['source']}) | "
+            f"**{result['verdict']}** | "
             f"{result['max_absolute_error']:.3e} | {result['max_relative_error']:.3e} |"
         )
+    variants = [result for result in results if result["verdict"] == "VARIANT"]
+    if variants:
+        lines.extend(["", "## Definition variants", ""])
+        for result in variants:
+            lines.append(f"- `{result['class']}`: {result['variant_reason']}")
     lines.extend(
         [
             "",

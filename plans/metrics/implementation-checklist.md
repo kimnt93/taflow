@@ -13,20 +13,20 @@ stable.
 
 ## Before editing a metric
 
-- [ ] Resolve the full descriptive canonical class name. Reject abbreviations.
-- [ ] Search every possible existing name/alias in Rust, Python, tests, plans,
+- [x] Resolve the full descriptive canonical class name. Reject abbreviations.
+- [x] Search every possible existing name/alias in Rust, Python, tests, plans,
       verification, and docs.
-- [ ] Confirm it is a whole-history scalar metric rather than an existing
+- [x] Confirm it is a whole-history scalar metric rather than an existing
       aligned rolling indicator.
-- [ ] Read the pinned oracle source for the exact function and version.
-- [ ] Write the formula, input domains, annualization/rate convention,
+- [x] Read the pinned oracle source for the exact function and version.
+- [x] Write the formula, input domains, annualization/rate convention,
       estimator/ddof, sign, minimum sample, NaN policy, and edge results in the
       registry entry before production code.
-- [ ] Mark an unavoidable oracle definition difference `VARIANT` before
+- [x] Mark an unavoidable oracle definition difference `VARIANT` before
       implementation; do not discover semantics by tuning until arrays match.
-- [ ] Identify reusable primitive state without moving the public formula into
+- [x] Identify reusable primitive state without moving the public formula into
       a shared helper.
-- [ ] Inspect the working tree and preserve unrelated user changes.
+- [x] Inspect the working tree and preserve unrelated user changes.
 
 Example scan for Sharpe:
 
@@ -39,62 +39,62 @@ rg --files crates/taflow-metrics crates/taflow-python/src/metrics \
 
 ## File and class work
 
-- [ ] Add exactly one core production file
+- [x] Add exactly one core production file
       `crates/taflow-metrics/src/metrics/<canonical_name>.rs`.
-- [ ] Add exactly one separate core test file with `_test.rs`.
-- [ ] Add exactly one PyO3 binding file under
+- [x] Add exactly one separate core test file with `_test.rs`.
+- [x] Add exactly one PyO3 binding file under
       `crates/taflow-python/src/metrics/`.
-- [ ] Add exactly one Python adapter file under `python/taflow/metrics/`.
-- [ ] Add exactly one Python test file under `tests/metrics/`.
-- [ ] Update Rust/Python module declarations and re-exports only.
-- [ ] Register the native class only under `taflow._native.metrics`.
-- [ ] Export the public class from `taflow.metrics`; do not top-level-export it.
-- [ ] Add one metrics registry record with pinned oracle metadata.
-- [ ] Keep production files free of inline tests and package initializers free
+- [x] Add exactly one Python adapter file under `python/taflow/metrics/`.
+- [x] Add exactly one Python test file under `tests/metrics/`.
+- [x] Update Rust/Python module declarations and re-exports only.
+- [x] Register the native class only under `taflow._native.metrics`.
+- [x] Export the public class from `taflow.metrics`; do not top-level-export it.
+- [x] Add one metrics registry record with pinned oracle metadata.
+- [x] Keep production files free of inline tests and package initializers free
       of logic.
 
 ## Core lifecycle
 
-- [ ] `new(...) -> TaResult<Self>` validates every configuration value.
-- [ ] Associated `from_*` constructors or a validated input-mode constructor
+- [x] `new(...) -> TaResult<Self>` validates every configuration value.
+- [x] Associated `from_*` constructors or a validated input-mode constructor
       select one native semantic domain without duplicating the metric formula.
-- [ ] `append(...)` accepts one observation in the selected domain.
-- [ ] `extend_slices_into`/equivalent bulk method uses the same state and checks
+- [x] `append(...)` accepts one observation in the selected domain.
+- [x] `extend_slices_into`/equivalent bulk method uses the same state and checks
       paired lengths before mutation.
-- [ ] `value(&self)` returns the current `Option<f64>` or named value.
-- [ ] `compute(&mut/self)` does not replay processed inputs; exact tail metrics
+- [x] `value(&self)` returns the current `Option<f64>` or named value.
+- [x] `compute(&mut/self)` does not replay processed inputs; exact tail metrics
       may refresh a dirty cache.
-- [ ] `reset(&mut self)` preserves allocation and input configuration.
-- [ ] `len()` reports valid derived metric observations from native state.
-- [ ] Fixed-statistic append performs no allocation after construction.
-- [ ] P&L/equity conversion happens in Rust and supports correct continuation.
-- [ ] Batch, chunks, and scalar replay leave identical post-run state/results.
+- [x] `reset(&mut self)` preserves allocation and input configuration.
+- [x] `len()` reports valid derived metric observations from native state.
+- [x] Fixed-statistic append performs no allocation after construction.
+- [x] P&L/equity conversion happens in Rust and supports correct continuation.
+- [x] Batch, chunks, and scalar replay leave identical post-run state/results.
 
 ## Python adapter
 
-- [ ] Normalize each supported container exactly once with shared adapters.
-- [ ] Do not calculate returns, P&L conversion, annualization, missing-value
+- [x] Normalize each supported container exactly once with shared adapters.
+- [x] Do not calculate returns, P&L conversion, annualization, missing-value
       repair, or metric arithmetic in Python.
-- [ ] Release the GIL for native bulk work.
-- [ ] `append`, `extend`, and `reset` return the quoted concrete class type.
-- [ ] `value` and `compute` have `float | None` or explicit named-value types.
-- [ ] `__len__` delegates to native state.
-- [ ] Every accepted factory is documented, including later append semantics.
-- [ ] The docstring names the oracle/function/version and every semantic choice.
-- [ ] Unsupported domains do not appear as factories.
+- [x] Release the GIL for native bulk work.
+- [x] `append`, `extend`, and `reset` return the quoted concrete class type.
+- [x] `value` and `compute` have `float | None` or explicit named-value types.
+- [x] `__len__` delegates to native state.
+- [x] Every accepted factory is documented, including later append semantics.
+- [x] The docstring names the oracle/function/version and every semantic choice.
+- [x] Unsupported domains do not appear as factories.
 
 ## Correctness gates
 
-- [ ] Rust edge/lifecycle test passes.
-- [ ] Python adapter/lifecycle test passes.
-- [ ] Deterministic dataset matrix passes through public class API.
-- [ ] Parameter matrix passes against the independent oracle.
-- [ ] Return/equity/P&L/log-return equivalence passes when supported.
-- [ ] Scalar, chunked, warmed continuation, and reset/replay are invariant.
-- [ ] NaN and infinity behavior matches the contract.
-- [ ] The registry row says `MATCH` only for numerical parity; otherwise it
+- [x] Rust edge/lifecycle test passes.
+- [x] Python adapter/lifecycle test passes.
+- [x] Deterministic dataset matrix passes through public class API.
+- [x] Parameter matrix passes against the independent oracle.
+- [x] Return/equity/P&L/log-return equivalence passes when supported.
+- [x] Scalar, chunked, warmed continuation, and reset/replay are invariant.
+- [x] NaN and infinity behavior matches the contract.
+- [x] The registry row says `MATCH` only for numerical parity; otherwise it
       says `VARIANT` with the exact reason.
-- [ ] Interface audit passes.
+- [x] Interface audit passes.
 
 ## Performance preparation (do not execute without authorization)
 

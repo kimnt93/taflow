@@ -38,6 +38,12 @@ class OracleSpec:
     source_url: str
     argument_transform: str
     output_normalization: str = "none_to_nan"
+    source_function: str | None = None
+
+    @property
+    def source_function_name(self) -> str:
+        """Return the exact external source symbol used for comparison."""
+        return self.source_function or f"{self.import_name}.{self.function}"
 
 
 @dataclass(frozen=True)
@@ -100,6 +106,7 @@ def _empyrical(function: str, transform: str) -> OracleSpec:
         function=function,
         source_url=EMPYRICAL_SOURCE,
         argument_transform=transform,
+        source_function=f"empyrical.stats.{function}",
     )
 
 
@@ -113,6 +120,7 @@ def _quantstats(function: str, transform: str) -> OracleSpec:
             "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py"
         ),
         argument_transform=transform,
+        source_function=f"quantstats.stats.{function}",
     )
 
 
@@ -124,6 +132,51 @@ def _numpy(function: str, transform: str) -> OracleSpec:
         function=function,
         source_url="https://github.com/numpy/numpy/blob/v2.4.6/numpy/_core/fromnumeric.py",
         argument_transform=transform,
+        source_function=f"numpy.{function}",
+    )
+
+
+def _scipy_normal(transform: str) -> OracleSpec:
+    vectorbt_source = (
+        "https://github.com/polakowo/vectorbt/blob/"
+        "993ceca7116fc8e55f4cd3a36fe43d83dab62b27/vectorbt/returns/metrics.py"
+    )
+    performanceanalytics_source = (
+        "https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/"
+        "PerformanceAnalytics_2.1.0.tar.gz"
+    )
+    scipy_source = (
+        "https://github.com/scipy/scipy/blob/v1.18.0/scipy/stats/"
+        "_continuous_distns.py"
+    )
+    source_functions = {
+        "gaussian_value_at_risk": "scipy.stats.norm.ppf + numpy.std",
+        "gaussian_expected_shortfall": "scipy.stats.norm.ppf/pdf + numpy.std",
+        "performanceanalytics_modified_sharpe_source": (
+            "PerformanceAnalytics::SharpeRatio.modified(FUN='VaR')"
+        ),
+        "vectorbt_probabilistic_sharpe_source": (
+            "vectorbt probabilistic Sharpe kernel + scipy.stats.norm.cdf"
+        ),
+        "vectorbt_deflated_sharpe_source": (
+            "vectorbt deflated Sharpe kernel + scipy.stats.norm.ppf/cdf"
+        ),
+    }
+    source_urls = {
+        "gaussian_value_at_risk": scipy_source,
+        "gaussian_expected_shortfall": scipy_source,
+        "performanceanalytics_modified_sharpe_source": performanceanalytics_source,
+        "vectorbt_probabilistic_sharpe_source": vectorbt_source,
+        "vectorbt_deflated_sharpe_source": vectorbt_source,
+    }
+    return OracleSpec(
+        distribution="scipy",
+        version="1.18.0",
+        import_name="scipy.stats",
+        function="norm",
+        source_url=source_urls[transform],
+        argument_transform=transform,
+        source_function=source_functions[transform],
     )
 
 
@@ -558,13 +611,9 @@ METRICS: tuple[MetricSpec, ...] = (
                 "PerformanceAnalytics_2.1.0.tar.gz"
             ),
             argument_transform="performanceanalytics_pain_index_source",
+            source_function="PerformanceAnalytics::PainIndex",
         ),
         GROWTH,
-        expected="VARIANT",
-        variant_reason=(
-            "PerformanceAnalytics 2.1.0 source is pinned and translated for the "
-            "executable comparison because R is unavailable in the test environment."
-        ),
     ),
     MetricSpec(
         "PainRatio",
@@ -580,11 +629,10 @@ METRICS: tuple[MetricSpec, ...] = (
             distribution="numpy", version="2.4.6", import_name="numpy", function="mean",
             source_url="https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz",
             argument_transform="performanceanalytics_pain_ratio_source",
+            source_function="PerformanceAnalytics::PainRatio",
         ),
         RATIO,
         ANNUAL_ROWS,
-        expected="VARIANT",
-        variant_reason="PerformanceAnalytics 2.1.0 source translation is used because R is unavailable.",
         benchmark_eligible=False,
     ),
     MetricSpec(
@@ -594,8 +642,8 @@ METRICS: tuple[MetricSpec, ...] = (
         "drawdown path quality",
         ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
         "float | None", 1, "mean trough magnitude across drawdown episodes", "empty is None; no drawdown is zero",
-        OracleSpec(distribution="numpy", version="2.4.6", import_name="numpy", function="mean", source_url="https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz", argument_transform="performanceanalytics_average_drawdown_source"),
-        GROWTH, expected="VARIANT", variant_reason="PerformanceAnalytics 2.1.0 source translation is used because R is unavailable.", benchmark_eligible=False,
+        OracleSpec(distribution="numpy", version="2.4.6", import_name="numpy", function="mean", source_url="https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz", argument_transform="performanceanalytics_average_drawdown_source", source_function="PerformanceAnalytics::AverageDrawdown"),
+        GROWTH, benchmark_eligible=False,
     ),
     MetricSpec(
         "MaximumDrawdownDuration",
@@ -604,8 +652,8 @@ METRICS: tuple[MetricSpec, ...] = (
         "drawdown path quality",
         ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
         "int | None", 1, "maximum negative drawdown episode length including boundary", "no drawdown is None",
-        OracleSpec(distribution="numpy", version="2.4.6", import_name="numpy", function="max", source_url="https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz", argument_transform="performanceanalytics_maximum_drawdown_duration_source"),
-        GROWTH, expected="VARIANT", variant_reason="PerformanceAnalytics 2.1.0 findDrawdowns source translation is used because R is unavailable.", benchmark_eligible=False,
+        OracleSpec(distribution="numpy", version="2.4.6", import_name="numpy", function="max", source_url="https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz", argument_transform="performanceanalytics_maximum_drawdown_duration_source", source_function="PerformanceAnalytics::findDrawdowns"),
+        GROWTH, benchmark_eligible=False,
     ),
     MetricSpec(
         "StabilityOfTimeSeries",
@@ -718,8 +766,13 @@ METRICS: tuple[MetricSpec, ...] = (
         "SystemQualityNumber", "system_quality_number", "P4", "period and trade quality",
         ("from_trades",), "float | None", 2,
         "square root of trade count times mean trade P&L divided by sample deviation", "fewer than two or zero deviation is None",
-        _numpy("mean", "system_quality_number"), RATIO,
-        expected="VARIANT", variant_reason="Executable NumPy cross-check follows pinned vectorbt 0.28.1 Trades.sqn source because vectorbt is unavailable.", benchmark_eligible=False,
+        OracleSpec(
+            distribution="numpy", version="2.4.6", import_name="numpy",
+            function="mean",
+            source_url="https://github.com/polakowo/vectorbt/blob/v0.28.1/vectorbt/portfolio/trades.py",
+            argument_transform="system_quality_number",
+            source_function="vectorbt.Trades.sqn",
+        ), RATIO, benchmark_eligible=False,
     ),
     MetricSpec(
         "CommonSenseRatio", "common_sense_ratio", "P4", "period and trade quality",
@@ -744,6 +797,141 @@ METRICS: tuple[MetricSpec, ...] = (
             "derived from the formula, not a claimed historical expansion of "
             "the QuantStats cpc_index alias."
         ),
+    ),
+    MetricSpec(
+        "ModifiedSharpeRatio", "modified_sharpe_ratio", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
+        "float | None", 2,
+        "mean period excess return divided by Cornish-Fisher modified value at risk",
+        "fewer than two observations or zero/inverse modified risk is None",
+        _scipy_normal("performanceanalytics_modified_sharpe_source"),
+        Tolerance(relative=2e-8, absolute=2e-10),
+        (
+            ParameterRow("default"),
+            ParameterRow("confidence=0.975", (("confidence_level", 0.975),)),
+            ParameterRow("risk_free=0.03", (("annual_risk_free_rate", 0.03),)),
+        ),
+    ),
+    MetricSpec(
+        "ProbabilisticSharpeRatio", "probabilistic_sharpe_ratio", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
+        "float | None", 4,
+        "normal CDF probability that sample Sharpe exceeds a benchmark after skewness and kurtosis adjustment",
+        "fewer than four observations, zero deviation, or invalid adjustment is None",
+        _scipy_normal("vectorbt_probabilistic_sharpe_source"),
+        Tolerance(relative=2e-11, absolute=2e-13),
+        (
+            ParameterRow("default"),
+            ParameterRow("benchmark=0.5", (("annual_benchmark_sharpe_ratio", 0.5),)),
+            ParameterRow("risk_free=0.03", (("annual_risk_free_rate", 0.03),)),
+        ),
+    ),
+    MetricSpec(
+        "DeflatedSharpeRatio", "deflated_sharpe_ratio", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
+        "float | None", 4,
+        "probability that observed Sharpe exceeds the expected maximum across multiple trials",
+        "fewer than four observations, zero deviation, or invalid adjustment is None",
+        _scipy_normal("vectorbt_deflated_sharpe_source"),
+        Tolerance(relative=2e-6, absolute=2e-7),
+        (
+            ParameterRow("trials=2", (("number_of_trials", 2), ("annual_sharpe_ratio_variance", 0.1))),
+            ParameterRow("trials=20", (("number_of_trials", 20), ("annual_sharpe_ratio_variance", 0.64))),
+            ParameterRow("trials=100", (("number_of_trials", 100), ("annual_sharpe_ratio_variance", 1.4))),
+        ),
+    ),
+    MetricSpec(
+        "ParametricValueAtRisk", "parametric_value_at_risk", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
+        "float | None", 2,
+        "sample mean plus the Gaussian lower-tail quantile times sample deviation",
+        "fewer than two observations is None; constant input equals its mean",
+        _scipy_normal("gaussian_value_at_risk"),
+        Tolerance(relative=2e-9, absolute=2e-11),
+        tuple(ParameterRow(f"cutoff={cutoff:g}", (("cutoff", cutoff),)) for cutoff in (0.01, 0.05, 0.10, 0.25)),
+    ),
+    MetricSpec(
+        "ParametricExpectedShortfall", "parametric_expected_shortfall", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
+        "float | None", 2,
+        "sample mean minus sample deviation times normal density at the cutoff quantile divided by cutoff",
+        "fewer than two observations is None; constant input equals its mean",
+        _scipy_normal("gaussian_expected_shortfall"),
+        Tolerance(relative=2e-8, absolute=2e-10),
+        tuple(ParameterRow(f"cutoff={cutoff:g}", (("cutoff", cutoff),)) for cutoff in (0.01, 0.05, 0.10, 0.25)),
+    ),
+    MetricSpec(
+        "ConditionalDrawdownAtRisk", "conditional_drawdown_at_risk", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
+        "float | None", 1,
+        "positive expected shortfall of discrete drawdown-episode troughs",
+        "empty is None; a path without loss is zero",
+        OracleSpec(
+            distribution="numpy", version="2.4.6", import_name="numpy",
+            function="quantile",
+            source_url="https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz",
+            argument_transform="performanceanalytics_conditional_drawdown_source",
+            source_function="PerformanceAnalytics::CDD(method='discrete')",
+        ),
+        GROWTH,
+        tuple(ParameterRow(f"confidence={confidence:g}", (("confidence", confidence),)) for confidence in (0.5, 0.75, 0.90, 0.95, 0.99)),
+    ),
+    MetricSpec(
+        "EntropicValueAtRisk", "entropic_value_at_risk", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_returns", "from_equity", "from_pnl", "from_log_returns"),
+        "float | None", 1,
+        "infimum over positive z of z times log mean exponential loss plus log inverse cutoff",
+        "empty is None; a singleton equals its loss",
+        OracleSpec(
+            distribution="scipy", version="1.18.0", import_name="scipy.optimize",
+            function="minimize_scalar",
+            source_url="https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/riskfolio/src/RiskFunctions.py",
+            argument_transform="riskfolio_entropic_value_at_risk_source",
+            source_function="riskfolio.RiskFunctions.EVaR_Hist",
+        ),
+        Tolerance(relative=2e-10, absolute=2e-12),
+        tuple(ParameterRow(f"cutoff={cutoff:g}", (("cutoff", cutoff),)) for cutoff in (0.025, 0.05, 0.10, 0.20)),
+    ),
+    MetricSpec(
+        "Exposure", "exposure", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_positions", "from_returns"), "float | None", 1,
+        "ceiling to one percentage point of the nonzero usable-period fraction",
+        "empty is None; all-flat is zero",
+        _quantstats("exposure", "quantstats_exposure"),
+        GROWTH,
+    ),
+    MetricSpec(
+        "EffectiveNumberOfBets", "effective_number_of_bets", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_risk_contributions", "from_weights_and_covariance"),
+        "float | None", 1,
+        "exponential Shannon entropy of normalized independent risk contributions",
+        "empty or zero total risk contribution is None",
+        OracleSpec(
+            distribution="numpy", version="2.4.6", import_name="numpy",
+            function="sum",
+            source_url="https://github.com/numpy/numpy/blob/v2.4.6/numpy/linalg/_linalg.py",
+            argument_transform="effective_number_of_bets",
+            source_function="numpy.linalg.eigh + numpy.sum",
+        ),
+        Tolerance(relative=2e-10, absolute=2e-12),
+    ),
+    MetricSpec(
+        "Turnover", "turnover", "P5",
+        "advanced risk and portfolio diagnostics",
+        ("from_weights",), "float | None", 2,
+        "mean absolute change between consecutive risky-asset portfolio weights",
+        "fewer than two valid weights is None",
+        _numpy("mean", "mean_absolute_weight_change"),
+        GROWTH,
     ),
 )
 

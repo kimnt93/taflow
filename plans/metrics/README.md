@@ -4,15 +4,15 @@ Research date: 2026-08-11.
 
 ## Core release status
 
-Implemented and verified on 2026-08-11: all 47 P1-P4 metrics in the catalog,
+Implemented and verified through 2026-08-12: all 57 P1-P5 metrics in the catalog,
 the separate Rust/native/Python package architecture, semantic factories,
 correctness and interface registries, and the authorized performance suite.
 See [metrics correctness](../../verify/metrics/CORRECTNESS.md) and
 [metrics benchmark](../../verify/metrics/BENCHMARK.md) for generated evidence.
 
-P5 remains an explicitly opt-in research phase. Its estimators require new
-statistical contracts or portfolio/position inputs and are not part of this
-one-series core release.
+P5 advanced estimators and explicit portfolio/position inputs are complete.
+The registry records definition variants and specialized domains rather than
+silently treating them as ordinary one-series return metrics.
 
 ## Decision
 
@@ -39,6 +39,12 @@ from_pnl = SharpeRatio.from_pnl(
     initial_equity=100_000.0,
     periods_per_year=252.0,
 )
+
+# Fresh O(1) streaming state for daily returns. The empty semantic factory is
+# the explicit "create" operation; later values keep that selected meaning.
+live_sharpe = SharpeRatio.from_returns([], periods_per_year=252.0)
+live_sharpe.append(today_return)
+current_value = live_sharpe.compute()
 ```
 
 This is preferable to `SharpeRatio(series, series_type=...)`. A named factory

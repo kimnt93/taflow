@@ -109,20 +109,20 @@ or closed trade. Do not annualize closed-trade statistics.
 Do not implement a class named `CpcIndex` until the abbreviation is resolved
 to a complete descriptive canonical name, per repository naming rules.
 
-## P5: advanced estimators, opt-in after the core release
+## P5: advanced estimators and explicit portfolio-state inputs
 
-| Done | Proposed class | Candidate oracle/specification | Reason for deferral |
+| Done | Canonical class | Oracle/specification | Frozen contract |
 |:---:|---|---|---|
-| [ ] | `ProbabilisticSharpeRatio` | vectorbt returns metrics; Bailey and López de Prado | Requires skew, kurtosis, benchmark Sharpe, and a frozen small-sample formula. |
-| [ ] | `DeflatedSharpeRatio` | vectorbt `deflated_sharpe_ratio`; Bailey and López de Prado | Requires number of trials and variance across tested Sharpe ratios; not a single-stream default. |
-| [ ] | `ModifiedSharpeRatio` | PerformanceAnalytics `SharpeRatio.modified` | Requires a declared Cornish-Fisher estimator. |
-| [ ] | `ParametricValueAtRisk` | PerformanceAnalytics/Riskfolio-Lib | Must name Gaussian vs Student-t and positive-loss vs signed-return convention. |
-| [ ] | `ParametricExpectedShortfall` | PerformanceAnalytics/Riskfolio-Lib | Same distribution and sign decisions as parametric VaR. |
-| [ ] | `ConditionalDrawdownAtRisk` | PerformanceAnalytics/Riskfolio-Lib | Exact drawdown-episode estimator and confidence convention required. |
-| [ ] | `EntropicValueAtRisk` | Riskfolio-Lib | Numerical optimization and convergence contract required. |
-| [ ] | `EffectiveNumberOfBets` | Riskfolio-Lib or a pinned paper implementation | Requires portfolio weights/covariance, outside the first one-series API. |
-| [ ] | `Turnover` | vectorbt portfolio records | Requires weights/positions and timestamp semantics. |
-| [ ] | `Exposure` | QuantStats/vectorbt | Requires position state, not return inference. |
+| [x] | `ProbabilisticSharpeRatio` | vectorbt 0.28.5; Bailey and López de Prado | Bias-corrected skew/Pearson kurtosis, explicit annual benchmark Sharpe, minimum four. |
+| [x] | `DeflatedSharpeRatio` | vectorbt 0.28.5; Bailey and López de Prado | Explicit trial count and across-trial annual Sharpe variance; no one-stream inference. |
+| [x] | `ModifiedSharpeRatio` | PerformanceAnalytics 2.1.0 | Population moments and Cornish-Fisher modified VaR, signed period ratio. |
+| [x] | `ParametricValueAtRisk` | SciPy Gaussian distribution | Signed lower-return quantile from sample mean and sample deviation. |
+| [x] | `ParametricExpectedShortfall` | SciPy Gaussian distribution | Signed lower-tail Gaussian mean from sample moments. |
+| [x] | `ConditionalDrawdownAtRisk` | PerformanceAnalytics 2.1.0 | Discrete drawdown episodes, R type-7 boundary, positive loss magnitude. |
+| [x] | `EntropicValueAtRisk` | Riskfolio-Lib pinned source; SciPy optimizer oracle | Positive-loss empirical EVaR; deterministic native solver and lazy cache. |
+| [x] | `EffectiveNumberOfBets` | Meucci PCA distribution; NumPy `eigh` | Explicit weights/covariance or independent contributions; exponential entropy. |
+| [x] | `Turnover` | NumPy | Mean absolute transition in chronological single-risky-asset weights; implicit cash. |
+| [x] | `Exposure` | QuantStats 0.0.81 | Explicit positions preferred; return proxy labeled; oracle percentage-point ceiling retained. |
 
 ## Explicitly out of scope for this package phase
 

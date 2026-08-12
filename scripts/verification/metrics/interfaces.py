@@ -73,7 +73,12 @@ def audit(spec: MetricSpec) -> list[str]:
         failures.append(f"{factory_name} must require its series")
     try:
         empty = np.array([], dtype=np.float64)
-        state = factory(empty, empty) if spec.paired else factory(empty)
+        factory_kwargs = spec.parameter_rows[0].as_kwargs()
+        state = (
+            factory(empty, empty, **factory_kwargs)
+            if spec.paired
+            else factory(empty, **factory_kwargs)
+        )
     except Exception as error:  # noqa: BLE001 - audit reports public failures.
         failures.append(f"empty {factory_name} construction failed: {error}")
         return failures
@@ -88,13 +93,22 @@ def audit(spec: MetricSpec) -> list[str]:
         failures.append("empty state length is not zero")
     if state.compute() is not None or state.value is not None:
         failures.append("empty state does not expose None")
-    append_result = state.append(0.01, 0.005) if spec.paired else state.append(0.01)
+    append_value = 0.01
+    append_result = (
+        state.append(append_value, 0.005)
+        if spec.paired
+        else state.append(append_value)
+    )
     if append_result is not state:
         failures.append("append is not fluent")
     extend_result = (
         state.extend(np.array([-0.02, 0.015]), np.array([-0.01, 0.005]))
         if spec.paired
-        else state.extend(np.array([-0.02, 0.015]))
+        else state.extend(
+            np.array([0.02, 0.015])
+            if spec.class_name == "EffectiveNumberOfBets"
+            else np.array([-0.02, 0.015])
+        )
     )
     if extend_result is not state:
         failures.append("extend is not fluent")

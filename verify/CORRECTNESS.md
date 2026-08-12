@@ -1,6 +1,6 @@
 # TAFlow correctness verification
 
-Date: 2026-08-11 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
+Date: 2026-08-12 | bars: 10,000 | warm-up split: 9,000 extend + 1,000 append | tolerance rtol=1e-08, atol=1e-10
 Environment: python 3.12.3, numpy 2.4.6, TA-Lib 0.7.1, Wickra 0.9.9, pandas-ta-classic 0.6.52, SMC 0.0.27, TAFlow 0.1.2
 
 Summary: MATCH: 393

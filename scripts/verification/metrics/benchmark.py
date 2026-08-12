@@ -173,6 +173,8 @@ def benchmark_metric(
     execution_profiles = None
     for size in sizes:
         values = np.ascontiguousarray(rng.normal(0.0004, 0.012, size), dtype=np.float64)
+        if spec.class_name == "EffectiveNumberOfBets":
+            values = np.abs(values)
         if spec.paired:
             benchmark_values = np.ascontiguousarray(
                 values * 0.35 + rng.normal(0.0, 0.008, size), dtype=np.float64
@@ -190,11 +192,7 @@ def benchmark_metric(
                 repeats,
             )
         else:
-            factory = (
-                getattr(cls, "from_returns", None)
-                or getattr(cls, "from_pnl", None)
-                or getattr(cls, "from_trades")
-            )
+            factory = getattr(cls, spec.factories[0])
             taflow = timed(
                 lambda input_values=values, public_factory=factory: public_factory(
                     input_values, **public_kwargs
@@ -227,7 +225,9 @@ def benchmark_metric(
         "oracle_distribution": spec.oracle.distribution,
         "oracle_version": spec.oracle.version,
         "oracle_function": spec.oracle.function,
-        "correctness_gate": "MATCH",
+        "oracle_source_function": spec.oracle.source_function_name,
+        "oracle_source": spec.oracle.source_url,
+        "correctness_gate": correctness["verdict"],
         "rows": rows,
         "execution_profiles": execution_profiles,
     }
@@ -259,15 +259,17 @@ def write_results(results: list[dict[str, object]]) -> None:
         "",
         f"Generated: {datetime.now(UTC).date().isoformat()}",
         "",
-        "Public end-to-end semantic-factory `compute()` timings; every row passed the external correctness gate first.",
+        f"Public end-to-end semantic-factory `compute()` timings for {len(results)} benchmark-eligible metrics; every row passed the external correctness gate first.",
         "",
-        "| Metric | Observations | TAFlow median (ms) | Oracle median (ms) | Speedup |",
-        "|---|---:|---:|---:|---:|",
+        "| Metric | Oracle source function | Correctness | Observations | TAFlow median (ms) | Oracle median (ms) | Speedup |",
+        "|---|---|---:|---:|---:|---:|---:|",
     ]
     for result in results:
         for row in result["rows"]:  # type: ignore[index]
             lines.append(
-                f"| `{result['class']}` | {row['observations']:,} | "
+                f"| `{result['class']}` | "
+                f"[`{result['oracle_source_function']}`]({result['oracle_source']}) | "
+                f"**{result['correctness_gate']}** | {row['observations']:,} | "
                 f"{row['taflow_public']['median_seconds'] * 1e3:.4f} | "
                 f"{row['oracle']['median_seconds'] * 1e3:.4f} | {row['speedup']:.2f}x |"
             )
@@ -321,14 +323,17 @@ def write_results(results: list[dict[str, object]]) -> None:
             "",
             "## Exact-tail retained memory",
             "",
-            "Historical VaR, Historical Expected Shortfall, Tail Ratio, and Common Sense Ratio retain both chronological and sorted `f64` buffers after compute. The payload lower bound is 16 bytes per observation, excluding vector capacity and allocator overhead.",
+            "Historical VaR, Historical Expected Shortfall, Tail Ratio, and Common Sense Ratio retain both chronological and sorted `f64` buffers after compute. Conditional Drawdown at Risk retains two buffers per drawdown episode. Entropic Value at Risk retains one `f64` per usable return. The payload estimates exclude vector capacity and allocator overhead.",
             "",
-            "| Observations | Retained `f64` payload lower bound |",
-            "|---:|---:|",
+            "| Observations/episodes | Exact order-statistics and CDaR lower bound | Entropic VaR lower bound |",
+            "|---:|---:|---:|",
         ]
     )
     for size in DEFAULT_SIZES:
-        lines.append(f"| {size:,} | {16 * size / (1024 * 1024):.3f} MiB |")
+        lines.append(
+            f"| {size:,} | {16 * size / (1024 * 1024):.3f} MiB | "
+            f"{8 * size / (1024 * 1024):.3f} MiB |"
+        )
     import taflow._native as native
 
     rustc = subprocess.run(
@@ -338,6 +343,7 @@ def write_results(results: list[dict[str, object]]) -> None:
         f"Environment: Python {platform.python_version()}, NumPy {np.__version__}, "
         f"Empyrical Reloaded {importlib.metadata.version('empyrical-reloaded')}, "
         f"QuantStats {importlib.metadata.version('quantstats')}; "
+        f"SciPy {importlib.metadata.version('scipy')}; "
         f"OS {platform.platform()}; machine {platform.machine()}; {rustc}; "
         f"release extension `{native.__file__}`."
     )
