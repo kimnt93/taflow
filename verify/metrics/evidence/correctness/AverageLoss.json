@@ -217,6 +217,8 @@
   "oracle": {
     "distribution": "quantstats",
     "function": "avg_loss",
+    "runtime_distribution": "quantstats",
+    "runtime_version": "0.0.81",
     "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
     "source_function": "quantstats.stats.avg_loss",
     "version": "0.0.81"

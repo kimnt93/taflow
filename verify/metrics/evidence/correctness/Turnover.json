@@ -202,6 +202,8 @@
   "oracle": {
     "distribution": "numpy",
     "function": "mean",
+    "runtime_distribution": "numpy",
+    "runtime_version": "2.4.6",
     "source": "https://github.com/numpy/numpy/blob/v2.4.6/numpy/_core/fromnumeric.py",
     "source_function": "numpy.mean",
     "version": "2.4.6"

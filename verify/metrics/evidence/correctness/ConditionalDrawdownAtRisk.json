@@ -1057,6 +1057,8 @@
   "oracle": {
     "distribution": "numpy",
     "function": "quantile",
+    "runtime_distribution": "numpy",
+    "runtime_version": "2.4.6",
     "source": "https://cran.r-project.org/src/contrib/Archive/PerformanceAnalytics/PerformanceAnalytics_2.1.0.tar.gz",
     "source_function": "PerformanceAnalytics::CDD(method='discrete')",
     "version": "2.4.6"

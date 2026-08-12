@@ -787,6 +787,8 @@
   "oracle": {
     "distribution": "scipy",
     "function": "norm",
+    "runtime_distribution": "scipy",
+    "runtime_version": "1.18.0",
     "source": "https://github.com/scipy/scipy/blob/v1.18.0/scipy/stats/_continuous_distns.py",
     "source_function": "scipy.stats.norm.ppf + numpy.std",
     "version": "1.18.0"

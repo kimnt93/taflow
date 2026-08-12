@@ -397,6 +397,8 @@
   "oracle": {
     "distribution": "empyrical-reloaded",
     "function": "omega_ratio",
+    "runtime_distribution": "empyrical-reloaded",
+    "runtime_version": "0.5.12",
     "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
     "source_function": "empyrical.stats.omega_ratio",
     "version": "0.5.12"

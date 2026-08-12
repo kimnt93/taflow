@@ -217,6 +217,8 @@
   "oracle": {
     "distribution": "empyrical-reloaded",
     "function": "cum_returns_final",
+    "runtime_distribution": "empyrical-reloaded",
+    "runtime_version": "0.5.12",
     "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
     "source_function": "empyrical.stats.cum_returns_final",
     "version": "0.5.12"

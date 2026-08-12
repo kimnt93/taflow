@@ -202,6 +202,8 @@
   "oracle": {
     "distribution": "quantstats",
     "function": "r_squared",
+    "runtime_distribution": "quantstats",
+    "runtime_version": "0.0.81",
     "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
     "source_function": "quantstats.stats.r_squared",
     "version": "0.0.81"

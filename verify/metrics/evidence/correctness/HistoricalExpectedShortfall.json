@@ -847,6 +847,8 @@
   "oracle": {
     "distribution": "empyrical-reloaded",
     "function": "conditional_value_at_risk",
+    "runtime_distribution": "empyrical-reloaded",
+    "runtime_version": "0.5.12",
     "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
     "source_function": "empyrical.stats.conditional_value_at_risk",
     "version": "0.5.12"

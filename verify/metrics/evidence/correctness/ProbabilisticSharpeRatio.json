@@ -502,6 +502,8 @@
   "oracle": {
     "distribution": "scipy",
     "function": "norm",
+    "runtime_distribution": "scipy",
+    "runtime_version": "1.18.0",
     "source": "https://github.com/polakowo/vectorbt/blob/993ceca7116fc8e55f4cd3a36fe43d83dab62b27/vectorbt/returns/metrics.py",
     "source_function": "vectorbt probabilistic Sharpe kernel + scipy.stats.norm.cdf",
     "version": "1.18.0"

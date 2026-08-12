@@ -202,6 +202,8 @@
   "oracle": {
     "distribution": "quantstats",
     "function": "ulcer_index",
+    "runtime_distribution": "quantstats",
+    "runtime_version": "0.0.81",
     "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
     "source_function": "quantstats.stats.ulcer_index",
     "version": "0.0.81"

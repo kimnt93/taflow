@@ -847,6 +847,8 @@
   "oracle": {
     "distribution": "scipy",
     "function": "minimize_scalar",
+    "runtime_distribution": "scipy",
+    "runtime_version": "1.18.0",
     "source": "https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/riskfolio/src/RiskFunctions.py",
     "source_function": "riskfolio.RiskFunctions.EVaR_Hist",
     "version": "1.18.0"

@@ -202,6 +202,8 @@
   "oracle": {
     "distribution": "numpy",
     "function": "mean",
+    "runtime_distribution": "numpy",
+    "runtime_version": "2.4.6",
     "source": "https://github.com/polakowo/vectorbt/blob/v0.28.1/vectorbt/portfolio/trades.py",
     "source_function": "vectorbt.Trades.sqn",
     "version": "2.4.6"

@@ -29,7 +29,7 @@ Every TAFlow value below came from the public canonical class factory and `compu
 | `UpMarketCaptureRatio` | empyrical-reloaded 0.5.12 | [`empyrical.stats.up_capture`](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | **MATCH** | 2.975e+134 | 1.063e-12 |
 | `DownMarketCaptureRatio` | empyrical-reloaded 0.5.12 | [`empyrical.stats.down_capture`](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | **MATCH** | 4.619e-14 | 1.603e-14 |
 | `UpDownCaptureRatio` | empyrical-reloaded 0.5.12 | [`empyrical.stats.up_down_capture`](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | **MATCH** | 2.975e+134 | 1.063e-12 |
-| `TreynorRatio` | quantstats 0.0.81 | [`quantstats.stats.treynor_ratio`](https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py) | **VARIANT** | 3.031e-07 | 1.582e-11 |
+| `TreynorRatio` | PerformanceAnalytics 2.1.0 | [`PerformanceAnalytics::TreynorRatio`](https://cran.r-project.org/src/contrib/PerformanceAnalytics_2.1.0.tar.gz) | **MATCH** | 2.830e-05 | 1.582e-11 |
 | `UlcerIndex` | quantstats 0.0.81 | [`quantstats.stats.ulcer_index`](https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py) | **MATCH** | 5.551e-17 | 2.497e-16 |
 | `UlcerPerformanceIndex` | quantstats 0.0.81 | [`quantstats.stats.ulcer_performance_index`](https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py) | **MATCH** | 1.554e-14 | 9.973e-15 |
 | `RecoveryFactor` | quantstats 0.0.81 | [`quantstats.stats.recovery_factor`](https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py) | **MATCH** | 2.220e-16 | 1.727e-15 |
@@ -65,9 +65,5 @@ Every TAFlow value below came from the public canonical class factory and `compu
 | `Exposure` | quantstats 0.0.81 | [`quantstats.stats.exposure`](https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py) | **MATCH** | 0.000e+00 | 0.000e+00 |
 | `EffectiveNumberOfBets` | numpy 2.4.6 | [`numpy.linalg.eigh + numpy.sum`](https://github.com/numpy/numpy/blob/v2.4.6/numpy/linalg/_linalg.py) | **MATCH** | 2.046e-12 | 5.336e-15 |
 | `Turnover` | numpy 2.4.6 | [`numpy.mean`](https://github.com/numpy/numpy/blob/v2.4.6/numpy/_core/fromnumeric.py) | **MATCH** | 1.388e-17 | 6.429e-16 |
-
-## Definition variants
-
-- `TreynorRatio`: The full convention is pinned to PerformanceAnalytics 2.1.0 source; the executable QuantStats cross-check is equivalent only at zero risk-free rate when periods_per_year equals the aligned sample length.
 
 Environment: Python 3.12.3, NumPy 2.4.6.
