@@ -39,11 +39,21 @@ class OracleSpec:
     argument_transform: str
     output_normalization: str = "none_to_nan"
     source_function: str | None = None
+    source_distribution: str | None = None
+    source_version: str | None = None
 
     @property
     def source_function_name(self) -> str:
         """Return the exact external source symbol used for comparison."""
         return self.source_function or f"{self.import_name}.{self.function}"
+
+    @property
+    def source_package(self) -> tuple[str, str]:
+        """Return the library/version whose function defines the contract."""
+        return (
+            self.source_distribution or self.distribution,
+            self.source_version or self.version,
+        )
 
 
 @dataclass(frozen=True)
@@ -528,13 +538,44 @@ METRICS: tuple[MetricSpec, ...] = (
         2,
         "CAGR of period excess returns divided by beta of excess primary versus excess benchmark",
         "fewer than two aligned pairs, zero beta, or invalid excess compounding is None",
-        _quantstats("treynor_ratio", "paired_treynor_crosscheck"),
+        OracleSpec(
+            distribution="numpy",
+            version="2.4.6",
+            import_name="numpy",
+            function="prod",
+            source_url=(
+                "https://cran.r-project.org/src/contrib/"
+                "PerformanceAnalytics_2.1.0.tar.gz"
+            ),
+            argument_transform="performanceanalytics_treynor_source",
+            source_function="PerformanceAnalytics::TreynorRatio",
+            source_distribution="PerformanceAnalytics",
+            source_version="2.1.0",
+        ),
         CORRELATION,
-        expected="VARIANT",
-        variant_reason=(
-            "The full convention is pinned to PerformanceAnalytics 2.1.0 source; "
-            "the executable QuantStats cross-check is equivalent only at zero "
-            "risk-free rate when periods_per_year equals the aligned sample length."
+        (
+            ParameterRow("default"),
+            ParameterRow(
+                "periods=12/risk_free=0.0616778",
+                (
+                    ("periods_per_year", 12.0),
+                    ("annual_risk_free_rate", 0.06167781186449828),
+                ),
+            ),
+            ParameterRow(
+                "periods=52/risk_free=-0.01",
+                (
+                    ("periods_per_year", 52.0),
+                    ("annual_risk_free_rate", -0.01),
+                ),
+            ),
+            ParameterRow(
+                "periods=365/risk_free=0.05",
+                (
+                    ("periods_per_year", 365.0),
+                    ("annual_risk_free_rate", 0.05),
+                ),
+            ),
         ),
         benchmark_eligible=False,
         paired=True,

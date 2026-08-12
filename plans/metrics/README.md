@@ -10,6 +10,11 @@ correctness and interface registries, and the authorized performance suite.
 See [metrics correctness](../../verify/metrics/CORRECTNESS.md) and
 [metrics benchmark](../../verify/metrics/BENCHMARK.md) for generated evidence.
 
+The native multi-metric workspace is implemented as `MetricPipeline`. It
+shares one Rust semantic input converter across selected single-return metrics
+and exposes a thin Python adapter. See the
+[metric pipeline guide](../../docs/METRIC_PIPELINE.md).
+
 P5 advanced estimators and explicit portfolio/position inputs are complete.
 The registry records definition variants and specialized domains rather than
 silently treating them as ordinary one-series return metrics.

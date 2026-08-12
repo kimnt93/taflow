@@ -13,9 +13,10 @@
 1. [Indicators](docs/INDICATORS.md)
 2. [Streaming](docs/STREAMING.md)
 3. [Pipelines](docs/PIPELINES.md)
-4. [Data IO](docs/DATA.md)
-5. [Correctness](#correctness)
-6. [Performance](#performance)
+4. [Metric pipeline](docs/METRIC_PIPELINE.md)
+5. [Data IO](docs/DATA.md)
+6. [Correctness](#correctness)
+7. [Performance](#performance)
 
 <p align="center">
   <img src="https://img.shields.io/badge/indicators-393-blue" alt="393 indicators" />
@@ -199,6 +200,30 @@ step-counting tests. The full guide, including two sharp edges (unreachable
 nodes are never stepped; chaining propagates warm-up `NaN`), is in
 **[docs/PIPELINES.md](docs/PIPELINES.md)**.
 
+### 5. Compute many portfolio metrics from one conversion
+
+`MetricPipeline` is a Rust-owned fan-out path for whole-history portfolio
+metrics. A P&L stream is converted to returns once, then every selected metric
+state is updated inside the same native loop:
+
+```python
+period_pnl = np.array([500.0, -250.0, 300.0, 100.0])
+from taflow.metrics import MetricPipeline
+
+report = MetricPipeline.from_pnl(
+    period_pnl,
+    initial_equity=100_000.0,
+    metrics=("TotalReturn", "SharpeRatio", "SortinoRatio", "MaximumDrawdown"),
+    periods_per_year=252.0,
+    annual_risk_free_rate=0.03,
+)
+values = report.compute()
+```
+
+Python only converts the container and exposes the result mapping. See
+**[docs/METRIC_PIPELINE.md](docs/METRIC_PIPELINE.md)** for supported metrics,
+lifecycle, configuration, and deliberately separate input domains.
+
 ## Documentation
 
 | Document | What it covers |
@@ -206,6 +231,7 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 | [Indicators](docs/INDICATORS.md) | Indicator classes by category — TA-Lib name, parameters, constructor order, the shared class contract |
 | [Streaming](docs/STREAMING.md) | Live updates, warm-up, backfill-then-stream, chunk invariance, `reset`, threading, per-tick cost |
 | [Pipelines](docs/PIPELINES.md) | Building causal graphs, expressions, evaluate-once semantics, custom nodes, when not to use one |
+| [Metric pipeline](docs/METRIC_PIPELINE.md) | One native input conversion, multi-metric fan-out, configuration, lifecycle, and domain limits |
 | [Data in / out](docs/DATA.md) | Every accepted input container, output converters, dataframes, the adapter gateway, `RollingApply`, `SessionFlags` |
 | [Correctness](verify/CORRECTNESS.md) | External oracle and lifecycle result for all 393 registered indicators |
 | [Benchmarks](verify/BENCHMARK.md) | Correctness-gated vector timings for all 393 registered indicators |

@@ -142,8 +142,8 @@ def oracle_kwargs(spec: MetricSpec, row: ParameterRow) -> dict[str, Any]:
         "paired_up_down_capture",
     }:
         return {}
-    if transform == "paired_treynor_crosscheck":
-        return {"periods": annualization, "rf": 0.0}
+    if transform == "performanceanalytics_treynor_source":
+        return {}
     if transform == "quantstats_datetime_series":
         return {}
     if transform in {
@@ -365,18 +365,32 @@ def oracle_result(
                 **oracle_kwargs(spec, row),
             )
         )
-    elif transform == "paired_treynor_crosscheck":
+    elif transform == "performanceanalytics_treynor_source":
         if benchmark is None:
-            raise ValueError("paired oracle requires benchmark values")
-        import pandas as pd
-
-        result = normalized(
-            oracle(
-                pd.Series(primary),
-                pd.Series(benchmark),
-                **oracle_kwargs(spec, row),
-            )
+            raise ValueError("paired Treynor oracle requires benchmark values")
+        if primary.size < 2:
+            return None
+        periods = float(public.get("periods_per_year", 252.0))
+        annual_rate = float(public.get("annual_risk_free_rate", 0.0))
+        period_risk_free_rate = period_rate(annual_rate, periods)
+        primary_excess = primary - period_risk_free_rate
+        benchmark_excess = benchmark - period_risk_free_rate
+        benchmark_variance = float(np.var(benchmark_excess, ddof=1))
+        if benchmark_variance == 0.0:
+            return None
+        beta = float(
+            np.cov(primary_excess, benchmark_excess, ddof=1)[0, 1]
+            / benchmark_variance
         )
+        if beta == 0.0 or not math.isfinite(beta):
+            return None
+        with np.errstate(invalid="ignore", over="ignore"):
+            annualized_excess = float(
+                oracle(1.0 + primary_excess) ** (periods / primary.size) - 1.0
+            )
+        result = annualized_excess / beta
+        if not math.isfinite(result):
+            return None
     elif transform in {
         "paired_capture",
         "paired_up_capture",
@@ -677,14 +691,6 @@ def verify_metric(spec: MetricSpec) -> dict[str, Any]:
                 valid_count = int(np.count_nonzero(~np.isnan(values)))
             if valid_count < spec.minimum_observations:
                 continue
-            if spec.class_name == "TreynorRatio":
-                kwargs = {
-                    "periods_per_year": float(valid_count),
-                    "annual_risk_free_rate": 0.0,
-                }
-                row = ParameterRow(
-                    "quantstats_equivalent_subset", tuple(kwargs.items())
-                )
             if spec.paired:
                 state, actual = _actual_paired(spec, primary, benchmark, kwargs)
                 oracle_primary = primary[valid]
@@ -775,12 +781,15 @@ def verify_metric(spec: MetricSpec) -> dict[str, Any]:
                     "passed": passed and stable and reset_is_fluent and reset_clears,
                 }
             )
+    source_distribution, source_version = spec.oracle.source_package
     return {
         "class": spec.class_name,
         "verdict": spec.expected,
         "oracle": {
-            "distribution": spec.oracle.distribution,
-            "version": spec.oracle.version,
+            "distribution": source_distribution,
+            "version": source_version,
+            "runtime_distribution": spec.oracle.distribution,
+            "runtime_version": spec.oracle.version,
             "function": spec.oracle.function,
             "source_function": spec.oracle.source_function_name,
             "source": spec.oracle.source_url,

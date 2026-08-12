@@ -135,6 +135,24 @@ Then run focused tests/verifiers, `cargo fmt --all --check`,
 `git diff --check`, `git diff --stat`, and inspect the complete diff for
 unrelated/generated changes.
 
+## Native metric pipeline
+
+- [x] `MetricPipeline` owns one Rust `MetricInputState` and normalizes each
+      return/log-return/equity/period-P&L observation once.
+- [x] Selected compatible metric states are constructed and fanned out in
+      Rust; Python performs container conversion and result mapping only.
+- [x] Canonical standalone metric states remain the sole formula
+      implementations.
+- [x] Selection order is stable; duplicates and unsupported semantic domains
+      are rejected before processing.
+- [x] P&L pipeline values match standalone public metric classes.
+- [x] Return, log-return, equity, and P&L factories are equivalent.
+- [x] Scalar, chunked, reset/replay, cached compute, and length behavior pass.
+- [x] Bulk fan-out releases the GIL.
+- [x] Paired, raw-total, trade-only, and matrix metrics remain explicit rather
+      than being reinterpreted as one-return metrics.
+- [x] Public README and the metric-pipeline guide document the API and limits.
+
 ## Batch completion
 
 - [x] Re-scan class/file names and all aliases independently of the checklist.

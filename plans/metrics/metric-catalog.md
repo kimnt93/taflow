@@ -58,7 +58,7 @@ parameters of one class, not separate classes.
 | [x] | `UpMarketCaptureRatio` | Empyrical `up_capture` | Filter periods where benchmark return is positive. |
 | [x] | `DownMarketCaptureRatio` | Empyrical `down_capture` | Filter periods where benchmark return is negative. |
 | [x] | `UpDownCaptureRatio` | Empyrical `up_down_capture` | Up capture divided by down capture. |
-| [x] | `TreynorRatio` | PerformanceAnalytics `TreynorRatio` cross-check | Annual excess return divided by beta; defer if the exact return convention remains disputed. |
+| [x] | `TreynorRatio` | PerformanceAnalytics 2.1.0 `TreynorRatio` | Annualized period-excess return divided by excess-return beta; exact source convention is frozen and verified. |
 
 Do not infer date alignment from pandas indexes. The metric package accepts
 already aligned ordered arrays and rejects mismatched lengths before mutation.
