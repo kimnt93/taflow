@@ -1,7 +1,7 @@
 """Explicit contracts for metric correctness and performance verification.
 
 This registry is intentionally independent from the indicator registry.  A
-metric produces a whole-history scalar and has input-domain factories and
+metric produces a whole-history scalar and has explicit input methods and
 annualization semantics that do not apply to aligned indicator histories.
 """
 
@@ -75,7 +75,7 @@ class MetricSpec:
     module: str
     phase: str
     family: str
-    factories: tuple[str, ...]
+    input_methods: tuple[str, ...]
     output_type: str
     minimum_observations: int
     formula: str

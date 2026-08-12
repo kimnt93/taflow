@@ -17,7 +17,6 @@ pub struct PainRatio {
 impl PainRatio {
     /// Construct an empty state with explicit annualization and input semantics.
     pub fn new(
-        input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_risk_free_rate: f64,
         nan_policy: NanPolicy,
@@ -36,19 +35,9 @@ impl PainRatio {
                 reason: "must be finite and greater than -1",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "pain ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             growth: CompoundedGrowth::new(),
             drawdown: DrawdownState::new(),
             absolute_drawdown_sum: 0.0,
@@ -129,3 +118,5 @@ impl PainRatio {
         self.annual_risk_free_rate
     }
 }
+
+crate::impl_return_metric_lifecycle!(PainRatio);

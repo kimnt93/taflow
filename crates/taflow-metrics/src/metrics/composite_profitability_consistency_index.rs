@@ -11,20 +11,9 @@ pub struct CompositeProfitabilityConsistencyIndex {
 }
 impl CompositeProfitabilityConsistencyIndex {
     /// Construct an empty return or closed-trade state.
-    pub fn new(input_kind: MetricInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
-        if !matches!(
-            input_kind,
-            MetricInputKind::Returns | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason:
-                    "composite profitability consistency index accepts returns or closed trades",
-            });
-        }
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             gains: GainLossState::new(),
         })
     }
@@ -74,3 +63,5 @@ impl CompositeProfitabilityConsistencyIndex {
         self.input.is_empty()
     }
 }
+
+crate::impl_return_trade_metric_lifecycle!(CompositeProfitabilityConsistencyIndex);

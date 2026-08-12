@@ -21,8 +21,8 @@ class Expectancy:
     ``None``; an all-breakeven sample returns ``0.0``.
 
     ``from_pnl`` consumes raw non-cumulative period P&L and deliberately accepts
-    no initial equity. ``from_trades`` consumes realized P&L observations for
-    closed trades. Returns, equity, and log-return factories are intentionally
+    no initial capital. ``from_trades`` consumes realized P&L observations for
+    closed trades. Returns, equity, and log-return input methods are intentionally
     absent because this metric's output is denominated in the supplied monetary
     unit. Values are neither converted nor annualized. NaNs are omitted by
     default or rejected with ``nan_policy="raise"``; infinities are always
@@ -30,49 +30,26 @@ class Expectancy:
     releases the GIL, and Rust owns allocation-free O(1) arithmetic.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError("use Expectancy.from_pnl/from_trades")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "Expectancy":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy)
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, pnl: Any, *, column: str | None = None
     ) -> "Expectancy":
-        """Construct from raw non-cumulative period P&L without conversion."""
-        return cls._create(pnl, "pnl", nan_policy=nan_policy, column=column)
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
 
-    @classmethod
     def from_trades(
-        cls,
-        trade_pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, trades: Any, *, column: str | None = None
     ) -> "Expectancy":
-        """Construct from realized P&L observations for closed trades."""
-        return cls._create(
-            trade_pnl, "trades", nan_policy=nan_policy, column=column
-        )
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, value: float) -> "Expectancy":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

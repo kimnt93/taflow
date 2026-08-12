@@ -12,11 +12,7 @@ pub struct EntropicValueAtRisk {
 
 impl EntropicValueAtRisk {
     /// Construct an empty empirical EVaR state.
-    pub fn new(
-        input_kind: MetricInputKind,
-        cutoff: f64,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    pub fn new(cutoff: f64, nan_policy: NanPolicy) -> MetricResult<Self> {
         if !cutoff.is_finite() || cutoff <= 0.0 || cutoff >= 1.0 {
             return Err(MetricError::InvalidParameter {
                 name: "cutoff",
@@ -24,19 +20,9 @@ impl EntropicValueAtRisk {
                 reason: "must be finite and strictly between zero and one",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "entropic value at risk requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             returns: Vec::new(),
             cutoff,
             cached_value: None,
@@ -206,3 +192,5 @@ impl EntropicValueAtRisk {
         )
     }
 }
+
+crate::impl_return_metric_lifecycle!(EntropicValueAtRisk);

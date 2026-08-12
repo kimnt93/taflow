@@ -14,11 +14,7 @@ pub struct ParametricExpectedShortfall {
 
 impl ParametricExpectedShortfall {
     /// Construct an empty Gaussian expected-shortfall estimator.
-    pub fn new(
-        input_kind: MetricInputKind,
-        cutoff: f64,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    pub fn new(cutoff: f64, nan_policy: NanPolicy) -> MetricResult<Self> {
         if !cutoff.is_finite() || cutoff <= 0.0 || cutoff >= 1.0 {
             return Err(MetricError::InvalidParameter {
                 name: "cutoff",
@@ -26,21 +22,11 @@ impl ParametricExpectedShortfall {
                 reason: "must be finite and strictly between zero and one",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "parametric expected shortfall requires a normalized return domain",
-            });
-        }
         let quantile = Self::standard_normal_quantile(cutoff);
         let density_at_quantile =
             (-0.5 * quantile * quantile).exp() / (2.0 * std::f64::consts::PI).sqrt();
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             moments: OnlineMoments::new(),
             cutoff,
             density_at_quantile,
@@ -132,3 +118,5 @@ impl ParametricExpectedShortfall {
             / ((((D[0] * value + D[1]) * value + D[2]) * value + D[3]) * value + 1.0)
     }
 }
+
+crate::impl_return_metric_lifecycle!(ParametricExpectedShortfall);

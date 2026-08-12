@@ -1,156 +1,72 @@
-"""Geometric annualized-return metric."""
-
+"""Compute geometric CAGR from a chronological return-equivalent stream."""
 from __future__ import annotations
-
 from typing import Any
-
 from .._native.metrics import AnnualizedReturn as _Native
 from ._input import as_metric_series
-
 
 class AnnualizedReturn:
     """Compute geometric CAGR from a chronological return-equivalent stream.
 
-    Select input meaning with ``from_returns``, ``from_log_returns``,
-    ``from_equity``, or ``from_pnl``. Rust performs all conversion and computes
-    ``product(1 + return) ** (periods_per_year / n) - 1`` in stable logarithmic
-    form. ``periods_per_year`` defaults to 252 and is never inferred from an
-    index. NaNs are omitted by default; infinity and simple returns below -1
-    are rejected. Warm-up requires one usable return, so ``value`` and
-    ``compute`` return ``None`` while empty. An equity input needs two levels.
-    A -100% return produces -1. The external oracle/name mapping is Empyrical
-    Reloaded 0.5.12 ``annual_return`` with its ``annualization`` argument.
+    Warm-up returns ``None`` until the registered minimum sample is met. The
+    independent oracle mapping is ``empyrical.stats.annual_return`` from
+    empyrical-reloaded 0.5.12.
+
+    Construction stores configuration only. An instance ``from_*`` method
+    selects and ingests returns, log returns, equity, or period P&L. Period P&L
+    additionally requires positive ``initial_capital``. Rust owns semantic
+    conversion and all metric arithmetic. ``append``, ``extend``, ``reset``,
+    and every ``from_*`` method mutate and return this metric.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use AnnualizedReturn.from_returns/from_equity/from_pnl/from_log_returns"
-        )
+    def __init__(self, periods_per_year: float=252.0, nan_policy: str='omit') -> None:
+        """Create an empty configured metric without processing a series."""
+        self._state = _Native(float(periods_per_year), nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_kind: str,
-        *,
-        periods_per_year: float,
-        initial_equity: float | None = None,
-        nan_policy: str,
-        column: str | None,
-    ) -> "AnnualizedReturn":
-        state = cls.__new__(cls)
-        state._state = _Native(
-            input_kind,
-            float(periods_per_year),
-            initial_equity=initial_equity,
-            nan_policy=nan_policy,
-        )
-        return state.extend(values, column=column)
+    def from_returns(self, returns: Any, *, column: str | None=None) -> 'AnnualizedReturn':
+        """Select decimal simple returns, append them, and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        *,
-        periods_per_year: float = 252.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "AnnualizedReturn":
-        """Build from decimal simple returns where 0.01 means one percent."""
-        return cls._create(
-            returns,
-            "returns",
-            periods_per_year=periods_per_year,
-            nan_policy=nan_policy,
-            column=column,
-        )
+    def from_log_returns(self, log_returns: Any, *, column: str | None=None) -> 'AnnualizedReturn':
+        """Select log returns, append them, and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
 
-    @classmethod
-    def from_log_returns(
-        cls,
-        log_returns: Any,
-        *,
-        periods_per_year: float = 252.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "AnnualizedReturn":
-        """Build from log returns converted causally with ``expm1`` in Rust."""
-        return cls._create(
-            log_returns,
-            "log_returns",
-            periods_per_year=periods_per_year,
-            nan_policy=nan_policy,
-            column=column,
-        )
+    def from_equity(self, equity: Any, *, column: str | None=None) -> 'AnnualizedReturn':
+        """Select positive equity levels, append them, and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
 
-    @classmethod
-    def from_equity(
-        cls,
-        equity: Any,
-        *,
-        periods_per_year: float = 252.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "AnnualizedReturn":
-        """Build from strictly positive equity or total-return-adjusted levels."""
-        return cls._create(
-            equity,
-            "equity",
-            periods_per_year=periods_per_year,
-            nan_policy=nan_policy,
-            column=column,
-        )
+    def from_pnl(self, pnl: Any, initial_capital: float, *, column: str | None=None) -> 'AnnualizedReturn':
+        """Select period P&L, append it, and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column), float(initial_capital))
+        return self
 
-    @classmethod
-    def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        initial_equity: float,
-        periods_per_year: float = 252.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "AnnualizedReturn":
-        """Build from non-cumulative period P&L and positive starting capital."""
-        return cls._create(
-            pnl,
-            "pnl",
-            periods_per_year=periods_per_year,
-            initial_equity=initial_equity,
-            nan_policy=nan_policy,
-            column=column,
-        )
-
-    def append(self, value: float) -> "AnnualizedReturn":
-        """Append one observation in the factory-selected domain and return self."""
+    def append(self, value: float) -> 'AnnualizedReturn':
+        """Append one observation in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 
-    def extend(
-        self, values: Any, *, column: str | None = None
-    ) -> "AnnualizedReturn":
-        """Append one chronological series in the selected domain and return self."""
+    def extend(self, values: Any, *, column: str | None=None) -> 'AnnualizedReturn':
+        """Append observations in the selected domain and return this metric."""
         self._state.extend(as_metric_series(values, column=column))
         return self
 
     @property
     def value(self) -> float | None:
-        """Return the latest geometric annualized return, or ``None`` if empty."""
+        """Return the current native metric value, or ``None`` when undefined."""
         return self._state.value
 
     def compute(self) -> float | None:
-        """Return the current scalar without replaying or mutating native state."""
+        """Return the current native metric value without replaying input."""
         return self._state.compute()
 
-    def reset(self) -> "AnnualizedReturn":
-        """Clear observations, preserve configuration, and return self."""
+    def reset(self) -> 'AnnualizedReturn':
+        """Clear observations while preserving configuration and input domain."""
         self._state.reset()
         return self
 
     def __len__(self) -> int:
-        """Return the number of usable normalized returns held by Rust."""
+        """Return the number of usable observations processed by Rust."""
         return len(self._state)
-
-
-__all__ = ["AnnualizedReturn"]
+__all__ = ['AnnualizedReturn']

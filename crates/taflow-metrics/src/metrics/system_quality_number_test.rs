@@ -23,7 +23,12 @@ fn assert_close(actual: f64, expected: f64) {
 fn computes_vectorbt_formula_and_preserves_lifecycle() {
     let trades = [100.0, -40.0, 20.0, -10.0, 80.0];
     let expected = expected_system_quality_number(&trades);
-    let mut state = SystemQualityNumber::new(MetricInputKind::Trades, NanPolicy::Omit).unwrap();
+    let mut state = SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.append(trades[0]).unwrap(), None);
@@ -42,7 +47,12 @@ fn computes_vectorbt_formula_and_preserves_lifecycle() {
 #[test]
 fn retains_the_sign_of_mean_trade_pnl() {
     let losing = [-100.0, 20.0, -50.0, 10.0];
-    let mut state = SystemQualityNumber::new(MetricInputKind::Trades, NanPolicy::Omit).unwrap();
+    let mut state = SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         state.extend(&losing).unwrap().unwrap(),
         expected_system_quality_number(&losing),
@@ -55,7 +65,12 @@ fn retains_the_sign_of_mean_trade_pnl() {
 
 #[test]
 fn insufficient_and_constant_samples_are_undefined() {
-    let mut state = SystemQualityNumber::new(MetricInputKind::Trades, NanPolicy::Omit).unwrap();
+    let mut state = SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(state.append(10.0).unwrap(), None);
     assert_eq!(state.append(10.0).unwrap(), None);
     assert_eq!(state.append(10.0).unwrap(), None);
@@ -63,7 +78,12 @@ fn insufficient_and_constant_samples_are_undefined() {
 
 #[test]
 fn missing_and_invalid_values_follow_the_input_contract() {
-    let mut omit = SystemQualityNumber::new(MetricInputKind::Trades, NanPolicy::Omit).unwrap();
+    let mut omit = SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     omit.extend(&[f64::NAN, -10.0, 20.0]).unwrap();
     assert_eq!(omit.len(), 2);
     assert_close(
@@ -71,7 +91,12 @@ fn missing_and_invalid_values_follow_the_input_contract() {
         expected_system_quality_number(&[-10.0, 20.0]),
     );
 
-    let mut raise = SystemQualityNumber::new(MetricInputKind::Trades, NanPolicy::Raise).unwrap();
+    let mut raise = SystemQualityNumber::new(NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     raise.extend(&[-10.0, 20.0]).unwrap();
     assert!(raise.append(f64::NAN).is_err());
     assert_eq!(raise.len(), 2);
@@ -82,15 +107,34 @@ fn missing_and_invalid_values_follow_the_input_contract() {
 
 #[test]
 fn rejects_every_non_trade_domain() {
-    assert!(SystemQualityNumber::new(MetricInputKind::Returns, NanPolicy::Omit).is_err());
-    assert!(SystemQualityNumber::new(MetricInputKind::LogReturns, NanPolicy::Omit).is_err());
-    assert!(SystemQualityNumber::new(MetricInputKind::Equity, NanPolicy::Omit).is_err());
-    assert!(SystemQualityNumber::new(MetricInputKind::RawPnl, NanPolicy::Omit).is_err());
-    assert!(SystemQualityNumber::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        NanPolicy::Omit,
-    )
-    .is_err());
+    assert!(SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(SystemQualityNumber::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
 }

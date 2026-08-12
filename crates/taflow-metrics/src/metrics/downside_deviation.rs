@@ -14,7 +14,6 @@ pub struct DownsideDeviation {
 impl DownsideDeviation {
     /// Construct an empty state from annual effective target and frequency settings.
     pub fn new(
-        input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_required_return: f64,
         nan_policy: NanPolicy,
@@ -33,16 +32,6 @@ impl DownsideDeviation {
                 reason: "must be finite and greater than -1",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "downside deviation requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         let period_required_return = (annual_required_return.ln_1p() / periods_per_year).exp_m1();
         if !period_required_return.is_finite() {
@@ -53,7 +42,7 @@ impl DownsideDeviation {
             });
         }
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             downside_moment: DownsideMomentState::new(period_required_return),
             annualization_scale: periods_per_year.sqrt(),
         })
@@ -111,3 +100,5 @@ impl DownsideDeviation {
         self.input.is_empty()
     }
 }
+
+crate::impl_return_metric_lifecycle!(DownsideDeviation);

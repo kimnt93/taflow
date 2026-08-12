@@ -5,7 +5,7 @@ Research date: 2026-08-11.
 ## Core release status
 
 Implemented and verified through 2026-08-12: all 57 P1-P5 metrics in the catalog,
-the separate Rust/native/Python package architecture, semantic factories,
+the separate Rust/native/Python package architecture, semantic input methods,
 correctness and interface registries, and the authorized performance suite.
 See [metrics correctness](../../verify/metrics/CORRECTNESS.md) and
 [metrics benchmark](../../verify/metrics/BENCHMARK.md) for generated evidence.
@@ -31,38 +31,33 @@ The proposed public surface is:
 ```python
 from taflow.metrics import SharpeRatio
 
-metric = SharpeRatio.from_returns(
-    returns,
-    periods_per_year=252.0,
-    annual_risk_free_rate=0.02,
-)
+metric = SharpeRatio(periods_per_year=252.0, annual_risk_free_rate=0.02)
+metric.from_returns(returns)
 value = metric.compute()
 
-same_metric = SharpeRatio.from_equity(equity, periods_per_year=252.0)
-from_pnl = SharpeRatio.from_pnl(
-    period_pnl,
-    initial_equity=100_000.0,
-    periods_per_year=252.0,
+same_metric = SharpeRatio(periods_per_year=252.0).from_equity(equity)
+from_pnl = SharpeRatio(periods_per_year=252.0).from_pnl(
+    period_pnl, initial_capital=100_000.0
 )
 
-# Fresh O(1) streaming state for daily returns. The empty semantic factory is
+# Fresh O(1) streaming state for daily returns. The empty semantic input method is
 # the explicit "create" operation; later values keep that selected meaning.
-live_sharpe = SharpeRatio.from_returns([], periods_per_year=252.0)
+live_sharpe = SharpeRatio(periods_per_year=252.0).from_returns([])
 live_sharpe.append(today_return)
 current_value = live_sharpe.compute()
 ```
 
-This is preferable to `SharpeRatio(series, series_type=...)`. A named factory
+This is preferable to `SharpeRatio(series, series_type=...)`. An instance input method
 makes the financial meaning of the series reviewable at the call site and
 prevents a price, equity, return, cumulative P&L, or period-P&L series from
 being silently interpreted as another kind.
 
 `from_pnl` has one exact input meaning: each value is the non-cumulative P&L
 earned during one observation period. A return-based class such as
-`SharpeRatio` therefore requires `initial_equity` to convert P&L to returns. A
+`SharpeRatio` therefore requires `initial_capital` to convert P&L to returns. A
 P&L-native class such as `GrossProfit` consumes those same period P&L values
 directly and does not ask for capital it would ignore. A cumulative P&L series
-must first be expressed as equity (`initial_equity + cumulative_pnl`) and
+must first be expressed as equity (`initial_capital + cumulative_pnl`) and
 passed to `from_equity`; TAFlow must not guess which P&L convention the caller
 intended.
 
@@ -87,7 +82,7 @@ intended.
   warm-up, undefined-result handling, and scalar output. Python normalizes a
   supported container exactly once and delegates.
 - Every class supports persistent `append`, `extend`, `value`, `compute`,
-  `reset`, and `__len__`. The input factory fixes the meaning of later
+  `reset`, and `__len__`. The input input method fixes the meaning of later
   `append`/`extend` calls.
 - `append` is allocation-free after construction for metrics that have a
   fixed-size sufficient statistic. Exact historical quantile metrics are a

@@ -16,12 +16,7 @@ pub struct UpDownCaptureRatio {
 
 impl UpDownCaptureRatio {
     /// Construct an empty up/down capture state for aligned return-like inputs.
-    pub fn new(
-        primary_input_kind: MetricInputKind,
-        benchmark_input_kind: MetricInputKind,
-        periods_per_year: f64,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    pub fn new(periods_per_year: f64, nan_policy: NanPolicy) -> MetricResult<Self> {
         if !periods_per_year.is_finite() || periods_per_year <= 0.0 {
             return Err(MetricError::InvalidParameter {
                 name: "periods_per_year",
@@ -29,26 +24,8 @@ impl UpDownCaptureRatio {
                 reason: "must be finite and greater than zero",
             });
         }
-        if matches!(
-            primary_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) || matches!(
-            benchmark_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{primary_input_kind:?}/{benchmark_input_kind:?}"),
-                reason: "up/down capture ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
-
         Ok(Self {
-            input: PairedMetricInputState::new(
-                primary_input_kind,
-                benchmark_input_kind,
-                nan_policy,
-            )?,
+            input: PairedMetricInputState::unbound(nan_policy),
             up_primary_growth: CompoundedGrowth::new(),
             up_benchmark_growth: CompoundedGrowth::new(),
             down_primary_growth: CompoundedGrowth::new(),
@@ -146,3 +123,5 @@ impl UpDownCaptureRatio {
         self.periods_per_year
     }
 }
+
+crate::impl_paired_return_metric_lifecycle!(UpDownCaptureRatio);

@@ -16,8 +16,6 @@ pub struct TreynorRatio {
 impl TreynorRatio {
     /// Construct an empty state for aligned primary and benchmark input domains.
     pub fn new(
-        primary_input_kind: MetricInputKind,
-        benchmark_input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_risk_free_rate: f64,
         nan_policy: NanPolicy,
@@ -36,27 +34,9 @@ impl TreynorRatio {
                 reason: "must be finite and greater than -1",
             });
         }
-        if matches!(
-            primary_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) || matches!(
-            benchmark_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{primary_input_kind:?}/{benchmark_input_kind:?}"),
-                reason: "Treynor ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
-
         let period_risk_free_rate = (annual_risk_free_rate.ln_1p() / periods_per_year).exp_m1();
         Ok(Self {
-            input: PairedMetricInputState::new(
-                primary_input_kind,
-                benchmark_input_kind,
-                nan_policy,
-            )?,
+            input: PairedMetricInputState::unbound(nan_policy),
             moments: PairedMoments::new(),
             excess_growth_product: 1.0,
             periods_per_year,
@@ -134,3 +114,5 @@ impl TreynorRatio {
         self.input.is_empty()
     }
 }
+
+crate::impl_paired_return_metric_lifecycle!(TreynorRatio);

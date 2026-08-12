@@ -41,14 +41,12 @@ fn matches_pinned_performanceanalytics_source_convention() {
     let benchmark = [0.05, -0.02, 0.02, 0.00, -0.01];
     let periods_per_year = 12.0;
     let annual_risk_free_rate = 0.061_677_811_864_498_28;
-    let mut state = TreynorRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        periods_per_year,
-        annual_risk_free_rate,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = TreynorRatio::new(periods_per_year, annual_risk_free_rate, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&primary, &benchmark).unwrap();
     assert_relative_eq!(
         state.compute().unwrap(),
@@ -66,26 +64,22 @@ fn matches_pinned_performanceanalytics_source_convention() {
 fn lifecycle_pairwise_omission_and_reset_are_invariant() {
     let primary = [0.08, f64::NAN, -0.03, 0.04, 0.01];
     let benchmark = [0.05, 0.03, -0.02, 0.02, 0.00];
-    let mut batch = TreynorRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        12.0,
-        0.03,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut batch = TreynorRatio::new(12.0, 0.03, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     batch.extend(&primary, &benchmark).unwrap();
     assert_eq!(batch.len(), 4);
     let expected = batch.value().unwrap();
 
-    let mut streamed = TreynorRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        12.0,
-        0.03,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut streamed = TreynorRatio::new(12.0, 0.03, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     for (&value, &benchmark_value) in primary.iter().zip(&benchmark) {
         streamed.append(value, benchmark_value).unwrap();
     }
@@ -99,55 +93,45 @@ fn lifecycle_pairwise_omission_and_reset_are_invariant() {
 
 #[test]
 fn requires_two_pairs_and_nonzero_beta() {
-    let mut state = TreynorRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = TreynorRatio::new(252.0, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.append(0.01, 0.02).unwrap();
     assert_eq!(state.value(), None);
     state.append(0.02, 0.04).unwrap();
     assert!(state.value().is_some());
 
-    let mut zero_beta = TreynorRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut zero_beta = TreynorRatio::new(252.0, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     zero_beta.extend(&[0.01, 0.01], &[0.00, 0.02]).unwrap();
     assert_eq!(zero_beta.value(), None);
 }
 
 #[test]
 fn rejects_invalid_configuration_and_domains() {
-    assert!(TreynorRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        0.0,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .is_err());
-    assert!(TreynorRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        -1.0,
-        NanPolicy::Omit,
-    )
-    .is_err());
-    assert!(TreynorRatio::new(
-        MetricInputKind::Trades,
-        MetricInputKind::Trades,
-        252.0,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .is_err());
+    assert!(TreynorRatio::new(0.0, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(TreynorRatio::new(252.0, -1.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(TreynorRatio::new(252.0, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0, 0.0)?;
+            Ok(state)
+        })
+        .is_err());
 }

@@ -7,6 +7,7 @@ pub struct Turnover {
     previous_weight: Option<f64>,
     total_absolute_change: f64,
     valid_count: usize,
+    bound: bool,
 }
 
 impl Turnover {
@@ -17,11 +18,25 @@ impl Turnover {
             previous_weight: None,
             total_absolute_change: 0.0,
             valid_count: 0,
+            bound: false,
         })
+    }
+
+    pub fn from_weights(&mut self, weights: &[f64]) -> MetricResult<&mut Self> {
+        self.bound = true;
+        self.extend(weights)?;
+        Ok(self)
     }
 
     /// Append one risky-asset portfolio weight and return mean turnover to date.
     pub fn append(&mut self, weight: f64) -> MetricResult<Option<f64>> {
+        if !self.bound {
+            return Err(MetricError::InvalidParameter {
+                name: "input_kind",
+                value: "unbound".to_owned(),
+                reason: "call from_weights before append or extend",
+            });
+        }
         if weight.is_nan() {
             return match self.nan_policy {
                 NanPolicy::Omit => Ok(self.value()),

@@ -2,7 +2,7 @@
 
 Generated: 2026-08-12
 
-Every TAFlow value below came from the public canonical class factory and `compute()`.
+Every TAFlow value below came from a configured canonical instance, its input method, and `compute()`.
 
 `MATCH` means every registered dataset, parameter row, and lifecycle check passed the metric's declared absolute/relative tolerance.
 

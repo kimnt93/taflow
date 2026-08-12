@@ -13,7 +13,7 @@ from ._input import as_metric_series
 class EffectiveNumberOfBets:
     """Compute the exponential entropy of independent risk contributions.
 
-    The preferred ``from_weights_and_covariance`` factory diagonalizes a
+    The preferred ``from_weights_and_covariance`` input method diagonalizes a
     symmetric positive-semidefinite covariance matrix, projects portfolio
     weights into its orthogonal principal-component factors, and forms
     contributions ``eigenvalue[i] * exposure[i]**2``. After normalization to
@@ -30,44 +30,23 @@ class EffectiveNumberOfBets:
     covariance matrix from a return stream.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic factory."""
-        raise TypeError(
-            "use EffectiveNumberOfBets.from_weights_and_covariance/"
-            "from_risk_contributions"
-        )
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def from_risk_contributions(
-        cls,
-        contributions: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "EffectiveNumberOfBets":
-        """Construct from independent non-negative risk contributions."""
-        state = cls.__new__(cls)
-        state._state = _Native(nan_policy)
-        return state.extend(contributions, column=column)
+    def from_risk_contributions(self, contributions: Any, *, column: str | None = None) -> "EffectiveNumberOfBets":
+        """Append independent non-negative risk contributions."""
+        self._state.from_risk_contributions(as_metric_series(contributions, column=column))
+        return self
 
-    @classmethod
-    def from_weights_and_covariance(
-        cls,
-        weights: Any,
-        covariance: Any,
-        *,
-        nan_policy: str = "omit",
-    ) -> "EffectiveNumberOfBets":
-        """Construct from portfolio weights and an aligned covariance matrix."""
+    def from_weights_and_covariance(self, weights: Any, covariance: Any) -> "EffectiveNumberOfBets":
+        """Ingest portfolio weights and an aligned covariance matrix."""
         selected_weights = as_metric_series(weights)
         selected_covariance = np.ascontiguousarray(covariance, dtype=np.float64)
         if selected_covariance.ndim != 2:
             raise ValueError("covariance must be a two-dimensional matrix")
-        state = cls.__new__(cls)
-        state._state = _Native.from_weights_and_covariance(
-            selected_weights, selected_covariance, nan_policy
-        )
-        return state
+        self._state.from_weights_and_covariance(selected_weights, selected_covariance)
+        return self
 
     def append(self, contribution: float) -> "EffectiveNumberOfBets":
         """Append one independent risk contribution and return this metric."""

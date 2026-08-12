@@ -16,7 +16,6 @@ pub struct OmegaRatio {
 impl OmegaRatio {
     /// Construct an empty Omega-ratio state.
     pub fn new(
-        input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_required_return: f64,
         nan_policy: NanPolicy,
@@ -35,16 +34,6 @@ impl OmegaRatio {
                 reason: "must be finite and greater than -1",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "Omega ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         let period_required_return = (annual_required_return.ln_1p() / periods_per_year).exp_m1();
         if !period_required_return.is_finite() {
@@ -56,7 +45,7 @@ impl OmegaRatio {
         }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             excess_returns: GainLossState::new(),
             periods_per_year,
             annual_required_return,
@@ -132,3 +121,5 @@ impl OmegaRatio {
         self.period_required_return
     }
 }
+
+crate::impl_return_metric_lifecycle!(OmegaRatio);

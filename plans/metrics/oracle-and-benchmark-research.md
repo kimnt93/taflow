@@ -148,7 +148,7 @@ Each registry entry records:
 
 ```text
 TAFlow class
-accepted input factory used by the test
+accepted input input method used by the test
 oracle package, version, function, and source URL
 TAFlow parameters
 oracle parameter transformation
@@ -159,7 +159,7 @@ tolerance
 MATCH or VARIANT with reason
 ```
 
-The TAFlow side is always `CanonicalMetric.from_*(...).compute()`. Do not call
+The TAFlow side is always `CanonicalMetric(config...).from_*(...).compute()`. Do not call
 a Rust helper, Python reference formula, or free-function compatibility layer
 as the actual value.
 
@@ -221,8 +221,8 @@ Empyrical, and do not switch to a slower library merely to inflate a ratio.
   `excess_sharpe` and QuantStats `information_ratio` are unannualized. TAFlow
   exposes one class with an annualization parameter and transforms the oracle.
 - QuantStats return/price heuristics are convenience behavior, not a semantic
-  contract. TAFlow uses named factories instead.
+  contract. TAFlow uses named input methods instead.
 - P&L cannot become a return without a capital base. `from_pnl` therefore
-  requires initial equity and processes P&L chronologically.
+  requires initial capital and processes P&L chronologically.
 - Exact historical quantiles are not bounded-memory streaming reducers. State
   and benchmark reports must say so plainly.

@@ -202,22 +202,21 @@ nodes are never stepped; chaining propagates warm-up `NaN`), is in
 
 ### 5. Compute many portfolio metrics from one conversion
 
-`MetricPipeline` is a Rust-owned fan-out path for whole-history portfolio
-metrics. A P&L stream is converted to returns once, then every selected metric
-state is updated inside the same native loop:
+`MetricPipeline` owns configured whole-history metric instances under caller
+provided names and forwards one selected semantic input stream to them:
 
 ```python
 period_pnl = np.array([500.0, -250.0, 300.0, 100.0])
-from taflow.metrics import MetricPipeline
+from taflow.metrics import MetricPipeline, MaximumDrawdown, SharpeRatio, SortinoRatio, TotalReturn
 
-report = MetricPipeline.from_pnl(
-    period_pnl,
-    initial_equity=100_000.0,
-    metrics=("TotalReturn", "SharpeRatio", "SortinoRatio", "MaximumDrawdown"),
-    periods_per_year=252.0,
-    annual_risk_free_rate=0.03,
-)
+report = MetricPipeline()
+report.add("total", TotalReturn())
+report.add("sharpe", SharpeRatio(252.0, 0.03))
+report.add("sortino", SortinoRatio())
+report.add("drawdown", MaximumDrawdown())
+report.from_pnl(period_pnl, initial_capital=100_000.0)
 values = report.compute()
+values["sharpe"]
 ```
 
 Python only converts the container and exposes the result mapping. See

@@ -9,7 +9,12 @@ fn assert_close(actual: f64, expected: f64) {
 fn computes_mean_of_strictly_positive_returns_and_preserves_lifecycle() {
     let values = [0.02, -0.01, 0.0, 0.03, -0.025, 0.01];
     let expected = (0.02 + 0.03 + 0.01) / 3.0;
-    let mut state = AverageWin::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.append(values[0]).unwrap(), Some(values[0]));
@@ -30,16 +35,31 @@ fn raw_period_pnl_and_closed_trades_are_not_converted() {
     let observations = [100.0, -40.0, 0.0, 20.0, -10.0];
     let expected = 60.0;
 
-    let mut pnl = AverageWin::new(MetricInputKind::RawPnl, NanPolicy::Omit).unwrap();
+    let mut pnl = AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(pnl.extend(&observations).unwrap().unwrap(), expected);
 
-    let mut trades = AverageWin::new(MetricInputKind::Trades, NanPolicy::Omit).unwrap();
+    let mut trades = AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(trades.extend(&observations).unwrap().unwrap(), expected);
 }
 
 #[test]
 fn losses_and_breakevens_do_not_create_a_result() {
-    let mut state = AverageWin::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&[-0.10, 0.0, -0.02]).unwrap();
     assert_eq!(state.len(), 3);
     assert_eq!(state.value(), None);
@@ -49,12 +69,22 @@ fn losses_and_breakevens_do_not_create_a_result() {
 
 #[test]
 fn missing_and_invalid_values_follow_the_input_contract() {
-    let mut omit = AverageWin::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut omit = AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     omit.extend(&[f64::NAN, 0.02, -0.01]).unwrap();
     assert_eq!(omit.len(), 2);
     assert_eq!(omit.value(), Some(0.02));
 
-    let mut raise = AverageWin::new(MetricInputKind::Returns, NanPolicy::Raise).unwrap();
+    let mut raise = AverageWin::new(NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     raise.append(0.01).unwrap();
     assert!(raise.append(f64::NAN).is_err());
     assert_eq!(raise.len(), 1);
@@ -67,13 +97,22 @@ fn missing_and_invalid_values_follow_the_input_contract() {
 
 #[test]
 fn rejects_return_converters_outside_the_declared_domains() {
-    assert!(AverageWin::new(MetricInputKind::LogReturns, NanPolicy::Omit).is_err());
-    assert!(AverageWin::new(MetricInputKind::Equity, NanPolicy::Omit).is_err());
-    assert!(AverageWin::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        NanPolicy::Omit,
-    )
-    .is_err());
+    assert!(AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(AverageWin::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
 }

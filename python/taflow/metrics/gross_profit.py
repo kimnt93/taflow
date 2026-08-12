@@ -20,7 +20,7 @@ class GrossProfit:
     absolute gross loss is one.
 
     ``from_pnl`` consumes raw, non-cumulative period P&L and deliberately does
-    not accept initial equity. ``from_trades`` consumes realized P&L for each
+    not accept initial capital. ``from_trades`` consumes realized P&L for each
     closed trade. Returns, log returns, and equity are intentionally unsupported
     because this metric is an absolute currency-domain statistic, not a return
     measure. NaNs are omitted by default or rejected with
@@ -29,44 +29,23 @@ class GrossProfit:
     O(1)-memory arithmetic, and native bulk execution releases the GIL.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError("use GrossProfit.from_pnl/from_trades")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str,
-        column: str | None,
-    ) -> "GrossProfit":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy)
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, pnl: Any, *, column: str | None = None
     ) -> "GrossProfit":
-        """Construct from raw non-cumulative period P&L without conversion."""
-        return cls._create(pnl, "pnl", nan_policy=nan_policy, column=column)
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
 
-    @classmethod
     def from_trades(
-        cls,
-        trades: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, trades: Any, *, column: str | None = None
     ) -> "GrossProfit":
-        """Construct from realized P&L for chronological closed trades."""
-        return cls._create(trades, "trades", nan_policy=nan_policy, column=column)
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, value: float) -> "GrossProfit":
         """Append one P&L observation and return this metric."""

@@ -120,13 +120,13 @@ def benchmark_sharpe_execution_profiles(
     half = values.size // 2
     profiles: dict[str, object] = {}
     profiles["native_bulk"] = timed_setup_action(
-        lambda: cls.from_returns(empty, **kwargs)._state,
+        lambda: cls(**kwargs).from_returns(empty)._state,
         lambda state: (state.extend(values), state.compute()),
         repeats,
     )
     for chunk_size in (32, 1_024):
         profiles[f"chunks_{chunk_size}"] = timed_setup_action(
-            lambda: cls.from_returns(empty, **kwargs),
+            lambda: cls(**kwargs).from_returns(empty),
             lambda state, size=chunk_size: [
                 state.extend(values[offset : offset + size])
                 for offset in range(0, values.size, size)
@@ -134,16 +134,16 @@ def benchmark_sharpe_execution_profiles(
             repeats,
         )
     profiles["scalar_append"] = timed_setup_action(
-        lambda: cls.from_returns(empty, **kwargs),
+        lambda: cls(**kwargs).from_returns(empty),
         lambda state: [state.append(float(value)) for value in values],
         repeats,
     )
     profiles["warmed_continuation"] = timed_setup_action(
-        lambda: cls.from_returns(values[:half], **kwargs),
+        lambda: cls(**kwargs).from_returns(values[:half]),
         lambda state: state.extend(values[half:]),
         repeats,
     )
-    cached = cls.from_returns(values, **kwargs)
+    cached = cls(**kwargs).from_returns(values)
     profiles["cached_compute"] = timed(cached.compute, repeats)
     containers = {
         "numpy": values,
@@ -154,7 +154,7 @@ def benchmark_sharpe_execution_profiles(
     }
     profiles["container_end_to_end"] = {
         name: timed(
-            lambda container=container: cls.from_returns(container, **kwargs).compute(),
+            lambda container=container: cls(**kwargs).from_returns(container).compute(),
             repeats,
         )
         for name, container in containers.items()
@@ -187,9 +187,9 @@ def benchmark_metric(
                 values * 0.35 + rng.normal(0.0, 0.008, size), dtype=np.float64
             )
             taflow = timed(
-                lambda input_values=values, benchmark_input=benchmark_values: cls.from_returns(
-                    input_values, benchmark_input, **public_kwargs
-                ).compute(),
+                lambda input_values=values, benchmark_input=benchmark_values: cls(
+                    **public_kwargs
+                ).from_returns(input_values, benchmark_input).compute(),
                 repeats,
             )
             reference = timed(
@@ -199,11 +199,10 @@ def benchmark_metric(
                 repeats,
             )
         else:
-            factory = getattr(cls, spec.factories[0])
             taflow = timed(
-                lambda input_values=values, public_factory=factory: public_factory(
-                    input_values, **public_kwargs
-                ).compute(),
+                lambda input_values=values: getattr(
+                    cls(**public_kwargs), spec.input_methods[0]
+                )(input_values).compute(),
                 repeats,
             )
             reference = timed(
@@ -248,23 +247,23 @@ def benchmark_metric_pipeline(
     import taflow.metrics as metrics_module
 
     pipeline_class = metrics_module.MetricPipeline
-    initial_equity = 100_000_000.0
+    initial_capital = 100_000_000.0
     rng = np.random.default_rng(20_260_812)
     rows = []
     for size in sizes:
         pnl = np.ascontiguousarray(rng.normal(40.0, 1_200.0, size), dtype=np.float64)
 
         def pipeline_call() -> dict[str, float | None]:
-            return pipeline_class.from_pnl(
-                pnl,
-                initial_equity=initial_equity,
-                metrics=PIPELINE_METRICS,
-            ).compute()
+            pipeline = pipeline_class()
+            for name in PIPELINE_METRICS:
+                pipeline.add(name, getattr(metrics_module, name)())
+            return pipeline.from_pnl(pnl, initial_capital=initial_capital).compute()
 
         def standalone_call() -> dict[str, float | None]:
             return {
                 name: getattr(metrics_module, name)
-                .from_pnl(pnl, initial_equity=initial_equity)
+                ()
+                .from_pnl(pnl, initial_capital=initial_capital)
                 .compute()
                 for name in PIPELINE_METRICS
             }
@@ -335,7 +334,7 @@ def write_results(
         "",
         f"Generated: {datetime.now(UTC).date().isoformat()}",
         "",
-        f"Public end-to-end semantic-factory `compute()` timings for {len(results)} benchmark-eligible metrics; every row passed the external correctness gate first.",
+        f"Public end-to-end instance-input `compute()` timings for {len(results)} benchmark-eligible metrics; every row passed the external correctness gate first.",
         "",
         "Speedup is reference time divided by TAFlow time; values above 1× favor TAFlow.",
         "",

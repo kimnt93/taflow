@@ -50,9 +50,12 @@ fn pinned_performanceanalytics_discrete(returns: &[f64], confidence: f64) -> Opt
 fn matches_pinned_performanceanalytics_discrete_episode_estimator() {
     let returns = [0.25, -0.20, 0.25, 0.10, -0.50, 1.0, -0.10];
     for confidence in [0.5, 0.75, 0.90, 0.95, 0.99] {
-        let mut state =
-            ConditionalDrawdownAtRisk::new(MetricInputKind::Returns, confidence, NanPolicy::Omit)
-                .unwrap();
+        let mut state = ConditionalDrawdownAtRisk::new(confidence, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .unwrap();
         let actual = state.extend(&returns).unwrap().unwrap();
         let expected = pinned_performanceanalytics_discrete(&returns, confidence).unwrap();
         assert_relative_eq!(actual, expected, epsilon = 1e-15);
@@ -61,8 +64,12 @@ fn matches_pinned_performanceanalytics_discrete_episode_estimator() {
 
 #[test]
 fn includes_current_episode_and_all_boundary_ties() {
-    let mut state =
-        ConditionalDrawdownAtRisk::new(MetricInputKind::Returns, 0.5, NanPolicy::Omit).unwrap();
+    let mut state = ConditionalDrawdownAtRisk::new(0.5, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&[0.25, -0.20]).unwrap();
     assert_relative_eq!(state.compute().unwrap(), 0.20, epsilon = 1e-15);
     state.append(0.25).unwrap();
@@ -70,23 +77,35 @@ fn includes_current_episode_and_all_boundary_ties() {
     assert_relative_eq!(state.compute().unwrap(), 0.35, epsilon = 1e-15);
 
     let tied = [0.25, -0.20, 0.25, 0.25, -0.20];
-    let mut state =
-        ConditionalDrawdownAtRisk::new(MetricInputKind::Returns, 0.95, NanPolicy::Omit).unwrap();
+    let mut state = ConditionalDrawdownAtRisk::new(0.95, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_relative_eq!(state.extend(&tied).unwrap().unwrap(), 0.20, epsilon = 1e-15);
 }
 
 #[test]
 fn bulk_scalar_chunk_reset_and_cached_compute_are_invariant() {
     let values = [0.25, f64::NAN, -0.20, 0.25, 0.10, -0.50, 1.0, -0.10];
-    let mut batch =
-        ConditionalDrawdownAtRisk::new(MetricInputKind::Returns, 0.75, NanPolicy::Omit).unwrap();
+    let mut batch = ConditionalDrawdownAtRisk::new(0.75, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     let expected = batch.extend(&values).unwrap().unwrap();
     assert_eq!(batch.len(), 7);
     assert_eq!(batch.compute(), Some(expected));
     assert_eq!(batch.compute(), Some(expected));
 
-    let mut scalar =
-        ConditionalDrawdownAtRisk::new(MetricInputKind::Returns, 0.75, NanPolicy::Omit).unwrap();
+    let mut scalar = ConditionalDrawdownAtRisk::new(0.75, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     for value in values {
         scalar.append(value).unwrap();
     }
@@ -108,7 +127,28 @@ fn semantic_inputs_match_returns() {
     let pnl = [10.0, -22.0, 4.4];
 
     let compute = |kind, values: &[f64]| {
-        let mut state = ConditionalDrawdownAtRisk::new(kind, 0.95, NanPolicy::Omit).unwrap();
+        let mut state = ConditionalDrawdownAtRisk::new(0.95, NanPolicy::Omit)
+            .and_then(|mut state| {
+                match kind {
+                    MetricInputKind::Returns => {
+                        state.from_returns(&[])?;
+                    }
+                    MetricInputKind::LogReturns => {
+                        state.from_log_returns(&[])?;
+                    }
+                    MetricInputKind::Equity => {
+                        state.from_equity(&[])?;
+                    }
+                    MetricInputKind::PeriodPnl { initial_capital } => {
+                        state.from_pnl(&[], initial_capital)?;
+                    }
+                    MetricInputKind::RawPnl | MetricInputKind::Trades => {
+                        state.append(0.0)?;
+                    }
+                }
+                Ok(state)
+            })
+            .unwrap();
         state.extend(values).unwrap().unwrap()
     };
     let expected = compute(MetricInputKind::Returns, &returns);
@@ -125,7 +165,7 @@ fn semantic_inputs_match_returns() {
     assert_relative_eq!(
         compute(
             MetricInputKind::PeriodPnl {
-                initial_equity: 100.0,
+                initial_capital: 100.0,
             },
             &pnl,
         ),
@@ -137,22 +177,32 @@ fn semantic_inputs_match_returns() {
 #[test]
 fn validates_configuration_domains_and_observations() {
     for confidence in [0.0, 1.0, -0.1, 1.1, f64::NAN, f64::INFINITY] {
-        assert!(ConditionalDrawdownAtRisk::new(
-            MetricInputKind::Returns,
-            confidence,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(ConditionalDrawdownAtRisk::new(confidence, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .is_err());
     }
-    assert!(
-        ConditionalDrawdownAtRisk::new(MetricInputKind::RawPnl, 0.95, NanPolicy::Omit,).is_err()
-    );
-    assert!(
-        ConditionalDrawdownAtRisk::new(MetricInputKind::Trades, 0.95, NanPolicy::Omit,).is_err()
-    );
+    assert!(ConditionalDrawdownAtRisk::new(0.95, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(ConditionalDrawdownAtRisk::new(0.95, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
 
-    let mut state =
-        ConditionalDrawdownAtRisk::new(MetricInputKind::Returns, 0.95, NanPolicy::Raise).unwrap();
+    let mut state = ConditionalDrawdownAtRisk::new(0.95, NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(state.append(f64::NAN).is_err());
     assert!(state.is_empty());
     assert!(state.append(f64::INFINITY).is_err());

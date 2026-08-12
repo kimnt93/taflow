@@ -16,13 +16,12 @@ fn filters_positive_benchmark_periods_and_preserves_lifecycle() {
     let primary = [0.03, -0.01, 0.02, 0.04, -0.05];
     let benchmark = [0.01, -0.02, 0.0, 0.015, -0.01];
     let expected = annualized(&[0.03, 0.04], 252.0) / annualized(&[0.01, 0.015], 252.0);
-    let mut state = UpMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = UpMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_close(state.append(primary[0], benchmark[0]).unwrap().unwrap(), {
@@ -48,13 +47,12 @@ fn filters_positive_benchmark_periods_and_preserves_lifecycle() {
 
 #[test]
 fn omits_missing_pairs_before_filtering_and_requires_an_up_period() {
-    let mut state = UpMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = UpMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     state
         .extend(
             &[0.10, f64::NAN, 0.05, -0.02, 0.08],
@@ -67,26 +65,24 @@ fn omits_missing_pairs_before_filtering_and_requires_an_up_period() {
     );
     assert_eq!(state.len(), 3);
 
-    let mut no_up_period = UpMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut no_up_period = UpMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     no_up_period.extend(&[0.01, -0.02], &[0.0, -0.01]).unwrap();
     assert_eq!(no_up_period.value(), None);
     assert_eq!(no_up_period.len(), 2);
     assert!(!no_up_period.is_empty());
 
     let smallest_positive = f64::from_bits(1);
-    let mut rounded_zero_benchmark = UpMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        smallest_positive,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut rounded_zero_benchmark = UpMarketCaptureRatio::new(smallest_positive, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     rounded_zero_benchmark
         .append(0.01, smallest_positive)
         .unwrap();
@@ -98,26 +94,24 @@ fn input_modes_produce_equivalent_up_market_capture_ratio() {
     let primary_returns = [0.10, -0.20, 0.05];
     let benchmark_returns = [0.02, -0.10, 0.01];
     let expected = {
-        let mut state = UpMarketCaptureRatio::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            12.0,
-            NanPolicy::Omit,
-        )
-        .unwrap();
+        let mut state = UpMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .unwrap();
         state
             .extend(&primary_returns, &benchmark_returns)
             .unwrap()
             .unwrap()
     };
 
-    let mut equity = UpMarketCaptureRatio::new(
-        MetricInputKind::Equity,
-        MetricInputKind::Equity,
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut equity = UpMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_equity(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         equity
             .extend(&[100.0, 110.0, 88.0, 92.4], &[200.0, 204.0, 183.6, 185.436])
@@ -126,17 +120,12 @@ fn input_modes_produce_equivalent_up_market_capture_ratio() {
         expected,
     );
 
-    let mut pnl = UpMarketCaptureRatio::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        MetricInputKind::PeriodPnl {
-            initial_equity: 200.0,
-        },
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut pnl = UpMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[], &[], 100.0, 200.0)?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         pnl.extend(&[10.0, -22.0, 4.4], &[4.0, -20.4, 1.836])
             .unwrap()
@@ -144,13 +133,12 @@ fn input_modes_produce_equivalent_up_market_capture_ratio() {
         expected,
     );
 
-    let mut logarithmic = UpMarketCaptureRatio::new(
-        MetricInputKind::LogReturns,
-        MetricInputKind::LogReturns,
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut logarithmic = UpMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_log_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         logarithmic
             .extend(
@@ -166,28 +154,28 @@ fn input_modes_produce_equivalent_up_market_capture_ratio() {
 #[test]
 fn rejects_invalid_configuration_domains_and_misalignment_transactionally() {
     for invalid in [0.0, -1.0, f64::NAN, f64::INFINITY] {
-        assert!(UpMarketCaptureRatio::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            invalid,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(UpMarketCaptureRatio::new(invalid, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .is_err());
     }
     for invalid_domain in [MetricInputKind::RawPnl, MetricInputKind::Trades] {
-        assert!(
-            UpMarketCaptureRatio::new(invalid_domain, invalid_domain, 252.0, NanPolicy::Omit,)
-                .is_err()
-        );
+        assert!(UpMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.append(0.0, 0.0)?;
+                Ok(state)
+            })
+            .is_err());
     }
 
-    let mut state = UpMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = UpMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(state.extend(&[0.01, 0.02], &[0.01]).is_err());
     assert_eq!(state.len(), 0);
     assert_eq!(state.value(), None);

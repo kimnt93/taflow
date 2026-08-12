@@ -12,7 +12,7 @@ pub enum ExposureInputKind {
 /// Share of usable periods with a non-zero return or position state.
 #[derive(Debug, Clone)]
 pub struct Exposure {
-    input_kind: ExposureInputKind,
+    input_kind: Option<ExposureInputKind>,
     nan_policy: NanPolicy,
     exposed: usize,
     usable: usize,
@@ -21,9 +21,9 @@ pub struct Exposure {
 
 impl Exposure {
     /// Construct an empty state for an explicit return-proxy or position domain.
-    pub fn new(input_kind: ExposureInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input_kind,
+            input_kind: None,
             nan_policy,
             exposed: 0,
             usable: 0,
@@ -31,12 +31,44 @@ impl Exposure {
         })
     }
 
+    pub fn from_returns(&mut self, returns: &[f64]) -> MetricResult<&mut Self> {
+        self.bind(ExposureInputKind::Returns)?;
+        self.extend(returns)?;
+        Ok(self)
+    }
+
+    pub fn from_positions(&mut self, positions: &[f64]) -> MetricResult<&mut Self> {
+        self.bind(ExposureInputKind::Positions)?;
+        self.extend(positions)?;
+        Ok(self)
+    }
+
+    fn bind(&mut self, kind: ExposureInputKind) -> MetricResult<()> {
+        match self.input_kind {
+            None => self.input_kind = Some(kind),
+            Some(selected) if selected == kind => {}
+            Some(_) => {
+                return Err(MetricError::InvalidParameter {
+                    name: "input_kind",
+                    value: format!("{kind:?}"),
+                    reason: "exposure input domain is already selected",
+                })
+            }
+        }
+        Ok(())
+    }
+
     fn ingest(&mut self, value: f64) -> MetricResult<()> {
+        let input_kind = self.input_kind.ok_or(MetricError::InvalidParameter {
+            name: "input_kind",
+            value: "unbound".to_owned(),
+            reason: "call from_returns or from_positions before append or extend",
+        })?;
         let position = self.position;
         if value.is_nan() {
             if self.nan_policy == NanPolicy::Raise {
                 return Err(MetricError::InvalidObservation {
-                    domain: match self.input_kind {
+                    domain: match input_kind {
                         ExposureInputKind::Returns => "return",
                         ExposureInputKind::Positions => "position",
                     },
@@ -50,7 +82,7 @@ impl Exposure {
         }
         if !value.is_finite() {
             return Err(MetricError::InvalidObservation {
-                domain: match self.input_kind {
+                domain: match input_kind {
                     ExposureInputKind::Returns => "return",
                     ExposureInputKind::Positions => "position",
                 },
@@ -59,7 +91,7 @@ impl Exposure {
                 reason: "infinite values are not supported",
             });
         }
-        if self.input_kind == ExposureInputKind::Returns && value < -1.0 {
+        if input_kind == ExposureInputKind::Returns && value < -1.0 {
             return Err(MetricError::InvalidObservation {
                 domain: "return",
                 position,

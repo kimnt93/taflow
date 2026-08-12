@@ -21,67 +21,40 @@ class PayoffRatio:
     Use ``from_returns`` for decimal simple period returns, ``from_pnl`` for raw
     non-cumulative period P&L, and ``from_trades`` for realized P&L from closed
     trades. Raw P&L and trades are consumed without capital conversion and
-    accept no initial-equity argument. Equity and log-return factories are not
+    accept no initial capital argument. Equity and log-return input methods are not
     exposed because this quality metric preserves the declared observation
     domain. Rust owns O(1)-memory arithmetic. NaNs are omitted by default or
     rejected with ``nan_policy="raise"``; infinities are always rejected.
     Mutating lifecycle methods are fluent and bulk execution releases the GIL.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError("use PayoffRatio.from_returns/from_pnl/from_trades")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str,
-        column: str | None,
-    ) -> "PayoffRatio":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy)
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, returns: Any, *, column: str | None = None
     ) -> "PayoffRatio":
-        """Construct from chronological decimal simple period returns."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
     def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, pnl: Any, *, column: str | None = None
     ) -> "PayoffRatio":
-        """Construct from raw non-cumulative period P&L without conversion."""
-        return cls._create(pnl, "pnl", nan_policy=nan_policy, column=column)
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
 
-    @classmethod
     def from_trades(
-        cls,
-        trades: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, trades: Any, *, column: str | None = None
     ) -> "PayoffRatio":
-        """Construct from realized P&L for chronological closed trades."""
-        return cls._create(trades, "trades", nan_policy=nan_policy, column=column)
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, value: float) -> "PayoffRatio":
-        """Append one observation in the factory-selected domain and return self."""
+        """Append one observation in the selected domain and return self."""
         self._state.append(float(value))
         return self
 

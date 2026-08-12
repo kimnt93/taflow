@@ -12,32 +12,9 @@ pub struct Beta {
 
 impl Beta {
     /// Construct an empty state for aligned primary and benchmark input domains.
-    pub fn new(
-        primary_input_kind: MetricInputKind,
-        benchmark_input_kind: MetricInputKind,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
-        if matches!(
-            primary_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) || matches!(
-            benchmark_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{primary_input_kind:?}/{benchmark_input_kind:?}"),
-                reason:
-                    "beta requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
-
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input: PairedMetricInputState::new(
-                primary_input_kind,
-                benchmark_input_kind,
-                nan_policy,
-            )?,
+            input: PairedMetricInputState::unbound(nan_policy),
             moments: PairedMoments::new(),
         })
     }
@@ -94,3 +71,5 @@ impl Beta {
         self.input.is_empty()
     }
 }
+
+crate::impl_paired_return_metric_lifecycle!(Beta);

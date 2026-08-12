@@ -20,9 +20,9 @@ class ProfitFactor:
     positive infinity, while loss-only input returns ``0.0``.
 
     ``from_returns`` consumes decimal simple period returns. ``from_pnl``
-    consumes non-cumulative raw period P&L and accepts no initial equity;
+    consumes non-cumulative raw period P&L and accepts no initial capital;
     ``from_trades`` consumes realized P&L for closed trades. Values supplied to
-    P&L and trade factories are never converted or annualized. NaNs are omitted
+    P&L and trade input methods are never converted or annualized. NaNs are omitted
     by default or rejected by ``nan_policy="raise"``; infinities are always
     rejected. Warm-up requires one nonzero usable observation. Mutating lifecycle
     methods are fluent, native bulk work releases the GIL, and Rust owns all
@@ -30,62 +30,33 @@ class ProfitFactor:
     cross-check but is not installed in the pinned test environment.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError("use ProfitFactor.from_returns/from_pnl/from_trades")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "ProfitFactor":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy)
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, returns: Any, *, column: str | None = None
     ) -> "ProfitFactor":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
     def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, pnl: Any, *, column: str | None = None
     ) -> "ProfitFactor":
-        """Construct from raw non-cumulative period P&L without capital conversion."""
-        return cls._create(pnl, "pnl", nan_policy=nan_policy, column=column)
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
 
-    @classmethod
     def from_trades(
-        cls,
-        trade_pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, trades: Any, *, column: str | None = None
     ) -> "ProfitFactor":
-        """Construct from realized P&L observations for closed trades."""
-        return cls._create(
-            trade_pnl, "trades", nan_policy=nan_policy, column=column
-        )
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, value: float) -> "ProfitFactor":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

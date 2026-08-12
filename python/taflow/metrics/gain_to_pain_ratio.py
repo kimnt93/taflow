@@ -1,139 +1,72 @@
-"""Whole-history gain-to-pain ratio metric."""
-
+"""Compute net return sum divided by the absolute sum of losses."""
 from __future__ import annotations
-
 from typing import Any
-
 from .._native.metrics import GainToPainRatio as _Native
 from ._input import as_metric_series
-
 
 class GainToPainRatio:
     """Compute net return sum divided by the absolute sum of losses.
 
-    The frozen external oracle is QuantStats 0.0.81
-    ``gain_to_pain_ratio``. Despite the metric's common gross-gain wording,
-    that implementation uses ``sum(all returns) / abs(sum(negative returns))``;
-    TAFlow deliberately follows that executable convention. QuantStats also
-    ignores its ``rf`` argument for this metric, so TAFlow exposes no rate
-    parameter. Phase 1 performs no implicit date-based resampling: every input
-    observation must already represent the caller's intended aggregation
-    resolution.
+    Warm-up returns ``None`` until the registered minimum sample is met. The
+    independent oracle mapping is ``quantstats.stats.gain_to_pain_ratio`` from
+    quantstats 0.0.81.
 
-    Warm-up ends as soon as at least one negative return supplies a nonzero
-    pain denominator. The result is ``None`` for empty, all-zero, and gain-only
-    histories; a loss-only history validly returns ``-1.0``. Inputs may be
-    decimal simple returns, log returns, positive equity levels, or
-    non-cumulative period P&L with positive initial equity. Rust performs all
-    conversions and O(1)-memory arithmetic. NaNs are omitted by default or
-    rejected with ``nan_policy="raise"``; infinities are always rejected.
-    Mutating lifecycle methods are fluent and bulk work releases the GIL.
+    Construction stores configuration only. An instance ``from_*`` method
+    selects and ingests returns, log returns, equity, or period P&L. Period P&L
+    additionally requires positive ``initial_capital``. Rust owns semantic
+    conversion and all metric arithmetic. ``append``, ``extend``, ``reset``,
+    and every ``from_*`` method mutate and return this metric.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use GainToPainRatio.from_returns/from_equity/from_pnl/from_log_returns"
-        )
+    def __init__(self, nan_policy: str='omit') -> None:
+        """Create an empty configured metric without processing a series."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        initial_equity: float | None = None,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "GainToPainRatio":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, initial_equity, nan_policy)
-        return state.extend(values, column=column)
+    def from_returns(self, returns: Any, *, column: str | None=None) -> 'GainToPainRatio':
+        """Select decimal simple returns, append them, and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "GainToPainRatio":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+    def from_log_returns(self, log_returns: Any, *, column: str | None=None) -> 'GainToPainRatio':
+        """Select log returns, append them, and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
 
-    @classmethod
-    def from_log_returns(
-        cls,
-        log_returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "GainToPainRatio":
-        """Construct from chronological log returns converted by Rust."""
-        return cls._create(
-            log_returns, "log_returns", nan_policy=nan_policy, column=column
-        )
+    def from_equity(self, equity: Any, *, column: str | None=None) -> 'GainToPainRatio':
+        """Select positive equity levels, append them, and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
 
-    @classmethod
-    def from_equity(
-        cls,
-        equity: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "GainToPainRatio":
-        """Construct from positive chronological equity or adjusted-price levels."""
-        return cls._create(equity, "equity", nan_policy=nan_policy, column=column)
+    def from_pnl(self, pnl: Any, initial_capital: float, *, column: str | None=None) -> 'GainToPainRatio':
+        """Select period P&L, append it, and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column), float(initial_capital))
+        return self
 
-    @classmethod
-    def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        initial_equity: float,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "GainToPainRatio":
-        """Construct from non-cumulative period P&L and positive initial equity."""
-        return cls._create(
-            pnl,
-            "pnl",
-            initial_equity=float(initial_equity),
-            nan_policy=nan_policy,
-            column=column,
-        )
-
-    def append(self, value: float) -> "GainToPainRatio":
-        """Append one value in the factory-selected domain and return this metric."""
+    def append(self, value: float) -> 'GainToPainRatio':
+        """Append one observation in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 
-    def extend(
-        self, values: Any, *, column: str | None = None
-    ) -> "GainToPainRatio":
-        """Append a chronological input-resolution series and return this metric."""
+    def extend(self, values: Any, *, column: str | None=None) -> 'GainToPainRatio':
+        """Append observations in the selected domain and return this metric."""
         self._state.extend(as_metric_series(values, column=column))
         return self
 
     @property
     def value(self) -> float | None:
-        """Return net gain divided by pain, or ``None`` without a loss."""
+        """Return the current native metric value, or ``None`` when undefined."""
         return self._state.value
 
     def compute(self) -> float | None:
-        """Return the current scalar without replaying processed input."""
+        """Return the current native metric value without replaying input."""
         return self._state.compute()
 
-    def reset(self) -> "GainToPainRatio":
-        """Clear observations, preserve input configuration, and return this metric."""
+    def reset(self) -> 'GainToPainRatio':
+        """Clear observations while preserving configuration and input domain."""
         self._state.reset()
         return self
 
     def __len__(self) -> int:
-        """Return the number of usable normalized returns processed by Rust."""
+        """Return the number of usable observations processed by Rust."""
         return len(self._state)
-
-
-__all__ = ["GainToPainRatio"]
+__all__ = ['GainToPainRatio']

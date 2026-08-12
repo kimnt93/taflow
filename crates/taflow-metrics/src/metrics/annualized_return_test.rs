@@ -14,7 +14,8 @@ fn expected_annualized(returns: &[f64], periods_per_year: f64) -> f64 {
 fn computes_geometric_annualized_return_and_preserves_lifecycle() {
     let returns = [0.10, -0.20, 0.05, 0.03];
     let expected = expected_annualized(&returns, 12.0);
-    let mut state = AnnualizedReturn::new(MetricInputKind::Returns, 12.0, NanPolicy::Omit).unwrap();
+    let mut state = AnnualizedReturn::new(12.0, NanPolicy::Omit).unwrap();
+    state.from_returns(&[]).unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.compute(), None);
@@ -36,34 +37,28 @@ fn all_return_input_modes_are_equivalent() {
     let returns = [0.10, -0.20, 0.05];
     let expected = expected_annualized(&returns, 252.0);
 
-    let mut equity =
-        AnnualizedReturn::new(MetricInputKind::Equity, 252.0, NanPolicy::Omit).unwrap();
+    let mut equity = AnnualizedReturn::new(252.0, NanPolicy::Omit).unwrap();
+    equity.from_equity(&[]).unwrap();
     assert_close(
         equity.extend(&[100.0, 110.0, 88.0, 92.4]).unwrap().unwrap(),
         expected,
     );
     assert_eq!(equity.len(), 3);
 
-    let mut pnl = AnnualizedReturn::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        252.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut pnl = AnnualizedReturn::new(252.0, NanPolicy::Omit).unwrap();
+    pnl.from_pnl(&[], 100.0).unwrap();
     assert_close(pnl.extend(&[10.0, -22.0, 4.4]).unwrap().unwrap(), expected);
 
     let log_returns = returns.map(f64::ln_1p);
-    let mut logarithmic =
-        AnnualizedReturn::new(MetricInputKind::LogReturns, 252.0, NanPolicy::Omit).unwrap();
+    let mut logarithmic = AnnualizedReturn::new(252.0, NanPolicy::Omit).unwrap();
+    logarithmic.from_log_returns(&[]).unwrap();
     assert_close(logarithmic.extend(&log_returns).unwrap().unwrap(), expected);
 }
 
 #[test]
 fn omits_nan_and_represents_total_loss() {
-    let mut state =
-        AnnualizedReturn::new(MetricInputKind::Returns, 252.0, NanPolicy::Omit).unwrap();
+    let mut state = AnnualizedReturn::new(252.0, NanPolicy::Omit).unwrap();
+    state.from_returns(&[]).unwrap();
     state.extend(&[f64::NAN, 0.25, -1.0]).unwrap();
     assert_eq!(state.value(), Some(-1.0));
     assert_eq!(state.len(), 2);
@@ -72,8 +67,8 @@ fn omits_nan_and_represents_total_loss() {
 #[test]
 fn validates_configuration_and_semantic_domain() {
     for invalid in [0.0, -1.0, f64::NAN, f64::INFINITY] {
-        assert!(AnnualizedReturn::new(MetricInputKind::Returns, invalid, NanPolicy::Omit).is_err());
+        assert!(AnnualizedReturn::new(invalid, NanPolicy::Omit).is_err());
     }
-    assert!(AnnualizedReturn::new(MetricInputKind::RawPnl, 252.0, NanPolicy::Omit).is_err());
-    assert!(AnnualizedReturn::new(MetricInputKind::Trades, 252.0, NanPolicy::Omit).is_err());
+    let mut unbound = AnnualizedReturn::new(252.0, NanPolicy::Omit).unwrap();
+    assert!(unbound.append(0.01).is_err());
 }

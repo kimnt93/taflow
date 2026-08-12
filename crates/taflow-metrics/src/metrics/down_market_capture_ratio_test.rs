@@ -16,13 +16,12 @@ fn filters_negative_benchmark_periods_and_preserves_lifecycle() {
     let primary = [0.03, -0.01, 0.02, 0.04];
     let benchmark = [0.01, -0.02, -0.025, 0.01];
     let expected = annualized(&[-0.01, 0.02], 12.0) / annualized(&[-0.02, -0.025], 12.0);
-    let mut state = DownMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = DownMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.append(primary[0], benchmark[0]).unwrap(), None);
@@ -47,13 +46,12 @@ fn filters_negative_benchmark_periods_and_preserves_lifecycle() {
 
 #[test]
 fn omits_missing_pairs_and_requires_an_eligible_observation() {
-    let mut state = DownMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = DownMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     state
         .extend(
             &[0.10, f64::NAN, 0.05, -0.02],
@@ -67,13 +65,12 @@ fn omits_missing_pairs_and_requires_an_eligible_observation() {
     assert_eq!(state.len(), 2);
     assert_eq!(state.eligible_count(), 1);
 
-    let mut only_up = DownMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut only_up = DownMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     only_up.extend(&[0.01, -0.02], &[0.02, 0.0]).unwrap();
     assert_eq!(only_up.value(), None);
 }
@@ -82,25 +79,23 @@ fn omits_missing_pairs_and_requires_an_eligible_observation() {
 fn input_modes_produce_equivalent_results() {
     let primary_returns = [0.10, -0.20, 0.05];
     let benchmark_returns = [0.02, -0.10, -0.01];
-    let mut returns = DownMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut returns = DownMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     let expected = returns
         .extend(&primary_returns, &benchmark_returns)
         .unwrap()
         .unwrap();
 
-    let mut equity = DownMarketCaptureRatio::new(
-        MetricInputKind::Equity,
-        MetricInputKind::Equity,
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut equity = DownMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_equity(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         equity
             .extend(&[100.0, 110.0, 88.0, 92.4], &[200.0, 204.0, 183.6, 181.764])
@@ -109,17 +104,12 @@ fn input_modes_produce_equivalent_results() {
         expected,
     );
 
-    let mut pnl = DownMarketCaptureRatio::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        MetricInputKind::PeriodPnl {
-            initial_equity: 200.0,
-        },
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut pnl = DownMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[], &[], 100.0, 200.0)?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         pnl.extend(&[10.0, -22.0, 4.4], &[4.0, -20.4, -1.836])
             .unwrap()
@@ -127,13 +117,12 @@ fn input_modes_produce_equivalent_results() {
         expected,
     );
 
-    let mut logarithmic = DownMarketCaptureRatio::new(
-        MetricInputKind::LogReturns,
-        MetricInputKind::LogReturns,
-        12.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut logarithmic = DownMarketCaptureRatio::new(12.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_log_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         logarithmic
             .extend(
@@ -149,25 +138,28 @@ fn input_modes_produce_equivalent_results() {
 #[test]
 fn rejects_invalid_configuration_misalignment_and_domains_transactionally() {
     for invalid in [0.0, -1.0, f64::NAN, f64::INFINITY] {
-        assert!(DownMarketCaptureRatio::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            invalid,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(DownMarketCaptureRatio::new(invalid, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .is_err());
     }
     for kind in [MetricInputKind::RawPnl, MetricInputKind::Trades] {
-        assert!(DownMarketCaptureRatio::new(kind, kind, 252.0, NanPolicy::Omit).is_err());
+        assert!(DownMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.append(0.0, 0.0)?;
+                Ok(state)
+            })
+            .is_err());
     }
 
-    let mut state = DownMarketCaptureRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = DownMarketCaptureRatio::new(252.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(state.extend(&[0.01, 0.02], &[-0.01]).is_err());
     assert_eq!(state.len(), 0);
 }

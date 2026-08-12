@@ -15,7 +15,7 @@ fn converts_every_supported_domain_and_tracks_usable_length() {
         (MetricInputKind::Equity, equity.as_slice()),
         (
             MetricInputKind::PeriodPnl {
-                initial_equity: 100.0,
+                initial_capital: 100.0,
             },
             pnl.as_slice(),
         ),
@@ -62,7 +62,7 @@ fn failures_do_not_mutate_conversion_state() {
 
     let mut pnl = MetricInputState::new(
         MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
+            initial_capital: 100.0,
         },
         NanPolicy::Omit,
     )
@@ -77,7 +77,7 @@ fn failures_do_not_mutate_conversion_state() {
 fn validates_configuration_and_nonfinite_values() {
     assert!(MetricInputState::new(
         MetricInputKind::PeriodPnl {
-            initial_equity: 0.0,
+            initial_capital: 0.0,
         },
         NanPolicy::Omit,
     )
@@ -127,7 +127,7 @@ fn specialized_bulk_matches_scalar_state_and_bits() {
         ),
         (
             MetricInputKind::PeriodPnl {
-                initial_equity: 100.0,
+                initial_capital: 100.0,
             },
             vec![2.0, -1.0, f64::NAN, 4.0, -3.0],
         ),

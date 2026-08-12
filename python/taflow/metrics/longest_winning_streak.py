@@ -27,64 +27,27 @@ class LongestWinningStreak:
     streaming state.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use LongestWinningStreak.from_returns/from_pnl/from_trades"
-        )
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "LongestWinningStreak":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy)
-        return state.extend(values, column=column)
+    def from_returns(self, returns: Any, *, column: str | None = None) -> "LongestWinningStreak":
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "LongestWinningStreak":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+    def from_pnl(self, pnl: Any, *, column: str | None = None) -> "LongestWinningStreak":
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
 
-    @classmethod
-    def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "LongestWinningStreak":
-        """Construct from raw non-cumulative period P&L without conversion."""
-        return cls._create(pnl, "pnl", nan_policy=nan_policy, column=column)
-
-    @classmethod
-    def from_trades(
-        cls,
-        trade_pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "LongestWinningStreak":
-        """Construct from realized P&L observations for closed trades."""
-        return cls._create(
-            trade_pnl, "trades", nan_policy=nan_policy, column=column
-        )
+    def from_trades(self, trades: Any, *, column: str | None = None) -> "LongestWinningStreak":
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, value: float) -> "LongestWinningStreak":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

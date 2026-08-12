@@ -4,8 +4,12 @@ use crate::{MetricInputKind, NanPolicy};
 #[test]
 fn computes_signed_gaussian_lower_quantile() {
     let returns = [-0.02, 0.01, 0.03, -0.01, 0.015];
-    let mut metric =
-        ParametricValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
+    let mut metric = ParametricValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     let actual = metric.extend(&returns).unwrap().unwrap();
     let mean = returns.iter().sum::<f64>() / returns.len() as f64;
@@ -20,19 +24,42 @@ fn computes_signed_gaussian_lower_quantile() {
 }
 
 #[test]
-fn factories_and_lifecycle_are_invariant() {
+fn input_methods_and_lifecycle_are_invariant() {
     let returns: [f64; 4] = [0.10, -0.20, 0.05, -0.03];
     let log_returns: Vec<f64> = returns.iter().map(|value| value.ln_1p()).collect();
     let equity = [100.0, 110.0, 88.0, 92.4, 89.628];
     let pnl = [10.0, -22.0, 4.4, -2.772];
-    let create = |kind| ParametricValueAtRisk::new(kind, 0.05, NanPolicy::Omit).unwrap();
+    let create = |kind| {
+        ParametricValueAtRisk::new(0.05, NanPolicy::Omit)
+            .and_then(|mut state| {
+                match kind {
+                    MetricInputKind::Returns => {
+                        state.from_returns(&[])?;
+                    }
+                    MetricInputKind::LogReturns => {
+                        state.from_log_returns(&[])?;
+                    }
+                    MetricInputKind::Equity => {
+                        state.from_equity(&[])?;
+                    }
+                    MetricInputKind::PeriodPnl { initial_capital } => {
+                        state.from_pnl(&[], initial_capital)?;
+                    }
+                    MetricInputKind::RawPnl | MetricInputKind::Trades => {
+                        state.append(0.0)?;
+                    }
+                }
+                Ok(state)
+            })
+            .unwrap()
+    };
 
     let mut from_returns = create(MetricInputKind::Returns);
     let expected = from_returns.extend(&returns).unwrap().unwrap();
     let mut from_logs = create(MetricInputKind::LogReturns);
     let mut from_equity = create(MetricInputKind::Equity);
     let mut from_pnl = create(MetricInputKind::PeriodPnl {
-        initial_equity: 100.0,
+        initial_capital: 100.0,
     });
 
     assert!((from_logs.extend(&log_returns).unwrap().unwrap() - expected).abs() < 1e-14);
@@ -56,33 +83,62 @@ fn factories_and_lifecycle_are_invariant() {
 
 #[test]
 fn omits_missing_values_and_constant_sample_returns_mean() {
-    let mut with_missing =
-        ParametricValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
-    let mut without_missing =
-        ParametricValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
+    let mut with_missing = ParametricValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
+    let mut without_missing = ParametricValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(
         with_missing.extend(&[0.01, f64::NAN, -0.02, 0.03]).unwrap(),
         without_missing.extend(&[0.01, -0.02, 0.03]).unwrap()
     );
     assert_eq!(with_missing.len(), 3);
 
-    let mut constant =
-        ParametricValueAtRisk::new(MetricInputKind::Returns, 0.01, NanPolicy::Omit).unwrap();
+    let mut constant = ParametricValueAtRisk::new(0.01, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(constant.extend(&[0.0125, 0.0125]).unwrap(), Some(0.0125));
 }
 
 #[test]
 fn validates_configuration_and_requires_two_returns() {
     for cutoff in [f64::NAN, f64::NEG_INFINITY, 0.0, 1.0, f64::INFINITY] {
-        assert!(
-            ParametricValueAtRisk::new(MetricInputKind::Returns, cutoff, NanPolicy::Omit).is_err()
-        );
+        assert!(ParametricValueAtRisk::new(cutoff, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .is_err());
     }
-    assert!(ParametricValueAtRisk::new(MetricInputKind::RawPnl, 0.05, NanPolicy::Omit).is_err());
-    assert!(ParametricValueAtRisk::new(MetricInputKind::Trades, 0.05, NanPolicy::Omit).is_err());
+    assert!(ParametricValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(ParametricValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
 
-    let mut metric =
-        ParametricValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
+    let mut metric = ParametricValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(metric.compute(), None);
     assert_eq!(metric.append(0.01).unwrap(), None);
     assert!(metric.append(0.02).unwrap().is_some());

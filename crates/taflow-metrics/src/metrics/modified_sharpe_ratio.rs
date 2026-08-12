@@ -19,7 +19,6 @@ pub struct ModifiedSharpeRatio {
 impl ModifiedSharpeRatio {
     /// Construct an empty modified-Sharpe state.
     pub fn new(
-        input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_risk_free_rate: f64,
         confidence_level: f64,
@@ -46,16 +45,6 @@ impl ModifiedSharpeRatio {
                 reason: "must be finite and strictly between 0.5 and 1",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "modified Sharpe ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         let period_risk_free_rate = (annual_risk_free_rate.ln_1p() / periods_per_year).exp_m1();
         if !period_risk_free_rate.is_finite() {
@@ -67,7 +56,7 @@ impl ModifiedSharpeRatio {
         }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             count: 0,
             mean: 0.0,
             second_central_moment: 0.0,
@@ -248,3 +237,5 @@ impl ModifiedSharpeRatio {
             / (((((B[0] * r + B[1]) * r + B[2]) * r + B[3]) * r + B[4]) * r + 1.0)
     }
 }
+
+crate::impl_return_metric_lifecycle!(ModifiedSharpeRatio);

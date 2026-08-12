@@ -16,28 +16,30 @@ class MaximumDrawdownDuration:
     its running peak returns ``None``. NaNs are omitted by default. Rust owns
     the O(1) state and converts returns, log returns, equity, or period P&L.
     """
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic factory."""
-        raise TypeError("use MaximumDrawdownDuration.from_returns/from_equity/from_pnl/from_log_returns")
-    @classmethod
-    def _create(cls, values: Any, mode: str, *, initial_equity: float | None = None, nan_policy: str = "omit", column: str | None = None) -> "MaximumDrawdownDuration":
-        state = cls.__new__(cls); state._state = _Native(mode, initial_equity=initial_equity, nan_policy=nan_policy); return state.extend(values, column=column)
-    @classmethod
-    def from_returns(cls, returns: Any, *, nan_policy: str = "omit", column: str | None = None) -> "MaximumDrawdownDuration":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(returns, "returns", nan_policy=nan_policy, column=column)
-    @classmethod
-    def from_log_returns(cls, log_returns: Any, *, nan_policy: str = "omit", column: str | None = None) -> "MaximumDrawdownDuration":
-        """Construct from chronological log returns converted by Rust."""
-        return cls._create(log_returns, "log_returns", nan_policy=nan_policy, column=column)
-    @classmethod
-    def from_equity(cls, equity: Any, *, nan_policy: str = "omit", column: str | None = None) -> "MaximumDrawdownDuration":
-        """Construct from positive chronological equity levels."""
-        return cls._create(equity, "equity", nan_policy=nan_policy, column=column)
-    @classmethod
-    def from_pnl(cls, pnl: Any, *, initial_equity: float, nan_policy: str = "omit", column: str | None = None) -> "MaximumDrawdownDuration":
-        """Construct from period P&L and required positive initial equity."""
-        return cls._create(pnl, "pnl", initial_equity=float(initial_equity), nan_policy=nan_policy, column=column)
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
+
+    def from_returns(self, returns: Any, *, column: str | None = None) -> "MaximumDrawdownDuration":
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
+
+    def from_log_returns(self, log_returns: Any, *, column: str | None = None) -> "MaximumDrawdownDuration":
+        """Append chronological log returns observations and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
+
+    def from_equity(self, equity: Any, *, column: str | None = None) -> "MaximumDrawdownDuration":
+        """Append chronological equity observations and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
+
+    def from_pnl(self, pnl: Any, initial_capital: float, *, column: str | None = None) -> "MaximumDrawdownDuration":
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column), float(initial_capital))
+        return self
+
     def append(self, value: float) -> "MaximumDrawdownDuration":
         """Append one observation and return this metric."""
         self._state.append(float(value)); return self

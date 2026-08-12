@@ -7,6 +7,7 @@ pub struct EffectiveNumberOfBets {
     contribution_sum: f64,
     contribution_log_sum: f64,
     count: usize,
+    input_kind: Option<bool>,
 }
 
 impl EffectiveNumberOfBets {
@@ -17,15 +18,23 @@ impl EffectiveNumberOfBets {
             contribution_sum: 0.0,
             contribution_log_sum: 0.0,
             count: 0,
+            input_kind: None,
         })
+    }
+
+    pub fn from_risk_contributions(&mut self, contributions: &[f64]) -> MetricResult<&mut Self> {
+        self.bind(false)?;
+        self.extend(contributions)?;
+        Ok(self)
     }
 
     /// Build PCA-independent risk contributions from weights and covariance.
     pub fn from_weights_and_covariance(
+        &mut self,
         weights: &[f64],
         covariance: &[f64],
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    ) -> MetricResult<&mut Self> {
+        self.bind(true)?;
         let dimension = weights.len();
         if dimension == 0 || covariance.len() != dimension * dimension {
             return Err(MetricError::InvalidParameter {
@@ -73,18 +82,35 @@ impl EffectiveNumberOfBets {
             });
         }
 
-        let mut state = Self::new(nan_policy)?;
         for component in 0..dimension {
             let exposure = (0..dimension)
                 .map(|asset| eigenvectors[asset * dimension + component] * weights[asset])
                 .sum::<f64>();
-            state.append(eigenvalues[component].max(0.0) * exposure * exposure)?;
+            self.append(eigenvalues[component].max(0.0) * exposure * exposure)?;
         }
-        Ok(state)
+        Ok(self)
+    }
+
+    fn bind(&mut self, kind: bool) -> MetricResult<()> {
+        match self.input_kind {
+            None => self.input_kind = Some(kind),
+            Some(selected) if selected == kind => {}
+            Some(_) => {
+                return Err(MetricError::InvalidParameter {
+                    name: "input_kind",
+                    value: "different effective-bets input".to_owned(),
+                    reason: "input domain is already selected",
+                })
+            }
+        }
+        Ok(())
     }
 
     /// Append one non-negative independent risk contribution.
     pub fn append(&mut self, contribution: f64) -> MetricResult<Option<f64>> {
+        if self.input_kind.is_none() {
+            return Err(MetricError::InvalidParameter { name: "input_kind", value: "unbound".to_owned(), reason: "call from_risk_contributions or from_weights_and_covariance before append or extend" });
+        }
         if contribution.is_nan() {
             return match self.nan_policy {
                 NanPolicy::Omit => Ok(self.value()),

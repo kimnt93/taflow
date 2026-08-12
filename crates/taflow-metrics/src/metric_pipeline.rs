@@ -1,555 +1,281 @@
 use crate::{
     metrics::{
-        AnnualizedReturn, AnnualizedVolatility, AverageDrawdown, AverageLoss, AverageWin,
-        BreakevenRate, CalmarRatio, CommonSenseRatio, CompositeProfitabilityConsistencyIndex,
-        ConditionalDrawdownAtRisk, DownsideDeviation, EntropicValueAtRisk, Exposure,
-        ExposureInputKind, GainToPainRatio, HistoricalExpectedShortfall, HistoricalValueAtRisk,
-        KellyCriterion, LongestLosingStreak, LongestWinningStreak, MaximumDrawdown,
-        MaximumDrawdownDuration, ModifiedSharpeRatio, OmegaRatio, PainIndex, PainRatio,
-        ParametricExpectedShortfall, ParametricValueAtRisk, PayoffRatio, ProbabilisticSharpeRatio,
-        ProfitFactor, RecoveryFactor, SharpeRatio, SortinoRatio, StabilityOfTimeSeries, TailRatio,
-        TotalReturn, UlcerIndex, UlcerPerformanceIndex, WinRate,
+        AnnualizedReturn, AnnualizedVolatility, AverageDrawdown, CalmarRatio,
+        ConditionalDrawdownAtRisk, DeflatedSharpeRatio, DownsideDeviation, EntropicValueAtRisk,
+        GainToPainRatio, HistoricalExpectedShortfall, HistoricalValueAtRisk, MaximumDrawdown,
+        ModifiedSharpeRatio, OmegaRatio, PainIndex, PainRatio, ParametricExpectedShortfall,
+        ParametricValueAtRisk, ProbabilisticSharpeRatio, RecoveryFactor, SharpeRatio, SortinoRatio,
+        StabilityOfTimeSeries, TailRatio, TotalReturn, UlcerIndex, UlcerPerformanceIndex,
     },
-    MetricError, MetricInputKind, MetricInputState, MetricResult, NanPolicy,
+    MetricError, MetricResult,
 };
 
-/// Shared configuration applied when constructing compatible pipeline metrics.
-#[derive(Debug, Clone, Copy)]
-pub struct MetricPipelineConfiguration {
-    pub periods_per_year: f64,
-    pub annual_risk_free_rate: f64,
-    pub annual_required_return: f64,
-    pub annual_benchmark_sharpe_ratio: f64,
-    pub cutoff: f64,
-    pub confidence_level: f64,
+/// Semantic input domain selected for all metrics in a pipeline.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MetricPipelineInputKind {
+    Returns,
+    LogReturns,
+    Equity,
+    PeriodPnl,
 }
 
-impl Default for MetricPipelineConfiguration {
-    fn default() -> Self {
-        Self {
-            periods_per_year: 252.0,
-            annual_risk_free_rate: 0.0,
-            annual_required_return: 0.0,
-            annual_benchmark_sharpe_ratio: 0.0,
-            cutoff: 0.05,
-            confidence_level: 0.95,
-        }
-    }
+/// Type-erased lifecycle used by `MetricPipeline` to own configured metrics.
+pub trait PipelineMetric: Send {
+    fn supports(&self, input_kind: MetricPipelineInputKind) -> bool;
+    fn from_returns(&mut self, returns: &[f64]) -> MetricResult<()>;
+    fn from_log_returns(&mut self, log_returns: &[f64]) -> MetricResult<()>;
+    fn from_equity(&mut self, equity: &[f64]) -> MetricResult<()>;
+    fn from_pnl(&mut self, pnl: &[f64], initial_capital: f64) -> MetricResult<()>;
+    fn append(&mut self, value: f64) -> MetricResult<()>;
+    fn extend(&mut self, values: &[f64]) -> MetricResult<()>;
+    fn compute(&mut self) -> Option<f64>;
+    fn reset(&mut self);
+    fn len(&self) -> usize;
 }
 
-macro_rules! metric_nodes {
-    ($(($variant:ident, $state:ty, $name:literal)),+ $(,)?) => {
-        #[derive(Debug, Clone)]
-        enum MetricNode {
-            $($variant($state)),+
-        }
-
-        impl MetricNode {
-            fn name(&self) -> &'static str {
-                match self { $(Self::$variant(_) => $name),+ }
+macro_rules! impl_return_pipeline_metric {
+    ($state:ty) => {
+        impl PipelineMetric for $state {
+            fn supports(&self, _: MetricPipelineInputKind) -> bool {
+                true
             }
-
+            fn from_returns(&mut self, values: &[f64]) -> MetricResult<()> {
+                <$state>::from_returns(self, values).map(|_| ())
+            }
+            fn from_log_returns(&mut self, values: &[f64]) -> MetricResult<()> {
+                <$state>::from_log_returns(self, values).map(|_| ())
+            }
+            fn from_equity(&mut self, values: &[f64]) -> MetricResult<()> {
+                <$state>::from_equity(self, values).map(|_| ())
+            }
+            fn from_pnl(&mut self, values: &[f64], initial_capital: f64) -> MetricResult<()> {
+                <$state>::from_pnl(self, values, initial_capital).map(|_| ())
+            }
             fn append(&mut self, value: f64) -> MetricResult<()> {
-                match self {
-                    $(Self::$variant(state) => state.append(value).map(|_| ())),+
-                }
+                <$state>::append(self, value).map(|_| ())
             }
-
             fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
-                match self {
-                    $(Self::$variant(state) => state.extend(values).map(|_| ())),+
-                }
+                <$state>::extend(self, values).map(|_| ())
             }
-
-            fn value(&mut self) -> Option<f64> {
-                match self {
-                    $(Self::$variant(state) => state.value()),+
-                }
+            fn compute(&mut self) -> Option<f64> {
+                <$state>::compute(self)
             }
-
             fn reset(&mut self) {
-                match self { $(Self::$variant(state) => state.reset()),+ }
+                <$state>::reset(self)
+            }
+            fn len(&self) -> usize {
+                <$state>::len(self)
             }
         }
     };
 }
 
-metric_nodes!(
-    (TotalReturn, TotalReturn, "TotalReturn"),
-    (AnnualizedReturn, AnnualizedReturn, "AnnualizedReturn"),
-    (
-        AnnualizedVolatility,
-        AnnualizedVolatility,
-        "AnnualizedVolatility"
-    ),
-    (MaximumDrawdown, MaximumDrawdown, "MaximumDrawdown"),
-    (DownsideDeviation, DownsideDeviation, "DownsideDeviation"),
-    (SharpeRatio, SharpeRatio, "SharpeRatio"),
-    (SortinoRatio, SortinoRatio, "SortinoRatio"),
-    (CalmarRatio, CalmarRatio, "CalmarRatio"),
-    (OmegaRatio, OmegaRatio, "OmegaRatio"),
-    (
-        HistoricalValueAtRisk,
-        HistoricalValueAtRisk,
-        "HistoricalValueAtRisk"
-    ),
-    (
-        HistoricalExpectedShortfall,
-        HistoricalExpectedShortfall,
-        "HistoricalExpectedShortfall"
-    ),
-    (TailRatio, TailRatio, "TailRatio"),
-    (UlcerIndex, UlcerIndex, "UlcerIndex"),
-    (
-        UlcerPerformanceIndex,
-        UlcerPerformanceIndex,
-        "UlcerPerformanceIndex"
-    ),
-    (RecoveryFactor, RecoveryFactor, "RecoveryFactor"),
-    (GainToPainRatio, GainToPainRatio, "GainToPainRatio"),
-    (PainIndex, PainIndex, "PainIndex"),
-    (PainRatio, PainRatio, "PainRatio"),
-    (AverageDrawdown, AverageDrawdown, "AverageDrawdown"),
-    (
-        StabilityOfTimeSeries,
-        StabilityOfTimeSeries,
-        "StabilityOfTimeSeries"
-    ),
-    (BreakevenRate, BreakevenRate, "BreakevenRate"),
-    (WinRate, WinRate, "WinRate"),
-    (AverageWin, AverageWin, "AverageWin"),
-    (AverageLoss, AverageLoss, "AverageLoss"),
-    (PayoffRatio, PayoffRatio, "PayoffRatio"),
-    (ProfitFactor, ProfitFactor, "ProfitFactor"),
-    (
-        LongestWinningStreak,
-        LongestWinningStreak,
-        "LongestWinningStreak"
-    ),
-    (CommonSenseRatio, CommonSenseRatio, "CommonSenseRatio"),
-    (
-        CompositeProfitabilityConsistencyIndex,
-        CompositeProfitabilityConsistencyIndex,
-        "CompositeProfitabilityConsistencyIndex"
-    ),
-    (KellyCriterion, KellyCriterion, "KellyCriterion"),
-    (
-        ModifiedSharpeRatio,
-        ModifiedSharpeRatio,
-        "ModifiedSharpeRatio"
-    ),
-    (
-        ProbabilisticSharpeRatio,
-        ProbabilisticSharpeRatio,
-        "ProbabilisticSharpeRatio"
-    ),
-    (
-        ParametricValueAtRisk,
-        ParametricValueAtRisk,
-        "ParametricValueAtRisk"
-    ),
-    (
-        ParametricExpectedShortfall,
-        ParametricExpectedShortfall,
-        "ParametricExpectedShortfall"
-    ),
-    (
-        ConditionalDrawdownAtRisk,
-        ConditionalDrawdownAtRisk,
-        "ConditionalDrawdownAtRisk"
-    ),
-    (
-        EntropicValueAtRisk,
-        EntropicValueAtRisk,
-        "EntropicValueAtRisk"
-    ),
-    (Exposure, Exposure, "Exposure"),
-);
+impl_return_pipeline_metric!(SharpeRatio);
+impl_return_pipeline_metric!(SortinoRatio);
+impl_return_pipeline_metric!(TotalReturn);
+impl_return_pipeline_metric!(AnnualizedReturn);
+impl_return_pipeline_metric!(AnnualizedVolatility);
+impl_return_pipeline_metric!(MaximumDrawdown);
+impl_return_pipeline_metric!(DownsideDeviation);
+impl_return_pipeline_metric!(CalmarRatio);
+impl_return_pipeline_metric!(OmegaRatio);
+impl_return_pipeline_metric!(GainToPainRatio);
+impl_return_pipeline_metric!(PainIndex);
+impl_return_pipeline_metric!(UlcerIndex);
+impl_return_pipeline_metric!(AverageDrawdown);
+impl_return_pipeline_metric!(ConditionalDrawdownAtRisk);
+impl_return_pipeline_metric!(EntropicValueAtRisk);
+impl_return_pipeline_metric!(HistoricalExpectedShortfall);
+impl_return_pipeline_metric!(HistoricalValueAtRisk);
+impl_return_pipeline_metric!(ParametricExpectedShortfall);
+impl_return_pipeline_metric!(ParametricValueAtRisk);
+impl_return_pipeline_metric!(RecoveryFactor);
+impl_return_pipeline_metric!(StabilityOfTimeSeries);
+impl_return_pipeline_metric!(TailRatio);
+impl_return_pipeline_metric!(DeflatedSharpeRatio);
+impl_return_pipeline_metric!(ModifiedSharpeRatio);
+impl_return_pipeline_metric!(PainRatio);
+impl_return_pipeline_metric!(ProbabilisticSharpeRatio);
+impl_return_pipeline_metric!(UlcerPerformanceIndex);
 
-impl MetricNode {
-    fn extend_pipeline(&mut self, values: &[f64]) -> MetricResult<()> {
-        match self {
-            Self::TotalReturn(state) => state.extend_normalized(values),
-            Self::AnnualizedReturn(state) => state.extend_normalized(values),
-            Self::AnnualizedVolatility(state) => state.extend_normalized(values),
-            Self::MaximumDrawdown(state) => state.extend_normalized(values),
-            Self::DownsideDeviation(state) => state.extend_normalized(values),
-            Self::SharpeRatio(state) => state.extend_normalized(values),
-            Self::SortinoRatio(state) => state.extend_normalized(values),
-            Self::CalmarRatio(state) => state.extend_normalized(values),
-            _ => self.extend(values),
-        }
-    }
+struct NamedMetric {
+    name: String,
+    metric: Box<dyn PipelineMetric>,
 }
 
-#[derive(Debug, Clone)]
-enum IntegralMetricNode {
-    LongestLosingStreak(LongestLosingStreak),
-    MaximumDrawdownDuration(MaximumDrawdownDuration),
-}
-
-impl IntegralMetricNode {
-    fn name(&self) -> &'static str {
-        match self {
-            Self::LongestLosingStreak(_) => "LongestLosingStreak",
-            Self::MaximumDrawdownDuration(_) => "MaximumDrawdownDuration",
-        }
-    }
-
-    fn append(&mut self, value: f64) -> MetricResult<()> {
-        match self {
-            Self::LongestLosingStreak(state) => state.append(value).map(|_| ()),
-            Self::MaximumDrawdownDuration(state) => state.append(value).map(|_| ()),
-        }
-    }
-
-    fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
-        match self {
-            Self::LongestLosingStreak(state) => state.extend(values).map(|_| ()),
-            Self::MaximumDrawdownDuration(state) => state.extend(values).map(|_| ()),
-        }
-    }
-
-    fn value(&mut self) -> Option<f64> {
-        match self {
-            Self::LongestLosingStreak(state) => state.value().map(|value| value as f64),
-            Self::MaximumDrawdownDuration(state) => state.value().map(|value| value as f64),
-        }
-    }
-
-    fn reset(&mut self) {
-        match self {
-            Self::LongestLosingStreak(state) => state.reset(),
-            Self::MaximumDrawdownDuration(state) => state.reset(),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-enum PipelineNode {
-    Floating(MetricNode),
-    Integral(IntegralMetricNode),
-}
-
-impl PipelineNode {
-    fn name(&self) -> &'static str {
-        match self {
-            Self::Floating(node) => node.name(),
-            Self::Integral(node) => node.name(),
-        }
-    }
-
-    fn append(&mut self, value: f64) -> MetricResult<()> {
-        match self {
-            Self::Floating(node) => node.append(value),
-            Self::Integral(node) => node.append(value),
-        }
-    }
-
-    fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
-        match self {
-            Self::Floating(node) => node.extend_pipeline(values),
-            Self::Integral(node) => node.extend(values),
-        }
-    }
-
-    fn value(&mut self) -> Option<f64> {
-        match self {
-            Self::Floating(node) => node.value(),
-            Self::Integral(node) => node.value(),
-        }
-    }
-
-    fn reset(&mut self) {
-        match self {
-            Self::Floating(node) => node.reset(),
-            Self::Integral(node) => node.reset(),
-        }
-    }
-}
-
-/// Native fan-out pipeline that normalizes one input stream once.
-#[derive(Debug, Clone)]
+/// Pipeline of configured metrics addressed by caller-provided names.
 pub struct MetricPipeline {
-    input: MetricInputState,
-    nodes: Vec<PipelineNode>,
-    normalized: Vec<f64>,
+    metrics: Vec<NamedMetric>,
+    input_kind: Option<MetricPipelineInputKind>,
+}
+
+impl Default for MetricPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MetricPipeline {
-    pub const SUPPORTED_METRICS: &'static [&'static str] = &[
-        "TotalReturn",
-        "AnnualizedReturn",
-        "AnnualizedVolatility",
-        "MaximumDrawdown",
-        "DownsideDeviation",
-        "SharpeRatio",
-        "SortinoRatio",
-        "CalmarRatio",
-        "OmegaRatio",
-        "HistoricalValueAtRisk",
-        "HistoricalExpectedShortfall",
-        "TailRatio",
-        "UlcerIndex",
-        "UlcerPerformanceIndex",
-        "RecoveryFactor",
-        "GainToPainRatio",
-        "PainIndex",
-        "PainRatio",
-        "AverageDrawdown",
-        "MaximumDrawdownDuration",
-        "StabilityOfTimeSeries",
-        "BreakevenRate",
-        "WinRate",
-        "AverageWin",
-        "AverageLoss",
-        "PayoffRatio",
-        "ProfitFactor",
-        "LongestLosingStreak",
-        "LongestWinningStreak",
-        "CommonSenseRatio",
-        "CompositeProfitabilityConsistencyIndex",
-        "KellyCriterion",
-        "ModifiedSharpeRatio",
-        "ProbabilisticSharpeRatio",
-        "ParametricValueAtRisk",
-        "ParametricExpectedShortfall",
-        "ConditionalDrawdownAtRisk",
-        "EntropicValueAtRisk",
-        "Exposure",
-    ];
+    /// Construct an empty pipeline. Add configured metrics before ingesting data.
+    pub fn new() -> Self {
+        Self {
+            metrics: Vec::new(),
+            input_kind: None,
+        }
+    }
 
-    pub fn new(
-        input_kind: MetricInputKind,
-        metrics: &[String],
-        configuration: MetricPipelineConfiguration,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
+    /// Add a configured metric under a unique caller-provided name.
+    pub fn add<M>(&mut self, name: impl Into<String>, metric: M) -> MetricResult<&mut Self>
+    where
+        M: PipelineMetric + 'static,
+    {
+        if self.input_kind.is_some() {
+            return Err(MetricError::InvalidParameter {
+                name: "metric",
+                value: "configured metric".to_owned(),
+                reason: "metrics must be added before pipeline input is selected",
+            });
+        }
+        let name = name.into();
+        if name.is_empty() || self.metrics.iter().any(|entry| entry.name == name) {
+            return Err(MetricError::InvalidParameter {
+                name: "name",
+                value: name,
+                reason: "metric name must be non-empty and unique",
+            });
+        }
+        self.metrics.push(NamedMetric {
+            name,
+            metric: Box::new(metric),
+        });
+        Ok(self)
+    }
+
+    pub fn from_returns(&mut self, returns: &[f64]) -> MetricResult<&mut Self> {
+        self.ingest(MetricPipelineInputKind::Returns, returns, None)
+    }
+
+    pub fn from_log_returns(&mut self, values: &[f64]) -> MetricResult<&mut Self> {
+        self.ingest(MetricPipelineInputKind::LogReturns, values, None)
+    }
+
+    pub fn from_equity(&mut self, values: &[f64]) -> MetricResult<&mut Self> {
+        self.ingest(MetricPipelineInputKind::Equity, values, None)
+    }
+
+    pub fn from_pnl(&mut self, pnl: &[f64], initial_capital: f64) -> MetricResult<&mut Self> {
+        self.ingest(
+            MetricPipelineInputKind::PeriodPnl,
+            pnl,
+            Some(initial_capital),
+        )
+    }
+
+    fn ingest(
+        &mut self,
+        input_kind: MetricPipelineInputKind,
+        values: &[f64],
+        initial_capital: Option<f64>,
+    ) -> MetricResult<&mut Self> {
+        self.select(input_kind)?;
+        for entry in &mut self.metrics {
+            match input_kind {
+                MetricPipelineInputKind::Returns => entry.metric.from_returns(values)?,
+                MetricPipelineInputKind::LogReturns => entry.metric.from_log_returns(values)?,
+                MetricPipelineInputKind::Equity => entry.metric.from_equity(values)?,
+                MetricPipelineInputKind::PeriodPnl => entry.metric.from_pnl(
+                    values,
+                    initial_capital.expect("period P&L requires initial capital"),
+                )?,
+            }
+        }
+        Ok(self)
+    }
+
+    fn select(&mut self, input_kind: MetricPipelineInputKind) -> MetricResult<()> {
+        if self
+            .input_kind
+            .is_some_and(|selected| selected != input_kind)
+        {
             return Err(MetricError::InvalidParameter {
                 name: "input_kind",
                 value: format!("{input_kind:?}"),
-                reason: "metric pipeline requires returns, log returns, equity, or period P&L",
+                reason: "pipeline input domain is already selected",
             });
         }
-        let names: Vec<&str> = if metrics.is_empty() {
-            Self::SUPPORTED_METRICS.to_vec()
-        } else {
-            metrics.iter().map(String::as_str).collect()
-        };
-        let mut nodes = Vec::with_capacity(names.len());
-        for (index, name) in names.iter().enumerate() {
-            if names[..index].contains(name) {
-                return Err(MetricError::InvalidParameter {
-                    name: "metrics",
-                    value: (*name).to_owned(),
-                    reason: "metric names must be unique",
-                });
-            }
-            nodes.push(Self::build_node(name, configuration)?);
+        if let Some(entry) = self
+            .metrics
+            .iter()
+            .find(|entry| !entry.metric.supports(input_kind))
+        {
+            return Err(MetricError::InvalidParameter {
+                name: "metric",
+                value: entry.name.clone(),
+                reason: "metric does not support the selected pipeline input domain",
+            });
         }
-        Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
-            nodes,
-            normalized: Vec::new(),
-        })
-    }
-
-    fn build_node(name: &str, c: MetricPipelineConfiguration) -> MetricResult<PipelineNode> {
-        let input = MetricInputKind::Returns;
-        let policy = NanPolicy::Raise;
-        let floating = match name {
-            "TotalReturn" => MetricNode::TotalReturn(TotalReturn::new(input, policy)?),
-            "AnnualizedReturn" => MetricNode::AnnualizedReturn(AnnualizedReturn::new(
-                input,
-                c.periods_per_year,
-                policy,
-            )?),
-            "AnnualizedVolatility" => MetricNode::AnnualizedVolatility(AnnualizedVolatility::new(
-                input,
-                c.periods_per_year,
-                policy,
-            )?),
-            "MaximumDrawdown" => MetricNode::MaximumDrawdown(MaximumDrawdown::new(input, policy)?),
-            "DownsideDeviation" => MetricNode::DownsideDeviation(DownsideDeviation::new(
-                input,
-                c.periods_per_year,
-                c.annual_required_return,
-                policy,
-            )?),
-            "SharpeRatio" => MetricNode::SharpeRatio(SharpeRatio::new(
-                input,
-                c.periods_per_year,
-                c.annual_risk_free_rate,
-                policy,
-            )?),
-            "SortinoRatio" => MetricNode::SortinoRatio(SortinoRatio::new(
-                input,
-                c.periods_per_year,
-                c.annual_required_return,
-                policy,
-            )?),
-            "CalmarRatio" => {
-                MetricNode::CalmarRatio(CalmarRatio::new(input, c.periods_per_year, policy)?)
-            }
-            "OmegaRatio" => MetricNode::OmegaRatio(OmegaRatio::new(
-                input,
-                c.periods_per_year,
-                c.annual_required_return,
-                policy,
-            )?),
-            "HistoricalValueAtRisk" => MetricNode::HistoricalValueAtRisk(
-                HistoricalValueAtRisk::new(input, c.cutoff, policy)?,
-            ),
-            "HistoricalExpectedShortfall" => MetricNode::HistoricalExpectedShortfall(
-                HistoricalExpectedShortfall::new(input, c.cutoff, policy)?,
-            ),
-            "TailRatio" => MetricNode::TailRatio(TailRatio::new(input, policy)?),
-            "UlcerIndex" => MetricNode::UlcerIndex(UlcerIndex::new(input, policy)?),
-            "UlcerPerformanceIndex" => {
-                MetricNode::UlcerPerformanceIndex(UlcerPerformanceIndex::new(input, policy)?)
-            }
-            "RecoveryFactor" => MetricNode::RecoveryFactor(RecoveryFactor::new(input, policy)?),
-            "GainToPainRatio" => MetricNode::GainToPainRatio(GainToPainRatio::new(input, policy)?),
-            "PainIndex" => MetricNode::PainIndex(PainIndex::new(input, policy)?),
-            "PainRatio" => MetricNode::PainRatio(PainRatio::new(
-                input,
-                c.periods_per_year,
-                c.annual_risk_free_rate,
-                policy,
-            )?),
-            "AverageDrawdown" => MetricNode::AverageDrawdown(AverageDrawdown::new(input, policy)?),
-            "StabilityOfTimeSeries" => {
-                MetricNode::StabilityOfTimeSeries(StabilityOfTimeSeries::new(input, policy)?)
-            }
-            "BreakevenRate" => MetricNode::BreakevenRate(BreakevenRate::new(input, policy)?),
-            "WinRate" => MetricNode::WinRate(WinRate::new(input, policy)?),
-            "AverageWin" => MetricNode::AverageWin(AverageWin::new(input, policy)?),
-            "AverageLoss" => MetricNode::AverageLoss(AverageLoss::new(input, policy)?),
-            "PayoffRatio" => MetricNode::PayoffRatio(PayoffRatio::new(input, policy)?),
-            "ProfitFactor" => MetricNode::ProfitFactor(ProfitFactor::new(input, policy)?),
-            "LongestWinningStreak" => {
-                MetricNode::LongestWinningStreak(LongestWinningStreak::new(input, policy)?)
-            }
-            "CommonSenseRatio" => {
-                MetricNode::CommonSenseRatio(CommonSenseRatio::new(input, policy)?)
-            }
-            "CompositeProfitabilityConsistencyIndex" => {
-                MetricNode::CompositeProfitabilityConsistencyIndex(
-                    CompositeProfitabilityConsistencyIndex::new(input, policy)?,
-                )
-            }
-            "KellyCriterion" => MetricNode::KellyCriterion(KellyCriterion::new(input, policy)?),
-            "ModifiedSharpeRatio" => MetricNode::ModifiedSharpeRatio(ModifiedSharpeRatio::new(
-                input,
-                c.periods_per_year,
-                c.annual_risk_free_rate,
-                c.confidence_level,
-                policy,
-            )?),
-            "ProbabilisticSharpeRatio" => {
-                MetricNode::ProbabilisticSharpeRatio(ProbabilisticSharpeRatio::new(
-                    input,
-                    c.periods_per_year,
-                    c.annual_risk_free_rate,
-                    c.annual_benchmark_sharpe_ratio,
-                    policy,
-                )?)
-            }
-            "ParametricValueAtRisk" => MetricNode::ParametricValueAtRisk(
-                ParametricValueAtRisk::new(input, c.cutoff, policy)?,
-            ),
-            "ParametricExpectedShortfall" => MetricNode::ParametricExpectedShortfall(
-                ParametricExpectedShortfall::new(input, c.cutoff, policy)?,
-            ),
-            "ConditionalDrawdownAtRisk" => MetricNode::ConditionalDrawdownAtRisk(
-                ConditionalDrawdownAtRisk::new(input, c.confidence_level, policy)?,
-            ),
-            "EntropicValueAtRisk" => {
-                MetricNode::EntropicValueAtRisk(EntropicValueAtRisk::new(input, c.cutoff, policy)?)
-            }
-            "Exposure" => MetricNode::Exposure(Exposure::new(ExposureInputKind::Returns, policy)?),
-            "LongestLosingStreak" => {
-                return Ok(PipelineNode::Integral(
-                    IntegralMetricNode::LongestLosingStreak(LongestLosingStreak::new(
-                        input, policy,
-                    )?),
-                ))
-            }
-            "MaximumDrawdownDuration" => {
-                return Ok(PipelineNode::Integral(
-                    IntegralMetricNode::MaximumDrawdownDuration(MaximumDrawdownDuration::new(
-                        input, policy,
-                    )?),
-                ))
-            }
-            _ => {
-                return Err(MetricError::InvalidParameter {
-                    name: "metrics",
-                    value: name.to_owned(),
-                    reason: "unsupported or non-single-return metric",
-                })
-            }
-        };
-        Ok(PipelineNode::Floating(floating))
-    }
-
-    pub fn append(&mut self, value: f64) -> MetricResult<()> {
-        if let Some(simple_return) = self.input.append(value)? {
-            for node in &mut self.nodes {
-                node.append(simple_return)?;
-            }
-        }
+        self.input_kind = Some(input_kind);
         Ok(())
     }
 
-    pub fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
-        self.normalized.clear();
-        self.normalized.reserve(values.len());
-        self.input.extend(values, |simple_return| {
-            self.normalized.push(simple_return);
-            Ok(())
-        })?;
-        for node in &mut self.nodes {
-            node.extend(&self.normalized)?;
+    pub fn append(&mut self, value: f64) -> MetricResult<&mut Self> {
+        if self.input_kind.is_none() {
+            return Err(MetricError::InvalidParameter {
+                name: "input_kind",
+                value: "unbound".to_owned(),
+                reason: "call a semantic from_* method before append or extend",
+            });
         }
-        Ok(())
+        for entry in &mut self.metrics {
+            entry.metric.append(value)?;
+        }
+        Ok(self)
     }
 
-    pub fn value(&mut self) -> Vec<(&'static str, Option<f64>)> {
-        self.nodes
+    pub fn extend(&mut self, values: &[f64]) -> MetricResult<&mut Self> {
+        if self.input_kind.is_none() {
+            return Err(MetricError::InvalidParameter {
+                name: "input_kind",
+                value: "unbound".to_owned(),
+                reason: "call a semantic from_* method before append or extend",
+            });
+        }
+        for entry in &mut self.metrics {
+            entry.metric.extend(values)?;
+        }
+        Ok(self)
+    }
+
+    pub fn compute(&mut self) -> Vec<(&str, Option<f64>)> {
+        self.metrics
             .iter_mut()
-            .map(|node| {
-                let name = node.name();
-                (name, node.value())
-            })
+            .map(|entry| (entry.name.as_str(), entry.metric.compute()))
             .collect()
     }
 
-    pub fn compute(&mut self) -> Vec<(&'static str, Option<f64>)> {
-        self.value()
+    pub fn value(&mut self) -> Vec<(&str, Option<f64>)> {
+        self.compute()
     }
 
-    pub fn reset(&mut self) {
-        self.input.reset();
-        self.normalized.clear();
-        for node in &mut self.nodes {
-            node.reset();
+    pub fn reset(&mut self) -> &mut Self {
+        for entry in &mut self.metrics {
+            entry.metric.reset();
         }
+        self
     }
 
     pub fn len(&self) -> usize {
-        self.input.len()
+        self.metrics.first().map_or(0, |entry| entry.metric.len())
     }
 
     pub fn is_empty(&self) -> bool {
-        self.input.is_empty()
+        self.len() == 0
     }
 
-    pub fn metric_names(&self) -> Vec<&'static str> {
-        self.nodes.iter().map(PipelineNode::name).collect()
+    pub fn metric_names(&self) -> Vec<&str> {
+        self.metrics
+            .iter()
+            .map(|entry| entry.name.as_str())
+            .collect()
     }
 }

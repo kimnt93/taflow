@@ -28,7 +28,7 @@ def test_weights_and_covariance_match_numpy_eigh(
     weights: np.ndarray, covariance: np.ndarray
 ) -> None:
     expected = _numpy_pca_effective_bets(weights, covariance)
-    actual = EffectiveNumberOfBets.from_weights_and_covariance(
+    actual = EffectiveNumberOfBets().from_weights_and_covariance(
         weights, covariance
     ).compute()
     assert actual == pytest.approx(expected, rel=2e-10, abs=2e-12)
@@ -40,7 +40,7 @@ def test_contribution_stream_matches_entropy_oracle_and_lifecycle() -> None:
     expected = float(
         np.exp(-np.sum(probabilities[probabilities > 0] * np.log(probabilities[probabilities > 0])))
     )
-    state = EffectiveNumberOfBets.from_risk_contributions([])
+    state = EffectiveNumberOfBets().from_risk_contributions([])
     assert state.value is None
     assert state.append(contributions[0]) is state
     assert state.extend(contributions[1:]) is state
@@ -51,16 +51,17 @@ def test_contribution_stream_matches_entropy_oracle_and_lifecycle() -> None:
     assert state.extend(contributions).compute() == pytest.approx(expected)
 
 
-def test_validation_and_semantic_factory() -> None:
-    assert EffectiveNumberOfBets.from_risk_contributions([]).compute() is None
-    assert EffectiveNumberOfBets.from_risk_contributions([0.0]).compute() is None
+def test_validation_and_semantic_input_method() -> None:
+    assert EffectiveNumberOfBets().from_risk_contributions([]).compute() is None
+    assert EffectiveNumberOfBets().from_risk_contributions([0.0]).compute() is None
     with pytest.raises(ValueError):
-        EffectiveNumberOfBets.from_risk_contributions([-0.1])
+        EffectiveNumberOfBets().from_risk_contributions([-0.1])
     with pytest.raises(ValueError):
-        EffectiveNumberOfBets.from_weights_and_covariance([0.5, 0.5], np.eye(3))
+        EffectiveNumberOfBets().from_weights_and_covariance([0.5, 0.5], np.eye(3))
     with pytest.raises(ValueError):
-        EffectiveNumberOfBets.from_weights_and_covariance(
+        EffectiveNumberOfBets().from_weights_and_covariance(
             [0.5, 0.5], [[1.0, 0.2], [0.0, 1.0]]
         )
-    with pytest.raises(TypeError):
-        EffectiveNumberOfBets()
+    unbound = EffectiveNumberOfBets()
+    with pytest.raises(ValueError):
+        unbound.append(0.1)

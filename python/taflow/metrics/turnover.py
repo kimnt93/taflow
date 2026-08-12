@@ -25,22 +25,19 @@ class Turnover:
     contract rather than being ambiguously flattened here.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use :meth:`from_weights`."""
-        raise TypeError("use Turnover.from_weights")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured turnover metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
     def from_weights(
-        cls,
+        self,
         weights: Any,
         *,
-        nan_policy: str = "omit",
         column: str | None = None,
     ) -> "Turnover":
-        """Construct from chronological risky-asset portfolio weights."""
-        state = cls.__new__(cls)
-        state._state = _Native(nan_policy)
-        return state.extend(weights, column=column)
+        """Append chronological risky-asset portfolio weights."""
+        self._state.from_weights(as_metric_series(weights, column=column))
+        return self
 
     def append(self, weight: float) -> "Turnover":
         """Append one portfolio weight and return this metric."""

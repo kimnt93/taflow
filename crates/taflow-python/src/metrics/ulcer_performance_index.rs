@@ -1,30 +1,11 @@
 use numpy::PyReadonlyArray1;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow_metrics::{metrics::UlcerPerformanceIndex as State, MetricInputKind, NanPolicy};
+use taflow_metrics::{metrics::UlcerPerformanceIndex as State, NanPolicy};
 
 fn value_error(error: impl ToString) -> PyErr {
     PyValueError::new_err(error.to_string())
 }
-
-fn input_kind(name: &str, initial_equity: Option<f64>) -> PyResult<MetricInputKind> {
-    match (name, initial_equity) {
-        ("returns", None) => Ok(MetricInputKind::Returns),
-        ("log_returns", None) => Ok(MetricInputKind::LogReturns),
-        ("equity", None) => Ok(MetricInputKind::Equity),
-        ("pnl", Some(initial_equity)) => Ok(MetricInputKind::PeriodPnl { initial_equity }),
-        ("pnl", None) => Err(PyValueError::new_err(
-            "initial_equity is required for period-P&L conversion",
-        )),
-        (_, Some(_)) => Err(PyValueError::new_err(
-            "initial_equity is accepted only for period-P&L input",
-        )),
-        _ => Err(PyValueError::new_err(
-            "unsupported UlcerPerformanceIndex input mode",
-        )),
-    }
-}
-
 /// Native state backing `taflow.metrics.UlcerPerformanceIndex`.
 #[pyclass(module = "taflow._native.metrics")]
 pub(crate) struct UlcerPerformanceIndex {
@@ -34,15 +15,49 @@ pub(crate) struct UlcerPerformanceIndex {
 #[pymethods]
 impl UlcerPerformanceIndex {
     #[new]
-    #[pyo3(signature = (input_mode, initial_equity=None, nan_policy="omit"))]
-    fn new(input_mode: &str, initial_equity: Option<f64>, nan_policy: &str) -> PyResult<Self> {
+    #[pyo3(signature = (nan_policy="omit"))]
+    fn new(nan_policy: &str) -> PyResult<Self> {
         Ok(Self {
-            inner: State::new(
-                input_kind(input_mode, initial_equity)?,
-                NanPolicy::try_from(nan_policy).map_err(value_error)?,
-            )
-            .map_err(value_error)?,
+            inner: State::new(NanPolicy::try_from(nan_policy).map_err(value_error)?)
+                .map_err(value_error)?,
         })
+    }
+
+    fn from_returns(&mut self, py: Python<'_>, values: PyReadonlyArray1<'_, f64>) -> PyResult<()> {
+        let values = values.as_slice()?;
+        py.allow_threads(|| self.inner.from_returns(values))
+            .map(|_| ())
+            .map_err(value_error)
+    }
+
+    fn from_log_returns(
+        &mut self,
+        py: Python<'_>,
+        values: PyReadonlyArray1<'_, f64>,
+    ) -> PyResult<()> {
+        let values = values.as_slice()?;
+        py.allow_threads(|| self.inner.from_log_returns(values))
+            .map(|_| ())
+            .map_err(value_error)
+    }
+
+    fn from_equity(&mut self, py: Python<'_>, values: PyReadonlyArray1<'_, f64>) -> PyResult<()> {
+        let values = values.as_slice()?;
+        py.allow_threads(|| self.inner.from_equity(values))
+            .map(|_| ())
+            .map_err(value_error)
+    }
+
+    fn from_pnl(
+        &mut self,
+        py: Python<'_>,
+        values: PyReadonlyArray1<'_, f64>,
+        initial_capital: f64,
+    ) -> PyResult<()> {
+        let values = values.as_slice()?;
+        py.allow_threads(|| self.inner.from_pnl(values, initial_capital))
+            .map(|_| ())
+            .map_err(value_error)
     }
 
     fn append(&mut self, value: f64) -> PyResult<Option<f64>> {

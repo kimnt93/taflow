@@ -15,24 +15,31 @@ class BreakevenRate:
     or closed-trade P&L; no annualization or capital conversion is performed.
     Rust owns the allocation-free O(1) state and NaNs are omitted by default.
     """
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic factory."""
-        raise TypeError("use BreakevenRate.from_returns/from_pnl/from_trades")
-    @classmethod
-    def _create(cls, values: Any, mode: str, *, nan_policy: str = "omit", column: str | None = None) -> "BreakevenRate":
-        state = cls.__new__(cls); state._state = _Native(mode, nan_policy); return state.extend(values, column=column)
-    @classmethod
-    def from_returns(cls, returns: Any, *, nan_policy: str = "omit", column: str | None = None) -> "BreakevenRate":
-        """Construct from decimal period returns."""
-        return cls._create(returns, "returns", nan_policy=nan_policy, column=column)
-    @classmethod
-    def from_pnl(cls, pnl: Any, *, nan_policy: str = "omit", column: str | None = None) -> "BreakevenRate":
-        """Construct from raw non-cumulative period P&L."""
-        return cls._create(pnl, "pnl", nan_policy=nan_policy, column=column)
-    @classmethod
-    def from_trades(cls, trades: Any, *, nan_policy: str = "omit", column: str | None = None) -> "BreakevenRate":
-        """Construct from closed-trade P&L observations."""
-        return cls._create(trades, "trades", nan_policy=nan_policy, column=column)
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
+
+    def from_returns(
+        self, returns: Any, *, column: str | None = None
+    ) -> "BreakevenRate":
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
+
+    def from_pnl(
+        self, pnl: Any, *, column: str | None = None
+    ) -> "BreakevenRate":
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
+
+    def from_trades(
+        self, trades: Any, *, column: str | None = None
+    ) -> "BreakevenRate":
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
+
     def append(self, value: float) -> "BreakevenRate":
         """Append one observation and return this metric."""
         self._state.append(float(value)); return self

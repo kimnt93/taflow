@@ -19,7 +19,8 @@ fn source_convention(returns: &[f64]) -> f64 {
 #[test]
 fn matches_pinned_performanceanalytics_source_convention() {
     let returns = [0.02, -0.01, 0.015, -0.03, 0.01];
-    let mut state = PainIndex::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = PainIndex::new(NanPolicy::Omit).unwrap();
+    state.from_returns(&[]).unwrap();
     state.extend(&returns).unwrap();
     assert_relative_eq!(
         state.compute().unwrap(),
@@ -30,11 +31,13 @@ fn matches_pinned_performanceanalytics_source_convention() {
 
 #[test]
 fn phantom_wealth_and_real_observation_divisor_are_explicit() {
-    let mut loss = PainIndex::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut loss = PainIndex::new(NanPolicy::Omit).unwrap();
+    loss.from_returns(&[]).unwrap();
     loss.append(-0.2).unwrap();
     assert_relative_eq!(loss.value().unwrap(), 0.2, epsilon = 1e-15);
 
-    let mut gain = PainIndex::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut gain = PainIndex::new(NanPolicy::Omit).unwrap();
+    gain.from_returns(&[]).unwrap();
     gain.append(0.2).unwrap();
     assert_eq!(gain.value(), Some(0.0));
 }
@@ -42,12 +45,14 @@ fn phantom_wealth_and_real_observation_divisor_are_explicit() {
 #[test]
 fn lifecycle_omission_and_reset_are_invariant() {
     let returns = [0.10, f64::NAN, -0.20, 0.05, -0.25, 0.10];
-    let mut batch = PainIndex::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut batch = PainIndex::new(NanPolicy::Omit).unwrap();
+    batch.from_returns(&[]).unwrap();
     batch.extend(&returns).unwrap();
     assert_eq!(batch.len(), 5);
     let expected = batch.value().unwrap();
 
-    let mut streamed = PainIndex::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut streamed = PainIndex::new(NanPolicy::Omit).unwrap();
+    streamed.from_returns(&[]).unwrap();
     for value in returns {
         streamed.append(value).unwrap();
     }
@@ -61,10 +66,11 @@ fn lifecycle_omission_and_reset_are_invariant() {
 
 #[test]
 fn rejects_non_path_domains_and_invalid_observations() {
-    assert!(PainIndex::new(MetricInputKind::RawPnl, NanPolicy::Omit).is_err());
-    assert!(PainIndex::new(MetricInputKind::Trades, NanPolicy::Omit).is_err());
+    let mut unbound = PainIndex::new(NanPolicy::Omit).unwrap();
+    assert!(unbound.append(0.01).is_err());
 
-    let mut state = PainIndex::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = PainIndex::new(NanPolicy::Omit).unwrap();
+    state.from_returns(&[]).unwrap();
     assert!(state.append(-1.01).is_err());
     assert!(state.is_empty());
     assert!(state.append(f64::INFINITY).is_err());

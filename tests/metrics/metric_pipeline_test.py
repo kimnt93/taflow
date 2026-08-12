@@ -1,55 +1,43 @@
 from __future__ import annotations
-
 import numpy as np
 import pytest
+from taflow.metrics import MetricPipeline, SharpeRatio, SortinoRatio
 
-from taflow.metrics import MaximumDrawdown, MetricPipeline, SharpeRatio, TotalReturn
-
-
-def test_pnl_pipeline_matches_standalone_public_classes() -> None:
-    pnl = np.array([10.0, -5.0, 7.0, -2.0, 3.0])
-    selected = ("TotalReturn", "SharpeRatio", "MaximumDrawdown")
-    actual = MetricPipeline.from_pnl(
-        pnl, initial_equity=100.0, metrics=selected
-    )
-    expected = {
-        "TotalReturn": TotalReturn.from_pnl(pnl, initial_equity=100.0).compute(),
-        "SharpeRatio": SharpeRatio.from_pnl(pnl, initial_equity=100.0).compute(),
-        "MaximumDrawdown": MaximumDrawdown.from_pnl(
-            pnl, initial_equity=100.0
-        ).compute(),
-    }
-    assert actual.metrics == selected
-    assert actual.compute() == pytest.approx(expected)
-
-
-def test_pipeline_scalar_chunk_reset_and_domain_factories_match() -> None:
+def test_pipeline_computes_configured_metrics_under_caller_names() -> None:
     returns = np.array([0.01, -0.02, 0.03, 0.0, 0.04])
-    selected = ("TotalReturn", "WinRate", "TailRatio")
-    batch = MetricPipeline.from_returns(returns, metrics=selected)
-    scalar = MetricPipeline.from_returns([], metrics=selected)
-    assert scalar.extend(returns[:2]) is scalar
-    for value in returns[2:]:
-        assert scalar.append(value) is scalar
+    pipeline = MetricPipeline()
+    assert pipeline.add('sharpe', SharpeRatio()) is pipeline
+    assert pipeline.add('sor', SortinoRatio()) is pipeline
+    assert pipeline.from_returns(returns) is pipeline
+    values = pipeline.compute()
+    assert pipeline.metrics == ('sharpe', 'sor')
+    assert values['sharpe'] == pytest.approx(SharpeRatio().from_returns(returns).compute())
+    assert values['sor'] == pytest.approx(SortinoRatio().from_returns(returns).compute())
+
+def test_pipeline_scalar_chunk_reset_and_domains_are_invariant() -> None:
+    returns = np.array([0.1, -0.2, 0.05])
+    batch = MetricPipeline().add('sharpe', SharpeRatio(12.0, 0.04))
+    batch.from_returns(returns)
+    scalar = MetricPipeline().add('sharpe', SharpeRatio(12.0, 0.04))
+    scalar.from_returns([]).append(returns[0]).extend(returns[1:])
     assert scalar.compute() == pytest.approx(batch.compute())
     assert scalar.value == pytest.approx(batch.compute())
-    assert scalar.reset() is scalar
-    assert scalar.extend(returns).compute() == pytest.approx(batch.compute())
-    assert MetricPipeline.from_log_returns(
-        np.log1p(returns), metrics=selected
-    ).compute() == pytest.approx(batch.compute())
-    equity = 100.0 * np.cumprod(1.0 + returns)
-    assert MetricPipeline.from_equity(
-        np.r_[100.0, equity], metrics=selected
-    ).compute() == pytest.approx(batch.compute())
+    assert scalar.reset().extend(returns).compute() == pytest.approx(batch.compute())
+    log_returns = MetricPipeline().add('sharpe', SharpeRatio(12.0, 0.04))
+    assert log_returns.from_log_returns(np.log1p(returns)).compute() == pytest.approx(batch.compute())
+    equity = MetricPipeline().add('sharpe', SharpeRatio(12.0, 0.04))
+    assert equity.from_equity([100.0, 110.0, 88.0, 92.4]).compute() == pytest.approx(batch.compute())
+    pnl = MetricPipeline().add('sharpe', SharpeRatio(12.0, 0.04))
+    assert pnl.from_pnl([10.0, -22.0, 4.4], 100.0).compute() == pytest.approx(batch.compute())
 
-
-def test_default_suite_and_validation() -> None:
-    state = MetricPipeline.from_returns([0.01, -0.02, 0.03])
-    assert tuple(state.compute()) == MetricPipeline.supported_metrics()
+def test_pipeline_validation() -> None:
+    pipeline = MetricPipeline().add('sharpe', SharpeRatio())
     with pytest.raises(ValueError):
-        MetricPipeline.from_returns([0.01], metrics=["TotalReturn", "TotalReturn"])
+        pipeline.add('sharpe', SortinoRatio())
     with pytest.raises(ValueError):
-        MetricPipeline.from_returns([0.01], metrics=["TrackingError"])
-    with pytest.raises(TypeError):
-        MetricPipeline()
+        pipeline.append(0.01)
+    pipeline.from_returns([0.01])
+    with pytest.raises(ValueError):
+        pipeline.from_equity([100.0])
+    with pytest.raises(ValueError):
+        pipeline.add('late', SortinoRatio())

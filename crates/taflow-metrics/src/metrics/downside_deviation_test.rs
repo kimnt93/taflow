@@ -9,8 +9,8 @@ fn assert_close(actual: f64, expected: f64) {
 fn computes_lower_partial_moment_over_all_observations() {
     let returns = [-0.02, 0.01, -0.01, 0.03];
     let expected = ((0.02_f64.powi(2) + 0.01_f64.powi(2)) / 4.0).sqrt() * 252.0_f64.sqrt();
-    let mut state =
-        DownsideDeviation::new(MetricInputKind::Returns, 252.0, 0.0, NanPolicy::Omit).unwrap();
+    let mut state = DownsideDeviation::new(252.0, 0.0, NanPolicy::Omit).unwrap();
+    state.from_returns(&[]).unwrap();
 
     assert_eq!(state.value(), None);
     assert_close(
@@ -39,13 +39,9 @@ fn converts_annual_effective_required_return_to_each_period() {
         .map(|value| (*value - period_required_return).min(0.0).powi(2))
         .sum::<f64>();
     let expected = (squared_shortfall_sum / returns.len() as f64).sqrt() * periods_per_year.sqrt();
-    let mut state = DownsideDeviation::new(
-        MetricInputKind::Returns,
-        periods_per_year,
-        annual_required_return,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state =
+        DownsideDeviation::new(periods_per_year, annual_required_return, NanPolicy::Omit).unwrap();
+    state.from_returns(&[]).unwrap();
 
     assert_close(state.extend(&returns).unwrap().unwrap(), expected);
 }
@@ -53,30 +49,23 @@ fn converts_annual_effective_required_return_to_each_period() {
 #[test]
 fn input_modes_are_equivalent_and_missing_values_are_omitted() {
     let returns = [0.10, -0.20, 0.05];
-    let mut direct =
-        DownsideDeviation::new(MetricInputKind::Returns, 12.0, 0.03, NanPolicy::Omit).unwrap();
+    let mut direct = DownsideDeviation::new(12.0, 0.03, NanPolicy::Omit).unwrap();
+    direct.from_returns(&[]).unwrap();
     let expected = direct.extend(&returns).unwrap().unwrap();
 
-    let mut equity =
-        DownsideDeviation::new(MetricInputKind::Equity, 12.0, 0.03, NanPolicy::Omit).unwrap();
+    let mut equity = DownsideDeviation::new(12.0, 0.03, NanPolicy::Omit).unwrap();
+    equity.from_equity(&[]).unwrap();
     assert_close(
         equity.extend(&[100.0, 110.0, 88.0, 92.4]).unwrap().unwrap(),
         expected,
     );
 
-    let mut pnl = DownsideDeviation::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        12.0,
-        0.03,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut pnl = DownsideDeviation::new(12.0, 0.03, NanPolicy::Omit).unwrap();
+    pnl.from_pnl(&[], 100.0).unwrap();
     assert_close(pnl.extend(&[10.0, -22.0, 4.4]).unwrap().unwrap(), expected);
 
-    let mut logarithmic =
-        DownsideDeviation::new(MetricInputKind::LogReturns, 12.0, 0.03, NanPolicy::Omit).unwrap();
+    let mut logarithmic = DownsideDeviation::new(12.0, 0.03, NanPolicy::Omit).unwrap();
+    logarithmic.from_log_returns(&[]).unwrap();
     assert_close(
         logarithmic
             .extend(&returns.map(f64::ln_1p))
@@ -85,8 +74,8 @@ fn input_modes_are_equivalent_and_missing_values_are_omitted() {
         expected,
     );
 
-    let mut missing =
-        DownsideDeviation::new(MetricInputKind::Returns, 252.0, 0.0, NanPolicy::Omit).unwrap();
+    let mut missing = DownsideDeviation::new(252.0, 0.0, NanPolicy::Omit).unwrap();
+    missing.from_returns(&[]).unwrap();
     missing.extend(&[f64::NAN, -0.01, f64::NAN]).unwrap();
     assert_eq!(missing.len(), 1);
     assert_close(missing.value().unwrap(), 0.01 * 252.0_f64.sqrt());
@@ -95,23 +84,11 @@ fn input_modes_are_equivalent_and_missing_values_are_omitted() {
 #[test]
 fn validates_configuration() {
     for periods_per_year in [0.0, -1.0, f64::NAN, f64::INFINITY] {
-        assert!(DownsideDeviation::new(
-            MetricInputKind::Returns,
-            periods_per_year,
-            0.0,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(DownsideDeviation::new(periods_per_year, 0.0, NanPolicy::Omit,).is_err());
     }
     for annual_required_return in [-1.0, -2.0, f64::NAN, f64::INFINITY] {
-        assert!(DownsideDeviation::new(
-            MetricInputKind::Returns,
-            252.0,
-            annual_required_return,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(DownsideDeviation::new(252.0, annual_required_return, NanPolicy::Omit,).is_err());
     }
-    assert!(DownsideDeviation::new(MetricInputKind::RawPnl, 252.0, 0.0, NanPolicy::Omit,).is_err());
-    assert!(DownsideDeviation::new(MetricInputKind::Trades, 252.0, 0.0, NanPolicy::Omit,).is_err());
+    let mut unbound = DownsideDeviation::new(252.0, 0.0, NanPolicy::Omit).unwrap();
+    assert!(unbound.append(0.01).is_err());
 }

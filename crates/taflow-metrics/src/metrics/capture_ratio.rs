@@ -14,12 +14,7 @@ pub struct CaptureRatio {
 
 impl CaptureRatio {
     /// Construct an empty capture-ratio state for aligned input domains.
-    pub fn new(
-        primary_input_kind: MetricInputKind,
-        benchmark_input_kind: MetricInputKind,
-        periods_per_year: f64,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    pub fn new(periods_per_year: f64, nan_policy: NanPolicy) -> MetricResult<Self> {
         if !periods_per_year.is_finite() || periods_per_year <= 0.0 {
             return Err(MetricError::InvalidParameter {
                 name: "periods_per_year",
@@ -27,26 +22,8 @@ impl CaptureRatio {
                 reason: "must be finite and greater than zero",
             });
         }
-        if matches!(
-            primary_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) || matches!(
-            benchmark_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{primary_input_kind:?}/{benchmark_input_kind:?}"),
-                reason: "capture ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
-
         Ok(Self {
-            input: PairedMetricInputState::new(
-                primary_input_kind,
-                benchmark_input_kind,
-                nan_policy,
-            )?,
+            input: PairedMetricInputState::unbound(nan_policy),
             primary_growth: CompoundedGrowth::new(),
             benchmark_growth: CompoundedGrowth::new(),
             periods_per_year,
@@ -124,3 +101,5 @@ impl CaptureRatio {
         self.periods_per_year
     }
 }
+
+crate::impl_paired_return_metric_lifecycle!(CaptureRatio);

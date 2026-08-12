@@ -18,11 +18,7 @@ pub struct ConditionalDrawdownAtRisk {
 
 impl ConditionalDrawdownAtRisk {
     /// Construct an empty exact discrete-episode CDaR state.
-    pub fn new(
-        input_kind: MetricInputKind,
-        confidence: f64,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    pub fn new(confidence: f64, nan_policy: NanPolicy) -> MetricResult<Self> {
         if !confidence.is_finite() || confidence <= 0.0 || confidence >= 1.0 {
             return Err(MetricError::InvalidParameter {
                 name: "confidence",
@@ -30,19 +26,9 @@ impl ConditionalDrawdownAtRisk {
                 reason: "must be finite and strictly between zero and one",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "conditional drawdown at risk requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             drawdown: DrawdownState::new(),
             confidence,
             completed_troughs: Vec::new(),
@@ -167,3 +153,5 @@ impl ConditionalDrawdownAtRisk {
         self.input.is_empty()
     }
 }
+
+crate::impl_return_metric_lifecycle!(ConditionalDrawdownAtRisk);

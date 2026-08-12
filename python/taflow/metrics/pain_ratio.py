@@ -28,128 +28,39 @@ class PainRatio:
     positive drawdown pain. Empty and zero-pain paths return ``None``.
 
     Inputs may be decimal simple returns, log returns, positive equity levels,
-    or non-cumulative period P&L with positive initial equity. Rust performs
+    or non-cumulative period P&L with positive initial capital. Rust performs
     all conversions and O(1)-memory arithmetic. NaNs are omitted by default or
     rejected with ``nan_policy="raise"``; infinities and returns below -100%
     are rejected. Mutating lifecycle methods are fluent and bulk execution
     releases the GIL.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use PainRatio.from_returns/from_equity/from_pnl/from_log_returns"
-        )
+    def __init__(self, periods_per_year: float = 252.0, annual_risk_free_rate: float = 0.0, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(float(periods_per_year), float(annual_risk_free_rate), nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        periods_per_year: float,
-        annual_risk_free_rate: float,
-        initial_equity: float | None,
-        nan_policy: str,
-        column: str | None,
-    ) -> "PainRatio":
-        state = cls.__new__(cls)
-        state._state = _Native(
-            input_mode,
-            float(periods_per_year),
-            float(annual_risk_free_rate),
-            initial_equity,
-            nan_policy,
-        )
-        return state.extend(values, column=column)
+    def from_returns(self, returns: Any, *, column: str | None = None) -> "PainRatio":
+        """Append chronological returns and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        *,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "PainRatio":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(
-            returns,
-            "returns",
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            initial_equity=None,
-            nan_policy=nan_policy,
-            column=column,
-        )
+    def from_log_returns(self, log_returns: Any, *, column: str | None = None) -> "PainRatio":
+        """Append chronological log returns and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
 
-    @classmethod
-    def from_log_returns(
-        cls,
-        log_returns: Any,
-        *,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "PainRatio":
-        """Construct from chronological log returns converted by Rust."""
-        return cls._create(
-            log_returns,
-            "log_returns",
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            initial_equity=None,
-            nan_policy=nan_policy,
-            column=column,
-        )
+    def from_equity(self, equity: Any, *, column: str | None = None) -> "PainRatio":
+        """Append chronological equity and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
 
-    @classmethod
-    def from_equity(
-        cls,
-        equity: Any,
-        *,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "PainRatio":
-        """Construct from positive chronological equity or adjusted-price levels."""
-        return cls._create(
-            equity,
-            "equity",
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            initial_equity=None,
-            nan_policy=nan_policy,
-            column=column,
-        )
-
-    @classmethod
-    def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        initial_equity: float,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "PainRatio":
-        """Construct from non-cumulative period P&L and positive initial equity."""
-        return cls._create(
-            pnl,
-            "pnl",
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            initial_equity=float(initial_equity),
-            nan_policy=nan_policy,
-            column=column,
-        )
+    def from_pnl(self, pnl: Any, initial_capital: float, *, column: str | None = None) -> "PainRatio":
+        """Append period P&L using required positive initial capital."""
+        self._state.from_pnl(as_metric_series(pnl, column=column), float(initial_capital))
+        return self
 
     def append(self, value: float) -> "PainRatio":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the input method-selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

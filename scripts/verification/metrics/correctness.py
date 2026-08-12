@@ -1,7 +1,7 @@
 """Compare public metric classes with pinned independent financial oracles.
 
 The TAFlow actual path is deliberately class-only:
-the canonical public semantic factory and ``compute()``.
+the canonical public instance input method and ``compute()``.
 """
 
 from __future__ import annotations
@@ -594,8 +594,8 @@ def _actual(
     spec: MetricSpec, values: np.ndarray, kwargs: dict[str, Any]
 ) -> tuple[object, float | None]:
     cls = spec.load_class()
-    factory = getattr(cls, spec.factories[0])
-    state = factory(values, **kwargs)
+    state = cls(**kwargs)
+    state = getattr(state, spec.input_methods[0])(values)
     return state, state.compute()
 
 
@@ -606,7 +606,7 @@ def _actual_paired(
     kwargs: dict[str, Any],
 ) -> tuple[object, float | None]:
     cls = spec.load_class()
-    state = cls.from_returns(primary, benchmark, **kwargs)
+    state = cls(**kwargs).from_returns(primary, benchmark)
     return state, state.compute()
 
 
@@ -614,15 +614,14 @@ def _lifecycle(
     spec: MetricSpec, values: np.ndarray, kwargs: dict[str, Any], batch: float | None
 ) -> dict[str, bool]:
     cls = spec.load_class()
-    factory = getattr(cls, spec.factories[0])
-    scalar = factory([], **kwargs)
+    scalar = getattr(cls(**kwargs), spec.input_methods[0])([])
     for value in values:
         if not np.isnan(value):
             returned = scalar.append(float(value))
             if returned is not scalar:
                 raise TypeError(f"{spec.class_name}.append() is not fluent")
     scalar_result = scalar.compute()
-    chunked = factory([], **kwargs)
+    chunked = getattr(cls(**kwargs), spec.input_methods[0])([])
     for chunk in np.array_split(values, 7):
         returned = chunked.extend(chunk)
         if returned is not chunked:
@@ -646,13 +645,13 @@ def _paired_lifecycle(
     batch: float | None,
 ) -> dict[str, bool]:
     cls = spec.load_class()
-    scalar = cls.from_returns([], [], **kwargs)
+    scalar = cls(**kwargs).from_returns([], [])
     for primary_value, benchmark_value in zip(primary, benchmark, strict=True):
         returned = scalar.append(float(primary_value), float(benchmark_value))
         if returned is not scalar:
             raise TypeError(f"{spec.class_name}.append() is not fluent")
     scalar_result = scalar.compute()
-    chunked = cls.from_returns([], [], **kwargs)
+    chunked = cls(**kwargs).from_returns([], [])
     for primary_chunk, benchmark_chunk in zip(
         np.array_split(primary, 7), np.array_split(benchmark, 7), strict=True
     ):
@@ -756,7 +755,7 @@ def verify_metric(spec: MetricSpec) -> dict[str, Any]:
                     )
                 )
             )
-            state = cls.from_weights_and_covariance(weights, covariance)
+            state = cls().from_weights_and_covariance(weights, covariance)
             actual = state.compute()
             passed, absolute, relative = close(actual, expected, spec)
             stable = close(state.compute(), actual, spec)[0]
@@ -828,7 +827,7 @@ def write_results(results: list[dict[str, Any]]) -> None:
         "",
         f"Generated: {datetime.now(UTC).date().isoformat()}",
         "",
-        "Every TAFlow value below came from the public canonical class factory and `compute()`.",
+        "Every TAFlow value below came from a configured canonical instance, its input method, and `compute()`.",
         "",
         "`MATCH` means every registered dataset, parameter row, and lifecycle check passed the metric's declared absolute/relative tolerance.",
         "",

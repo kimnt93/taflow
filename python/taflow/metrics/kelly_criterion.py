@@ -35,46 +35,23 @@ class KellyCriterion:
     the GIL.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError("use KellyCriterion.from_returns/from_trades")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str,
-        column: str | None,
-    ) -> "KellyCriterion":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy)
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, returns: Any, *, column: str | None = None
     ) -> "KellyCriterion":
-        """Construct from chronological decimal simple period returns."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
     def from_trades(
-        cls,
-        trades: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, trades: Any, *, column: str | None = None
     ) -> "KellyCriterion":
-        """Construct from realized P&L for chronological closed trades."""
-        return cls._create(trades, "trades", nan_policy=nan_policy, column=column)
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, value: float) -> "KellyCriterion":
         """Append one observation and return this metric."""

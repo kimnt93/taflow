@@ -79,9 +79,9 @@ rg --files crates/taflow-metrics crates/taflow-python/src/metrics \
 - [x] `append`, `extend`, and `reset` return the quoted concrete class type.
 - [x] `value` and `compute` have `float | None` or explicit named-value types.
 - [x] `__len__` delegates to native state.
-- [x] Every accepted factory is documented, including later append semantics.
+- [x] Every accepted input method is documented, including later append semantics.
 - [x] The docstring names the oracle/function/version and every semantic choice.
-- [x] Unsupported domains do not appear as factories.
+- [x] Unsupported domains do not appear as input methods.
 
 ## Correctness gates
 
@@ -146,7 +146,7 @@ unrelated/generated changes.
 - [x] Selection order is stable; duplicates and unsupported semantic domains
       are rejected before processing.
 - [x] P&L pipeline values match standalone public metric classes.
-- [x] Return, log-return, equity, and P&L factories are equivalent.
+- [x] Return, log-return, equity, and P&L input methods are equivalent.
 - [x] Scalar, chunked, reset/replay, cached compute, and length behavior pass.
 - [x] Bulk fan-out releases the GIL.
 - [x] Paired, raw-total, trade-only, and matrix metrics remain explicit rather

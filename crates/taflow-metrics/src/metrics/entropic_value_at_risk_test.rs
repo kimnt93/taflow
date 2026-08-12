@@ -13,8 +13,12 @@ fn matches_independently_evaluated_empirical_objective() {
     let returns: Vec<f64> = (0..101)
         .map(|index| -0.04 + index as f64 * 0.0009)
         .collect();
-    let mut metric =
-        EntropicValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
+    let mut metric = EntropicValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     metric.extend(&returns).unwrap();
     let actual = metric.compute().unwrap();
 
@@ -26,19 +30,27 @@ fn matches_independently_evaluated_empirical_objective() {
 
 #[test]
 fn finite_sample_boundary_and_constant_follow_worst_loss() {
-    let mut short =
-        EntropicValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
+    let mut short = EntropicValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     short.extend(&[0.02, -0.01, -0.04, 0.03]).unwrap();
     assert_eq!(short.compute(), Some(0.04));
 
-    let mut constant =
-        EntropicValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
+    let mut constant = EntropicValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     constant.extend(&[0.0125; 64]).unwrap();
     assert_eq!(constant.compute(), Some(-0.0125));
 }
 
 #[test]
-fn factories_lifecycle_and_lazy_cache_are_invariant() {
+fn input_methods_lifecycle_and_lazy_cache_are_invariant() {
     let returns: Vec<f64> = (0..64)
         .map(|index| ((index * 37 % 101) as f64 - 50.0) / 2_000.0)
         .collect();
@@ -48,7 +60,30 @@ fn factories_lifecycle_and_lazy_cache_are_invariant() {
         equity.push(equity.last().unwrap() * (1.0 + value));
     }
     let pnl: Vec<f64> = equity.windows(2).map(|pair| pair[1] - pair[0]).collect();
-    let create = |kind| EntropicValueAtRisk::new(kind, 0.10, NanPolicy::Omit).unwrap();
+    let create = |kind| {
+        EntropicValueAtRisk::new(0.10, NanPolicy::Omit)
+            .and_then(|mut state| {
+                match kind {
+                    MetricInputKind::Returns => {
+                        state.from_returns(&[])?;
+                    }
+                    MetricInputKind::LogReturns => {
+                        state.from_log_returns(&[])?;
+                    }
+                    MetricInputKind::Equity => {
+                        state.from_equity(&[])?;
+                    }
+                    MetricInputKind::PeriodPnl { initial_capital } => {
+                        state.from_pnl(&[], initial_capital)?;
+                    }
+                    MetricInputKind::RawPnl | MetricInputKind::Trades => {
+                        state.append(0.0)?;
+                    }
+                }
+                Ok(state)
+            })
+            .unwrap()
+    };
 
     let mut from_returns = create(MetricInputKind::Returns);
     from_returns.extend(&returns).unwrap();
@@ -58,7 +93,7 @@ fn factories_lifecycle_and_lazy_cache_are_invariant() {
     let mut from_logs = create(MetricInputKind::LogReturns);
     let mut from_equity = create(MetricInputKind::Equity);
     let mut from_pnl = create(MetricInputKind::PeriodPnl {
-        initial_equity: 100.0,
+        initial_capital: 100.0,
     });
     from_logs.extend(&log_returns).unwrap();
     from_equity.extend(&equity).unwrap();
@@ -82,18 +117,39 @@ fn factories_lifecycle_and_lazy_cache_are_invariant() {
 #[test]
 fn validates_cutoff_domain_and_missing_policy() {
     for cutoff in [f64::NAN, f64::NEG_INFINITY, 0.0, 1.0, f64::INFINITY] {
-        assert!(
-            EntropicValueAtRisk::new(MetricInputKind::Returns, cutoff, NanPolicy::Omit).is_err()
-        );
+        assert!(EntropicValueAtRisk::new(cutoff, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .is_err());
     }
-    assert!(EntropicValueAtRisk::new(MetricInputKind::RawPnl, 0.05, NanPolicy::Omit).is_err());
-    assert!(EntropicValueAtRisk::new(MetricInputKind::Trades, 0.05, NanPolicy::Omit).is_err());
+    assert!(EntropicValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(EntropicValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
 
-    let mut omit =
-        EntropicValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Omit).unwrap();
+    let mut omit = EntropicValueAtRisk::new(0.05, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     omit.extend(&[f64::NAN, 0.01, -0.02]).unwrap();
     assert_eq!(omit.len(), 2);
-    let mut raise =
-        EntropicValueAtRisk::new(MetricInputKind::Returns, 0.05, NanPolicy::Raise).unwrap();
+    let mut raise = EntropicValueAtRisk::new(0.05, NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(raise.append(f64::NAN).is_err());
 }

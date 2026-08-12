@@ -35,85 +35,46 @@ class RecoveryFactor:
     fluently return this instance; all arithmetic and state live in Rust.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use RecoveryFactor.from_returns/from_equity/from_pnl/from_log_returns"
-        )
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        initial_equity: float | None = None,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "RecoveryFactor":
-        state = cls.__new__(cls)
-        state._state = _Native(
-            input_mode, initial_equity=initial_equity, nan_policy=nan_policy
-        )
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, returns: Any, *, column: str | None = None
     ) -> "RecoveryFactor":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+        """Append chronological decimal simple returns and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
     def from_log_returns(
-        cls,
-        log_returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, log_returns: Any, *, column: str | None = None
     ) -> "RecoveryFactor":
-        """Construct from chronological log returns converted by Rust."""
-        return cls._create(
-            log_returns, "log_returns", nan_policy=nan_policy, column=column
-        )
+        """Append chronological log returns and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
 
-    @classmethod
     def from_equity(
-        cls,
-        equity: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, equity: Any, *, column: str | None = None
     ) -> "RecoveryFactor":
-        """Construct from positive chronological equity or adjusted-price levels."""
-        return cls._create(equity, "equity", nan_policy=nan_policy, column=column)
+        """Append chronological positive equity levels and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
 
-    @classmethod
     def from_pnl(
-        cls,
+        self,
         pnl: Any,
+        initial_capital: float,
         *,
-        initial_equity: float,
-        nan_policy: str = "omit",
         column: str | None = None,
     ) -> "RecoveryFactor":
-        """Construct from non-cumulative period P&L and positive initial equity."""
-        return cls._create(
-            pnl,
-            "pnl",
-            initial_equity=float(initial_equity),
-            nan_policy=nan_policy,
-            column=column,
+        """Append period P&L using required positive initial capital."""
+        self._state.from_pnl(
+            as_metric_series(pnl, column=column), float(initial_capital)
         )
+        return self
 
     def append(self, value: float) -> "RecoveryFactor":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

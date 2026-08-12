@@ -15,7 +15,6 @@ pub struct SharpeRatio {
 impl SharpeRatio {
     /// Construct an empty state with an explicit input mode and annual settings.
     pub fn new(
-        input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_risk_free_rate: f64,
         nan_policy: NanPolicy,
@@ -34,24 +33,48 @@ impl SharpeRatio {
                 reason: "must be finite and greater than -1",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "Sharpe ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
-
         let period_risk_free_rate = (annual_risk_free_rate.ln_1p() / periods_per_year).exp_m1();
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             excess_return_moments: OnlineMoments::new(),
             period_risk_free_rate,
             annualization_scale: periods_per_year.sqrt(),
         })
+    }
+
+    /// Select decimal simple returns and append a chronological slice.
+    pub fn from_returns(&mut self, returns: &[f64]) -> MetricResult<&mut Self> {
+        self.bind_and_extend(MetricInputKind::Returns, returns)
+    }
+
+    /// Select logarithmic returns and append a chronological slice.
+    pub fn from_log_returns(&mut self, log_returns: &[f64]) -> MetricResult<&mut Self> {
+        self.bind_and_extend(MetricInputKind::LogReturns, log_returns)
+    }
+
+    /// Select positive equity levels and append a chronological slice.
+    pub fn from_equity(&mut self, equity: &[f64]) -> MetricResult<&mut Self> {
+        self.bind_and_extend(MetricInputKind::Equity, equity)
+    }
+
+    /// Select period P&L and append it using positive starting capital.
+    pub fn from_pnl(&mut self, pnl: &[f64], initial_capital: f64) -> MetricResult<&mut Self> {
+        self.bind_and_extend(
+            MetricInputKind::PeriodPnl {
+                initial_capital: initial_capital,
+            },
+            pnl,
+        )
+    }
+
+    fn bind_and_extend(
+        &mut self,
+        input_kind: MetricInputKind,
+        values: &[f64],
+    ) -> MetricResult<&mut Self> {
+        self.input.bind(input_kind)?;
+        self.extend(values)?;
+        Ok(self)
     }
 
     /// Append one chronological observation and return the current ratio.

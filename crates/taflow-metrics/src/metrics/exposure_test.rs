@@ -21,11 +21,21 @@ fn matches_pinned_quantstats_ceiling_contract() {
         vec![0.0; 101],
         vec![0.01; 101],
     ] {
-        let mut state = Exposure::new(ExposureInputKind::Returns, NanPolicy::Omit).unwrap();
+        let mut state = Exposure::new(NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .unwrap();
         assert_eq!(state.extend(&values).unwrap(), quantstats_0_0_81(&values));
     }
 
-    let mut state = Exposure::new(ExposureInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = Exposure::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_relative_eq!(
         state.extend(&[0.01, 0.0, 0.0]).unwrap().unwrap(),
         0.34,
@@ -36,7 +46,12 @@ fn matches_pinned_quantstats_ceiling_contract() {
 #[test]
 fn explicit_position_state_does_not_infer_returns() {
     let positions = [0.0, 1.0, -1.0, 0.0, 0.5, 2.0];
-    let mut state = Exposure::new(ExposureInputKind::Positions, NanPolicy::Omit).unwrap();
+    let mut state = Exposure::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_positions(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(state.extend(&positions).unwrap(), Some(0.67));
     assert_eq!(state.len(), positions.len());
 }
@@ -44,13 +59,23 @@ fn explicit_position_state_does_not_infer_returns() {
 #[test]
 fn scalar_chunk_reset_and_cached_compute_are_invariant() {
     let values = [0.01, f64::NAN, 0.0, -0.02, 0.0, 0.03];
-    let mut batch = Exposure::new(ExposureInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut batch = Exposure::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     let expected = batch.extend(&values).unwrap();
     assert_eq!(batch.len(), 5);
     assert_eq!(batch.compute(), expected);
     assert_eq!(batch.compute(), expected);
 
-    let mut scalar = Exposure::new(ExposureInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut scalar = Exposure::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     for value in values {
         scalar.append(value).unwrap();
     }
@@ -65,7 +90,12 @@ fn scalar_chunk_reset_and_cached_compute_are_invariant() {
 
 #[test]
 fn validates_domain_specific_observations_and_missing_policy() {
-    let mut returns = Exposure::new(ExposureInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut returns = Exposure::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(returns.append(f64::NAN).unwrap(), None);
     assert!(returns.is_empty());
     assert!(returns.append(-1.01).is_err());
@@ -73,10 +103,20 @@ fn validates_domain_specific_observations_and_missing_policy() {
     assert!(returns.append(f64::INFINITY).is_err());
     assert!(returns.is_empty());
 
-    let mut positions = Exposure::new(ExposureInputKind::Positions, NanPolicy::Omit).unwrap();
+    let mut positions = Exposure::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_positions(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(positions.append(-2.0).unwrap(), Some(1.0));
 
-    let mut strict = Exposure::new(ExposureInputKind::Positions, NanPolicy::Raise).unwrap();
+    let mut strict = Exposure::new(NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_positions(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(strict.append(f64::NAN).is_err());
     assert!(strict.is_empty());
 }

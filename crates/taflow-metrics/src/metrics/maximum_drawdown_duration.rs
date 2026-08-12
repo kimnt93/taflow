@@ -14,19 +14,9 @@ pub struct MaximumDrawdownDuration {
 
 impl MaximumDrawdownDuration {
     /// Construct an empty path-duration state.
-    pub fn new(input_kind: MetricInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "drawdown duration requires a normalized wealth-return path",
-            });
-        }
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             drawdown: DrawdownState::new(),
             underwater_observations: 0,
             maximum_duration: 0,
@@ -84,3 +74,5 @@ impl MaximumDrawdownDuration {
         self.input.is_empty()
     }
 }
+
+crate::impl_return_metric_lifecycle!(MaximumDrawdownDuration);

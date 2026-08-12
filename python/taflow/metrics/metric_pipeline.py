@@ -1,207 +1,145 @@
-"""Rust-owned fan-out pipeline for whole-history metrics."""
-
+"""Named lifecycle pipeline for configured metric instances."""
 from __future__ import annotations
-
-from collections.abc import Sequence
-from typing import Any
-
-from .._native.metrics import MetricPipeline as _Native
+from typing import Any, Protocol, runtime_checkable
 from ._input import as_metric_series
 
+@runtime_checkable
+class _Metric(Protocol):
+
+    def append(self, value: float) -> Any:
+        ...
+
+    def extend(self, values: Any) -> Any:
+        ...
+
+    def compute(self) -> float | int | None:
+        ...
+
+    @property
+    def value(self) -> float | int | None:
+        ...
+
+    def reset(self) -> Any:
+        ...
+
+    def __len__(self) -> int:
+        ...
 
 class MetricPipeline:
-    """Normalize one semantic input stream once and update many metrics.
+    """Update configured metric instances and return results by custom name.
 
-    Rust owns input conversion, metric states, fan-out, lifecycle, and scalar
-    computation. For example, ``from_pnl`` causally converts each period P&L
-    observation to a simple return once, then sends that normalized return to
-    every selected compatible metric. Python converts the input container once
-    and maps native named results; it performs no financial arithmetic.
-
-    ``metrics=None`` selects every supported single-return metric. A sequence
-    of canonical class names selects an ordered subset. Configuration is shared
-    by metrics that use it: annualization, risk-free/required returns, cutoff,
-    confidence, and benchmark Sharpe. Paired benchmark metrics, trade-only
-    metrics, weights/covariance metrics, and raw-P&L totals require different
-    semantic inputs and are deliberately rejected rather than silently mixed.
-
-    ``append``, ``extend``, and ``reset`` are fluent. ``value`` and ``compute``
-    return ``dict[str, float | None]`` in selection order. Empty/warm-up values
-    are ``None``. Bulk native fan-out releases the GIL.
+    Create an empty pipeline, add metrics with ``add``, then select and ingest
+    a semantic input domain with an instance ``from_*`` method. Subsequent
+    ``append`` and ``extend`` calls use that selected domain. Each metric keeps
+    its own configuration and native Rust state; Python only coordinates the
+    lifecycle and named results.
     """
 
     def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use MetricPipeline.from_returns/from_log_returns/from_equity/from_pnl"
-        )
+        """Create an empty metric pipeline."""
+        self._metrics: dict[str, _Metric] = {}
+        self._input_method: str | None = None
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        metrics: Sequence[str] | None = None,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        annual_required_return: float = 0.0,
-        annual_benchmark_sharpe_ratio: float = 0.0,
-        cutoff: float = 0.05,
-        confidence_level: float = 0.95,
-        initial_equity: float | None = None,
-        nan_policy: str = "omit",
-    ) -> "MetricPipeline":
-        state = cls.__new__(cls)
-        selected = [] if metrics is None else [str(name) for name in metrics]
-        state._state = _Native(
-            input_mode,
-            selected,
-            float(periods_per_year),
-            float(annual_risk_free_rate),
-            float(annual_required_return),
-            float(annual_benchmark_sharpe_ratio),
-            float(cutoff),
-            float(confidence_level),
-            initial_equity,
-            nan_policy,
-        )
-        return state.extend(values)
-
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        *,
-        metrics: Sequence[str] | None = None,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        annual_required_return: float = 0.0,
-        annual_benchmark_sharpe_ratio: float = 0.0,
-        cutoff: float = 0.05,
-        confidence_level: float = 0.95,
-        nan_policy: str = "omit",
-    ) -> "MetricPipeline":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(
-            returns, "returns", metrics=metrics,
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            annual_required_return=annual_required_return,
-            annual_benchmark_sharpe_ratio=annual_benchmark_sharpe_ratio,
-            cutoff=cutoff, confidence_level=confidence_level, nan_policy=nan_policy,
-        )
-
-    @classmethod
-    def from_log_returns(
-        cls,
-        log_returns: Any,
-        *,
-        metrics: Sequence[str] | None = None,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        annual_required_return: float = 0.0,
-        annual_benchmark_sharpe_ratio: float = 0.0,
-        cutoff: float = 0.05,
-        confidence_level: float = 0.95,
-        nan_policy: str = "omit",
-    ) -> "MetricPipeline":
-        """Construct from chronological log returns normalized once in Rust."""
-        return cls._create(
-            log_returns, "log_returns", metrics=metrics,
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            annual_required_return=annual_required_return,
-            annual_benchmark_sharpe_ratio=annual_benchmark_sharpe_ratio,
-            cutoff=cutoff, confidence_level=confidence_level, nan_policy=nan_policy,
-        )
-
-    @classmethod
-    def from_equity(
-        cls,
-        equity: Any,
-        *,
-        metrics: Sequence[str] | None = None,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        annual_required_return: float = 0.0,
-        annual_benchmark_sharpe_ratio: float = 0.0,
-        cutoff: float = 0.05,
-        confidence_level: float = 0.95,
-        nan_policy: str = "omit",
-    ) -> "MetricPipeline":
-        """Construct from positive chronological equity or adjusted-price levels."""
-        return cls._create(
-            equity, "equity", metrics=metrics,
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            annual_required_return=annual_required_return,
-            annual_benchmark_sharpe_ratio=annual_benchmark_sharpe_ratio,
-            cutoff=cutoff, confidence_level=confidence_level, nan_policy=nan_policy,
-        )
-
-    @classmethod
-    def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        initial_equity: float,
-        metrics: Sequence[str] | None = None,
-        periods_per_year: float = 252.0,
-        annual_risk_free_rate: float = 0.0,
-        annual_required_return: float = 0.0,
-        annual_benchmark_sharpe_ratio: float = 0.0,
-        cutoff: float = 0.05,
-        confidence_level: float = 0.95,
-        nan_policy: str = "omit",
-    ) -> "MetricPipeline":
-        """Construct from period P&L, converting to returns once in native Rust."""
-        return cls._create(
-            pnl, "pnl", initial_equity=float(initial_equity), metrics=metrics,
-            periods_per_year=periods_per_year,
-            annual_risk_free_rate=annual_risk_free_rate,
-            annual_required_return=annual_required_return,
-            annual_benchmark_sharpe_ratio=annual_benchmark_sharpe_ratio,
-            cutoff=cutoff, confidence_level=confidence_level, nan_policy=nan_policy,
-        )
-
-    @classmethod
-    def supported_metrics(cls) -> tuple[str, ...]:
-        """Return canonical metric names accepted by the native pipeline."""
-        return tuple(_Native.supported_metrics())
+    def add(self, name: str, metric: _Metric) -> 'MetricPipeline':
+        """Add one configured metric under a unique non-empty result name."""
+        if self._input_method is not None:
+            raise ValueError('metrics must be added before pipeline input is selected')
+        key = str(name)
+        if not key:
+            raise ValueError('metric name must not be empty')
+        if key in self._metrics:
+            raise ValueError(f'metric name already exists: {key}')
+        if not isinstance(metric, _Metric):
+            raise TypeError('metric must implement the metric lifecycle')
+        self._metrics[key] = metric
+        return self
 
     @property
     def metrics(self) -> tuple[str, ...]:
-        """Return selected metric names in stable result order."""
-        return tuple(self._state.metrics)
+        """Return caller-provided metric names in insertion order."""
+        return tuple(self._metrics)
 
-    def append(self, value: float) -> "MetricPipeline":
-        """Append one observation in the factory-selected domain."""
-        self._state.append(float(value))
+    def from_returns(self, returns: Any, *, column: str | None=None) -> 'MetricPipeline':
+        """Select decimal simple returns and append them to every metric."""
+        return self._from('from_returns', returns, column=column)
+
+    def from_log_returns(self, log_returns: Any, *, column: str | None=None) -> 'MetricPipeline':
+        """Select log returns and append them to every metric."""
+        return self._from('from_log_returns', log_returns, column=column)
+
+    def from_equity(self, equity: Any, *, column: str | None=None) -> 'MetricPipeline':
+        """Select positive equity levels and append them to every metric."""
+        return self._from('from_equity', equity, column=column)
+
+    def from_pnl(self, pnl: Any, initial_capital: float, *, column: str | None=None) -> 'MetricPipeline':
+        """Select period P&L and append it to every compatible metric."""
+        values = as_metric_series(pnl, column=column)
+        self._require_input_method('from_pnl', 'period P&L')
+        self._select('from_pnl')
+        for metric in self._metrics.values():
+            method = getattr(metric, 'from_pnl')
+            method(values, float(initial_capital))
         return self
 
-    def extend(self, values: Any) -> "MetricPipeline":
-        """Append one chronological series through one native fan-out pass."""
-        self._state.extend(as_metric_series(values))
+    def _from(self, method_name: str, values: Any, *, column: str | None) -> 'MetricPipeline':
+        converted = as_metric_series(values, column=column)
+        domain = method_name.removeprefix('from_').replace('_', ' ')
+        self._require_input_method(method_name, domain)
+        self._select(method_name)
+        for metric in self._metrics.values():
+            method = getattr(metric, method_name)
+            method(converted)
+        return self
+
+    def _require_input_method(self, method_name: str, domain: str) -> None:
+        for metric in self._metrics.values():
+            if not callable(getattr(metric, method_name, None)):
+                raise TypeError(f'{type(metric).__name__} does not accept {domain} input')
+
+    def _select(self, method_name: str) -> None:
+        if self._input_method is None:
+            self._input_method = method_name
+        elif self._input_method != method_name:
+            raise ValueError('pipeline input domain is already selected')
+
+    def append(self, value: float) -> 'MetricPipeline':
+        """Append one observation in the selected domain to every metric."""
+        if self._input_method is None:
+            raise ValueError('call a semantic from_* method before append or extend')
+        for metric in self._metrics.values():
+            metric.append(float(value))
+        return self
+
+    def extend(self, values: Any, *, column: str | None=None) -> 'MetricPipeline':
+        """Append observations in the selected domain to every metric."""
+        if self._input_method is None:
+            raise ValueError('call a semantic from_* method before append or extend')
+        converted = as_metric_series(values, column=column)
+        for metric in self._metrics.values():
+            metric.extend(converted)
         return self
 
     @property
-    def value(self) -> dict[str, float | None]:
-        """Return all current named native metric values."""
-        return dict(self._state.value)
+    def value(self) -> dict[str, float | int | None]:
+        """Return current metric values under caller-provided names."""
+        return {name: metric.value for name, metric in self._metrics.items()}
 
-    def compute(self) -> dict[str, float | None]:
-        """Return all current named values without replaying input."""
-        return dict(self._state.compute())
+    def compute(self) -> dict[str, float | int | None]:
+        """Compute current metric values under caller-provided names."""
+        return {name: metric.compute() for name, metric in self._metrics.items()}
 
-    def reset(self) -> "MetricPipeline":
-        """Reset the shared converter and every selected metric state."""
-        self._state.reset()
+    def reset(self) -> 'MetricPipeline':
+        """Reset every metric while preserving names, configuration, and domain."""
+        for metric in self._metrics.values():
+            metric.reset()
         return self
 
     def __len__(self) -> int:
-        """Return usable normalized-return count from the native converter."""
-        return len(self._state)
-
-
-__all__ = ["MetricPipeline"]
+        """Return the common native metric length, or zero when empty."""
+        lengths = {len(metric) for metric in self._metrics.values()}
+        if not lengths:
+            return 0
+        if len(lengths) != 1:
+            raise RuntimeError('pipeline metrics have inconsistent lengths')
+        return lengths.pop()
+__all__ = ['MetricPipeline']

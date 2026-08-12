@@ -12,7 +12,12 @@ fn computes_binary_historical_kelly_from_decisive_observations() {
     let values = [0.10, 0.0, -0.20, 0.30, -0.10, 0.0];
     let payoff_ratio = 4.0 / 3.0;
     let expected = ((payoff_ratio * 0.5) - 0.5) / payoff_ratio;
-    let mut state = KellyCriterion::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&values).unwrap();
 
     assert_close(state.value().unwrap(), expected);
@@ -23,7 +28,12 @@ fn computes_binary_historical_kelly_from_decisive_observations() {
 #[test]
 fn closed_trade_values_are_consumed_without_return_conversion() {
     let trades = [100.0, -20.0, 0.0, 50.0, -10.0];
-    let mut state = KellyCriterion::new(MetricInputKind::Trades, NanPolicy::Omit).unwrap();
+    let mut state = KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&trades).unwrap();
 
     let payoff_ratio = 75.0 / 15.0;
@@ -35,10 +45,19 @@ fn closed_trade_values_are_consumed_without_return_conversion() {
 fn breakevens_are_excluded_from_probability_but_included_in_length() {
     let base = [0.10, -0.05];
     let with_breakevens = [0.10, 0.0, -0.05, -0.0, 0.0];
-    let mut base_state = KellyCriterion::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut base_state = KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     base_state.extend(&base).unwrap();
-    let mut with_breakevens_state =
-        KellyCriterion::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut with_breakevens_state = KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     with_breakevens_state.extend(&with_breakevens).unwrap();
 
     assert_eq!(base_state.value(), with_breakevens_state.value());
@@ -48,12 +67,22 @@ fn breakevens_are_excluded_from_probability_but_included_in_length() {
 #[test]
 fn chunking_missing_values_and_reset_are_invariant() {
     let values = [0.10, f64::NAN, 0.0, -0.20, 0.30, -0.10];
-    let mut batch = KellyCriterion::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut batch = KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     batch.extend(&values).unwrap();
     assert_eq!(batch.len(), 5);
     let expected = batch.value().unwrap();
 
-    let mut streamed = KellyCriterion::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut streamed = KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     streamed.append(values[0]).unwrap();
     streamed.extend(&values[1..4]).unwrap();
     streamed.extend(&values[4..]).unwrap();
@@ -69,16 +98,41 @@ fn chunking_missing_values_and_reset_are_invariant() {
 #[test]
 fn undefined_edges_and_invalid_domains_are_explicit() {
     for values in [&[][..], &[0.0, -0.0], &[0.10, 0.20], &[-0.10, -0.20]] {
-        let mut state = KellyCriterion::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+        let mut state = KellyCriterion::new(NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .unwrap();
         state.extend(values).unwrap();
         assert_eq!(state.value(), None);
     }
 
-    assert!(KellyCriterion::new(MetricInputKind::RawPnl, NanPolicy::Omit).is_err());
-    assert!(KellyCriterion::new(MetricInputKind::LogReturns, NanPolicy::Omit).is_err());
-    assert!(KellyCriterion::new(MetricInputKind::Equity, NanPolicy::Omit).is_err());
+    assert!(KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(KellyCriterion::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
 
-    let mut state = KellyCriterion::new(MetricInputKind::Returns, NanPolicy::Raise).unwrap();
+    let mut state = KellyCriterion::new(NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(state.append(f64::NAN).is_err());
     assert!(state.append(f64::INFINITY).is_err());
     assert!(state.append(-1.01).is_err());

@@ -9,19 +9,9 @@ pub struct NetProfit {
 }
 impl NetProfit {
     /// Construct an empty raw P&L or closed-trade state.
-    pub fn new(input_kind: MetricInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
-        if !matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "net profit accepts raw period P&L or closed trades",
-            });
-        }
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             sum: 0.0,
             compensation: 0.0,
         })
@@ -70,3 +60,5 @@ impl NetProfit {
         self.input.is_empty()
     }
 }
+
+crate::impl_pnl_trade_metric_lifecycle!(NetProfit);

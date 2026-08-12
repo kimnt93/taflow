@@ -25,7 +25,7 @@ impl TryFrom<&str> for NanPolicy {
     }
 }
 
-/// Semantic domain selected by a metric factory.
+/// Semantic domain selected by a metric instance input method.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MetricInputKind {
     /// Decimal simple returns, where `0.01` means one percent.
@@ -35,7 +35,7 @@ pub enum MetricInputKind {
     /// Strictly positive equity, NAV, or adjusted price levels.
     Equity,
     /// Period P&L converted causally to returns from the supplied capital.
-    PeriodPnl { initial_equity: f64 },
+    PeriodPnl { initial_capital: f64 },
     /// Raw period P&L for P&L-native metrics.
     RawPnl,
     /// Realized P&L for closed trades.
@@ -67,6 +67,7 @@ impl MetricInputKind {
 #[derive(Debug, Clone)]
 pub struct MetricInputState {
     kind: MetricInputKind,
+    bound: bool,
     nan_policy: NanPolicy,
     previous_equity: Option<f64>,
     current_pnl_equity: Option<f64>,
@@ -78,21 +79,22 @@ impl MetricInputState {
     /// Construct and validate an input converter.
     pub fn new(kind: MetricInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
         let current_pnl_equity = match kind {
-            MetricInputKind::PeriodPnl { initial_equity }
-                if !initial_equity.is_finite() || initial_equity <= 0.0 =>
+            MetricInputKind::PeriodPnl { initial_capital }
+                if !initial_capital.is_finite() || initial_capital <= 0.0 =>
             {
                 return Err(MetricError::InvalidParameter {
-                    name: "initial_equity",
-                    value: initial_equity.to_string(),
+                    name: "initial_capital",
+                    value: initial_capital.to_string(),
                     reason: "must be finite and greater than zero",
                 });
             }
-            MetricInputKind::PeriodPnl { initial_equity } => Some(initial_equity),
+            MetricInputKind::PeriodPnl { initial_capital } => Some(initial_capital),
             _ => None,
         };
 
         Ok(Self {
             kind,
+            bound: true,
             nan_policy,
             previous_equity: None,
             current_pnl_equity,
@@ -101,8 +103,45 @@ impl MetricInputState {
         })
     }
 
+    /// Construct a converter whose semantic domain will be selected by the
+    /// first `from_*` lifecycle call.
+    pub fn unbound(nan_policy: NanPolicy) -> Self {
+        Self {
+            kind: MetricInputKind::Returns,
+            bound: false,
+            nan_policy,
+            previous_equity: None,
+            current_pnl_equity: None,
+            len: 0,
+            position: 0,
+        }
+    }
+
+    /// Select a semantic input domain without changing metric observations.
+    /// Re-selecting the same domain is allowed so repeated `from_*` calls can
+    /// extend one stream; changing domains after selection is rejected.
+    pub fn bind(&mut self, kind: MetricInputKind) -> MetricResult<()> {
+        if self.bound {
+            if self.kind == kind {
+                return Ok(());
+            }
+            return Err(MetricError::InvalidParameter {
+                name: "input_kind",
+                value: format!("{kind:?}"),
+                reason: "input domain is already selected for this metric",
+            });
+        }
+
+        let validated = Self::new(kind, self.nan_policy)?;
+        self.kind = validated.kind;
+        self.bound = true;
+        self.current_pnl_equity = validated.current_pnl_equity;
+        Ok(())
+    }
+
     /// Append one value and return its normalized observation when usable.
     pub fn append(&mut self, value: f64) -> MetricResult<Option<f64>> {
+        self.ensure_bound()?;
         self.validate_next(value)?;
         if value.is_nan() {
             self.position += 1;
@@ -230,6 +269,7 @@ impl MetricInputState {
         values: &[f64],
         mut consume: impl FnMut(f64) -> MetricResult<()>,
     ) -> MetricResult<()> {
+        self.ensure_bound()?;
         match self.kind {
             MetricInputKind::Returns => {
                 for &value in values {
@@ -382,6 +422,7 @@ impl MetricInputState {
         values: &[f64],
         mut consume: impl FnMut(f64) -> MetricResult<()>,
     ) -> MetricResult<()> {
+        self.ensure_bound()?;
         debug_assert_eq!(self.kind, MetricInputKind::Returns);
         for &value in values {
             self.position += 1;
@@ -419,7 +460,7 @@ impl MetricInputState {
     pub fn reset(&mut self) {
         self.previous_equity = None;
         self.current_pnl_equity = match self.kind {
-            MetricInputKind::PeriodPnl { initial_equity } => Some(initial_equity),
+            MetricInputKind::PeriodPnl { initial_capital } => Some(initial_capital),
             _ => None,
         };
         self.len = 0;
@@ -441,6 +482,11 @@ impl MetricInputState {
         self.kind
     }
 
+    /// Return whether a semantic `from_*` lifecycle call selected the domain.
+    pub fn is_bound(&self) -> bool {
+        self.bound
+    }
+
     /// Return the configured missing-value policy.
     pub fn nan_policy(&self) -> NanPolicy {
         self.nan_policy
@@ -458,4 +504,211 @@ impl MetricInputState {
             reason,
         }
     }
+
+    fn ensure_bound(&self) -> MetricResult<()> {
+        if self.bound {
+            Ok(())
+        } else {
+            Err(MetricError::InvalidParameter {
+                name: "input_kind",
+                value: "unbound".to_owned(),
+                reason: "call a semantic from_* method before append or extend",
+            })
+        }
+    }
+}
+
+/// Add the standard return-domain ingestion lifecycle to a metric whose input
+/// converter is stored in an `input` field and whose numerical bulk path is
+/// its inherent `extend` method.
+#[macro_export]
+macro_rules! impl_return_metric_lifecycle {
+    ($state:ty) => {
+        impl $state {
+            pub fn from_returns(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Returns)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+
+            pub fn from_log_returns(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::LogReturns)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+
+            pub fn from_equity(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Equity)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+
+            pub fn from_pnl(
+                &mut self,
+                values: &[f64],
+                initial_capital: f64,
+            ) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::PeriodPnl {
+                    initial_capital: initial_capital,
+                })?;
+                self.extend(values)?;
+                Ok(self)
+            }
+        }
+    };
+}
+
+/// Add raw observation ingestion for metrics that accept returns, period P&L,
+/// and closed-trade P&L without capital conversion.
+#[macro_export]
+macro_rules! impl_observation_metric_lifecycle {
+    ($state:ty) => {
+        impl $state {
+            pub fn from_returns(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Returns)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+
+            pub fn from_pnl(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::RawPnl)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+
+            pub fn from_trades(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Trades)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+        }
+    };
+}
+
+/// Add raw P&L and closed-trade ingestion for monetary observation metrics.
+#[macro_export]
+macro_rules! impl_pnl_trade_metric_lifecycle {
+    ($state:ty) => {
+        impl $state {
+            pub fn from_pnl(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::RawPnl)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+
+            pub fn from_trades(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Trades)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+        }
+    };
+}
+
+/// Add return and closed-trade ingestion for metrics defined on either scale.
+#[macro_export]
+macro_rules! impl_return_trade_metric_lifecycle {
+    ($state:ty) => {
+        impl $state {
+            pub fn from_returns(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Returns)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+
+            pub fn from_trades(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Trades)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_returns_only_metric_lifecycle {
+    ($state:ty) => {
+        impl $state {
+            pub fn from_returns(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Returns)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_trades_only_metric_lifecycle {
+    ($state:ty) => {
+        impl $state {
+            pub fn from_trades(&mut self, values: &[f64]) -> $crate::MetricResult<&mut Self> {
+                self.input.bind($crate::MetricInputKind::Trades)?;
+                self.extend(values)?;
+                Ok(self)
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! impl_paired_return_metric_lifecycle {
+    ($state:ty) => {
+        impl $state {
+            pub fn from_returns(
+                &mut self,
+                primary: &[f64],
+                benchmark: &[f64],
+            ) -> $crate::MetricResult<&mut Self> {
+                self.input.bind(
+                    $crate::MetricInputKind::Returns,
+                    $crate::MetricInputKind::Returns,
+                )?;
+                self.extend(primary, benchmark)?;
+                Ok(self)
+            }
+            pub fn from_log_returns(
+                &mut self,
+                primary: &[f64],
+                benchmark: &[f64],
+            ) -> $crate::MetricResult<&mut Self> {
+                self.input.bind(
+                    $crate::MetricInputKind::LogReturns,
+                    $crate::MetricInputKind::LogReturns,
+                )?;
+                self.extend(primary, benchmark)?;
+                Ok(self)
+            }
+            pub fn from_equity(
+                &mut self,
+                primary: &[f64],
+                benchmark: &[f64],
+            ) -> $crate::MetricResult<&mut Self> {
+                self.input.bind(
+                    $crate::MetricInputKind::Equity,
+                    $crate::MetricInputKind::Equity,
+                )?;
+                self.extend(primary, benchmark)?;
+                Ok(self)
+            }
+            pub fn from_pnl(
+                &mut self,
+                primary: &[f64],
+                benchmark: &[f64],
+                initial_capital: f64,
+                benchmark_initial_capital: f64,
+            ) -> $crate::MetricResult<&mut Self> {
+                self.input.bind(
+                    $crate::MetricInputKind::PeriodPnl {
+                        initial_capital: initial_capital,
+                    },
+                    $crate::MetricInputKind::PeriodPnl {
+                        initial_capital: benchmark_initial_capital,
+                    },
+                )?;
+                self.extend(primary, benchmark)?;
+                Ok(self)
+            }
+        }
+    };
 }

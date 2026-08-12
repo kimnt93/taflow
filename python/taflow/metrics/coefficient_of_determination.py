@@ -28,102 +28,33 @@ class CoefficientOfDetermination:
     and allocation-free O(1) paired moments.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a paired semantic factory."""
-        raise TypeError(
-            "use CoefficientOfDetermination."
-            "from_returns/from_equity/from_pnl/from_log_returns"
-        )
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        benchmark_values: Any,
-        input_mode: str,
-        *,
-        initial_equity: float | None = None,
-        benchmark_initial_equity: float | None = None,
-        nan_policy: str = "omit",
-    ) -> "CoefficientOfDetermination":
-        primary, benchmark = as_paired_metric_series(values, benchmark_values)
-        state = cls.__new__(cls)
-        state._state = _Native(
-            input_mode,
-            initial_equity,
-            benchmark_initial_equity,
-            nan_policy,
-        )
-        state._state.extend(primary, benchmark)
-        return state
+    def from_returns(self, returns: Any, benchmark_returns: Any) -> "CoefficientOfDetermination":
+        """Append aligned returns series and return this metric."""
+        primary, benchmark = as_paired_metric_series(returns, benchmark_returns)
+        self._state.from_returns(primary, benchmark)
+        return self
 
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        benchmark_returns: Any,
-        *,
-        nan_policy: str = "omit",
-    ) -> "CoefficientOfDetermination":
-        """Construct from aligned chronological decimal simple returns."""
-        return cls._create(
-            returns,
-            benchmark_returns,
-            "returns",
-            nan_policy=nan_policy,
-        )
+    def from_log_returns(self, log_returns: Any, benchmark_log_returns: Any) -> "CoefficientOfDetermination":
+        """Append aligned log returns series and return this metric."""
+        primary, benchmark = as_paired_metric_series(log_returns, benchmark_log_returns)
+        self._state.from_log_returns(primary, benchmark)
+        return self
 
-    @classmethod
-    def from_log_returns(
-        cls,
-        log_returns: Any,
-        benchmark_log_returns: Any,
-        *,
-        nan_policy: str = "omit",
-    ) -> "CoefficientOfDetermination":
-        """Construct from aligned chronological log returns converted by Rust."""
-        return cls._create(
-            log_returns,
-            benchmark_log_returns,
-            "log_returns",
-            nan_policy=nan_policy,
-        )
+    def from_equity(self, equity: Any, benchmark_equity: Any) -> "CoefficientOfDetermination":
+        """Append aligned equity series and return this metric."""
+        primary, benchmark = as_paired_metric_series(equity, benchmark_equity)
+        self._state.from_equity(primary, benchmark)
+        return self
 
-    @classmethod
-    def from_equity(
-        cls,
-        equity: Any,
-        benchmark_equity: Any,
-        *,
-        nan_policy: str = "omit",
-    ) -> "CoefficientOfDetermination":
-        """Construct from aligned positive equity or adjusted-price levels."""
-        return cls._create(
-            equity,
-            benchmark_equity,
-            "equity",
-            nan_policy=nan_policy,
-        )
-
-    @classmethod
-    def from_pnl(
-        cls,
-        pnl: Any,
-        benchmark_pnl: Any,
-        *,
-        initial_equity: float,
-        benchmark_initial_equity: float,
-        nan_policy: str = "omit",
-    ) -> "CoefficientOfDetermination":
-        """Construct from aligned period P&L and separate initial capitals."""
-        return cls._create(
-            pnl,
-            benchmark_pnl,
-            "pnl",
-            initial_equity=float(initial_equity),
-            benchmark_initial_equity=float(benchmark_initial_equity),
-            nan_policy=nan_policy,
-        )
+    def from_pnl(self, pnl: Any, benchmark_pnl: Any, initial_capital: float, benchmark_initial_capital: float) -> "CoefficientOfDetermination":
+        """Append aligned period P&L with separate initial capitals."""
+        primary, benchmark = as_paired_metric_series(pnl, benchmark_pnl)
+        self._state.from_pnl(primary, benchmark, float(initial_capital), float(benchmark_initial_capital))
+        return self
 
     def append(
         self, value: float, benchmark_value: float

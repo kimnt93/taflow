@@ -5,7 +5,7 @@
 Each scalar metric has the same lifecycle:
 
 ```python
-metric = SharpeRatio.from_returns([], periods_per_year=252.0)
+metric = SharpeRatio(periods_per_year=252.0).from_returns([])
 metric.append(0.01).extend([-0.02, 0.015])
 latest: float | None = metric.value
 result: float | None = metric.compute()
@@ -13,8 +13,8 @@ count: int = len(metric)
 metric.reset()
 ```
 
-- Factories, not a polymorphic positional constructor, select the input
-  domain.
+- Constructors accept configuration only; instance ``from_*`` methods select
+  and ingest the input domain.
 - `append`, `extend`, and `reset` mutate and return the concrete class.
 - `value` and `compute()` return the same latest scalar. `compute()` must not
   replay prior input or mutate state. An expensive exact metric may lazily
@@ -27,10 +27,10 @@ metric.reset()
   `n - 1`. The first streamed equity value establishes the baseline and does
   not increment the metric length.
 - `reset()` preserves configuration, selected input mode, and the original
-  `initial_equity` when applicable, but clears all processed observations and
+  `initial_capital` when applicable, but clears all processed observations and
   conversion state.
 
-## Supported input factories
+## Supported instance input methods
 
 ### `from_returns`
 
@@ -41,7 +41,7 @@ domain and the primary external-oracle input.
 ### `from_log_returns`
 
 Input is chronological log return `log(V_t / V_(t-1))`. Rust converts each
-value with `expm1`. This factory is useful but should be delivered after
+value with `expm1`. This input method is useful but should be delivered after
 `from_returns`, `from_equity`, and `from_pnl` are stable.
 
 ### `from_equity`
@@ -53,23 +53,23 @@ Rust derives:
 r_t = equity_t / equity_(t-1) - 1
 ```
 
-All levels must be finite and strictly positive. The factory deliberately
+All levels must be finite and strictly positive. The input method deliberately
 does not infer or adjust dividends, splits, deposits, withdrawals, fees, or
 currency conversion. The caller supplies a total-return-adjusted series when
 those semantics are required.
 
-`from_prices` may be provided as a documented semantic factory that enters
+`from_prices` may be provided as a documented semantic input method that enters
 the exact same native level-input mode as `from_equity`; it must not implement
-a second conversion path. It is lower priority than the three core factories.
+a second conversion path. It is lower priority than the three core input methods.
 
 ### `from_pnl`
 
 Input is non-cumulative P&L per observation period. For a return/path metric,
-the factory requires a positive `initial_equity`; Rust derives returns and
+the input method requires a positive `initial_capital`; Rust derives returns and
 advances equity in chronological order:
 
 ```text
-equity_before_0 = initial_equity
+equity_before_0 = initial_capital
 r_t = pnl_t / equity_before_t
 equity_after_t = equity_before_t + pnl_t
 ```
@@ -81,13 +81,13 @@ error for this conversion contract.
 
 For a P&L-native metric such as `GrossProfit`, `NetProfit`, or trade/period
 `ProfitFactor`, `from_pnl` consumes the raw period P&L values and does not
-accept `initial_equity`. Requiring and then ignoring a capital value would be
-misleading. Each metric docstring must state whether its P&L factory converts
+accept `initial_capital`. Requiring and then ignoring a capital value would be
+misleading. Each metric docstring must state whether its P&L input method converts
 to returns or consumes raw P&L.
 
 ### `from_trades`
 
-Only trade-compatible metrics expose this factory. Input is the realized P&L
+Only trade-compatible metrics expose this input method. Input is the realized P&L
 of each closed trade, not bar P&L and not mark-to-market equity changes. It is
 the correct input for `ProfitFactor`, `PayoffRatio`, `Expectancy`, streaks,
 `KellyCriterion`, and `SystemQualityNumber`. Annualized return metrics must not
@@ -96,16 +96,12 @@ frequency.
 
 ## Benchmark inputs
 
-Benchmark-relative classes use paired, explicit factories:
+Benchmark-relative classes use paired, explicit input methods:
 
 ```python
-InformationRatio.from_returns(
-    returns,
-    benchmark_returns,
-    periods_per_year=252.0,
-)
+InformationRatio(periods_per_year=252.0).from_returns(returns, benchmark_returns)
 
-Beta.from_equity(equity, benchmark_equity)
+Beta().from_equity(equity, benchmark_equity)
 ```
 
 Both series are ordered primary first, benchmark second everywhere. Reject
@@ -208,7 +204,7 @@ The exception is an economically meaningful unbounded ratio:
 
 Every metric file must document its minimum observations and edge matrix.
 
-## Metric-specific factory eligibility
+## Metric-specific input method eligibility
 
 | Metric family | returns | equity/price | period P&L | closed trades |
 |---|:---:|:---:|:---:|:---:|
@@ -219,5 +215,5 @@ Every metric file must document its minimum observations and edge matrix.
 | Trade quality and streaks | no by default | no | no | yes |
 | Absolute gross/net P&L | no | no | yes (raw P&L) | yes |
 
-Do not expose a factory just because a numeric conversion is possible. The
+Do not expose a input method just because a numeric conversion is possible. The
 result must have a defensible financial meaning.

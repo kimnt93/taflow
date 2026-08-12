@@ -16,25 +16,44 @@ class ParametricExpectedShortfall:
     Negative output denotes a loss-side return, rather than a positive loss
     magnitude. Rust owns O(1) state, conversion, and missing-value handling.
     """
-    def __init__(self)->None:raise TypeError("use ParametricExpectedShortfall.from_returns/from_equity/from_pnl/from_log_returns")
-    @classmethod
-    def _create(cls,values:Any,mode:str,*,cutoff:float=.05,initial_equity:float|None=None,nan_policy:str="omit",column:str|None=None)->"ParametricExpectedShortfall":state=cls.__new__(cls);state._state=_Native(mode,float(cutoff),initial_equity,nan_policy);return state.extend(values,column=column)
-    @classmethod
-    def from_returns(cls,returns:Any,*,cutoff:float=.05,nan_policy:str="omit",column:str|None=None)->"ParametricExpectedShortfall":
-        """Construct from decimal simple returns."""
-        return cls._create(returns,"returns",cutoff=cutoff,nan_policy=nan_policy,column=column)
-    @classmethod
-    def from_log_returns(cls,log_returns:Any,*,cutoff:float=.05,nan_policy:str="omit",column:str|None=None)->"ParametricExpectedShortfall":
-        """Construct from log returns converted by Rust."""
-        return cls._create(log_returns,"log_returns",cutoff=cutoff,nan_policy=nan_policy,column=column)
-    @classmethod
-    def from_equity(cls,equity:Any,*,cutoff:float=.05,nan_policy:str="omit",column:str|None=None)->"ParametricExpectedShortfall":
-        """Construct from positive equity levels converted by Rust."""
-        return cls._create(equity,"equity",cutoff=cutoff,nan_policy=nan_policy,column=column)
-    @classmethod
-    def from_pnl(cls,pnl:Any,*,initial_equity:float,cutoff:float=.05,nan_policy:str="omit",column:str|None=None)->"ParametricExpectedShortfall":
-        """Construct from period P&L and required positive initial equity."""
-        return cls._create(pnl,"pnl",cutoff=cutoff,initial_equity=float(initial_equity),nan_policy=nan_policy,column=column)
+    def __init__(self, cutoff: float = 0.05, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(float(cutoff), nan_policy)
+
+    def from_returns(
+        self, returns: Any, *, column: str | None = None
+    ) -> "ParametricExpectedShortfall":
+        """Append chronological decimal simple returns and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
+
+    def from_log_returns(
+        self, log_returns: Any, *, column: str | None = None
+    ) -> "ParametricExpectedShortfall":
+        """Append chronological log returns and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
+
+    def from_equity(
+        self, equity: Any, *, column: str | None = None
+    ) -> "ParametricExpectedShortfall":
+        """Append chronological positive equity levels and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
+
+    def from_pnl(
+        self,
+        pnl: Any,
+        initial_capital: float,
+        *,
+        column: str | None = None,
+    ) -> "ParametricExpectedShortfall":
+        """Append period P&L using required positive initial capital."""
+        self._state.from_pnl(
+            as_metric_series(pnl, column=column), float(initial_capital)
+        )
+        return self
+
     def append(self,value:float)->"ParametricExpectedShortfall":
         """Append one selected-domain observation and return this metric."""
         self._state.append(float(value));return self

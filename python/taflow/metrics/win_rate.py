@@ -22,69 +22,42 @@ class WinRate:
 
     ``from_returns`` consumes chronological decimal simple period returns.
     ``from_pnl`` consumes raw, non-cumulative period P&L and deliberately does
-    not accept initial equity. ``from_trades`` consumes realized P&L for each
+    not accept initial capital. ``from_trades`` consumes realized P&L for each
     closed trade. These domains preserve sign classification without conversion
-    and are not annualized. Equity and log-return factories are intentionally
+    and are not annualized. Equity and log-return input methods are intentionally
     absent. NaNs are omitted by default or rejected with
     ``nan_policy="raise"``; infinities are always rejected, and return-domain
     values below -100% are invalid. ``append``, ``extend``, and ``reset`` are
     fluent. Bulk work releases the GIL; all counting and arithmetic live in Rust.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError("use WinRate.from_returns/from_pnl/from_trades")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "WinRate":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy=nan_policy)
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, returns: Any, *, column: str | None = None
     ) -> "WinRate":
-        """Construct from chronological decimal simple period returns."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
     def from_pnl(
-        cls,
-        pnl: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, pnl: Any, *, column: str | None = None
     ) -> "WinRate":
-        """Construct from raw non-cumulative period P&L without conversion."""
-        return cls._create(pnl, "pnl", nan_policy=nan_policy, column=column)
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
 
-    @classmethod
     def from_trades(
-        cls,
-        trades: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, trades: Any, *, column: str | None = None
     ) -> "WinRate":
-        """Construct from realized P&L observations for closed trades."""
-        return cls._create(trades, "trades", nan_policy=nan_policy, column=column)
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, value: float) -> "WinRate":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

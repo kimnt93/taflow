@@ -37,14 +37,12 @@ fn computes_compounded_annualized_regression_intercept() {
     let primary = [0.03, -0.01, 0.02, 0.04];
     let benchmark = [0.01, -0.02, 0.025, 0.01];
     let expected = expected_alpha(&primary, &benchmark, 12.0, 0.04);
-    let mut state = Alpha::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        12.0,
-        0.04,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = Alpha::new(12.0, 0.04, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.append(primary[0], benchmark[0]).unwrap(), None);
@@ -67,14 +65,12 @@ fn computes_compounded_annualized_regression_intercept() {
 
 #[test]
 fn omits_missing_values_pairwise_and_handles_undefined_cases() {
-    let mut state = Alpha::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        1.0,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = Alpha::new(1.0, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     state
         .extend(
             &[0.01, f64::NAN, 0.05, -0.02],
@@ -84,14 +80,12 @@ fn omits_missing_values_pairwise_and_handles_undefined_cases() {
     assert_close(state.value().unwrap(), 0.01);
     assert_eq!(state.len(), 2);
 
-    let mut constant_benchmark = Alpha::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut constant_benchmark = Alpha::new(252.0, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     constant_benchmark
         .extend(&[0.01, 0.02, 0.03], &[0.01, 0.01, 0.01])
         .unwrap();
@@ -103,28 +97,24 @@ fn input_modes_produce_equivalent_alpha() {
     let primary_returns = [0.10, -0.20, 0.05];
     let benchmark_returns = [0.02, -0.10, 0.01];
     let expected = {
-        let mut state = Alpha::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            12.0,
-            0.04,
-            NanPolicy::Omit,
-        )
-        .unwrap();
+        let mut state = Alpha::new(12.0, 0.04, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .unwrap();
         state
             .extend(&primary_returns, &benchmark_returns)
             .unwrap()
             .unwrap()
     };
 
-    let mut equity = Alpha::new(
-        MetricInputKind::Equity,
-        MetricInputKind::Equity,
-        12.0,
-        0.04,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut equity = Alpha::new(12.0, 0.04, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_equity(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         equity
             .extend(&[100.0, 110.0, 88.0, 92.4], &[200.0, 204.0, 183.6, 185.436])
@@ -133,18 +123,12 @@ fn input_modes_produce_equivalent_alpha() {
         expected,
     );
 
-    let mut pnl = Alpha::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        MetricInputKind::PeriodPnl {
-            initial_equity: 200.0,
-        },
-        12.0,
-        0.04,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut pnl = Alpha::new(12.0, 0.04, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[], &[], 100.0, 200.0)?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         pnl.extend(&[10.0, -22.0, 4.4], &[4.0, -20.4, 1.836])
             .unwrap()
@@ -152,14 +136,12 @@ fn input_modes_produce_equivalent_alpha() {
         expected,
     );
 
-    let mut logarithmic = Alpha::new(
-        MetricInputKind::LogReturns,
-        MetricInputKind::LogReturns,
-        12.0,
-        0.04,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut logarithmic = Alpha::new(12.0, 0.04, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_log_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         logarithmic
             .extend(
@@ -174,49 +156,46 @@ fn input_modes_produce_equivalent_alpha() {
 
 #[test]
 fn rejects_misalignment_invalid_configuration_domains_and_nan() {
-    let mut state = Alpha::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = Alpha::new(252.0, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(state.extend(&[0.01, 0.02], &[0.01]).is_err());
     assert_eq!(state.len(), 0);
 
     for periods in [0.0, -1.0, f64::NAN, f64::INFINITY] {
-        assert!(Alpha::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            periods,
-            0.0,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(Alpha::new(periods, 0.0, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .is_err());
     }
     for rate in [-1.0, f64::NAN, f64::INFINITY] {
-        assert!(Alpha::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            252.0,
-            rate,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(Alpha::new(252.0, rate, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .is_err());
     }
     for kind in [MetricInputKind::RawPnl, MetricInputKind::Trades] {
-        assert!(Alpha::new(kind, kind, 252.0, 0.0, NanPolicy::Omit).is_err());
+        assert!(Alpha::new(252.0, 0.0, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.append(0.0, 0.0)?;
+                Ok(state)
+            })
+            .is_err());
     }
 
-    let mut raises = Alpha::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        NanPolicy::Raise,
-    )
-    .unwrap();
+    let mut raises = Alpha::new(252.0, 0.0, NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(raises.append(f64::NAN, 0.01).is_err());
     assert_eq!(raises.len(), 0);
 }

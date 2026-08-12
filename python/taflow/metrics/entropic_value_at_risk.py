@@ -29,98 +29,48 @@ class EntropicValueAtRisk:
     Rust retains O(n) normalized returns. ``append`` is amortized O(1), bulk
     ``extend`` is one native GIL-free loop, and the first ``compute`` after new
     input is O(n * iterations). Repeated unchanged ``compute`` calls are O(1)
-    through a lazy cache. Semantic factories accept simple returns, log
-    returns, equity levels, and period P&L with positive initial equity.
+    through a lazy cache. Semantic input methods accept simple returns, log
+    returns, equity levels, and period P&L with positive initial capital.
     ``nan_policy`` is ``"omit"`` or ``"raise"``; infinities are rejected.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use EntropicValueAtRisk.from_returns/from_equity/from_pnl/"
-            "from_log_returns"
-        )
+    def __init__(self, cutoff: float = 0.05, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(float(cutoff), nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        cutoff: float = 0.05,
-        initial_equity: float | None = None,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "EntropicValueAtRisk":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, float(cutoff), initial_equity, nan_policy)
-        return state.extend(values, column=column)
-
-    @classmethod
     def from_returns(
-        cls,
-        returns: Any,
-        *,
-        cutoff: float = 0.05,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, returns: Any, *, column: str | None = None
     ) -> "EntropicValueAtRisk":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(
-            returns, "returns", cutoff=cutoff, nan_policy=nan_policy, column=column
-        )
+        """Append chronological decimal simple returns and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
     def from_log_returns(
-        cls,
-        log_returns: Any,
-        *,
-        cutoff: float = 0.05,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, log_returns: Any, *, column: str | None = None
     ) -> "EntropicValueAtRisk":
-        """Construct from chronological log returns converted by Rust."""
-        return cls._create(
-            log_returns,
-            "log_returns",
-            cutoff=cutoff,
-            nan_policy=nan_policy,
-            column=column,
-        )
+        """Append chronological log returns and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
 
-    @classmethod
     def from_equity(
-        cls,
-        equity: Any,
-        *,
-        cutoff: float = 0.05,
-        nan_policy: str = "omit",
-        column: str | None = None,
+        self, equity: Any, *, column: str | None = None
     ) -> "EntropicValueAtRisk":
-        """Construct from positive equity or adjusted-price levels."""
-        return cls._create(
-            equity, "equity", cutoff=cutoff, nan_policy=nan_policy, column=column
-        )
+        """Append chronological positive equity levels and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
 
-    @classmethod
     def from_pnl(
-        cls,
+        self,
         pnl: Any,
+        initial_capital: float,
         *,
-        initial_equity: float,
-        cutoff: float = 0.05,
-        nan_policy: str = "omit",
         column: str | None = None,
     ) -> "EntropicValueAtRisk":
-        """Construct from period P&L and required positive initial equity."""
-        return cls._create(
-            pnl,
-            "pnl",
-            cutoff=cutoff,
-            initial_equity=float(initial_equity),
-            nan_policy=nan_policy,
-            column=column,
+        """Append period P&L using required positive initial capital."""
+        self._state.from_pnl(
+            as_metric_series(pnl, column=column), float(initial_capital)
         )
+        return self
 
     def append(self, value: float) -> "EntropicValueAtRisk":
         """Append one selected-domain observation and return this metric."""

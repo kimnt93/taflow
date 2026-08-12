@@ -10,6 +10,32 @@ pub struct PairedMetricInputState {
 }
 
 impl PairedMetricInputState {
+    /// Construct paired converters without selecting their semantic domain.
+    pub fn unbound(nan_policy: NanPolicy) -> Self {
+        Self {
+            primary: MetricInputState::unbound(nan_policy),
+            benchmark: MetricInputState::unbound(nan_policy),
+            len: 0,
+        }
+    }
+
+    /// Bind both aligned streams to matching semantic domains.
+    pub fn bind(
+        &mut self,
+        primary_kind: MetricInputKind,
+        benchmark_kind: MetricInputKind,
+    ) -> MetricResult<()> {
+        if !primary_kind.discriminant_matches(benchmark_kind) {
+            return Err(MetricError::InputDomainMismatch {
+                primary: primary_kind.domain(),
+                benchmark: benchmark_kind.domain(),
+            });
+        }
+        self.primary.bind(primary_kind)?;
+        self.benchmark.bind(benchmark_kind)?;
+        Ok(())
+    }
+
     /// Construct paired converters whose semantic domains match.
     pub fn new(
         primary_kind: MetricInputKind,
@@ -31,6 +57,13 @@ impl PairedMetricInputState {
 
     /// Append one aligned pair without partially mutating either converter.
     pub fn append(&mut self, primary: f64, benchmark: f64) -> MetricResult<Option<(f64, f64)>> {
+        if !self.primary.is_bound() || !self.benchmark.is_bound() {
+            return Err(MetricError::InvalidParameter {
+                name: "input_kind",
+                value: "unbound".to_owned(),
+                reason: "call a semantic from_* method before append or extend",
+            });
+        }
         if primary.is_nan() || benchmark.is_nan() {
             if self.primary.nan_policy() == NanPolicy::Raise {
                 let rejected = if primary.is_nan() { primary } else { benchmark };

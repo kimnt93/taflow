@@ -16,7 +16,6 @@ pub struct ProbabilisticSharpeRatio {
 impl ProbabilisticSharpeRatio {
     /// Construct an empty probabilistic-Sharpe state.
     pub fn new(
-        input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_risk_free_rate: f64,
         annual_benchmark_sharpe_ratio: f64,
@@ -43,16 +42,6 @@ impl ProbabilisticSharpeRatio {
                 reason: "must be finite",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "probabilistic Sharpe ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         let period_risk_free_rate = (annual_risk_free_rate.ln_1p() / periods_per_year).exp_m1();
         if !period_risk_free_rate.is_finite() {
@@ -64,7 +53,7 @@ impl ProbabilisticSharpeRatio {
         }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             count: 0,
             mean: 0.0,
             second_central_moment: 0.0,
@@ -245,3 +234,5 @@ impl ProbabilisticSharpeRatio {
         }
     }
 }
+
+crate::impl_return_metric_lifecycle!(ProbabilisticSharpeRatio);

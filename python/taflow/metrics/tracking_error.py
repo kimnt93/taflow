@@ -23,128 +23,39 @@ class TrackingError:
     default ``nan_policy="omit"`` or rejected by ``"raise"``; infinities and
     mismatched series lengths are rejected. Inputs may be aligned decimal
     simple returns, log returns, positive equity levels, or non-cumulative
-    period P&L. P&L conversion requires separate positive initial equity for
+    period P&L. P&L conversion requires separate positive initial capital for
     the primary and benchmark series. The first pair of equity levels sets
     baselines and does not increment the length. Mutating lifecycle methods
     are fluent, and Rust owns conversion and O(1)-memory metric arithmetic.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a paired semantic factory."""
-        raise TypeError(
-            "use TrackingError.from_returns/from_equity/from_pnl/"
-            "from_log_returns"
-        )
+    def __init__(self, periods_per_year: float = 252.0, annualized: bool = True, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(float(periods_per_year), annualized, nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        benchmark_values: Any,
-        input_mode: str,
-        *,
-        periods_per_year: float = 252.0,
-        annualized: bool = True,
-        initial_equity: float | None = None,
-        benchmark_initial_equity: float | None = None,
-        nan_policy: str = "omit",
-    ) -> "TrackingError":
-        primary, benchmark = as_paired_metric_series(values, benchmark_values)
-        state = cls.__new__(cls)
-        state._state = _Native(
-            input_mode,
-            float(periods_per_year),
-            bool(annualized),
-            initial_equity,
-            benchmark_initial_equity,
-            nan_policy,
-        )
-        state._state.extend(primary, benchmark)
-        return state
+    def from_returns(self, returns: Any, benchmark_returns: Any) -> "TrackingError":
+        """Append aligned returns series and return this metric."""
+        primary, benchmark = as_paired_metric_series(returns, benchmark_returns)
+        self._state.from_returns(primary, benchmark)
+        return self
 
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        benchmark_returns: Any,
-        *,
-        periods_per_year: float = 252.0,
-        annualized: bool = True,
-        nan_policy: str = "omit",
-    ) -> "TrackingError":
-        """Construct from aligned chronological decimal simple returns."""
-        return cls._create(
-            returns,
-            benchmark_returns,
-            "returns",
-            periods_per_year=periods_per_year,
-            annualized=annualized,
-            nan_policy=nan_policy,
-        )
+    def from_log_returns(self, log_returns: Any, benchmark_log_returns: Any) -> "TrackingError":
+        """Append aligned log returns series and return this metric."""
+        primary, benchmark = as_paired_metric_series(log_returns, benchmark_log_returns)
+        self._state.from_log_returns(primary, benchmark)
+        return self
 
-    @classmethod
-    def from_log_returns(
-        cls,
-        log_returns: Any,
-        benchmark_log_returns: Any,
-        *,
-        periods_per_year: float = 252.0,
-        annualized: bool = True,
-        nan_policy: str = "omit",
-    ) -> "TrackingError":
-        """Construct from aligned chronological log returns converted by Rust."""
-        return cls._create(
-            log_returns,
-            benchmark_log_returns,
-            "log_returns",
-            periods_per_year=periods_per_year,
-            annualized=annualized,
-            nan_policy=nan_policy,
-        )
+    def from_equity(self, equity: Any, benchmark_equity: Any) -> "TrackingError":
+        """Append aligned equity series and return this metric."""
+        primary, benchmark = as_paired_metric_series(equity, benchmark_equity)
+        self._state.from_equity(primary, benchmark)
+        return self
 
-    @classmethod
-    def from_equity(
-        cls,
-        equity: Any,
-        benchmark_equity: Any,
-        *,
-        periods_per_year: float = 252.0,
-        annualized: bool = True,
-        nan_policy: str = "omit",
-    ) -> "TrackingError":
-        """Construct from aligned positive equity or adjusted-price levels."""
-        return cls._create(
-            equity,
-            benchmark_equity,
-            "equity",
-            periods_per_year=periods_per_year,
-            annualized=annualized,
-            nan_policy=nan_policy,
-        )
-
-    @classmethod
-    def from_pnl(
-        cls,
-        pnl: Any,
-        benchmark_pnl: Any,
-        *,
-        initial_equity: float,
-        benchmark_initial_equity: float,
-        periods_per_year: float = 252.0,
-        annualized: bool = True,
-        nan_policy: str = "omit",
-    ) -> "TrackingError":
-        """Construct from aligned period P&L and separate initial capitals."""
-        return cls._create(
-            pnl,
-            benchmark_pnl,
-            "pnl",
-            periods_per_year=periods_per_year,
-            annualized=annualized,
-            initial_equity=float(initial_equity),
-            benchmark_initial_equity=float(benchmark_initial_equity),
-            nan_policy=nan_policy,
-        )
+    def from_pnl(self, pnl: Any, benchmark_pnl: Any, initial_capital: float, benchmark_initial_capital: float) -> "TrackingError":
+        """Append aligned period P&L with separate initial capitals."""
+        primary, benchmark = as_paired_metric_series(pnl, benchmark_pnl)
+        self._state.from_pnl(primary, benchmark, float(initial_capital), float(benchmark_initial_capital))
+        return self
 
     def append(self, value: float, benchmark_value: float) -> "TrackingError":
         """Append one aligned pair in the selected domain and return this metric."""

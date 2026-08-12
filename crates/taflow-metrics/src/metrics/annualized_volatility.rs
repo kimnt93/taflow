@@ -13,11 +13,7 @@ pub struct AnnualizedVolatility {
 
 impl AnnualizedVolatility {
     /// Construct an empty state with an explicit input mode and annual frequency.
-    pub fn new(
-        input_kind: MetricInputKind,
-        periods_per_year: f64,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    pub fn new(periods_per_year: f64, nan_policy: NanPolicy) -> MetricResult<Self> {
         if !periods_per_year.is_finite() || periods_per_year <= 0.0 {
             return Err(MetricError::InvalidParameter {
                 name: "periods_per_year",
@@ -25,19 +21,9 @@ impl AnnualizedVolatility {
                 reason: "must be finite and greater than zero",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "annualized volatility requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             moments: OnlineMoments::new(),
             annualization_scale: periods_per_year.sqrt(),
         })
@@ -95,3 +81,5 @@ impl AnnualizedVolatility {
         self.input.is_empty()
     }
 }
+
+crate::impl_return_metric_lifecycle!(AnnualizedVolatility);

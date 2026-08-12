@@ -32,7 +32,12 @@ fn source_convention(returns: &[f64]) -> f64 {
 #[test]
 fn matches_pinned_performanceanalytics_episode_convention() {
     let returns = [0.25, -0.20, 0.0, 0.10, -0.50, 1.0, -0.10];
-    let mut state = AverageDrawdown::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&returns).unwrap();
     assert_relative_eq!(
         state.compute().unwrap(),
@@ -43,7 +48,12 @@ fn matches_pinned_performanceanalytics_episode_convention() {
 
 #[test]
 fn completed_and_current_episodes_are_counted_once() {
-    let mut state = AverageDrawdown::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&[0.25, -0.20]).unwrap();
     assert_relative_eq!(state.value().unwrap(), 0.20, epsilon = 1e-15);
     state.append(0.25).unwrap();
@@ -54,7 +64,12 @@ fn completed_and_current_episodes_are_counted_once() {
 
 #[test]
 fn nonempty_path_without_drawdowns_returns_zero() {
-    let mut state = AverageDrawdown::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(state.value(), None);
     state.extend(&[0.10, 0.0, 0.20]).unwrap();
     assert_eq!(state.value(), Some(0.0));
@@ -63,12 +78,22 @@ fn nonempty_path_without_drawdowns_returns_zero() {
 #[test]
 fn lifecycle_omission_and_reset_are_invariant() {
     let returns = [0.25, f64::NAN, -0.20, 0.25, 0.10, -0.50, 1.0, -0.10];
-    let mut batch = AverageDrawdown::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut batch = AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     batch.extend(&returns).unwrap();
     assert_eq!(batch.len(), 7);
     let expected = batch.value().unwrap();
 
-    let mut streamed = AverageDrawdown::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut streamed = AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     for value in returns {
         streamed.append(value).unwrap();
     }
@@ -82,9 +107,24 @@ fn lifecycle_omission_and_reset_are_invariant() {
 
 #[test]
 fn rejects_non_path_domains_and_invalid_observations() {
-    assert!(AverageDrawdown::new(MetricInputKind::RawPnl, NanPolicy::Omit).is_err());
-    assert!(AverageDrawdown::new(MetricInputKind::Trades, NanPolicy::Omit).is_err());
-    let mut state = AverageDrawdown::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    assert!(AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    let mut state = AverageDrawdown::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(state.append(-1.01).is_err());
     assert!(state.is_empty());
     assert!(state.append(f64::INFINITY).is_err());

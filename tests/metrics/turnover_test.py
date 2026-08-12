@@ -19,7 +19,7 @@ from taflow.metrics.turnover import Turnover
 def test_turnover_matches_numpy_oracle(weights: np.ndarray) -> None:
     usable = weights[~np.isnan(weights)]
     expected = None if len(usable) < 2 else float(np.mean(np.abs(np.diff(usable))))
-    actual = Turnover.from_weights(weights).compute()
+    actual = Turnover().from_weights(weights).compute()
     if expected is None:
         assert actual is None
     else:
@@ -28,8 +28,8 @@ def test_turnover_matches_numpy_oracle(weights: np.ndarray) -> None:
 
 def test_turnover_lifecycle_is_invariant() -> None:
     weights = np.array([0.0, 0.4, 0.1, -0.2, 0.0])
-    expected = Turnover.from_weights(weights).compute()
-    state = Turnover.from_weights([])
+    expected = Turnover().from_weights(weights).compute()
+    state = Turnover().from_weights([])
     assert state.append(weights[0]) is state and state.value is None
     assert state.extend(weights[1:3]) is state
     assert state.extend(weights[3:]) is state
@@ -40,12 +40,13 @@ def test_turnover_lifecycle_is_invariant() -> None:
     assert state.extend(weights).compute() == pytest.approx(expected)
 
 
-def test_turnover_validation_and_semantic_factory() -> None:
-    assert Turnover.from_weights([]).compute() is None
-    assert Turnover.from_weights([0.5]).compute() is None
+def test_turnover_validation_and_semantic_input_method() -> None:
+    assert Turnover().from_weights([]).compute() is None
+    assert Turnover().from_weights([0.5]).compute() is None
     with pytest.raises(ValueError):
-        Turnover.from_weights([np.nan], nan_policy="raise")
+        Turnover(nan_policy="raise").from_weights([np.nan])
     with pytest.raises(ValueError):
-        Turnover.from_weights([np.inf])
-    with pytest.raises(TypeError):
-        Turnover()
+        Turnover().from_weights([np.inf])
+    unbound = Turnover()
+    with pytest.raises(ValueError):
+        unbound.append(0.1)

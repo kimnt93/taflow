@@ -24,7 +24,7 @@ class AverageDrawdown:
     ``fc801d39382818cd3a7052326b45d078302aef4d290c85dab83498ed4516d58d``.
 
     Inputs may be decimal simple returns, log returns, positive equity levels,
-    or non-cumulative period P&L. The P&L factory requires positive initial
+    or non-cumulative period P&L. The P&L input method requires positive initial
     equity and Rust performs causal capital conversion. The first equity level
     establishes a conversion baseline and does not increment metric length.
     ``nan_policy`` is ``"omit"`` or ``"raise"``; infinities and simple returns
@@ -33,61 +33,46 @@ class AverageDrawdown:
     streaming state.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError(
-            "use AverageDrawdown.from_returns/from_equity/from_pnl/from_log_returns"
-        )
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        initial_equity: float | None = None,
-        nan_policy: str = "omit",
-    ) -> "AverageDrawdown":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, initial_equity, nan_policy)
-        return state.extend(values)
-
-    @classmethod
     def from_returns(
-        cls, returns: Any, *, nan_policy: str = "omit"
+        self, returns: Any, *, column: str | None = None
     ) -> "AverageDrawdown":
-        """Construct from chronological decimal simple returns."""
-        return cls._create(returns, "returns", nan_policy=nan_policy)
+        """Append chronological decimal simple returns and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
-    @classmethod
     def from_log_returns(
-        cls, log_returns: Any, *, nan_policy: str = "omit"
+        self, log_returns: Any, *, column: str | None = None
     ) -> "AverageDrawdown":
-        """Construct from chronological log returns converted by Rust."""
-        return cls._create(log_returns, "log_returns", nan_policy=nan_policy)
+        """Append chronological log returns and return this metric."""
+        self._state.from_log_returns(as_metric_series(log_returns, column=column))
+        return self
 
-    @classmethod
     def from_equity(
-        cls, equity: Any, *, nan_policy: str = "omit"
+        self, equity: Any, *, column: str | None = None
     ) -> "AverageDrawdown":
-        """Construct from positive chronological equity or adjusted-price levels."""
-        return cls._create(equity, "equity", nan_policy=nan_policy)
+        """Append chronological positive equity levels and return this metric."""
+        self._state.from_equity(as_metric_series(equity, column=column))
+        return self
 
-    @classmethod
     def from_pnl(
-        cls,
+        self,
         pnl: Any,
+        initial_capital: float,
         *,
-        initial_equity: float,
-        nan_policy: str = "omit",
+        column: str | None = None,
     ) -> "AverageDrawdown":
-        """Construct from non-cumulative period P&L and positive initial equity."""
-        return cls._create(
-            pnl, "pnl", initial_equity=float(initial_equity), nan_policy=nan_policy
+        """Append period P&L using required positive initial capital."""
+        self._state.from_pnl(
+            as_metric_series(pnl, column=column), float(initial_capital)
         )
+        return self
 
     def append(self, value: float) -> "AverageDrawdown":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

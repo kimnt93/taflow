@@ -30,22 +30,14 @@ class CommonSenseRatio:
     releases the GIL; Python performs no financial arithmetic.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use ``from_returns``."""
-        raise TypeError("use CommonSenseRatio.from_returns")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "CommonSenseRatio":
-        """Construct from chronological decimal simple returns."""
-        state = cls.__new__(cls)
-        state._state = _Native(nan_policy)
-        return state.extend(returns, column=column)
+    def from_returns(self, returns: Any, *, column: str | None = None) -> "CommonSenseRatio":
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
     def append(self, value: float) -> "CommonSenseRatio":
         """Append one simple return and return this metric."""

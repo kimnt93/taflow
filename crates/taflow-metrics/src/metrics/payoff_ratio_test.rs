@@ -11,7 +11,12 @@ fn computes_average_win_over_absolute_average_loss_and_preserves_lifecycle() {
     let average_win = (0.02 + 0.03 + 0.01) / 3.0;
     let average_loss = (-0.01 - 0.025) / 2.0;
     let expected = average_win / -average_loss;
-    let mut state = PayoffRatio::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut state = PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.append(values[0]).unwrap(), None);
@@ -32,36 +37,71 @@ fn raw_period_pnl_and_closed_trades_are_not_converted() {
     let observations = [100.0, -40.0, 0.0, 20.0, -10.0];
     let expected = 60.0 / 25.0;
 
-    let mut pnl = PayoffRatio::new(MetricInputKind::RawPnl, NanPolicy::Omit).unwrap();
+    let mut pnl = PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(pnl.extend(&observations).unwrap().unwrap(), expected);
 
-    let mut trades = PayoffRatio::new(MetricInputKind::Trades, NanPolicy::Omit).unwrap();
+    let mut trades = PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_trades(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(trades.extend(&observations).unwrap().unwrap(), expected);
 }
 
 #[test]
 fn either_missing_side_keeps_the_ratio_undefined() {
-    let mut wins = PayoffRatio::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut wins = PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     wins.extend(&[0.10, 0.0, 0.02]).unwrap();
     assert_eq!(wins.value(), None);
 
-    let mut losses = PayoffRatio::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut losses = PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     losses.extend(&[-0.10, 0.0, -0.02]).unwrap();
     assert_eq!(losses.value(), None);
 
-    let mut breakeven = PayoffRatio::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut breakeven = PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     breakeven.extend(&[0.0, 0.0]).unwrap();
     assert_eq!(breakeven.value(), None);
 }
 
 #[test]
 fn missing_and_invalid_values_follow_the_input_contract() {
-    let mut omit = PayoffRatio::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut omit = PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     omit.extend(&[f64::NAN, 0.02, -0.01]).unwrap();
     assert_eq!(omit.len(), 2);
     assert_eq!(omit.value(), Some(2.0));
 
-    let mut raise = PayoffRatio::new(MetricInputKind::Returns, NanPolicy::Raise).unwrap();
+    let mut raise = PayoffRatio::new(NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     raise.extend(&[0.01, -0.02]).unwrap();
     assert!(raise.append(f64::NAN).is_err());
     assert_eq!(raise.len(), 2);
@@ -74,13 +114,22 @@ fn missing_and_invalid_values_follow_the_input_contract() {
 
 #[test]
 fn rejects_return_converters_outside_the_declared_domains() {
-    assert!(PayoffRatio::new(MetricInputKind::LogReturns, NanPolicy::Omit).is_err());
-    assert!(PayoffRatio::new(MetricInputKind::Equity, NanPolicy::Omit).is_err());
-    assert!(PayoffRatio::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        NanPolicy::Omit,
-    )
-    .is_err());
+    assert!(PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(PayoffRatio::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
 }

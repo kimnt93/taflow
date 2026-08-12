@@ -59,28 +59,30 @@ def audit(spec: MetricSpec) -> list[str]:
         if required.casefold() not in doc.casefold():
             failures.append(f"class docstring does not describe {required}")
 
-    factory_name = spec.factories[0]
-    factory = getattr(cls, factory_name, None)
-    if factory is None:
-        failures.append(f"{factory_name} factory is missing")
+    input_method_name = spec.input_methods[0]
+    input_method = getattr(cls, input_method_name, None)
+    if input_method is None:
+        failures.append(f"{input_method_name} input method is missing")
         return failures
-    parameters = list(inspect.signature(factory).parameters.values())
+    parameters = list(inspect.signature(input_method).parameters.values())[1:]
     required_series = 2 if spec.paired else 1
     if len(parameters) < required_series or any(
         parameter.default is not inspect.Parameter.empty
         for parameter in parameters[:required_series]
     ):
-        failures.append(f"{factory_name} must require its series")
+        failures.append(f"{input_method_name} must require its series")
     try:
         empty = np.array([], dtype=np.float64)
-        factory_kwargs = spec.parameter_rows[0].as_kwargs()
+        constructor_kwargs = spec.parameter_rows[0].as_kwargs()
+        state = cls(**constructor_kwargs)
+        bound_input_method = getattr(state, input_method_name)
         state = (
-            factory(empty, empty, **factory_kwargs)
+            bound_input_method(empty, empty)
             if spec.paired
-            else factory(empty, **factory_kwargs)
+            else bound_input_method(empty)
         )
     except Exception as error:  # noqa: BLE001 - audit reports public failures.
-        failures.append(f"empty {factory_name} construction failed: {error}")
+        failures.append(f"empty {input_method_name} ingestion failed: {error}")
         return failures
     for method_name in ("append", "extend", "compute", "reset", "__len__"):
         if not callable(getattr(state, method_name, None)):

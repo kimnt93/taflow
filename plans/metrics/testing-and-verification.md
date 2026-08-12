@@ -5,7 +5,7 @@
 Every metric needs three independent kinds of evidence:
 
 1. Rust unit tests establish state-machine behavior and exact edge rules.
-2. Python tests establish the public adapter, factories, containers, and
+2. Python tests establish the public adapter, input methods, containers, and
    lifecycle.
 3. The metrics correctness verifier compares the public Python class to the
    pinned external oracle.
@@ -28,7 +28,7 @@ The matching `<metric>_test.rs` file must cover:
 - NaN policy and infinity rejection;
 - signed zero and zero-denominator behavior;
 - clone/debug behavior if those traits are public;
-- P&L or equity conversion continuation when that factory is supported;
+- P&L or equity conversion continuation when that input method is supported;
 - paired length validation before mutation for benchmark metrics.
 
 Use bitwise equality for paths promised bitwise invariant. If an oracle
@@ -45,7 +45,7 @@ canonical class and cover:
 - supported `from_equity`, `from_pnl`, `from_log_returns`, or `from_trades`;
 - fluent concrete returns from `append`, `extend`, and `reset`;
 - `value`, `compute`, and `__len__` before and after each lifecycle action;
-- constructor factory with an empty series for fresh streaming;
+- constructor input method with an empty series for fresh streaming;
 - scalar, chunked, and one-shot equality;
 - reset/replay equality;
 - list/NumPy/pandas/Polars/Arrow container equivalence where dependencies are
@@ -93,17 +93,17 @@ the TAFlow actual path:
 ```text
 equity: [100, 102, 99.96, 104.958]
 returns: [0.02, -0.02, 0.05]
-period P&L: [2, -2.04, 4.998] with initial_equity=100
+period P&L: [2, -2.04, 4.998] with initial_capital=100
 log returns: log1p(returns)
 ```
 
 For every return/path metric, assert that:
 
 ```python
-Metric.from_returns(returns).compute()
-Metric.from_equity(equity).compute()
-Metric.from_pnl(pnl, initial_equity=100.0).compute()
-Metric.from_log_returns(log_returns).compute()
+Metric().from_returns(returns).compute()
+Metric().from_equity(equity).compute()
+Metric().from_pnl(pnl, initial_capital=100.0).compute()
+Metric().from_log_returns(log_returns).compute()
 ```
 
 agree under the metric's tolerance and leave continuation in an equivalent
@@ -113,15 +113,15 @@ state. The actual TAFlow value must still be oracle-checked through
 ## Oracle verifier organization
 
 Create `scripts/verification/metrics/registry.py` with one explicit record per
-class. Do not reuse the indicator registry: scalar output, factories,
+class. Do not reuse the indicator registry: scalar output, input methods,
 annualization, and missing policies are different contracts.
 
 Each entry names:
 
 - canonical class and module;
 - phase/family;
-- supported factories;
-- factory arguments and metric configuration;
+- supported input methods;
+- input method arguments and metric configuration;
 - output type and minimum observations;
 - oracle package/version/function/source;
 - oracle argument transformation;
@@ -172,7 +172,7 @@ Never use a loose global tolerance to hide a definition mismatch.
 - exactly one public class implementation exists per layer;
 - no same-named free metric function exists;
 - class is exported from `taflow.metrics` only;
-- factories require their series and have descriptive parameters;
+- input methods require their series and have descriptive parameters;
 - append/extend/reset return the concrete class;
 - value/compute return type is `float | None` or an explicit named value;
 - `__len__` delegates to native state;

@@ -32,22 +32,14 @@ class SystemQualityNumber:
     methods are fluent and bulk execution releases the GIL.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use ``from_trades``."""
-        raise TypeError("use SystemQualityNumber.from_trades")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def from_trades(
-        cls,
-        trades: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "SystemQualityNumber":
-        """Construct from realized P&L for chronological closed trades."""
-        state = cls.__new__(cls)
-        state._state = _Native("trades", nan_policy)
-        return state.extend(trades, column=column)
+    def from_trades(self, trades: Any, *, column: str | None = None) -> "SystemQualityNumber":
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
 
     def append(self, trade_pnl: float) -> "SystemQualityNumber":
         """Append one realized closed-trade P&L and return this metric."""

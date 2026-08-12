@@ -13,11 +13,7 @@ pub struct HistoricalValueAtRisk {
 
 impl HistoricalValueAtRisk {
     /// Construct an empty exact historical value-at-risk state.
-    pub fn new(
-        input_kind: MetricInputKind,
-        cutoff: f64,
-        nan_policy: NanPolicy,
-    ) -> MetricResult<Self> {
+    pub fn new(cutoff: f64, nan_policy: NanPolicy) -> MetricResult<Self> {
         if !cutoff.is_finite() || cutoff <= 0.0 || cutoff >= 1.0 {
             return Err(MetricError::InvalidParameter {
                 name: "cutoff",
@@ -25,19 +21,9 @@ impl HistoricalValueAtRisk {
                 reason: "must be finite and strictly between zero and one",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "historical value at risk requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             order_statistics: ExactOrderStatistics::new(),
             cutoff,
         })
@@ -91,3 +77,5 @@ impl HistoricalValueAtRisk {
         self.input.is_empty()
     }
 }
+
+crate::impl_return_metric_lifecycle!(HistoricalValueAtRisk);

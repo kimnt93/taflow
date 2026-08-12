@@ -14,21 +14,25 @@ class LongestLosingStreak:
     sample returns integer zero. Inputs are explicit period returns, raw period
     P&L, or closed-trade P&L. Rust owns O(1) state; no annualization occurs.
     """
-    def __init__(self)->None: raise TypeError("use LongestLosingStreak.from_returns/from_pnl/from_trades")
-    @classmethod
-    def _create(cls,values:Any,mode:str,*,nan_policy:str="omit",column:str|None=None)->"LongestLosingStreak": state=cls.__new__(cls);state._state=_Native(mode,nan_policy);return state.extend(values,column=column)
-    @classmethod
-    def from_returns(cls,returns:Any,*,nan_policy:str="omit",column:str|None=None)->"LongestLosingStreak":
-        """Construct from decimal period returns."""
-        return cls._create(returns,"returns",nan_policy=nan_policy,column=column)
-    @classmethod
-    def from_pnl(cls,pnl:Any,*,nan_policy:str="omit",column:str|None=None)->"LongestLosingStreak":
-        """Construct from raw period P&L."""
-        return cls._create(pnl,"pnl",nan_policy=nan_policy,column=column)
-    @classmethod
-    def from_trades(cls,trades:Any,*,nan_policy:str="omit",column:str|None=None)->"LongestLosingStreak":
-        """Construct from closed-trade P&L."""
-        return cls._create(trades,"trades",nan_policy=nan_policy,column=column)
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
+
+    def from_returns(self, returns: Any, *, column: str | None = None) -> "LongestLosingStreak":
+        """Append chronological returns observations and return this metric."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
+
+    def from_pnl(self, pnl: Any, *, column: str | None = None) -> "LongestLosingStreak":
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
+
+    def from_trades(self, trades: Any, *, column: str | None = None) -> "LongestLosingStreak":
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
+
     def append(self,value:float)->"LongestLosingStreak":
         """Append one observation and return this metric."""
         self._state.append(float(value));return self

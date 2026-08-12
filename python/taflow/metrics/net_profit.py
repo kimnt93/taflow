@@ -14,17 +14,20 @@ class NetProfit:
     realized closed-trade P&L are accepted. No capital conversion or
     annualization occurs. Rust owns compensated O(1) streaming state.
     """
-    def __init__(self)->None: raise TypeError("use NetProfit.from_pnl/from_trades")
-    @classmethod
-    def _create(cls,values:Any,mode:str,*,nan_policy:str="omit",column:str|None=None)->"NetProfit": state=cls.__new__(cls);state._state=_Native(mode,nan_policy);return state.extend(values,column=column)
-    @classmethod
-    def from_pnl(cls,pnl:Any,*,nan_policy:str="omit",column:str|None=None)->"NetProfit":
-        """Construct from raw non-cumulative period P&L."""
-        return cls._create(pnl,"pnl",nan_policy=nan_policy,column=column)
-    @classmethod
-    def from_trades(cls,trades:Any,*,nan_policy:str="omit",column:str|None=None)->"NetProfit":
-        """Construct from realized closed-trade P&L."""
-        return cls._create(trades,"trades",nan_policy=nan_policy,column=column)
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured metric."""
+        self._state = _Native(nan_policy)
+
+    def from_pnl(self, pnl: Any, *, column: str | None = None) -> "NetProfit":
+        """Append chronological pnl observations and return this metric."""
+        self._state.from_pnl(as_metric_series(pnl, column=column))
+        return self
+
+    def from_trades(self, trades: Any, *, column: str | None = None) -> "NetProfit":
+        """Append chronological trades observations and return this metric."""
+        self._state.from_trades(as_metric_series(trades, column=column))
+        return self
+
     def append(self,value:float)->"NetProfit":
         """Append one P&L observation and return this metric."""
         self._state.append(float(value));return self

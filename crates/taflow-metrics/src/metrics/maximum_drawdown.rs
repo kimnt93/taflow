@@ -12,19 +12,9 @@ pub struct MaximumDrawdown {
 
 impl MaximumDrawdown {
     /// Construct an empty state with an explicitly selected semantic input mode.
-    pub fn new(input_kind: MetricInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "maximum drawdown requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             drawdown: DrawdownState::new(),
         })
     }
@@ -75,3 +65,5 @@ impl MaximumDrawdown {
         self.input.is_empty()
     }
 }
+
+crate::impl_return_metric_lifecycle!(MaximumDrawdown);

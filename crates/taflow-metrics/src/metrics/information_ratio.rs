@@ -14,8 +14,6 @@ pub struct InformationRatio {
 impl InformationRatio {
     /// Construct an empty state for aligned primary and benchmark input domains.
     pub fn new(
-        primary_input_kind: MetricInputKind,
-        benchmark_input_kind: MetricInputKind,
         periods_per_year: f64,
         annualized: bool,
         nan_policy: NanPolicy,
@@ -27,26 +25,8 @@ impl InformationRatio {
                 reason: "must be finite and greater than zero",
             });
         }
-        if matches!(
-            primary_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) || matches!(
-            benchmark_input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{primary_input_kind:?}/{benchmark_input_kind:?}"),
-                reason: "information ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
-
         Ok(Self {
-            input: PairedMetricInputState::new(
-                primary_input_kind,
-                benchmark_input_kind,
-                nan_policy,
-            )?,
+            input: PairedMetricInputState::unbound(nan_policy),
             active_return_moments: OnlineMoments::new(),
             annualization_scale: if annualized {
                 periods_per_year.sqrt()
@@ -105,3 +85,5 @@ impl InformationRatio {
         self.input.is_empty()
     }
 }
+
+crate::impl_paired_return_metric_lifecycle!(InformationRatio);

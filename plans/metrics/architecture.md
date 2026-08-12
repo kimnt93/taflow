@@ -155,7 +155,7 @@ the important Python-facing speedup.
 
 Keep configuration on the metric class and validate it in `new`:
 annualization, risk-free/required rates, degrees of freedom, quantile cutoff,
-and missing policy. The input factory selects an internal `MetricInputKind`.
+and missing policy. The input input method selects an internal `MetricInputKind`.
 The Rust state is the source of truth for processed length and converter
 continuation state.
 

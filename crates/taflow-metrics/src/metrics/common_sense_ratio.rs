@@ -13,16 +13,9 @@ pub struct CommonSenseRatio {
 
 impl CommonSenseRatio {
     /// Construct an empty state for decimal simple returns.
-    pub fn new(input_kind: MetricInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
-        if input_kind != MetricInputKind::Returns {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "common sense ratio requires decimal simple returns",
-            });
-        }
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             observations: GainLossState::new(),
             order_statistics: ExactOrderStatistics::new(),
         })
@@ -95,3 +88,5 @@ impl CommonSenseRatio {
         self.input.is_empty()
     }
 }
+
+crate::impl_returns_only_metric_lifecycle!(CommonSenseRatio);

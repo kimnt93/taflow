@@ -4,7 +4,12 @@ use crate::{MetricInputKind, NanPolicy};
 #[test]
 fn computes_squared_correlation_of_cumulative_log_returns() {
     let returns = [0.01, -0.02, 0.03, 0.015];
-    let mut metric = StabilityOfTimeSeries::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut metric = StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     metric.extend(&returns).unwrap();
     let cumulative: Vec<f64> = returns
         .iter()
@@ -31,7 +36,12 @@ fn computes_squared_correlation_of_cumulative_log_returns() {
 
 #[test]
 fn lifecycle_nan_and_warmup_are_invariant() {
-    let mut metric = StabilityOfTimeSeries::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    let mut metric = StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(metric.append(0.01).unwrap(), None);
     metric.append(f64::NAN).unwrap();
     let expected = metric.append(0.02).unwrap();
@@ -46,19 +56,30 @@ fn semantic_input_modes_are_equivalent() {
     let log_returns: Vec<_> = returns.iter().map(|value| value.ln_1p()).collect();
     let equity = [100.0, 101.0, 98.98, 101.9494];
     let pnl = [1.0, -2.02, 2.9694];
-    let mut from_returns =
-        StabilityOfTimeSeries::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
-    let mut from_logs =
-        StabilityOfTimeSeries::new(MetricInputKind::LogReturns, NanPolicy::Omit).unwrap();
-    let mut from_equity =
-        StabilityOfTimeSeries::new(MetricInputKind::Equity, NanPolicy::Omit).unwrap();
-    let mut from_pnl = StabilityOfTimeSeries::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut from_returns = StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
+    let mut from_logs = StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_log_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
+    let mut from_equity = StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_equity(&[])?;
+            Ok(state)
+        })
+        .unwrap();
+    let mut from_pnl = StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[], 100.0)?;
+            Ok(state)
+        })
+        .unwrap();
     let expected = from_returns.extend(&returns).unwrap().unwrap();
     assert!((from_logs.extend(&log_returns).unwrap().unwrap() - expected).abs() < 1e-14);
     assert!((from_equity.extend(&equity).unwrap().unwrap() - expected).abs() < 1e-14);
@@ -67,7 +88,17 @@ fn semantic_input_modes_are_equivalent() {
 
 #[test]
 fn rejects_non_return_domains_and_total_loss_is_undefined() {
-    assert!(StabilityOfTimeSeries::new(MetricInputKind::RawPnl, NanPolicy::Omit).is_err());
-    let mut metric = StabilityOfTimeSeries::new(MetricInputKind::Returns, NanPolicy::Omit).unwrap();
+    assert!(StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    let mut metric = StabilityOfTimeSeries::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(metric.extend(&[0.1, -1.0, 0.2]).unwrap(), None);
 }

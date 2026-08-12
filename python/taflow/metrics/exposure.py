@@ -11,7 +11,7 @@ from ._input import as_metric_series
 class Exposure:
     """Compute the share of usable periods with non-zero activity.
 
-    ``from_positions`` is the preferred semantic factory: each observation is
+    ``from_positions`` is the preferred semantic input method: each observation is
     an explicit position, portfolio weight, or exposure-state scalar, exact
     zero means cash/flat, and any finite non-zero value means exposed.
     ``from_returns`` implements QuantStats' weaker proxy contract explicitly:
@@ -34,51 +34,22 @@ class Exposure:
     ``compute`` are O(1), and bulk ``extend`` is one native linear pass.
     """
 
-    def __init__(self) -> None:
-        """Reject ambiguous construction; use a semantic ``from_*`` factory."""
-        raise TypeError("use Exposure.from_positions/from_returns")
+    def __init__(self, nan_policy: str = "omit") -> None:
+        """Initialize an empty configured exposure metric."""
+        self._state = _Native(nan_policy)
 
-    @classmethod
-    def _create(
-        cls,
-        values: Any,
-        input_mode: str,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "Exposure":
-        state = cls.__new__(cls)
-        state._state = _Native(input_mode, nan_policy=nan_policy)
-        return state.extend(values, column=column)
+    def from_positions(self, positions: Any, *, column: str | None = None) -> "Exposure":
+        """Append explicit chronological position or exposure states."""
+        self._state.from_positions(as_metric_series(positions, column=column))
+        return self
 
-    @classmethod
-    def from_positions(
-        cls,
-        positions: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "Exposure":
-        """Construct from explicit chronological position or exposure states."""
-        return cls._create(
-            positions, "positions", nan_policy=nan_policy, column=column
-        )
-
-    @classmethod
-    def from_returns(
-        cls,
-        returns: Any,
-        *,
-        nan_policy: str = "omit",
-        column: str | None = None,
-    ) -> "Exposure":
-        """Construct from the explicit non-zero-return activity proxy."""
-        return cls._create(
-            returns, "returns", nan_policy=nan_policy, column=column
-        )
+    def from_returns(self, returns: Any, *, column: str | None = None) -> "Exposure":
+        """Append chronological returns as the activity proxy."""
+        self._state.from_returns(as_metric_series(returns, column=column))
+        return self
 
     def append(self, value: float) -> "Exposure":
-        """Append one value in the factory-selected domain and return this metric."""
+        """Append one value in the selected domain and return this metric."""
         self._state.append(float(value))
         return self
 

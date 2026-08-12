@@ -13,15 +13,12 @@ fn matches_pinned_vectorbt_deflated_sharpe_formula() {
     // vectorbt 0.28.5 commit 993ceca7116fc8e55f4cd3a36fe43d83dab62b27.
     // Expected value independently evaluated with SciPy 1.17.0.
     let returns = [0.02, -0.01, 0.03, -0.025, 0.01, -0.04, 0.015];
-    let mut state = DeflatedSharpeRatio::new(
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        20,
-        0.64,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = DeflatedSharpeRatio::new(252.0, 0.0, 20, 0.64, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&returns).unwrap();
     assert_close(state.compute().unwrap(), 0.407_248_550_042_508_76, 2e-10);
 }
@@ -29,7 +26,19 @@ fn matches_pinned_vectorbt_deflated_sharpe_formula() {
 #[test]
 fn semantic_modes_chunking_and_reset_are_invariant() {
     let returns = [0.10, -0.20, 0.05, -0.03, 0.08, -0.01];
-    let make = |kind| DeflatedSharpeRatio::new(kind, 12.0, 0.03, 8, 0.25, NanPolicy::Omit).unwrap();
+    let make = |kind| {
+        let mut state = DeflatedSharpeRatio::new(12.0, 0.03, 8, 0.25, NanPolicy::Omit).unwrap();
+        match kind {
+            MetricInputKind::Returns => state.from_returns(&[]).unwrap(),
+            MetricInputKind::LogReturns => state.from_log_returns(&[]).unwrap(),
+            MetricInputKind::Equity => state.from_equity(&[]).unwrap(),
+            MetricInputKind::PeriodPnl { initial_capital } => {
+                state.from_pnl(&[], initial_capital).unwrap()
+            }
+            _ => unreachable!(),
+        };
+        state
+    };
     let mut direct = make(MetricInputKind::Returns);
     let expected = direct.extend(&returns).unwrap().unwrap();
     let mut equity = make(MetricInputKind::Equity);
@@ -42,7 +51,7 @@ fn semantic_modes_chunking_and_reset_are_invariant() {
         2e-10,
     );
     let mut pnl = make(MetricInputKind::PeriodPnl {
-        initial_equity: 100.0,
+        initial_capital: 100.0,
     });
     assert_close(
         pnl.extend(&[10.0, -22.0, 4.4, -2.772, 7.17024, -0.9679824])
@@ -70,15 +79,12 @@ fn semantic_modes_chunking_and_reset_are_invariant() {
 
 #[test]
 fn edges_and_validation_are_explicit() {
-    let mut state = DeflatedSharpeRatio::new(
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        2,
-        0.0,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = DeflatedSharpeRatio::new(252.0, 0.0, 2, 0.0, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[])?;
+            Ok(state)
+        })
+        .unwrap();
     state.extend(&[f64::NAN, 0.01, -0.02, 0.03]).unwrap();
     assert_eq!(state.len(), 3);
     assert_eq!(state.compute(), None);
@@ -87,26 +93,28 @@ fn edges_and_validation_are_explicit() {
     state.reset();
     state.extend(&[0.01; 8]).unwrap();
     assert_eq!(state.compute(), None);
-    assert!(DeflatedSharpeRatio::new(
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        1,
-        0.2,
-        NanPolicy::Omit
-    )
-    .is_err());
-    assert!(DeflatedSharpeRatio::new(
-        MetricInputKind::Returns,
-        252.0,
-        0.0,
-        2,
-        -0.1,
-        NanPolicy::Omit
-    )
-    .is_err());
     assert!(
-        DeflatedSharpeRatio::new(MetricInputKind::RawPnl, 252.0, 0.0, 2, 0.1, NanPolicy::Omit)
+        DeflatedSharpeRatio::new(252.0, 0.0, 1, 0.2, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .is_err()
+    );
+    assert!(
+        DeflatedSharpeRatio::new(252.0, 0.0, 2, -0.1, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[])?;
+                Ok(state)
+            })
+            .is_err()
+    );
+    assert!(
+        DeflatedSharpeRatio::new(252.0, 0.0, 2, 0.1, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.append(0.0)?;
+                Ok(state)
+            })
             .is_err()
     );
 }

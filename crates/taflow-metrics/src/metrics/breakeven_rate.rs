@@ -9,19 +9,9 @@ pub struct BreakevenRate {
 
 impl BreakevenRate {
     /// Construct an empty state for returns, raw period P&L, or closed trades.
-    pub fn new(input_kind: MetricInputKind, nan_policy: NanPolicy) -> MetricResult<Self> {
-        if !matches!(
-            input_kind,
-            MetricInputKind::Returns | MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "breakeven rate accepts returns, raw period P&L, or closed trades",
-            });
-        }
+    pub fn new(nan_policy: NanPolicy) -> MetricResult<Self> {
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             breakevens: 0,
         })
     }
@@ -62,3 +52,5 @@ impl BreakevenRate {
         self.input.is_empty()
     }
 }
+
+crate::impl_observation_metric_lifecycle!(BreakevenRate);

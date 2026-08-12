@@ -24,6 +24,13 @@ impl Turnover {
         })
     }
 
+    fn from_weights(&mut self, py: Python<'_>, weights: PyReadonlyArray1<'_, f64>) -> PyResult<()> {
+        let weights = weights.as_slice()?;
+        py.allow_threads(|| self.inner.from_weights(weights))
+            .map(|_| ())
+            .map_err(value_error)
+    }
+
     fn append(&mut self, weight: f64) -> PyResult<Option<f64>> {
         self.inner.append(weight).map_err(value_error)
     }

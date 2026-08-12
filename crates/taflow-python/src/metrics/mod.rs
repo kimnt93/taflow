@@ -34,7 +34,6 @@ mod longest_losing_streak;
 mod longest_winning_streak;
 mod maximum_drawdown;
 mod maximum_drawdown_duration;
-mod metric_pipeline;
 mod modified_sharpe_ratio;
 mod net_profit;
 mod omega_ratio;
@@ -97,7 +96,6 @@ pub(crate) fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<longest_winning_streak::LongestWinningStreak>()?;
     module.add_class::<maximum_drawdown::MaximumDrawdown>()?;
     module.add_class::<maximum_drawdown_duration::MaximumDrawdownDuration>()?;
-    module.add_class::<metric_pipeline::MetricPipeline>()?;
     module.add_class::<modified_sharpe_ratio::ModifiedSharpeRatio>()?;
     module.add_class::<net_profit::NetProfit>()?;
     module.add_class::<omega_ratio::OmegaRatio>()?;

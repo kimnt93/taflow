@@ -27,12 +27,12 @@ fn computes_squared_pearson_correlation_and_lifecycle() {
             .sum::<f64>();
         cross_sum.powi(2) / (primary_sum * benchmark_sum)
     };
-    let mut state = CoefficientOfDetermination::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.append(primary[0], benchmark[0]).unwrap(), None);
@@ -55,12 +55,12 @@ fn computes_squared_pearson_correlation_and_lifecycle() {
 
 #[test]
 fn omits_missing_values_pairwise_and_handles_undefined_cases() {
-    let mut state = CoefficientOfDetermination::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     state
         .extend(
             &[0.01, f64::NAN, 0.05, -0.02],
@@ -76,12 +76,12 @@ fn omits_missing_values_pairwise_and_handles_undefined_cases() {
         (&[0.01, 0.01][..], &[0.10, 0.20][..]),
         (&[0.01, 0.02][..], &[0.10, 0.10][..]),
     ] {
-        let mut undefined = CoefficientOfDetermination::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            NanPolicy::Omit,
-        )
-        .unwrap();
+        let mut undefined = CoefficientOfDetermination::new(NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .unwrap();
         undefined.extend(primary, benchmark).unwrap();
         assert_eq!(undefined.value(), None);
     }
@@ -92,24 +92,24 @@ fn input_modes_produce_equivalent_results() {
     let primary_returns = [0.10, -0.20, 0.05];
     let benchmark_returns = [0.02, -0.10, 0.01];
     let expected = {
-        let mut state = CoefficientOfDetermination::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            NanPolicy::Omit,
-        )
-        .unwrap();
+        let mut state = CoefficientOfDetermination::new(NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .unwrap();
         state
             .extend(&primary_returns, &benchmark_returns)
             .unwrap()
             .unwrap()
     };
 
-    let mut equity = CoefficientOfDetermination::new(
-        MetricInputKind::Equity,
-        MetricInputKind::Equity,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut equity = CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_equity(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         equity
             .extend(&[100.0, 110.0, 88.0, 92.4], &[200.0, 204.0, 183.6, 185.436])
@@ -118,16 +118,12 @@ fn input_modes_produce_equivalent_results() {
         expected,
     );
 
-    let mut pnl = CoefficientOfDetermination::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        MetricInputKind::PeriodPnl {
-            initial_equity: 200.0,
-        },
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut pnl = CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[], &[], 100.0, 200.0)?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         pnl.extend(&[10.0, -22.0, 4.4], &[4.0, -20.4, 1.836])
             .unwrap()
@@ -135,12 +131,12 @@ fn input_modes_produce_equivalent_results() {
         expected,
     );
 
-    let mut logarithmic = CoefficientOfDetermination::new(
-        MetricInputKind::LogReturns,
-        MetricInputKind::LogReturns,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut logarithmic = CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_log_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         logarithmic
             .extend(
@@ -155,34 +151,34 @@ fn input_modes_produce_equivalent_results() {
 
 #[test]
 fn rejects_misalignment_invalid_domains_and_nan_when_requested() {
-    let mut state = CoefficientOfDetermination::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(state.extend(&[0.01, 0.02], &[0.01]).is_err());
     assert_eq!(state.len(), 0);
 
-    assert!(CoefficientOfDetermination::new(
-        MetricInputKind::RawPnl,
-        MetricInputKind::RawPnl,
-        NanPolicy::Omit,
-    )
-    .is_err());
-    assert!(CoefficientOfDetermination::new(
-        MetricInputKind::Trades,
-        MetricInputKind::Trades,
-        NanPolicy::Omit,
-    )
-    .is_err());
+    assert!(CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0, 0.0)?;
+            Ok(state)
+        })
+        .is_err());
+    assert!(CoefficientOfDetermination::new(NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.append(0.0, 0.0)?;
+            Ok(state)
+        })
+        .is_err());
 
-    let mut raises = CoefficientOfDetermination::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        NanPolicy::Raise,
-    )
-    .unwrap();
+    let mut raises = CoefficientOfDetermination::new(NanPolicy::Raise)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert!(raises.append(f64::NAN, 0.01).is_err());
     assert_eq!(raises.len(), 0);
 }

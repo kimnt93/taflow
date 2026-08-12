@@ -25,14 +25,12 @@ fn computes_annualized_mean_active_return_over_sample_deviation() {
     let primary = [0.03, -0.01, 0.02, 0.04];
     let benchmark = [0.01, -0.02, 0.025, 0.01];
     let expected = expected(&primary, &benchmark, 252.0_f64.sqrt());
-    let mut state = InformationRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        true,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = InformationRatio::new(252.0, true, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
 
     assert_eq!(state.value(), None);
     assert_eq!(state.append(primary[0], benchmark[0]).unwrap(), None);
@@ -55,14 +53,12 @@ fn computes_annualized_mean_active_return_over_sample_deviation() {
 
 #[test]
 fn supports_unannualized_output_and_pairwise_missing_omission() {
-    let mut state = InformationRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        12.0,
-        false,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = InformationRatio::new(12.0, false, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     state
         .extend(
             &[0.03, f64::NAN, 0.01, -0.02],
@@ -82,28 +78,24 @@ fn input_modes_produce_equivalent_information_ratio() {
     let primary_returns = [0.10, -0.20, 0.05];
     let benchmark_returns = [0.02, -0.10, 0.01];
     let expected = {
-        let mut state = InformationRatio::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            12.0,
-            true,
-            NanPolicy::Omit,
-        )
-        .unwrap();
+        let mut state = InformationRatio::new(12.0, true, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.from_returns(&[], &[])?;
+                Ok(state)
+            })
+            .unwrap();
         state
             .extend(&primary_returns, &benchmark_returns)
             .unwrap()
             .unwrap()
     };
 
-    let mut equity = InformationRatio::new(
-        MetricInputKind::Equity,
-        MetricInputKind::Equity,
-        12.0,
-        true,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut equity = InformationRatio::new(12.0, true, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_equity(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         equity
             .extend(&[100.0, 110.0, 88.0, 92.4], &[200.0, 204.0, 183.6, 185.436])
@@ -112,18 +104,12 @@ fn input_modes_produce_equivalent_information_ratio() {
         expected,
     );
 
-    let mut pnl = InformationRatio::new(
-        MetricInputKind::PeriodPnl {
-            initial_equity: 100.0,
-        },
-        MetricInputKind::PeriodPnl {
-            initial_equity: 200.0,
-        },
-        12.0,
-        true,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut pnl = InformationRatio::new(12.0, true, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_pnl(&[], &[], 100.0, 200.0)?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         pnl.extend(&[10.0, -22.0, 4.4], &[4.0, -20.4, 1.836])
             .unwrap()
@@ -131,14 +117,12 @@ fn input_modes_produce_equivalent_information_ratio() {
         expected,
     );
 
-    let mut logarithmic = InformationRatio::new(
-        MetricInputKind::LogReturns,
-        MetricInputKind::LogReturns,
-        12.0,
-        true,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut logarithmic = InformationRatio::new(12.0, true, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_log_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_close(
         logarithmic
             .extend(
@@ -153,14 +137,12 @@ fn input_modes_produce_equivalent_information_ratio() {
 
 #[test]
 fn handles_minimum_constant_and_rejects_misalignment_without_mutation() {
-    let mut state = InformationRatio::new(
-        MetricInputKind::Returns,
-        MetricInputKind::Returns,
-        252.0,
-        true,
-        NanPolicy::Omit,
-    )
-    .unwrap();
+    let mut state = InformationRatio::new(252.0, true, NanPolicy::Omit)
+        .and_then(|mut state| {
+            state.from_returns(&[], &[])?;
+            Ok(state)
+        })
+        .unwrap();
     assert_eq!(state.append(0.01, 0.0).unwrap(), None);
     assert!(state.extend(&[0.02, 0.03], &[0.01]).is_err());
     assert_eq!(state.len(), 1);
@@ -172,16 +154,21 @@ fn handles_minimum_constant_and_rejects_misalignment_without_mutation() {
 #[test]
 fn rejects_invalid_configuration_and_domains() {
     for periods_per_year in [0.0, -1.0, f64::NAN, f64::INFINITY] {
-        assert!(InformationRatio::new(
-            MetricInputKind::Returns,
-            MetricInputKind::Returns,
-            periods_per_year,
-            true,
-            NanPolicy::Omit,
-        )
-        .is_err());
+        assert!(
+            InformationRatio::new(periods_per_year, true, NanPolicy::Omit)
+                .and_then(|mut state| {
+                    state.from_returns(&[], &[])?;
+                    Ok(state)
+                })
+                .is_err()
+        );
     }
     for kind in [MetricInputKind::RawPnl, MetricInputKind::Trades] {
-        assert!(InformationRatio::new(kind, kind, 252.0, true, NanPolicy::Omit).is_err());
+        assert!(InformationRatio::new(252.0, true, NanPolicy::Omit)
+            .and_then(|mut state| {
+                state.append(0.0, 0.0)?;
+                Ok(state)
+            })
+            .is_err());
     }
 }

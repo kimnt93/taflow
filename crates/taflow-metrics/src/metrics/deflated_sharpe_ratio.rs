@@ -16,7 +16,6 @@ pub struct DeflatedSharpeRatio {
 impl DeflatedSharpeRatio {
     /// Construct a state using explicit independent-trial configuration.
     pub fn new(
-        input_kind: MetricInputKind,
         periods_per_year: f64,
         annual_risk_free_rate: f64,
         number_of_trials: usize,
@@ -51,16 +50,6 @@ impl DeflatedSharpeRatio {
                 reason: "must be finite and non-negative",
             });
         }
-        if matches!(
-            input_kind,
-            MetricInputKind::RawPnl | MetricInputKind::Trades
-        ) {
-            return Err(MetricError::InvalidParameter {
-                name: "input_kind",
-                value: format!("{input_kind:?}"),
-                reason: "deflated Sharpe ratio requires returns, log returns, equity, or period P&L with initial equity",
-            });
-        }
 
         let period_risk_free_rate = (annual_risk_free_rate.ln_1p() / periods_per_year).exp_m1();
         if !period_risk_free_rate.is_finite() {
@@ -80,7 +69,7 @@ impl DeflatedSharpeRatio {
             * ((1.0 - EULER_MASCHERONI) * first_quantile + EULER_MASCHERONI * second_quantile);
 
         Ok(Self {
-            input: MetricInputState::new(input_kind, nan_policy)?,
+            input: MetricInputState::unbound(nan_policy),
             count: 0,
             mean: 0.0,
             second_central_moment: 0.0,
@@ -287,3 +276,5 @@ impl DeflatedSharpeRatio {
         }
     }
 }
+
+crate::impl_return_metric_lifecycle!(DeflatedSharpeRatio);
