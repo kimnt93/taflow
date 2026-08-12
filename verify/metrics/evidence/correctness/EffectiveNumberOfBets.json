@@ -2,9 +2,24 @@
   "cases": [
     {
       "absolute_error": 0.0,
-      "actual": -0.33333333333333337,
+      "actual": 1.0,
+      "dataset": "singleton",
+      "expected": 1.0,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 1.8898815748423097,
       "dataset": "two_observations",
-      "expected": -0.33333333333333337,
+      "expected": 1.8898815748423097,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -31,10 +46,10 @@
       "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": null,
+      "absolute_error": 2.842170943040401e-14,
+      "actual": 32.00000000000003,
       "dataset": "constant_positive",
-      "expected": null,
+      "expected": 32.0,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -43,13 +58,13 @@
       "oracle_passed": true,
       "parameter_row": "default",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 8.881784197001252e-16
     },
     {
-      "absolute_error": 0.0,
-      "actual": null,
+      "absolute_error": 2.842170943040401e-14,
+      "actual": 32.00000000000003,
       "dataset": "constant_negative",
-      "expected": null,
+      "expected": 32.0,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -58,13 +73,13 @@
       "oracle_passed": true,
       "parameter_row": "default",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 8.881784197001252e-16
     },
     {
-      "absolute_error": 0.0,
-      "actual": 0.0,
+      "absolute_error": 1.1368683772161603e-13,
+      "actual": 63.999999999999865,
       "dataset": "alternating",
-      "expected": 0.0,
+      "expected": 63.99999999999998,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -73,13 +88,13 @@
       "oracle_passed": true,
       "parameter_row": "default",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.7763568394002513e-15
     },
     {
-      "absolute_error": 5.551115123125783e-17,
-      "actual": -0.3872378334355533,
+      "absolute_error": 4.440892098500626e-16,
+      "actual": 3.0297002163913027,
       "dataset": "deep_early_drawdown",
-      "expected": -0.38723783343555324,
+      "expected": 3.0297002163913023,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -88,13 +103,13 @@
       "oracle_passed": true,
       "parameter_row": "default",
       "passed": true,
-      "relative_error": 1.4335156959940065e-16
+      "relative_error": 1.4657859792445752e-16
     },
     {
-      "absolute_error": 5.551115123125783e-17,
-      "actual": -0.3872378334355533,
+      "absolute_error": 0.0,
+      "actual": 3.0297002163913023,
       "dataset": "deep_late_drawdown",
-      "expected": -0.38723783343555324,
+      "expected": 3.0297002163913023,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -103,13 +118,13 @@
       "oracle_passed": true,
       "parameter_row": "default",
       "passed": true,
-      "relative_error": 1.4335156959940065e-16
+      "relative_error": 0.0
     },
     {
       "absolute_error": 0.0,
-      "actual": -0.9847456289293487,
+      "actual": 1.162102429844361,
       "dataset": "terminal_total_loss",
-      "expected": -0.9847456289293487,
+      "expected": 1.162102429844361,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -121,10 +136,10 @@
       "relative_error": 0.0
     },
     {
-      "absolute_error": 4.592118784785271e-06,
-      "actual": 603032.0360104933,
+      "absolute_error": 1.4210854715202004e-14,
+      "actual": 31.999999998636028,
       "dataset": "near_zero_variance",
-      "expected": 603032.0360059012,
+      "expected": 31.999999998636042,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -133,13 +148,13 @@
       "oracle_passed": true,
       "parameter_row": "default",
       "passed": true,
-      "relative_error": 7.615049467687539e-12
+      "relative_error": 4.440892098689913e-16
     },
     {
-      "absolute_error": 9.992007221626409e-16,
-      "actual": 0.7245488665256078,
+      "absolute_error": 2.0463630789890885e-12,
+      "actual": 383.4973001769652,
       "dataset": "normal_seed_20260811",
-      "expected": 0.7245488665256088,
+      "expected": 383.49730017696317,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -148,43 +163,13 @@
       "oracle_passed": true,
       "parameter_row": "default",
       "passed": true,
-      "relative_error": 1.3790660207006543e-15
-    },
-    {
-      "absolute_error": 2.220446049250313e-16,
-      "actual": -1.335638994746956,
-      "dataset": "fat_tailed_seed_20260811",
-      "expected": -1.3356389947469558,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "default",
-      "passed": true,
-      "relative_error": 1.662459734990733e-16
-    },
-    {
-      "absolute_error": 9.020562075079397e-17,
-      "actual": -0.058062766814793415,
-      "dataset": "autocorrelated_seed_20260811",
-      "expected": -0.058062766814793325,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "default",
-      "passed": true,
-      "relative_error": 1.5535880513329454e-15
+      "relative_error": 5.3360560245008326e-15
     },
     {
       "absolute_error": 0.0,
-      "actual": 0.47462266590754676,
-      "dataset": "nan_omit",
-      "expected": 0.47462266590754676,
+      "actual": 271.3089907411521,
+      "dataset": "fat_tailed_seed_20260811",
+      "expected": 271.3089907411521,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
@@ -194,16 +179,46 @@
       "parameter_row": "default",
       "passed": true,
       "relative_error": 0.0
+    },
+    {
+      "absolute_error": 1.3642420526593924e-12,
+      "actual": 389.0686804272144,
+      "dataset": "autocorrelated_seed_20260811",
+      "expected": 389.0686804272158,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 3.5064298960311845e-15
+    },
+    {
+      "absolute_error": 1.7763568394002505e-14,
+      "actual": 19.157695867215995,
+      "dataset": "nan_omit",
+      "expected": 19.157695867215978,
+      "lifecycle": {
+        "chunked_reset_matches_batch": true,
+        "scalar_matches_batch": true,
+        "value_matches_compute": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 9.27228854509628e-16
     }
   ],
-  "class": "SystemQualityNumber",
-  "max_absolute_error": 4.592118784785271e-06,
-  "max_relative_error": 7.615049467687539e-12,
+  "class": "EffectiveNumberOfBets",
+  "max_absolute_error": 2.0463630789890885e-12,
+  "max_relative_error": 5.3360560245008326e-15,
   "oracle": {
     "distribution": "numpy",
-    "function": "mean",
-    "source": "https://github.com/polakowo/vectorbt/blob/v0.28.1/vectorbt/portfolio/trades.py",
-    "source_function": "vectorbt.Trades.sqn",
+    "function": "sum",
+    "source": "https://github.com/numpy/numpy/blob/v2.4.6/numpy/linalg/_linalg.py",
+    "source_function": "numpy.linalg.eigh + numpy.sum",
     "version": "2.4.6"
   },
   "passed": true,

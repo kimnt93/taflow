@@ -218,8 +218,10 @@
     "distribution": "empyrical-reloaded",
     "function": "tail_ratio",
     "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
+    "source_function": "empyrical.stats.tail_ratio",
     "version": "0.5.12"
   },
   "passed": true,
+  "variant_reason": null,
   "verdict": "MATCH"
 }

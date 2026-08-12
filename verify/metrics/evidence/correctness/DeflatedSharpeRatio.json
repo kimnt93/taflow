@@ -2,599 +2,509 @@
   "cases": [
     {
       "absolute_error": 0.0,
-      "actual": -0.21402387345999907,
-      "dataset": "two_observations",
-      "expected": -0.21402387345999907,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
-      "passed": true,
-      "relative_error": 0.0
-    },
-    {
-      "absolute_error": 0.0,
-      "actual": 0.01010060523810119,
+      "actual": null,
       "dataset": "all_zero",
-      "expected": 0.01010060523810119,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
       "relative_error": 0.0
     },
     {
       "absolute_error": 0.0,
-      "actual": 11.396743382755789,
+      "actual": null,
       "dataset": "constant_positive",
-      "expected": 11.396743382755789,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
       "relative_error": 0.0
     },
     {
       "absolute_error": 0.0,
-      "actual": -0.9197439545896011,
+      "actual": null,
       "dataset": "constant_negative",
-      "expected": -0.9197439545896011,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
       "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.019307585029073926,
+      "absolute_error": 1.2466694343515883e-11,
+      "actual": 0.46725157568530834,
       "dataset": "alternating",
-      "expected": -0.019307585029073926,
+      "expected": 0.46725157567284165,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 2.6680903805543855e-11
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.1248390536710301,
+      "absolute_error": 3.4662273051822012e-12,
+      "actual": 0.3278562332750279,
       "dataset": "deep_early_drawdown",
-      "expected": -0.1248390536710301,
+      "expected": 0.32785623327156166,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.0572400196860502e-11
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.21964057202779508,
+      "absolute_error": 3.46617179403097e-12,
+      "actual": 0.32785623327502794,
       "dataset": "deep_late_drawdown",
-      "expected": -0.21964057202779508,
+      "expected": 0.32785623327156177,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
-      "relative_error": 0.0
-    },
-    {
-      "absolute_error": 2.0317081350640365e-14,
-      "actual": -0.27384538438547545,
-      "dataset": "terminal_total_loss",
-      "expected": -0.27384538438545514,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
-      "passed": true,
-      "relative_error": 7.419179766799632e-14
+      "relative_error": 1.0572230881332539e-11
     },
     {
       "absolute_error": 0.0,
-      "actual": 11.397436839784428,
+      "actual": 1.0,
       "dataset": "near_zero_variance",
-      "expected": 11.397436839784428,
+      "expected": 1.0,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
       "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.01624003546423558,
+      "absolute_error": 3.159927874918367e-11,
+      "actual": 0.6875393205150875,
       "dataset": "normal_seed_20260811",
-      "expected": -0.01624003546423558,
+      "expected": 0.6875393204834882,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 4.595995866383696e-11
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.023689468119636792,
+      "absolute_error": 7.772810173278799e-12,
+      "actual": 0.0334471533274109,
       "dataset": "fat_tailed_seed_20260811",
-      "expected": -0.023689468119636792,
+      "expected": 0.03344715331963809,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 2.3239078372374036e-10
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.020420314247845295,
+      "absolute_error": 3.416916749543475e-11,
+      "actual": 0.3850343340539549,
       "dataset": "autocorrelated_seed_20260811",
-      "expected": -0.020420314247845295,
+      "expected": 0.3850343340197857,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 8.874317035238448e-11
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.044345232373664056,
+      "absolute_error": 7.684741731850409e-12,
+      "actual": 0.6638918189279841,
       "dataset": "nan_omit",
-      "expected": -0.044345232373664056,
+      "expected": 0.6638918189202994,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=-0.01",
+      "parameter_row": "trials=2",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.1575292107603102e-11
     },
     {
       "absolute_error": 0.0,
-      "actual": -0.19719488813449493,
-      "dataset": "two_observations",
-      "expected": -0.19719488813449493,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "risk_free=0",
-      "passed": true,
-      "relative_error": 0.0
-    },
-    {
-      "absolute_error": 0.0,
-      "actual": 0.0,
+      "actual": null,
       "dataset": "all_zero",
-      "expected": 0.0,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
       "relative_error": 0.0
     },
     {
       "absolute_error": 0.0,
-      "actual": 11.274002099240244,
+      "actual": null,
       "dataset": "constant_positive",
-      "expected": 11.274002099240244,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
       "relative_error": 0.0
     },
     {
-      "absolute_error": 2.220446049250313e-15,
-      "actual": -0.9205545483094462,
+      "absolute_error": 0.0,
+      "actual": null,
       "dataset": "constant_negative",
-      "expected": -0.9205545483094439,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 2.412074388560743e-15
+      "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.0010766989823253192,
+      "absolute_error": 2.4473689741455473e-10,
+      "actual": 0.22354266696116898,
       "dataset": "alternating",
-      "expected": -0.0010766989823253192,
+      "expected": 0.22354266671643208,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.094810673100755e-09
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.10821655548839348,
+      "absolute_error": 8.078204771777564e-11,
+      "actual": 0.2567568064508353,
       "dataset": "deep_early_drawdown",
-      "expected": -0.10821655548839348,
+      "expected": 0.25675680637005327,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 3.146247566319536e-10
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.20507665236039707,
+      "absolute_error": 8.078204771777564e-11,
+      "actual": 0.2567568064508353,
       "dataset": "deep_late_drawdown",
-      "expected": -0.20507665236039707,
+      "expected": 0.25675680637005327,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 3.146247566319536e-10
     },
     {
-      "absolute_error": 2.0761170560490427e-14,
-      "actual": -0.2601171193119616,
-      "dataset": "terminal_total_loss",
-      "expected": -0.2601171193119408,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "risk_free=0",
-      "passed": true,
-      "relative_error": 7.98147027593096e-14
-    },
-    {
-      "absolute_error": 6.803446694902959e-13,
-      "actual": 11.274686327088466,
+      "absolute_error": 0.0,
+      "actual": 1.0,
       "dataset": "near_zero_variance",
-      "expected": 11.274686327089146,
+      "expected": 1.0,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 6.034266938811987e-14
+      "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": 0.001189120526871923,
+      "absolute_error": 3.2909598657315797e-10,
+      "actual": 0.07471180499864578,
       "dataset": "normal_seed_20260811",
-      "expected": 0.001189120526871923,
+      "expected": 0.0747118046695498,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 4.404872670774706e-09
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.005530613015906516,
+      "absolute_error": 2.5305359004535073e-13,
+      "actual": 2.1515649759716063e-05,
       "dataset": "fat_tailed_seed_20260811",
-      "expected": -0.005530613015906516,
+      "expected": 2.1515649506662473e-05,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.176137350475945e-08
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.002730456612550669,
+      "absolute_error": 7.83017470307179e-11,
+      "actual": 0.013026883216456583,
       "dataset": "autocorrelated_seed_20260811",
-      "expected": -0.002730456612550669,
+      "expected": 0.013026883138154836,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 6.010781412583454e-09
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.02721120793716436,
+      "absolute_error": 2.1941615191423125e-10,
+      "actual": 0.48704302470632405,
       "dataset": "nan_omit",
-      "expected": -0.02721120793716436,
+      "expected": 0.4870430244869079,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0",
+      "parameter_row": "trials=20",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 4.5050671271882537e-10
     },
     {
       "absolute_error": 0.0,
-      "actual": -0.14558679744308678,
-      "dataset": "two_observations",
-      "expected": -0.14558679744308678,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
-      "passed": true,
-      "relative_error": 0.0
-    },
-    {
-      "absolute_error": 0.0,
-      "actual": -0.029129580150139667,
+      "actual": null,
       "dataset": "all_zero",
-      "expected": -0.029129580150139667,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
       "relative_error": 0.0
     },
     {
       "absolute_error": 0.0,
-      "actual": 10.91995418316494,
+      "actual": null,
       "dataset": "constant_positive",
-      "expected": 10.91995418316494,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
       "relative_error": 0.0
     },
     {
       "absolute_error": 0.0,
-      "actual": -0.9228917909534721,
+      "actual": null,
       "dataset": "constant_negative",
-      "expected": -0.9228917909534721,
+      "expected": null,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
       "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": 0.054525860172837115,
+      "absolute_error": 1.322310178020203e-10,
+      "actual": 0.06718038578169462,
       "dataset": "alternating",
-      "expected": 0.054525860172837115,
+      "expected": 0.06718038591392564,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.9682979786903915e-09
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.057479744405661726,
+      "absolute_error": 8.435410703278023e-11,
+      "actual": 0.18973053421532096,
       "dataset": "deep_early_drawdown",
-      "expected": -0.057479744405661726,
+      "expected": 0.18973053429967507,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 4.445995334601485e-10
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.16065170113814353,
+      "absolute_error": 8.43542180550827e-11,
+      "actual": 0.18973053421532096,
       "dataset": "deep_late_drawdown",
-      "expected": -0.16065170113814353,
+      "expected": 0.18973053429967518,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
-      "relative_error": 0.0
-    },
-    {
-      "absolute_error": 2.1871393585115584e-14,
-      "actual": -0.2182215309656077,
-      "dataset": "terminal_total_loss",
-      "expected": -0.21822153096558583,
-      "lifecycle": {
-        "chunked_reset_matches_batch": true,
-        "scalar_matches_batch": true,
-        "value_matches_compute": true
-      },
-      "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
-      "passed": true,
-      "relative_error": 1.002256445014345e-13
+      "relative_error": 4.446001186179504e-10
     },
     {
       "absolute_error": 0.0,
-      "actual": 10.920611922778201,
+      "actual": 1.0,
       "dataset": "near_zero_variance",
-      "expected": 10.920611922778201,
+      "expected": 1.0,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
       "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": 0.05425659071952538,
+      "absolute_error": 2.1997003285707806e-12,
+      "actual": 0.0002006331356729223,
       "dataset": "normal_seed_20260811",
-      "expected": 0.05425659071952538,
+      "expected": 0.00020063313787262264,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.0963793677828633e-08
     },
     {
-      "absolute_error": 0.0,
-      "actual": 0.04985329474363498,
+      "absolute_error": 6.358071304118738e-19,
+      "actual": 2.987374323392254e-11,
       "dataset": "fat_tailed_seed_20260811",
-      "expected": 0.04985329474363498,
+      "expected": 2.987374386972967e-11,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 3.179035652059369e-12
     },
     {
-      "absolute_error": 0.0,
-      "actual": 0.05116648865305651,
+      "absolute_error": 9.981720768811658e-14,
+      "actual": 7.5925509742448656e-06,
       "dataset": "autocorrelated_seed_20260811",
-      "expected": 0.05116648865305651,
+      "expected": 7.592551074062073e-06,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.3146728512517415e-08
     },
     {
-      "absolute_error": 0.0,
-      "actual": 0.02497913221894077,
+      "absolute_error": 2.3707852347953917e-10,
+      "actual": 0.29890904464211837,
       "dataset": "nan_omit",
-      "expected": 0.02497913221894077,
+      "expected": 0.2989090448791969,
       "lifecycle": {
         "chunked_reset_matches_batch": true,
         "scalar_matches_batch": true,
         "value_matches_compute": true
       },
       "oracle_passed": true,
-      "parameter_row": "risk_free=0.03",
+      "parameter_row": "trials=100",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 7.931460340230042e-10
     }
   ],
-  "class": "Alpha",
-  "max_absolute_error": 6.803446694902959e-13,
-  "max_relative_error": 1.002256445014345e-13,
+  "class": "DeflatedSharpeRatio",
+  "max_absolute_error": 3.2909598657315797e-10,
+  "max_relative_error": 1.3146728512517415e-08,
   "oracle": {
-    "distribution": "empyrical-reloaded",
-    "function": "alpha_aligned",
-    "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
-    "source_function": "empyrical.stats.alpha_aligned",
-    "version": "0.5.12"
+    "distribution": "scipy",
+    "function": "norm",
+    "source": "https://github.com/polakowo/vectorbt/blob/993ceca7116fc8e55f4cd3a36fe43d83dab62b27/vectorbt/returns/metrics.py",
+    "source_function": "vectorbt deflated Sharpe kernel + scipy.stats.norm.ppf/cdf",
+    "version": "1.18.0"
   },
   "passed": true,
   "variant_reason": null,

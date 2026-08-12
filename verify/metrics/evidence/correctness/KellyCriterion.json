@@ -218,8 +218,10 @@
     "distribution": "quantstats",
     "function": "kelly_criterion",
     "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
+    "source_function": "quantstats.stats.kelly_criterion",
     "version": "0.0.81"
   },
   "passed": true,
+  "variant_reason": null,
   "verdict": "MATCH"
 }

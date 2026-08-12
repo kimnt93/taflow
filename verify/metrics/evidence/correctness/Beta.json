@@ -203,8 +203,10 @@
     "distribution": "empyrical-reloaded",
     "function": "beta_aligned",
     "source": "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py",
+    "source_function": "empyrical.stats.beta_aligned",
     "version": "0.5.12"
   },
   "passed": true,
+  "variant_reason": null,
   "verdict": "MATCH"
 }

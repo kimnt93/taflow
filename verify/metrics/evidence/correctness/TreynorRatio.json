@@ -203,8 +203,10 @@
     "distribution": "quantstats",
     "function": "treynor_ratio",
     "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
+    "source_function": "quantstats.stats.treynor_ratio",
     "version": "0.0.81"
   },
   "passed": true,
+  "variant_reason": "The full convention is pinned to PerformanceAnalytics 2.1.0 source; the executable QuantStats cross-check is equivalent only at zero risk-free rate when periods_per_year equals the aligned sample length.",
   "verdict": "VARIANT"
 }

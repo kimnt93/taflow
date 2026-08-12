@@ -203,8 +203,10 @@
     "distribution": "quantstats",
     "function": "r_squared",
     "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
+    "source_function": "quantstats.stats.r_squared",
     "version": "0.0.81"
   },
   "passed": true,
+  "variant_reason": null,
   "verdict": "MATCH"
 }

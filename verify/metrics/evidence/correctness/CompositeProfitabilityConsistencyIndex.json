@@ -218,8 +218,10 @@
     "distribution": "quantstats",
     "function": "cpc_index",
     "source": "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py",
+    "source_function": "quantstats.stats.cpc_index",
     "version": "0.0.81"
   },
   "passed": true,
+  "variant_reason": "CompositeProfitabilityConsistencyIndex is TAFlow nomenclature derived from the formula, not a claimed historical expansion of the QuantStats cpc_index alias.",
   "verdict": "MATCH"
 }
