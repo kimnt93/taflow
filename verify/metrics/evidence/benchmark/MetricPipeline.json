@@ -1,0 +1,129 @@
+{
+  "class": "MetricPipeline",
+  "comparison": "equivalent standalone TAFlow metric classes",
+  "correctness_gate": "INVARIANT",
+  "input_domain": "period P&L",
+  "metrics": [
+    "TotalReturn",
+    "AnnualizedReturn",
+    "AnnualizedVolatility",
+    "MaximumDrawdown",
+    "DownsideDeviation",
+    "SharpeRatio",
+    "SortinoRatio",
+    "CalmarRatio"
+  ],
+  "rows": [
+    {
+      "metrics": 8,
+      "observations": 1000,
+      "pipeline_public": {
+        "iterations_per_sample": 128,
+        "median_absolute_deviation_seconds": 7.633984374999996e-07,
+        "median_seconds": 5.04660625e-05,
+        "samples_seconds": [
+          4.93844140625e-05,
+          5.0212890625e-05,
+          5.0080390625e-05,
+          4.97026640625e-05,
+          5.0760796875e-05,
+          5.04660625e-05,
+          5.25866171875e-05,
+          5.2035453125e-05,
+          5.27378984375e-05
+        ]
+      },
+      "speedup": 1.518962310067285,
+      "standalone_public": {
+        "iterations_per_sample": 64,
+        "median_absolute_deviation_seconds": 1.1569374999999949e-06,
+        "median_seconds": 7.6656046875e-05,
+        "samples_seconds": [
+          7.8628234375e-05,
+          7.726728125e-05,
+          7.791625e-05,
+          7.752365625e-05,
+          7.62e-05,
+          7.52150625e-05,
+          7.6656046875e-05,
+          7.5499109375e-05,
+          7.5200453125e-05
+        ]
+      }
+    },
+    {
+      "metrics": 8,
+      "observations": 10000,
+      "pipeline_public": {
+        "iterations_per_sample": 16,
+        "median_absolute_deviation_seconds": 9.32331249999999e-06,
+        "median_seconds": 0.0004695065625,
+        "samples_seconds": [
+          0.00049383975,
+          0.0004702325,
+          0.0004814845625,
+          0.0004695065625,
+          0.0004811225625,
+          0.000460936625,
+          0.00046018325,
+          0.0004597078125,
+          0.0004649138125
+        ]
+      },
+      "speedup": 1.3699102981121805,
+      "standalone_public": {
+        "iterations_per_sample": 8,
+        "median_absolute_deviation_seconds": 8.552125000000038e-06,
+        "median_seconds": 0.000643181875,
+        "samples_seconds": [
+          0.000637178,
+          0.000643181875,
+          0.0006437325,
+          0.000633059375,
+          0.000652780625,
+          0.000736592375,
+          0.00066667225,
+          0.000635540375,
+          0.00063462975
+        ]
+      }
+    },
+    {
+      "metrics": 8,
+      "observations": 100000,
+      "pipeline_public": {
+        "iterations_per_sample": 2,
+        "median_absolute_deviation_seconds": 7.754650000000012e-05,
+        "median_seconds": 0.0046386705,
+        "samples_seconds": [
+          0.0046322475,
+          0.0049033915,
+          0.004748131,
+          0.0046386705,
+          0.004561124,
+          0.004633073,
+          0.004589166,
+          0.0047573285,
+          0.0047751505
+        ]
+      },
+      "speedup": 1.320857775951105,
+      "standalone_public": {
+        "iterations_per_sample": 1,
+        "median_absolute_deviation_seconds": 6.541899999999972e-05,
+        "median_seconds": 0.006127024,
+        "samples_seconds": [
+          0.006208233,
+          0.005975929,
+          0.006268855,
+          0.006061605,
+          0.006202657,
+          0.006127024,
+          0.006112922,
+          0.00616562,
+          0.006103747
+        ]
+      }
+    }
+  ]
+}

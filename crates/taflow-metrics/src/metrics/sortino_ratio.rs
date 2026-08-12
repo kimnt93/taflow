@@ -75,10 +75,22 @@ impl SortinoRatio {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        let required_return = self.downside.required_return();
+        self.input.extend(values, |simple_return| {
+            self.excess_return_sum += simple_return - required_return;
+            self.downside.append(simple_return);
+            Ok(())
+        })?;
         Ok(self.value())
+    }
+
+    pub(crate) fn extend_normalized(&mut self, values: &[f64]) -> MetricResult<()> {
+        let required = self.downside.required_return();
+        self.input.extend_normalized_returns(values, |value| {
+            self.excess_return_sum += value - required;
+            self.downside.append(value);
+            Ok(())
+        })
     }
 
     /// Return the Sortino ratio, or `None` before two returns or at zero downside.

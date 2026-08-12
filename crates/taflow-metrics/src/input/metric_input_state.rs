@@ -103,17 +103,23 @@ impl MetricInputState {
 
     /// Append one value and return its normalized observation when usable.
     pub fn append(&mut self, value: f64) -> MetricResult<Option<f64>> {
-        let position = self.position;
+        self.validate_next(value)?;
         if value.is_nan() {
-            if self.nan_policy == NanPolicy::Raise {
-                return Err(self.invalid(
-                    value,
-                    position,
-                    "NaN is forbidden by nan_policy='raise'",
-                ));
-            }
             self.position += 1;
             return Ok(None);
+        }
+        Ok(self.append_validated(value))
+    }
+
+    /// Validate the next value without changing converter state.
+    pub(crate) fn validate_next(&self, value: f64) -> MetricResult<()> {
+        let position = self.position;
+        if value.is_nan() {
+            return if self.nan_policy == NanPolicy::Raise {
+                Err(self.invalid(value, position, "NaN is forbidden by nan_policy='raise'"))
+            } else {
+                Ok(())
+            };
         }
         if !value.is_finite() {
             return Err(self.invalid(value, position, "infinite values are not supported"));
@@ -125,44 +131,26 @@ impl MetricInputState {
                 "simple returns must be greater than or equal to -1",
             ));
         }
-
-        let normalized = match self.kind {
-            MetricInputKind::Returns | MetricInputKind::RawPnl | MetricInputKind::Trades => {
-                Some(value)
-            }
-            MetricInputKind::LogReturns => {
-                let result = value.exp_m1();
-                if !result.is_finite() {
-                    return Err(self.invalid(
-                        value,
-                        position,
-                        "conversion with expm1 must produce a finite simple return",
-                    ));
-                }
-                Some(result)
+        match self.kind {
+            MetricInputKind::LogReturns if !value.exp_m1().is_finite() => Err(self.invalid(
+                value,
+                position,
+                "conversion with expm1 must produce a finite simple return",
+            )),
+            MetricInputKind::Equity if value <= 0.0 => {
+                Err(self.invalid(value, position, "equity must be greater than zero"))
             }
             MetricInputKind::Equity => {
-                if value <= 0.0 {
-                    return Err(self.invalid(value, position, "equity must be greater than zero"));
-                }
-                match self.previous_equity {
-                    Some(previous) => {
-                        let result = value / previous - 1.0;
-                        if !result.is_finite() {
-                            return Err(self.invalid(
-                                value,
-                                position,
-                                "level conversion must produce a finite simple return",
-                            ));
-                        }
-                        self.previous_equity = Some(value);
-                        Some(result)
-                    }
-                    None => {
-                        self.previous_equity = Some(value);
-                        None
+                if let Some(previous) = self.previous_equity {
+                    if !(value / previous - 1.0).is_finite() {
+                        return Err(self.invalid(
+                            value,
+                            position,
+                            "level conversion must produce a finite simple return",
+                        ));
                     }
                 }
+                Ok(())
             }
             MetricInputKind::PeriodPnl { .. } => {
                 let equity = self
@@ -183,14 +171,46 @@ impl MetricInputState {
                         "P&L must leave finite non-negative equity",
                     ));
                 }
-                let result = value / equity;
-                if !result.is_finite() {
+                if !(value / equity).is_finite() {
                     return Err(self.invalid(
                         value,
                         position,
                         "P&L conversion must produce a finite simple return",
                     ));
                 }
+                Ok(())
+            }
+            _ => Ok(()),
+        }
+    }
+
+    /// Convert a finite, non-missing value already accepted by `validate_next`.
+    pub(crate) fn append_validated(&mut self, value: f64) -> Option<f64> {
+        let normalized = match self.kind {
+            MetricInputKind::Returns | MetricInputKind::RawPnl | MetricInputKind::Trades => {
+                Some(value)
+            }
+            MetricInputKind::LogReturns => {
+                let result = value.exp_m1();
+                Some(result)
+            }
+            MetricInputKind::Equity => match self.previous_equity {
+                Some(previous) => {
+                    let result = value / previous - 1.0;
+                    self.previous_equity = Some(value);
+                    Some(result)
+                }
+                None => {
+                    self.previous_equity = Some(value);
+                    None
+                }
+            },
+            MetricInputKind::PeriodPnl { .. } => {
+                let equity = self
+                    .current_pnl_equity
+                    .expect("validated period-P&L mode owns equity state");
+                let next_equity = equity + value;
+                let result = value / equity;
                 self.current_pnl_equity = Some(next_equity);
                 Some(result)
             }
@@ -200,7 +220,199 @@ impl MetricInputState {
         if normalized.is_some() {
             self.len += 1;
         }
-        Ok(normalized)
+        normalized
+    }
+
+    /// Convert a chronological slice with the semantic-domain branch hoisted
+    /// out of the hot loop, invoking `consume` for every usable observation.
+    pub fn extend(
+        &mut self,
+        values: &[f64],
+        mut consume: impl FnMut(f64) -> MetricResult<()>,
+    ) -> MetricResult<()> {
+        match self.kind {
+            MetricInputKind::Returns => {
+                for &value in values {
+                    if value.is_nan() {
+                        self.handle_missing()?;
+                    } else if !value.is_finite() {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "infinite values are not supported",
+                        ));
+                    } else if value < -1.0 {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "simple returns must be greater than or equal to -1",
+                        ));
+                    } else {
+                        self.accept(value, &mut consume)?;
+                    }
+                }
+            }
+            MetricInputKind::RawPnl | MetricInputKind::Trades => {
+                for &value in values {
+                    if value.is_nan() {
+                        self.handle_missing()?;
+                    } else if !value.is_finite() {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "infinite values are not supported",
+                        ));
+                    } else {
+                        self.accept(value, &mut consume)?;
+                    }
+                }
+            }
+            MetricInputKind::LogReturns => {
+                for &value in values {
+                    if value.is_nan() {
+                        self.handle_missing()?;
+                    } else if !value.is_finite() {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "infinite values are not supported",
+                        ));
+                    } else {
+                        let simple_return = value.exp_m1();
+                        if !simple_return.is_finite() {
+                            return Err(self.invalid(
+                                value,
+                                self.position,
+                                "conversion with expm1 must produce a finite simple return",
+                            ));
+                        }
+                        self.accept(simple_return, &mut consume)?;
+                    }
+                }
+            }
+            MetricInputKind::Equity => {
+                for &value in values {
+                    if value.is_nan() {
+                        self.handle_missing()?;
+                        continue;
+                    }
+                    if !value.is_finite() {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "infinite values are not supported",
+                        ));
+                    }
+                    if value <= 0.0 {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "equity must be greater than zero",
+                        ));
+                    }
+                    if let Some(previous) = self.previous_equity {
+                        let simple_return = value / previous - 1.0;
+                        if !simple_return.is_finite() {
+                            return Err(self.invalid(
+                                value,
+                                self.position,
+                                "level conversion must produce a finite simple return",
+                            ));
+                        }
+                        self.previous_equity = Some(value);
+                        self.position += 1;
+                        self.len += 1;
+                        consume(simple_return)?;
+                    } else {
+                        self.previous_equity = Some(value);
+                        self.position += 1;
+                    }
+                }
+            }
+            MetricInputKind::PeriodPnl { .. } => {
+                for &value in values {
+                    if value.is_nan() {
+                        self.handle_missing()?;
+                        continue;
+                    }
+                    if !value.is_finite() {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "infinite values are not supported",
+                        ));
+                    }
+                    let equity = self
+                        .current_pnl_equity
+                        .expect("validated period-P&L mode owns equity state");
+                    if equity == 0.0 {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "P&L cannot continue after equity reaches zero",
+                        ));
+                    }
+                    let next_equity = equity + value;
+                    if !next_equity.is_finite() || next_equity < 0.0 {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "P&L must leave finite non-negative equity",
+                        ));
+                    }
+                    let simple_return = value / equity;
+                    if !simple_return.is_finite() {
+                        return Err(self.invalid(
+                            value,
+                            self.position,
+                            "P&L conversion must produce a finite simple return",
+                        ));
+                    }
+                    self.current_pnl_equity = Some(next_equity);
+                    self.accept(simple_return, &mut consume)?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Ingest already validated simple returns from a trusted native fan-out.
+    pub(crate) fn extend_normalized_returns(
+        &mut self,
+        values: &[f64],
+        mut consume: impl FnMut(f64) -> MetricResult<()>,
+    ) -> MetricResult<()> {
+        debug_assert_eq!(self.kind, MetricInputKind::Returns);
+        for &value in values {
+            self.position += 1;
+            self.len += 1;
+            consume(value)?;
+        }
+        Ok(())
+    }
+
+    #[inline]
+    fn accept(
+        &mut self,
+        value: f64,
+        consume: &mut impl FnMut(f64) -> MetricResult<()>,
+    ) -> MetricResult<()> {
+        self.position += 1;
+        self.len += 1;
+        consume(value)
+    }
+
+    #[inline]
+    fn handle_missing(&mut self) -> MetricResult<()> {
+        if self.nan_policy == NanPolicy::Raise {
+            return Err(self.invalid(
+                f64::NAN,
+                self.position,
+                "NaN is forbidden by nan_policy='raise'",
+            ));
+        }
+        self.position += 1;
+        Ok(())
     }
 
     /// Restore fresh converter behavior while preserving mode and configuration.

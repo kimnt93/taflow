@@ -34,9 +34,10 @@ impl BreakevenRate {
     }
     /// Append a slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        self.input.extend(values, |observation| {
+            self.breakevens += usize::from(observation == 0.0);
+            Ok(())
+        })?;
         Ok(self.value())
     }
     /// Return exact-zero count divided by valid observation count.

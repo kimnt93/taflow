@@ -69,10 +69,18 @@ impl DownsideDeviation {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        self.input.extend(values, |simple_return| {
+            self.downside_moment.append(simple_return);
+            Ok(())
+        })?;
         Ok(self.value())
+    }
+
+    pub(crate) fn extend_normalized(&mut self, values: &[f64]) -> MetricResult<()> {
+        self.input.extend_normalized_returns(values, |value| {
+            self.downside_moment.append(value);
+            Ok(())
+        })
     }
 
     /// Return annualized downside deviation, or `None` without a usable return.

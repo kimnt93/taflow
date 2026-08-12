@@ -38,9 +38,13 @@ impl NetProfit {
     }
     /// Append observations through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        self.input.extend(values, |observation| {
+            let adjusted = observation - self.compensation;
+            let next = self.sum + adjusted;
+            self.compensation = (next - self.sum) - adjusted;
+            self.sum = next;
+            Ok(())
+        })?;
         Ok(self.value())
     }
     /// Return gross profit plus signed gross loss.

@@ -75,9 +75,11 @@ impl OmegaRatio {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        let required_return = self.period_required_return;
+        self.input.extend(values, |simple_return| {
+            self.excess_returns.append(simple_return - required_return);
+            Ok(())
+        })?;
         Ok(self.value())
     }
 

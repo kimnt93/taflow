@@ -55,9 +55,10 @@ impl ParametricExpectedShortfall {
     }
     /// Append a chronological slice through the same state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        self.input.extend(values, |simple_return| {
+            self.moments.append(simple_return);
+            Ok(())
+        })?;
         Ok(self.value())
     }
     /// Return `mean - sample_std * normal_pdf(normal_ppf(cutoff)) / cutoff`.

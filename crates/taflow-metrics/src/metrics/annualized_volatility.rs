@@ -53,10 +53,18 @@ impl AnnualizedVolatility {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        self.input.extend(values, |simple_return| {
+            self.moments.append(simple_return);
+            Ok(())
+        })?;
         Ok(self.value())
+    }
+
+    pub(crate) fn extend_normalized(&mut self, values: &[f64]) -> MetricResult<()> {
+        self.input.extend_normalized_returns(values, |value| {
+            self.moments.append(value);
+            Ok(())
+        })
     }
 
     /// Return annualized sample volatility, or `None` with fewer than two returns.

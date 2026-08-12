@@ -4,8 +4,11 @@ use crate::{MetricError, MetricResult};
 #[derive(Debug, Clone, Default)]
 pub struct ExactOrderStatistics {
     values: Vec<f64>,
-    sorted: Vec<f64>,
+    working: Vec<f64>,
     dirty: bool,
+    quantile_cache: [Option<(u64, f64)>; 2],
+    next_quantile_slot: usize,
+    lower_tail_cache: Option<(u64, f64)>,
 }
 
 impl ExactOrderStatistics {
@@ -18,8 +21,11 @@ impl ExactOrderStatistics {
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             values: Vec::with_capacity(capacity),
-            sorted: Vec::with_capacity(capacity),
+            working: Vec::with_capacity(capacity),
             dirty: false,
+            quantile_cache: [None, None],
+            next_quantile_slot: 0,
+            lower_tail_cache: None,
         }
     }
 
@@ -32,8 +38,11 @@ impl ExactOrderStatistics {
     /// Clear observations without shrinking allocated buffers.
     pub fn reset(&mut self) {
         self.values.clear();
-        self.sorted.clear();
+        self.working.clear();
         self.dirty = false;
+        self.quantile_cache = [None, None];
+        self.next_quantile_slot = 0;
+        self.lower_tail_cache = None;
     }
 
     /// Number of retained observations.
@@ -52,14 +61,30 @@ impl ExactOrderStatistics {
         if self.values.is_empty() {
             return Ok(None);
         }
-        self.refresh();
-        let index = (self.sorted.len() - 1) as f64 * cutoff;
+        self.refresh_working();
+        let key = cutoff.to_bits();
+        if let Some((_, value)) = self
+            .quantile_cache
+            .iter()
+            .flatten()
+            .find(|(cached, _)| *cached == key)
+        {
+            return Ok(Some(*value));
+        }
+        let index = (self.working.len() - 1) as f64 * cutoff;
         let lower = index.floor() as usize;
         let upper = index.ceil() as usize;
         let weight = index - lower as f64;
-        Ok(Some(
-            self.sorted[lower] + (self.sorted[upper] - self.sorted[lower]) * weight,
-        ))
+        let lower_value = *self.working.select_nth_unstable_by(lower, f64::total_cmp).1;
+        let upper_value = if upper == lower {
+            lower_value
+        } else {
+            *self.working.select_nth_unstable_by(upper, f64::total_cmp).1
+        };
+        let value = lower_value + (upper_value - lower_value) * weight;
+        self.quantile_cache[self.next_quantile_slot] = Some((key, value));
+        self.next_quantile_slot = (self.next_quantile_slot + 1) % self.quantile_cache.len();
+        Ok(Some(value))
     }
 
     /// Mean of the lowest `floor((n - 1) * cutoff) + 1` observations.
@@ -68,11 +93,21 @@ impl ExactOrderStatistics {
         if self.values.is_empty() {
             return Ok(None);
         }
-        self.refresh();
-        let selected = ((self.sorted.len() - 1) as f64 * cutoff).floor() as usize + 1;
-        Ok(Some(
-            self.sorted[..selected].iter().sum::<f64>() / selected as f64,
-        ))
+        self.refresh_working();
+        let key = cutoff.to_bits();
+        if let Some((cached, value)) = self.lower_tail_cache {
+            if cached == key {
+                return Ok(Some(value));
+            }
+        }
+        let selected = ((self.working.len() - 1) as f64 * cutoff).floor() as usize + 1;
+        if selected < self.working.len() {
+            self.working
+                .select_nth_unstable_by(selected - 1, f64::total_cmp);
+        }
+        let value = self.working[..selected].iter().sum::<f64>() / selected as f64;
+        self.lower_tail_cache = Some((key, value));
+        Ok(Some(value))
     }
 
     fn validate_cutoff(&self, cutoff: f64, allow_endpoints: bool) -> MetricResult<()> {
@@ -97,11 +132,13 @@ impl ExactOrderStatistics {
         }
     }
 
-    fn refresh(&mut self) {
+    fn refresh_working(&mut self) {
         if self.dirty {
-            self.sorted.clear();
-            self.sorted.extend_from_slice(&self.values);
-            self.sorted.sort_by(f64::total_cmp);
+            self.working.clear();
+            self.working.extend_from_slice(&self.values);
+            self.quantile_cache = [None, None];
+            self.next_quantile_slot = 0;
+            self.lower_tail_cache = None;
             self.dirty = false;
         }
     }

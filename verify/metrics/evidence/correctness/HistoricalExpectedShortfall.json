@@ -376,8 +376,8 @@
       "relative_error": 0.0
     },
     {
-      "absolute_error": 6.938893903907228e-18,
-      "actual": -0.052957002420845334,
+      "absolute_error": 0.0,
+      "actual": -0.05295700242084533,
       "dataset": "fat_tailed_seed_20260811",
       "expected": -0.05295700242084533,
       "lifecycle": {
@@ -388,11 +388,11 @@
       "oracle_passed": true,
       "parameter_row": "cutoff=0.05",
       "passed": true,
-      "relative_error": 1.310288269106389e-16
+      "relative_error": 0.0
     },
     {
-      "absolute_error": 3.469446951953614e-18,
-      "actual": -0.021935395353737716,
+      "absolute_error": 1.0408340855860843e-17,
+      "actual": -0.021935395353737723,
       "dataset": "autocorrelated_seed_20260811",
       "expected": -0.021935395353737713,
       "lifecycle": {
@@ -403,7 +403,7 @@
       "oracle_passed": true,
       "parameter_row": "cutoff=0.05",
       "passed": true,
-      "relative_error": 1.5816660224281905e-16
+      "relative_error": 4.744998067284572e-16
     },
     {
       "absolute_error": 0.0,
@@ -571,8 +571,8 @@
       "relative_error": 0.0
     },
     {
-      "absolute_error": 0.0,
-      "actual": -0.020714479611483486,
+      "absolute_error": 3.469446951953614e-18,
+      "actual": -0.020714479611483483,
       "dataset": "normal_seed_20260811",
       "expected": -0.020714479611483486,
       "lifecycle": {
@@ -583,7 +583,7 @@
       "oracle_passed": true,
       "parameter_row": "cutoff=0.1",
       "passed": true,
-      "relative_error": 0.0
+      "relative_error": 1.6748897471845041e-16
     },
     {
       "absolute_error": 6.938893903907228e-18,
@@ -796,8 +796,8 @@
       "relative_error": 5.713336199312612e-16
     },
     {
-      "absolute_error": 1.734723475976807e-18,
-      "actual": -0.012681139791534483,
+      "absolute_error": 5.204170427930421e-18,
+      "actual": -0.012681139791534487,
       "dataset": "fat_tailed_seed_20260811",
       "expected": -0.012681139791534481,
       "lifecycle": {
@@ -808,7 +808,7 @@
       "oracle_passed": true,
       "parameter_row": "cutoff=0.5",
       "passed": true,
-      "relative_error": 1.367955487041356e-16
+      "relative_error": 4.103866461124068e-16
     },
     {
       "absolute_error": 1.734723475976807e-18,
@@ -842,7 +842,7 @@
     }
   ],
   "class": "HistoricalExpectedShortfall",
-  "max_absolute_error": 6.938893903907228e-18,
+  "max_absolute_error": 1.0408340855860843e-17,
   "max_relative_error": 5.713336199312612e-16,
   "oracle": {
     "distribution": "empyrical-reloaded",

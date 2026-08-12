@@ -53,11 +53,10 @@ impl HistoricalValueAtRisk {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            if let Some(simple_return) = self.input.append(value)? {
-                self.order_statistics.append(simple_return);
-            }
-        }
+        self.input.extend(values, |simple_return| {
+            self.order_statistics.append(simple_return);
+            Ok(())
+        })?;
         Ok(self.value())
     }
 

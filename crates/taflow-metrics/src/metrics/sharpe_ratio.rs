@@ -65,10 +65,21 @@ impl SharpeRatio {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        let period_risk_free_rate = self.period_risk_free_rate;
+        self.input.extend(values, |simple_return| {
+            self.excess_return_moments
+                .append(simple_return - period_risk_free_rate);
+            Ok(())
+        })?;
         Ok(self.value())
+    }
+
+    pub(crate) fn extend_normalized(&mut self, values: &[f64]) -> MetricResult<()> {
+        let risk_free = self.period_risk_free_rate;
+        self.input.extend_normalized_returns(values, |value| {
+            self.excess_return_moments.append(value - risk_free);
+            Ok(())
+        })
     }
 
     /// Return the annualized Sharpe ratio, or `None` when it is undefined.

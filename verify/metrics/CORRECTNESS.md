@@ -20,7 +20,7 @@ Reference libraries and source functions are linked through each Target entry.
 | CalmarRatio | [empyrical-reloaded 0.5.12](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | MATCH | pass (err 2.8e-08, nan 0) | pass (err 2.8e-08, nan 0) |
 | OmegaRatio | [empyrical-reloaded 0.5.12](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | MATCH | pass (err 1.1e-14, nan 0) | pass (err 1.1e-14, nan 0) |
 | HistoricalValueAtRisk | [empyrical-reloaded 0.5.12](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | MATCH | pass (err 1.7e-18, nan 0) | pass (err 1.7e-18, nan 0) |
-| HistoricalExpectedShortfall | [empyrical-reloaded 0.5.12](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | MATCH | pass (err 6.9e-18, nan 0) | pass (err 6.9e-18, nan 0) |
+| HistoricalExpectedShortfall | [empyrical-reloaded 0.5.12](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | MATCH | pass (err 1.0e-17, nan 0) | pass (err 1.0e-17, nan 0) |
 | TailRatio | [empyrical-reloaded 0.5.12](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | MATCH | pass (err 1.1e-16, nan 0) | pass (err 1.1e-16, nan 0) |
 | TrackingError | [numpy 2.4.6](https://github.com/numpy/numpy/blob/v2.4.6/numpy/_core/fromnumeric.py) | MATCH | pass (err 8.9e-16, nan 0) | pass (err 8.9e-16, nan 0) |
 | InformationRatio | [empyrical-reloaded 0.5.12](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | MATCH | pass (err 1.1e-13, nan 0) | pass (err 1.1e-13, nan 0) |

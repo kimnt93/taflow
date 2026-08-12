@@ -39,10 +39,14 @@ impl MaximumDrawdown {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        self.input
+            .extend(values, |simple_return| self.drawdown.append(simple_return))?;
         Ok(self.value())
+    }
+
+    pub(crate) fn extend_normalized(&mut self, values: &[f64]) -> MetricResult<()> {
+        self.input
+            .extend_normalized_returns(values, |value| self.drawdown.append(value))
     }
 
     /// Return the signed, non-positive maximum drawdown, or `None` when empty.

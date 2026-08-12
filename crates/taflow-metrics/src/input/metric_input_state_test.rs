@@ -89,3 +89,62 @@ fn validates_configuration_and_nonfinite_values() {
     assert!(state.is_empty());
     assert_eq!(state.append(-1.0).unwrap(), Some(-1.0));
 }
+
+#[test]
+fn specialized_bulk_matches_scalar_state_and_bits() {
+    let returns = [0.02, f64::NAN, -0.01, 0.0, 0.04];
+    for kind in [
+        MetricInputKind::Returns,
+        MetricInputKind::LogReturns,
+        MetricInputKind::RawPnl,
+        MetricInputKind::Trades,
+    ] {
+        let input = if kind == MetricInputKind::LogReturns {
+            returns.map(|value| if value.is_nan() { value } else { value.ln_1p() })
+        } else {
+            returns
+        };
+        let mut scalar = MetricInputState::new(kind, NanPolicy::Omit).unwrap();
+        let scalar_values: Vec<_> = input
+            .iter()
+            .filter_map(|&value| scalar.append(value).unwrap())
+            .collect();
+        let mut bulk = MetricInputState::new(kind, NanPolicy::Omit).unwrap();
+        let mut bulk_values = Vec::new();
+        bulk.extend(&input, |value| {
+            bulk_values.push(value);
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(bulk_values, scalar_values);
+        assert_eq!(bulk.len(), scalar.len());
+    }
+
+    for (kind, input) in [
+        (
+            MetricInputKind::Equity,
+            vec![100.0, 102.0, f64::NAN, 101.0, 105.0],
+        ),
+        (
+            MetricInputKind::PeriodPnl {
+                initial_equity: 100.0,
+            },
+            vec![2.0, -1.0, f64::NAN, 4.0, -3.0],
+        ),
+    ] {
+        let mut scalar = MetricInputState::new(kind, NanPolicy::Omit).unwrap();
+        let scalar_values: Vec<_> = input
+            .iter()
+            .filter_map(|&value| scalar.append(value).unwrap())
+            .collect();
+        let mut bulk = MetricInputState::new(kind, NanPolicy::Omit).unwrap();
+        let mut bulk_values = Vec::new();
+        bulk.extend(&input, |value| {
+            bulk_values.push(value);
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(bulk_values, scalar_values);
+        assert_eq!(bulk.len(), scalar.len());
+    }
+}

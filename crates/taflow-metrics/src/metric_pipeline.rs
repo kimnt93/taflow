@@ -55,6 +55,12 @@ macro_rules! metric_nodes {
                 }
             }
 
+            fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
+                match self {
+                    $(Self::$variant(state) => state.extend(values).map(|_| ())),+
+                }
+            }
+
             fn value(&mut self) -> Option<f64> {
                 match self {
                     $(Self::$variant(state) => state.value()),+
@@ -160,6 +166,22 @@ metric_nodes!(
     (Exposure, Exposure, "Exposure"),
 );
 
+impl MetricNode {
+    fn extend_pipeline(&mut self, values: &[f64]) -> MetricResult<()> {
+        match self {
+            Self::TotalReturn(state) => state.extend_normalized(values),
+            Self::AnnualizedReturn(state) => state.extend_normalized(values),
+            Self::AnnualizedVolatility(state) => state.extend_normalized(values),
+            Self::MaximumDrawdown(state) => state.extend_normalized(values),
+            Self::DownsideDeviation(state) => state.extend_normalized(values),
+            Self::SharpeRatio(state) => state.extend_normalized(values),
+            Self::SortinoRatio(state) => state.extend_normalized(values),
+            Self::CalmarRatio(state) => state.extend_normalized(values),
+            _ => self.extend(values),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 enum IntegralMetricNode {
     LongestLosingStreak(LongestLosingStreak),
@@ -178,6 +200,13 @@ impl IntegralMetricNode {
         match self {
             Self::LongestLosingStreak(state) => state.append(value).map(|_| ()),
             Self::MaximumDrawdownDuration(state) => state.append(value).map(|_| ()),
+        }
+    }
+
+    fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
+        match self {
+            Self::LongestLosingStreak(state) => state.extend(values).map(|_| ()),
+            Self::MaximumDrawdownDuration(state) => state.extend(values).map(|_| ()),
         }
     }
 
@@ -217,6 +246,13 @@ impl PipelineNode {
         }
     }
 
+    fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
+        match self {
+            Self::Floating(node) => node.extend_pipeline(values),
+            Self::Integral(node) => node.extend(values),
+        }
+    }
+
     fn value(&mut self) -> Option<f64> {
         match self {
             Self::Floating(node) => node.value(),
@@ -237,6 +273,7 @@ impl PipelineNode {
 pub struct MetricPipeline {
     input: MetricInputState,
     nodes: Vec<PipelineNode>,
+    normalized: Vec<f64>,
 }
 
 impl MetricPipeline {
@@ -317,6 +354,7 @@ impl MetricPipeline {
         Ok(Self {
             input: MetricInputState::new(input_kind, nan_policy)?,
             nodes,
+            normalized: Vec::new(),
         })
     }
 
@@ -469,8 +507,14 @@ impl MetricPipeline {
     }
 
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<()> {
-        for &value in values {
-            self.append(value)?;
+        self.normalized.clear();
+        self.normalized.reserve(values.len());
+        self.input.extend(values, |simple_return| {
+            self.normalized.push(simple_return);
+            Ok(())
+        })?;
+        for node in &mut self.nodes {
+            node.extend(&self.normalized)?;
         }
         Ok(())
     }
@@ -491,6 +535,7 @@ impl MetricPipeline {
 
     pub fn reset(&mut self) {
         self.input.reset();
+        self.normalized.clear();
         for node in &mut self.nodes {
             node.reset();
         }

@@ -41,6 +41,16 @@ except ImportError:
     )  # type: ignore[no-redef]
 
 DEFAULT_SIZES = (1_000, 10_000, 100_000)
+PIPELINE_METRICS = (
+    "TotalReturn",
+    "AnnualizedReturn",
+    "AnnualizedVolatility",
+    "MaximumDrawdown",
+    "DownsideDeviation",
+    "SharpeRatio",
+    "SortinoRatio",
+    "CalmarRatio",
+)
 
 
 def timed(call: Callable[[], object], repeats: int) -> dict[str, object]:
@@ -231,6 +241,68 @@ def benchmark_metric(
     }
 
 
+def benchmark_metric_pipeline(
+    sizes: tuple[int, ...], repeats: int
+) -> dict[str, object]:
+    """Compare one P&L conversion/fan-out pass with equivalent standalone states."""
+    import taflow.metrics as metrics_module
+
+    pipeline_class = metrics_module.MetricPipeline
+    initial_equity = 100_000_000.0
+    rng = np.random.default_rng(20_260_812)
+    rows = []
+    for size in sizes:
+        pnl = np.ascontiguousarray(rng.normal(40.0, 1_200.0, size), dtype=np.float64)
+
+        def pipeline_call() -> dict[str, float | None]:
+            return pipeline_class.from_pnl(
+                pnl,
+                initial_equity=initial_equity,
+                metrics=PIPELINE_METRICS,
+            ).compute()
+
+        def standalone_call() -> dict[str, float | None]:
+            return {
+                name: getattr(metrics_module, name)
+                .from_pnl(pnl, initial_equity=initial_equity)
+                .compute()
+                for name in PIPELINE_METRICS
+            }
+
+        actual = pipeline_call()
+        expected = standalone_call()
+        for name in PIPELINE_METRICS:
+            left, right = actual[name], expected[name]
+            if left is None or right is None:
+                if left is not right:
+                    raise AssertionError(f"MetricPipeline mismatch for {name}")
+            elif not np.isclose(left, right, rtol=1e-12, atol=1e-14):
+                raise AssertionError(
+                    f"MetricPipeline mismatch for {name}: {left!r} != {right!r}"
+                )
+        pipeline_timing = timed(pipeline_call, repeats)
+        standalone_timing = timed(standalone_call, repeats)
+        pipeline_seconds = float(pipeline_timing["median_seconds"])
+        standalone_seconds = float(standalone_timing["median_seconds"])
+        rows.append(
+            {
+                "observations": size,
+                "metrics": len(PIPELINE_METRICS),
+                "pipeline_public": pipeline_timing,
+                "standalone_public": standalone_timing,
+                "speedup": standalone_seconds / pipeline_seconds,
+            }
+        )
+    return {
+        "class": "MetricPipeline",
+        "comparison": "equivalent standalone TAFlow metric classes",
+        "input_domain": "period P&L",
+        "metrics": list(PIPELINE_METRICS),
+        "correctness_gate": "INVARIANT",
+        "rows": rows,
+    }
+
+
 def _atomic_write(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     descriptor, temporary_name = tempfile.mkstemp(
@@ -245,13 +317,19 @@ def _atomic_write(path: Path, content: str) -> None:
         raise
 
 
-def write_results(results: list[dict[str, object]]) -> None:
+def write_results(
+    results: list[dict[str, object]], pipeline_result: dict[str, object]
+) -> None:
     BENCHMARK_EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     for result in results:
         _atomic_write(
             BENCHMARK_EVIDENCE_DIR / f"{result['class']}.json",
             json.dumps(result, indent=2, sort_keys=True) + "\n",
         )
+    _atomic_write(
+        BENCHMARK_EVIDENCE_DIR / "MetricPipeline.json",
+        json.dumps(pipeline_result, indent=2, sort_keys=True) + "\n",
+    )
     lines = [
         "# Metrics benchmark",
         "",
@@ -281,6 +359,72 @@ def write_results(results: list[dict[str, object]]) -> None:
             f"| {result['class']} | {result['oracle_distribution']} "
             f"{result['oracle_version']} | " + " | ".join(cells) + " |"
         )
+    lines.extend(
+        [
+            "",
+            "## Metric pipeline amortization",
+            "",
+            "One Rust-owned P&L conversion and fan-out pass is compared with constructing the same eight TAFlow metric classes separately. This is an internal architecture comparison, not an external-oracle claim; results are gated by equality with the standalone public classes.",
+            "",
+            "| **Metrics** | **Input** | **1k** | **10k** | **100k** |",
+            "|---|---|---:|---:|---:|",
+        ]
+    )
+    pipeline_by_size = {
+        row["observations"]: row for row in pipeline_result["rows"]  # type: ignore[index]
+    }
+    pipeline_cells = [
+        f"{pipeline_by_size[size]['speedup']:.2f}x"
+        if size in pipeline_by_size
+        else "—"
+        for size in DEFAULT_SIZES
+    ]
+    lines.append(
+        f"| {len(PIPELINE_METRICS)} whole-history metrics | period P&L | "
+        + " | ".join(pipeline_cells)
+        + " |"
+    )
+    lines.extend(
+        [
+            "",
+            "## Implementation interpretation",
+            "",
+            "The public adapter performs one contiguous container conversion and releases the GIL for native bulk work. Rust bulk loops hoist semantic-domain validation and avoid per-observation result calculation. They deliberately retain chronological scalar accumulation for Welford moments, compensated sums, compounding, and drawdown state; these recurrences are not reassociated into SIMD reductions because scalar append, chunked extend, and batch extend must leave the same persistent state. Exact historical tails use cached linear-time selection rather than a full sort.",
+            "",
+            "Consequently, array libraries can remain faster for simple one-shot reductions that use highly tuned vector kernels, while TAFlow's advantages are persistent O(1) continuation, cached O(1) reads, native streaming, and amortizing one semantic conversion across a metric pipeline.",
+        ]
+    )
+
+    sharpe = next((row for row in results if row["class"] == "SharpeRatio"), None)
+    if sharpe and sharpe.get("execution_profiles"):
+        profiles = sharpe["execution_profiles"]
+        lines.extend(
+            [
+                "",
+                "## SharpeRatio execution profiles (100k observations)",
+                "",
+                "These profiles separate native bulk processing from Python scalar/chunk boundary costs and cached reads.",
+                "",
+                "| **Path** | **Median** |",
+                "|---|---:|",
+            ]
+        )
+        for key in (
+            "native_bulk",
+            "chunks_1024",
+            "chunks_32",
+            "scalar_append",
+            "warmed_continuation",
+            "cached_compute",
+        ):
+            timing = profiles[key]  # type: ignore[index]
+            seconds = float(timing["median_seconds"])
+            rendered = (
+                f"{seconds * 1e9:.1f} ns"
+                if seconds < 1e-6
+                else f"{seconds * 1e3:.3f} ms"
+            )
+            lines.append(f"| {key.replace('_', ' ')} | {rendered} |")
     _atomic_write(VERIFY_DIR / "BENCHMARK.md", "\n".join(lines) + "\n")
 
 
@@ -334,7 +478,8 @@ def main() -> int:
     if any(size <= 0 for size in sizes) or args.repeats < 1:
         raise ValueError("sizes and repeats must be positive")
     results = [benchmark_metric(spec, sizes, args.repeats) for spec in specs]
-    write_results(results)
+    pipeline_result = benchmark_metric_pipeline(sizes, args.repeats)
+    write_results(results, pipeline_result)
     print(f"benchmarked {len(results)} correctness-gated metrics")
     return 0
 

@@ -48,10 +48,12 @@ impl PairedMetricInputState {
             return Ok(None);
         }
 
-        let mut primary_state = self.primary.clone();
-        let mut benchmark_state = self.benchmark.clone();
-        let primary_value = primary_state.append(primary)?;
-        let benchmark_value = benchmark_state.append(benchmark)?;
+        // Validate both sides before either converter mutates. This preserves
+        // pair transactionality without cloning two converter states per row.
+        self.primary.validate_next(primary)?;
+        self.benchmark.validate_next(benchmark)?;
+        let primary_value = self.primary.append_validated(primary);
+        let benchmark_value = self.benchmark.append_validated(benchmark);
         let pair = match (primary_value, benchmark_value) {
             (Some(primary), Some(benchmark)) => Some((primary, benchmark)),
             (None, None) => None,
@@ -62,8 +64,6 @@ impl PairedMetricInputState {
                 });
             }
         };
-        self.primary = primary_state;
-        self.benchmark = benchmark_state;
         if pair.is_some() {
             self.len += 1;
         }

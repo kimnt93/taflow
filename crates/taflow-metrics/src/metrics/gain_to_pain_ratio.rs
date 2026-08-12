@@ -39,9 +39,10 @@ impl GainToPainRatio {
 
     /// Append a chronological slice through the same persistent state.
     pub fn extend(&mut self, values: &[f64]) -> MetricResult<Option<f64>> {
-        for &value in values {
-            self.append(value)?;
-        }
+        self.input.extend(values, |simple_return| {
+            self.returns.append(simple_return);
+            Ok(())
+        })?;
         Ok(self.value())
     }
 
