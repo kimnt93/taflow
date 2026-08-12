@@ -32,6 +32,7 @@ from .longest_losing_streak import LongestLosingStreak
 from .longest_winning_streak import LongestWinningStreak
 from .maximum_drawdown import MaximumDrawdown
 from .maximum_drawdown_duration import MaximumDrawdownDuration
+from .metric_pipeline import MetricPipeline
 from .modified_sharpe_ratio import ModifiedSharpeRatio
 from .net_profit import NetProfit
 from .omega_ratio import OmegaRatio
@@ -91,6 +92,7 @@ __all__ = [
     "LongestWinningStreak",
     "MaximumDrawdown",
     "MaximumDrawdownDuration",
+    "MetricPipeline",
     "ModifiedSharpeRatio",
     "NetProfit",
     "OmegaRatio",
