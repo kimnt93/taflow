@@ -42,9 +42,17 @@ from registry import (
 )
 
 SCHEMA_VERSION = 3
-DEFAULT_SIZES = (1_000, 10_000, 100_000, 1_000_000)
+DEFAULT_SIZES = (1_000, 10_000, 100_000)
 DEFAULT_WARMUP_SIZES = (1, 10, 100, 1_000)
 DEFAULT_THREADS = (1, 5, 10)
+
+ORACLE_ENV_KEYS = {
+    "TA-Lib": "talib",
+    "Wickra": "wickra",
+    "pandas-ta-classic": "pandas_ta_classic",
+    "NumPy": "numpy",
+    "SMC": "smartmoneyconcepts",
+}
 
 
 def oracle_call(spec: Spec, arrays: list[np.ndarray]):
@@ -285,10 +293,16 @@ def render_aggregate(reports: list[dict], env: dict) -> str:
         f"{env['smartmoneyconcepts']}, and TAFlow {env['taflow']}.",
         "",
         "Only `MATCH` indicators are timed. Speedup is reference time divided "
-        "by TAFlow time; values above 1× favor TAFlow. Each cell is API/kernel.",
+        "by the TAFlow native kernel time; values above 1× favor TAFlow.",
         "",
-        "| Class | Target | 1k | 10k | 100k | 1m |",
-        "|---|---|---:|---:|---:|---:|",
+        "Reference libraries: [TA-Lib](https://ta-lib.org/), "
+        "[Wickra](https://pypi.org/project/wickra/), "
+        "[pandas-ta-classic](https://xgboosted.github.io/pandas-ta-classic/), "
+        "[NumPy](https://numpy.org/), and "
+        "[Smart Money Concepts](https://github.com/joshyattridge/smart-money-concepts).",
+        "",
+        "| **Class** | **Target** | **1k** | **10k** | **100k** |",
+        "|---|---|---:|---:|---:|",
     ]
     for report in sorted(reports, key=lambda item: item["canonical_class"]):
         by_size = {row["bars"]: row for row in report["vector"]}
@@ -296,13 +310,14 @@ def render_aggregate(reports: list[dict], env: dict) -> str:
         for size in DEFAULT_SIZES:
             row = by_size.get(size)
             cells.append(
-                f"{row['api_speedup']:.2f}×/{row['kernel_speedup']:.2f}×"
+                f"{row['kernel_speedup']:.2f}×"
                 if row
                 else "—"
             )
         lines.append(
             f"| {report['canonical_class']} | {report['oracle']} "
-            f"`{report['oracle_name']}` | " + " | ".join(cells) + " |"
+            f"{report['environment'].get(ORACLE_ENV_KEYS[report['oracle']], '')}"
+            f" | " + " | ".join(cells) + " |"
         )
     lines += [
         "",

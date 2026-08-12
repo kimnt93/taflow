@@ -8,12 +8,9 @@ from __future__ import annotations
 
 import argparse
 import gc
-import importlib.metadata
 import json
 import os
-import platform
 import statistics
-import subprocess
 import tempfile
 import time
 from datetime import UTC, datetime
@@ -43,7 +40,7 @@ except ImportError:
         resolve_specs,
     )  # type: ignore[no-redef]
 
-DEFAULT_SIZES = (1_000, 10_000, 100_000, 1_000_000)
+DEFAULT_SIZES = (1_000, 10_000, 100_000)
 
 
 def timed(call: Callable[[], object], repeats: int) -> dict[str, object]:
@@ -220,10 +217,11 @@ def benchmark_metric(
             execution_profiles = benchmark_sharpe_execution_profiles(
                 cls, values, public_kwargs, repeats
             )
+    source_distribution, source_version = spec.oracle.source_package
     return {
         "class": spec.class_name,
-        "oracle_distribution": spec.oracle.distribution,
-        "oracle_version": spec.oracle.version,
+        "oracle_distribution": source_distribution,
+        "oracle_version": source_version,
         "oracle_function": spec.oracle.function,
         "oracle_source_function": spec.oracle.source_function_name,
         "oracle_source": spec.oracle.source_url,
@@ -261,100 +259,29 @@ def write_results(results: list[dict[str, object]]) -> None:
         "",
         f"Public end-to-end semantic-factory `compute()` timings for {len(results)} benchmark-eligible metrics; every row passed the external correctness gate first.",
         "",
-        "| Metric | Oracle source function | Correctness | Observations | TAFlow median (ms) | Oracle median (ms) | Speedup |",
-        "|---|---|---:|---:|---:|---:|---:|",
+        "Speedup is reference time divided by TAFlow time; values above 1× favor TAFlow.",
+        "",
+        "Reference libraries: [empyrical-reloaded](https://github.com/stefan-jansen/empyrical-reloaded), "
+        "[QuantStats](https://github.com/ranaroussi/quantstats), "
+        "[NumPy](https://numpy.org/), [SciPy](https://scipy.org/), "
+        "[PerformanceAnalytics](https://cran.r-project.org/package=PerformanceAnalytics), "
+        "[vectorbt](https://vectorbt.dev/), and "
+        "[Riskfolio-Lib](https://riskfolio-lib.readthedocs.io/).",
+        "",
+        "| **Class** | **Target** | **1k** | **10k** | **100k** |",
+        "|---|---|---:|---:|---:|",
     ]
     for result in results:
-        for row in result["rows"]:  # type: ignore[index]
-            lines.append(
-                f"| `{result['class']}` | "
-                f"[`{result['oracle_source_function']}`]({result['oracle_source']}) | "
-                f"**{result['correctness_gate']}** | {row['observations']:,} | "
-                f"{row['taflow_public']['median_seconds'] * 1e3:.4f} | "
-                f"{row['oracle']['median_seconds'] * 1e3:.4f} | {row['speedup']:.2f}x |"
-            )
-    sharpe = next(
-        (result for result in results if result["class"] == "SharpeRatio"), None
-    )
-    if sharpe is not None and sharpe.get("execution_profiles"):
-        profiles = sharpe["execution_profiles"]
-        lines.extend(
-            [
-                "",
-                "## Representative execution profiles",
-                "",
-                "Sharpe Ratio at 100,000 observations isolates the native bulk boundary, chunking, scalar append, warmed continuation, and cached compute paths.",
-                "",
-                "| Path | Median (ms) | MAD (ms) |",
-                "|---|---:|---:|",
-            ]
-        )
-        for name in (
-            "native_bulk",
-            "chunks_32",
-            "chunks_1024",
-            "scalar_append",
-            "warmed_continuation",
-            "cached_compute",
-        ):
-            timing = profiles[name]
-            lines.append(
-                f"| `{name}` | {timing['median_seconds'] * 1e3:.4f} | "
-                f"{timing['median_absolute_deviation_seconds'] * 1e3:.4f} |"
-            )
-        lines.extend(
-            [
-                "",
-                "### Input-container conversion",
-                "",
-                "Public end-to-end Sharpe Ratio construction and compute at 100,000 observations.",
-                "",
-                "| Container | Median (ms) | MAD (ms) |",
-                "|---|---:|---:|",
-            ]
-        )
-        for name, timing in profiles["container_end_to_end"].items():
-            lines.append(
-                f"| `{name}` | {timing['median_seconds'] * 1e3:.4f} | "
-                f"{timing['median_absolute_deviation_seconds'] * 1e3:.4f} |"
-            )
-    lines.extend(
-        [
-            "",
-            "## Exact-tail retained memory",
-            "",
-            "Historical VaR, Historical Expected Shortfall, Tail Ratio, and Common Sense Ratio retain both chronological and sorted `f64` buffers after compute. Conditional Drawdown at Risk retains two buffers per drawdown episode. Entropic Value at Risk retains one `f64` per usable return. The payload estimates exclude vector capacity and allocator overhead.",
-            "",
-            "| Observations/episodes | Exact order-statistics and CDaR lower bound | Entropic VaR lower bound |",
-            "|---:|---:|---:|",
+        by_size = {row["observations"]: row for row in result["rows"]}  # type: ignore[index]
+        cells = [
+            f"{by_size[size]['speedup']:.2f}x" if size in by_size else "—"
+            for size in DEFAULT_SIZES
         ]
-    )
-    for size in DEFAULT_SIZES:
         lines.append(
-            f"| {size:,} | {16 * size / (1024 * 1024):.3f} MiB | "
-            f"{8 * size / (1024 * 1024):.3f} MiB |"
+            f"| {result['class']} | {result['oracle_distribution']} "
+            f"{result['oracle_version']} | " + " | ".join(cells) + " |"
         )
-    import taflow._native as native
-
-    rustc = subprocess.run(
-        ["rustc", "--version"], capture_output=True, text=True, check=True
-    ).stdout.strip()
-    environment = (
-        f"Environment: Python {platform.python_version()}, NumPy {np.__version__}, "
-        f"Empyrical Reloaded {importlib.metadata.version('empyrical-reloaded')}, "
-        f"QuantStats {importlib.metadata.version('quantstats')}; "
-        f"SciPy {importlib.metadata.version('scipy')}; "
-        f"OS {platform.platform()}; machine {platform.machine()}; {rustc}; "
-        f"release extension `{native.__file__}`."
-    )
-    lines.extend(
-        [
-            "",
-            environment,
-            "",
-        ]
-    )
-    _atomic_write(VERIFY_DIR / "BENCHMARK.md", "\n".join(lines))
+    _atomic_write(VERIFY_DIR / "BENCHMARK.md", "\n".join(lines) + "\n")
 
 
 def parse_args() -> argparse.Namespace:

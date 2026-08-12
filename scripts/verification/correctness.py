@@ -1650,17 +1650,15 @@ def write_report(rows: list[dict], path: Path, bars: int, split: int) -> None:
         "vs oracle*: the stitched output against the reference. Repeated",
         f"native `extend` chunks {list(CHUNK_SIZES)} are also checked bitwise.",
         "",
-        "| Function | taflow class | Oracle | Verdict | Batch vs oracle | "
-        "Continue vs batch | Extend chunks | Continue vs oracle |",
-        "|---|---|---|---|---|---|---|---|",
+        "| **Class** | **Target** | **Verdict** | **Batch vs oracle** | "
+        "**Continue vs oracle** |",
+        "|---|---|---|---|---|",
     ]
     for row in sorted(rows, key=lambda r: (verdict(r) == "MATCH", r["function"])):
         lines.append(
-            f"| {row['function']} | {row.get('taflow_class') or '—'} | "
+            f"| {row.get('taflow_class') or row['function']} | "
             f"{row.get('oracle') or '—'} | {verdict(row)} | "
             f"{fmt_check(row.get('batch_vs_oracle'))} | "
-            f"{fmt_check(row.get('continue_vs_batch_bitwise'))} | "
-            f"{fmt_check(all(row.get('chunk_invariance', {}).values()))} | "
             f"{fmt_check(row.get('continue_vs_oracle'))} |"
         )
 

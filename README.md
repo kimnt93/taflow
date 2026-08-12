@@ -239,11 +239,11 @@ lifecycle, configuration, and deliberately separate input domains.
 
 ## Performance
 
-The authoritative benchmark was generated on 2026-08-11 after every registered
+The authoritative benchmark was generated on 2026-08-12 after every registered
 indicator passed its selected external oracle. It covers all 393 indicators at
-1k, 10k, 100k, and 1m bars, plus fresh-state runs at 1, 5, and 10 concurrent
-threads. Each row reports Python API and native-kernel speedup against the same
-reference used for correctness.
+1k, 10k, and 100k bars, plus fresh-state runs at 1, 5, and 10 concurrent
+threads. Each row reports native-kernel speedup against the same reference used
+for correctness.
 
 See [verify/BENCHMARK.md](verify/BENCHMARK.md) for the aggregate vector table.
 Complete warm-up/thread matrices and raw repeated samples are retained under
@@ -252,7 +252,7 @@ Complete warm-up/thread matrices and raw repeated samples are retained under
 ### Reproduce it
 
 ```bash
-make bench                   # all 393 indicators, 1k/10k/100k/1M bars
+make bench                   # all 393 indicators, 1k/10k/100k bars
 make bench ARGS="SMA MAX"    # a subset
 ```
 

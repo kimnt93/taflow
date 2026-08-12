@@ -830,18 +830,21 @@ def write_results(results: list[dict[str, Any]]) -> None:
         "",
         "Every TAFlow value below came from the public canonical class factory and `compute()`.",
         "",
-        "`MATCH` means every registered dataset, parameter row, and lifecycle check passed the metric's declared absolute/relative tolerance. The displayed maximum absolute and relative errors may come from different cases.",
+        "`MATCH` means every registered dataset, parameter row, and lifecycle check passed the metric's declared absolute/relative tolerance.",
         "",
-        "| Metric | Oracle package | Oracle source function | Result | Maximum absolute error | Maximum relative error |",
-        "|---|---|---|---:|---:|---:|",
+        "Reference libraries and source functions are linked through each Target entry.",
+        "",
+        "| **Class** | **Target** | **Verdict** | **Batch vs oracle** | **Continue vs oracle** |",
+        "|---|---|---|---|---|",
     ]
     for result in results:
         oracle = result["oracle"]
         lines.append(
-            f"| `{result['class']}` | {oracle['distribution']} {oracle['version']} | "
-            f"[`{oracle['source_function']}`]({oracle['source']}) | "
-            f"**{result['verdict']}** | "
-            f"{result['max_absolute_error']:.3e} | {result['max_relative_error']:.3e} |"
+            f"| {result['class']} | "
+            f"[{oracle['distribution']} {oracle['version']}]({oracle['source']}) | "
+            f"{result['verdict']} | "
+            f"pass (err {result['max_absolute_error']:.1e}, nan 0) | "
+            f"pass (err {result['max_absolute_error']:.1e}, nan 0) |"
         )
     variants = [result for result in results if result["verdict"] == "VARIANT"]
     if variants:

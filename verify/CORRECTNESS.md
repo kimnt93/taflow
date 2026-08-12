@@ -14,401 +14,401 @@ bitwise-identical to one-shot batch (chunk invariance); *continue
 vs oracle*: the stitched output against the reference. Repeated
 native `extend` chunks [1, 10, 1000] are also checked bitwise.
 
-| Function | taflow class | Oracle | Verdict | Batch vs oracle | Continue vs batch | Extend chunks | Continue vs oracle |
-|---|---|---|---|---|---|---|---|
-| ACCBANDS | AccelerationBands | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ACOS | MathAcos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| AD | AccumulationDistribution | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ADD | MathAdd | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ADOSC | AccumulationDistributionOscillator | TA-Lib | MATCH | pass (err 1.5e-08, nan 0) | yes | yes | pass (err 1.5e-08, nan 0) |
-| ADX | AverageDirectionalIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| ADXR | AverageDirectionalIndexRating | TA-Lib | MATCH | pass (err 2.1e-14, nan 0) | yes | yes | pass (err 2.1e-14, nan 0) |
-| APO | AbsolutePriceOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| AROON | Aroon | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| AROONOSC | AroonOscillator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| ASIN | MathAsin | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ATAN | MathAtan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ATR | AverageTrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| AVGDEV | RollingAverageDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| AVGPRICE | AveragePrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| BBANDS | BollingerBands | TA-Lib | MATCH | pass (err 7.9e-10, nan 0) | yes | yes | pass (err 7.9e-10, nan 0) |
-| BETA | RollingBeta | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| BOP | BalanceOfPower | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CCI | CommodityChannelIndex | TA-Lib | MATCH | pass (err 1.4e-11, nan 0) | yes | yes | pass (err 1.4e-11, nan 0) |
-| CDL2CROWS | CandleTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDL3BLACKCROWS | CandleThreeBlackCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDL3INSIDE | CandleThreeInside | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDL3LINESTRIKE | CandleThreeLineStrike | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDL3OUTSIDE | CandleThreeOutside | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDL3STARSINSOUTH | CandleThreeStarsInSouth | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDL3WHITESOLDIERS | CandleThreeWhiteSoldiers | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLABANDONEDBABY | CandleAbandonedBaby | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLADVANCEBLOCK | CandleAdvanceBlock | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLBELTHOLD | CandleBeltHold | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLBREAKAWAY | CandleBreakaway | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLCLOSINGMARUBOZU | CandleClosingMarubozu | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLCONCEALBABYSWALL | CandleConcealBabySwall | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLCOUNTERATTACK | CandleCounterAttack | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLDARKCLOUDCOVER | CandleDarkCloudCover | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLDOJI | CandleDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLDOJISTAR | CandleDojiStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLDRAGONFLYDOJI | CandleDragonflyDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLENGULFING | CandleEngulfing | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLEVENINGDOJISTAR | CandleEveningDojiStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLEVENINGSTAR | CandleEveningStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLGAPSIDESIDEWHITE | CandleGapSideSideWhite | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLGRAVESTONEDOJI | CandleGravestoneDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHAMMER | CandleHammer | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHANGINGMAN | CandleHangingMan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHARAMI | CandleHarami | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHARAMICROSS | CandleHaramiCross | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHIGHWAVE | CandleHighWave | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHIKKAKE | CandleHikkake | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHIKKAKEMOD | CandleHikkakeModified | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLHOMINGPIGEON | CandleHomingPigeon | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLIDENTICAL3CROWS | CandleIdenticalThreeCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLINNECK | CandleInNeck | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLINVERTEDHAMMER | CandleInvertedHammer | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLKICKING | CandleKicking | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLKICKINGBYLENGTH | CandleKickingByLength | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLLADDERBOTTOM | CandleLadderBottom | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLLONGLEGGEDDOJI | CandleLongLeggedDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLLONGLINE | CandleLongLine | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLMARUBOZU | CandleMarubozu | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLMATCHINGLOW | CandleMatchingLow | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLMATHOLD | CandleMatHold | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLMORNINGDOJISTAR | CandleMorningDojiStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLMORNINGSTAR | CandleMorningStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLONNECK | CandleOnNeck | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLPIERCING | CandlePiercing | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLRICKSHAWMAN | CandleRickshawman | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLRISEFALL3METHODS | CandleRiseFallThreeMethods | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLSEPARATINGLINES | CandleSeparatingLines | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLSHOOTINGSTAR | CandleShootingStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLSHORTLINE | CandleShortLine | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLSPINNINGTOP | CandleSpinningTop | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLSTALLEDPATTERN | CandleStalledPattern | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLSTICKSANDWICH | CandleStickSandwich | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLTAKURI | CandleTakuri | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLTASUKIGAP | CandleTasukiGap | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLTHRUSTING | CandleThrusting | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLTRISTAR | CandleTriStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLUNIQUE3RIVER | CandleUniqueThreeRiver | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLUPSIDEGAP2CROWS | CandleUpsideGapTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CDLXSIDEGAP3METHODS | CandleUpDownSideGapThreeMethods | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CEIL | MathCeil | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| CMO | ChandeMomentumOscillator | TA-Lib | MATCH | pass (err 6.8e-14, nan 0) | yes | yes | pass (err 6.8e-14, nan 0) |
-| CORREL | RollingCorrelation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| COS | MathCos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| COSH | MathCosh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| DEMA | DoubleExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| DIV | MathDivide | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| DX | DirectionalMovementIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| EMA | ExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| EXP | MathExp | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| FLOOR | MathFloor | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| HT_DCPERIOD | HilbertTransformDominantCyclePeriod | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| HT_DCPHASE | HilbertTransformDominantCyclePhase | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| HT_PHASOR | HilbertTransformPhasor | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| HT_SINE | HilbertTransformSineWave | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| HT_TRENDLINE | HilbertTransformTrendline | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| HT_TRENDMODE | HilbertTransformTrendMode | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| IMI | IntradayMomentumIndex | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| KAMA | KaufmanAdaptiveMovingAverage | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| LINEARREG | RollingLinearRegression | TA-Lib | MATCH | pass (err 6.0e-13, nan 0) | yes | yes | pass (err 6.0e-13, nan 0) |
-| LINEARREG_ANGLE | RollingLinearRegressionAngle | TA-Lib | MATCH | pass (err 4.9e-12, nan 0) | yes | yes | pass (err 4.9e-12, nan 0) |
-| LINEARREG_INTERCEPT | RollingLinearRegressionIntercept | TA-Lib | MATCH | pass (err 6.0e-13, nan 0) | yes | yes | pass (err 6.0e-13, nan 0) |
-| LINEARREG_SLOPE | RollingLinearRegressionSlope | TA-Lib | MATCH | pass (err 9.1e-14, nan 0) | yes | yes | pass (err 9.1e-14, nan 0) |
-| LN | MathLn | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| LOG10 | MathLog10 | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MA | MovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MACD | MovingAverageConvergenceDivergence | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| MACDEXT | MovingAverageConvergenceDivergenceExtended | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MACDFIX | MovingAverageConvergenceDivergenceFixed | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| MAMA | MesaAdaptiveMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MAVP | VariablePeriodMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MAX | RollingMaximum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MAXINDEX | RollingMaximumIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MEDPRICE | MedianPrice | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MFI | MoneyFlowIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| MIDPOINT | RollingMidpoint | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MIDPRICE | RollingMidprice | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MIN | RollingMinimum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MININDEX | RollingMinimumIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MINMAX | RollingMinMax | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MINMAXINDEX | RollingMinMaxIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MINUS_DI | MinusDirectionalIndicator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| MINUS_DM | MinusDirectionalMovement | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MOM | Momentum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| MULT | MathMultiply | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| NATR | NormalizedAverageTrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| OBV | OnBalanceVolume | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| PLUS_DI | PlusDirectionalIndicator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| PLUS_DM | PlusDirectionalMovement | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| PPO | PercentagePriceOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ROC | RateOfChange | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| ROCP | RateOfChangePercent | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ROCR | RateOfChangeRatio | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ROCR100 | RateOfChangeRatioPercent | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| RSI | RelativeStrengthIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SAR | ParabolicSar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SAREXT | ParabolicSarExtended | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SIN | MathSin | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SINH | MathSinh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SMA | SimpleMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SQRT | MathSqrt | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| STDDEV | RollingStandardDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| STOCH | StochasticOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| STOCHF | FastStochasticOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| STOCHRSI | StochasticRelativeStrengthIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SUB | MathSubtract | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| SUM | RollingSum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| T3 | TripleExponentialAverage | TA-Lib | MATCH | pass (err 5.7e-13, nan 0) | yes | yes | pass (err 5.7e-13, nan 0) |
-| TAN | MathTan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| TANH | MathTanh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| TEMA | TripleExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| TRANGE | TrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| TRIMA | TriangularMovingAverage | TA-Lib | MATCH | pass (err 6.8e-13, nan 0) | yes | yes | pass (err 6.8e-13, nan 0) |
-| TRIX | TripleExponentialRateOfChange | TA-Lib | MATCH | pass (err 1.1e-14, nan 0) | yes | yes | pass (err 1.1e-14, nan 0) |
-| TSF | RollingTimeSeriesForecast | TA-Lib | MATCH | pass (err 6.8e-13, nan 0) | yes | yes | pass (err 6.8e-13, nan 0) |
-| TYPPRICE | TypicalPrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| ULTOSC | UltimateOscillator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| VAR | RollingVariance | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| WCLPRICE | WeightedClose | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| WILLR | WilliamsPercentR | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| WMA | WeightedMovingAverage | TA-Lib | MATCH | pass (err 1.9e-10, nan 0) | yes | yes | pass (err 1.9e-10, nan 0) |
-| absolute_breadth_index | AbsoluteBreadthIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| adaptive_cycle | AdaptiveCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| amihud | Amihud | Wickra | MATCH | pass (err 2.6e-11, nan 0) | yes | yes | pass (err 2.6e-11, nan 0) |
-| anchored_vwap | AnchoredVolumeWeightedAveragePrice | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| arms_index | ArmsIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| arnaud_legoux_moving_average | ArnaudLegouxMovingAverage | Wickra | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| automatic_fibonacci | AutomaticFibonacci | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| average_daily_dollar_value | AverageDailyDollarValue | NumPy | MATCH | pass (err 3.9e-07, nan 0) | yes | yes | pass (err 3.9e-07, nan 0) |
-| average_daily_range | AverageDailyRange | Wickra | MATCH | pass (err 2.8e-14, nan 0) | yes | yes | pass (err 2.8e-14, nan 0) |
-| average_true_range_bands | AverageTrueRangeBands | Wickra | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| awesome_oscillator | AwesomeOscillator | Wickra | MATCH | pass (err 3.1e-13, nan 0) | yes | yes | pass (err 3.1e-13, nan 0) |
-| bars_since | BarsSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| bat_pattern | BatPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| better_volume | BetterVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| breadth_thrust | BreadthThrust | Wickra | MATCH | pass (err 1.1e-16, nan 0) | yes | yes | pass (err 1.1e-16, nan 0) |
-| break_of_structure_change_of_character | BreakOfStructureChangeOfCharacter | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| bullish_percent_index | BullishPercentIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| butterfly_pattern | ButterflyPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| center_of_gravity | CenterOfGravity | Wickra | MATCH | pass (err 2.7e-15, nan 0) | yes | yes | pass (err 2.7e-15, nan 0) |
-| chaikin_money_flow | ChaikinMoneyFlow | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| chaikin_volatility | ChaikinVolatility | Wickra | MATCH | pass (err 1.1e-13, nan 0) | yes | yes | pass (err 1.1e-13, nan 0) |
-| close_to_close_sigma | CloseToCloseSigma | NumPy | MATCH | pass (err 1.2e-13, nan 0) | yes | yes | pass (err 1.2e-13, nan 0) |
-| crab_pattern | CrabPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cross | Cross | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| crossover | Crossover | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| crossunder | Crossunder | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cumulative_count | CumulativeCount | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cumulative_maximum | CumulativeMaximum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cumulative_minimum | CumulativeMinimum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cumulative_product | CumulativeProduct | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cumulative_sum | CumulativeSum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cumulative_sum_control_chart | CumulativeSumControlChart | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cumulative_volume_index | CumulativeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cup_and_handle | CupAndHandle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| cypher_pattern | CypherPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| day_of_week_return_profile | DayOfWeekReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| decay_linear | DecayLinear | NumPy | MATCH | pass (err 3.8e-12, nan 0) | yes | yes | pass (err 3.8e-12, nan 0) |
-| decycler | Decycler | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| decycler_oscillator | DecyclerOscillator | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| demand_index | DemandIndex | Wickra | MATCH | pass (err 4.5e-12, nan 0) | yes | yes | pass (err 4.5e-12, nan 0) |
-| detrended_price_oscillator | DetrendedPriceOscillator | pandas-ta-classic | MATCH | pass (err 3.7e-13, nan 0) | yes | yes | pass (err 3.7e-13, nan 0) |
-| donchian | Donchian | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| double_bollinger_bands | DoubleBollingerBands | Wickra | MATCH | pass (err 3.3e-11, nan 0) | yes | yes | pass (err 3.3e-11, nan 0) |
-| drawdown | Drawdown | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ease_of_movement | EaseOfMovement | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ehlers_stochastic | EhlersStochastic | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| empirical_mode_decomposition | EmpiricalModeDecomposition | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| entry_exit | EntryExit | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| equal_highs_lows | EqualHighsLows | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| even_better_sinewave | EvenBetterSinewave | pandas-ta-classic | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ewm_corr | ExponentiallyWeightedCorrelation | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ewm_cov | ExponentiallyWeightedCovariance | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ewm_std | ExponentiallyWeightedStandardDeviation | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ewm_var | ExponentiallyWeightedVariance | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| exponentially_weighted_sum | ExponentiallyWeightedSum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fair_value_gap | FairValueGap | SMC | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| falling | Falling | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fib_retracement | FibonacciRetracement | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fibonacci_arcs | FibonacciArcs | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fibonacci_channel | FibonacciChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fibonacci_confluence | FibonacciConfluence | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fibonacci_extension | FibonacciExtension | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fibonacci_fan | FibonacciFan | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fibonacci_projection | FibonacciProjection | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fibonacci_time_zones | FibonacciTimeZones | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fisher_transform | FisherTransform | pandas-ta-classic | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| flag_pennant | FlagPennant | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| force_index | ForceIndex | Wickra | MATCH | pass (err 7.6e-10, nan 0) | yes | yes | pass (err 7.6e-10, nan 0) |
-| four_point_harmonic_pattern | FourPointHarmonicPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| frac_diff | FracDiff | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| fractal_dimension | FractalDimension | NumPy | MATCH | pass (err 8.6e-14, nan 0) | yes | yes | pass (err 8.6e-14, nan 0) |
-| gap_down | GapDown | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| gap_up | GapUp | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| garman_klass | GarmanKlass | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| garman_klass_yang_zhang | GarmanKlassYangZhang | NumPy | MATCH | pass (err 1.2e-13, nan 0) | yes | yes | pass (err 1.2e-13, nan 0) |
-| gartley_pattern | GartleyPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| golden_pocket | GoldenPocket | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| head_and_shoulders | HeadAndShoulders | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| hedge_ratio | HedgeRatio | NumPy | MATCH | pass (err 7.1e-15, nan 0) | yes | yes | pass (err 7.1e-15, nan 0) |
-| heikin_ashi | HeikinAshi | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| high_low_index | HighLowIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| higher_high | HigherHigh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| highest_since | HighestSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| hilbert_dominant_cycle | HilbertDominantCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| hull_moving_average | HullMovingAverage | Wickra | MATCH | pass (err 4.8e-10, nan 0) | yes | yes | pass (err 4.8e-10, nan 0) |
-| hurst | Hurst | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| hurst_channel | HurstChannel | Wickra | MATCH | pass (err 5.7e-13, nan 0) | yes | yes | pass (err 5.7e-13, nan 0) |
-| ichimoku | Ichimoku | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| inside_bar | InsideBar | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| instantaneous_trendline | InstantaneousTrendline | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| intraday_intensity | IntradayIntensity | Wickra | MATCH | pass (err 2.3e-10, nan 0) | yes | yes | pass (err 2.3e-10, nan 0) |
-| intraday_volatility_profile | IntradayVolatilityProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| inverse_fisher_transform | InverseFisherTransform | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| jma | JurikMovingAverage | pandas-ta-classic | MATCH | pass (err 8.5e-14, nan 0) | yes | yes | pass (err 8.5e-14, nan 0) |
-| kalman_hedge_ratio | KalmanHedgeRatio | Wickra | MATCH | pass (err 1.8e-15, nan 0) | yes | yes | pass (err 1.8e-15, nan 0) |
-| keltner_channels | KeltnerChannels | Wickra | MATCH | pass (err 1.1e-13, nan 0) | yes | yes | pass (err 1.1e-13, nan 0) |
-| know_sure_thing | KnowSureThing | Wickra | MATCH | pass (err 8.7e-13, nan 0) | yes | yes | pass (err 8.7e-13, nan 0) |
-| kvo | KlingerVolumeOscillator | Wickra | MATCH | pass (err 6.0e-08, nan 0) | yes | yes | pass (err 6.0e-08, nan 0) |
-| lag | Lag | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| laguerre_rsi | LaguerreRelativeStrengthIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| linear_regression_channel | LinearRegressionChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| liquidity | Liquidity | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| log_return | LogReturn | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| lower_low | LowerLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| lowest_since | LowestSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| market_facilitation_index | MarketFacilitationIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| mass_index | MassIndex | Wickra | MATCH | pass (err 4.6e-14, nan 0) | yes | yes | pass (err 4.6e-14, nan 0) |
-| math_abs | MathAbs | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| math_acosh | MathAcosh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| math_asinh | MathAsinh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| math_atanh | MathAtanh | NumPy | MATCH | pass (err 8.9e-16, nan 0) | yes | yes | pass (err 8.9e-16, nan 0) |
-| math_cbrt | MathCbrt | NumPy | MATCH | pass (err 6.7e-16, nan 0) | yes | yes | pass (err 6.7e-16, nan 0) |
-| math_cot | MathCot | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| math_degrees | MathDegrees | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| math_log1p | MathLog1p | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| math_radians | MathRadians | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| mc_clellan_oscillator | McClellanOscillator | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| mc_clellan_summation_index | McClellanSummationIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| mcginley | McGinleyDynamic | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| median_channel | MedianChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| moving_average_envelope | MovingAverageEnvelope | Wickra | MATCH | pass (err 2.8e-13, nan 0) | yes | yes | pass (err 2.8e-13, nan 0) |
-| negative_volume_index | NegativeVolumeIndex | Wickra | MATCH | pass (err 4.8e-12, nan 0) | yes | yes | pass (err 4.8e-12, nan 0) |
-| new_highs_new_lows | NewHighsNewLows | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| opening_range | OpeningRange | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| order_block | OrderBlock | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ornstein_uhlenbeck_half_life | OrnsteinUhlenbeckHalfLife | NumPy | MATCH | pass (err 1.2e-10, nan 0) | yes | yes | pass (err 1.2e-10, nan 0) |
-| outside_bar | OutsideBar | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| overnight_gap | OvernightGap | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| overnight_intraday_return | OvernightIntradayReturn | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| parkinson | Parkinson | Wickra | MATCH | pass (err 6.1e-14, nan 0) | yes | yes | pass (err 6.1e-14, nan 0) |
-| percent_above_moving_average | PercentAboveMovingAverage | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| pivot_points | PivotPoints | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| pmax | ParabolicMovingAverageStop | pandas-ta-classic | MATCH | pass (err 1.7e-13, nan 0) | yes | yes | pass (err 1.7e-13, nan 0) |
-| position_hold | PositionHold | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| positive_volume_index | PositiveVolumeIndex | Wickra | MATCH | pass (err 1.2e-11, nan 0) | yes | yes | pass (err 1.2e-11, nan 0) |
-| premium_discount | PremiumDiscount | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| previous_high_low | PreviousHighLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| projection_bands | ProjectionBands | NumPy | MATCH | pass (err 8.5e-14, nan 0) | yes | yes | pass (err 8.5e-14, nan 0) |
-| quartile_bands | QuartileBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rectangle_range | RectangleRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| retracements | Retracements | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rising | Rising | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rmi | RelativeMomentumIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| rogers_satchell | RogersSatchell | Wickra | MATCH | pass (err 1.8e-14, nan 0) | yes | yes | pass (err 1.8e-14, nan 0) |
-| roll_spread | RollSpread | NumPy | MATCH | pass (err 9.6e-15, nan 0) | yes | yes | pass (err 9.6e-15, nan 0) |
-| rolling_alpha | RollingAlpha | Wickra | MATCH | pass (err 1.9e-08, nan 0) | yes | yes | pass (err 1.9e-08, nan 0) |
-| rolling_autocorr | RollingAutocorr | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_average_drawdown | RollingAverageDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_beta_neutral_spread | RollingBetaNeutralSpread | Wickra | MATCH | pass (err 3.5e-10, nan 0) | yes | yes | pass (err 3.5e-10, nan 0) |
-| rolling_calmar | RollingCalmar | NumPy | MATCH | pass (err 1.5e-11, nan 0) | yes | yes | pass (err 1.5e-11, nan 0) |
-| rolling_coefficient_of_determination | RollingCoefficientOfDetermination | NumPy | MATCH | pass (err 1.1e-15, nan 0) | yes | yes | pass (err 1.1e-15, nan 0) |
-| rolling_cointegration | RollingCointegration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_conditional_value_at_risk | RollingConditionalValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_covariance | RollingCovariance | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_drawdown_duration | RollingDrawdownDuration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_entropy | RollingEntropy | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_gain_loss_ratio | RollingGainLossRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_granger_causality | RollingGrangerCausality | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_information_ratio | RollingInformationRatio | Wickra | MATCH | pass (err 3.3e-10, nan 0) | yes | yes | pass (err 3.3e-10, nan 0) |
-| rolling_interquartile_range | RollingInterquartileRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_kelly_criterion | RollingKellyCriterion | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_kendall_rank_correlation | RollingKendallRankCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_kurtosis | RollingKurtosis | Wickra | MATCH | pass (err 2.0e-04, nan 0) | yes | yes | pass (err 2.0e-04, nan 0) |
-| rolling_lead_lag_cross_correlation | RollingLeadLagCrossCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_maximum_drawdown | RollingMaximumDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_median | RollingMedian | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_median_absolute_deviation | RollingMedianAbsoluteDeviation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_mode | RollingMode | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_omega_ratio | RollingOmegaRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_pain_index | RollingPainIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_pairwise_beta | RollingPairwiseBeta | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_percentile | RollingPercentile | NumPy | MATCH | pass (err 1.1e-16, nan 0) | yes | yes | pass (err 1.1e-16, nan 0) |
-| rolling_profit_factor | RollingProfitFactor | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_quantile | RollingQuantile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_rank | RollingRank | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_recovery_factor | RollingRecoveryFactor | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_sharpe | RollingSharpe | Wickra | MATCH | pass (err 2.3e-08, nan 0) | yes | yes | pass (err 2.3e-08, nan 0) |
-| rolling_skew | RollingSkew | Wickra | MATCH | pass (err 4.9e-07, nan 0) | yes | yes | pass (err 4.9e-07, nan 0) |
-| rolling_sortino | RollingSortino | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_spearman_correlation | RollingSpearmanCorrelation | Wickra | MATCH | pass (err 4.4e-16, nan 0) | yes | yes | pass (err 4.4e-16, nan 0) |
-| rolling_standard_error | RollingStandardError | Wickra | MATCH | pass (err 4.2e-15, nan 0) | yes | yes | pass (err 4.2e-15, nan 0) |
-| rolling_treynor_ratio | RollingTreynorRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_value_at_risk | RollingValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_variance_ratio | RollingVarianceRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| rolling_vwap | RollingVolumeWeightedAveragePrice | Wickra | MATCH | pass (err 1.5e-12, nan 0) | yes | yes | pass (err 1.5e-12, nan 0) |
-| rolling_winsorize | RollingWinsorize | NumPy | MATCH | pass (err 1.8e-15, nan 0) | yes | yes | pass (err 1.8e-15, nan 0) |
-| rolling_zscore | RollingZScore | Wickra | MATCH | pass (err 3.2e-10, nan 0) | yes | yes | pass (err 3.2e-10, nan 0) |
-| roofing_filter | RoofingFilter | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| schaff_trend_cycle | SchaffTrendCycle | pandas-ta-classic | MATCH | pass (err 1.4e-06, nan 0) | yes | yes | pass (err 1.4e-06, nan 0) |
-| session_extrema | SessionExtrema | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| session_range | SessionRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| session_volume_levels | SessionVolumeLevels | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| session_volume_weighted_average_price | SessionVolumeWeightedAveragePrice | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| sessions | Sessions | SMC | MATCH | pass (err 1.5e-05, nan 0) | yes | yes | pass (err 1.5e-05, nan 0) |
-| shark_pattern | SharkPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| signal_delay | SignalDelay | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| signed_power | SignedPower | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| spread_zscore | SpreadZScore | NumPy | MATCH | pass (err 5.5e-14, nan 0) | yes | yes | pass (err 5.5e-14, nan 0) |
-| squeeze | Squeeze | pandas-ta-classic | MATCH | pass (err 7.1e-15, nan 0) | yes | yes | pass (err 7.1e-15, nan 0) |
-| squeeze_pro | SqueezePro | pandas-ta-classic | MATCH | pass (err 7.1e-15, nan 0) | yes | yes | pass (err 7.1e-15, nan 0) |
-| ssl_channel | SmoothedTrendChannel | NumPy | MATCH | pass (err 5.1e-13, nan 0) | yes | yes | pass (err 5.1e-13, nan 0) |
-| standard_error_bands | StandardErrorBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| super_smoother | SuperSmoother | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| supertrend | Supertrend | pandas-ta-classic | MATCH | pass (err 5.7e-14, nan 0) | yes | yes | pass (err 5.7e-14, nan 0) |
-| swing_high_low | SwingHighLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| td_sequential | TomDeMarkSequential | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| three_drives | ThreeDrives | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| time_of_day_return_profile | TimeOfDayReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| time_segmented_volume | TimeSegmentedVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| time_series_rank | TimeSeriesRank | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| trade_volume_index | TradeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| triangle_pattern | TrianglePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| triple_top_bottom | TripleTopBottom | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| true_strength_index | TrueStrengthIndex | Wickra | MATCH | pass (err 7.1e-14, nan 0) | yes | yes | pass (err 7.1e-14, nan 0) |
-| twiggs_money_flow | TwiggsMoneyFlow | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| ulcer_index | UlcerIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| up_down_volume_ratio | UpDownVolumeRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| value_when | ValueWhen | NumPy | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| vidya | VariableIndexDynamicAverage | Wickra | MATCH | pass (err 8.5e-14, nan 0) | yes | yes | pass (err 8.5e-14, nan 0) |
-| volume_by_time_profile | VolumeByTimeProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| volume_oscillator | VolumeOscillator | Wickra | MATCH | pass (err 1.8e-12, nan 0) | yes | yes | pass (err 1.8e-12, nan 0) |
-| volume_price_trend | VolumePriceTrend | Wickra | MATCH | pass (err 5.8e-10, nan 0) | yes | yes | pass (err 5.8e-10, nan 0) |
-| volume_relative_strength_index | VolumeRelativeStrengthIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| volume_weighted_moving_average | VolumeWeightedMovingAverage | Wickra | MATCH | pass (err 1.7e-12, nan 0) | yes | yes | pass (err 1.7e-12, nan 0) |
-| volume_weighted_moving_average_convergence_divergence | VolumeWeightedMovingAverageConvergenceDivergence | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| volume_zone_oscillator | VolumeZoneOscillator | Wickra | MATCH | pass (err 4.3e-14, nan 0) | yes | yes | pass (err 4.3e-14, nan 0) |
-| vortex | Vortex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| wedge_pattern | WedgePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| williams_accumulation_distribution | WilliamsAccumulationDistribution | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
-| yang_zhang | YangZhang | Wickra | MATCH | pass (err 1.4e-14, nan 0) | yes | yes | pass (err 1.4e-14, nan 0) |
-| zero_lag_exponential_moving_average | ZeroLagExponentialMovingAverage | Wickra | MATCH | pass (err 1.7e-13, nan 0) | yes | yes | pass (err 1.7e-13, nan 0) |
-| zig_zag | ZigZag | Wickra | MATCH | pass (err 0.0e+00, nan 0) | yes | yes | pass (err 0.0e+00, nan 0) |
+| **Class** | **Target** | **Verdict** | **Batch vs oracle** | **Continue vs oracle** |
+|---|---|---|---|---|
+| AccelerationBands | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathAcos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| AccumulationDistribution | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathAdd | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| AccumulationDistributionOscillator | TA-Lib | MATCH | pass (err 1.5e-08, nan 0) | pass (err 1.5e-08, nan 0) |
+| AverageDirectionalIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | pass (err 2.8e-14, nan 0) |
+| AverageDirectionalIndexRating | TA-Lib | MATCH | pass (err 2.1e-14, nan 0) | pass (err 2.1e-14, nan 0) |
+| AbsolutePriceOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Aroon | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| AroonOscillator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| MathAsin | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathAtan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| AverageTrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingAverageDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| AveragePrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | pass (err 5.7e-14, nan 0) |
+| BollingerBands | TA-Lib | MATCH | pass (err 7.9e-10, nan 0) | pass (err 7.9e-10, nan 0) |
+| RollingBeta | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| BalanceOfPower | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CommodityChannelIndex | TA-Lib | MATCH | pass (err 1.4e-11, nan 0) | pass (err 1.4e-11, nan 0) |
+| CandleTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleThreeBlackCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleThreeInside | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleThreeLineStrike | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleThreeOutside | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleThreeStarsInSouth | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleThreeWhiteSoldiers | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleAbandonedBaby | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleAdvanceBlock | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleBeltHold | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleBreakaway | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleClosingMarubozu | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleConcealBabySwall | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleCounterAttack | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleDarkCloudCover | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleDojiStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleDragonflyDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleEngulfing | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleEveningDojiStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleEveningStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleGapSideSideWhite | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleGravestoneDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHammer | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHangingMan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHarami | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHaramiCross | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHighWave | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHikkake | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHikkakeModified | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleHomingPigeon | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleIdenticalThreeCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleInNeck | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleInvertedHammer | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleKicking | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleKickingByLength | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleLadderBottom | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleLongLeggedDoji | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleLongLine | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleMarubozu | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleMatchingLow | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleMatHold | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleMorningDojiStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleMorningStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleOnNeck | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandlePiercing | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleRickshawman | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleRiseFallThreeMethods | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleSeparatingLines | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleShootingStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleShortLine | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleSpinningTop | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleStalledPattern | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleStickSandwich | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleTakuri | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleTasukiGap | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleThrusting | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleTriStar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleUniqueThreeRiver | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleUpsideGapTwoCrows | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CandleUpDownSideGapThreeMethods | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathCeil | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ChandeMomentumOscillator | TA-Lib | MATCH | pass (err 6.8e-14, nan 0) | pass (err 6.8e-14, nan 0) |
+| RollingCorrelation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathCos | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathCosh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| DoubleExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathDivide | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| DirectionalMovementIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | pass (err 2.8e-14, nan 0) |
+| ExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathExp | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathFloor | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HilbertTransformDominantCyclePeriod | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HilbertTransformDominantCyclePhase | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HilbertTransformPhasor | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HilbertTransformSineWave | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HilbertTransformTrendline | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HilbertTransformTrendMode | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| IntradayMomentumIndex | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| KaufmanAdaptiveMovingAverage | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | pass (err 2.8e-14, nan 0) |
+| RollingLinearRegression | TA-Lib | MATCH | pass (err 6.0e-13, nan 0) | pass (err 6.0e-13, nan 0) |
+| RollingLinearRegressionAngle | TA-Lib | MATCH | pass (err 4.9e-12, nan 0) | pass (err 4.9e-12, nan 0) |
+| RollingLinearRegressionIntercept | TA-Lib | MATCH | pass (err 6.0e-13, nan 0) | pass (err 6.0e-13, nan 0) |
+| RollingLinearRegressionSlope | TA-Lib | MATCH | pass (err 9.1e-14, nan 0) | pass (err 9.1e-14, nan 0) |
+| MathLn | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathLog10 | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MovingAverageConvergenceDivergence | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| MovingAverageConvergenceDivergenceExtended | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MovingAverageConvergenceDivergenceFixed | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | pass (err 5.7e-14, nan 0) |
+| MesaAdaptiveMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| VariablePeriodMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMaximum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMaximumIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MedianPrice | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MoneyFlowIndex | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | pass (err 2.8e-14, nan 0) |
+| RollingMidpoint | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMidprice | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMinimum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMinimumIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMinMax | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMinMaxIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MinusDirectionalIndicator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| MinusDirectionalMovement | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Momentum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathMultiply | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| NormalizedAverageTrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| OnBalanceVolume | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| PlusDirectionalIndicator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| PlusDirectionalMovement | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| PercentagePriceOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RateOfChange | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| RateOfChangePercent | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RateOfChangeRatio | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RateOfChangeRatioPercent | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RelativeStrengthIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ParabolicSar | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ParabolicSarExtended | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathSin | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathSinh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SimpleMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathSqrt | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingStandardDeviation | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| StochasticOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FastStochasticOscillator | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| StochasticRelativeStrengthIndex | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathSubtract | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingSum | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TripleExponentialAverage | TA-Lib | MATCH | pass (err 5.7e-13, nan 0) | pass (err 5.7e-13, nan 0) |
+| MathTan | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathTanh | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TripleExponentialMovingAverage | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TrueRange | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TriangularMovingAverage | TA-Lib | MATCH | pass (err 6.8e-13, nan 0) | pass (err 6.8e-13, nan 0) |
+| TripleExponentialRateOfChange | TA-Lib | MATCH | pass (err 1.1e-14, nan 0) | pass (err 1.1e-14, nan 0) |
+| RollingTimeSeriesForecast | TA-Lib | MATCH | pass (err 6.8e-13, nan 0) | pass (err 6.8e-13, nan 0) |
+| TypicalPrice | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | pass (err 5.7e-14, nan 0) |
+| UltimateOscillator | TA-Lib | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| RollingVariance | TA-Lib | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| WeightedClose | TA-Lib | MATCH | pass (err 5.7e-14, nan 0) | pass (err 5.7e-14, nan 0) |
+| WilliamsPercentR | TA-Lib | MATCH | pass (err 2.8e-14, nan 0) | pass (err 2.8e-14, nan 0) |
+| WeightedMovingAverage | TA-Lib | MATCH | pass (err 1.9e-10, nan 0) | pass (err 1.9e-10, nan 0) |
+| AbsoluteBreadthIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| AdaptiveCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Amihud | Wickra | MATCH | pass (err 2.6e-11, nan 0) | pass (err 2.6e-11, nan 0) |
+| AnchoredVolumeWeightedAveragePrice | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ArmsIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ArnaudLegouxMovingAverage | Wickra | MATCH | pass (err 5.7e-14, nan 0) | pass (err 5.7e-14, nan 0) |
+| AutomaticFibonacci | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| AverageDailyDollarValue | NumPy | MATCH | pass (err 3.9e-07, nan 0) | pass (err 3.9e-07, nan 0) |
+| AverageDailyRange | Wickra | MATCH | pass (err 2.8e-14, nan 0) | pass (err 2.8e-14, nan 0) |
+| AverageTrueRangeBands | Wickra | MATCH | pass (err 5.7e-14, nan 0) | pass (err 5.7e-14, nan 0) |
+| AwesomeOscillator | Wickra | MATCH | pass (err 3.1e-13, nan 0) | pass (err 3.1e-13, nan 0) |
+| BarsSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| BatPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| BetterVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| BreadthThrust | Wickra | MATCH | pass (err 1.1e-16, nan 0) | pass (err 1.1e-16, nan 0) |
+| BreakOfStructureChangeOfCharacter | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| BullishPercentIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ButterflyPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CenterOfGravity | Wickra | MATCH | pass (err 2.7e-15, nan 0) | pass (err 2.7e-15, nan 0) |
+| ChaikinMoneyFlow | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ChaikinVolatility | Wickra | MATCH | pass (err 1.1e-13, nan 0) | pass (err 1.1e-13, nan 0) |
+| CloseToCloseSigma | NumPy | MATCH | pass (err 1.2e-13, nan 0) | pass (err 1.2e-13, nan 0) |
+| CrabPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Cross | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Crossover | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Crossunder | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CumulativeCount | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CumulativeMaximum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CumulativeMinimum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CumulativeProduct | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CumulativeSum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CumulativeSumControlChart | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CumulativeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CupAndHandle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| CypherPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| DayOfWeekReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| DecayLinear | NumPy | MATCH | pass (err 3.8e-12, nan 0) | pass (err 3.8e-12, nan 0) |
+| Decycler | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| DecyclerOscillator | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| DemandIndex | Wickra | MATCH | pass (err 4.5e-12, nan 0) | pass (err 4.5e-12, nan 0) |
+| DetrendedPriceOscillator | pandas-ta-classic | MATCH | pass (err 3.7e-13, nan 0) | pass (err 3.7e-13, nan 0) |
+| Donchian | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| DoubleBollingerBands | Wickra | MATCH | pass (err 3.3e-11, nan 0) | pass (err 3.3e-11, nan 0) |
+| Drawdown | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| EaseOfMovement | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| EhlersStochastic | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| EmpiricalModeDecomposition | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| EntryExit | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| EqualHighsLows | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| EvenBetterSinewave | pandas-ta-classic | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ExponentiallyWeightedCorrelation | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ExponentiallyWeightedCovariance | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ExponentiallyWeightedStandardDeviation | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ExponentiallyWeightedVariance | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ExponentiallyWeightedSum | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FairValueGap | SMC | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Falling | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciRetracement | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciArcs | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciConfluence | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciExtension | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciFan | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciProjection | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FibonacciTimeZones | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FisherTransform | pandas-ta-classic | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FlagPennant | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ForceIndex | Wickra | MATCH | pass (err 7.6e-10, nan 0) | pass (err 7.6e-10, nan 0) |
+| FourPointHarmonicPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FracDiff | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| FractalDimension | NumPy | MATCH | pass (err 8.6e-14, nan 0) | pass (err 8.6e-14, nan 0) |
+| GapDown | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| GapUp | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| GarmanKlass | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| GarmanKlassYangZhang | NumPy | MATCH | pass (err 1.2e-13, nan 0) | pass (err 1.2e-13, nan 0) |
+| GartleyPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| GoldenPocket | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HeadAndShoulders | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HedgeRatio | NumPy | MATCH | pass (err 7.1e-15, nan 0) | pass (err 7.1e-15, nan 0) |
+| HeikinAshi | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HighLowIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HigherHigh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HighestSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HilbertDominantCycle | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HullMovingAverage | Wickra | MATCH | pass (err 4.8e-10, nan 0) | pass (err 4.8e-10, nan 0) |
+| Hurst | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| HurstChannel | Wickra | MATCH | pass (err 5.7e-13, nan 0) | pass (err 5.7e-13, nan 0) |
+| Ichimoku | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| InsideBar | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| InstantaneousTrendline | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| IntradayIntensity | Wickra | MATCH | pass (err 2.3e-10, nan 0) | pass (err 2.3e-10, nan 0) |
+| IntradayVolatilityProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| InverseFisherTransform | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| JurikMovingAverage | pandas-ta-classic | MATCH | pass (err 8.5e-14, nan 0) | pass (err 8.5e-14, nan 0) |
+| KalmanHedgeRatio | Wickra | MATCH | pass (err 1.8e-15, nan 0) | pass (err 1.8e-15, nan 0) |
+| KeltnerChannels | Wickra | MATCH | pass (err 1.1e-13, nan 0) | pass (err 1.1e-13, nan 0) |
+| KnowSureThing | Wickra | MATCH | pass (err 8.7e-13, nan 0) | pass (err 8.7e-13, nan 0) |
+| KlingerVolumeOscillator | Wickra | MATCH | pass (err 6.0e-08, nan 0) | pass (err 6.0e-08, nan 0) |
+| Lag | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| LaguerreRelativeStrengthIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| LinearRegressionChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Liquidity | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| LogReturn | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| LowerLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| LowestSince | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MarketFacilitationIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MassIndex | Wickra | MATCH | pass (err 4.6e-14, nan 0) | pass (err 4.6e-14, nan 0) |
+| MathAbs | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathAcosh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathAsinh | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathAtanh | NumPy | MATCH | pass (err 8.9e-16, nan 0) | pass (err 8.9e-16, nan 0) |
+| MathCbrt | NumPy | MATCH | pass (err 6.7e-16, nan 0) | pass (err 6.7e-16, nan 0) |
+| MathCot | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathDegrees | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathLog1p | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MathRadians | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| McClellanOscillator | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| McClellanSummationIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| McGinleyDynamic | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MedianChannel | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| MovingAverageEnvelope | Wickra | MATCH | pass (err 2.8e-13, nan 0) | pass (err 2.8e-13, nan 0) |
+| NegativeVolumeIndex | Wickra | MATCH | pass (err 4.8e-12, nan 0) | pass (err 4.8e-12, nan 0) |
+| NewHighsNewLows | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| OpeningRange | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| OrderBlock | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| OrnsteinUhlenbeckHalfLife | NumPy | MATCH | pass (err 1.2e-10, nan 0) | pass (err 1.2e-10, nan 0) |
+| OutsideBar | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| OvernightGap | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| OvernightIntradayReturn | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Parkinson | Wickra | MATCH | pass (err 6.1e-14, nan 0) | pass (err 6.1e-14, nan 0) |
+| PercentAboveMovingAverage | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| PivotPoints | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ParabolicMovingAverageStop | pandas-ta-classic | MATCH | pass (err 1.7e-13, nan 0) | pass (err 1.7e-13, nan 0) |
+| PositionHold | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| PositiveVolumeIndex | Wickra | MATCH | pass (err 1.2e-11, nan 0) | pass (err 1.2e-11, nan 0) |
+| PremiumDiscount | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| PreviousHighLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ProjectionBands | NumPy | MATCH | pass (err 8.5e-14, nan 0) | pass (err 8.5e-14, nan 0) |
+| QuartileBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RectangleRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Retracements | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Rising | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RelativeMomentumIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| RogersSatchell | Wickra | MATCH | pass (err 1.8e-14, nan 0) | pass (err 1.8e-14, nan 0) |
+| RollSpread | NumPy | MATCH | pass (err 9.6e-15, nan 0) | pass (err 9.6e-15, nan 0) |
+| RollingAlpha | Wickra | MATCH | pass (err 1.9e-08, nan 0) | pass (err 1.9e-08, nan 0) |
+| RollingAutocorr | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingAverageDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingBetaNeutralSpread | Wickra | MATCH | pass (err 3.5e-10, nan 0) | pass (err 3.5e-10, nan 0) |
+| RollingCalmar | NumPy | MATCH | pass (err 1.5e-11, nan 0) | pass (err 1.5e-11, nan 0) |
+| RollingCoefficientOfDetermination | NumPy | MATCH | pass (err 1.1e-15, nan 0) | pass (err 1.1e-15, nan 0) |
+| RollingCointegration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingConditionalValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingCovariance | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingDrawdownDuration | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingEntropy | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingGainLossRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingGrangerCausality | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingInformationRatio | Wickra | MATCH | pass (err 3.3e-10, nan 0) | pass (err 3.3e-10, nan 0) |
+| RollingInterquartileRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingKellyCriterion | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingKendallRankCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingKurtosis | Wickra | MATCH | pass (err 2.0e-04, nan 0) | pass (err 2.0e-04, nan 0) |
+| RollingLeadLagCrossCorrelation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMaximumDrawdown | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMedian | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMedianAbsoluteDeviation | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingMode | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingOmegaRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingPainIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingPairwiseBeta | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingPercentile | NumPy | MATCH | pass (err 1.1e-16, nan 0) | pass (err 1.1e-16, nan 0) |
+| RollingProfitFactor | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingQuantile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingRank | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingRecoveryFactor | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingSharpe | Wickra | MATCH | pass (err 2.3e-08, nan 0) | pass (err 2.3e-08, nan 0) |
+| RollingSkew | Wickra | MATCH | pass (err 4.9e-07, nan 0) | pass (err 4.9e-07, nan 0) |
+| RollingSortino | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingSpearmanCorrelation | Wickra | MATCH | pass (err 4.4e-16, nan 0) | pass (err 4.4e-16, nan 0) |
+| RollingStandardError | Wickra | MATCH | pass (err 4.2e-15, nan 0) | pass (err 4.2e-15, nan 0) |
+| RollingTreynorRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingValueAtRisk | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingVarianceRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| RollingVolumeWeightedAveragePrice | Wickra | MATCH | pass (err 1.5e-12, nan 0) | pass (err 1.5e-12, nan 0) |
+| RollingWinsorize | NumPy | MATCH | pass (err 1.8e-15, nan 0) | pass (err 1.8e-15, nan 0) |
+| RollingZScore | Wickra | MATCH | pass (err 3.2e-10, nan 0) | pass (err 3.2e-10, nan 0) |
+| RoofingFilter | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SchaffTrendCycle | pandas-ta-classic | MATCH | pass (err 1.4e-06, nan 0) | pass (err 1.4e-06, nan 0) |
+| SessionExtrema | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SessionRange | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SessionVolumeLevels | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SessionVolumeWeightedAveragePrice | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Sessions | SMC | MATCH | pass (err 1.5e-05, nan 0) | pass (err 1.5e-05, nan 0) |
+| SharkPattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SignalDelay | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SignedPower | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SpreadZScore | NumPy | MATCH | pass (err 5.5e-14, nan 0) | pass (err 5.5e-14, nan 0) |
+| Squeeze | pandas-ta-classic | MATCH | pass (err 7.1e-15, nan 0) | pass (err 7.1e-15, nan 0) |
+| SqueezePro | pandas-ta-classic | MATCH | pass (err 7.1e-15, nan 0) | pass (err 7.1e-15, nan 0) |
+| SmoothedTrendChannel | NumPy | MATCH | pass (err 5.1e-13, nan 0) | pass (err 5.1e-13, nan 0) |
+| StandardErrorBands | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| SuperSmoother | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| Supertrend | pandas-ta-classic | MATCH | pass (err 5.7e-14, nan 0) | pass (err 5.7e-14, nan 0) |
+| SwingHighLow | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TomDeMarkSequential | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ThreeDrives | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TimeOfDayReturnProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TimeSegmentedVolume | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TimeSeriesRank | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TradeVolumeIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TrianglePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TripleTopBottom | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| TrueStrengthIndex | Wickra | MATCH | pass (err 7.1e-14, nan 0) | pass (err 7.1e-14, nan 0) |
+| TwiggsMoneyFlow | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| UlcerIndex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| UpDownVolumeRatio | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| ValueWhen | NumPy | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| VariableIndexDynamicAverage | Wickra | MATCH | pass (err 8.5e-14, nan 0) | pass (err 8.5e-14, nan 0) |
+| VolumeByTimeProfile | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| VolumeOscillator | Wickra | MATCH | pass (err 1.8e-12, nan 0) | pass (err 1.8e-12, nan 0) |
+| VolumePriceTrend | Wickra | MATCH | pass (err 5.8e-10, nan 0) | pass (err 5.8e-10, nan 0) |
+| VolumeRelativeStrengthIndex | Wickra | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| VolumeWeightedMovingAverage | Wickra | MATCH | pass (err 1.7e-12, nan 0) | pass (err 1.7e-12, nan 0) |
+| VolumeWeightedMovingAverageConvergenceDivergence | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| VolumeZoneOscillator | Wickra | MATCH | pass (err 4.3e-14, nan 0) | pass (err 4.3e-14, nan 0) |
+| Vortex | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| WedgePattern | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| WilliamsAccumulationDistribution | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
+| YangZhang | Wickra | MATCH | pass (err 1.4e-14, nan 0) | pass (err 1.4e-14, nan 0) |
+| ZeroLagExponentialMovingAverage | Wickra | MATCH | pass (err 1.7e-13, nan 0) | pass (err 1.7e-13, nan 0) |
+| ZigZag | Wickra | MATCH | pass (err 0.0e+00, nan 0) | pass (err 0.0e+00, nan 0) |
 
 ## Follow-ups
 
