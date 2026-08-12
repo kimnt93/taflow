@@ -4,6 +4,8 @@ Generated: 2026-08-12
 
 Every TAFlow value below came from the public canonical class factory and `compute()`.
 
+`MATCH` means every registered dataset, parameter row, and lifecycle check passed the metric's declared absolute/relative tolerance. The displayed maximum absolute and relative errors may come from different cases.
+
 | Metric | Oracle package | Oracle source function | Result | Maximum absolute error | Maximum relative error |
 |---|---|---|---:|---:|---:|
 | `TotalReturn` | empyrical-reloaded 0.5.12 | [`empyrical.stats.cum_returns_final`](https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/src/empyrical/stats.py) | **MATCH** | 1.776e-15 | 1.026e-14 |

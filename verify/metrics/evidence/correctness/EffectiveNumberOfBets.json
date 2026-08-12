@@ -209,6 +209,51 @@
       "parameter_row": "default",
       "passed": true,
       "relative_error": 9.27228854509628e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 2.0,
+      "dataset": "weights_and_covariance_0",
+      "expected": 2.0,
+      "lifecycle": {
+        "compute_is_stable": true,
+        "reset_clears": true,
+        "reset_is_fluent": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
+    },
+    {
+      "absolute_error": 4.440892098500626e-16,
+      "actual": 1.783962996790891,
+      "dataset": "weights_and_covariance_1",
+      "expected": 1.7839629967908905,
+      "lifecycle": {
+        "compute_is_stable": true,
+        "reset_clears": true,
+        "reset_is_fluent": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 2.489340926066961e-16
+    },
+    {
+      "absolute_error": 0.0,
+      "actual": 1.4925642730216664,
+      "dataset": "weights_and_covariance_2",
+      "expected": 1.4925642730216664,
+      "lifecycle": {
+        "compute_is_stable": true,
+        "reset_clears": true,
+        "reset_is_fluent": true
+      },
+      "oracle_passed": true,
+      "parameter_row": "default",
+      "passed": true,
+      "relative_error": 0.0
     }
   ],
   "class": "EffectiveNumberOfBets",

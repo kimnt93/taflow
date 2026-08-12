@@ -718,6 +718,63 @@ def verify_metric(spec: MetricSpec) -> dict[str, Any]:
                     "passed": passed and lifecycle_passed,
                 }
             )
+    if spec.class_name == "EffectiveNumberOfBets":
+        cls = spec.load_class()
+        matrix_inputs = (
+            (np.array([0.5, 0.5]), np.eye(2)),
+            (
+                np.array([0.6, 0.4]),
+                np.array([[0.04, 0.012], [0.012, 0.09]]),
+            ),
+            (
+                np.array([0.2, 0.3, 0.5]),
+                np.array(
+                    [
+                        [0.04, 0.01, -0.002],
+                        [0.01, 0.06, 0.008],
+                        [-0.002, 0.008, 0.09],
+                    ]
+                ),
+            ),
+        )
+        for index, (weights, covariance) in enumerate(matrix_inputs):
+            eigenvalues, eigenvectors = np.linalg.eigh(covariance)
+            exposures = eigenvectors.T @ weights
+            contributions = np.maximum(eigenvalues, 0.0) * exposures**2
+            probabilities = contributions / np.sum(contributions)
+            positive = probabilities > 0.0
+            expected = float(
+                np.exp(
+                    -np.sum(
+                        probabilities[positive] * np.log(probabilities[positive])
+                    )
+                )
+            )
+            state = cls.from_weights_and_covariance(weights, covariance)
+            actual = state.compute()
+            passed, absolute, relative = close(actual, expected, spec)
+            stable = close(state.compute(), actual, spec)[0]
+            reset_is_fluent = state.reset() is state
+            reset_clears = state.compute() is None and len(state) == 0
+            max_absolute = max(max_absolute, absolute)
+            max_relative = max(max_relative, relative)
+            cases.append(
+                {
+                    "dataset": f"weights_and_covariance_{index}",
+                    "parameter_row": "default",
+                    "actual": actual,
+                    "expected": expected,
+                    "absolute_error": absolute,
+                    "relative_error": relative,
+                    "oracle_passed": passed,
+                    "lifecycle": {
+                        "compute_is_stable": stable,
+                        "reset_is_fluent": reset_is_fluent,
+                        "reset_clears": reset_clears,
+                    },
+                    "passed": passed and stable and reset_is_fluent and reset_clears,
+                }
+            )
     return {
         "class": spec.class_name,
         "verdict": spec.expected,
@@ -763,6 +820,8 @@ def write_results(results: list[dict[str, Any]]) -> None:
         f"Generated: {datetime.now(UTC).date().isoformat()}",
         "",
         "Every TAFlow value below came from the public canonical class factory and `compute()`.",
+        "",
+        "`MATCH` means every registered dataset, parameter row, and lifecycle check passed the metric's declared absolute/relative tolerance. The displayed maximum absolute and relative errors may come from different cases.",
         "",
         "| Metric | Oracle package | Oracle source function | Result | Maximum absolute error | Maximum relative error |",
         "|---|---|---|---:|---:|---:|",
