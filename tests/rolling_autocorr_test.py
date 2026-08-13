@@ -4,7 +4,7 @@ from taflow import RollingAutocorr
 
 
 def test_rolling_autocorr_lifecycle_and_reset():
-    state = RollingAutocorr(np.array([], dtype=float), timeperiod=3)
+    state = RollingAutocorr(timeperiod=3)
     state.extend([1.0, 2.0, 3.0])
     assert np.isfinite(state.compute()[-1])
     assert len(state) == 3

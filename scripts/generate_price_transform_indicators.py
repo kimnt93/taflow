@@ -154,8 +154,8 @@ from ._price_state import {base}
 class {class_name}({base}):
     """Compute ``{formula}`` in persistent Rust state.
 
-    The constructor requires the aligned chronological {", ".join(inputs)}
-    series. Pass empty aligned arrays for a fresh streaming state. Output has no
+    Construct with no arguments, then supply aligned chronological
+    {", ".join(inputs)} series through ``extend`` or ``append``. Output has no
     rolling warm-up and maps to TA-Lib ``{oracle}``.
     """
 

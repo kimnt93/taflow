@@ -14,17 +14,17 @@ class InstantaneousTrendline:
     begins immediately. This maps to Wickra ``InstantaneousTrendline``.
 
     Args:
-        values: Initial chronological price or signal history.
+        values: Chronological price or signal history.
         period: Positive dominant-cycle period, default 10.
 
     Raises:
         ValueError: If ``period`` is zero.
     """
 
-    def __init__(self, values: Any, period: int = 10) -> None:
-        """Initialize native recursion and process the initial history."""
+    def __init__(self, period: int = 10) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "InstantaneousTrendline":
         """Append one signal value and return this adapter."""

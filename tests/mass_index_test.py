@@ -5,7 +5,7 @@ from taflow import MassIndex
 def test_mass_index_lifecycle() -> None:
     high = 100.0 + np.arange(64.0)
     low = high - 2.0
-    state = MassIndex(high, low, ema_period=3, sum_period=5)
+    state = MassIndex(ema_period=3, sum_period=5).extend(high, low)
     first = state.compute()
     state.reset().extend(high, low)
     np.testing.assert_array_equal(state.compute(), first)

@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class SimpleMovingAverage:
     """Compute SMA from required ``values`` using the Rust rolling state."""
 
-    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _NativeSimpleMovingAverage(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "SimpleMovingAverage":
         self._state.append(float(value))

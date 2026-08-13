@@ -11,8 +11,8 @@ from .._series import as_float64_series
 class BalanceOfPower:
     """Compute ``(close - open) / (high - low)`` in persistent Rust state.
 
-    The constructor requires aligned chronological open, high, low, and close
-    series. Pass four empty arrays for a fresh streaming state. Zero or negative
+    ``extend`` accepts aligned chronological open, high, low, and close
+    series. Supply the aligned series through ``extend`` after construction. Zero or negative
     high-low ranges produce ``0.0``, matching TA-Lib ``BOP``. There is no
     warm-up.
 
@@ -28,9 +28,8 @@ class BalanceOfPower:
         Chronological closing-price series.
     """
 
-    def __init__(self, open: Any, high: Any, low: Any, close: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeBalanceOfPower()
-        self.extend(open, high, low, close)
 
     def append(self, open: float, high: float, low: float, close: float) -> "BalanceOfPower":
         """Append one open/high/low/close tuple and return this indicator."""

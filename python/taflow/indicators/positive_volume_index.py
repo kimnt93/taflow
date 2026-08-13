@@ -7,8 +7,9 @@ from .._series import as_float64_series
 
 class PositiveVolumeIndex:
     """Causal index updated when volume increases."""
-    def __init__(self, close: Any, volume: Any) -> None:
-        self._state = _Native(); self.extend(close, volume)
+    def __init__(self) -> None:
+        self._state = _Native()
+
     def append(self, close: float, volume: float) -> "PositiveVolumeIndex":
         self._state.append(float(close), float(volume)); return self
     def extend(self, close: Any, volume: Any) -> "PositiveVolumeIndex":

@@ -15,12 +15,12 @@ def test_math_exp_matches_talib_and_lifecycle() -> None:
     )
     for values in datasets:
         expected = (talib.EXP)(values)
-        actual = MathExp(values)
+        actual = MathExp().extend(values)
         np.testing.assert_allclose(
             actual.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-        state = MathExp([])
+        state = MathExp()
         split = len(values) // 3
         assert state.extend(values[:split]) is state
         assert state.extend(values[split:]) is state
@@ -35,6 +35,6 @@ def test_math_exp_matches_talib_and_lifecycle() -> None:
             state.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-    fresh = MathExp([])
+    fresh = MathExp()
     assert len(fresh) == 0
     assert fresh.value is None

@@ -22,7 +22,6 @@ class KnowSureThing:
 
     def __init__(
         self,
-        close: Any,
         roc1: int = 10,
         roc2: int = 15,
         roc3: int = 20,
@@ -44,7 +43,6 @@ class KnowSureThing:
             int(sma4),
             int(signal),
         )
-        self.extend(close)
 
     def append(self, close: float) -> "KnowSureThing":
         self._state.append(float(close))

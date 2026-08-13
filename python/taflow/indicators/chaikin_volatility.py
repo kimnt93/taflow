@@ -21,13 +21,10 @@ class ChaikinVolatility:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
         timeperiod: int = 10,
         roc_period: int = 10,
     ) -> None:
         self._state = _Native(int(timeperiod), int(roc_period))
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "ChaikinVolatility":
         """Append one high/low bar and return this adapter."""

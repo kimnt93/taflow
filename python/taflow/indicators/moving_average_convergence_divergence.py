@@ -11,8 +11,7 @@ from .._series import as_float64_series
 class MovingAverageConvergenceDivergence:
     """Compute TA-Lib ``MACD`` as aligned MACD, signal, and histogram arrays.
 
-    ``values`` is the chronological close series; pass an empty array for a
-    fresh stream. ``fast_period``, ``slow_period``, and ``signal_period``
+    Supply the chronological ``values`` close series through ``extend``. ``fast_period``, ``slow_period``, and ``signal_period``
     default to 12, 26, and 9 and must be valid positive periods. Scalar
     ``value`` is ``None`` until the signal warm-up completes. ``compute``
     returns a tuple in MACD/signal/histogram order with NaN warm-up entries.
@@ -23,7 +22,6 @@ class MovingAverageConvergenceDivergence:
 
     def __init__(
         self,
-        values: Any,
         fast_period: int = 12,
         slow_period: int = 26,
         signal_period: int = 9,
@@ -31,7 +29,6 @@ class MovingAverageConvergenceDivergence:
         self._state = _NativeMovingAverageConvergenceDivergence(
             fast_period, slow_period, signal_period
         )
-        self.extend(values)
 
     def append(self, value: float) -> "MovingAverageConvergenceDivergence":
         self._state.append(float(value))

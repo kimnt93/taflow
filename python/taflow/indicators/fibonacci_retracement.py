@@ -16,8 +16,7 @@ class FibonacciRetracement:
     Parameters
     ----------
     close : array-like
-        Initial chronological close prices. Pass an empty series for a fresh
-        streaming state.
+        Chronological close prices. Supply the series through ``extend`` after construction.
     window : int, default 120
         Positive trailing window used for the rolling high and low.
 
@@ -32,10 +31,10 @@ class FibonacciRetracement:
     ``append``, ``extend``, and ``reset`` mutate and return this adapter.
     """
 
-    def __init__(self, close: Any, window: int = 120) -> None:
-        """Create validated native state and process the required close series."""
+    def __init__(self, window: int = 120) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _NativeFibonacciRetracement(window)
-        self.extend(close)
 
     def append(self, close: float) -> "FibonacciRetracement":
         """Append one chronological close and return this indicator.

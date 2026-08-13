@@ -17,18 +17,18 @@ class WilliamsAccumulationDistribution:
     ``Wad``.
 
     Args:
-        high: Initial chronological high prices.
-        low: Initial chronological low prices.
-        close: Initial chronological closing prices.
+        high: Chronological high prices.
+        low: Chronological low prices.
+        close: Chronological closing prices.
 
     Raises:
         ValueError: If the three series differ in length.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any) -> None:
-        """Initialize native state and process the aligned history."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "WilliamsAccumulationDistribution":
         """Append one high/low/close bar and return this instance."""

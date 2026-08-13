@@ -11,5 +11,5 @@ def test_matches_talib_mfi() -> None:
     close = high - 0.8
     volume = 1000.0 + index * 3.0
     expected = talib.MFI(high, low, close, volume, 14)
-    actual = MoneyFlowIndex(high, low, close, volume, 14).compute()
+    actual = MoneyFlowIndex(14).extend(high, low, close, volume).compute()
     np.testing.assert_allclose(actual, expected, rtol=0.0, atol=2e-12, equal_nan=True)

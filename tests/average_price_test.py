@@ -12,10 +12,10 @@ def test_average_price_matches_talib_and_lifecycle() -> None:
     low = close - rng.uniform(0.1, 2.0, 128)
     open = low + rng.random(128) * (high - low)
     expected = talib.AVGPRICE(open, high, low, close)
-    actual = AveragePrice(open, high, low, close)
+    actual = AveragePrice().extend(open, high, low, close)
     np.testing.assert_allclose(actual.compute(), expected, rtol=1e-12, atol=1e-12)
 
-    state = AveragePrice([], [], [], [])
+    state = AveragePrice()
     assert state.extend(open[:43], high[:43], low[:43], close[:43]) is state
     assert state.extend(open[43:], high[43:], low[43:], close[43:]) is state
     np.testing.assert_allclose(state.compute(), expected, rtol=1e-12, atol=1e-12)
@@ -24,7 +24,7 @@ def test_average_price_matches_talib_and_lifecycle() -> None:
         assert state.append(float(open[index]), float(high[index]), float(low[index]), float(close[index])) is state
     np.testing.assert_allclose(state.compute(), expected, rtol=1e-12, atol=1e-12)
 
-    fresh = AveragePrice([], [], [], [])
+    fresh = AveragePrice()
     assert len(fresh) == 0
     assert fresh.value is None
     with pytest.raises(ValueError):

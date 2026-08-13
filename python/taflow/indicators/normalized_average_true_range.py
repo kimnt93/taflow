@@ -11,17 +11,15 @@ from .._series import as_float64_series
 class NormalizedAverageTrueRange:
     """Compute ``100 * AverageTrueRange / close`` in persistent Rust state.
 
-    High, low, and close histories are required; pass three empty arrays for a
-    fresh state. ``timeperiod`` defaults to 14 and must be positive. Warm-up is
+    Supply aligned high, low, and close histories through ``extend``. ``timeperiod`` defaults to 14 and must be positive. Warm-up is
     NaN through index ``timeperiod - 1`` and a warmed zero close returns zero.
     TA-Lib's historical period-1 contract returns raw True Range without
     normalization; this adapter preserves that special case. This maps to
     TA-Lib ``NATR``.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeNormalizedAverageTrueRange(timeperiod)
-        self.extend(high, low, close)
 
     def append(
         self, high: float, low: float, close: float

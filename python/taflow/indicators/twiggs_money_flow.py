@@ -17,20 +17,20 @@ class TwiggsMoneyFlow:
     seed both averages. This maps to Wickra ``TwiggsMoneyFlow``.
 
     Args:
-        high: Initial chronological high prices.
-        low: Initial chronological low prices.
-        close: Initial chronological closing prices.
-        volume: Initial chronological volumes.
+        high: Chronological high prices.
+        low: Chronological low prices.
+        close: Chronological closing prices.
+        volume: Chronological volumes.
         period: Wilder smoothing period, default 21.
 
     Raises:
         ValueError: If series lengths differ or ``period`` is zero.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, volume: Any, period: int = 21) -> None:
-        """Initialize native state and process the aligned OHLCV history."""
+    def __init__(self, period: int = 21) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> "TwiggsMoneyFlow":
         """Append one high/low/close/volume bar and return this instance."""

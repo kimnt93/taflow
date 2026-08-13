@@ -13,9 +13,8 @@ class BarRelationAdapter:
 
     _native_cls = None
 
-    def __init__(self, high: Any, low: Any) -> None:
+    def __init__(self) -> None:
         self._state = self._native_cls()
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "BarRelationAdapter":
         self._state.append(float(high), float(low))

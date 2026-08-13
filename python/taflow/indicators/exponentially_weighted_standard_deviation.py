@@ -14,17 +14,14 @@ class ExponentiallyWeightedStandardDeviation:
 
     def __init__(
         self,
-        _input: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
         timeperiod : object
             Trailing window length in bars.
-        _input : object
-            Input series or the current scalar observation.
 
         Returns
         -------
@@ -32,7 +29,6 @@ class ExponentiallyWeightedStandardDeviation:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(_input)
 
     def append(self, _input: float) -> "ExponentiallyWeightedStandardDeviation":
         """Append one observation or aligned bar to the native Rust state.

@@ -21,10 +21,10 @@ class McClellanOscillator:
         ValueError: If the two histories have different lengths.
     """
 
-    def __init__(self, advancers: Any, decliners: Any) -> None:
-        """Initialize native EMA state and process aligned breadth histories."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(advancers, decliners)
 
     def append(self, advancers: float, decliners: float) -> "McClellanOscillator":
         """Append one breadth tick and return this adapter."""

@@ -11,16 +11,15 @@ from .._series import as_float64_series
 class WilliamsPercentR:
     """Locate close within the trailing high-low range on a -100 to 0 scale.
 
-    The constructor requires aligned chronological high, low, and close series.
-    Pass three empty arrays for a fresh streaming state. ``timeperiod`` defaults
+    ``extend`` accepts aligned chronological high, low, and close series.
+    Supply the aligned series through ``extend`` after construction. ``timeperiod`` defaults
     to 14 and must be at least 2. The first ``timeperiod - 1`` aligned outputs
     are NaN; a zero trailing range produces ``0.0``. This maps to TA-Lib
     ``WILLR``.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeWilliamsPercentR(timeperiod)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "WilliamsPercentR":
         """Append one high/low/close tuple and return this indicator."""

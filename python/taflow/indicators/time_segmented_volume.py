@@ -16,18 +16,18 @@ class TimeSegmentedVolume:
     are required. This contract maps to Wickra ``TSV``.
 
     Args:
-        close: Initial chronological closes.
-        volume: Initial chronological volumes.
+        close: Chronological closes.
+        volume: Chronological volumes.
         period: Rolling number of flows, default 18.
 
     Raises:
         ValueError: If inputs are misaligned or ``period`` is zero.
     """
 
-    def __init__(self, close: Any, volume: Any, period: int = 18) -> None:
-        """Initialize the native state and process the supplied history."""
+    def __init__(self, period: int = 18) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "TimeSegmentedVolume":
         """Append one close/volume sample and return this instance."""

@@ -20,11 +20,8 @@ class RollingPercentile:
     return ``self``. The independent oracle is pandas rolling quantile.
     """
 
-    def __init__(
-        self, _input: Any, timeperiod: int = 14, percentile: float = 50.0
-    ) -> None:
+    def __init__(self, timeperiod: int = 14, percentile: float = 50.0) -> None:
         self._state = _Native(int(timeperiod), float(percentile))
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingPercentile":
         """Append one observation and return this adapter."""

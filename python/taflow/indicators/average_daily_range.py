@@ -9,17 +9,10 @@ class AverageDailyRange:
 
     def __init__(
         self,
-        open: Any,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
-        timestamp: Any,
         period: int = 14,
         utc_offset_minutes: int = 0,
     ) -> None:
         self._state = _Native(period, utc_offset_minutes)
-        self.extend(open, high, low, close, volume, timestamp)
 
     def append(
         self,

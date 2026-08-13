@@ -17,7 +17,7 @@ class RollingTreynorRatio:
     zero risk-free rate; TA-Lib has no direct equivalent.
 
     Args:
-        values: Initial chronological asset-return series.
+        values: Chronological asset-return series.
         benchmark: Initial benchmark-return series aligned with ``values``.
         timeperiod: Rolling window length. Defaults to 14.
 
@@ -25,15 +25,10 @@ class RollingTreynorRatio:
         ValueError: If the inputs are misaligned or the period is zero.
     """
 
-    def __init__(
-        self,
-        values: Any,
-        benchmark: Any,
-        timeperiod: int = 14,
-    ) -> None:
-        """Initialize the ratio and process aligned return histories."""
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(int(timeperiod))
-        self.extend(values, benchmark)
 
     def append(
         self,

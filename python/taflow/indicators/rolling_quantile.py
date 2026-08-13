@@ -11,13 +11,8 @@ class RollingQuantile:
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
-    def __init__(
-        self,
-        _input: Any,
-        timeperiod: int = 14,
-        quantile: float = 0.5,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
+    def __init__(self, timeperiod: int = 14, quantile: float = 0.5) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
@@ -25,8 +20,6 @@ class RollingQuantile:
             Trailing window length in bars.
         quantile : object
             Requested trailing quantile.
-        _input : object
-            Input series or the current scalar observation.
 
         Returns
         -------
@@ -34,7 +27,6 @@ class RollingQuantile:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod, quantile)
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingQuantile":
         """Append one observation or aligned bar to the native Rust state.

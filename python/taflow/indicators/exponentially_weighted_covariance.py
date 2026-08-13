@@ -23,20 +23,14 @@ class ExponentiallyWeightedCovariance:
 
     def __init__(
         self,
-        left: Any,
-        right: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
         timeperiod : object
             Trailing window length in bars.
-        left : object
-            Left-hand aligned input series or scalar value.
-        right : object
-            Right-hand aligned input series or scalar value.
 
         Returns
         -------
@@ -44,7 +38,6 @@ class ExponentiallyWeightedCovariance:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(int(timeperiod))
-        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "ExponentiallyWeightedCovariance":
         """Append one observation or aligned bar to the native Rust state.

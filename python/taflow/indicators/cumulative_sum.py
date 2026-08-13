@@ -11,14 +11,12 @@ from .._series import as_float64_series
 class CumulativeSum:
     """Compute the cumulative sum in persistent Rust state.
 
-    ``_input`` is a required chronological numeric series; pass an empty array
-    for a fresh streaming state. There is no warm-up. Correctness maps to the
+    Supply the chronological numeric ``_input`` series through ``extend``. There is no warm-up. Correctness maps to the
     Polars ``Series.cum_sum`` expression.
     """
 
-    def __init__(self, _input: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeCumulativeSum()
-        self.extend(_input)
 
     def append(self, _input: float) -> "CumulativeSum":
         """Append one observation and return this indicator."""

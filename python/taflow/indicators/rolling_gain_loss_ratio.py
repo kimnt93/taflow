@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class RollingGainLossRatio:
     """Rolling sum of positive inputs divided by absolute negative inputs."""
 
-    def __init__(self, values: Any, period: int = 14) -> None:
+    def __init__(self, period: int = 14) -> None:
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingGainLossRatio":
         self._state.append(float(value))

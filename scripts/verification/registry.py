@@ -859,21 +859,7 @@ class Spec:
     # -- state adapters (handle fluent and value-returning APIs) -----------
 
     def new_state(self):
-        boolean_roles = {
-            "condition",
-            "new_session",
-            "anchor",
-            "entry",
-            "_exit",
-            "exit",
-            "on_buy_signal",
-            "above_moving_average",
-        }
-        empty_series = [
-            np.empty(0, dtype=np.bool_ if role in boolean_roles else np.float64)
-            for role in self.input_roles
-        ]
-        return self.cls(*empty_series, **self.ctor_kwargs)
+        return self.cls(**self.ctor_kwargs)
 
     @staticmethod
     def extend(state, arrays) -> tuple[np.ndarray, ...]:

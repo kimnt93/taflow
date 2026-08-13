@@ -10,6 +10,6 @@ def test_matches_talib_stochf() -> None:
     low = high - 2.0
     close = high - 0.8
     expected = talib.STOCHF(high, low, close, 5, 3, 0)
-    actual = FastStochasticOscillator(high, low, close).compute()
+    actual = FastStochasticOscillator().extend(high, low, close).compute()
     for got, want in zip(actual, expected):
         np.testing.assert_allclose(got, want, equal_nan=True)

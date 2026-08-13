@@ -14,8 +14,7 @@ class PremiumDiscount:
     Parameters
     ----------
     close : array-like
-        Required chronological close series; an empty array creates a fresh
-        stream.
+        Chronological close series supplied through ``extend``.
     window : int, default 20
         Positive rolling window used by the native Rust state.
 
@@ -26,9 +25,8 @@ class PremiumDiscount:
     a TAFlow session-zone definition.
     """
 
-    def __init__(self, close: Any, window: int = 20) -> None:
+    def __init__(self, window: int = 20) -> None:
         self._state = _NativePremiumDiscount(int(window))
-        self.extend(close)
 
     def append(self, close: float) -> "PremiumDiscount":
         """Append one chronological close and return this adapter."""

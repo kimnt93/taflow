@@ -7,9 +7,8 @@ from .._series import as_float64_series
 class MarketFacilitationIndex:
     """High-low trading range divided by volume."""
 
-    def __init__(self, high: Any, low: Any, volume: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(high, low, volume)
 
     def append(
         self, high: float, low: float, volume: float

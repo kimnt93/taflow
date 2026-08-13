@@ -10,9 +10,8 @@ from .._series import as_float64_series
 class Vortex:
     """Vortex positive and negative directional ratios over OHLC series."""
 
-    def __init__(self, high: Any, low: Any, close: Any, window: int = 14) -> None:
+    def __init__(self, window: int = 14) -> None:
         self._state = _Native(int(window))
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Vortex":
         self._state.append(float(high), float(low), float(close))

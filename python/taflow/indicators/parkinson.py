@@ -12,20 +12,11 @@ class Parkinson:
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `high`, `low`. Warm-up positions are represented by `NaN` in history."""
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        timeperiod: int = 20,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
+    def __init__(self, timeperiod: int = 20) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
         timeperiod : object
             Trailing window length in bars.
 
@@ -35,7 +26,6 @@ class Parkinson:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Parkinson":
         """Append one observation or aligned bar to the native Rust state.

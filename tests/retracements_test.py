@@ -7,7 +7,7 @@ def test_retracements_lifecycle_and_alignment():
     close = np.linspace(10.0, 20.0, 80)
     high = close + 0.5
     low = close - 0.5
-    indicator = Retracements(high, low, close, swing_length=3)
+    indicator = Retracements(swing_length=3).extend(high, low, close)
     outputs = indicator.compute()
     assert all(array.shape == close.shape for array in outputs)
     assert len(indicator) == len(close)
@@ -17,4 +17,4 @@ def test_retracements_lifecycle_and_alignment():
 
 def test_retracements_rejects_misaligned_inputs():
     with np.testing.assert_raises(ValueError):
-        Retracements([1, 2], [0], [1, 2])
+        Retracements().extend([1, 2], [0], [1, 2])

@@ -28,7 +28,7 @@ def test_fibonacci_retracement_matches_pandas(window: int) -> None:
         repeated,
         random,
     ):
-        actual = FibonacciRetracement(close, window).compute()
+        actual = FibonacciRetracement(window).extend(close).compute()
         expected = pandas_reference(close, window)
         for actual_level, expected_level in zip(actual, expected, strict=True):
             np.testing.assert_array_equal(actual_level, expected_level)
@@ -37,9 +37,9 @@ def test_fibonacci_retracement_matches_pandas(window: int) -> None:
 def test_fibonacci_retracement_lifecycle_is_invariant() -> None:
     rng = np.random.default_rng(8128)
     close = 100.0 + rng.normal(size=301).cumsum()
-    batch = FibonacciRetracement(close, 30)
+    batch = FibonacciRetracement(30).extend(close)
 
-    chunked = FibonacciRetracement([], 30)
+    chunked = FibonacciRetracement(30)
     assert chunked.extend(close[:43]) is chunked
     assert chunked.extend(close[43:211]) is chunked
     assert chunked.extend(close[211:]) is chunked
@@ -62,6 +62,6 @@ def test_fibonacci_retracement_lifecycle_is_invariant() -> None:
 
 def test_fibonacci_retracement_validates_configuration_and_input() -> None:
     with pytest.raises(ValueError):
-        FibonacciRetracement([], 0)
+        FibonacciRetracement(0)
     with pytest.raises(ValueError):
-        FibonacciRetracement(None)
+        FibonacciRetracement().extend(None)

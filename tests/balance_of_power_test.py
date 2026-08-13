@@ -15,11 +15,11 @@ def _prices(close: np.ndarray, seed: int) -> tuple[np.ndarray, np.ndarray, np.nd
 
 def _assert_lifecycle(open: np.ndarray, high: np.ndarray, low: np.ndarray, close: np.ndarray) -> None:
     expected = talib.BOP(open, high, low, close)
-    actual = BalanceOfPower(open, high, low, close)
+    actual = BalanceOfPower().extend(open, high, low, close)
     np.testing.assert_allclose(actual.compute(), expected, rtol=1e-12, atol=1e-12)
     assert actual.value == expected[-1]
 
-    chunked = BalanceOfPower([], [], [], [])
+    chunked = BalanceOfPower()
     split = max(1, len(close) // 3)
     assert chunked.extend(open[:split], high[:split], low[:split], close[:split]) is chunked
     assert chunked.extend(open[split:], high[split:], low[split:], close[split:]) is chunked
@@ -58,7 +58,7 @@ def test_balance_of_power_matches_talib_parameter_matrix_and_lifecycle() -> None
 
 
 def test_balance_of_power_rejects_misaligned_input_before_mutation() -> None:
-    state = BalanceOfPower([], [], [], [])
+    state = BalanceOfPower()
     with pytest.raises(ValueError):
         state.extend([1.0, 2.0], [2.0], [0.0, 0.0], [1.0, 1.0])
     assert len(state) == 0

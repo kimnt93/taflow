@@ -16,11 +16,11 @@ class SessionRange:
     ``SessionRange`` whose timestamps are converted to milliseconds.
 
     Args:
-        open: Initial chronological opening prices.
-        high: Initial chronological high prices.
-        low: Initial chronological low prices.
-        close: Initial chronological closing prices.
-        volume: Initial chronological volumes.
+        open: Chronological opening prices.
+        high: Chronological high prices.
+        low: Chronological low prices.
+        close: Chronological closing prices.
+        volume: Chronological volumes.
         timestamp: Initial Unix-nanosecond timestamps.
         utc_offset_minutes: Signed local offset from UTC, default 0.
 
@@ -28,10 +28,10 @@ class SessionRange:
         ValueError: If the six input histories differ in length.
     """
 
-    def __init__(self, open: Any, high: Any, low: Any, close: Any, volume: Any, timestamp: Any, utc_offset_minutes: int = 0) -> None:
-        """Initialize native calendar state and process aligned histories."""
+    def __init__(self, utc_offset_minutes: int = 0) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(utc_offset_minutes)
-        self.extend(open, high, low, close, volume, timestamp)
 
     def append(self, open: float, high: float, low: float, close: float, volume: float, timestamp: int) -> "SessionRange":
         """Append one timestamped OHLCV bar and return this adapter."""

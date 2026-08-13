@@ -45,7 +45,7 @@ def test_matches_pandas_oracle(timeperiod: int, case: str) -> None:
         "minimum_length": np.linspace(1.0, 2.0, timeperiod),
     }
     equity = cases[case]
-    actual = RollingMaximumDrawdown(equity, timeperiod).compute()
+    actual = RollingMaximumDrawdown(timeperiod).extend(equity).compute()
     expected = pandas_maximum_drawdown(equity, timeperiod)
     np.testing.assert_allclose(actual, expected, rtol=1e-14, atol=1e-14, equal_nan=True)
 
@@ -56,7 +56,7 @@ def test_matches_wickra_and_records_talib_unavailability() -> None:
     equity[[140, 260]] = np.nan
     timeperiod = 21
 
-    actual = RollingMaximumDrawdown(equity, timeperiod).compute()
+    actual = RollingMaximumDrawdown(timeperiod).extend(equity).compute()
     expected = np.asarray(wickra.MaxDrawdown(timeperiod).batch(equity), dtype=np.float64)
     np.testing.assert_allclose(actual, expected, rtol=1e-14, atol=1e-14, equal_nan=True)
     assert "MAXDRAWDOWN" not in talib.get_functions()
@@ -66,16 +66,16 @@ def test_scalar_chunked_warmed_continuation_and_reset_are_invariant() -> None:
     rng = np.random.default_rng(7)
     equity = 100.0 * np.exp(np.cumsum(rng.normal(0.0, 0.03, 127)))
     period = 17
-    batch = RollingMaximumDrawdown(equity, period)
+    batch = RollingMaximumDrawdown(period).extend(equity)
     expected = batch.compute()
 
-    scalar = RollingMaximumDrawdown(np.array([], dtype=np.float64), period)
+    scalar = RollingMaximumDrawdown(period)
     assert scalar.value is None
     for value in equity:
         assert scalar.append(value) is scalar
     np.testing.assert_array_equal(scalar.compute(), expected)
 
-    chunked = RollingMaximumDrawdown(np.array([], dtype=np.float64), period)
+    chunked = RollingMaximumDrawdown(period)
     assert chunked.extend(equity[:13]) is chunked
     chunked.extend(equity[13:81]).extend(equity[81:])
     np.testing.assert_array_equal(chunked.compute(), expected)
@@ -98,4 +98,4 @@ def test_scalar_chunked_warmed_continuation_and_reset_are_invariant() -> None:
 
 def test_rejects_zero_period() -> None:
     with pytest.raises(ValueError):
-        RollingMaximumDrawdown(np.array([], dtype=np.float64), 0)
+        RollingMaximumDrawdown(0)

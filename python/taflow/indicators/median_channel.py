@@ -15,7 +15,7 @@ class MedianChannel:
     ``MedianChannel``.
 
     Args:
-        prices: Initial chronological price history.
+        prices: Chronological price history.
         period: Positive rolling window length, default 20.
         multiplier: Positive MAD multiplier, default 2.0.
 
@@ -23,10 +23,10 @@ class MedianChannel:
         ValueError: If period or multiplier is not positive.
     """
 
-    def __init__(self, prices: Any, period: int = 20, multiplier: float = 2.0) -> None:
-        """Initialize native rolling state and process the initial history."""
+    def __init__(self, period: int = 20, multiplier: float = 2.0) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, multiplier)
-        self.extend(prices)
 
     def append(self, price: float) -> "MedianChannel":
         """Append one price and return this adapter."""

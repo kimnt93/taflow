@@ -10,9 +10,8 @@ from ._series import as_float64_series
 class MathUnaryState:
     _native_cls = None
 
-    def __init__(self, _input: Any) -> None:
+    def __init__(self) -> None:
         self._state = self._native_cls()
-        self.extend(_input)
 
     def append(self, _input: float) -> "Self":
         self._state.append(float(_input))
@@ -40,9 +39,8 @@ class MathUnaryState:
 class MathBinaryState:
     _native_cls = None
 
-    def __init__(self, left: Any, right: Any) -> None:
+    def __init__(self) -> None:
         self._state = self._native_cls()
-        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "Self":
         self._state.append(float(left), float(right))

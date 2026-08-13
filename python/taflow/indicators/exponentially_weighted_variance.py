@@ -20,18 +20,15 @@ class ExponentiallyWeightedVariance:
     variance with ``bias=True``. Lifecycle mutators return ``self``.
     """
 
-    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
-        """Initialize the state and process the supplied input history.
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        _input : object
-            Required chronological values; an empty series creates a fresh state.
         timeperiod : int, default 14
             Positive EWM span in bars.
         """
         self._state = _Native(int(timeperiod))
-        self.extend(_input)
 
     def append(self, _input: float) -> "ExponentiallyWeightedVariance":
         """Append one observation and return this adapter."""

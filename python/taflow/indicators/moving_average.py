@@ -14,8 +14,7 @@ class MovingAverage:
     Parameters
     ----------
     values : array-like
-        Initial chronological input values. Pass an empty series for a fresh
-        state intended for later streaming.
+        Chronological input values supplied through ``extend``.
     timeperiod : int, default 30
         Lookback period forwarded to the selected native moving-average state.
     matype : int, default 0
@@ -32,13 +31,12 @@ class MovingAverage:
 
     def __init__(
         self,
-        values: Any,
         timeperiod: int = 30,
         matype: int = 0,
     ) -> None:
-        """Create a selectable moving-average state and process ``values``."""
+        """Initialize an empty configured native state.
+        """
         self._state = _NativeMovingAverage(timeperiod, matype)
-        self.extend(values)
 
     def append(self, value: float) -> "MovingAverage":
         """Append one value and return this adapter for fluent chaining."""

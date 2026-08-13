@@ -22,10 +22,10 @@ class HighLowIndex:
         ValueError: If histories differ in length or ``period`` is zero.
     """
 
-    def __init__(self, new_highs: Any, new_lows: Any, period: int = 10) -> None:
-        """Initialize native rolling state and process aligned histories."""
+    def __init__(self, period: int = 10) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(new_highs, new_lows)
 
     def append(self, new_highs: float, new_lows: float) -> "HighLowIndex":
         """Append one aggregate-extremes tick and return this adapter."""

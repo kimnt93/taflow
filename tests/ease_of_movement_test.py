@@ -4,9 +4,7 @@ from taflow import EaseOfMovement
 
 
 def test_ease_of_movement_lifecycle_and_alignment():
-    state = EaseOfMovement(
-        np.array([], dtype=float), np.array([], dtype=float), np.array([], dtype=float)
-    )
+    state = EaseOfMovement()
     high = np.arange(15.0) + 11.0
     low = high - 2.0
     volume = np.full(15, 2.0)

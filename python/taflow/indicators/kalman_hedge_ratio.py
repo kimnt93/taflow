@@ -25,11 +25,11 @@ class KalmanHedgeRatio:
     Raises:
         ValueError: If inputs are misaligned or configuration is invalid.
     """
-    def __init__(self, x: Any, y: Any, delta: float = 1e-4,
+    def __init__(self, delta: float = 1e-4,
                  observation_variance: float = 1e-3) -> None:
-        """Initialize the filter and process aligned historical pairs."""
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(float(delta), float(observation_variance))
-        self.extend(x, y)
     def append(self, x: float, y: float) -> "KalmanHedgeRatio":
         """Append one regressor/target pair and return this adapter."""
         self._state.append(float(x), float(y))

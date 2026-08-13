@@ -15,9 +15,9 @@ def test_variable_index_dynamic_average_matches_registered_wickra_oracle() -> No
 def test_lifecycle_is_bitwise_invariant_with_custom_parameters() -> None:
     rng = np.random.default_rng(94117)
     close = 100.0 + rng.normal(size=431).cumsum()
-    batch = VariableIndexDynamicAverage(close, 17, 7, 0.35)
+    batch = VariableIndexDynamicAverage(17, 7, 0.35).extend(close)
 
-    chunked = VariableIndexDynamicAverage([], 17, 7, 0.35)
+    chunked = VariableIndexDynamicAverage(17, 7, 0.35)
     assert chunked.extend(close[:53]) is chunked
     assert chunked.extend(close[53:]) is chunked
     np.testing.assert_array_equal(chunked.compute(), batch.compute())
@@ -31,7 +31,7 @@ def test_lifecycle_is_bitwise_invariant_with_custom_parameters() -> None:
 
 
 def test_warm_up_and_validation() -> None:
-    state = VariableIndexDynamicAverage([], length=3, cmo_period=3)
+    state = VariableIndexDynamicAverage(length=3, cmo_period=3)
     state.append(1.0).append(2.0).append(3.0)
     assert state.value is None
     assert np.isnan(state.compute()[-1])
@@ -39,11 +39,11 @@ def test_warm_up_and_validation() -> None:
     assert state.value == 4.0
 
     with pytest.raises(ValueError):
-        VariableIndexDynamicAverage(None)
+        VariableIndexDynamicAverage().extend(None)
     with pytest.raises(ValueError):
-        VariableIndexDynamicAverage([], length=0)
+        VariableIndexDynamicAverage(length=0)
     with pytest.raises(ValueError):
-        VariableIndexDynamicAverage([], cmo_period=0)
+        VariableIndexDynamicAverage(cmo_period=0)
     for invalid_alpha in (0.0, -0.1, 1.1, np.nan, np.inf):
         with pytest.raises(ValueError):
-            VariableIndexDynamicAverage([], 14, 9, invalid_alpha)
+            VariableIndexDynamicAverage(14, 9, invalid_alpha)

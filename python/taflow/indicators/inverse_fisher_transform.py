@@ -7,9 +7,8 @@ from .._series import as_float64_series
 class InverseFisherTransform:
     """Scaled hyperbolic-tangent inverse Fisher transform."""
 
-    def __init__(self, values: Any, scale: float = 1.0) -> None:
+    def __init__(self, scale: float = 1.0) -> None:
         self._state = _Native(scale)
-        self.extend(values)
 
     def append(self, value: float) -> "InverseFisherTransform":
         self._state.append(float(value))

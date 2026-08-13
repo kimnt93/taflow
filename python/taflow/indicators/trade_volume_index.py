@@ -17,18 +17,18 @@ class TradeVolumeIndex:
     This class maps to Wickra ``TradeVolumeIndex``.
 
     Args:
-        close: Initial chronological closing prices.
-        volume: Initial chronological volumes.
+        close: Chronological closing prices.
+        volume: Chronological volumes.
         min_tick: Non-negative direction threshold, default 0.25.
 
     Raises:
         ValueError: If inputs are misaligned or ``min_tick`` is invalid.
     """
 
-    def __init__(self, close: Any, volume: Any, min_tick: float = 0.25) -> None:
-        """Initialize the state and process the supplied close/volume history."""
+    def __init__(self, min_tick: float = 0.25) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(min_tick)
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "TradeVolumeIndex":
         """Append one close/volume sample and return this instance."""

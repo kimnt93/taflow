@@ -26,10 +26,10 @@ class VolumePriceTrend:
             converted to contiguous one-dimensional float64 arrays.
     """
 
-    def __init__(self, close: Any, volume: Any) -> None:
-        """Initialize the native state and process aligned history."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "VolumePriceTrend":
         """Append one close/volume observation and return this adapter."""

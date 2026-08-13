@@ -20,9 +20,8 @@ class RollingSharpe:
     ``self``. The oracle is pandas rolling mean/std with ``ddof=0``.
     """
 
-    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingSharpe":
         """Append one observation and return this adapter."""

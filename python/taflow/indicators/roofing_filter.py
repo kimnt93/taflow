@@ -14,7 +14,7 @@ class RoofingFilter:
     ``RoofingFilter`` with ``lp_period`` and ``hp_period``.
 
     Args:
-        values: Initial chronological price or signal history.
+        values: Chronological price or signal history.
         low_period: Positive low-pass period, default 10.
         high_period: High-pass period, default 48 and greater than low_period.
 
@@ -22,10 +22,10 @@ class RoofingFilter:
         ValueError: If periods are zero or incorrectly ordered.
     """
 
-    def __init__(self, values: Any, low_period: int = 10, high_period: int = 48) -> None:
-        """Initialize native filter state and process the initial history."""
+    def __init__(self, low_period: int = 10, high_period: int = 48) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(low_period, high_period)
-        self.extend(values)
 
     def append(self, value: float) -> "RoofingFilter":
         """Append one signal value and return this adapter."""

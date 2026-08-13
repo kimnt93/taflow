@@ -19,9 +19,8 @@ class Rising:
     arithmetic.
     """
 
-    def __init__(self, _input: Any, timeperiod: int = 1) -> None:
+    def __init__(self, timeperiod: int = 1) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(_input)
 
     def append(self, _input: float) -> "Rising":
         """Append one observation and return this adapter."""

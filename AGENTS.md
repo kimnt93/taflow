@@ -154,7 +154,7 @@ GOOD Python production and correctness shape:
 ```python
 # python/taflow/variable_period_moving_average.py
 class VariablePeriodMovingAverage:
-    def __init__(self, values, periods): ...
+    def __init__(self, min_period=2, max_period=30, average_type=0): ...
     def append(self, value: float, period: float) -> "VariablePeriodMovingAverage": ...
     def extend(self, values, periods) -> "VariablePeriodMovingAverage": ...
     def compute(self) -> np.ndarray: ...
@@ -164,7 +164,7 @@ class VariablePeriodMovingAverage:
 ```python
 # tests/variable_period_moving_average_test.py
 def test_variable_period_moving_average_matches_reference():
-    actual = VariablePeriodMovingAverage(values, periods).compute()
+    actual = VariablePeriodMovingAverage().extend(values, periods).compute()
     expected = external_library_reference(values, periods)
     np.testing.assert_allclose(actual, expected, equal_nan=True)
 ```
@@ -279,13 +279,13 @@ full diff for unintended generated or unrelated changes.
   `append`, `extend`, `value`, `compute`, `reset`, and `__len__`.
   `append`, `extend`, and `reset` mutate and return `self` for fluent use.
   Callers read the latest scalar/tuple through `value`.
-- Constructors require every input series. Use empty aligned arrays to create
-  a fresh state for later streaming; do not make series optional or use
-  `None` as an implicit empty stream. Configuration parameters have documented
-  defaults unless the caller must make a genuine semantic choice. `extend`
-  accepts the same ordered input streams as the constructor; `append` accepts
-  one scalar per stream in that order. Reject misaligned multi-series input
-  before mutating native state.
+- Constructors accept configuration only and always create a fresh empty state.
+  Input series are never constructor parameters; do not accept empty placeholder
+  arrays, optional series, or `None` as an implicit stream. Configuration
+  parameters have documented defaults unless the caller must make a genuine
+  semantic choice. `extend` accepts every ordered input stream; `append`
+  accepts one scalar per stream in that order. Reject misaligned multi-series
+  input before mutating native state.
 - Convert supported containers once at the Python/Rust boundary using the
   shared series adapters. Never loop over bars or calculate indicator values in
   Python. Native `extend` must release the GIL around the Rust loop.
@@ -407,18 +407,15 @@ class EqualHighsLows:
     by ``NaN`` in history. The oracle/name mapping is pandas-ta ``equal_re``.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, eq_len: int = 3) -> None:
-        """Initialize and process aligned chronological input histories.
+    def __init__(self, eq_len: int = 3) -> None:
+        """Initialize an empty configured indicator.
 
         Parameters
         ----------
-        high, low, close : object
-            Required aligned price histories; empty arrays create a fresh state.
         eq_len : int, default 3
             Equality lookback in bars.
         """
         self._state = _Native(eq_len)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "EqualHighsLows":
         """Append one high/low/close bar and return this adapter."""
@@ -466,10 +463,9 @@ class PositiveVolumeIndex:
     The oracle/name mapping is TA-Lib ``PVI`` when available.
     """
 
-    def __init__(self, close: Any, volume: Any) -> None:
-        """Initialize the adapter and process aligned input histories."""
+    def __init__(self) -> None:
+        """Initialize an empty configured adapter."""
         self._state = _Native()
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "PositiveVolumeIndex":
         """Append one close/volume observation and return this adapter."""

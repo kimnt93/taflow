@@ -13,9 +13,8 @@ class CumulativeSumControlChart:
     only before the first observation.
     """
 
-    def __init__(self, change: Any, threshold: float = 1.0) -> None:
+    def __init__(self, threshold: float = 1.0) -> None:
         self._state = _Native(float(threshold))
-        self.extend(change)
 
     def append(self, change: float) -> "CumulativeSumControlChart":
         self._state.append(float(change))

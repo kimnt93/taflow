@@ -20,16 +20,8 @@ class Drawdown:
     ``Series.cummax``.
     """
 
-    def __init__(
-        self,
-        _input: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
 
         Returns
         -------
@@ -37,7 +29,6 @@ class Drawdown:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self.extend(_input)
 
     def append(self, _input: float) -> "Drawdown":
         """Append one observation or aligned bar to the native Rust state.

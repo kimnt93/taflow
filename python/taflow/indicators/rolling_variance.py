@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class RollingVariance:
     """Compute population variance from required ``values``; ``nbdev`` is accepted for API parity."""
 
-    def __init__(self, values: Any, timeperiod: int = 14, nbdev: float = 1.0) -> None:
+    def __init__(self, timeperiod: int = 14, nbdev: float = 1.0) -> None:
         self._state = _NativeRollingVariance(timeperiod, nbdev)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingVariance":
         self._state.append(float(value))

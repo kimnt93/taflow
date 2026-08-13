@@ -5,7 +5,7 @@ from tests.oracle_assertions import assert_registered_oracle_match
 
 
 def test_hurst_lifecycle_and_reset():
-    state = Hurst(np.array([], dtype=float), timeperiod=8, chunks=4)
+    state = Hurst(timeperiod=8, chunks=4)
     state.extend(np.arange(1.0, 9.0))
     assert np.isfinite(state.compute()[-1])
     assert len(state) == 8

@@ -11,14 +11,12 @@ from .._series import as_float64_series
 class AverageTrueRange:
     """Compute Wilder-smoothed True Range in persistent Rust state.
 
-    High, low, and close histories are required; pass three empty arrays for a
-    fresh state. ``timeperiod`` defaults to 14 and must be positive. The first
+    Supply aligned high, low, and close histories through ``extend``. ``timeperiod`` defaults to 14 and must be positive. The first
     ``timeperiod`` outputs are NaN. This maps to TA-Lib ``ATR``.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeAverageTrueRange(timeperiod)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "AverageTrueRange":
         """Append one high/low/close tuple and return this indicator."""

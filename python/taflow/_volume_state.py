@@ -12,7 +12,8 @@ class OhlcvStateAdapter:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Configuration values are accepted by the constructor; series are supplied
+    to ``extend``.
 
     Returns
     -------
@@ -25,16 +26,10 @@ class OhlcvStateAdapter:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
         *parameters,
     ) -> None:
-        """Create native state and process initial OHLCV data."""
+        """Create an empty configured native state."""
         self._state = self._native_cls(*parameters)
-        if any(value is not None for value in (high, low, close, volume)):
-            self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> "Self":
         """Append one chronological observation to the native Rust state.
@@ -121,7 +116,7 @@ class CloseVolumeStateAdapter:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construction creates an empty state; series are supplied to ``extend``.
 
     Returns
     -------
@@ -131,15 +126,9 @@ class CloseVolumeStateAdapter:
 
     _native_cls = None
 
-    def __init__(
-        self,
-        close: Any,
-        volume: Any,
-    ) -> None:
-        """Create native state and process initial close/volume data."""
+    def __init__(self) -> None:
+        """Create an empty configured native state."""
         self._state = self._native_cls()
-        if close is not None or volume is not None:
-            self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "Self":
         """Append one chronological observation to the native Rust state.

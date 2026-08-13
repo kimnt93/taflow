@@ -14,23 +14,14 @@ class EqualHighsLows:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         eq_len: int = 3,
         atr_period: int = 200,
         eq_threshold: float = 0.1,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
         eq_len : object
             Equal-high/low lookback in bars.
         atr_period : object
@@ -44,7 +35,6 @@ class EqualHighsLows:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(eq_len, atr_period, eq_threshold)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "EqualHighsLows":
         """Append one observation or aligned bar to the native Rust state.

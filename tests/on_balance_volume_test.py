@@ -7,11 +7,11 @@ from taflow import OnBalanceVolume
 
 def _assert_lifecycle(close: np.ndarray, volume: np.ndarray) -> None:
     expected = talib.OBV(close, volume)
-    actual = OnBalanceVolume(close, volume)
+    actual = OnBalanceVolume().extend(close, volume)
     np.testing.assert_array_equal(actual.compute(), expected)
     assert actual.value == expected[-1]
 
-    chunked = OnBalanceVolume([], [])
+    chunked = OnBalanceVolume()
     split = max(1, len(close) // 3)
     assert chunked.extend(close[:split], volume[:split]) is chunked
     assert chunked.extend(close[split:], volume[split:]) is chunked
@@ -41,7 +41,7 @@ def test_on_balance_volume_matches_talib_parameter_matrix_and_lifecycle() -> Non
 
 
 def test_on_balance_volume_rejects_misaligned_input_before_mutation() -> None:
-    state = OnBalanceVolume([], [])
+    state = OnBalanceVolume()
     with pytest.raises(ValueError):
         state.extend([1.0, 2.0], [3.0])
     assert len(state) == 0

@@ -8,9 +8,8 @@ from .._series import as_float64_series
 
 class AbsolutePriceOscillator:
     """Compute fast moving average minus slow moving average in Rust."""
-    def __init__(self, _input: Any, fastperiod: int = 12, slowperiod: int = 26, moving_average_type: int = 0) -> None:
+    def __init__(self, fastperiod: int = 12, slowperiod: int = 26, moving_average_type: int = 0) -> None:
         self._state = _NativeAbsolutePriceOscillator(fastperiod, slowperiod, moving_average_type)
-        self.extend(_input)
     def append(self, _input: float) -> "AbsolutePriceOscillator": self._state.append(float(_input)); return self
     def extend(self, _input: Any) -> "AbsolutePriceOscillator": self._state.extend(as_float64_series(_input)); return self
     def compute(self) -> np.ndarray: return self._state.compute()

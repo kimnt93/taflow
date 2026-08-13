@@ -11,15 +11,13 @@ from .._series import as_float64_series
 class AroonOscillator:
     """Compute Aroon Up minus Aroon Down in persistent Rust state.
 
-    The constructor requires aligned chronological high and low series. Pass
-    two empty arrays for a fresh streaming state. ``timeperiod`` defaults to 14
+    ``extend`` accepts aligned chronological high and low series. Supply the aligned series through ``extend`` after construction. ``timeperiod`` defaults to 14
     and must be at least 2. Output contains NaN for the first ``timeperiod``
     bars and maps to TA-Lib ``AROONOSC``.
     """
 
-    def __init__(self, high: Any, low: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeAroonOscillator(timeperiod)
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "AroonOscillator":
         """Append one high/low pair and return this indicator."""

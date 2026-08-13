@@ -18,9 +18,8 @@ class MovingAverageConvergenceDivergenceFixed:
     ``reset`` mutate and return this adapter. Oracle: ``MACDFIX``.
     """
 
-    def __init__(self, values: Any, signal_period: int = 9) -> None:
+    def __init__(self, signal_period: int = 9) -> None:
         self._state = _NativeMovingAverageConvergenceDivergenceFixed(signal_period)
-        self.extend(values)
 
     def append(self, value: float) -> "MovingAverageConvergenceDivergenceFixed":
         self._state.append(float(value))

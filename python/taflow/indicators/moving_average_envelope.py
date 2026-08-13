@@ -25,10 +25,10 @@ class MovingAverageEnvelope:
         ValueError: If ``period`` or ``percent`` is not positive.
     """
 
-    def __init__(self, values: Any, period: int = 20, percent: float = 0.025) -> None:
-        """Initialize the native state and process the supplied history."""
+    def __init__(self, period: int = 20, percent: float = 0.025) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, percent)
-        self.extend(values)
 
     def append(self, value: float) -> "MovingAverageEnvelope":
         """Append one price and return ``self``."""

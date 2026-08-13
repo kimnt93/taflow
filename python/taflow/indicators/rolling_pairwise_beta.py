@@ -17,18 +17,18 @@ class RollingPairwiseBeta:
     ``PairwiseBeta``.
 
     Args:
-        asset: Initial prices for the dependent asset.
-        benchmark: Initial prices for the explanatory asset.
+        asset: Chronological prices for the dependent asset.
+        benchmark: Chronological prices for the explanatory asset.
         period: Number of return pairs, default 20 and minimum 2.
 
     Raises:
         ValueError: If series lengths differ or ``period`` is below two.
     """
 
-    def __init__(self, asset: Any, benchmark: Any, period: int = 20) -> None:
-        """Initialize native state and process aligned price histories."""
+    def __init__(self, period: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(asset, benchmark)
 
     def append(self, asset: float, benchmark: float) -> "RollingPairwiseBeta":
         """Append one aligned price pair and return this instance."""

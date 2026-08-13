@@ -7,7 +7,7 @@ def test_rogers_satchell_lifecycle():
     high = open_ + 1.0
     low = open_ - 1.0
     close = open_ + 0.5
-    indicator = RogersSatchell(open_, high, low, close, timeperiod=10)
+    indicator = RogersSatchell(timeperiod=10).extend(open_, high, low, close)
     assert indicator.compute().shape == open_.shape
     assert len(indicator) == len(open_)
     indicator.reset().extend(open_[:20], high[:20], low[:20], close[:20])

@@ -22,10 +22,10 @@ class BreadthThrust:
         ValueError: If histories differ in length or ``period`` is zero.
     """
 
-    def __init__(self, advancers: Any, decliners: Any, period: int = 10) -> None:
-        """Initialize native rolling state and process aligned histories."""
+    def __init__(self, period: int = 10) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(advancers, decliners)
 
     def append(self, advancers: float, decliners: float) -> "BreadthThrust":
         """Append one breadth tick and return this adapter."""

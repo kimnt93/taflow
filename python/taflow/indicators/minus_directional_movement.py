@@ -15,18 +15,12 @@ class MinusDirectionalMovement:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
         timeperiod : object
             Trailing window length in bars.
 
@@ -36,7 +30,6 @@ class MinusDirectionalMovement:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "MinusDirectionalMovement":
         """Append one observation or aligned bar to the native Rust state.

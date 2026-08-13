@@ -6,7 +6,7 @@ from tests.oracle_assertions import assert_registered_oracle_match
 
 def test_lifecycle() -> None:
     values = np.linspace(1.0, 20.0, 32)
-    state = TrueStrengthIndex(values, 5, 10)
+    state = TrueStrengthIndex(5, 10).extend(values)
     assert len(state) == len(values)
     assert state.reset().value is None
 

@@ -19,10 +19,10 @@ class ForceIndex:
     or ``None`` during warm-up, and lifecycle mutators return ``self``.
     """
 
-    def __init__(self, close: Any, volume: Any, period: int = 13) -> None:
-        """Initialize with aligned histories and an EMA period (default 13)."""
+    def __init__(self, period: int = 13) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "ForceIndex":
         """Append one close/volume pair and return this adapter."""

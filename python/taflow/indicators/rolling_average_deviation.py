@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class RollingAverageDeviation:
     """Compute AVGDEV from required ``values`` with period 14 by default."""
 
-    def __init__(self, values: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeRollingAverageDeviation(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingAverageDeviation":
         self._state.append(float(value))

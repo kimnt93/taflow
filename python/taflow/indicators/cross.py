@@ -19,9 +19,8 @@ class Cross:
     native mutation.
     """
 
-    def __init__(self, left: Any, right: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "Cross":
         """Append one pair and return this adapter."""

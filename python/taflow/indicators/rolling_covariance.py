@@ -20,18 +20,11 @@ class RollingCovariance:
     covariance with ``ddof=0``.
     """
 
-    def __init__(
-        self,
-        left: Any,
-        right: Any,
-        timeperiod: int = 14,
-    ) -> None:
-        """Initialize native state and process the supplied aligned series.
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        left, right : array-like
-            Equal-length aligned input histories.
         timeperiod : int, default=14
             Number of observations in the trailing population window.
 
@@ -41,7 +34,6 @@ class RollingCovariance:
             The constructor initializes the native state and returns no value.
         """
         self._state = _Native(int(timeperiod))
-        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "RollingCovariance":
         """Append one ``left``/``right`` pair and return this adapter."""

@@ -10,9 +10,8 @@ from .._series import as_float64_series
 class TimeSeriesRank:
     """WorldQuant rank of each value within a trailing window."""
 
-    def __init__(self, input: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(input)
 
     def append(self, input: float) -> "TimeSeriesRank":
         self._state.append(float(input))

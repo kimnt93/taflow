@@ -8,11 +8,9 @@ from ._series import as_float64_series
 
 
 class OhlcPriceState:
-    """Adapt a native four-input OHLC state
+    """Adapt a native four-input OHLC state.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
+    The constructor creates an empty state; inputs are supplied to ``extend``.
 
     Returns
     -------
@@ -22,16 +20,9 @@ class OhlcPriceState:
 
     _native_cls = None
 
-    def __init__(
-        self,
-        _open: Any,
-        high: Any,
-        low: Any,
-        close: Any,
-    ) -> None:
-        """Create native state and process initial OHLC data."""
+    def __init__(self) -> None:
+        """Create an empty native OHLC state."""
         self._state = self._native_cls()
-        self.extend(_open, high, low, close)
 
     def append(self, _open: float, high: float, low: float, close: float) -> "Self":
         """Append one chronological observation to the native Rust state.
@@ -114,11 +105,9 @@ class OhlcPriceState:
 
 
 class HlcPriceState:
-    """Adapt a native three-input HLC state
+    """Adapt a native three-input HLC state.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
+    The constructor creates an empty state; inputs are supplied to ``extend``.
 
     Returns
     -------
@@ -128,15 +117,9 @@ class HlcPriceState:
 
     _native_cls = None
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        close: Any,
-    ) -> None:
-        """Create native state and process initial HLC data."""
+    def __init__(self) -> None:
+        """Create an empty native HLC state."""
         self._state = self._native_cls()
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Self":
         """Append one chronological observation to the native Rust state.
@@ -212,11 +195,9 @@ class HlcPriceState:
 
 
 class HlPriceState:
-    """Adapt a native two-input high/low state
+    """Adapt a native two-input high/low state.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
+    The constructor creates an empty state; inputs are supplied to ``extend``.
 
     Returns
     -------
@@ -226,14 +207,9 @@ class HlPriceState:
 
     _native_cls = None
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-    ) -> None:
-        """Create native state and process initial high/low data."""
+    def __init__(self) -> None:
+        """Create an empty native high/low state."""
         self._state = self._native_cls()
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Self":
         """Append one chronological observation to the native Rust state.

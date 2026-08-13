@@ -15,9 +15,6 @@ class Squeeze:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         bb_length: int = 20,
         bb_std: float = 2.0,
         kc_length: int = 20,
@@ -33,7 +30,6 @@ class Squeeze:
             int(mom_length),
             int(mom_smooth),
         )
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Squeeze":
         self._state.append(float(high), float(low), float(close))

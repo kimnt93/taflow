@@ -21,16 +21,10 @@ class NegativeVolumeIndex:
     it is recorded as a native stateful variant.
     """
 
-    def __init__(self, close: Any, volume: Any) -> None:
-        """Initialize and process aligned close/volume histories.
-
-        Parameters
-        ----------
-        close, volume : object
-            Required aligned numeric histories; empty arrays create a fresh state.
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
         """
         self._state = _Native()
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "NegativeVolumeIndex":
         """Append one close/volume bar in that order."""

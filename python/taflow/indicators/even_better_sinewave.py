@@ -18,9 +18,8 @@ class EvenBetterSinewave:
     The correctness oracle is ``pandas_ta_classic.ebsw``.
     """
 
-    def __init__(self, close: Any, length: int = 40) -> None:
+    def __init__(self, length: int = 40) -> None:
         self._state = _NativeEvenBetterSinewave(int(length))
-        self.extend(close)
 
     def append(self, close: float) -> "EvenBetterSinewave":
         """Append one chronological close and return this adapter."""

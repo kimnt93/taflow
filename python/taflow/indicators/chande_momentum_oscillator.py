@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class ChandeMomentumOscillator:
     """Compute CMO from required ``values`` with period 14 by default."""
 
-    def __init__(self, values: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeChandeMomentumOscillator(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "ChandeMomentumOscillator":
         self._state.append(float(value))

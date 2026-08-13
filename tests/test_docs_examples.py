@@ -83,7 +83,7 @@ def base_namespace():
         "frame": pd.DataFrame(
             {"open": open_, "high": high, "low": low, "close": close, "volume": volume}
         ),
-        "sma": SimpleMovingAverage(close, timeperiod=10).compute(),
+        "sma": SimpleMovingAverage(timeperiod=10).extend(close).compute(),
     }
 
 

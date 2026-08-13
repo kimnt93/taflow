@@ -14,8 +14,7 @@ class RelativeStrengthIndex:
     Parameters
     ----------
     close : array-like
-        Initial chronological close prices. Pass an empty series for a fresh
-        streaming state.
+        Chronological close prices. Supply the series through ``extend`` after construction.
     timeperiod : int, default 14
         Wilder smoothing period, which must be at least two.
 
@@ -31,17 +30,11 @@ class RelativeStrengthIndex:
     ``reset`` mutate and return this adapter.
     """
 
-    def __init__(
-        self,
-        close: Any,
-        timeperiod: int = 14,
-    ) -> None:
-        """Create an RSI state and process initial closes.
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        close : array-like
-            Initial close-price history.
         timeperiod : int, default 14
             Wilder smoothing period.
 
@@ -51,7 +44,6 @@ class RelativeStrengthIndex:
             The instance is initialized in place.
         """
         self._state = _NativeRelativeStrengthIndex(timeperiod)
-        self.extend(close)
 
     def append(self, close: float) -> "RelativeStrengthIndex":
         """Append one close and update the native RSI state.

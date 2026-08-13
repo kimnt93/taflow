@@ -14,18 +14,12 @@ class HedgeRatio:
 
     def __init__(
         self,
-        x: Any,
-        y: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        x : object
-            First aligned input series or scalar observation.
-        y : object
-            Second aligned input series or scalar observation.
         timeperiod : object
             Trailing window length in bars.
 
@@ -35,7 +29,6 @@ class HedgeRatio:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(x, y)
 
     def append(self, x: float, y: float) -> "HedgeRatio":
         """Append one observation or aligned bar to the native Rust state.

@@ -14,8 +14,7 @@ class RelativeMomentumIndex:
     Parameters
     ----------
     close : array-like
-        Initial chronological close prices. Pass an empty series for a fresh
-        state intended for later ``append`` or ``extend`` calls.
+        Chronological close prices supplied through ``extend``.
     timeperiod : int, default 14
         Number of momentum observations used to seed and smooth average gains
         and losses. Must be at least one.
@@ -35,25 +34,17 @@ class RelativeMomentumIndex:
     ``extend``, and ``reset`` mutate and return this adapter.
     """
 
-    def __init__(
-        self,
-        close: Any,
-        timeperiod: int = 14,
-        momentum: int = 5,
-    ) -> None:
-        """Create an RMI state and process initial close prices.
+    def __init__(self, timeperiod: int = 14, momentum: int = 5) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        close : array-like
-            Initial chronological close-price history; empty is allowed.
         timeperiod : int, default 14
             Wilder smoothing period.
         momentum : int, default 5
             Momentum comparison lag in bars.
         """
         self._state = _NativeRelativeMomentumIndex(timeperiod, momentum)
-        self.extend(close)
 
     def append(self, close: float) -> "RelativeMomentumIndex":
         """Append one close and update the native RMI state.

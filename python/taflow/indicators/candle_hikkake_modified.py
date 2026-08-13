@@ -11,25 +11,8 @@ class CandleHikkakeModified:
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_open`, `high`, `low`, `close`. Warm-up positions are represented by `NaN` in history."""
 
-    def __init__(
-        self,
-        _open: Any,
-        high: Any,
-        low: Any,
-        close: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        _open : object
-            Open-price series or the current bar open.
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
 
         Returns
         -------
@@ -37,7 +20,6 @@ class CandleHikkakeModified:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self.extend(_open, high, low, close)
 
     def append(self, _open: float, high: float, low: float, close: float) -> "CandleHikkakeModified":
         """Append one observation or aligned bar to the native Rust state.

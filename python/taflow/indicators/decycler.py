@@ -13,17 +13,17 @@ class Decycler:
     first-bar initialization. It maps to Wickra ``Decycler``.
 
     Args:
-        values: Initial chronological price or signal history.
+        values: Chronological price or signal history.
         period: Positive high-pass critical period, default 20.
 
     Raises:
         ValueError: If ``period`` is zero.
     """
 
-    def __init__(self, values: Any, period: int = 20) -> None:
-        """Initialize native filter state and process the initial history."""
+    def __init__(self, period: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "Decycler":
         """Append one signal value and return this adapter."""

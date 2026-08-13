@@ -20,20 +20,17 @@ class McGinleyDynamic:
     ``McGinleyDynamic``. Lifecycle mutators return this adapter.
     """
 
-    def __init__(self, close: Any, length: int = 10, c: float = 0.6) -> None:
-        """Initialize and process the supplied close history.
+    def __init__(self, length: int = 10, c: float = 0.6) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        close : object
-            Required chronological close prices; empty creates a fresh state.
         length : int, default 10
             Positive recurrence length.
         c : float, default 0.6
             Positive adjustment constant; ``0.6`` matches Wickra.
         """
         self._state = _Native(int(length), float(c))
-        self.extend(close)
 
     def append(self, close: float) -> "McGinleyDynamic":
         """Append one close price and return this adapter."""

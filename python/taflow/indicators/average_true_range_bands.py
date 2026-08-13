@@ -28,15 +28,12 @@ class AverageTrueRangeBands:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         period: int = 14,
         multiplier: float = 3.0,
     ) -> None:
-        """Initialize the native state and process aligned price history."""
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, multiplier)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "AverageTrueRangeBands":
         """Append one high/low/close bar and return ``self``."""

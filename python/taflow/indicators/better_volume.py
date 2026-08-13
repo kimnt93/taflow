@@ -17,20 +17,20 @@ class BetterVolume:
     ``BetterVolume``; arithmetic and warm-up are owned by Rust.
 
     Args:
-        high: Initial chronological high prices.
-        low: Initial chronological low prices.
-        close: Initial chronological closes; retained for the OHLCV API order.
-        volume: Initial chronological volumes.
+        high: Chronological high prices.
+        low: Chronological low prices.
+        close: Chronological closes; retained for the OHLCV API order.
+        volume: Chronological volumes.
         period: Simple-average lookback, default 20.
 
     Raises:
         ValueError: If inputs are misaligned or ``period`` is zero.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, volume: Any, period: int = 20) -> None:
-        """Initialize the native state and process the supplied history."""
+    def __init__(self, period: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> "BetterVolume":
         """Append one OHLCV bar and return this instance."""

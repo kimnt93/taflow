@@ -11,8 +11,8 @@ from .._series import as_float64_series
 class AccumulationDistributionOscillator:
     """Compute fast minus slow EMA of the A/D line in persistent Rust state.
 
-    The constructor requires aligned chronological high, low, close, and volume
-    series. Pass four empty arrays for a fresh streaming state. ``fastperiod``
+    ``extend`` accepts aligned chronological high, low, close, and volume
+    series. Supply the aligned series through ``extend`` after construction. ``fastperiod``
     and ``slowperiod`` default to 3 and 10 and must both be at least 2. Outputs
     are NaN for ``max(fastperiod, slowperiod) - 1`` warm-up bars. The definition
     and first-value EMA seeds map to TA-Lib ``ADOSC``.
@@ -20,15 +20,10 @@ class AccumulationDistributionOscillator:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
         fastperiod: int = 3,
         slowperiod: int = 10,
     ) -> None:
         self._state = _NativeAccumulationDistributionOscillator(fastperiod, slowperiod)
-        self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float

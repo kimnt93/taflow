@@ -21,17 +21,14 @@ class PercentagePriceOscillator:
 
     def __init__(
         self,
-        _input: Any,
         fastperiod: int = 12,
         slowperiod: int = 26,
         moving_average_type: int = 0,
     ) -> None:
-        """Initialize and process the supplied price history.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        _input : object
-            Required chronological price series; empty creates a fresh state.
         fastperiod, slowperiod : int, default 12 and 26
             Positive fast and slow average periods; slow must exceed fast.
         moving_average_type : int, default 0
@@ -40,7 +37,6 @@ class PercentagePriceOscillator:
         self._state = _Native(
             int(fastperiod), int(slowperiod), int(moving_average_type)
         )
-        self.extend(_input)
 
     def append(self, _input: float) -> "PercentagePriceOscillator":
         """Append one price and return this adapter."""

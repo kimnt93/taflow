@@ -10,9 +10,8 @@ from ._series import as_float64_series
 class BivariateState:
     _native_cls = None
 
-    def __init__(self, _input0: Any, _input1: Any, timeperiod: int = 5) -> None:
+    def __init__(self, timeperiod: int = 5) -> None:
         self._state = self._native_cls(timeperiod)
-        self.extend(_input0, _input1)
 
     def append(self, input0: float, input1: float) -> "Self":
         self._state.append(float(input0), float(input1))

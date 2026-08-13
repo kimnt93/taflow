@@ -18,11 +18,11 @@ from taflow import SimpleMovingAverage
 
 close = np.cumsum(np.random.default_rng(0).normal(0, 1, 500)) + 100.0
 
-SimpleMovingAverage(close, timeperiod=10).compute()                    # numpy
-SimpleMovingAverage(close.tolist(), timeperiod=10).compute()           # list
-SimpleMovingAverage(pd.Series(close), timeperiod=10).compute()         # pandas
-SimpleMovingAverage(pl.Series("close", close), timeperiod=10).compute()# polars
-SimpleMovingAverage(pa.array(close), timeperiod=10).compute()          # arrow
+SimpleMovingAverage(timeperiod=10).extend(close).compute()                    # numpy
+SimpleMovingAverage(timeperiod=10).extend(close.tolist()).compute()           # list
+SimpleMovingAverage(timeperiod=10).extend(pd.Series(close)).compute()         # pandas
+SimpleMovingAverage(timeperiod=10).extend(pl.Series("close", close)).compute()# polars
+SimpleMovingAverage(timeperiod=10).extend(pa.array(close)).compute()          # arrow
 ```
 
 All five produce the identical `float64` NumPy array. Conversion happens once
@@ -45,7 +45,7 @@ from taflow.op import AdaptInput
 frame = pd.DataFrame({"open": o, "high": h, "low": l, "close": c,
                       "volume": v})
 
-SimpleMovingAverage(AdaptInput(frame, column="close"), timeperiod=10).compute()
+SimpleMovingAverage(timeperiod=10).extend(AdaptInput(frame, column="close")).compute()
 ```
 
 Passing a multi-column frame without `column=` raises
@@ -58,8 +58,9 @@ adapter at all:
 ```python
 from taflow import MoneyFlowIndex
 
-mfi = MoneyFlowIndex(frame["high"], frame["low"], frame["close"],
-                     frame["volume"], timeperiod=14).compute()
+mfi = MoneyFlowIndex(timeperiod=14).extend(
+    frame["high"], frame["low"], frame["close"], frame["volume"]
+).compute()
 ```
 
 The same line works unchanged if `frame` is a Polars DataFrame.
@@ -72,7 +73,7 @@ want to continue in:
 ```python
 from taflow.op import ToNumpy, ToList, ToPandas, ToPolars, ToArrow
 
-sma = SimpleMovingAverage(close, timeperiod=10).compute()
+sma = SimpleMovingAverage(timeperiod=10).extend(close).compute()
 
 ToNumpy(sma)                      # np.ndarray (identity, for symmetry)
 ToList(sma)                       # list[float]
@@ -84,7 +85,7 @@ ToArrow(sma)                      # pyarrow array
 Attaching results back to a frame is the common case:
 
 ```python
-frame["sma_10"] = SimpleMovingAverage(frame["close"], timeperiod=10).compute()
+frame["sma_10"] = SimpleMovingAverage(timeperiod=10).extend(frame["close"]).compute()
 ```
 
 Multi-output indicators return a tuple, so unpack before converting:
@@ -92,7 +93,7 @@ Multi-output indicators return a tuple, so unpack before converting:
 ```python
 from taflow import BollingerBands
 
-upper, middle, lower = BollingerBands(values=close, period=20).compute()
+upper, middle, lower = BollingerBands(period=20).extend(close).compute()
 frame["bb_upper"] = upper
 ```
 
@@ -150,7 +151,7 @@ from taflow.op import SessionFlags
 from taflow import Sessions
 
 flags = SessionFlags(frame["date"])
-high, low = Sessions(new_session=flags, high=frame["high"], low=frame["low"]).compute()
+high, low = Sessions().extend(new_session=flags, high=frame["high"], low=frame["low"]).compute()
 ```
 
 ## Cost
@@ -165,7 +166,7 @@ a snapshot: mutating the returned array does not affect the indicator.
 
 ## Related
 
-- [Indicator reference](INDICATORS.md) — every class, its parameters, and its
-  constructor order.
+- [Indicator reference](INDICATORS.md) — every class, its input order, and its
+  constructor configuration.
 - [Streaming](STREAMING.md) — live updates and the chunk-invariance contract.
 - [Pipelines](PIPELINES.md) — computing many indicators in one pass.

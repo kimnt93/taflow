@@ -9,8 +9,10 @@ from .._native import MathMultiply as _NativeMathMultiply
 class MathMultiply(MathBinaryState):
     """Apply the pointwise multiply operation in persistent Rust state.
 
-    Construction accepts required aligned left and right operand series. This class maps to TA-Lib `MULT`; aligned
-    history has no rolling warm-up beyond the native operation's domain rules.
+    Construction creates a fresh empty state; supply aligned left and right
+    operands through ``extend`` or ``append``. This class maps to TA-Lib `MULT`;
+    aligned history has no rolling warm-up beyond the native operation's domain
+    rules.
     """
 
     _native_cls = _NativeMathMultiply

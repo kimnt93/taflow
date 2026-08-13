@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class RollingVarianceRatio:
     """Rolling variance ratio for paired series, with period and aggregation ``q``."""
 
-    def __init__(self, a: Any, b: Any, period: int = 60, q: int = 2) -> None:
+    def __init__(self, period: int = 60, q: int = 2) -> None:
         self._state = _Native(period, q)
-        self.extend(a, b)
 
     def append(self, a: float, b: float) -> "RollingVarianceRatio":
         self._state.append(float(a), float(b))

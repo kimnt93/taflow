@@ -18,14 +18,13 @@ class FibonacciChannel:
     causal levels at each bar rather than a mutable chart annotation object.
     """
 
-    def __init__(self, high: Any, low: Any) -> None:
-        """Initialize and process required aligned chronological high/low data.
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
 
         Empty aligned series create fresh streaming state. Differing lengths
         raise ValueError before native state is mutated.
         """
         self._state = _Native()
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "FibonacciChannel":
         """Append one high/low observation and return this adapter."""

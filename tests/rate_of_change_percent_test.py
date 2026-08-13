@@ -11,10 +11,10 @@ def test_rate_of_change_percent_matches_talib_and_lifecycle(timeperiod: int) -> 
     values = rng.normal(100.0, 7.0, 257)
     values[[17, 81, 163]] = 0.0
     expected = talib.ROCP(values, timeperiod=timeperiod)
-    actual = RateOfChangePercent(values, timeperiod)
+    actual = RateOfChangePercent(timeperiod).extend(values)
     np.testing.assert_array_equal(actual.compute(), expected)
 
-    chunked = RateOfChangePercent([], timeperiod)
+    chunked = RateOfChangePercent(timeperiod)
     assert chunked.extend(values[:43]).extend(values[43:]) is chunked
     np.testing.assert_array_equal(chunked.compute(), actual.compute())
     assert chunked.reset() is chunked
@@ -27,6 +27,6 @@ def test_rate_of_change_percent_matches_talib_and_lifecycle(timeperiod: int) -> 
 
 def test_rate_of_change_percent_requires_values_and_positive_period() -> None:
     with pytest.raises(ValueError):
-        RateOfChangePercent(None)
+        RateOfChangePercent().extend(None)
     with pytest.raises(ValueError):
-        RateOfChangePercent([], 0)
+        RateOfChangePercent(0)

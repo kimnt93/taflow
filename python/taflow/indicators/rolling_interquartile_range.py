@@ -20,9 +20,8 @@ class RollingInterquartileRange:
     independent oracle is pandas rolling quantile.
     """
 
-    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingInterquartileRange":
         """Append one observation and return this adapter."""

@@ -10,7 +10,7 @@ class RollingMinimumIndex(UnaryStateAdapter):
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -20,10 +20,10 @@ class RollingMinimumIndex(UnaryStateAdapter):
 
     _native_cls = RollingMinimumIndex
 
-    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
-        """Create the native minimum-index state and process ``_input``."""
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = self._native_cls(timeperiod)
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingMinimumIndex":
         """Append one observation and return this indicator."""

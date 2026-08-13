@@ -9,8 +9,8 @@ from .._price_state import HlPriceState
 class MedianPrice(HlPriceState):
     """Compute ``(high + low) / 2`` in persistent Rust state.
 
-    The constructor requires the aligned chronological high, low
-    series. Pass empty aligned arrays for a fresh streaming state. Output has no
+    Construction creates a fresh empty state. Supply aligned chronological high and
+    low series through ``extend`` or ``append``. Output has no
     rolling warm-up and maps to TA-Lib ``MEDPRICE``.
     """
 

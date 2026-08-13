@@ -11,10 +11,10 @@ def test_momentum_matches_talib_and_lifecycle(timeperiod: int) -> None:
     values = rng.normal(100.0, 7.0, 257)
     values[[17, 81, 163]] = 0.0
     expected = talib.MOM(values, timeperiod=timeperiod)
-    actual = Momentum(values, timeperiod)
+    actual = Momentum(timeperiod).extend(values)
     np.testing.assert_array_equal(actual.compute(), expected)
 
-    chunked = Momentum([], timeperiod)
+    chunked = Momentum(timeperiod)
     assert chunked.extend(values[:43]) is chunked
     assert chunked.extend(values[43:]) is chunked
     np.testing.assert_array_equal(chunked.compute(), actual.compute())
@@ -28,6 +28,6 @@ def test_momentum_matches_talib_and_lifecycle(timeperiod: int) -> None:
 
 def test_momentum_requires_values_and_positive_period() -> None:
     with pytest.raises(ValueError):
-        Momentum(None)
+        Momentum().extend(None)
     with pytest.raises(ValueError):
-        Momentum([], 0)
+        Momentum(0)

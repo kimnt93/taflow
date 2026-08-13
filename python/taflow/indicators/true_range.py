@@ -11,14 +11,12 @@ from .._series import as_float64_series
 class TrueRange:
     """Compute max(high-low, |high-prev close|, |low-prev close|) in Rust.
 
-    High, low, and close histories are required; pass three empty arrays for a
-    fresh state. The first output is NaN because no previous close exists. This
+    Supply aligned high, low, and close histories through ``extend``. The first output is NaN because no previous close exists. This
     maps to TA-Lib ``TRANGE``.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeTrueRange()
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "TrueRange":
         """Append one high/low/close tuple and return this indicator."""

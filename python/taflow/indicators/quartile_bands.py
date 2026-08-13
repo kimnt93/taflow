@@ -7,9 +7,8 @@ from .._series import as_float64_series
 class QuartileBands:
     """Rolling 75th-percentile, median, and 25th-percentile bands."""
 
-    def __init__(self, prices: Any, period: int = 20) -> None:
+    def __init__(self, period: int = 20) -> None:
         self._state = _Native(period)
-        self.extend(prices)
 
     def append(self, price: float) -> "QuartileBands":
         self._state.append(float(price))

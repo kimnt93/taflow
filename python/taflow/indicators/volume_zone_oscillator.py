@@ -17,18 +17,18 @@ class VolumeZoneOscillator:
     This definition maps to Wickra ``VZO`` 0.9.9; TA-Lib has no equivalent.
 
     Args:
-        close: Initial chronological closing-price series.
-        volume: Initial chronological volume series aligned with ``close``.
+        close: Chronological closing-price series.
+        volume: Chronological volume series aligned with ``close``.
         timeperiod: EMA smoothing period. Defaults to 14.
 
     Raises:
         ValueError: If the input lengths differ or ``timeperiod`` is zero.
     """
 
-    def __init__(self, close: Any, volume: Any, timeperiod: int = 14) -> None:
-        """Initialize the oscillator and process aligned close/volume history."""
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(int(timeperiod))
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "VolumeZoneOscillator":
         """Append one close/volume bar and return this instance."""

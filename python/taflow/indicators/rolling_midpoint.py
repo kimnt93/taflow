@@ -17,9 +17,8 @@ class RollingMidpoint:
     TA-Lib ``MIDPOINT``.
     """
 
-    def __init__(self, values: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeRollingMidpoint(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingMidpoint":
         """Append one value and return this indicator."""

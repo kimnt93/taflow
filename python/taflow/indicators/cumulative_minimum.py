@@ -11,14 +11,12 @@ from .._series import as_float64_series
 class CumulativeMinimum:
     """Compute the cumulative minimum in persistent Rust state.
 
-    ``_input`` is a required chronological numeric series; pass an empty array
-    for a fresh streaming state. There is no warm-up. Correctness maps to the
+    Supply the chronological numeric ``_input`` series through ``extend``. There is no warm-up. Correctness maps to the
     Polars ``Series.cum_min`` expression.
     """
 
-    def __init__(self, _input: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeCumulativeMinimum()
-        self.extend(_input)
 
     def append(self, _input: float) -> "CumulativeMinimum":
         """Append one observation and return this indicator."""

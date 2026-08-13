@@ -17,10 +17,10 @@ def test_aroon_oscillator_matches_talib_matrix_and_lifecycle(timeperiod: int) ->
         high = base + 1.0
         low = base - 1.0
         expected = talib.AROONOSC(high, low, timeperiod)
-        actual = AroonOscillator(high, low, timeperiod)
+        actual = AroonOscillator(timeperiod).extend(high, low)
         np.testing.assert_allclose(actual.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True)
 
-        state = AroonOscillator([], [], timeperiod)
+        state = AroonOscillator(timeperiod)
         assert state.extend(high[:47], low[:47]) is state
         assert state.extend(high[47:], low[47:]) is state
         np.testing.assert_array_equal(state.compute(), actual.compute())
@@ -32,8 +32,8 @@ def test_aroon_oscillator_matches_talib_matrix_and_lifecycle(timeperiod: int) ->
 
 def test_aroon_oscillator_validates_configuration_and_alignment_before_mutation() -> None:
     with pytest.raises(ValueError):
-        AroonOscillator([], [], 1)
-    state = AroonOscillator([], [], 5)
+        AroonOscillator(1)
+    state = AroonOscillator(5)
     with pytest.raises(ValueError):
         state.extend([1.0, 2.0], [1.0])
     assert len(state) == 0

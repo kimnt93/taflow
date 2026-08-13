@@ -11,9 +11,8 @@ from .._series import as_float64_series
 class DoubleExponentialMovingAverage:
     """Compute DEMA from required ``values``; Rust owns warm-up and recurrence."""
 
-    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _NativeDoubleExponentialMovingAverage(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "DoubleExponentialMovingAverage":
         self._state.append(float(value))

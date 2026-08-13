@@ -4,7 +4,7 @@ from taflow import ForceIndex
 
 
 def test_force_index_lifecycle_and_alignment():
-    state = ForceIndex(np.array([], dtype=float), np.array([], dtype=float))
+    state = ForceIndex()
     close = np.arange(14.0) + 10.0
     volume = np.arange(14.0) + 2.0
     state.extend(close, volume)

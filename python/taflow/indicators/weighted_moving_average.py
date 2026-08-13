@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class WeightedMovingAverage:
     """Compute linearly weighted MA from required ``values`` in Rust."""
 
-    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _NativeWeightedMovingAverage(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "WeightedMovingAverage":
         self._state.append(float(value))

@@ -12,10 +12,10 @@ def test_median_price_matches_talib_and_lifecycle() -> None:
     low = close - rng.uniform(0.1, 2.0, 128)
     open = low + rng.random(128) * (high - low)
     expected = talib.MEDPRICE(high, low)
-    actual = MedianPrice(high, low)
+    actual = MedianPrice().extend(high, low)
     np.testing.assert_allclose(actual.compute(), expected, rtol=1e-12, atol=1e-12)
 
-    state = MedianPrice([], [])
+    state = MedianPrice()
     assert state.extend(high[:43], low[:43]) is state
     assert state.extend(high[43:], low[43:]) is state
     np.testing.assert_allclose(state.compute(), expected, rtol=1e-12, atol=1e-12)
@@ -24,7 +24,7 @@ def test_median_price_matches_talib_and_lifecycle() -> None:
         assert state.append(float(high[index]), float(low[index])) is state
     np.testing.assert_allclose(state.compute(), expected, rtol=1e-12, atol=1e-12)
 
-    fresh = MedianPrice([], [])
+    fresh = MedianPrice()
     assert len(fresh) == 0
     assert fresh.value is None
     with pytest.raises(ValueError):

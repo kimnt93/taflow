@@ -7,9 +7,8 @@ from .._series import as_float64_series
 class ProjectionBands:
     """Rolling projected central value."""
 
-    def __init__(self, values: Any, period: int = 20) -> None:
+    def __init__(self, period: int = 20) -> None:
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "ProjectionBands":
         self._state.append(float(value))

@@ -16,8 +16,7 @@ class VariablePeriodMovingAverage:
     Parameters
     ----------
     values : array-like
-        Initial chronological input values. Pass an empty aligned series to
-        create a fresh streaming state.
+        Chronological input values supplied through ``extend``.
     periods : array-like
         Per-bar periods aligned with ``values``. Values are truncated to an
         integer and clamped to ``[min_period, max_period]`` like TA-Lib MAVP.
@@ -37,17 +36,15 @@ class VariablePeriodMovingAverage:
 
     def __init__(
         self,
-        values: Any,
-        periods: Any,
         min_period: int = 2,
         max_period: int = 30,
         average_type: int = 0,
     ) -> None:
-        """Create the native state and process the required aligned inputs."""
+        """Initialize an empty configured native state.
+        """
         self._state = _NativeVariablePeriodMovingAverage(
             min_period, max_period, average_type
         )
-        self.extend(values, periods)
 
     def append(self, value: float, period: float) -> "VariablePeriodMovingAverage":
         """Append one value and its period to the native Rust state.

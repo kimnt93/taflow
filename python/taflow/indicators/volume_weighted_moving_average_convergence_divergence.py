@@ -23,17 +23,10 @@ class VolumeWeightedMovingAverageConvergenceDivergence:
         ValueError: If inputs differ in length or periods are invalid.
     """
 
-    def __init__(
-        self,
-        close: Any,
-        volume: Any,
-        fast: int = 12,
-        slow: int = 26,
-        signal: int = 9,
-    ) -> None:
-        """Initialize native VWMA-MACD state and process aligned histories."""
+    def __init__(self, fast: int = 12, slow: int = 26, signal: int = 9) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(fast, slow, signal)
-        self.extend(close, volume)
 
     def append(
         self, close: float, volume: float

@@ -14,17 +14,17 @@ class CenterOfGravity:
     ``NaN``. This maps to Wickra ``CenterOfGravity``.
 
     Args:
-        values: Initial chronological price history.
+        values: Chronological price history.
         period: Positive rolling window length, default 10.
 
     Raises:
         ValueError: If ``period`` is zero.
     """
 
-    def __init__(self, values: Any, period: int = 10) -> None:
-        """Initialize native rolling state and process the initial history."""
+    def __init__(self, period: int = 10) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "CenterOfGravity":
         """Append one price and return this adapter."""

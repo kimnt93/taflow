@@ -16,17 +16,17 @@ class RollingStandardError:
     standard error of a sample mean. It maps to Wickra ``StandardError``.
 
     Args:
-        values: Initial chronological dependent observations.
+        values: Chronological dependent observations.
         period: Regression window length, default 20 and minimum 3.
 
     Raises:
         ValueError: If ``period`` is below three.
     """
 
-    def __init__(self, values: Any, period: int = 20) -> None:
-        """Initialize native regression state and process the history."""
+    def __init__(self, period: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingStandardError":
         """Append one observation and return this instance."""

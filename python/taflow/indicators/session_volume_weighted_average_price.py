@@ -7,18 +7,8 @@ from .._series import as_float64_series, as_int64_series
 class SessionVolumeWeightedAveragePrice:
     """Session-reset typical-price VWAP; Wickra alias is ``SessionVwap``."""
 
-    def __init__(
-        self,
-        open: Any,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
-        timestamp: Any,
-        utc_offset_minutes: int = 0,
-    ) -> None:
+    def __init__(self, utc_offset_minutes: int = 0) -> None:
         self._state = _Native(utc_offset_minutes)
-        self.extend(open, high, low, close, volume, timestamp)
 
     def append(
         self,

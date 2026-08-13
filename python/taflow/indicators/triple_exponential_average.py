@@ -14,7 +14,7 @@ class TripleExponentialAverage:
     Parameters
     ----------
     values : array-like
-        Input values; an empty array creates a fresh stream.
+        Input values; supply the series through ``extend`` after construction.
     timeperiod : int, default 5
         Period for each of the six seeded EMAs; values below 2 are rejected.
     volume_factor : float, default 0.7
@@ -33,14 +33,8 @@ class TripleExponentialAverage:
     recurrence, warm-up, and bulk processing.
     """
 
-    def __init__(
-        self,
-        values: Any,
-        timeperiod: int = 5,
-        volume_factor: float = 0.7,
-    ) -> None:
+    def __init__(self, timeperiod: int = 5, volume_factor: float = 0.7) -> None:
         self._state = _NativeTripleExponentialAverage(timeperiod, volume_factor)
-        self.extend(values)
 
     def append(self, value: float) -> "TripleExponentialAverage":
         """Append one value and return this indicator for fluent chaining."""

@@ -11,8 +11,7 @@ from .._series import as_float64_series
 class MovingAverageConvergenceDivergenceExtended:
     """Compute TA-Lib ``MACDEXT`` with independently selected MA types.
 
-    ``values`` is the chronological close series; pass an empty array for a
-    fresh stream. Periods default to 12/26/9 and ``fast_matype``,
+    Supply the chronological ``values`` close series through ``extend``. Periods default to 12/26/9 and ``fast_matype``,
     ``slow_matype``, and ``signal_matype`` default to TA-Lib code 1 (EMA).
     ``compute`` returns MACD/signal/histogram arrays with NaN warm-up values;
     ``value`` is the latest tuple or ``None``. Lifecycle mutators are fluent.
@@ -22,7 +21,6 @@ class MovingAverageConvergenceDivergenceExtended:
 
     def __init__(
         self,
-        values: Any,
         fast_period: int = 12,
         fast_average_type: int = 1,
         slow_period: int = 26,
@@ -38,7 +36,6 @@ class MovingAverageConvergenceDivergenceExtended:
             signal_period,
             signal_average_type,
         )
-        self.extend(values)
 
     def append(self, value: float) -> "MovingAverageConvergenceDivergenceExtended":
         self._state.append(float(value))

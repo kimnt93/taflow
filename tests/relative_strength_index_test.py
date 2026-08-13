@@ -20,7 +20,7 @@ def test_matches_talib(timeperiod: int, case: str) -> None:
         close = np.resize(np.array([10.0, 12.0, 12.0, 9.0, 9.0, 12.0]), size)
 
     expected = talib.RSI(close, timeperiod=timeperiod)
-    actual = RelativeStrengthIndex(close, timeperiod).compute()
+    actual = RelativeStrengthIndex(timeperiod).extend(close).compute()
     np.testing.assert_allclose(actual, expected, rtol=0.0, atol=1e-12, equal_nan=True)
 
 
@@ -28,16 +28,16 @@ def test_matches_talib(timeperiod: int, case: str) -> None:
 def test_minimum_length_matches_talib(timeperiod: int) -> None:
     close = np.linspace(5.0, 5.0 + timeperiod, timeperiod + 1)
     expected = talib.RSI(close, timeperiod=timeperiod)
-    actual = RelativeStrengthIndex(close, timeperiod).compute()
+    actual = RelativeStrengthIndex(timeperiod).extend(close).compute()
     np.testing.assert_array_equal(actual, expected)
 
 
 def test_lifecycle_is_bitwise_invariant() -> None:
     rng = np.random.default_rng(21931)
     close = 100.0 + rng.normal(size=431).cumsum()
-    batch = RelativeStrengthIndex(close, 17)
+    batch = RelativeStrengthIndex(17).extend(close)
 
-    chunked = RelativeStrengthIndex([], 17)
+    chunked = RelativeStrengthIndex(17)
     assert chunked.extend(close[:53]) is chunked
     assert chunked.extend(close[53:]) is chunked
     np.testing.assert_array_equal(chunked.compute(), batch.compute())
@@ -53,7 +53,7 @@ def test_lifecycle_is_bitwise_invariant() -> None:
 
 
 def test_warm_up_validation_and_input_contract() -> None:
-    state = RelativeStrengthIndex([], 3)
+    state = RelativeStrengthIndex(3)
     for value in (1.0, 2.0, 3.0):
         assert state.append(value) is state
         assert state.value is None
@@ -62,8 +62,8 @@ def test_warm_up_validation_and_input_contract() -> None:
     np.testing.assert_array_equal(np.isnan(state.compute()), [True, True, True, False])
 
     with pytest.raises(ValueError):
-        RelativeStrengthIndex(None)
+        RelativeStrengthIndex().extend(None)
     with pytest.raises(ValueError):
-        RelativeStrengthIndex([[1.0, 2.0]])
+        RelativeStrengthIndex().extend([[1.0, 2.0]])
     with pytest.raises(ValueError):
-        RelativeStrengthIndex([], 1)
+        RelativeStrengthIndex(1)

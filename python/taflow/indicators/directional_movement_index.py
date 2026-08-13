@@ -13,7 +13,7 @@ class DirectionalMovementIndex:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -23,14 +23,10 @@ class DirectionalMovementIndex:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         period: int = 14,
     ) -> None:
-        """Create DX with an optional aligned high/low/close history."""
+        """Create an empty configured DX state."""
         self._state = _NativeDirectionalMovementIndex(period)
-        self.extend(high, low, close)
 
     def append(self, high: object, low: object, close: object) -> "DirectionalMovementIndex":
         """Append one observation or aligned bar to the native Rust state.

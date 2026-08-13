@@ -14,15 +14,11 @@ class Ichimoku:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         tenkan: int = 9,
         kijun: int = 26,
         senkou: int = 52,
     ) -> None:
         self._state = _Native(int(tenkan), int(kijun), int(senkou))
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Ichimoku":
         self._state.append(float(high), float(low), float(close))

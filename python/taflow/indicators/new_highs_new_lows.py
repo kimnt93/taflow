@@ -20,10 +20,10 @@ class NewHighsNewLows:
         ValueError: If the two histories have different lengths.
     """
 
-    def __init__(self, new_highs: Any, new_lows: Any) -> None:
-        """Initialize native state and process aligned count histories."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(new_highs, new_lows)
 
     def append(self, new_highs: float, new_lows: float) -> "NewHighsNewLows":
         """Append one aggregate-extremes tick and return this adapter."""

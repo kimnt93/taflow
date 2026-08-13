@@ -12,9 +12,9 @@ def test_normalized_average_true_range_matches_talib_and_lifecycle(
     close = 100 + rng.normal(size=257).cumsum()
     high, low = close + rng.uniform(0.1, 2, 257), close - rng.uniform(0.1, 2, 257)
     expected = talib.NATR(high, low, close, timeperiod)
-    actual = NormalizedAverageTrueRange(high, low, close, timeperiod)
+    actual = NormalizedAverageTrueRange(timeperiod).extend(high, low, close)
     np.testing.assert_array_equal(actual.compute(), expected)
-    state = NormalizedAverageTrueRange([], [], [], timeperiod)
+    state = NormalizedAverageTrueRange(timeperiod)
     state.extend(high[:41], low[:41], close[:41]).extend(
         high[41:], low[41:], close[41:]
     )
@@ -27,4 +27,4 @@ def test_normalized_average_true_range_matches_talib_and_lifecycle(
 
 def test_normalized_average_true_range_validates() -> None:
     with pytest.raises(ValueError):
-        NormalizedAverageTrueRange([], [], [], 0)
+        NormalizedAverageTrueRange(0)

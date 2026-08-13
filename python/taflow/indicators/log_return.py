@@ -11,15 +11,14 @@ from .._series import as_float64_series
 class LogReturn:
     """Compute ``ln(x[t] / x[t-timeperiod])`` using persistent Rust state.
 
-    ``_input`` is required; pass an empty series for a fresh streaming state.
+    Supply the chronological ``_input`` series through ``extend``.
     ``timeperiod`` defaults to 1 and must be positive. The first
     ``timeperiod`` history positions are ``NaN``. Correctness maps to pandas
     shifted division followed by ``numpy.log``.
     """
 
-    def __init__(self, _input: Any, timeperiod: int = 1) -> None:
+    def __init__(self, timeperiod: int = 1) -> None:
         self._state = _NativeLogReturn(timeperiod)
-        self.extend(_input)
 
     def append(self, _input: float) -> "LogReturn":
         """Append one observation and return this indicator."""

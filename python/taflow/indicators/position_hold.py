@@ -19,9 +19,8 @@ class PositionHold:
     for this stateful signal definition.
     """
 
-    def __init__(self, position: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(position)
 
     def append(self, position: float) -> "PositionHold":
         """Append one position and return this adapter."""

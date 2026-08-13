@@ -25,16 +25,10 @@ class RollingCointegration:
     Raises:
         ValueError: If histories differ in length or the period is too short.
     """
-    def __init__(
-        self,
-        left: Any,
-        right: Any,
-        period: int = 30,
-        augmented_dickey_fuller_lags: int = 1,
-    ) -> None:
-        """Initialize native regression state and process aligned histories."""
+    def __init__(self, period: int = 30, augmented_dickey_fuller_lags: int = 1) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, augmented_dickey_fuller_lags)
-        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "RollingCointegration":
         """Append one aligned observation and return this adapter."""

@@ -18,9 +18,8 @@ class JurikMovingAverage:
     pandas-ta-classic ``jma`` definition used by TAFlow.
     """
 
-    def __init__(self, values: Any, length: int = 7, phase: float = 0.0) -> None:
+    def __init__(self, length: int = 7, phase: float = 0.0) -> None:
         self._state = _NativeJurikMovingAverage(length, phase)
-        self.extend(values)
 
     def append(self, value: float) -> "JurikMovingAverage":
         self._state.append(float(value))

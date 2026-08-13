@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class TriangularMovingAverage:
     """Compute TRIMA from required ``values`` through the Rust state."""
 
-    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _NativeTriangularMovingAverage(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "TriangularMovingAverage":
         self._state.append(float(value))

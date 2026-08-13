@@ -18,9 +18,8 @@ class Crossover:
     return ``self``. Input length mismatches are rejected before mutation.
     """
 
-    def __init__(self, left: Any, right: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(left, right)
 
     def append(self, left: float, right: float) -> "Crossover":
         """Append one pair and return this adapter."""

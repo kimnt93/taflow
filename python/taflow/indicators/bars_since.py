@@ -19,9 +19,8 @@ class BarsSince:
     this stateful signal definition.
     """
 
-    def __init__(self, condition: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(condition)
 
     def append(self, condition: bool) -> "BarsSince":
         """Append one condition and return this adapter."""

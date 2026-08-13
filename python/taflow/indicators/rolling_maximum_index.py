@@ -13,7 +13,7 @@ class RollingMaximumIndex(UnaryStateAdapter):
     timeperiod : int
         Number of observations in each trailing window.
     input_values : array-like
-        Initial chronological values processed by the native state.
+        Chronological values processed by the native state.
 
     Returns
     -------
@@ -23,10 +23,10 @@ class RollingMaximumIndex(UnaryStateAdapter):
 
     _native_cls = RollingMaximumIndex
 
-    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
-        """Create the native maximum-index state and process ``_input``."""
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = self._native_cls(timeperiod)
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingMaximumIndex":
         """Append one observation and return this indicator."""

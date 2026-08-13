@@ -19,14 +19,13 @@ class BatPattern:
     mapping is Wickra 0.9.9 Bat; TA-Lib has no equivalent pattern function.
     """
 
-    def __init__(self, open: Any, high: Any, low: Any, close: Any) -> None:
-        """Initialize and process required aligned chronological OHLC series.
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
 
         Empty aligned series create a fresh streaming state. Differing input
         lengths raise ValueError before native state is mutated.
         """
         self._state = _Native()
-        self.extend(open, high, low, close)
 
     def append(
         self, open: float, high: float, low: float, close: float

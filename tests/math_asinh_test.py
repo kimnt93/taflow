@@ -14,12 +14,12 @@ def test_math_asinh_matches_numpy_and_lifecycle() -> None:
     )
     for values in datasets:
         expected = (np.arcsinh)(values)
-        actual = MathAsinh(values)
+        actual = MathAsinh().extend(values)
         np.testing.assert_allclose(
             actual.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-        state = MathAsinh([])
+        state = MathAsinh()
         split = len(values) // 3
         assert state.extend(values[:split]) is state
         assert state.extend(values[split:]) is state
@@ -34,6 +34,6 @@ def test_math_asinh_matches_numpy_and_lifecycle() -> None:
             state.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-    fresh = MathAsinh([])
+    fresh = MathAsinh()
     assert len(fresh) == 0
     assert fresh.value is None

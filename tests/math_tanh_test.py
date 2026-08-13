@@ -15,12 +15,12 @@ def test_math_tanh_matches_talib_and_lifecycle() -> None:
     )
     for values in datasets:
         expected = (talib.TANH)(values)
-        actual = MathTanh(values)
+        actual = MathTanh().extend(values)
         np.testing.assert_allclose(
             actual.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-        state = MathTanh([])
+        state = MathTanh()
         split = len(values) // 3
         assert state.extend(values[:split]) is state
         assert state.extend(values[split:]) is state
@@ -35,6 +35,6 @@ def test_math_tanh_matches_talib_and_lifecycle() -> None:
             state.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-    fresh = MathTanh([])
+    fresh = MathTanh()
     assert len(fresh) == 0
     assert fresh.value is None

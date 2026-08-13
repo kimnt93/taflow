@@ -14,10 +14,9 @@ class Liquidity:
     """
 
     def __init__(
-        self, high: Any, low: Any, swing_length: int = 50, range_percent: float = 0.01
+        self, swing_length: int = 50, range_percent: float = 0.01
     ) -> None:
         self._state = _Native(int(swing_length), float(range_percent))
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Liquidity":
         self._state.append(float(high), float(low))

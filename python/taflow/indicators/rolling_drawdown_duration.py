@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class RollingDrawdownDuration:
     """Cumulative bars since the latest running equity peak."""
 
-    def __init__(self, values: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(values)
 
     def append(self, value: float) -> "RollingDrawdownDuration":
         self._state.append(float(value))

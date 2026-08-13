@@ -138,9 +138,8 @@ from ._native import {class_name} as _Native{class_name}
 class {class_name}(MathUnaryState):
     """Apply pointwise {operation_name} in persistent Rust state.
 
-    Parameters:
-        _input: Required chronological values. Pass an empty series for a fresh
-            streaming state.
+    Construct with no arguments, then supply chronological values through
+    ``extend`` or ``append``.
 
     The output is a same-length ``float64`` array with no rolling warm-up.
     Domain behavior follows IEEE 754. The independent correctness oracle is

@@ -27,15 +27,12 @@ class HurstChannel:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         period: int = 10,
         multiplier: float = 0.5,
     ) -> None:
-        """Initialize native channel state and process aligned histories."""
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, multiplier)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "HurstChannel":
         """Append one high/low/close bar and return this adapter."""

@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class RollingStandardDeviation:
     """Compute STDDEV from required ``values`` with configurable ``nbdev``."""
 
-    def __init__(self, values: Any, timeperiod: int = 14, nbdev: float = 1.0) -> None:
+    def __init__(self, timeperiod: int = 14, nbdev: float = 1.0) -> None:
         self._state = _NativeRollingStandardDeviation(timeperiod, nbdev)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingStandardDeviation":
         self._state.append(float(value))

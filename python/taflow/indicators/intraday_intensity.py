@@ -7,9 +7,8 @@ from .._series import as_float64_series
 class IntradayIntensity:
     """Within-bar buying/selling pressure weighted by volume."""
 
-    def __init__(self, high: Any, low: Any, close: Any, volume: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float

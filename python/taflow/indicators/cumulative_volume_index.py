@@ -21,10 +21,10 @@ class CumulativeVolumeIndex:
         ValueError: If the input histories have different lengths.
     """
 
-    def __init__(self, advancing_volume: Any, declining_volume: Any) -> None:
-        """Initialize native state and process aligned volume histories."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(advancing_volume, declining_volume)
 
     def append(
         self, advancing_volume: float, declining_volume: float

@@ -17,11 +17,11 @@ def test_heikin_ashi_matches_pandas_ta_classic_and_lifecycle() -> None:
     )
     expected = tuple(frame[column].to_numpy() for column in frame.columns)
 
-    actual = HeikinAshi(_open, high, low, close)
+    actual = HeikinAshi().extend(_open, high, low, close)
     for actual_output, expected_output in zip(actual.compute(), expected, strict=True):
         np.testing.assert_array_equal(actual_output, expected_output)
 
-    chunked = HeikinAshi([], [], [], [])
+    chunked = HeikinAshi()
     assert chunked.extend(_open[:43], high[:43], low[:43], close[:43]) is chunked
     assert chunked.extend(_open[43:], high[43:], low[43:], close[43:]) is chunked
     for chunked_output, batch_output in zip(
@@ -41,6 +41,6 @@ def test_heikin_ashi_matches_pandas_ta_classic_and_lifecycle() -> None:
 
 def test_heikin_ashi_requires_aligned_histories() -> None:
     with pytest.raises(ValueError):
-        HeikinAshi(None, [], [], [])
+        HeikinAshi().extend(None, [], [], [])
     with pytest.raises(ValueError):
-        HeikinAshi([1.0], [], [1.0], [1.0])
+        HeikinAshi().extend([1.0], [], [1.0], [1.0])

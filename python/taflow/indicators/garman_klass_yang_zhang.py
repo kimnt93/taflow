@@ -14,24 +14,12 @@ class GarmanKlassYangZhang:
 
     def __init__(
         self,
-        _open: Any,
-        high: Any,
-        low: Any,
-        close: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        _open : object
-            Open-price series or the current bar open.
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
         timeperiod : object
             Trailing window length in bars.
 
@@ -41,7 +29,6 @@ class GarmanKlassYangZhang:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(_open, high, low, close)
 
     def append(
         self, _open: float, high: float, low: float, close: float

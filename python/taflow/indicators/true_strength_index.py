@@ -20,9 +20,8 @@ class TrueStrengthIndex:
     The formula and warm-up match Wickra ``TSI``.
     """
 
-    def __init__(self, _input: Any, fast: int = 13, slow: int = 25) -> None:
+    def __init__(self, fast: int = 13, slow: int = 25) -> None:
         self._state = _Native(int(fast), int(slow))
-        self.extend(_input)
 
     def append(self, _input: float) -> "TrueStrengthIndex":
         """Append one close and return this adapter."""

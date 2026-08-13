@@ -16,7 +16,7 @@ class RollingOmegaRatio:
     has no direct equivalent.
 
     Args:
-        values: Initial chronological return or profit/loss series.
+        values: Chronological return or profit/loss series.
         timeperiod: Rolling window length. Defaults to 14.
         threshold: Return threshold separating gains from losses. Defaults to 0.0.
 
@@ -24,10 +24,10 @@ class RollingOmegaRatio:
         ValueError: If the window or another configuration value is invalid.
     """
 
-    def __init__(self, values: Any, timeperiod: int = 14, threshold: float = 0.0) -> None:
-        """Initialize the state and process the supplied history."""
+    def __init__(self, timeperiod: int = 14, threshold: float = 0.0) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(int(timeperiod), float(threshold))
-        self.extend(values)
 
     def append(self, value: float) -> "RollingOmegaRatio":
         """Append one observation and return this instance."""

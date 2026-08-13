@@ -65,9 +65,7 @@ def test_matches_pandas_grouped_weighted_moments(
     expected = pandas_grouped_weighted_moments(
         high, low, close, volume, anchor, multiplier
     )
-    actual = AnchoredVolumeWeightedAveragePrice(
-        high, low, close, volume, anchor, multiplier
-    ).compute()
+    actual = AnchoredVolumeWeightedAveragePrice(multiplier).extend(high, low, close, volume, anchor).compute()
     for actual_output, expected_output in zip(actual, expected, strict=True):
         np.testing.assert_allclose(
             actual_output, expected_output, rtol=1e-12, atol=1e-9, equal_nan=True
@@ -83,10 +81,8 @@ def test_lifecycle_is_bitwise_invariant() -> None:
     anchor = np.zeros(len(close), dtype=bool)
     anchor[[0, 43, 44, 109, 170]] = True
 
-    batch = AnchoredVolumeWeightedAveragePrice(
-        high, low, close, volume, anchor, 1.75
-    )
-    chunked = AnchoredVolumeWeightedAveragePrice([], [], [], [], [], 1.75)
+    batch = AnchoredVolumeWeightedAveragePrice(1.75).extend(high, low, close, volume, anchor)
+    chunked = AnchoredVolumeWeightedAveragePrice(1.75)
     assert (
         chunked.extend(
             high[:47], low[:47], close[:47], volume[:47], anchor[:47]
@@ -119,11 +115,11 @@ def test_lifecycle_is_bitwise_invariant() -> None:
 def test_validates_configuration_and_alignment_before_mutation() -> None:
     for invalid in (-1.0, np.nan, np.inf):
         with pytest.raises(ValueError):
-            AnchoredVolumeWeightedAveragePrice([], [], [], [], [], invalid)
+            AnchoredVolumeWeightedAveragePrice(invalid)
     with pytest.raises(ValueError):
-        AnchoredVolumeWeightedAveragePrice(None, [], [], [], [])
+        AnchoredVolumeWeightedAveragePrice().extend(None, [], [], [], [])
 
-    state = AnchoredVolumeWeightedAveragePrice([], [], [], [], [])
+    state = AnchoredVolumeWeightedAveragePrice()
     state.append(2.0, 0.0, 1.0, 10.0, True)
     prior_value = state.value
     with pytest.raises(ValueError):
@@ -133,9 +129,7 @@ def test_validates_configuration_and_alignment_before_mutation() -> None:
 
 
 def test_zero_volume_outputs_nan_until_positive_cumulative_volume() -> None:
-    state = AnchoredVolumeWeightedAveragePrice(
-        [2.0, 3.0], [0.0, 1.0], [1.0, 2.0], [0.0, 5.0], [True, False]
-    )
+    state = AnchoredVolumeWeightedAveragePrice().extend([2.0, 3.0], [0.0, 1.0], [1.0, 2.0], [0.0, 5.0], [True, False])
     average, upper, lower = state.compute()
     assert np.isnan(average[0]) and np.isnan(upper[0]) and np.isnan(lower[0])
     np.testing.assert_array_equal(

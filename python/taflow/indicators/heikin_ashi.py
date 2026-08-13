@@ -14,19 +14,17 @@ class HeikinAshi:
     Parameters
     ----------
     _open : array-like
-        Initial chronological open prices. Pass an empty aligned series for a
-        fresh streaming state.
+        Chronological open prices. Supply the series through ``extend`` after construction.
     high : array-like
-        Initial chronological high prices aligned with ``_open``.
+        Chronological high prices aligned with ``_open``.
     low : array-like
-        Initial chronological low prices aligned with ``_open``.
+        Chronological low prices aligned with ``_open``.
     close : array-like
-        Initial chronological close prices aligned with ``_open``.
+        Chronological close prices aligned with ``_open``.
 
     Notes
     -----
-    The constructor requires aligned open, high, low, and close series; pass
-    four empty series for a fresh streaming state. The first transformed open
+    ``extend`` accepts aligned open, high, low, and close series; Supply the aligned series through ``extend`` after construction. The first transformed open
     is ``(open + close) / 2``; later opens average the previous transformed
     open and close. There is no warm-up. ``compute`` returns arrays in
     ``(open, high, low, close)`` order. Rust owns the recurrence, warm-up,
@@ -34,9 +32,8 @@ class HeikinAshi:
     ``ha``. ``append``, ``extend``, and ``reset`` mutate and return this adapter.
     """
 
-    def __init__(self, _open: Any, high: Any, low: Any, close: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeHeikinAshi()
-        self.extend(_open, high, low, close)
 
     def append(
         self, _open: float, high: float, low: float, close: float

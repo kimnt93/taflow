@@ -10,9 +10,8 @@ from .._series import as_float64_series
 class DecayLinear:
     """WorldQuant linear-decay weighted moving average."""
 
-    def __init__(self, input: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(input)
 
     def append(self, input: float) -> "DecayLinear":
         self._state.append(float(input))

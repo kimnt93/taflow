@@ -23,12 +23,10 @@ class RollingLeadLagCrossCorrelation:
         ValueError: If histories differ in length or configuration is invalid.
     """
 
-    def __init__(
-        self, left: Any, right: Any, window: int = 20, max_lag: int = 10
-    ) -> None:
-        """Initialize native lag-search state and process aligned histories."""
+    def __init__(self, window: int = 20, max_lag: int = 10) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(window, max_lag)
-        self.extend(left, right)
 
     def append(
         self, left: float, right: float

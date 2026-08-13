@@ -22,15 +22,12 @@ class EaseOfMovement:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        volume: Any,
         period: int = 14,
         divisor: float = 100_000_000.0,
     ) -> None:
-        """Initialize aligned histories, averaging period, and output scale."""
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, divisor)
-        self.extend(high, low, volume)
 
     def append(self, high: float, low: float, volume: float) -> "EaseOfMovement":
         """Append one high/low/volume bar and return this adapter."""

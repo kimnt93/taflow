@@ -64,25 +64,23 @@ def load_metadata():
     }
 
 
-def signature(cls):
+def signature(cls, inputs):
     try:
         params = list(inspect.signature(cls.__init__).parameters.values())[1:]
     except (TypeError, ValueError):
         return None
-    config = [p for p in params if p.name not in SERIES]
     cfg = (
         ", ".join(
             f"{p.name}={p.default!r}"
             if p.default is not inspect.Parameter.empty
             else p.name
-            for p in config
+            for p in params
         )
         or "—"
     )
     return {
         "cfg": cfg,
-        "order": ", ".join(p.name for p in params),
-        "series_first": bool(params) and params[0].name in SERIES,
+        "inputs": ", ".join(inputs) or "—",
     }
 
 
@@ -241,7 +239,7 @@ def main():
     rows = []
     for name in sorted(meta):
         cls = meta[name]["class"]
-        sig = signature(cls)
+        sig = signature(cls, meta[name]["inputs"])
         if sig is None:
             continue
         entry = dict(sig)
@@ -267,7 +265,8 @@ def main():
 ```python
 from taflow import SimpleMovingAverage
 
-ind = SimpleMovingAverage(close, timeperiod=30)  # data may go in the constructor
+ind = SimpleMovingAverage(timeperiod=30)         # configuration only
+ind.extend(close)                                # historical backfill
 ind.append(float(close[-1]))                     # O(1) live update
 ind.value                                        # latest value, None during warm-up
 ind.compute()                                    # full aligned series
@@ -279,20 +278,21 @@ Outputs are `float64` arrays the same length as the input, `NaN` through
 warm-up. Multi-output indicators return a tuple. Candle patterns return
 `int32` scores (`0`, `±100`).
 """,
-        "### Argument order\n",
-        """Every stateful indicator takes its required input series **first**, then
-configuration. Configuration values have defaults unless the algorithm cannot
-define one semantically:
+        "### Input and configuration order\n",
+        """Every constructor accepts configuration only. Historical series are
+passed to ``extend`` in the documented input order. Configuration values have
+defaults unless the algorithm cannot define one semantically:
 
 ```python
 from taflow import SimpleMovingAverage, MoneyFlowIndex
 
-SimpleMovingAverage(close, timeperiod=30)
-MoneyFlowIndex(high, low, close, volume, timeperiod=14)
+SimpleMovingAverage(timeperiod=30).extend(close)
+MoneyFlowIndex(timeperiod=14).extend(high, low, close, volume)
 ```
 
-The `Constructor order` column below is authoritative — it is introspected from
-the live signature. Passing data by keyword always works.
+The `Input order` and `Constructor configuration` columns below are
+authoritative: they are introspected from the live ``extend`` and constructor
+signatures. Passing data by keyword always works.
 """,
         "Correctness is reported in [../verify/CORRECTNESS.md](../verify/CORRECTNESS.md); "
         "throughput is in [../verify/BENCHMARK.md](../verify/BENCHMARK.md).\n",
@@ -307,12 +307,12 @@ the live signature. Passing data by keyword always works.
         if cat not in grouped:
             continue
         out.append(f"## {cat}\n")
-        out.append("| Class | TA-Lib | Parameters | Constructor order |")
+        out.append("| Class | TA-Lib | Input order | Constructor configuration |")
         out.append("|---|---|---|---|")
         for row in sorted(grouped[cat], key=lambda r: r["cls"]):
             out.append(
-                f"| `{row['cls']}` | {row['talib'] or '—'} | {row['cfg']} "
-                f"| `({row['order']})` |"
+                f"| `{row['cls']}` | {row['talib'] or '—'} | `({row['inputs']})` "
+                f"| `({row['cfg']})` |"
             )
         out.append("")
 

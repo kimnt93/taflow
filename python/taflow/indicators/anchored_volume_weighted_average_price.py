@@ -16,14 +16,13 @@ class AnchoredVolumeWeightedAveragePrice:
     Parameters
     ----------
     high : array-like
-        Initial chronological high prices. Pass an empty aligned series for a
-        fresh streaming state.
+        Chronological high prices. Supply the series through ``extend`` after construction.
     low : array-like
-        Initial chronological low prices aligned with ``high``.
+        Chronological low prices aligned with ``high``.
     close : array-like
-        Initial chronological close prices aligned with ``high``.
+        Chronological close prices aligned with ``high``.
     volume : array-like
-        Initial chronological volumes aligned with ``high``.
+        Chronological volumes aligned with ``high``.
     anchor : array-like of bool
         Reset flags aligned with ``high``. A true flag starts a new weighted
         accumulation at the current bar.
@@ -44,17 +43,11 @@ class AnchoredVolumeWeightedAveragePrice:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
-        anchor: Any,
         standard_deviation_multiplier: float = 1.0,
     ) -> None:
         self._state = _NativeAnchoredVolumeWeightedAveragePrice(
             float(standard_deviation_multiplier)
         )
-        self.extend(high, low, close, volume, anchor)
 
     def append(
         self, high: float, low: float, close: float, volume: float, anchor: bool

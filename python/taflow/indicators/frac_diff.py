@@ -13,9 +13,8 @@ class FracDiff:
     Scalar output is None during warm-up; history uses NaN there.
     """
 
-    def __init__(self, input: Any, d: float = 0.5, threshold: float = 1e-5) -> None:
+    def __init__(self, d: float = 0.5, threshold: float = 1e-5) -> None:
         self._state = _Native(float(d), float(threshold))
-        self.extend(input)
 
     def append(self, input: float) -> "FracDiff":
         self._state.append(float(input))

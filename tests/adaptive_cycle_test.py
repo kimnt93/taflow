@@ -4,7 +4,7 @@ from taflow import AdaptiveCycle
 
 
 def test_adaptive_cycle_lifecycle():
-    state = AdaptiveCycle(np.array([], dtype=float))
+    state = AdaptiveCycle()
     state.extend(np.arange(60.0))
 
     assert state.value is not None

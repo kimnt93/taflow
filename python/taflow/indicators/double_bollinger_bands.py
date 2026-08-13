@@ -28,14 +28,13 @@ class DoubleBollingerBands:
 
     def __init__(
         self,
-        values: Any,
         period: int = 20,
         inner_multiplier: float = 1.0,
         outer_multiplier: float = 2.0,
     ) -> None:
-        """Initialize the native state and process the supplied history."""
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, inner_multiplier, outer_multiplier)
-        self.extend(values)
 
     def append(self, value: float) -> "DoubleBollingerBands":
         """Append one price and return ``self``."""

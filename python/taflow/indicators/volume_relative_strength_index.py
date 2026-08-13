@@ -17,18 +17,17 @@ class VolumeRelativeStrengthIndex:
     maps to Wickra ``VolumeRsi`` 0.9.9; TA-Lib has no direct equivalent.
 
     Args:
-        volume: Initial chronological volume series. An empty series creates a
-            fresh state for later streaming.
+        volume: Chronological volume series supplied through ``extend``.
         period: Wilder smoothing period. Defaults to 14.
 
     Raises:
         ValueError: If ``period`` is zero.
     """
 
-    def __init__(self, volume: Any, period: int = 14) -> None:
-        """Initialize the index and process the supplied volume history."""
+    def __init__(self, period: int = 14) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(int(period))
-        self.extend(volume)
 
     def append(self, volume: float) -> "VolumeRelativeStrengthIndex":
         """Append one volume observation and return this instance."""

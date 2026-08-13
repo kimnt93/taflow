@@ -18,8 +18,8 @@ class RollingGrangerCausality:
     ``GrangerCausality``.
 
     Args:
-        dependent: Initial chronological series being predicted.
-        predictor: Initial chronological candidate explanatory series.
+        dependent: Chronological series being predicted.
+        predictor: Chronological candidate explanatory series.
         period: Regression lookback, default 60.
         lag: Autoregressive order, default 1.
 
@@ -28,10 +28,10 @@ class RollingGrangerCausality:
             than ``3 * lag + 2``.
     """
 
-    def __init__(self, dependent: Any, predictor: Any, period: int = 60, lag: int = 1) -> None:
-        """Initialize native state and process aligned histories."""
+    def __init__(self, period: int = 60, lag: int = 1) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, lag)
-        self.extend(dependent, predictor)
 
     def append(self, dependent: float, predictor: float) -> "RollingGrangerCausality":
         """Append one aligned observation pair and return this instance."""

@@ -17,14 +17,13 @@ class AdaptiveCycle:
     canonical name map to Wickra ``AdaptiveCycle``.
 
     Args:
-        prices: Required chronological price history. An empty series creates a
-            fresh state for streaming updates.
+        prices: Chronological price history supplied through ``extend``.
     """
 
-    def __init__(self, prices: Any) -> None:
-        """Initialize the native state and process the supplied price history."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(prices)
 
     def append(self, price: float) -> "AdaptiveCycle":
         """Append one price and return this adapter for method chaining."""

@@ -8,8 +8,8 @@ same descriptive Python/Rust name.
 
 For each item:
 
-1. Define a causal Rust state with constructor parameters and aligned input
-   series accepted by the Python constructor.
+1. Define a causal Rust state with configuration-only constructor parameters;
+   aligned input series are supplied through Python ``extend`` or ``append``.
 2. Add the Rust batch operator using the same recurrence and warm-up policy.
 3. Add the PyO3 state/batch binding and a descriptive doc comment covering
    inputs, parameters, and return values.

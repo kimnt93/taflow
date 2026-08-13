@@ -14,12 +14,12 @@ def test_math_abs_matches_numpy_and_lifecycle() -> None:
     )
     for values in datasets:
         expected = (np.abs)(values)
-        actual = MathAbs(values)
+        actual = MathAbs().extend(values)
         np.testing.assert_allclose(
             actual.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-        state = MathAbs([])
+        state = MathAbs()
         split = len(values) // 3
         assert state.extend(values[:split]) is state
         assert state.extend(values[split:]) is state
@@ -34,6 +34,6 @@ def test_math_abs_matches_numpy_and_lifecycle() -> None:
             state.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-    fresh = MathAbs([])
+    fresh = MathAbs()
     assert len(fresh) == 0
     assert fresh.value is None

@@ -18,9 +18,8 @@ class HilbertTransformTrendline:
     TA-Lib ``HT_TRENDLINE``.
     """
 
-    def __init__(self, values: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeHilbertTransformTrendline()
-        self.extend(values)
 
     def append(self, value: float) -> "HilbertTransformTrendline":
         self._state.append(float(value))

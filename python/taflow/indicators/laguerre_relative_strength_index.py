@@ -14,8 +14,7 @@ class LaguerreRelativeStrengthIndex:
     Parameters
     ----------
     close : array-like
-        Initial chronological close prices. Pass an empty series for a fresh
-        streaming state.
+        Chronological close prices. Supply the series through ``extend`` after construction.
     gamma : float, default 0.5
         Laguerre smoothing coefficient in the interval ``[0, 1]``.
 
@@ -31,9 +30,8 @@ class LaguerreRelativeStrengthIndex:
     ``extend``, and ``reset`` mutate and return this adapter.
     """
 
-    def __init__(self, close: Any, gamma: float = 0.5) -> None:
+    def __init__(self, gamma: float = 0.5) -> None:
         self._state = _NativeLaguerreRelativeStrengthIndex(float(gamma))
-        self.extend(close)
 
     def append(self, close: float) -> "LaguerreRelativeStrengthIndex":
         """Append one chronological close price.

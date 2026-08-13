@@ -7,9 +7,9 @@ from taflow import CumulativeSum
 def test_cumulative_sum_matches_polars_and_lifecycle() -> None:
     values = np.array([2.0, 4.0, 1.0, 8.0, 2.0, -3.0, 5.0], dtype=np.float64)
     expected = pl.Series(values).cum_sum().to_numpy()
-    np.testing.assert_array_equal(CumulativeSum(values).compute(), expected)
+    np.testing.assert_array_equal(CumulativeSum().extend(values).compute(), expected)
 
-    state = CumulativeSum([])
+    state = CumulativeSum()
     assert state.value is None
     assert state.extend(values[:3]) is state
     assert state.extend(values[3:]) is state

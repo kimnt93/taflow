@@ -11,9 +11,8 @@ from .._series import as_float64_series
 class KaufmanAdaptiveMovingAverage:
     """Compute KAMA from required ``values`` through the Rust recurrence."""
 
-    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _NativeKaufmanAdaptiveMovingAverage(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "KaufmanAdaptiveMovingAverage":
         self._state.append(float(value))

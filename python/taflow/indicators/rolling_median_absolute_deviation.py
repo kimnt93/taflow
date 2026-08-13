@@ -16,17 +16,17 @@ class RollingMedianAbsoluteDeviation:
     Wickra ``MedianAbsoluteDeviation``.
 
     Args:
-        values: Initial chronological observations.
+        values: Chronological observations.
         period: Rolling window length, default 20.
 
     Raises:
         ValueError: If ``period`` is zero.
     """
 
-    def __init__(self, values: Any, period: int = 20) -> None:
-        """Initialize native state and process the initial history."""
+    def __init__(self, period: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingMedianAbsoluteDeviation":
         """Append one observation and return this instance."""

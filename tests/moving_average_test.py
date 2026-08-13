@@ -11,14 +11,14 @@ def test_matches_talib(timeperiod: int, matype: int) -> None:
     rng = np.random.default_rng(51231 + timeperiod * 17 + matype)
     values = 100.0 + rng.normal(size=257).cumsum()
     expected = talib.MA(values, timeperiod=timeperiod, matype=matype)
-    actual = MovingAverage(values, timeperiod, matype).compute()
+    actual = MovingAverage(timeperiod, matype).extend(values).compute()
     np.testing.assert_allclose(actual, expected, rtol=0.0, atol=2e-9, equal_nan=True)
 
 
 def test_lifecycle_is_bitwise_invariant() -> None:
     values = np.linspace(10.0, 90.0, 431) + np.sin(np.arange(431) * 0.13)
-    batch = MovingAverage(values, 17, 2)
-    chunked = MovingAverage([], 17, 2)
+    batch = MovingAverage(17, 2).extend(values)
+    chunked = MovingAverage(17, 2)
     assert chunked.extend(values[:53]) is chunked
     assert chunked.extend(values[53:]) is chunked
     np.testing.assert_array_equal(chunked.compute(), batch.compute())
@@ -32,10 +32,10 @@ def test_lifecycle_is_bitwise_invariant() -> None:
 
 def test_input_and_parameter_validation() -> None:
     with pytest.raises(ValueError):
-        MovingAverage(None)
+        MovingAverage().extend(None)
     with pytest.raises(ValueError):
-        MovingAverage([[1.0, 2.0]])
+        MovingAverage().extend([[1.0, 2.0]])
     with pytest.raises(ValueError):
-        MovingAverage([], 0)
+        MovingAverage(0)
     with pytest.raises(ValueError):
-        MovingAverage([], 5, 99)
+        MovingAverage(5, 99)

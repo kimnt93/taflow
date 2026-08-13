@@ -23,13 +23,11 @@ class ArnaudLegouxMovingAverage:
 
     def __init__(
         self,
-        _input: Any,
         timeperiod: int = 10,
         offset: float = 0.85,
         sigma: float = 6.0,
     ) -> None:
         self._state = _Native(int(timeperiod), float(offset), float(sigma))
-        self.extend(_input)
 
     def append(self, _input: float) -> "ArnaudLegouxMovingAverage":
         """Append one observation and return this adapter."""

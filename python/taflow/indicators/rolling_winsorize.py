@@ -23,17 +23,14 @@ class RollingWinsorize:
 
     def __init__(
         self,
-        _input: Any,
         timeperiod: int = 14,
         lower: float = 0.05,
         upper: float = 0.95,
     ) -> None:
-        """Initialize native state and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        _input : array-like
-            Input history to process in chronological order.
         timeperiod : int, default=14
             Number of observations in the trailing quantile window.
         lower, upper : float, default=0.05, 0.95
@@ -45,7 +42,6 @@ class RollingWinsorize:
             The constructor initializes native state and returns no value.
         """
         self._state = _Native(int(timeperiod), float(lower), float(upper))
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingWinsorize":
         """Append one observation and return this adapter."""

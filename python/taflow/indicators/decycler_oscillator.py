@@ -13,7 +13,7 @@ class DecyclerOscillator:
     no ``NaN`` warm-up. It maps to Wickra ``DecyclerOscillator``.
 
     Args:
-        values: Initial chronological price or signal history.
+        values: Chronological price or signal history.
         fast: Positive fast critical period, default 10.
         slow: Slow critical period, default 20 and strictly greater than fast.
 
@@ -21,10 +21,10 @@ class DecyclerOscillator:
         ValueError: If periods are zero or ``fast >= slow``.
     """
 
-    def __init__(self, values: Any, fast: int = 10, slow: int = 20) -> None:
-        """Initialize both native filters and process the initial history."""
+    def __init__(self, fast: int = 10, slow: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(fast, slow)
-        self.extend(values)
 
     def append(self, value: float) -> "DecyclerOscillator":
         """Append one signal value and return this adapter."""

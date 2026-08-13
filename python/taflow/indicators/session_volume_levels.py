@@ -12,25 +12,14 @@ class SessionVolumeLevels:
     """Compute session point-of-control and value-area levels.
 
     ``high``, ``low``, ``close``, ``volume``, and boolean ``anchor`` are
-    required aligned histories in that order; empty arrays create a fresh
-    stream. ``bins`` defaults to 24 and ``value_area`` to 0.7. ``compute``
+    supplied to ``extend`` as aligned histories in that order. ``bins`` defaults to 24 and ``value_area`` to 0.7. ``compute``
     returns ``(point_of_control, value_area_high, value_area_low)`` arrays.
     Rust owns binning, session resets, warm-up, and output alignment; lifecycle
     mutators return ``self`` and reject unequal lengths before mutation.
     """
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
-        anchor: Any,
-        bins: int = 24,
-        value_area: float = 0.7,
-    ) -> None:
+    def __init__(self, bins: int = 24, value_area: float = 0.7) -> None:
         self._state = _NativeSessionVolumeLevels(int(bins), float(value_area))
-        self.extend(high, low, close, volume, anchor)
 
     def append(
         self,

@@ -21,7 +21,7 @@ def test_matches_wickra(timeperiod: int, momentum: int, case: str) -> None:
         close = np.resize(np.array([10.0, 12.0, 12.0, 9.0, 9.0, 12.0]), size)
 
     expected = np.asarray(wickra.RMI(timeperiod, momentum).batch(close.tolist()))
-    actual = RelativeMomentumIndex(close, timeperiod, momentum).compute()
+    actual = RelativeMomentumIndex(timeperiod, momentum).extend(close).compute()
     np.testing.assert_allclose(actual, expected, rtol=0.0, atol=2e-12, equal_nan=True)
 
 
@@ -29,16 +29,16 @@ def test_matches_wickra(timeperiod: int, momentum: int, case: str) -> None:
 def test_minimum_length_matches_wickra(timeperiod: int, momentum: int) -> None:
     close = np.linspace(5.0, 5.0 + momentum + timeperiod, momentum + timeperiod)
     expected = np.asarray(wickra.RMI(timeperiod, momentum).batch(close.tolist()))
-    actual = RelativeMomentumIndex(close, timeperiod, momentum).compute()
+    actual = RelativeMomentumIndex(timeperiod, momentum).extend(close).compute()
     np.testing.assert_allclose(actual, expected, rtol=0.0, atol=2e-12, equal_nan=True)
 
 
 def test_lifecycle_is_bitwise_invariant() -> None:
     rng = np.random.default_rng(21931)
     close = 100.0 + rng.normal(size=431).cumsum()
-    batch = RelativeMomentumIndex(close, 17, 5)
+    batch = RelativeMomentumIndex(17, 5).extend(close)
 
-    chunked = RelativeMomentumIndex([], 17, 5)
+    chunked = RelativeMomentumIndex(17, 5)
     assert chunked.extend(close[:53]) is chunked
     assert chunked.extend(close[53:]) is chunked
     np.testing.assert_array_equal(chunked.compute(), batch.compute())
@@ -54,7 +54,7 @@ def test_lifecycle_is_bitwise_invariant() -> None:
 
 
 def test_warm_up_validation_and_input_contract() -> None:
-    state = RelativeMomentumIndex([], 3, 2)
+    state = RelativeMomentumIndex(3, 2)
     for value in (1.0, 2.0, 3.0, 4.0):
         assert state.append(value) is state
         assert state.value is None
@@ -63,10 +63,10 @@ def test_warm_up_validation_and_input_contract() -> None:
     np.testing.assert_array_equal(np.isnan(state.compute()), [True, True, True, True, False])
 
     with pytest.raises(ValueError):
-        RelativeMomentumIndex(None)
+        RelativeMomentumIndex().extend(None)
     with pytest.raises(ValueError):
-        RelativeMomentumIndex([[1.0, 2.0]])
+        RelativeMomentumIndex().extend([[1.0, 2.0]])
     with pytest.raises(ValueError):
-        RelativeMomentumIndex([], 0, 5)
+        RelativeMomentumIndex(0, 5)
     with pytest.raises(ValueError):
-        RelativeMomentumIndex([], 14, 0)
+        RelativeMomentumIndex(14, 0)

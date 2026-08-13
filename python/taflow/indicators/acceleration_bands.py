@@ -13,7 +13,7 @@ class AccelerationBands:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -23,14 +23,10 @@ class AccelerationBands:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         period: int = 20,
     ) -> None:
-        """Create Acceleration Bands with optional aligned OHLC history."""
+        """Create an empty configured Acceleration Bands state."""
         self._state = _NativeAccelerationBands(period)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "AccelerationBands":
         """Append one observation or aligned bar to the native Rust state.

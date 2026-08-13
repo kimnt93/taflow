@@ -11,15 +11,13 @@ from .._series import as_float64_series
 class RateOfChange:
     """Compute ``100 * (current - previous) / previous`` in Rust.
 
-    ``values`` is required; pass an empty series to create a fresh streaming
-    state. ``timeperiod`` defaults to 14 and must be positive. The first
+    ``values`` is required; supply the series through ``extend`` after construction. ``timeperiod`` defaults to 14 and must be positive. The first
     ``timeperiod`` outputs are NaN; a warmed zero denominator produces zero,
     matching TA-Lib ``ROC``.
     """
 
-    def __init__(self, values: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeRateOfChange(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "RateOfChange":
         """Append one chronological value and return this indicator."""

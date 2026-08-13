@@ -7,13 +7,13 @@ from taflow import RollingValueAtRisk
 def test_rolling_value_at_risk_matches_wickra_and_lifecycle() -> None:
     values = np.array([1.0, -1.0, 2.0, -2.0, 3.0, -3.0])
     expected = wickra.ValueAtRisk(3, 0.95).batch(values)
-    batch = RollingValueAtRisk(values, timeperiod=3, confidence=0.95)
+    batch = RollingValueAtRisk(timeperiod=3, confidence=0.95).extend(values)
 
     np.testing.assert_allclose(batch.compute(), expected, equal_nan=True)
     assert len(batch) == len(values)
     assert batch.value == expected[-1]
 
-    streamed = RollingValueAtRisk(np.array([], dtype=float), timeperiod=3, confidence=0.95)
+    streamed = RollingValueAtRisk(timeperiod=3, confidence=0.95)
     for value in values:
         assert streamed.append(value) is streamed
     np.testing.assert_array_equal(streamed.compute(), batch.compute())
@@ -26,6 +26,6 @@ def test_rolling_value_at_risk_matches_wickra_and_lifecycle() -> None:
 
 def test_rolling_value_at_risk_clamps_positive_quantiles_to_zero() -> None:
     values = np.array([0.01, 0.02, 0.03, 0.04, 0.05])
-    actual = RollingValueAtRisk(values, timeperiod=2).compute()
+    actual = RollingValueAtRisk(timeperiod=2).extend(values).compute()
     expected = wickra.ValueAtRisk(2).batch(values)
     np.testing.assert_array_equal(actual, expected)

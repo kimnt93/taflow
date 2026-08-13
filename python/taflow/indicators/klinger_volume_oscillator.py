@@ -12,7 +12,7 @@ class KlingerVolumeOscillator:
     """Compute signed-volume fast/slow EMA and signal outputs.
 
     ``high``, ``low``, ``close``, and ``volume`` are required aligned series in
-    that order; empty arrays create a fresh stream. ``fast``, ``slow``, and
+    that order; supply the aligned series through ``extend`` after construction. ``fast``, ``slow``, and
     ``signal`` default to 34, 55, and 13. Rust owns signed-volume force,
     exponential smoothing, warm-up, and aligned NaN history. ``compute``
     returns ``(oscillator, signal)`` arrays; lifecycle mutators return ``self``
@@ -22,17 +22,13 @@ class KlingerVolumeOscillator:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
         fast: int = 34,
         slow: int = 55,
         signal: int = 13,
     ) -> None:
-        """Initialize native KVO state and process aligned OHLCV histories."""
+        """Initialize an empty configured native state.
+        """
         self._state = _NativeKlingerVolumeOscillator(int(fast), int(slow), int(signal))
-        self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float

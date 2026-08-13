@@ -17,9 +17,8 @@ class TomDeMarkSequential:
     fluent. The independent oracle is ``pandas-ta-classic.td_sequential``.
     """
 
-    def __init__(self, close: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeTomDeMarkSequential()
-        self.extend(close)
 
     def append(self, close: float) -> "TomDeMarkSequential":
         """Append one chronological close and return this adapter."""

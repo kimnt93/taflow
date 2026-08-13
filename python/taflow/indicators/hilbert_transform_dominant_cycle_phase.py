@@ -11,16 +11,8 @@ class HilbertTransformDominantCyclePhase:
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `_input`. Warm-up positions are represented by `NaN` in history."""
 
-    def __init__(
-        self,
-        _input: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        _input : object
-            Input series or the current scalar observation.
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
 
         Returns
         -------
@@ -28,7 +20,6 @@ class HilbertTransformDominantCyclePhase:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self.extend(_input)
 
     def append(self, value: float) -> "HilbertTransformDominantCyclePhase":
         """Append one observation or aligned bar to the native Rust state.

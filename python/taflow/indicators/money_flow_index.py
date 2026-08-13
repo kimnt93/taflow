@@ -15,7 +15,7 @@ class MoneyFlowIndex:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -25,24 +25,12 @@ class MoneyFlowIndex:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
-        volume : object
-            Volume series or the current bar volume.
         timeperiod : object
             Trailing window length in bars.
 
@@ -52,7 +40,6 @@ class MoneyFlowIndex:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _NativeMoneyFlowIndex(timeperiod)
-        self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float

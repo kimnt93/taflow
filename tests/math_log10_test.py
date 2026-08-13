@@ -15,12 +15,12 @@ def test_math_log10_matches_talib_and_lifecycle() -> None:
     )
     for values in datasets:
         expected = (talib.LOG10)(values)
-        actual = MathLog10(values)
+        actual = MathLog10().extend(values)
         np.testing.assert_allclose(
             actual.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-        state = MathLog10([])
+        state = MathLog10()
         split = len(values) // 3
         assert state.extend(values[:split]) is state
         assert state.extend(values[split:]) is state
@@ -35,6 +35,6 @@ def test_math_log10_matches_talib_and_lifecycle() -> None:
             state.compute(), expected, rtol=1e-12, atol=1e-12, equal_nan=True
         )
 
-    fresh = MathLog10([])
+    fresh = MathLog10()
     assert len(fresh) == 0
     assert fresh.value is None

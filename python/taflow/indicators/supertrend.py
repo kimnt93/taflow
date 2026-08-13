@@ -13,16 +13,8 @@ class Supertrend:
     trend, direction, long, short.
     """
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        close: Any,
-        timeperiod: int = 7,
-        multiplier: float = 3.0,
-    ) -> None:
+    def __init__(self, timeperiod: int = 7, multiplier: float = 3.0) -> None:
         self._state = _Native(int(timeperiod), float(multiplier))
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Supertrend":
         self._state.append(float(high), float(low), float(close))

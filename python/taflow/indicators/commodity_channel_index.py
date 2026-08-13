@@ -15,7 +15,7 @@ class CommodityChannelIndex:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -25,25 +25,16 @@ class CommodityChannelIndex:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         timeperiod: int = 14,
         *,
         high_column: str = 'high',
         low_column: str = 'low',
         close_column: str = 'close',
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
-        close : object
-            Close-price series or the current bar close.
         timeperiod : object
             Trailing window length in bars.
         high_column : object
@@ -59,14 +50,6 @@ class CommodityChannelIndex:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _NativeCommodityChannelIndex(timeperiod)
-        self.extend(
-            high,
-            low,
-            close,
-            high_column=high_column,
-            low_column=low_column,
-            close_column=close_column,
-        )
 
     def append(self, high: float, low: float, close: float) -> "CommodityChannelIndex":
         """Append one observation or aligned bar to the native Rust state.

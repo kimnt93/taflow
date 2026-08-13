@@ -11,17 +11,15 @@ from .._series import as_float64_series
 class Aroon:
     """Compute named Aroon Down and Up histories in persistent Rust state.
 
-    The constructor requires aligned chronological high and low series. Pass
-    two empty arrays for a fresh streaming state. ``timeperiod`` defaults to 14
+    ``extend`` accepts aligned chronological high and low series. Supply the aligned series through ``extend`` after construction. ``timeperiod`` defaults to 14
     and must be at least 2. The state uses a ``timeperiod + 1`` bar extrema
     window with latest-equal extrema winning. Both outputs contain NaN for the
     first ``timeperiod`` bars and are returned in ``(down, up)`` order, matching
     TA-Lib ``AROON``.
     """
 
-    def __init__(self, high: Any, low: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeAroon(int(timeperiod))
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Aroon":
         """Append one high/low pair and return this indicator."""

@@ -26,11 +26,8 @@ class OpeningRange:
     ``self``; unequal input lengths are rejected before native mutation.
     """
 
-    def __init__(
-        self, high: Any, low: Any, close: Any, anchor: Any, bars: int = 30
-    ) -> None:
+    def __init__(self, bars: int = 30) -> None:
         self._state = _NativeOpeningRange(int(bars))
-        self.extend(high, low, close, anchor)
 
     def append(
         self, high: float, low: float, close: float, anchor: bool

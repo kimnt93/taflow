@@ -1,8 +1,8 @@
 """Lifecycle and self-consistency checks for every public indicator adapter.
 
 This complements ``correctness.py``: external parity is established there,
-while this pass exercises the canonical state API and checks that constructor,
-bulk, and scalar histories are identical.  It also enforces the documented
+while this pass exercises the canonical state API and checks that bulk,
+chunked, and scalar histories are identical. It also enforces the documented
 fluent lifecycle so interface drift is visible in the generated report.
 """
 
@@ -212,12 +212,18 @@ def main() -> None:
                 raise TypeError(
                     "adapter duplicates native length in Python with self._length"
                 )
-            full = cls(**kwargs_for(cls, arrays=True))
+            constructor_kwargs = kwargs_for(cls, arrays=False)
+            full = cls(**constructor_kwargs)
+            require_fluent(
+                full.extend(**kwargs_for(full.extend, arrays=True)),
+                full,
+                "extend",
+            )
             expected = output(full)
             require_length(full, N)
             if not hasattr(full, "extend"):
                 raise TypeError("indicator has no extend()")
-            state = cls(**kwargs_for(cls, arrays=False))
+            state = cls(**constructor_kwargs)
             require_length(state, 0)
             require_fluent(
                 state.extend(**kwargs_for(state.extend, arrays=True)),
@@ -228,9 +234,9 @@ def main() -> None:
             actual = output(state)
             if not equal(expected, actual):
                 raise AssertionError(
-                    "constructor history differs from native extend history"
+                    "full extend history differs from replayed extend history"
                 )
-            live = cls(**kwargs_for(cls, arrays=False))
+            live = cls(**constructor_kwargs)
             append_params = tuple(inspect.signature(live.append).parameters.values())
             for index in range(N):
                 row_kwargs = {}
@@ -254,7 +260,7 @@ def main() -> None:
                 require_length(live, index + 1)
             if not equal(expected, output(live)):
                 raise AssertionError(
-                    "constructor history differs from one-bar append history"
+                    "full extend history differs from one-bar append history"
                 )
             require_fluent(live.reset(), live, "reset")
             require_length(live, 0)

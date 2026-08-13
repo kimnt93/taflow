@@ -16,10 +16,6 @@ class OrderBlock:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
         swing_length: int = 50,
         internal_length: int = 5,
         atr_period: int = 200,
@@ -28,7 +24,6 @@ class OrderBlock:
         self._state = _Native(
             int(swing_length), int(internal_length), int(atr_period), float(threshold)
         )
-        self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float

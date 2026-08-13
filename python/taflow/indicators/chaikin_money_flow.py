@@ -11,10 +11,9 @@ class ChaikinMoneyFlow:
     """Chaikin Money Flow over high, low, close, and volume."""
 
     def __init__(
-        self, high: Any, low: Any, close: Any, volume: Any, period: int = 20
+        self, period: int = 20
     ) -> None:
         self._state = _Native(int(period))
-        self.extend(high, low, close, volume)
 
     def append(
         self, high: float, low: float, close: float, volume: float

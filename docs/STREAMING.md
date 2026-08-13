@@ -14,7 +14,7 @@ Every one of the 393 indicator classes exposes the same six operations:
 ```python
 from taflow import ExponentialMovingAverage
 
-ema = ExponentialMovingAverage([], timeperiod=20)
+ema = ExponentialMovingAverage(timeperiod=20)
 
 ema.extend(history)        # backfill a whole array
 ema.append(next_close)     # O(1) update for one new bar
@@ -28,13 +28,13 @@ ema.reset()                # clear state and history, in place
 `append` returns the indicator itself, so calls chain:
 `ema.append(a).append(b)`.
 
-Multi-series indicators take their bar values positionally in the same order
-as their constructor:
+Multi-series indicators take historical and scalar inputs in the same ordered
+`extend`/`append` contract; constructors contain configuration only:
 
 ```python
 from taflow import AverageTrueRange
 
-atr = AverageTrueRange([], [], [], timeperiod=14)
+atr = AverageTrueRange(timeperiod=14)
 atr.extend(high_history, low_history, close_history)
 atr.append(high_tick, low_tick, close_tick)
 ```
@@ -46,7 +46,7 @@ period `value` is `None` and `compute()` reports `NaN`, so the output series
 always lines up index-for-index with the input:
 
 ```python
-sma = SimpleMovingAverage([], timeperiod=30)
+sma = SimpleMovingAverage(timeperiod=30)
 sma.extend(close)                 # 500 bars
 
 
@@ -64,7 +64,7 @@ in a live loop; it avoids a NaN check per tick.
 The normal production shape: load history once, then feed the feed.
 
 ```python
-ema = ExponentialMovingAverage([], timeperiod=20)
+ema = ExponentialMovingAverage(timeperiod=20)
 ema.extend(history)                       # thousands of bars, one call
 
 for tick in live_feed():                  # then one bar at a time, forever
@@ -78,9 +78,9 @@ is bit-for-bit what it would be after appending each of those bars
 individually. Splitting the input differently never changes a result:
 
 ```python
-whole = SimpleMovingAverage([], timeperiod=14); whole.extend(close)
+whole = SimpleMovingAverage(timeperiod=14); whole.extend(close)
 
-split = SimpleMovingAverage([], timeperiod=14)
+split = SimpleMovingAverage(timeperiod=14)
 for start in range(0, len(close), 37):
     split.extend(close[start:start + 37])
 
@@ -145,7 +145,7 @@ compute in parallel:
 from concurrent.futures import ThreadPoolExecutor
 
 def run(symbol_bars):
-    ind = SimpleMovingAverage([], timeperiod=30)
+    ind = SimpleMovingAverage(timeperiod=30)
     ind.extend(symbol_bars)
     return ind.compute()
 
@@ -159,8 +159,8 @@ a single indicator is not safe to update from two threads at once.
 
 ## Related
 
-- [Indicator reference](INDICATORS.md) — every class, parameters, constructor
-  order.
+- [Indicator reference](INDICATORS.md) — every class, input order, and
+  constructor configuration.
 - [Data in and out](DATA.md) — accepted input containers and output converters.
 - [Pipelines](PIPELINES.md) — stream many indicators through one graph, each
   bar dispatched once.

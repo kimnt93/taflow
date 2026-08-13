@@ -14,8 +14,7 @@ class VariableIndexDynamicAverage:
     Parameters
     ----------
     close : array-like
-        Initial chronological close prices. Pass an empty series for a fresh
-        streaming state.
+        Chronological close prices. Supply the series through ``extend`` after construction.
     length : int, default 14
         EMA-equivalent period used to derive ``2 / (length + 1)``.
     cmo_period : int, default 9
@@ -35,14 +34,13 @@ class VariableIndexDynamicAverage:
 
     def __init__(
         self,
-        close: Any,
         length: int = 14,
         cmo_period: int = 9,
         alpha: float | None = None,
     ) -> None:
-        """Initialize and process a chronological close-price history."""
+        """Initialize an empty configured native state.
+        """
         self._state = _NativeVariableIndexDynamicAverage(length, cmo_period, alpha)
-        self.extend(close)
 
     def append(self, close: float) -> "VariableIndexDynamicAverage":
         """Append one chronological close price.

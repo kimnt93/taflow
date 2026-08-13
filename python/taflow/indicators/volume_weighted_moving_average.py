@@ -20,11 +20,8 @@ class VolumeWeightedMovingAverage:
     oracle is pandas rolling ``sum(price * volume) / sum(volume)``.
     """
 
-    def __init__(
-        self, price: Any, volume: Any, timeperiod: int = 10
-    ) -> None:
+    def __init__(self, timeperiod: int = 10) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(price, volume)
 
     def append(self, price: float, volume: float) -> "VolumeWeightedMovingAverage":
         """Append one price/volume pair and return this adapter."""

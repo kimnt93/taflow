@@ -10,9 +10,9 @@ def test_average_true_range_matches_talib_and_lifecycle(timeperiod: int) -> None
     close = 100 + rng.normal(size=257).cumsum()
     high, low = close + rng.uniform(0.1, 2, 257), close - rng.uniform(0.1, 2, 257)
     expected = talib.ATR(high, low, close, timeperiod)
-    actual = AverageTrueRange(high, low, close, timeperiod)
+    actual = AverageTrueRange(timeperiod).extend(high, low, close)
     np.testing.assert_array_equal(actual.compute(), expected)
-    state = AverageTrueRange([], [], [], timeperiod)
+    state = AverageTrueRange(timeperiod)
     state.extend(high[:37], low[:37], close[:37]).extend(
         high[37:], low[37:], close[37:]
     )
@@ -25,8 +25,8 @@ def test_average_true_range_matches_talib_and_lifecycle(timeperiod: int) -> None
 
 def test_average_true_range_validates() -> None:
     with pytest.raises(ValueError):
-        AverageTrueRange([], [], [], 0)
-    state = AverageTrueRange([], [], [])
+        AverageTrueRange(0)
+    state = AverageTrueRange()
     with pytest.raises(ValueError):
         state.extend([1, 2], [1], [1, 2])
     assert len(state) == 0

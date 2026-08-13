@@ -5,7 +5,7 @@ from taflow import FracDiff
 
 def test_frac_diff_lifecycle() -> None:
     values = np.arange(1.0, 129.0)
-    state = FracDiff(values, threshold=1e-3)
+    state = FracDiff(threshold=1e-3).extend(values)
     first = state.compute()
     assert np.isnan(first).any() and np.isfinite(first).any()
     state.reset().extend(values)

@@ -9,8 +9,8 @@ from .._price_state import HlcPriceState
 class WeightedClose(HlcPriceState):
     """Compute ``(high + low + 2 * close) / 4`` in persistent Rust state.
 
-    The constructor requires the aligned chronological high, low, close
-    series. Pass empty aligned arrays for a fresh streaming state. Output has no
+    Construction creates a fresh empty state. Supply aligned chronological high,
+    low, and close series through ``extend`` or ``append``. Output has no
     rolling warm-up and maps to TA-Lib ``WCLPRICE``.
     """
 

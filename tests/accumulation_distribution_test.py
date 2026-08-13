@@ -7,11 +7,11 @@ from taflow import AccumulationDistribution
 
 def _assert_lifecycle(high: np.ndarray, low: np.ndarray, close: np.ndarray, volume: np.ndarray) -> None:
     expected = talib.AD(high, low, close, volume)
-    actual = AccumulationDistribution(high, low, close, volume)
+    actual = AccumulationDistribution().extend(high, low, close, volume)
     np.testing.assert_array_equal(actual.compute(), expected)
     assert actual.value == expected[-1]
 
-    state = AccumulationDistribution([], [], [], [])
+    state = AccumulationDistribution()
     split = max(1, len(close) // 3)
     assert state.extend(high[:split], low[:split], close[:split], volume[:split]) is state
     assert state.extend(high[split:], low[split:], close[split:], volume[split:]) is state
@@ -44,7 +44,7 @@ def test_accumulation_distribution_matches_talib_matrix_and_lifecycle() -> None:
 
 
 def test_accumulation_distribution_rejects_misalignment_before_mutation() -> None:
-    state = AccumulationDistribution([], [], [], [])
+    state = AccumulationDistribution()
     with pytest.raises(ValueError):
         state.extend([2.0, 3.0], [1.0], [1.5, 2.5], [10.0, 20.0])
     assert len(state) == 0

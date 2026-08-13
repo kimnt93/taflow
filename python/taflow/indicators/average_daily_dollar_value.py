@@ -10,10 +10,10 @@ from .._series import as_float64_series
 class AverageDailyDollarValue:
     """Rolling simple average of aligned ``close * volume`` values."""
 
-    def __init__(self, close: Any, volume: Any, timeperiod: int = 20) -> None:
-        """Create native state and replay required aligned histories."""
+    def __init__(self, timeperiod: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(timeperiod)
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "AverageDailyDollarValue":
         """Append one bar and return this adapter."""

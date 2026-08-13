@@ -10,7 +10,7 @@ def test_klinger_volume_oscillator_matches_wickra():
     high = close + rng.uniform(0.2, 1.5, len(close))
     low = close - rng.uniform(0.2, 1.5, len(close))
     volume = rng.uniform(100.0, 1000.0, len(close))
-    actual = KlingerVolumeOscillator(high, low, close, volume).compute()
+    actual = KlingerVolumeOscillator().extend(high, low, close, volume).compute()
     expected = np.asarray(
         wickra.KVO().batch(high, low, close, volume), dtype=np.float64
     )
@@ -25,10 +25,8 @@ def test_klinger_volume_oscillator_chunked_reset():
     high = close + 1.0
     low = close - 1.0
     volume = np.full_like(close, 500.0)
-    whole = KlingerVolumeOscillator(high, low, close, volume, 5, 8, 3)
-    chunked = KlingerVolumeOscillator(
-        np.array([]), np.array([]), np.array([]), np.array([]), 5, 8, 3
-    )
+    whole = KlingerVolumeOscillator(5, 8, 3).extend(high, low, close, volume)
+    chunked = KlingerVolumeOscillator(5, 8, 3)
     chunked.extend(high[:31], low[:31], close[:31], volume[:31])
     chunked.extend(high[31:], low[31:], close[31:], volume[31:])
     for left, right in zip(whole.compute(), chunked.compute()):

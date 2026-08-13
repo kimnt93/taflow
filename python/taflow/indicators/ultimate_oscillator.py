@@ -19,9 +19,6 @@ class UltimateOscillator:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         timeperiod1: int = 7,
         timeperiod2: int = 14,
         timeperiod3: int = 28,
@@ -30,7 +27,6 @@ class UltimateOscillator:
         self._state = _NativeUltimateOscillator(
             timeperiod1, timeperiod2, timeperiod3
         )
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "UltimateOscillator":
         """Append one high, low, close bar and return ``self``."""

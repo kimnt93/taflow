@@ -11,7 +11,8 @@ Every class behaves the same way:
 ```python
 from taflow import SimpleMovingAverage
 
-ind = SimpleMovingAverage(close, timeperiod=30)  # data may go in the constructor
+ind = SimpleMovingAverage(timeperiod=30)         # configuration only
+ind.extend(close)                                # historical backfill
 ind.append(float(close[-1]))                     # O(1) live update
 ind.value                                        # latest value, None during warm-up
 ind.compute()                                    # full aligned series
@@ -23,21 +24,22 @@ Outputs are `float64` arrays the same length as the input, `NaN` through
 warm-up. Multi-output indicators return a tuple. Candle patterns return
 `int32` scores (`0`, `±100`).
 
-### Argument order
+### Input and configuration order
 
-Every stateful indicator takes its required input series **first**, then
-configuration. Configuration values have defaults unless the algorithm cannot
-define one semantically:
+Every constructor accepts configuration only. Historical series are
+passed to ``extend`` in the documented input order. Configuration values have
+defaults unless the algorithm cannot define one semantically:
 
 ```python
 from taflow import SimpleMovingAverage, MoneyFlowIndex
 
-SimpleMovingAverage(close, timeperiod=30)
-MoneyFlowIndex(high, low, close, volume, timeperiod=14)
+SimpleMovingAverage(timeperiod=30).extend(close)
+MoneyFlowIndex(timeperiod=14).extend(high, low, close, volume)
 ```
 
-The `Constructor order` column below is authoritative — it is introspected from
-the live signature. Passing data by keyword always works.
+The `Input order` and `Constructor configuration` columns below are
+authoritative: they are introspected from the live ``extend`` and constructor
+signatures. Passing data by keyword always works.
 
 Correctness is reported in [../verify/CORRECTNESS.md](../verify/CORRECTNESS.md); throughput is in [../verify/BENCHMARK.md](../verify/BENCHMARK.md).
 
@@ -58,453 +60,453 @@ Correctness is reported in [../verify/CORRECTNESS.md](../verify/CORRECTNESS.md);
 
 ## Moving averages & overlap
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `ArnaudLegouxMovingAverage` | — | timeperiod=10, offset=0.85, sigma=6.0 | `(_input, timeperiod, offset, sigma)` |
-| `DoubleExponentialMovingAverage` | DEMA | timeperiod=30 | `(values, timeperiod)` |
-| `ExponentialMovingAverage` | EMA | timeperiod=30 | `(values, timeperiod)` |
-| `HullMovingAverage` | — | timeperiod=10 | `(_input, timeperiod)` |
-| `JurikMovingAverage` | — | length=7, phase=0.0 | `(values, length, phase)` |
-| `KaufmanAdaptiveMovingAverage` | KAMA | timeperiod=30 | `(values, timeperiod)` |
-| `McGinleyDynamic` | — | length=10, c=0.6 | `(close, length, c)` |
-| `MesaAdaptiveMovingAverage` | MAMA | fastlimit=0.5, slowlimit=0.05 | `(_input, fastlimit, slowlimit)` |
-| `MovingAverage` | MA | timeperiod=30, matype=0 | `(values, timeperiod, matype)` |
-| `MovingAverageConvergenceDivergence` | MACD | fast_period=12, slow_period=26, signal_period=9 | `(values, fast_period, slow_period, signal_period)` |
-| `MovingAverageConvergenceDivergenceExtended` | MACDEXT | fast_period=12, fast_average_type=1, slow_period=26, slow_average_type=1, signal_period=9, signal_average_type=1 | `(values, fast_period, fast_average_type, slow_period, slow_average_type, signal_period, signal_average_type)` |
-| `MovingAverageConvergenceDivergenceFixed` | MACDFIX | signal_period=9 | `(values, signal_period)` |
-| `MovingAverageEnvelope` | — | period=20, percent=0.025 | `(values, period, percent)` |
-| `ParabolicMovingAverageStop` | — | length=10, multiplier=3.0 | `(high, low, close, length, multiplier)` |
-| `PercentAboveMovingAverage` | — | above_moving_average_count, universe_size | `(above_moving_average_count, universe_size)` |
-| `SimpleMovingAverage` | SMA | timeperiod=30 | `(values, timeperiod)` |
-| `TriangularMovingAverage` | TRIMA | timeperiod=30 | `(values, timeperiod)` |
-| `TripleExponentialAverage` | T3 | timeperiod=5, volume_factor=0.7 | `(values, timeperiod, volume_factor)` |
-| `TripleExponentialMovingAverage` | TEMA | timeperiod=30 | `(values, timeperiod)` |
-| `TripleExponentialRateOfChange` | TRIX | timeperiod=30 | `(_input, timeperiod)` |
-| `VariablePeriodMovingAverage` | MAVP | min_period=2, max_period=30, average_type=0 | `(values, periods, min_period, max_period, average_type)` |
-| `VolumeWeightedMovingAverage` | — | timeperiod=10 | `(price, volume, timeperiod)` |
-| `VolumeWeightedMovingAverageConvergenceDivergence` | — | fast=12, slow=26, signal=9 | `(close, volume, fast, slow, signal)` |
-| `WeightedMovingAverage` | WMA | timeperiod=30 | `(values, timeperiod)` |
-| `ZeroLagExponentialMovingAverage` | — | timeperiod=10 | `(_input, timeperiod)` |
+| `ArnaudLegouxMovingAverage` | — | `(_input)` | `(timeperiod=10, offset=0.85, sigma=6.0)` |
+| `DoubleExponentialMovingAverage` | DEMA | `(values)` | `(timeperiod=30)` |
+| `ExponentialMovingAverage` | EMA | `(values)` | `(timeperiod=30)` |
+| `HullMovingAverage` | — | `(_input)` | `(timeperiod=10)` |
+| `JurikMovingAverage` | — | `(values)` | `(length=7, phase=0.0)` |
+| `KaufmanAdaptiveMovingAverage` | KAMA | `(values)` | `(timeperiod=30)` |
+| `McGinleyDynamic` | — | `(close)` | `(length=10, c=0.6)` |
+| `MesaAdaptiveMovingAverage` | MAMA | `(_input)` | `(fastlimit=0.5, slowlimit=0.05)` |
+| `MovingAverage` | MA | `(values)` | `(timeperiod=30, matype=0)` |
+| `MovingAverageConvergenceDivergence` | MACD | `(values)` | `(fast_period=12, slow_period=26, signal_period=9)` |
+| `MovingAverageConvergenceDivergenceExtended` | MACDEXT | `(values)` | `(fast_period=12, fast_average_type=1, slow_period=26, slow_average_type=1, signal_period=9, signal_average_type=1)` |
+| `MovingAverageConvergenceDivergenceFixed` | MACDFIX | `(values)` | `(signal_period=9)` |
+| `MovingAverageEnvelope` | — | `(values)` | `(period=20, percent=0.025)` |
+| `ParabolicMovingAverageStop` | — | `(high, low, close)` | `(length=10, multiplier=3.0)` |
+| `PercentAboveMovingAverage` | — | `(above_moving_average_count, universe_size)` | `(—)` |
+| `SimpleMovingAverage` | SMA | `(values)` | `(timeperiod=30)` |
+| `TriangularMovingAverage` | TRIMA | `(values)` | `(timeperiod=30)` |
+| `TripleExponentialAverage` | T3 | `(values)` | `(timeperiod=5, volume_factor=0.7)` |
+| `TripleExponentialMovingAverage` | TEMA | `(values)` | `(timeperiod=30)` |
+| `TripleExponentialRateOfChange` | TRIX | `(_input)` | `(timeperiod=30)` |
+| `VariablePeriodMovingAverage` | MAVP | `(values, periods)` | `(min_period=2, max_period=30, average_type=0)` |
+| `VolumeWeightedMovingAverage` | — | `(price, volume)` | `(timeperiod=10)` |
+| `VolumeWeightedMovingAverageConvergenceDivergence` | — | `(close, volume)` | `(fast=12, slow=26, signal=9)` |
+| `WeightedMovingAverage` | WMA | `(values)` | `(timeperiod=30)` |
+| `ZeroLagExponentialMovingAverage` | — | `(_input)` | `(timeperiod=10)` |
 
 ## Momentum & trend
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `AbsoluteBreadthIndex` | — | advancers, decliners | `(advancers, decliners)` |
-| `AdaptiveCycle` | — | prices | `(prices)` |
-| `ArmsIndex` | — | advancers, decliners, advancing_volume, declining_volume | `(advancers, decliners, advancing_volume, declining_volume)` |
-| `Aroon` | AROON | timeperiod=14 | `(high, low, timeperiod)` |
-| `AroonOscillator` | AROONOSC | timeperiod=14 | `(high, low, timeperiod)` |
-| `AverageDailyDollarValue` | — | timeperiod=20 | `(close, volume, timeperiod)` |
-| `AverageDailyRange` | — | timestamp, period=14, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, period, utc_offset_minutes)` |
-| `AverageDirectionalIndex` | ADX | period=14 | `(high, low, close, period)` |
-| `AverageDirectionalIndexRating` | ADXR | period=14 | `(high, low, close, period)` |
-| `AwesomeOscillator` | — | fast=5, slow=34 | `(high, low, fast, slow)` |
-| `BalanceOfPower` | BOP | — | `(open, high, low, close)` |
-| `BatPattern` | — | — | `(open, high, low, close)` |
-| `BreadthThrust` | — | advancers, decliners, period=10 | `(advancers, decliners, period)` |
-| `BullishPercentIndex` | — | on_buy_signal_count, universe_size | `(on_buy_signal_count, universe_size)` |
-| `ButterflyPattern` | — | — | `(open, high, low, close)` |
-| `CenterOfGravity` | — | period=10 | `(values, period)` |
-| `ChandeMomentumOscillator` | CMO | timeperiod=14 | `(values, timeperiod)` |
-| `CommodityChannelIndex` | CCI | timeperiod=14, high_column='high', low_column='low', close_column='close' | `(high, low, close, timeperiod, high_column, low_column, close_column)` |
-| `CrabPattern` | — | — | `(open, high, low, close)` |
-| `Cross` | — | left, right | `(left, right)` |
-| `CupAndHandle` | — | — | `(open, high, low, close)` |
-| `CypherPattern` | — | — | `(open, high, low, close)` |
-| `DayOfWeekReturnProfile` | — | timestamp, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, utc_offset_minutes)` |
-| `Decycler` | — | period=20 | `(values, period)` |
-| `DecyclerOscillator` | — | fast=10, slow=20 | `(values, fast, slow)` |
-| `DemandIndex` | — | timeperiod=10 | `(high, low, close, volume, timeperiod)` |
-| `DirectionalMovementIndex` | DX | period=14 | `(high, low, close, period)` |
-| `EhlersStochastic` | — | period=10 | `(values, period)` |
-| `EmpiricalModeDecomposition` | — | prices, period=20, fraction=0.5 | `(prices, period, fraction)` |
-| `EvenBetterSinewave` | — | length=40 | `(close, length)` |
-| `FastStochasticOscillator` | STOCHF | fast_k_period=5, fast_d_period=3, fast_d_average_type=0 | `(high, low, close, fast_k_period, fast_d_period, fast_d_average_type)` |
-| `FisherTransform` | — | timeperiod=10 | `(high, low, timeperiod)` |
-| `FlagPennant` | — | — | `(open, high, low, close)` |
-| `FourPointHarmonicPattern` | — | — | `(open, high, low, close)` |
-| `GartleyPattern` | — | — | `(open, high, low, close)` |
-| `GoldenPocket` | — | — | `(high, low)` |
-| `HeadAndShoulders` | — | — | `(open, high, low, close)` |
-| `HighLowIndex` | — | new_highs, new_lows, period=10 | `(new_highs, new_lows, period)` |
-| `HilbertDominantCycle` | — | prices | `(prices)` |
-| `Ichimoku` | — | tenkan=9, kijun=26, senkou=52 | `(high, low, close, tenkan, kijun, senkou)` |
-| `InstantaneousTrendline` | — | period=10 | `(values, period)` |
-| `IntradayIntensity` | — | — | `(high, low, close, volume)` |
-| `IntradayMomentumIndex` | IMI | timeperiod=14 | `(open, close, timeperiod)` |
-| `InverseFisherTransform` | — | scale=1.0 | `(values, scale)` |
-| `KnowSureThing` | — | roc1=10, roc2=15, roc3=20, roc4=30, sma1=10, sma2=10, sma3=10, sma4=15, signal=9 | `(close, roc1, roc2, roc3, roc4, sma1, sma2, sma3, sma4, signal)` |
-| `LinearRegressionChannel` | — | period=20, multiplier=2.0 | `(values, period, multiplier)` |
-| `MarketFacilitationIndex` | — | — | `(high, low, volume)` |
-| `MassIndex` | — | ema_period=9, sum_period=25 | `(high, low, ema_period, sum_period)` |
-| `McClellanOscillator` | — | advancers, decliners | `(advancers, decliners)` |
-| `McClellanSummationIndex` | — | advancers, decliners | `(advancers, decliners)` |
-| `MedianChannel` | — | prices, period=20, multiplier=2.0 | `(prices, period, multiplier)` |
-| `MinusDirectionalIndicator` | MINUS_DI | timeperiod=14 | `(high, low, close, timeperiod)` |
-| `MinusDirectionalMovement` | MINUS_DM | timeperiod=14 | `(high, low, timeperiod)` |
-| `Momentum` | MOM | timeperiod=14 | `(values, timeperiod)` |
-| `NewHighsNewLows` | — | new_highs, new_lows | `(new_highs, new_lows)` |
-| `OvernightGap` | — | timestamp, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, utc_offset_minutes)` |
-| `OvernightIntradayReturn` | — | timestamp, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, utc_offset_minutes)` |
-| `ParabolicSar` | SAR | acceleration=0.02, maximum=0.2 | `(high, low, acceleration, maximum)` |
-| `ParabolicSarExtended` | SAREXT | start_value=0.0, offset_on_reverse=0.0, acceleration_init_long=0.02, acceleration_long=0.02, acceleration_max_long=0.2, acceleration_init_short=0.02, acceleration_short=0.02, acceleration_max_short=0.2 | `(high, low, start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short)` |
-| `PlusDirectionalIndicator` | PLUS_DI | timeperiod=14 | `(high, low, close, timeperiod)` |
-| `PlusDirectionalMovement` | PLUS_DM | timeperiod=14 | `(high, low, timeperiod)` |
-| `RateOfChange` | ROC | timeperiod=14 | `(values, timeperiod)` |
-| `RateOfChangePercent` | ROCP | timeperiod=14 | `(values, timeperiod)` |
-| `RateOfChangeRatio` | ROCR | timeperiod=14 | `(values, timeperiod)` |
-| `RateOfChangeRatioPercent` | ROCR100 | timeperiod=14 | `(values, timeperiod)` |
-| `RectangleRange` | — | — | `(open, high, low, close)` |
-| `RelativeMomentumIndex` | — | timeperiod=14, momentum=5 | `(close, timeperiod, momentum)` |
-| `RelativeStrengthIndex` | RSI | timeperiod=14 | `(close, timeperiod)` |
-| `RoofingFilter` | — | low_period=10, high_period=48 | `(values, low_period, high_period)` |
-| `SchaffTrendCycle` | — | tclength=10, fast=12, slow=26, factor=0.5 | `(close, tclength, fast, slow, factor)` |
-| `SharkPattern` | — | — | `(open, high, low, close)` |
-| `SmoothedTrendChannel` | — | length=10 | `(high, low, close, length)` |
-| `StochasticOscillator` | STOCH | fast_k_period=5, slow_k_period=3, slow_k_average_type=0, slow_d_period=3, slow_d_average_type=0 | `(high, low, close, fast_k_period, slow_k_period, slow_k_average_type, slow_d_period, slow_d_average_type)` |
-| `StochasticRelativeStrengthIndex` | STOCHRSI | time_period=14, fast_k_period=5, fast_d_period=3, fast_d_average_type=0 | `(_input, time_period, fast_k_period, fast_d_period, fast_d_average_type)` |
-| `SuperSmoother` | — | period=10 | `(values, period)` |
-| `ThreeDrives` | — | — | `(open, high, low, close)` |
-| `TimeOfDayReturnProfile` | — | timestamp, buckets=24, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, buckets, utc_offset_minutes)` |
-| `TomDeMarkSequential` | — | — | `(close)` |
-| `TrianglePattern` | — | — | `(open, high, low, close)` |
-| `TripleTopBottom` | — | — | `(open, high, low, close)` |
-| `TrueStrengthIndex` | — | fast=13, slow=25 | `(_input, fast, slow)` |
-| `UltimateOscillator` | ULTOSC | timeperiod1=7, timeperiod2=14, timeperiod3=28 | `(high, low, close, timeperiod1, timeperiod2, timeperiod3)` |
-| `VariableIndexDynamicAverage` | — | length=14, cmo_period=9, alpha=None | `(close, length, cmo_period, alpha)` |
-| `Vortex` | — | window=14 | `(high, low, close, window)` |
-| `WedgePattern` | — | — | `(open, high, low, close)` |
-| `WeightedClose` | WCLPRICE | — | `(high, low, close)` |
-| `WilliamsPercentR` | WILLR | timeperiod=14 | `(high, low, close, timeperiod)` |
-| `ZigZag` | — | threshold=0.05 | `(high, low, threshold)` |
+| `AbsoluteBreadthIndex` | — | `(advancers, decliners)` | `(—)` |
+| `AdaptiveCycle` | — | `(prices)` | `(—)` |
+| `ArmsIndex` | — | `(advancers, decliners, advancing_volume, declining_volume)` | `(—)` |
+| `Aroon` | AROON | `(high, low)` | `(timeperiod=14)` |
+| `AroonOscillator` | AROONOSC | `(high, low)` | `(timeperiod=14)` |
+| `AverageDailyDollarValue` | — | `(close, volume)` | `(timeperiod=20)` |
+| `AverageDailyRange` | — | `(open, high, low, close, volume, timestamp)` | `(period=14, utc_offset_minutes=0)` |
+| `AverageDirectionalIndex` | ADX | `(high, low, close)` | `(period=14)` |
+| `AverageDirectionalIndexRating` | ADXR | `(high, low, close)` | `(period=14)` |
+| `AwesomeOscillator` | — | `(high, low)` | `(fast=5, slow=34)` |
+| `BalanceOfPower` | BOP | `(open, high, low, close)` | `(—)` |
+| `BatPattern` | — | `(open, high, low, close)` | `(—)` |
+| `BreadthThrust` | — | `(advancers, decliners)` | `(period=10)` |
+| `BullishPercentIndex` | — | `(on_buy_signal_count, universe_size)` | `(—)` |
+| `ButterflyPattern` | — | `(open, high, low, close)` | `(—)` |
+| `CenterOfGravity` | — | `(values)` | `(period=10)` |
+| `ChandeMomentumOscillator` | CMO | `(values)` | `(timeperiod=14)` |
+| `CommodityChannelIndex` | CCI | `(high, low, close)` | `(timeperiod=14, high_column='high', low_column='low', close_column='close')` |
+| `CrabPattern` | — | `(open, high, low, close)` | `(—)` |
+| `Cross` | — | `(left, right)` | `(—)` |
+| `CupAndHandle` | — | `(open, high, low, close)` | `(—)` |
+| `CypherPattern` | — | `(open, high, low, close)` | `(—)` |
+| `DayOfWeekReturnProfile` | — | `(open, high, low, close, volume, timestamp)` | `(utc_offset_minutes=0)` |
+| `Decycler` | — | `(values)` | `(period=20)` |
+| `DecyclerOscillator` | — | `(values)` | `(fast=10, slow=20)` |
+| `DemandIndex` | — | `(high, low, close, volume)` | `(timeperiod=10)` |
+| `DirectionalMovementIndex` | DX | `(high, low, close)` | `(period=14)` |
+| `EhlersStochastic` | — | `(values)` | `(period=10)` |
+| `EmpiricalModeDecomposition` | — | `(prices)` | `(period=20, fraction=0.5)` |
+| `EvenBetterSinewave` | — | `(close)` | `(length=40)` |
+| `FastStochasticOscillator` | STOCHF | `(high, low, close)` | `(fast_k_period=5, fast_d_period=3, fast_d_average_type=0)` |
+| `FisherTransform` | — | `(high, low)` | `(timeperiod=10)` |
+| `FlagPennant` | — | `(open, high, low, close)` | `(—)` |
+| `FourPointHarmonicPattern` | — | `(open, high, low, close)` | `(—)` |
+| `GartleyPattern` | — | `(open, high, low, close)` | `(—)` |
+| `GoldenPocket` | — | `(high, low)` | `(—)` |
+| `HeadAndShoulders` | — | `(open, high, low, close)` | `(—)` |
+| `HighLowIndex` | — | `(new_highs, new_lows)` | `(period=10)` |
+| `HilbertDominantCycle` | — | `(prices)` | `(—)` |
+| `Ichimoku` | — | `(high, low, close)` | `(tenkan=9, kijun=26, senkou=52)` |
+| `InstantaneousTrendline` | — | `(values)` | `(period=10)` |
+| `IntradayIntensity` | — | `(high, low, close, volume)` | `(—)` |
+| `IntradayMomentumIndex` | IMI | `(open, close)` | `(timeperiod=14)` |
+| `InverseFisherTransform` | — | `(values)` | `(scale=1.0)` |
+| `KnowSureThing` | — | `(close)` | `(roc1=10, roc2=15, roc3=20, roc4=30, sma1=10, sma2=10, sma3=10, sma4=15, signal=9)` |
+| `LinearRegressionChannel` | — | `(values)` | `(period=20, multiplier=2.0)` |
+| `MarketFacilitationIndex` | — | `(high, low, volume)` | `(—)` |
+| `MassIndex` | — | `(high, low)` | `(ema_period=9, sum_period=25)` |
+| `McClellanOscillator` | — | `(advancers, decliners)` | `(—)` |
+| `McClellanSummationIndex` | — | `(advancers, decliners)` | `(—)` |
+| `MedianChannel` | — | `(prices)` | `(period=20, multiplier=2.0)` |
+| `MinusDirectionalIndicator` | MINUS_DI | `(high, low, close)` | `(timeperiod=14)` |
+| `MinusDirectionalMovement` | MINUS_DM | `(high, low)` | `(timeperiod=14)` |
+| `Momentum` | MOM | `(values)` | `(timeperiod=14)` |
+| `NewHighsNewLows` | — | `(new_highs, new_lows)` | `(—)` |
+| `OvernightGap` | — | `(open, high, low, close, volume, timestamp)` | `(utc_offset_minutes=0)` |
+| `OvernightIntradayReturn` | — | `(open, high, low, close, volume, timestamp)` | `(utc_offset_minutes=0)` |
+| `ParabolicSar` | SAR | `(high, low)` | `(acceleration=0.02, maximum=0.2)` |
+| `ParabolicSarExtended` | SAREXT | `(high, low)` | `(start_value=0.0, offset_on_reverse=0.0, acceleration_init_long=0.02, acceleration_long=0.02, acceleration_max_long=0.2, acceleration_init_short=0.02, acceleration_short=0.02, acceleration_max_short=0.2)` |
+| `PlusDirectionalIndicator` | PLUS_DI | `(high, low, close)` | `(timeperiod=14)` |
+| `PlusDirectionalMovement` | PLUS_DM | `(high, low)` | `(timeperiod=14)` |
+| `RateOfChange` | ROC | `(values)` | `(timeperiod=14)` |
+| `RateOfChangePercent` | ROCP | `(values)` | `(timeperiod=14)` |
+| `RateOfChangeRatio` | ROCR | `(values)` | `(timeperiod=14)` |
+| `RateOfChangeRatioPercent` | ROCR100 | `(values)` | `(timeperiod=14)` |
+| `RectangleRange` | — | `(open, high, low, close)` | `(—)` |
+| `RelativeMomentumIndex` | — | `(close)` | `(timeperiod=14, momentum=5)` |
+| `RelativeStrengthIndex` | RSI | `(close)` | `(timeperiod=14)` |
+| `RoofingFilter` | — | `(values)` | `(low_period=10, high_period=48)` |
+| `SchaffTrendCycle` | — | `(close)` | `(tclength=10, fast=12, slow=26, factor=0.5)` |
+| `SharkPattern` | — | `(open, high, low, close)` | `(—)` |
+| `SmoothedTrendChannel` | — | `(high, low, close)` | `(length=10)` |
+| `StochasticOscillator` | STOCH | `(high, low, close)` | `(fast_k_period=5, slow_k_period=3, slow_k_average_type=0, slow_d_period=3, slow_d_average_type=0)` |
+| `StochasticRelativeStrengthIndex` | STOCHRSI | `(_input)` | `(time_period=14, fast_k_period=5, fast_d_period=3, fast_d_average_type=0)` |
+| `SuperSmoother` | — | `(values)` | `(period=10)` |
+| `ThreeDrives` | — | `(open, high, low, close)` | `(—)` |
+| `TimeOfDayReturnProfile` | — | `(open, high, low, close, volume, timestamp)` | `(buckets=24, utc_offset_minutes=0)` |
+| `TomDeMarkSequential` | — | `(close)` | `(—)` |
+| `TrianglePattern` | — | `(open, high, low, close)` | `(—)` |
+| `TripleTopBottom` | — | `(open, high, low, close)` | `(—)` |
+| `TrueStrengthIndex` | — | `(_input)` | `(fast=13, slow=25)` |
+| `UltimateOscillator` | ULTOSC | `(high, low, close)` | `(timeperiod1=7, timeperiod2=14, timeperiod3=28)` |
+| `VariableIndexDynamicAverage` | — | `(close)` | `(length=14, cmo_period=9, alpha=None)` |
+| `Vortex` | — | `(high, low, close)` | `(window=14)` |
+| `WedgePattern` | — | `(open, high, low, close)` | `(—)` |
+| `WeightedClose` | WCLPRICE | `(high, low, close)` | `(—)` |
+| `WilliamsPercentR` | WILLR | `(high, low, close)` | `(timeperiod=14)` |
+| `ZigZag` | — | `(high, low)` | `(threshold=0.05)` |
 
 ## Volatility & bands
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `AccelerationBands` | ACCBANDS | period=20 | `(high, low, close, period)` |
-| `AverageTrueRange` | ATR | timeperiod=14 | `(high, low, close, timeperiod)` |
-| `AverageTrueRangeBands` | — | period=14, multiplier=3.0 | `(high, low, close, period, multiplier)` |
-| `BollingerBands` | BBANDS | period=5, deviations_up=2.0, deviations_down=2.0, moving_average_type=0 | `(values, period, deviations_up, deviations_down, moving_average_type)` |
-| `ChaikinVolatility` | — | timeperiod=10, roc_period=10 | `(high, low, timeperiod, roc_period)` |
-| `CloseToCloseSigma` | — | timeperiod=20 | `(close, timeperiod)` |
-| `Donchian` | — | timeperiod=20 | `(high, low, timeperiod)` |
-| `DoubleBollingerBands` | — | period=20, inner_multiplier=1.0, outer_multiplier=2.0 | `(values, period, inner_multiplier, outer_multiplier)` |
-| `GarmanKlass` | — | timeperiod=20 | `(_open, high, low, close, timeperiod)` |
-| `GarmanKlassYangZhang` | — | timeperiod=20 | `(_open, high, low, close, timeperiod)` |
-| `IntradayVolatilityProfile` | — | timestamp, buckets=24, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, buckets, utc_offset_minutes)` |
-| `KeltnerChannels` | — | timeperiod=20, multiplier=2.0 | `(high, low, close, timeperiod, multiplier)` |
-| `NormalizedAverageTrueRange` | NATR | timeperiod=14 | `(high, low, close, timeperiod)` |
-| `Parkinson` | — | timeperiod=20 | `(high, low, timeperiod)` |
-| `ProjectionBands` | — | period=20 | `(values, period)` |
-| `QuartileBands` | — | prices, period=20 | `(prices, period)` |
-| `RogersSatchell` | — | timeperiod=20 | `(_open, high, low, close, timeperiod)` |
-| `Squeeze` | — | bb_length=20, bb_std=2.0, kc_length=20, kc_scalar=1.5, mom_length=12, mom_smooth=6 | `(high, low, close, bb_length, bb_std, kc_length, kc_scalar, mom_length, mom_smooth)` |
-| `SqueezePro` | — | bb_length=20, bb_std=2.0, kc_length=20, kc_scalar_wide=2.0, kc_scalar_normal=1.5, kc_scalar_narrow=1.0, mom_length=12, mom_smooth=6 | `(high, low, close, bb_length, bb_std, kc_length, kc_scalar_wide, kc_scalar_normal, kc_scalar_narrow, mom_length, mom_smooth)` |
-| `StandardErrorBands` | — | period=21, multiplier=2.0 | `(values, period, multiplier)` |
-| `Supertrend` | — | timeperiod=7, multiplier=3.0 | `(high, low, close, timeperiod, multiplier)` |
-| `TrueRange` | TRANGE | — | `(high, low, close)` |
-| `UlcerIndex` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `YangZhang` | — | timeperiod=20 | `(_open, high, low, close, timeperiod)` |
+| `AccelerationBands` | ACCBANDS | `(high, low, close)` | `(period=20)` |
+| `AverageTrueRange` | ATR | `(high, low, close)` | `(timeperiod=14)` |
+| `AverageTrueRangeBands` | — | `(high, low, close)` | `(period=14, multiplier=3.0)` |
+| `BollingerBands` | BBANDS | `(values)` | `(period=5, deviations_up=2.0, deviations_down=2.0, moving_average_type=0)` |
+| `ChaikinVolatility` | — | `(high, low)` | `(timeperiod=10, roc_period=10)` |
+| `CloseToCloseSigma` | — | `(close)` | `(timeperiod=20)` |
+| `Donchian` | — | `(high, low)` | `(timeperiod=20)` |
+| `DoubleBollingerBands` | — | `(values)` | `(period=20, inner_multiplier=1.0, outer_multiplier=2.0)` |
+| `GarmanKlass` | — | `(_open, high, low, close)` | `(timeperiod=20)` |
+| `GarmanKlassYangZhang` | — | `(_open, high, low, close)` | `(timeperiod=20)` |
+| `IntradayVolatilityProfile` | — | `(open, high, low, close, volume, timestamp)` | `(buckets=24, utc_offset_minutes=0)` |
+| `KeltnerChannels` | — | `(high, low, close)` | `(timeperiod=20, multiplier=2.0)` |
+| `NormalizedAverageTrueRange` | NATR | `(high, low, close)` | `(timeperiod=14)` |
+| `Parkinson` | — | `(high, low)` | `(timeperiod=20)` |
+| `ProjectionBands` | — | `(values)` | `(period=20)` |
+| `QuartileBands` | — | `(prices)` | `(period=20)` |
+| `RogersSatchell` | — | `(_open, high, low, close)` | `(timeperiod=20)` |
+| `Squeeze` | — | `(high, low, close)` | `(bb_length=20, bb_std=2.0, kc_length=20, kc_scalar=1.5, mom_length=12, mom_smooth=6)` |
+| `SqueezePro` | — | `(high, low, close)` | `(bb_length=20, bb_std=2.0, kc_length=20, kc_scalar_wide=2.0, kc_scalar_normal=1.5, kc_scalar_narrow=1.0, mom_length=12, mom_smooth=6)` |
+| `StandardErrorBands` | — | `(values)` | `(period=21, multiplier=2.0)` |
+| `Supertrend` | — | `(high, low, close)` | `(timeperiod=7, multiplier=3.0)` |
+| `TrueRange` | TRANGE | `(high, low, close)` | `(—)` |
+| `UlcerIndex` | — | `(_input)` | `(timeperiod=14)` |
+| `YangZhang` | — | `(_open, high, low, close)` | `(timeperiod=20)` |
 
 ## Volume
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `AccumulationDistribution` | AD | — | `(high, low, close, volume)` |
-| `AccumulationDistributionOscillator` | ADOSC | fastperiod=3, slowperiod=10 | `(high, low, close, volume, fastperiod, slowperiod)` |
-| `Amihud` | — | timeperiod=20 | `(close, volume, timeperiod)` |
-| `AnchoredVolumeWeightedAveragePrice` | — | anchor, standard_deviation_multiplier=1.0 | `(high, low, close, volume, anchor, standard_deviation_multiplier)` |
-| `BetterVolume` | — | period=20 | `(high, low, close, volume, period)` |
-| `ChaikinMoneyFlow` | — | period=20 | `(high, low, close, volume, period)` |
-| `CumulativeVolumeIndex` | — | advancing_volume, declining_volume | `(advancing_volume, declining_volume)` |
-| `EaseOfMovement` | — | period=14, divisor=100000000.0 | `(high, low, volume, period, divisor)` |
-| `ForceIndex` | — | period=13 | `(close, volume, period)` |
-| `KlingerVolumeOscillator` | — | fast=34, slow=55, signal=13 | `(high, low, close, volume, fast, slow, signal)` |
-| `MoneyFlowIndex` | MFI | timeperiod=14 | `(high, low, close, volume, timeperiod)` |
-| `NegativeVolumeIndex` | — | — | `(close, volume)` |
-| `OnBalanceVolume` | OBV | — | `(close, volume)` |
-| `PositiveVolumeIndex` | — | — | `(close, volume)` |
-| `SessionVolumeLevels` | — | anchor, bins=24, value_area=0.7 | `(high, low, close, volume, anchor, bins, value_area)` |
-| `SessionVolumeWeightedAveragePrice` | — | timestamp, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, utc_offset_minutes)` |
-| `TimeSegmentedVolume` | — | period=18 | `(close, volume, period)` |
-| `TradeVolumeIndex` | — | min_tick=0.25 | `(close, volume, min_tick)` |
-| `TwiggsMoneyFlow` | — | period=21 | `(high, low, close, volume, period)` |
-| `UpDownVolumeRatio` | — | advancing_volume, declining_volume | `(advancing_volume, declining_volume)` |
-| `VolumeByTimeProfile` | — | timestamp, buckets=24, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, buckets, utc_offset_minutes)` |
-| `VolumeOscillator` | — | fast=5, slow=10 | `(volume, fast, slow)` |
-| `VolumePriceTrend` | — | — | `(close, volume)` |
-| `VolumeRelativeStrengthIndex` | — | period=14 | `(volume, period)` |
-| `VolumeZoneOscillator` | — | timeperiod=14 | `(close, volume, timeperiod)` |
-| `WilliamsAccumulationDistribution` | — | — | `(high, low, close)` |
+| `AccumulationDistribution` | AD | `(high, low, close, volume)` | `(—)` |
+| `AccumulationDistributionOscillator` | ADOSC | `(high, low, close, volume)` | `(fastperiod=3, slowperiod=10)` |
+| `Amihud` | — | `(close, volume)` | `(timeperiod=20)` |
+| `AnchoredVolumeWeightedAveragePrice` | — | `(high, low, close, volume, anchor)` | `(standard_deviation_multiplier=1.0)` |
+| `BetterVolume` | — | `(high, low, close, volume)` | `(period=20)` |
+| `ChaikinMoneyFlow` | — | `(high, low, close, volume)` | `(period=20)` |
+| `CumulativeVolumeIndex` | — | `(advancing_volume, declining_volume)` | `(—)` |
+| `EaseOfMovement` | — | `(high, low, volume)` | `(period=14, divisor=100000000.0)` |
+| `ForceIndex` | — | `(close, volume)` | `(period=13)` |
+| `KlingerVolumeOscillator` | — | `(high, low, close, volume)` | `(fast=34, slow=55, signal=13)` |
+| `MoneyFlowIndex` | MFI | `(high, low, close, volume)` | `(timeperiod=14)` |
+| `NegativeVolumeIndex` | — | `(close, volume)` | `(—)` |
+| `OnBalanceVolume` | OBV | `(close, volume)` | `(—)` |
+| `PositiveVolumeIndex` | — | `(close, volume)` | `(—)` |
+| `SessionVolumeLevels` | — | `(high, low, close, volume, anchor)` | `(bins=24, value_area=0.7)` |
+| `SessionVolumeWeightedAveragePrice` | — | `(open, high, low, close, volume, timestamp)` | `(utc_offset_minutes=0)` |
+| `TimeSegmentedVolume` | — | `(close, volume)` | `(period=18)` |
+| `TradeVolumeIndex` | — | `(close, volume)` | `(min_tick=0.25)` |
+| `TwiggsMoneyFlow` | — | `(high, low, close, volume)` | `(period=21)` |
+| `UpDownVolumeRatio` | — | `(advancing_volume, declining_volume)` | `(—)` |
+| `VolumeByTimeProfile` | — | `(open, high, low, close, volume, timestamp)` | `(buckets=24, utc_offset_minutes=0)` |
+| `VolumeOscillator` | — | `(volume)` | `(fast=5, slow=10)` |
+| `VolumePriceTrend` | — | `(close, volume)` | `(—)` |
+| `VolumeRelativeStrengthIndex` | — | `(volume)` | `(period=14)` |
+| `VolumeZoneOscillator` | — | `(close, volume)` | `(timeperiod=14)` |
+| `WilliamsAccumulationDistribution` | — | `(high, low, close)` | `(—)` |
 
 ## Price transforms
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `AbsolutePriceOscillator` | APO | fastperiod=12, slowperiod=26, moving_average_type=0 | `(_input, fastperiod, slowperiod, moving_average_type)` |
-| `AveragePrice` | AVGPRICE | — | `(_open, high, low, close)` |
-| `DetrendedPriceOscillator` | — | period=20 | `(close, period)` |
-| `HeikinAshi` | — | — | `(_open, high, low, close)` |
-| `MedianPrice` | MEDPRICE | — | `(high, low)` |
-| `PercentagePriceOscillator` | PPO | fastperiod=12, slowperiod=26, moving_average_type=0 | `(_input, fastperiod, slowperiod, moving_average_type)` |
-| `TypicalPrice` | TYPPRICE | — | `(high, low, close)` |
+| `AbsolutePriceOscillator` | APO | `(_input)` | `(fastperiod=12, slowperiod=26, moving_average_type=0)` |
+| `AveragePrice` | AVGPRICE | `(open, high, low, close)` | `(—)` |
+| `DetrendedPriceOscillator` | — | `(close)` | `(period=20)` |
+| `HeikinAshi` | — | `(_open, high, low, close)` | `(—)` |
+| `MedianPrice` | MEDPRICE | `(high, low)` | `(—)` |
+| `PercentagePriceOscillator` | PPO | `(_input)` | `(fastperiod=12, slowperiod=26, moving_average_type=0)` |
+| `TypicalPrice` | TYPPRICE | `(high, low, close)` | `(—)` |
 
 ## Rolling & statistical operators
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `ExponentiallyWeightedCorrelation` | — | left, right, timeperiod=14 | `(left, right, timeperiod)` |
-| `ExponentiallyWeightedCovariance` | — | left, right, timeperiod=14 | `(left, right, timeperiod)` |
-| `ExponentiallyWeightedStandardDeviation` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `ExponentiallyWeightedSum` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `ExponentiallyWeightedVariance` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingAlpha` | — | benchmark, timeperiod=20 | `(_input, benchmark, timeperiod)` |
-| `RollingAutocorr` | — | timeperiod=20 | `(_input, timeperiod)` |
-| `RollingAverageDeviation` | AVGDEV | timeperiod=14 | `(values, timeperiod)` |
-| `RollingAverageDrawdown` | — | period=14 | `(values, period)` |
-| `RollingBeta` | BETA | _input0, _input1, timeperiod=5 | `(_input0, _input1, timeperiod)` |
-| `RollingBetaNeutralSpread` | — | period=20 | `(x, y, period)` |
-| `RollingCalmar` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingCoefficientOfDetermination` | — | period=20 | `(x, y, period)` |
-| `RollingCointegration` | — | left, right, period=30, augmented_dickey_fuller_lags=1 | `(left, right, period, augmented_dickey_fuller_lags)` |
-| `RollingConditionalValueAtRisk` | — | timeperiod=14, confidence=0.95 | `(values, timeperiod, confidence)` |
-| `RollingCorrelation` | CORREL | _input0, _input1, timeperiod=5 | `(_input0, _input1, timeperiod)` |
-| `RollingCovariance` | — | left, right, timeperiod=14 | `(left, right, timeperiod)` |
-| `RollingDrawdownDuration` | — | — | `(values)` |
-| `RollingEntropy` | — | timeperiod=20 | `(_input, timeperiod)` |
-| `RollingGainLossRatio` | — | period=14 | `(values, period)` |
-| `RollingGrangerCausality` | — | dependent, predictor, period=60, lag=1 | `(dependent, predictor, period, lag)` |
-| `RollingInformationRatio` | — | benchmark, timeperiod=20 | `(_input, benchmark, timeperiod)` |
-| `RollingInterquartileRange` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingKellyCriterion` | — | timeperiod=14 | `(values, timeperiod)` |
-| `RollingKendallRankCorrelation` | — | period=20 | `(x, y, period)` |
-| `RollingKurtosis` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingLeadLagCrossCorrelation` | — | left, right, window=20, max_lag=10 | `(left, right, window, max_lag)` |
-| `RollingLinearRegression` | LINEARREG | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingLinearRegressionAngle` | LINEARREG_ANGLE | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingLinearRegressionIntercept` | LINEARREG_INTERCEPT | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingLinearRegressionSlope` | LINEARREG_SLOPE | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMaximum` | MAX | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMaximumDrawdown` | — | equity, timeperiod=14 | `(equity, timeperiod)` |
-| `RollingMaximumIndex` | MAXINDEX | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMedian` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMedianAbsoluteDeviation` | — | period=20 | `(values, period)` |
-| `RollingMidpoint` | MIDPOINT | timeperiod=14 | `(values, timeperiod)` |
-| `RollingMidprice` | MIDPRICE | timeperiod=14 | `(high, low, timeperiod)` |
-| `RollingMinMax` | MINMAX | timeperiod=30 | `(_input, timeperiod)` |
-| `RollingMinMaxIndex` | MINMAXINDEX | timeperiod=30 | `(_input, timeperiod)` |
-| `RollingMinimum` | MIN | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMinimumIndex` | MININDEX | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingMode` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingOmegaRatio` | — | timeperiod=14, threshold=0.0 | `(values, timeperiod, threshold)` |
-| `RollingPainIndex` | — | period=14 | `(values, period)` |
-| `RollingPairwiseBeta` | — | asset, benchmark, period=20 | `(asset, benchmark, period)` |
-| `RollingPercentile` | — | timeperiod=14, percentile=50.0 | `(_input, timeperiod, percentile)` |
-| `RollingProfitFactor` | — | timeperiod=14 | `(values, timeperiod)` |
-| `RollingQuantile` | — | timeperiod=14, quantile=0.5 | `(_input, timeperiod, quantile)` |
-| `RollingRank` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingRecoveryFactor` | — | timeperiod=14 | `(values, timeperiod)` |
-| `RollingSharpe` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingSkew` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingSortino` | — | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingSpearmanCorrelation` | — | period=20 | `(x, y, period)` |
-| `RollingStandardDeviation` | STDDEV | timeperiod=14, nbdev=1.0 | `(values, timeperiod, nbdev)` |
-| `RollingStandardError` | — | period=20 | `(values, period)` |
-| `RollingSum` | SUM | timeperiod=30 | `(values, timeperiod)` |
-| `RollingTimeSeriesForecast` | TSF | timeperiod=14 | `(_input, timeperiod)` |
-| `RollingTreynorRatio` | — | benchmark, timeperiod=14 | `(values, benchmark, timeperiod)` |
-| `RollingValueAtRisk` | — | timeperiod=14, confidence=0.95 | `(values, timeperiod, confidence)` |
-| `RollingVariance` | VAR | timeperiod=14, nbdev=1.0 | `(values, timeperiod, nbdev)` |
-| `RollingVarianceRatio` | — | a, b, period=60, q=2 | `(a, b, period, q)` |
-| `RollingVolumeWeightedAveragePrice` | — | timeperiod=20 | `(high, low, close, volume, timeperiod)` |
-| `RollingWinsorize` | — | timeperiod=14, lower=0.05, upper=0.95 | `(_input, timeperiod, lower, upper)` |
-| `RollingZScore` | — | timeperiod=14 | `(_input, timeperiod)` |
+| `ExponentiallyWeightedCorrelation` | — | `(left, right)` | `(timeperiod=14)` |
+| `ExponentiallyWeightedCovariance` | — | `(left, right)` | `(timeperiod=14)` |
+| `ExponentiallyWeightedStandardDeviation` | — | `(_input)` | `(timeperiod=14)` |
+| `ExponentiallyWeightedSum` | — | `(_input)` | `(timeperiod=14)` |
+| `ExponentiallyWeightedVariance` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingAlpha` | — | `(_input, benchmark)` | `(timeperiod=20)` |
+| `RollingAutocorr` | — | `(_input)` | `(timeperiod=20)` |
+| `RollingAverageDeviation` | AVGDEV | `(values)` | `(timeperiod=14)` |
+| `RollingAverageDrawdown` | — | `(values)` | `(period=14)` |
+| `RollingBeta` | BETA | `(input0, input1)` | `(timeperiod=5)` |
+| `RollingBetaNeutralSpread` | — | `(x, y)` | `(period=20)` |
+| `RollingCalmar` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingCoefficientOfDetermination` | — | `(x, y)` | `(period=20)` |
+| `RollingCointegration` | — | `(left, right)` | `(period=30, augmented_dickey_fuller_lags=1)` |
+| `RollingConditionalValueAtRisk` | — | `(values)` | `(timeperiod=14, confidence=0.95)` |
+| `RollingCorrelation` | CORREL | `(input0, input1)` | `(timeperiod=5)` |
+| `RollingCovariance` | — | `(left, right)` | `(timeperiod=14)` |
+| `RollingDrawdownDuration` | — | `(values)` | `(—)` |
+| `RollingEntropy` | — | `(_input)` | `(timeperiod=20)` |
+| `RollingGainLossRatio` | — | `(values)` | `(period=14)` |
+| `RollingGrangerCausality` | — | `(dependent, predictor)` | `(period=60, lag=1)` |
+| `RollingInformationRatio` | — | `(_input, benchmark)` | `(timeperiod=20)` |
+| `RollingInterquartileRange` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingKellyCriterion` | — | `(values)` | `(timeperiod=14)` |
+| `RollingKendallRankCorrelation` | — | `(x, y)` | `(period=20)` |
+| `RollingKurtosis` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingLeadLagCrossCorrelation` | — | `(left, right)` | `(window=20, max_lag=10)` |
+| `RollingLinearRegression` | LINEARREG | `(_input)` | `(timeperiod=14)` |
+| `RollingLinearRegressionAngle` | LINEARREG_ANGLE | `(_input)` | `(timeperiod=14)` |
+| `RollingLinearRegressionIntercept` | LINEARREG_INTERCEPT | `(_input)` | `(timeperiod=14)` |
+| `RollingLinearRegressionSlope` | LINEARREG_SLOPE | `(_input)` | `(timeperiod=14)` |
+| `RollingMaximum` | MAX | `(_input)` | `(timeperiod=14)` |
+| `RollingMaximumDrawdown` | — | `(equity)` | `(timeperiod=14)` |
+| `RollingMaximumIndex` | MAXINDEX | `(_input)` | `(timeperiod=14)` |
+| `RollingMedian` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingMedianAbsoluteDeviation` | — | `(values)` | `(period=20)` |
+| `RollingMidpoint` | MIDPOINT | `(values)` | `(timeperiod=14)` |
+| `RollingMidprice` | MIDPRICE | `(high, low)` | `(timeperiod=14)` |
+| `RollingMinMax` | MINMAX | `(_input)` | `(timeperiod=30)` |
+| `RollingMinMaxIndex` | MINMAXINDEX | `(_input)` | `(timeperiod=30)` |
+| `RollingMinimum` | MIN | `(_input)` | `(timeperiod=14)` |
+| `RollingMinimumIndex` | MININDEX | `(_input)` | `(timeperiod=14)` |
+| `RollingMode` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingOmegaRatio` | — | `(values)` | `(timeperiod=14, threshold=0.0)` |
+| `RollingPainIndex` | — | `(values)` | `(period=14)` |
+| `RollingPairwiseBeta` | — | `(asset, benchmark)` | `(period=20)` |
+| `RollingPercentile` | — | `(_input)` | `(timeperiod=14, percentile=50.0)` |
+| `RollingProfitFactor` | — | `(values)` | `(timeperiod=14)` |
+| `RollingQuantile` | — | `(_input)` | `(timeperiod=14, quantile=0.5)` |
+| `RollingRank` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingRecoveryFactor` | — | `(values)` | `(timeperiod=14)` |
+| `RollingSharpe` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingSkew` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingSortino` | — | `(_input)` | `(timeperiod=14)` |
+| `RollingSpearmanCorrelation` | — | `(x, y)` | `(period=20)` |
+| `RollingStandardDeviation` | STDDEV | `(values)` | `(timeperiod=14, nbdev=1.0)` |
+| `RollingStandardError` | — | `(values)` | `(period=20)` |
+| `RollingSum` | SUM | `(values)` | `(timeperiod=30)` |
+| `RollingTimeSeriesForecast` | TSF | `(_input)` | `(timeperiod=14)` |
+| `RollingTreynorRatio` | — | `(values, benchmark)` | `(timeperiod=14)` |
+| `RollingValueAtRisk` | — | `(values)` | `(timeperiod=14, confidence=0.95)` |
+| `RollingVariance` | VAR | `(values)` | `(timeperiod=14, nbdev=1.0)` |
+| `RollingVarianceRatio` | — | `(a, b)` | `(period=60, q=2)` |
+| `RollingVolumeWeightedAveragePrice` | — | `(high, low, close, volume)` | `(timeperiod=20)` |
+| `RollingWinsorize` | — | `(_input)` | `(timeperiod=14, lower=0.05, upper=0.95)` |
+| `RollingZScore` | — | `(_input)` | `(timeperiod=14)` |
 
 ## Cycle (Hilbert transform)
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `HilbertTransformDominantCyclePeriod` | HT_DCPERIOD | — | `(_input)` |
-| `HilbertTransformDominantCyclePhase` | HT_DCPHASE | — | `(_input)` |
-| `HilbertTransformPhasor` | HT_PHASOR | — | `(_input)` |
-| `HilbertTransformSineWave` | HT_SINE | — | `(_input)` |
-| `HilbertTransformTrendMode` | HT_TRENDMODE | — | `(_input)` |
-| `HilbertTransformTrendline` | HT_TRENDLINE | — | `(values)` |
+| `HilbertTransformDominantCyclePeriod` | HT_DCPERIOD | `(_input)` | `(—)` |
+| `HilbertTransformDominantCyclePhase` | HT_DCPHASE | `(_input)` | `(—)` |
+| `HilbertTransformPhasor` | HT_PHASOR | `(_input)` | `(—)` |
+| `HilbertTransformSineWave` | HT_SINE | `(_input)` | `(—)` |
+| `HilbertTransformTrendMode` | HT_TRENDMODE | `(_input)` | `(—)` |
+| `HilbertTransformTrendline` | HT_TRENDLINE | `(values)` | `(—)` |
 
 ## Math transforms
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `MathAbs` | — | — | `(_input)` |
-| `MathAcos` | ACOS | — | `(_input)` |
-| `MathAcosh` | — | — | `(_input)` |
-| `MathAdd` | ADD | left, right | `(left, right)` |
-| `MathAsin` | ASIN | — | `(_input)` |
-| `MathAsinh` | — | — | `(_input)` |
-| `MathAtan` | ATAN | — | `(_input)` |
-| `MathAtanh` | — | — | `(_input)` |
-| `MathCbrt` | — | — | `(_input)` |
-| `MathCeil` | CEIL | — | `(_input)` |
-| `MathCos` | COS | — | `(_input)` |
-| `MathCosh` | COSH | — | `(_input)` |
-| `MathCot` | — | — | `(_input)` |
-| `MathDegrees` | — | — | `(_input)` |
-| `MathDivide` | DIV | left, right | `(left, right)` |
-| `MathExp` | EXP | — | `(_input)` |
-| `MathFloor` | FLOOR | — | `(_input)` |
-| `MathLn` | LN | — | `(_input)` |
-| `MathLog10` | LOG10 | — | `(_input)` |
-| `MathLog1p` | — | — | `(_input)` |
-| `MathMultiply` | MULT | left, right | `(left, right)` |
-| `MathRadians` | — | — | `(_input)` |
-| `MathSin` | SIN | — | `(_input)` |
-| `MathSinh` | SINH | — | `(_input)` |
-| `MathSqrt` | SQRT | — | `(_input)` |
-| `MathSubtract` | SUB | left, right | `(left, right)` |
-| `MathTan` | TAN | — | `(_input)` |
-| `MathTanh` | TANH | — | `(_input)` |
+| `MathAbs` | — | `(_input)` | `(—)` |
+| `MathAcos` | ACOS | `(_input)` | `(—)` |
+| `MathAcosh` | — | `(_input)` | `(—)` |
+| `MathAdd` | ADD | `(left, right)` | `(—)` |
+| `MathAsin` | ASIN | `(_input)` | `(—)` |
+| `MathAsinh` | — | `(_input)` | `(—)` |
+| `MathAtan` | ATAN | `(_input)` | `(—)` |
+| `MathAtanh` | — | `(_input)` | `(—)` |
+| `MathCbrt` | — | `(_input)` | `(—)` |
+| `MathCeil` | CEIL | `(_input)` | `(—)` |
+| `MathCos` | COS | `(_input)` | `(—)` |
+| `MathCosh` | COSH | `(_input)` | `(—)` |
+| `MathCot` | — | `(_input)` | `(—)` |
+| `MathDegrees` | — | `(_input)` | `(—)` |
+| `MathDivide` | DIV | `(left, right)` | `(—)` |
+| `MathExp` | EXP | `(_input)` | `(—)` |
+| `MathFloor` | FLOOR | `(_input)` | `(—)` |
+| `MathLn` | LN | `(_input)` | `(—)` |
+| `MathLog10` | LOG10 | `(_input)` | `(—)` |
+| `MathLog1p` | — | `(_input)` | `(—)` |
+| `MathMultiply` | MULT | `(left, right)` | `(—)` |
+| `MathRadians` | — | `(_input)` | `(—)` |
+| `MathSin` | SIN | `(_input)` | `(—)` |
+| `MathSinh` | SINH | `(_input)` | `(—)` |
+| `MathSqrt` | SQRT | `(_input)` | `(—)` |
+| `MathSubtract` | SUB | `(left, right)` | `(—)` |
+| `MathTan` | TAN | `(_input)` | `(—)` |
+| `MathTanh` | TANH | `(_input)` | `(—)` |
 
 ## Candlestick patterns
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `CandleAbandonedBaby` | CDLABANDONEDBABY | — | `(_open, high, low, close)` |
-| `CandleAdvanceBlock` | CDLADVANCEBLOCK | — | `(_open, high, low, close)` |
-| `CandleBeltHold` | CDLBELTHOLD | — | `(_open, high, low, close)` |
-| `CandleBreakaway` | CDLBREAKAWAY | — | `(_open, high, low, close)` |
-| `CandleClosingMarubozu` | CDLCLOSINGMARUBOZU | — | `(_open, high, low, close)` |
-| `CandleConcealBabySwall` | CDLCONCEALBABYSWALL | — | `(_open, high, low, close)` |
-| `CandleCounterAttack` | CDLCOUNTERATTACK | — | `(_open, high, low, close)` |
-| `CandleDarkCloudCover` | CDLDARKCLOUDCOVER | — | `(_open, high, low, close)` |
-| `CandleDoji` | CDLDOJI | — | `(_open, high, low, close)` |
-| `CandleDojiStar` | CDLDOJISTAR | — | `(_open, high, low, close)` |
-| `CandleDragonflyDoji` | CDLDRAGONFLYDOJI | — | `(_open, high, low, close)` |
-| `CandleEngulfing` | CDLENGULFING | — | `(_open, high, low, close)` |
-| `CandleEveningDojiStar` | CDLEVENINGDOJISTAR | — | `(_open, high, low, close)` |
-| `CandleEveningStar` | CDLEVENINGSTAR | — | `(_open, high, low, close)` |
-| `CandleGapSideSideWhite` | CDLGAPSIDESIDEWHITE | — | `(_open, high, low, close)` |
-| `CandleGravestoneDoji` | CDLGRAVESTONEDOJI | — | `(_open, high, low, close)` |
-| `CandleHammer` | CDLHAMMER | — | `(_open, high, low, close)` |
-| `CandleHangingMan` | CDLHANGINGMAN | — | `(_open, high, low, close)` |
-| `CandleHarami` | CDLHARAMI | — | `(_open, high, low, close)` |
-| `CandleHaramiCross` | CDLHARAMICROSS | — | `(_open, high, low, close)` |
-| `CandleHighWave` | CDLHIGHWAVE | — | `(_open, high, low, close)` |
-| `CandleHikkake` | CDLHIKKAKE | — | `(_open, high, low, close)` |
-| `CandleHikkakeModified` | CDLHIKKAKEMOD | — | `(_open, high, low, close)` |
-| `CandleHomingPigeon` | CDLHOMINGPIGEON | — | `(_open, high, low, close)` |
-| `CandleIdenticalThreeCrows` | CDLIDENTICAL3CROWS | — | `(_open, high, low, close)` |
-| `CandleInNeck` | CDLINNECK | — | `(_open, high, low, close)` |
-| `CandleInvertedHammer` | CDLINVERTEDHAMMER | — | `(_open, high, low, close)` |
-| `CandleKicking` | CDLKICKING | — | `(_open, high, low, close)` |
-| `CandleKickingByLength` | CDLKICKINGBYLENGTH | — | `(_open, high, low, close)` |
-| `CandleLadderBottom` | CDLLADDERBOTTOM | — | `(_open, high, low, close)` |
-| `CandleLongLeggedDoji` | CDLLONGLEGGEDDOJI | — | `(_open, high, low, close)` |
-| `CandleLongLine` | CDLLONGLINE | — | `(_open, high, low, close)` |
-| `CandleMarubozu` | CDLMARUBOZU | — | `(_open, high, low, close)` |
-| `CandleMatHold` | CDLMATHOLD | — | `(_open, high, low, close)` |
-| `CandleMatchingLow` | CDLMATCHINGLOW | — | `(_open, high, low, close)` |
-| `CandleMorningDojiStar` | CDLMORNINGDOJISTAR | — | `(_open, high, low, close)` |
-| `CandleMorningStar` | CDLMORNINGSTAR | — | `(_open, high, low, close)` |
-| `CandleOnNeck` | CDLONNECK | — | `(_open, high, low, close)` |
-| `CandlePiercing` | CDLPIERCING | — | `(_open, high, low, close)` |
-| `CandleRickshawman` | CDLRICKSHAWMAN | — | `(_open, high, low, close)` |
-| `CandleRiseFallThreeMethods` | CDLRISEFALL3METHODS | — | `(_open, high, low, close)` |
-| `CandleSeparatingLines` | CDLSEPARATINGLINES | — | `(_open, high, low, close)` |
-| `CandleShootingStar` | CDLSHOOTINGSTAR | — | `(_open, high, low, close)` |
-| `CandleShortLine` | CDLSHORTLINE | — | `(_open, high, low, close)` |
-| `CandleSpinningTop` | CDLSPINNINGTOP | — | `(_open, high, low, close)` |
-| `CandleStalledPattern` | CDLSTALLEDPATTERN | — | `(_open, high, low, close)` |
-| `CandleStickSandwich` | CDLSTICKSANDWICH | — | `(_open, high, low, close)` |
-| `CandleTakuri` | CDLTAKURI | — | `(_open, high, low, close)` |
-| `CandleTasukiGap` | CDLTASUKIGAP | — | `(_open, high, low, close)` |
-| `CandleThreeBlackCrows` | CDL3BLACKCROWS | — | `(_open, high, low, close)` |
-| `CandleThreeInside` | CDL3INSIDE | — | `(_open, high, low, close)` |
-| `CandleThreeLineStrike` | CDL3LINESTRIKE | — | `(_open, high, low, close)` |
-| `CandleThreeOutside` | CDL3OUTSIDE | — | `(_open, high, low, close)` |
-| `CandleThreeStarsInSouth` | CDL3STARSINSOUTH | — | `(_open, high, low, close)` |
-| `CandleThreeWhiteSoldiers` | CDL3WHITESOLDIERS | — | `(_open, high, low, close)` |
-| `CandleThrusting` | CDLTHRUSTING | — | `(_open, high, low, close)` |
-| `CandleTriStar` | CDLTRISTAR | — | `(_open, high, low, close)` |
-| `CandleTwoCrows` | CDL2CROWS | — | `(_open, high, low, close)` |
-| `CandleUniqueThreeRiver` | CDLUNIQUE3RIVER | — | `(_open, high, low, close)` |
-| `CandleUpDownSideGapThreeMethods` | CDLXSIDEGAP3METHODS | — | `(_open, high, low, close)` |
-| `CandleUpsideGapTwoCrows` | CDLUPSIDEGAP2CROWS | — | `(_open, high, low, close)` |
+| `CandleAbandonedBaby` | CDLABANDONEDBABY | `(_open, high, low, close)` | `(—)` |
+| `CandleAdvanceBlock` | CDLADVANCEBLOCK | `(_open, high, low, close)` | `(—)` |
+| `CandleBeltHold` | CDLBELTHOLD | `(_open, high, low, close)` | `(—)` |
+| `CandleBreakaway` | CDLBREAKAWAY | `(_open, high, low, close)` | `(—)` |
+| `CandleClosingMarubozu` | CDLCLOSINGMARUBOZU | `(_open, high, low, close)` | `(—)` |
+| `CandleConcealBabySwall` | CDLCONCEALBABYSWALL | `(_open, high, low, close)` | `(—)` |
+| `CandleCounterAttack` | CDLCOUNTERATTACK | `(_open, high, low, close)` | `(—)` |
+| `CandleDarkCloudCover` | CDLDARKCLOUDCOVER | `(_open, high, low, close)` | `(—)` |
+| `CandleDoji` | CDLDOJI | `(_open, high, low, close)` | `(—)` |
+| `CandleDojiStar` | CDLDOJISTAR | `(_open, high, low, close)` | `(—)` |
+| `CandleDragonflyDoji` | CDLDRAGONFLYDOJI | `(_open, high, low, close)` | `(—)` |
+| `CandleEngulfing` | CDLENGULFING | `(_open, high, low, close)` | `(—)` |
+| `CandleEveningDojiStar` | CDLEVENINGDOJISTAR | `(_open, high, low, close)` | `(—)` |
+| `CandleEveningStar` | CDLEVENINGSTAR | `(_open, high, low, close)` | `(—)` |
+| `CandleGapSideSideWhite` | CDLGAPSIDESIDEWHITE | `(_open, high, low, close)` | `(—)` |
+| `CandleGravestoneDoji` | CDLGRAVESTONEDOJI | `(_open, high, low, close)` | `(—)` |
+| `CandleHammer` | CDLHAMMER | `(_open, high, low, close)` | `(—)` |
+| `CandleHangingMan` | CDLHANGINGMAN | `(_open, high, low, close)` | `(—)` |
+| `CandleHarami` | CDLHARAMI | `(_open, high, low, close)` | `(—)` |
+| `CandleHaramiCross` | CDLHARAMICROSS | `(_open, high, low, close)` | `(—)` |
+| `CandleHighWave` | CDLHIGHWAVE | `(_open, high, low, close)` | `(—)` |
+| `CandleHikkake` | CDLHIKKAKE | `(_open, high, low, close)` | `(—)` |
+| `CandleHikkakeModified` | CDLHIKKAKEMOD | `(_open, high, low, close)` | `(—)` |
+| `CandleHomingPigeon` | CDLHOMINGPIGEON | `(_open, high, low, close)` | `(—)` |
+| `CandleIdenticalThreeCrows` | CDLIDENTICAL3CROWS | `(_open, high, low, close)` | `(—)` |
+| `CandleInNeck` | CDLINNECK | `(_open, high, low, close)` | `(—)` |
+| `CandleInvertedHammer` | CDLINVERTEDHAMMER | `(_open, high, low, close)` | `(—)` |
+| `CandleKicking` | CDLKICKING | `(_open, high, low, close)` | `(—)` |
+| `CandleKickingByLength` | CDLKICKINGBYLENGTH | `(_open, high, low, close)` | `(—)` |
+| `CandleLadderBottom` | CDLLADDERBOTTOM | `(_open, high, low, close)` | `(—)` |
+| `CandleLongLeggedDoji` | CDLLONGLEGGEDDOJI | `(_open, high, low, close)` | `(—)` |
+| `CandleLongLine` | CDLLONGLINE | `(_open, high, low, close)` | `(—)` |
+| `CandleMarubozu` | CDLMARUBOZU | `(_open, high, low, close)` | `(—)` |
+| `CandleMatHold` | CDLMATHOLD | `(_open, high, low, close)` | `(—)` |
+| `CandleMatchingLow` | CDLMATCHINGLOW | `(_open, high, low, close)` | `(—)` |
+| `CandleMorningDojiStar` | CDLMORNINGDOJISTAR | `(_open, high, low, close)` | `(—)` |
+| `CandleMorningStar` | CDLMORNINGSTAR | `(_open, high, low, close)` | `(—)` |
+| `CandleOnNeck` | CDLONNECK | `(_open, high, low, close)` | `(—)` |
+| `CandlePiercing` | CDLPIERCING | `(_open, high, low, close)` | `(—)` |
+| `CandleRickshawman` | CDLRICKSHAWMAN | `(_open, high, low, close)` | `(—)` |
+| `CandleRiseFallThreeMethods` | CDLRISEFALL3METHODS | `(_open, high, low, close)` | `(—)` |
+| `CandleSeparatingLines` | CDLSEPARATINGLINES | `(_open, high, low, close)` | `(—)` |
+| `CandleShootingStar` | CDLSHOOTINGSTAR | `(_open, high, low, close)` | `(—)` |
+| `CandleShortLine` | CDLSHORTLINE | `(_open, high, low, close)` | `(—)` |
+| `CandleSpinningTop` | CDLSPINNINGTOP | `(_open, high, low, close)` | `(—)` |
+| `CandleStalledPattern` | CDLSTALLEDPATTERN | `(_open, high, low, close)` | `(—)` |
+| `CandleStickSandwich` | CDLSTICKSANDWICH | `(_open, high, low, close)` | `(—)` |
+| `CandleTakuri` | CDLTAKURI | `(_open, high, low, close)` | `(—)` |
+| `CandleTasukiGap` | CDLTASUKIGAP | `(_open, high, low, close)` | `(—)` |
+| `CandleThreeBlackCrows` | CDL3BLACKCROWS | `(_open, high, low, close)` | `(—)` |
+| `CandleThreeInside` | CDL3INSIDE | `(_open, high, low, close)` | `(—)` |
+| `CandleThreeLineStrike` | CDL3LINESTRIKE | `(_open, high, low, close)` | `(—)` |
+| `CandleThreeOutside` | CDL3OUTSIDE | `(_open, high, low, close)` | `(—)` |
+| `CandleThreeStarsInSouth` | CDL3STARSINSOUTH | `(_open, high, low, close)` | `(—)` |
+| `CandleThreeWhiteSoldiers` | CDL3WHITESOLDIERS | `(_open, high, low, close)` | `(—)` |
+| `CandleThrusting` | CDLTHRUSTING | `(_open, high, low, close)` | `(—)` |
+| `CandleTriStar` | CDLTRISTAR | `(_open, high, low, close)` | `(—)` |
+| `CandleTwoCrows` | CDL2CROWS | `(_open, high, low, close)` | `(—)` |
+| `CandleUniqueThreeRiver` | CDLUNIQUE3RIVER | `(_open, high, low, close)` | `(—)` |
+| `CandleUpDownSideGapThreeMethods` | CDLXSIDEGAP3METHODS | `(_open, high, low, close)` | `(—)` |
+| `CandleUpsideGapTwoCrows` | CDLUPSIDEGAP2CROWS | `(_open, high, low, close)` | `(—)` |
 
 ## Market structure & sessions
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `AutomaticFibonacci` | — | — | `(high, low)` |
-| `BreakOfStructureChangeOfCharacter` | — | swing_length=5 | `(high, low, close, swing_length)` |
-| `EqualHighsLows` | — | eq_len=3, atr_period=200, eq_threshold=0.1 | `(high, low, close, eq_len, atr_period, eq_threshold)` |
-| `FairValueGap` | — | — | `(_open, high, low, close)` |
-| `FibonacciArcs` | — | — | `(high, low)` |
-| `FibonacciChannel` | — | — | `(high, low)` |
-| `FibonacciConfluence` | — | — | `(high, low)` |
-| `FibonacciExtension` | — | — | `(high, low)` |
-| `FibonacciFan` | — | — | `(high, low)` |
-| `FibonacciProjection` | — | — | `(high, low)` |
-| `FibonacciRetracement` | — | window=120 | `(close, window)` |
-| `FibonacciTimeZones` | — | — | `(high, low)` |
-| `GapDown` | — | — | `(high, low)` |
-| `GapUp` | — | — | `(high, low)` |
-| `HigherHigh` | — | — | `(high, low)` |
-| `InsideBar` | — | — | `(high, low)` |
-| `Liquidity` | — | swing_length=50, range_percent=0.01 | `(high, low, swing_length, range_percent)` |
-| `LowerLow` | — | — | `(high, low)` |
-| `OpeningRange` | — | anchor, bars=30 | `(high, low, close, anchor, bars)` |
-| `OrderBlock` | — | swing_length=50, internal_length=5, atr_period=200, threshold=2.0 | `(high, low, close, volume, swing_length, internal_length, atr_period, threshold)` |
-| `OutsideBar` | — | — | `(high, low)` |
-| `PivotPoints` | — | anchor | `(high, low, close, anchor)` |
-| `PremiumDiscount` | — | window=20 | `(close, window)` |
-| `PreviousHighLow` | — | — | `(new_session, high, low)` |
-| `Retracements` | — | swing_length=5 | `(high, low, close, swing_length)` |
-| `SessionExtrema` | — | — | `(new_session, high, low)` |
-| `SessionRange` | — | timestamp, utc_offset_minutes=0 | `(open, high, low, close, volume, timestamp, utc_offset_minutes)` |
-| `Sessions` | — | — | `(new_session, high, low)` |
-| `SwingHighLow` | — | swing_length=5 | `(high, low, swing_length)` |
+| `AutomaticFibonacci` | — | `(high, low)` | `(—)` |
+| `BreakOfStructureChangeOfCharacter` | — | `(high, low, close)` | `(swing_length=5)` |
+| `EqualHighsLows` | — | `(high, low, close)` | `(eq_len=3, atr_period=200, eq_threshold=0.1)` |
+| `FairValueGap` | — | `(_open, high, low, close)` | `(—)` |
+| `FibonacciArcs` | — | `(high, low)` | `(—)` |
+| `FibonacciChannel` | — | `(high, low)` | `(—)` |
+| `FibonacciConfluence` | — | `(high, low)` | `(—)` |
+| `FibonacciExtension` | — | `(high, low)` | `(—)` |
+| `FibonacciFan` | — | `(high, low)` | `(—)` |
+| `FibonacciProjection` | — | `(high, low)` | `(—)` |
+| `FibonacciRetracement` | — | `(close)` | `(window=120)` |
+| `FibonacciTimeZones` | — | `(high, low)` | `(—)` |
+| `GapDown` | — | `(high, low)` | `(—)` |
+| `GapUp` | — | `(high, low)` | `(—)` |
+| `HigherHigh` | — | `(high, low)` | `(—)` |
+| `InsideBar` | — | `(high, low)` | `(—)` |
+| `Liquidity` | — | `(high, low)` | `(swing_length=50, range_percent=0.01)` |
+| `LowerLow` | — | `(high, low)` | `(—)` |
+| `OpeningRange` | — | `(high, low, close, anchor)` | `(bars=30)` |
+| `OrderBlock` | — | `(high, low, close, volume)` | `(swing_length=50, internal_length=5, atr_period=200, threshold=2.0)` |
+| `OutsideBar` | — | `(high, low)` | `(—)` |
+| `PivotPoints` | — | `(high, low, close, anchor)` | `(—)` |
+| `PremiumDiscount` | — | `(close)` | `(window=20)` |
+| `PreviousHighLow` | — | `(new_session, high, low)` | `(—)` |
+| `Retracements` | — | `(high, low, close)` | `(swing_length=5)` |
+| `SessionExtrema` | — | `(new_session, high, low)` | `(—)` |
+| `SessionRange` | — | `(open, high, low, close, volume, timestamp)` | `(utc_offset_minutes=0)` |
+| `Sessions` | — | `(new_session, high, low)` | `(—)` |
+| `SwingHighLow` | — | `(high, low)` | `(swing_length=5)` |
 
 ## Quant & econometrics
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `CumulativeSumControlChart` | — | change, threshold=1.0 | `(change, threshold)` |
-| `FracDiff` | — | d=0.5, threshold=1e-05 | `(input, d, threshold)` |
-| `FractalDimension` | — | prices, timeperiod=20 | `(prices, timeperiod)` |
-| `HedgeRatio` | — | timeperiod=20 | `(x, y, timeperiod)` |
-| `Hurst` | — | timeperiod=20, chunks=4 | `(_input, timeperiod, chunks)` |
-| `HurstChannel` | — | period=10, multiplier=0.5 | `(high, low, close, period, multiplier)` |
-| `KalmanHedgeRatio` | — | delta=0.0001, observation_variance=0.001 | `(x, y, delta, observation_variance)` |
-| `OrnsteinUhlenbeckHalfLife` | — | timeperiod=20 | `(price, timeperiod)` |
-| `RollSpread` | — | timeperiod=20 | `(price, timeperiod)` |
-| `SpreadZScore` | — | timeperiod=20 | `(x, y, timeperiod)` |
+| `CumulativeSumControlChart` | — | `(change)` | `(threshold=1.0)` |
+| `FracDiff` | — | `(input)` | `(d=0.5, threshold=1e-05)` |
+| `FractalDimension` | — | `(prices)` | `(timeperiod=20)` |
+| `HedgeRatio` | — | `(x, y)` | `(timeperiod=20)` |
+| `Hurst` | — | `(_input)` | `(timeperiod=20, chunks=4)` |
+| `HurstChannel` | — | `(high, low, close)` | `(period=10, multiplier=0.5)` |
+| `KalmanHedgeRatio` | — | `(x, y)` | `(delta=0.0001, observation_variance=0.001)` |
+| `OrnsteinUhlenbeckHalfLife` | — | `(price)` | `(timeperiod=20)` |
+| `RollSpread` | — | `(price)` | `(timeperiod=20)` |
+| `SpreadZScore` | — | `(x, y)` | `(timeperiod=20)` |
 
 ## Signal & series operators
 
-| Class | TA-Lib | Parameters | Constructor order |
+| Class | TA-Lib | Input order | Constructor configuration |
 |---|---|---|---|
-| `BarsSince` | — | — | `(condition)` |
-| `Crossover` | — | left, right | `(left, right)` |
-| `Crossunder` | — | left, right | `(left, right)` |
-| `CumulativeCount` | — | — | `(_input)` |
-| `CumulativeMaximum` | — | — | `(_input)` |
-| `CumulativeMinimum` | — | — | `(_input)` |
-| `CumulativeProduct` | — | — | `(_input)` |
-| `CumulativeSum` | — | — | `(_input)` |
-| `DecayLinear` | — | timeperiod=30 | `(input, timeperiod)` |
-| `Drawdown` | — | — | `(_input)` |
-| `EntryExit` | — | entry, exit | `(entry, exit)` |
-| `Falling` | — | timeperiod=1 | `(_input, timeperiod)` |
-| `HighestSince` | — | — | `(condition, _input)` |
-| `Lag` | — | timeperiod=1 | `(_input, timeperiod)` |
-| `LaguerreRelativeStrengthIndex` | — | gamma=0.5 | `(close, gamma)` |
-| `LogReturn` | — | timeperiod=1 | `(_input, timeperiod)` |
-| `LowestSince` | — | — | `(condition, _input)` |
-| `PositionHold` | — | position | `(position)` |
-| `Rising` | — | timeperiod=1 | `(_input, timeperiod)` |
-| `SignalDelay` | — | timeperiod=1 | `(_input, timeperiod)` |
-| `SignedPower` | — | exponent=2.0 | `(input, exponent)` |
-| `TimeSeriesRank` | — | timeperiod=14 | `(input, timeperiod)` |
-| `ValueWhen` | — | — | `(condition, _input)` |
+| `BarsSince` | — | `(condition)` | `(—)` |
+| `Crossover` | — | `(left, right)` | `(—)` |
+| `Crossunder` | — | `(left, right)` | `(—)` |
+| `CumulativeCount` | — | `(_input)` | `(—)` |
+| `CumulativeMaximum` | — | `(_input)` | `(—)` |
+| `CumulativeMinimum` | — | `(_input)` | `(—)` |
+| `CumulativeProduct` | — | `(_input)` | `(—)` |
+| `CumulativeSum` | — | `(_input)` | `(—)` |
+| `DecayLinear` | — | `(input)` | `(timeperiod=30)` |
+| `Drawdown` | — | `(_input)` | `(—)` |
+| `EntryExit` | — | `(entry, exit)` | `(—)` |
+| `Falling` | — | `(_input)` | `(timeperiod=1)` |
+| `HighestSince` | — | `(condition, _input)` | `(—)` |
+| `Lag` | — | `(_input)` | `(timeperiod=1)` |
+| `LaguerreRelativeStrengthIndex` | — | `(close)` | `(gamma=0.5)` |
+| `LogReturn` | — | `(_input)` | `(timeperiod=1)` |
+| `LowestSince` | — | `(condition, _input)` | `(—)` |
+| `PositionHold` | — | `(position)` | `(—)` |
+| `Rising` | — | `(_input)` | `(timeperiod=1)` |
+| `SignalDelay` | — | `(_input)` | `(timeperiod=1)` |
+| `SignedPower` | — | `(input)` | `(exponent=2.0)` |
+| `TimeSeriesRank` | — | `(input)` | `(timeperiod=14)` |
+| `ValueWhen` | — | `(condition, _input)` | `(—)` |

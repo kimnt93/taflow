@@ -14,7 +14,7 @@ class DetrendedPriceOscillator:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -24,15 +24,12 @@ class DetrendedPriceOscillator:
 
     def __init__(
         self,
-        close: Any,
         period: int = 20,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        close : object
-            Close-price series or the current bar close.
         period : object
             Trailing window length in bars.
 
@@ -42,7 +39,6 @@ class DetrendedPriceOscillator:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(period)
-        self.extend(close)
 
     def append(self, close: float) -> "DetrendedPriceOscillator":
         """Append one observation or aligned bar to the native Rust state.

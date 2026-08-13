@@ -12,7 +12,8 @@ class OhlcStateAdapter:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Configuration values are accepted by the constructor; series are supplied
+    to ``extend``.
 
     Returns
     -------
@@ -25,18 +26,13 @@ class OhlcStateAdapter:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Create the native state and process initial OHLC data."""
+        """Create an empty configured native state."""
         if self._period_required:
             self._state = self._native_cls(timeperiod)
         else:
             self._state = self._native_cls()
-        if high is not None or low is not None or close is not None:
-            self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "Self":
         """Append one chronological observation to the native Rust state.

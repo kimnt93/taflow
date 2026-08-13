@@ -21,7 +21,6 @@ class BollingerBands:
 
     def __init__(
         self,
-        values: Any,
         period: int = 5,
         deviations_up: float = 2.0,
         deviations_down: float = 2.0,
@@ -33,7 +32,6 @@ class BollingerBands:
             float(deviations_down),
             int(moving_average_type),
         )
-        self.extend(values)
 
     def append(self, value: float) -> "BollingerBands":
         self._state.append(float(value))

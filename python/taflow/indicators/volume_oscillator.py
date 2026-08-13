@@ -16,8 +16,7 @@ class VolumeOscillator:
     ``VolumeOscillator`` 0.9.9; TA-Lib has no direct equivalent.
 
     Args:
-        volume: Initial chronological volume series. An empty series creates a
-            fresh state for later streaming.
+        volume: Chronological volume series supplied through ``extend``.
         fast: Fast simple-moving-average period. Defaults to 5.
         slow: Slow simple-moving-average period. Defaults to 10 and must be
             greater than ``fast``.
@@ -26,10 +25,10 @@ class VolumeOscillator:
         ValueError: If the periods do not satisfy ``1 <= fast < slow``.
     """
 
-    def __init__(self, volume: Any, fast: int = 5, slow: int = 10) -> None:
-        """Initialize the oscillator and process the supplied volume history."""
+    def __init__(self, fast: int = 5, slow: int = 10) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(int(fast), int(slow))
-        self.extend(volume)
 
     def append(self, volume: float) -> "VolumeOscillator":
         """Append one volume observation and return this instance."""

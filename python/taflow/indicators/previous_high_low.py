@@ -12,22 +12,8 @@ class PreviousHighLow:
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `new_session`, `high`, `low`. Warm-up positions are represented by `NaN` in history."""
 
-    def __init__(
-        self,
-        new_session: Any,
-        high: Any,
-        low: Any,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
-
-        Parameters
-        ----------
-        new_session : object
-            Boolean series marking the start of each session.
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
 
         Returns
         -------
@@ -35,7 +21,6 @@ class PreviousHighLow:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native()
-        self.extend(new_session, high, low)
 
     def append(self, new_session: bool, high: float, low: float) -> "PreviousHighLow":
         """Append one observation or aligned bar to the native Rust state.

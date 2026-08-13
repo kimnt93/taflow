@@ -4,13 +4,7 @@ from taflow import VolumeWeightedMovingAverageConvergenceDivergence
 
 
 def test_volume_weighted_moving_average_convergence_divergence_lifecycle():
-    state = VolumeWeightedMovingAverageConvergenceDivergence(
-        np.array([], dtype=float),
-        np.array([], dtype=float),
-        fast=2,
-        slow=3,
-        signal=1,
-    )
+    state = VolumeWeightedMovingAverageConvergenceDivergence(fast=2, slow=3, signal=1)
     state.extend([1.0, 2.0, 3.0], [2.0, 2.0, 2.0])
 
     assert state.value is not None

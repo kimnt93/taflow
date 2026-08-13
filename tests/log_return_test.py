@@ -9,10 +9,10 @@ def test_log_return_matches_pandas_and_lifecycle() -> None:
     series = pd.Series(values)
     expected = np.log(series / series.shift(2)).to_numpy()
     np.testing.assert_allclose(
-        LogReturn(values, timeperiod=2).compute(), expected, equal_nan=True
+        LogReturn(timeperiod=2).extend(values).compute(), expected, equal_nan=True
     )
 
-    state = LogReturn([], timeperiod=2)
+    state = LogReturn(timeperiod=2)
     assert state.extend(values[:3]) is state
     assert state.extend(values[3:]) is state
     np.testing.assert_allclose(state.compute(), expected, equal_nan=True)

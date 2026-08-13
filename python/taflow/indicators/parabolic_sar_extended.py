@@ -13,7 +13,7 @@ class ParabolicSarExtended:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -23,8 +23,6 @@ class ParabolicSarExtended:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
         start_value: object = 0.0,
         offset_on_reverse: object = 0.0,
         acceleration_init_long: object = 0.02,
@@ -34,7 +32,7 @@ class ParabolicSarExtended:
         acceleration_short: object = 0.02,
         acceleration_max_short: object = 0.2,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
@@ -54,10 +52,6 @@ class ParabolicSarExtended:
             Input parameter or configuration value for this operation.
         acceleration_max_short : object
             Input parameter or configuration value for this operation.
-        high : object
-            High-price series or the current bar high.
-        low : object
-            Low-price series or the current bar low.
 
         Returns
         -------
@@ -74,7 +68,6 @@ class ParabolicSarExtended:
             acceleration_short,
             acceleration_max_short,
         )
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "ParabolicSarExtended":
         """Append one observation or aligned bar to the native Rust state.

@@ -10,9 +10,8 @@ from .._series import as_float64_series
 class SignedPower:
     """Pointwise sign(x) times abs(x) raised to exponent."""
 
-    def __init__(self, input: Any, exponent: float = 2.0) -> None:
+    def __init__(self, exponent: float = 2.0) -> None:
         self._state = _Native(float(exponent))
-        self.extend(input)
 
     def append(self, input: float) -> "SignedPower":
         self._state.append(float(input))

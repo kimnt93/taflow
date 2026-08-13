@@ -17,9 +17,8 @@ class SmoothedTrendChannel:
     ``(lower, upper)`` arrays. This is the TAFlow SSL Channel definition.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, length: int = 10) -> None:
+    def __init__(self, length: int = 10) -> None:
         self._state = _NativeSmoothedTrendChannel(int(length))
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "SmoothedTrendChannel":
         """Append one high/low/close bar and return this adapter."""

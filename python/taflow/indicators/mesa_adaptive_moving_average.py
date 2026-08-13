@@ -15,9 +15,8 @@ class MesaAdaptiveMovingAverage:
     0.05, matching TA-Lib ``MAMA``. History contains both aligned outputs.
     """
 
-    def __init__(self, _input: Any, fastlimit: float = 0.5, slowlimit: float = 0.05) -> None:
+    def __init__(self, fastlimit: float = 0.5, slowlimit: float = 0.05) -> None:
         self._state = _NativeMesaAdaptiveMovingAverage(fastlimit, slowlimit)
-        self.extend(_input)
 
     def append(self, _input: float) -> "MesaAdaptiveMovingAverage":
         """Append one value and return this indicator."""

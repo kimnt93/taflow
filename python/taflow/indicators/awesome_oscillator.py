@@ -21,10 +21,9 @@ class AwesomeOscillator:
     """
 
     def __init__(
-        self, high: Any, low: Any, fast: int = 5, slow: int = 34
+        self, fast: int = 5, slow: int = 34
     ) -> None:
         self._state = _Native(int(fast), int(slow))
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "AwesomeOscillator":
         """Append one high/low bar and return this adapter."""

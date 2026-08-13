@@ -13,14 +13,12 @@ class AccumulationDistribution:
 
     For each bar the increment is
     ``((close-low) - (high-close)) / (high-low) * volume``; a non-positive
-    range contributes zero. The constructor requires aligned chronological
-    high, low, close, and volume series. Pass four empty arrays for a fresh
-    streaming state. There is no warm-up. This maps to TA-Lib ``AD``.
+    range contributes zero. ``extend`` accepts aligned chronological
+    high, low, close, and volume series. Construction creates an empty state. There is no warm-up. This maps to TA-Lib ``AD``.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, volume: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeAccumulationDistribution()
-        self.extend(high, low, close, volume)
 
     def append(self, high: float, low: float, close: float, volume: float) -> "AccumulationDistribution":
         """Append one high/low/close/volume tuple and return this indicator."""

@@ -12,7 +12,7 @@ class ParabolicMovingAverageStop:
     """Compute pandas-ta-compatible EMA/ATR PMAX bands and trend direction.
 
     ``high``, ``low``, and ``close`` are required aligned chronological
-    series; empty arrays create a fresh stream. ``length`` defaults to 10 and
+    series; supply the aligned series through ``extend`` after construction. ``length`` defaults to 10 and
     ``multiplier`` to 3.0. Rust owns Wilder ATR/EMA seeding, PMAX band
     transitions, warm-up (``value`` is ``None`` until ``length - 1`` bars),
     and aligned output. ``compute`` returns ``(stop, trend)`` arrays, while
@@ -20,16 +20,8 @@ class ParabolicMovingAverageStop:
     ``pandas-ta-classic.pmax``.
     """
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        close: Any,
-        length: int = 10,
-        multiplier: float = 3.0,
-    ) -> None:
+    def __init__(self, length: int = 10, multiplier: float = 3.0) -> None:
         self._state = _NativeParabolicMovingAverageStop(int(length), float(multiplier))
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "ParabolicMovingAverageStop":
         """Append one high/low/close bar and return this adapter."""

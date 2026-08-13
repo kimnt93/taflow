@@ -15,17 +15,17 @@ class EhlersStochastic:
     ``EhlersStochastic``.
 
     Args:
-        values: Initial chronological price history.
+        values: Chronological price history.
         period: Positive stochastic lookback, default 10.
 
     Raises:
         ValueError: If ``period`` is zero.
     """
 
-    def __init__(self, values: Any, period: int = 10) -> None:
-        """Initialize native filter state and process the initial history."""
+    def __init__(self, period: int = 10) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "EhlersStochastic":
         """Append one price and return this adapter."""

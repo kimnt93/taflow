@@ -13,9 +13,8 @@ class BreakOfStructureChangeOfCharacter:
     broken with NaN until an event exists.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, swing_length: int = 5) -> None:
+    def __init__(self, swing_length: int = 5) -> None:
         self._state = _Native(int(swing_length))
-        self.extend(high, low, close)
 
     def append(
         self, high: float, low: float, close: float

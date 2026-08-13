@@ -27,10 +27,10 @@ class RectangleRange:
         ValueError: If the four OHLC histories have different lengths.
     """
 
-    def __init__(self, open: Any, high: Any, low: Any, close: Any) -> None:
-        """Initialize native range state and process aligned OHLC history."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(open, high, low, close)
 
     def append(
         self, open: float, high: float, low: float, close: float

@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class RollingPainIndex:
     """Mean causal percentage drawdown over a fixed price window."""
 
-    def __init__(self, values: Any, period: int = 14) -> None:
+    def __init__(self, period: int = 14) -> None:
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingPainIndex":
         self._state.append(float(value))

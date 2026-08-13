@@ -23,12 +23,10 @@ class ArmsIndex:
         ValueError: If the four histories have different lengths.
     """
 
-    def __init__(
-        self, advancers: Any, decliners: Any, advancing_volume: Any, declining_volume: Any
-    ) -> None:
-        """Initialize native TRIN state and process aligned histories."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(advancers, decliners, advancing_volume, declining_volume)
 
     def append(
         self,

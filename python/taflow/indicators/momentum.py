@@ -11,14 +11,12 @@ from .._series import as_float64_series
 class Momentum:
     """Compute the causal difference from ``timeperiod`` bars earlier.
 
-    ``values`` is required; pass an empty series to create a fresh streaming
-    state. ``timeperiod`` defaults to 14 and must be positive. The first
+    ``values`` is required; supply the series through ``extend`` after construction. ``timeperiod`` defaults to 14 and must be positive. The first
     ``timeperiod`` aligned outputs are NaN. This maps to TA-Lib ``MOM``.
     """
 
-    def __init__(self, values: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeMomentum(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "Momentum":
         """Append one chronological value and return this indicator."""

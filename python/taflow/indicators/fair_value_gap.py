@@ -11,9 +11,8 @@ from .._series import as_float64_series
 class FairValueGap:
     """Detect causal fair-value gaps and subsequent mitigation events."""
 
-    def __init__(self, _open: Any, high: Any, low: Any, close: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(_open, high, low, close)
 
     def append(self, _open: float, high: float, low: float, close: float) -> "FairValueGap":
         self._state.append(float(_open), float(high), float(low), float(close))

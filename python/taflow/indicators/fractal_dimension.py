@@ -12,8 +12,8 @@ class FractalDimension:
     """Estimate rolling fractal dimension as ``2 - Hurst exponent``.
 
     Rust owns the two-chunk rescaled-range calculation and persistent state.
-    ``prices`` is a required chronological series; an empty array creates a
-    fresh stream. ``timeperiod`` defaults to 20 and must be at least four.
+    Supply chronological ``prices`` through ``extend``. ``timeperiod``
+    defaults to 20 and must be at least four.
     Aligned history contains ``NaN`` until one full period is available. The
     independent formula oracle is the registered NumPy rescaled-range model.
 
@@ -25,10 +25,10 @@ class FractalDimension:
         ValueError: If ``timeperiod`` is less than four.
     """
 
-    def __init__(self, prices: Any, timeperiod: int = 20) -> None:
-        """Initialize native state and process the supplied price history."""
+    def __init__(self, timeperiod: int = 20) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(timeperiod)
-        self.extend(prices)
 
     def append(self, price: float) -> "FractalDimension":
         """Append one price and return this adapter for method chaining."""

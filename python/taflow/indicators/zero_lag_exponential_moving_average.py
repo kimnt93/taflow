@@ -20,9 +20,8 @@ class ZeroLagExponentialMovingAverage:
     ``zlema``.
     """
 
-    def __init__(self, _input: Any, timeperiod: int = 10) -> None:
+    def __init__(self, timeperiod: int = 10) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(_input)
 
     def append(self, _input: float) -> "ZeroLagExponentialMovingAverage":
         """Append one observation and return this adapter."""

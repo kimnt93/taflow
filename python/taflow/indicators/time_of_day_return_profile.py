@@ -30,20 +30,10 @@ class TimeOfDayReturnProfile:
         ValueError: If inputs differ in length or ``buckets`` is zero.
     """
 
-    def __init__(
-        self,
-        open: Any,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
-        timestamp: Any,
-        buckets: int = 24,
-        utc_offset_minutes: int = 0,
-    ) -> None:
-        """Initialize the native profile and process the supplied history."""
+    def __init__(self, buckets: int = 24, utc_offset_minutes: int = 0) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(buckets, utc_offset_minutes)
-        self.extend(open, high, low, close, volume, timestamp)
 
     def append(
         self,

@@ -9,9 +9,8 @@ from .._series import as_float64_series
 class ExponentialMovingAverage:
     """Compute EMA from required ``values``; Rust owns seed and warm-up."""
 
-    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _NativeExponentialMovingAverage(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "ExponentialMovingAverage":
         self._state.append(float(value))

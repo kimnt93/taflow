@@ -18,9 +18,8 @@ class CumulativeCount:
     adapter; the native Rust state performs all counting and warm-up handling.
     """
 
-    def __init__(self, _input: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeCumulativeCount()
-        self.extend(_input)
 
     def append(self, _input: float) -> "CumulativeCount":
         """Append one chronological observation and return this adapter."""

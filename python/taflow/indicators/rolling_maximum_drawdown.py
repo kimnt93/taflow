@@ -27,8 +27,7 @@ class RollingMaximumDrawdown:
     Parameters
     ----------
     equity : object
-        Required chronological equity samples. An empty series creates a fresh
-        streaming state.
+        Required chronological equity samples. Supply the series through ``extend`` after construction.
     timeperiod : int, default 14
         Positive trailing-window length. A value of one emits zero immediately.
 
@@ -38,9 +37,8 @@ class RollingMaximumDrawdown:
         If ``timeperiod`` is zero.
     """
 
-    def __init__(self, equity: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(equity)
 
     def append(self, equity: float) -> "RollingMaximumDrawdown":
         """Append one equity sample and return this adapter."""

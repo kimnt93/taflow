@@ -21,12 +21,10 @@ def test_accumulation_distribution_oscillator_matches_talib_and_lifecycle(
 ) -> None:
     high, low, close, volume = _inputs(257, fastperiod * 100 + slowperiod)
     expected = talib.ADOSC(high, low, close, volume, fastperiod, slowperiod)
-    actual = AccumulationDistributionOscillator(
-        high, low, close, volume, fastperiod, slowperiod
-    )
+    actual = AccumulationDistributionOscillator(fastperiod, slowperiod).extend(high, low, close, volume)
     np.testing.assert_allclose(actual.compute(), expected, rtol=1e-12, atol=2e-8, equal_nan=True)
 
-    state = AccumulationDistributionOscillator([], [], [], [], fastperiod, slowperiod)
+    state = AccumulationDistributionOscillator(fastperiod, slowperiod)
     assert state.value is None
     assert state.extend(high[:41], low[:41], close[:41], volume[:41]) is state
     assert state.extend(high[41:], low[41:], close[41:], volume[41:]) is state
@@ -41,8 +39,8 @@ def test_accumulation_distribution_oscillator_matches_talib_and_lifecycle(
 
 def test_accumulation_distribution_oscillator_validates_before_mutation() -> None:
     with pytest.raises(ValueError):
-        AccumulationDistributionOscillator([], [], [], [], 1, 10)
-    state = AccumulationDistributionOscillator([], [], [], [])
+        AccumulationDistributionOscillator(1, 10)
+    state = AccumulationDistributionOscillator()
     with pytest.raises(ValueError):
         state.extend([2.0, 3.0], [1.0], [1.5, 2.5], [10.0, 20.0])
     assert len(state) == 0

@@ -20,10 +20,10 @@ class PercentAboveMovingAverage:
         ValueError: If the two histories have different lengths.
     """
 
-    def __init__(self, above_moving_average_count: Any, universe_size: Any) -> None:
-        """Initialize native state and process aligned count histories."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(above_moving_average_count, universe_size)
 
     def append(
         self, above_moving_average_count: float, universe_size: float

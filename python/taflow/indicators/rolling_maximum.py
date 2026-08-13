@@ -10,7 +10,7 @@ class RollingMaximum(UnaryStateAdapter):
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -20,10 +20,10 @@ class RollingMaximum(UnaryStateAdapter):
 
     _native_cls = RollingMaximum
 
-    def __init__(self, _input: Any, timeperiod: int = 14) -> None:
-        """Create the native rolling maximum state and process ``_input``."""
+    def __init__(self, timeperiod: int = 14) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = self._native_cls(timeperiod)
-        self.extend(_input)
 
     def append(self, _input: float) -> "RollingMaximum":
         """Append one observation and return this indicator."""

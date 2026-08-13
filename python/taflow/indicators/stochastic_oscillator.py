@@ -9,11 +9,15 @@ from .._series import as_float64_series
 class StochasticOscillator:
     """Compute slow %K and %D from aligned high, low, and close series."""
 
-    def __init__(self, high: Any, low: Any, close: Any, fast_k_period: int = 5,
-                 slow_k_period: int = 3, slow_k_average_type: int = 0,
-                 slow_d_period: int = 3, slow_d_average_type: int = 0) -> None:
+    def __init__(
+        self,
+        fast_k_period: int = 5,
+        slow_k_period: int = 3,
+        slow_k_average_type: int = 0,
+        slow_d_period: int = 3,
+        slow_d_average_type: int = 0,
+    ) -> None:
         self._state = _NativeStochasticOscillator(fast_k_period, slow_k_period, slow_k_average_type, slow_d_period, slow_d_average_type)
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "StochasticOscillator":
         self._state.append(float(high), float(low), float(close)); return self

@@ -19,9 +19,8 @@ class EntryExit:
     return ``self``.
     """
 
-    def __init__(self, entry: Any, exit: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(entry, exit)
 
     def append(self, entry: bool, exit: bool) -> "EntryExit":
         """Append one entry/exit pair and return this adapter."""

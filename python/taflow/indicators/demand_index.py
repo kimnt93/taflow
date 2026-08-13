@@ -17,10 +17,10 @@ class DemandIndex:
     TA-Lib has no direct equivalent.
 
     Args:
-        high: Initial chronological high-price series.
-        low: Initial chronological low-price series.
-        close: Initial chronological closing-price series.
-        volume: Initial chronological volume series.
+        high: Chronological high-price series.
+        low: Chronological low-price series.
+        close: Chronological closing-price series.
+        volume: Chronological volume series.
         timeperiod: EMA smoothing period. Defaults to 10.
 
     Raises:
@@ -30,15 +30,11 @@ class DemandIndex:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
-        volume: Any,
         timeperiod: int = 10,
     ) -> None:
-        """Initialize the index and process aligned OHLCV history."""
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(int(timeperiod))
-        self.extend(high, low, close, volume)
 
     def append(
         self,

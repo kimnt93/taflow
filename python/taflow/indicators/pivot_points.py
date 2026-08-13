@@ -12,16 +12,15 @@ class PivotPoints:
     """Compute anchored classic pivot, resistance, and support levels.
 
     ``high``, ``low``, ``close``, and boolean ``anchor`` are required aligned
-    histories in that order; empty arrays create a fresh stream. ``compute``
+    histories in that order; supply the aligned series through ``extend`` after construction. ``compute``
     returns ``(pivot, resistance_one, support_one, support_two,
     resistance_two)`` arrays. Rust owns causal anchor transitions and warm-up;
     ``value`` exposes the latest five-value tuple or ``None``. Lifecycle
     mutators are fluent and reject unequal input lengths before mutation.
     """
 
-    def __init__(self, high: Any, low: Any, close: Any, anchor: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativePivotPoints()
-        self.extend(high, low, close, anchor)
 
     def append(
         self, high: float, low: float, close: float, anchor: bool

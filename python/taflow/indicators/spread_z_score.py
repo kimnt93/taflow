@@ -12,20 +12,11 @@ class SpreadZScore:
 
     This public class owns a persistent native Rust state; Python performs container conversion only. `append`, `extend`, and `reset` are fluent, `value` exposes the latest result, and `compute` returns aligned history. Required input histories: `x`, `y`. Warm-up positions are represented by `NaN` in history."""
 
-    def __init__(
-        self,
-        x: Any,
-        y: Any,
-        timeperiod: int = 20,
-    ) -> None:
-        """Initialize this adapter and process the supplied input series.
+    def __init__(self, timeperiod: int = 20) -> None:
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        x : object
-            First aligned input series or scalar observation.
-        y : object
-            Second aligned input series or scalar observation.
         timeperiod : object
             Trailing window length in bars.
 
@@ -35,7 +26,6 @@ class SpreadZScore:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(x, y)
 
     def append(self, x: float, y: float) -> "SpreadZScore":
         """Append one observation or aligned bar to the native Rust state.

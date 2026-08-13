@@ -47,7 +47,7 @@ def test_shared_node_steps_once_per_bar(bars):
     """One indicator feeding several outputs is stepped once, not once per output."""
     _, _, close = bars
     pipe = TAPipeline()
-    spy = SpyState(ExponentialMovingAverage([], timeperiod=10))
+    spy = SpyState(ExponentialMovingAverage(timeperiod=10))
     node = pipe.indicator("ema", spy, pipe.source("close"))
 
     # Four distinct consumers of the same node.
@@ -64,8 +64,8 @@ def test_chained_indicators_step_once_each(bars):
     """An indicator consuming another indicator advances both exactly once."""
     _, _, close = bars
     pipe = TAPipeline()
-    first = SpyState(ExponentialMovingAverage([], timeperiod=5))
-    second = SpyState(SimpleMovingAverage([], timeperiod=7))
+    first = SpyState(ExponentialMovingAverage(timeperiod=5))
+    second = SpyState(SimpleMovingAverage(timeperiod=7))
 
     a = pipe.indicator("ema", first, pipe.source("close"))
     b = pipe.indicator("sma_of_ema", second, a)
@@ -82,8 +82,8 @@ def test_multi_input_indicator_steps_once(bars):
     """A three-input indicator sharing sources with others steps once per bar."""
     high, low, close = bars
     pipe = TAPipeline()
-    atr = SpyState(AverageTrueRange([], [], [], timeperiod=14))
-    ema = SpyState(ExponentialMovingAverage([], timeperiod=10))
+    atr = SpyState(AverageTrueRange(timeperiod=14))
+    ema = SpyState(ExponentialMovingAverage(timeperiod=10))
 
     h, l, c = pipe.source("high"), pipe.source("low"), pipe.source("close")
     atr_node = pipe.indicator("atr", atr, h, l, c)
@@ -102,7 +102,7 @@ def test_append_steps_once_per_call(bars):
     """Bar-at-a-time dispatch also steps a shared node exactly once."""
     _, _, close = bars
     pipe = TAPipeline()
-    spy = SpyState(SimpleMovingAverage([], timeperiod=4))
+    spy = SpyState(SimpleMovingAverage(timeperiod=4))
     node = pipe.indicator("sma", spy, pipe.source("close"))
     pipe.output("a", node)
     pipe.output("b", pipe.expression("b", node * 3.0))
@@ -116,12 +116,12 @@ def test_pipeline_matches_standalone_indicator(bars):
     """Graph output equals driving the same indicator directly."""
     _, _, close = bars
     pipe = TAPipeline()
-    node = pipe.indicator("ema", ExponentialMovingAverage([], timeperiod=12),
+    node = pipe.indicator("ema", ExponentialMovingAverage(timeperiod=12),
                           pipe.source("close"))
     pipe.output("ema", node)
     from_pipeline = pipe.extend({"close": close})["ema"]
 
-    standalone = ExponentialMovingAverage([], timeperiod=12)
+    standalone = ExponentialMovingAverage(timeperiod=12)
     standalone.extend(close)
     expected = standalone.compute()
 
@@ -135,8 +135,8 @@ def test_extend_equals_repeated_append(bars):
     def build():
         pipe = TAPipeline()
         h, l, c = pipe.source("high"), pipe.source("low"), pipe.source("close")
-        atr = pipe.indicator("atr", AverageTrueRange([], [], [], timeperiod=14), h, l, c)
-        ema = pipe.indicator("ema", ExponentialMovingAverage([], timeperiod=20), c)
+        atr = pipe.indicator("atr", AverageTrueRange(timeperiod=14), h, l, c)
+        ema = pipe.indicator("ema", ExponentialMovingAverage(timeperiod=20), c)
         pipe.output("atr", atr)
         pipe.output("z", pipe.expression("z", (c - ema) / atr))
         return pipe
@@ -160,7 +160,7 @@ def test_chunked_extend_matches_single_extend(bars):
 
     def build():
         pipe = TAPipeline()
-        node = pipe.indicator("ema", ExponentialMovingAverage([], timeperiod=15),
+        node = pipe.indicator("ema", ExponentialMovingAverage(timeperiod=15),
                               pipe.source("close"))
         pipe.output("ema", node)
         return pipe
@@ -178,7 +178,7 @@ def test_reset_restores_initial_state(bars):
     """reset() clears stateful nodes so a replay reproduces the first run."""
     _, _, close = bars
     pipe = TAPipeline()
-    node = pipe.indicator("ema", ExponentialMovingAverage([], timeperiod=9),
+    node = pipe.indicator("ema", ExponentialMovingAverage(timeperiod=9),
                           pipe.source("close"))
     pipe.output("ema", node)
 
@@ -193,7 +193,7 @@ def test_warmup_is_nan_and_length_is_preserved(bars):
     """Outputs stay aligned with inputs, warm-up reported as NaN."""
     _, _, close = bars
     pipe = TAPipeline()
-    node = pipe.indicator("sma", SimpleMovingAverage([], timeperiod=30),
+    node = pipe.indicator("sma", SimpleMovingAverage(timeperiod=30),
                           pipe.source("close"))
     pipe.output("sma", node)
 
@@ -206,7 +206,7 @@ def test_warmup_is_nan_and_length_is_preserved(bars):
 def test_outputs_property_lists_registered_names(bars):
     _, _, close = bars
     pipe = TAPipeline()
-    node = pipe.indicator("sma", SimpleMovingAverage([], timeperiod=5),
+    node = pipe.indicator("sma", SimpleMovingAverage(timeperiod=5),
                           pipe.source("close"))
     pipe.output("a", node)
     pipe.output("b", pipe.expression("b", node + 1.0))
@@ -215,11 +215,19 @@ def test_outputs_property_lists_registered_names(bars):
 
 def test_mismatched_input_lengths_raise():
     pipe = TAPipeline()
-    node = pipe.indicator("sma", SimpleMovingAverage([], timeperiod=3),
+    node = pipe.indicator("sma", SimpleMovingAverage(timeperiod=3),
                           pipe.source("close"))
     pipe.output("sma", node)
     with pytest.raises(ValueError):
         pipe.extend({"close": [1.0, 2.0, 3.0], "other": [1.0, 2.0]})
+
+
+def test_indicator_constructors_reject_legacy_series_arguments():
+    """Historical inputs belong to extend, never indicator construction."""
+    with pytest.raises(TypeError):
+        ExponentialMovingAverage([])
+    with pytest.raises(TypeError):
+        AverageTrueRange([], [], [])
 
 
 def test_unreachable_node_is_not_stepped(bars):
@@ -232,8 +240,8 @@ def test_unreachable_node_is_not_stepped(bars):
     """
     _, _, close = bars
     pipe = TAPipeline()
-    used = SpyState(SimpleMovingAverage([], timeperiod=5))
-    unused = SpyState(SimpleMovingAverage([], timeperiod=5))
+    used = SpyState(SimpleMovingAverage(timeperiod=5))
+    unused = SpyState(SimpleMovingAverage(timeperiod=5))
 
     pipe.output("used", pipe.indicator("used", used, pipe.source("close")))
     pipe.indicator("unused", unused, pipe.source("close"))
@@ -254,19 +262,19 @@ def test_chained_indicator_propagates_warmup_nan(bars):
     """
     _, _, close = bars
     pipe = TAPipeline()
-    ema = pipe.indicator("ema", ExponentialMovingAverage([], timeperiod=5),
+    ema = pipe.indicator("ema", ExponentialMovingAverage(timeperiod=5),
                          pipe.source("close"))
-    chained = pipe.indicator("chained", SimpleMovingAverage([], timeperiod=7), ema)
+    chained = pipe.indicator("chained", SimpleMovingAverage(timeperiod=7), ema)
     pipe.output("chained", chained)
 
     result = pipe.extend({"close": close})["chained"]
     assert np.all(np.isnan(result)), "expected the documented all-NaN poisoning"
 
     # The workaround: feed only the warmed upstream values.
-    upstream = ExponentialMovingAverage([], timeperiod=5)
+    upstream = ExponentialMovingAverage(timeperiod=5)
     upstream.extend(close)
     warm = upstream.compute()
     warm = warm[~np.isnan(warm)]
-    downstream = SimpleMovingAverage([], timeperiod=7)
+    downstream = SimpleMovingAverage(timeperiod=7)
     downstream.extend(warm)
     assert not np.isnan(downstream.compute()[-1])

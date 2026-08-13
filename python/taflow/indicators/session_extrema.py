@@ -19,9 +19,8 @@ class SessionExtrema:
     or ``None`` for an empty stream, and lifecycle mutators return ``self``.
     """
 
-    def __init__(self, new_session: Any, high: Any, low: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native()
-        self.extend(new_session, high, low)
 
     def append(self, new_session: bool, high: float, low: float) -> "SessionExtrema":
         """Append one session/high/low bar and return this adapter."""

@@ -17,17 +17,17 @@ class RollingAverageDrawdown:
     independent name mapping is Wickra ``AverageDrawdown``.
 
     Args:
-        values: Initial chronological equity-curve observations.
+        values: Chronological equity-curve observations.
         period: Rolling window length, default 14.
 
     Raises:
         ValueError: If ``period`` is zero.
     """
 
-    def __init__(self, values: Any, period: int = 14) -> None:
-        """Initialize native state and process the initial history."""
+    def __init__(self, period: int = 14) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period)
-        self.extend(values)
 
     def append(self, value: float) -> "RollingAverageDrawdown":
         """Append one equity observation and return this instance."""

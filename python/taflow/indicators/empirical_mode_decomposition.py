@@ -26,10 +26,10 @@ class EmpiricalModeDecomposition:
         ValueError: If ``period`` or ``fraction`` is invalid.
     """
 
-    def __init__(self, prices: Any, period: int = 20, fraction: float = 0.5) -> None:
-        """Initialize native EMD state and process the supplied history."""
+    def __init__(self, period: int = 20, fraction: float = 0.5) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(period, fraction)
-        self.extend(prices)
 
     def append(self, price: float) -> "EmpiricalModeDecomposition":
         """Append one price and return this adapter."""

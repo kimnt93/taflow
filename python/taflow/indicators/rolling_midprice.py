@@ -17,9 +17,8 @@ class RollingMidprice:
     float64 array. This maps to TA-Lib ``MIDPRICE``.
     """
 
-    def __init__(self, high: Any, low: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeRollingMidprice(timeperiod)
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "RollingMidprice":
         """Append one aligned high/low pair and return this indicator."""

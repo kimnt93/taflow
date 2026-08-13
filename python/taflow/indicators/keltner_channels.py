@@ -23,14 +23,10 @@ class KeltnerChannels:
 
     def __init__(
         self,
-        high: Any,
-        low: Any,
-        close: Any,
         timeperiod: int = 20,
         multiplier: float = 2.0,
     ) -> None:
         self._state = _Native(int(timeperiod), float(multiplier))
-        self.extend(high, low, close)
 
     def append(self, high: float, low: float, close: float) -> "KeltnerChannels":
         """Append one OHLC bar and return this adapter."""

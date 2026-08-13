@@ -16,14 +16,13 @@ class HilbertDominantCycle:
     implementation maps directly to Wickra ``HilbertDominantCycle``.
 
     Args:
-        prices: Required chronological price history. Pass an empty series to
-            construct a fresh streaming estimator.
+        prices: Chronological price history supplied through ``extend``.
     """
 
-    def __init__(self, prices: Any) -> None:
-        """Initialize the estimator and process the supplied history."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(prices)
 
     def append(self, price: float) -> "HilbertDominantCycle":
         """Append one price and return this adapter."""

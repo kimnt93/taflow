@@ -7,7 +7,7 @@ def test_order_block_lifecycle() -> None:
     close = 100.0 + np.sin(np.arange(128.0) / 7.0)
     high, low = close + 1.0, close - 1.0
     volume = np.arange(128.0) + 1000.0
-    state = OrderBlock(high, low, close, volume, swing_length=5, internal_length=3, atr_period=14)
+    state = OrderBlock(swing_length=5, internal_length=3, atr_period=14).extend(high, low, close, volume)
     first = state.compute()
     state.reset().extend(high, low, close, volume)
     for got, expected in zip(state.compute(), first):

@@ -14,15 +14,12 @@ class CloseToCloseSigma:
 
     def __init__(
         self,
-        close: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        close : object
-            Close-price series or the current bar close.
         timeperiod : object
             Trailing window length in bars.
 
@@ -32,7 +29,6 @@ class CloseToCloseSigma:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(timeperiod)
-        self.extend(close)
 
     def append(self, close: float) -> "CloseToCloseSigma":
         """Append one observation or aligned bar to the native Rust state.

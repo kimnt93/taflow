@@ -9,8 +9,8 @@ from .._price_state import HlcPriceState
 class TypicalPrice(HlcPriceState):
     """Compute ``(high + low + close) / 3`` in persistent Rust state.
 
-    The constructor requires the aligned chronological high, low, close
-    series. Pass empty aligned arrays for a fresh streaming state. Output has no
+    Construction creates a fresh empty state. Supply aligned chronological high,
+    low, and close series through ``extend`` or ``append``. Output has no
     rolling warm-up and maps to TA-Lib ``TYPPRICE``.
     """
 

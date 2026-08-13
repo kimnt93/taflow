@@ -20,7 +20,8 @@ names and will not be extended.
 ```python
 from taflow import ExponentialMovingAverage
 
-ema = ExponentialMovingAverage(series_numpy_or_list_or_polars_or_df, timeperiod=20)
+ema = ExponentialMovingAverage(timeperiod=20)
+ema.extend(series_numpy_or_list_or_polars_or_df)
 values = ema.compute()                    # full, aligned NumPy result
 
 ema.append(next_value)                    # persistent O(1) state update
@@ -39,17 +40,16 @@ path.  Multi-output indicators return a tuple of aligned NumPy arrays from
 
 ## Inputs and lifecycle
 
-- Constructors accept initial data plus the indicator's TA-Lib parameters;
-  initial data is optional, so `ExponentialMovingAverage(timeperiod=20)` is a
-  valid empty realtime state.
+- Constructors accept only the indicator's configuration and always create an
+  empty realtime state. Historical data is supplied explicitly to `extend`.
 - `append(...)` accepts one scalar per required input stream and mutates the
-  object. `extend(...)` accepts the same supported collection types as the
-  constructor and processes only the supplied new bars.
+  object. `extend(...)` accepts supported collection types and processes only
+  the supplied new bars.
 - NumPy one-dimensional float64 input is read without a copy when contiguous.
   Python lists, Polars `Series`, and supported one-column dataframe selections
   normalize to float64 once at the API boundary.
 - For OHLCV indicators, callers may provide positional series
-  (`AverageTrueRange(high, low, close, timeperiod=14)`) or a dataframe plus
+  (`AverageTrueRange(timeperiod=14).extend(high, low, close)`) or a dataframe plus
   explicit column names.  The public API never guesses columns silently;
   standard names are defaults and ambiguous/missing columns raise `ValueError`.
 - `reset()` clears state and accumulated outputs. Input length mismatches,

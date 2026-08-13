@@ -7,9 +7,8 @@ from .._series import as_float64_series
 class RollingCoefficientOfDetermination:
     """Rolling coefficient of determination for two aligned series."""
 
-    def __init__(self, x: Any, y: Any, period: int = 20) -> None:
+    def __init__(self, period: int = 20) -> None:
         self._state = _Native(period)
-        self.extend(x, y)
 
     def append(self, x: float, y: float) -> "RollingCoefficientOfDetermination":
         self._state.append(float(x), float(y))

@@ -14,7 +14,7 @@ class TripleExponentialMovingAverage:
     Parameters
     ----------
     values : array-like
-        Chronological input values; an empty array creates a fresh stream.
+        Chronological input values; supply the series through ``extend`` after construction.
     timeperiod : int, default 30
         EMA period. Values below 2 are rejected by the native state.
 
@@ -31,9 +31,8 @@ class TripleExponentialMovingAverage:
     warm-up, and bulk processing; this adapter only converts input series.
     """
 
-    def __init__(self, values: Any, timeperiod: int = 30) -> None:
+    def __init__(self, timeperiod: int = 30) -> None:
         self._state = _NativeTripleExponentialMovingAverage(timeperiod)
-        self.extend(values)
 
     def append(self, value: float) -> "TripleExponentialMovingAverage":
         """Append one value and return this indicator for fluent chaining."""

@@ -20,10 +20,10 @@ class BullishPercentIndex:
         ValueError: If the input histories have different lengths.
     """
 
-    def __init__(self, on_buy_signal_count: Any, universe_size: Any) -> None:
-        """Initialize native state and process aligned count histories."""
+    def __init__(self) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native()
-        self.extend(on_buy_signal_count, universe_size)
 
     def append(
         self, on_buy_signal_count: float, universe_size: float

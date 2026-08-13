@@ -17,8 +17,7 @@ class Hurst:
     aligned history.
 
     Args:
-        _input: Required chronological price series. An empty series creates a
-            fresh streaming state.
+        _input: Chronological price series supplied through ``extend``.
         timeperiod: Trailing window length. Must be at least ``chunks * 2``.
         chunks: Number of rescaled-range segments. Must be at least two.
 
@@ -28,13 +27,12 @@ class Hurst:
 
     def __init__(
         self,
-        _input: Any,
         timeperiod: int = 20,
         chunks: int = 4,
     ) -> None:
-        """Initialize the estimator and process the supplied price history."""
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(timeperiod, chunks)
-        self.extend(_input)
 
     def append(self, _input: float) -> "Hurst":
         """Append one price observation and return this estimator."""

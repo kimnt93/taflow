@@ -8,11 +8,9 @@ from ._series import as_float64_series
 
 
 class UnaryStateAdapter:
-    """Adapt a native unary state without performing numerical work in Python
+    """Adapt a native unary state without performing numerical work in Python.
 
-    Parameters
-    ----------
-    Input series and configuration values are accepted by the constructor.
+    The constructor accepts configuration only and creates an empty state.
 
     Returns
     -------
@@ -24,15 +22,12 @@ class UnaryStateAdapter:
 
     def __init__(
         self,
-        _input: Any,
         timeperiod: int = 14,
     ) -> None:
-        """Create the native state and process an input history."""
+        """Create an empty native state for the configured time period."""
         if self._native_cls is None:
             raise TypeError("a native state class must be configured")
         self._state = self._native_cls(timeperiod)
-        if _input is not None:
-            self.extend(_input)
 
     def append(self, _input: float) -> "Self":
         """Append one chronological observation to the native Rust state.

@@ -16,7 +16,7 @@ class RollingValueAtRisk:
     has no direct equivalent.
 
     Args:
-        values: Initial chronological return or profit/loss series.
+        values: Chronological return or profit/loss series.
         timeperiod: Rolling window length. Defaults to 14.
         confidence: Tail confidence in the open interval ``(0, 1)``. Defaults to 0.95.
 
@@ -24,10 +24,10 @@ class RollingValueAtRisk:
         ValueError: If the window or another configuration value is invalid.
     """
 
-    def __init__(self, values: Any, timeperiod: int = 14, confidence: float = 0.95) -> None:
-        """Initialize the state and process the supplied history."""
+    def __init__(self, timeperiod: int = 14, confidence: float = 0.95) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(int(timeperiod), float(confidence))
-        self.extend(values)
 
     def append(self, value: float) -> "RollingValueAtRisk":
         """Append one observation and return this instance."""

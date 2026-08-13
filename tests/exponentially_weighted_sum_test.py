@@ -5,7 +5,7 @@ from taflow import ExponentiallyWeightedSum
 
 def test_matches_pandas_ewm_sum() -> None:
     values = np.arange(32, dtype=float)
-    actual = ExponentiallyWeightedSum(values, 8).compute()
+    actual = ExponentiallyWeightedSum(8).extend(values).compute()
     alpha = 2.0 / 9.0
     expected = np.empty_like(values)
     expected[0] = values[0]

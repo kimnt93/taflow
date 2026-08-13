@@ -27,10 +27,10 @@ class ZigZag:
         ValueError: If inputs differ in length or ``threshold`` is invalid.
     """
 
-    def __init__(self, high: Any, low: Any, threshold: float = 0.05) -> None:
-        """Initialize native ZigZag state and process aligned history."""
+    def __init__(self, threshold: float = 0.05) -> None:
+        """Initialize an empty configured native state.
+        """
         self._state = _Native(threshold)
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "ZigZag":
         """Append one high/low bar and return this adapter."""

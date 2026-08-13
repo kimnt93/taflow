@@ -13,7 +13,7 @@ class ParabolicSar:
 
     Parameters
     ----------
-    Input series and configuration values are accepted by the constructor.
+    Construct with configuration values only; supply input series through ``extend``.
 
     Returns
     -------
@@ -21,16 +21,9 @@ class ParabolicSar:
         A persistent native-backed indicator adapter.
     """
 
-    def __init__(
-        self,
-        high: Any,
-        low: Any,
-        acceleration: float = 0.02,
-        maximum: float = 0.2,
-    ) -> None:
-        """Create Parabolic SAR with optional aligned high/low history."""
+    def __init__(self, acceleration: float = 0.02, maximum: float = 0.2) -> None:
+        """Create an empty configured Parabolic SAR state."""
         self._state = _NativeParabolicSar(acceleration, maximum)
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "ParabolicSar":
         """Append one observation or aligned bar to the native Rust state.

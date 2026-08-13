@@ -97,11 +97,11 @@ from taflow import SimpleMovingAverage
 
 close = np.cumsum(np.random.default_rng(0).normal(0, 1, 500)) + 100.0
 
-SimpleMovingAverage(close, timeperiod=10).compute()                     # numpy
-SimpleMovingAverage(close.tolist(), timeperiod=10).compute()            # list
-SimpleMovingAverage(pd.Series(close), timeperiod=10).compute()          # pandas
-SimpleMovingAverage(pl.Series("close", close), timeperiod=10).compute() # polars
-SimpleMovingAverage(pa.array(close), timeperiod=10).compute()           # arrow
+SimpleMovingAverage(timeperiod=10).extend(close).compute()                     # numpy
+SimpleMovingAverage(timeperiod=10).extend(close.tolist()).compute()            # list
+SimpleMovingAverage(timeperiod=10).extend(pd.Series(close)).compute()          # pandas
+SimpleMovingAverage(timeperiod=10).extend(pl.Series("close", close)).compute() # polars
+SimpleMovingAverage(timeperiod=10).extend(pa.array(close)).compute()           # arrow
 ```
 
 Working from a dataframe, hand over the columns:
@@ -109,7 +109,7 @@ Working from a dataframe, hand over the columns:
 ```python
 frame = pd.DataFrame({"open": o, "high": h, "low": l, "close": c, "volume": v})
 
-frame["sma_10"] = SimpleMovingAverage(frame["close"], timeperiod=10).compute()
+frame["sma_10"] = SimpleMovingAverage(timeperiod=10).extend(frame["close"]).compute()
 ```
 
 The same line works unchanged on a Polars DataFrame. Full detail — multi-column
@@ -118,32 +118,33 @@ frames, output converters, custom containers — in
 
 ### 2. Call the indicator
 
-Every class has the same shape: construct with the data, read the result.
+Every class has the same shape: construct with configuration, ingest data,
+then read the result.
 Outputs are `float64` arrays the same length as the input, `NaN` through
 warm-up, so indices always line up with your bars.
 
 ```python
 from taflow import RelativeStrengthIndex, MoneyFlowIndex, AverageTrueRange, Aroon
 
-rsi = RelativeStrengthIndex(close, timeperiod=14).compute()
-mfi = MoneyFlowIndex(high, low, close, volume, timeperiod=14).compute()
-atr = AverageTrueRange(high, low, close, timeperiod=14).compute()
+rsi = RelativeStrengthIndex(timeperiod=14).extend(close).compute()
+mfi = MoneyFlowIndex(timeperiod=14).extend(high, low, close, volume).compute()
+atr = AverageTrueRange(timeperiod=14).extend(high, low, close).compute()
 
-down, up = Aroon(high, low, timeperiod=14).compute()     # multi-output → tuple
+down, up = Aroon(timeperiod=14).extend(high, low).compute()     # multi-output → tuple
 ```
 
-Every class takes its required input series first and configuration after it.
-Configuration has documented defaults, so positional or keyword style works:
+Every constructor takes configuration only. Pass historical inputs to
+`extend` in the same order used by `append`:
 
 ```python
 from taflow import BollingerBands, StochasticOscillator
 
-upper, middle, lower = BollingerBands(close, period=20).compute()
-slowk, slowd = StochasticOscillator(high, low, close).compute()
+upper, middle, lower = BollingerBands(period=20).extend(close).compute()
+slowk, slowd = StochasticOscillator().extend(high, low, close).compute()
 ```
 
 Keywords always work. **[docs/INDICATORS.md](docs/INDICATORS.md)** lists every
-class with its TA-Lib name, parameters and exact constructor order.
+class with its TA-Lib name, input order, and constructor configuration.
 
 ### 3. Go live
 
@@ -153,7 +154,7 @@ bar is flat:
 ```python
 from taflow import ExponentialMovingAverage
 
-ema = ExponentialMovingAverage(np.array([], dtype=np.float64), timeperiod=20)
+ema = ExponentialMovingAverage(timeperiod=20)
 ema.extend(history)          # backfill in one call
 
 for tick in feed:
@@ -181,11 +182,10 @@ from taflow.op import TAPipeline
 pipe = TAPipeline()
 high_s, low_s, close_s = pipe.source("high"), pipe.source("low"), pipe.source("close")
 
-empty = np.array([], dtype=np.float64)
-fast = pipe.indicator("fast", ExponentialMovingAverage(empty, timeperiod=12), close_s)
-slow = pipe.indicator("slow", ExponentialMovingAverage(empty, timeperiod=26), close_s)
+fast = pipe.indicator("fast", ExponentialMovingAverage(timeperiod=12), close_s)
+slow = pipe.indicator("slow", ExponentialMovingAverage(timeperiod=26), close_s)
 atr_n = pipe.indicator(
-    "atr", AverageTrueRange(empty, empty, empty, timeperiod=14), high_s, low_s, close_s
+    "atr", AverageTrueRange(timeperiod=14), high_s, low_s, close_s
 )
 
 pipe.output("macd", pipe.expression("macd", fast - slow))
@@ -227,7 +227,7 @@ lifecycle, configuration, and deliberately separate input domains.
 
 | Document | What it covers |
 |---|---|
-| [Indicators](docs/INDICATORS.md) | Indicator classes by category — TA-Lib name, parameters, constructor order, the shared class contract |
+| [Indicators](docs/INDICATORS.md) | Indicator classes by category — TA-Lib name, input order, constructor configuration, and the shared class contract |
 | [Streaming](docs/STREAMING.md) | Live updates, warm-up, backfill-then-stream, chunk invariance, `reset`, threading, per-tick cost |
 | [Pipelines](docs/PIPELINES.md) | Building causal graphs, expressions, evaluate-once semantics, custom nodes, when not to use one |
 | [Metric pipeline](docs/METRIC_PIPELINE.md) | One native input conversion, multi-metric fan-out, configuration, lifecycle, and domain limits |
@@ -238,7 +238,7 @@ lifecycle, configuration, and deliberately separate input domains.
 
 ## Performance
 
-The authoritative benchmark was generated on 2026-08-12 after every registered
+The authoritative benchmark was generated on 2026-08-13 after every registered
 indicator passed its selected external oracle. It covers all 393 indicators at
 1k, 10k, and 100k bars, plus fresh-state runs at 1, 5, and 10 concurrent
 threads. Each row reports native-kernel speedup against the same reference used
@@ -270,7 +270,7 @@ Correctness is verified before performance is measured, on every run.
 - Four functions — VAR, STDDEV, CORREL and BETA — reproduce TA-Lib
   **bitwise**, byte for byte at 1M bars, by replicating its exact accumulation
   order.
-- Every public class is also checked for constructor backfill, empty-state
+- Every public class is also checked for bulk extension, empty-state
   startup, scalar append, chunked continuation, fluent identity, length, and
   reset behavior. Current status: **400/400 public interfaces pass**.
 

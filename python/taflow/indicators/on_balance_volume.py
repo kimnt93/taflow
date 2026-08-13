@@ -11,8 +11,8 @@ from .._series import as_float64_series
 class OnBalanceVolume:
     """Accumulate volume according to consecutive closing-price direction.
 
-    The constructor requires aligned chronological ``close`` and ``volume``
-    series. Pass two empty arrays for a fresh streaming state. The first output
+    ``extend`` accepts aligned chronological ``close`` and ``volume``
+    series. Supply the aligned series through ``extend`` after construction. The first output
     equals the first volume; later volume is added, subtracted, or retained when
     close rises, falls, or is unchanged. There is no warm-up. This definition
     maps to TA-Lib ``OBV``.
@@ -25,9 +25,8 @@ class OnBalanceVolume:
         Chronological volume series aligned with ``close``.
     """
 
-    def __init__(self, close: Any, volume: Any) -> None:
+    def __init__(self) -> None:
         self._state = _NativeOnBalanceVolume()
-        self.extend(close, volume)
 
     def append(self, close: float, volume: float) -> "OnBalanceVolume":
         """Append one close/volume pair and return this indicator."""

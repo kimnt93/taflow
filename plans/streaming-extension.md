@@ -9,7 +9,8 @@ canonical CamelCase classes resolve directly to native extendable states.
 The first reference API is:
 
 ```python
-ema = ExponentialMovingAverage(history, timeperiod=20)
+ema = ExponentialMovingAverage(timeperiod=20)
+ema.extend(history)
 full_history = ema.compute()
 
 ema.append(next_close)

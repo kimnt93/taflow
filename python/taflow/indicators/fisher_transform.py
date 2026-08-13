@@ -23,10 +23,9 @@ class FisherTransform:
     """
 
     def __init__(
-        self, high: Any, low: Any, timeperiod: int = 10
+        self, timeperiod: int = 10
     ) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "FisherTransform":
         """Append one high/low bar and return this adapter."""

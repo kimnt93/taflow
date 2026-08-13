@@ -19,9 +19,8 @@ class Donchian:
     rolling max/min.
     """
 
-    def __init__(self, high: Any, low: Any, timeperiod: int = 20) -> None:
+    def __init__(self, timeperiod: int = 20) -> None:
         self._state = _Native(int(timeperiod))
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "Donchian":
         """Append one high/low bar and return this adapter."""

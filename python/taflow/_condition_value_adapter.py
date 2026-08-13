@@ -11,9 +11,8 @@ from ._series import as_float64_series
 class ConditionValueAdapter:
     _native_cls = None
 
-    def __init__(self, condition: Any, _input: Any) -> None:
+    def __init__(self) -> None:
         self._state = self._native_cls()
-        self.extend(condition, _input)
 
     def append(self, condition: bool, _input: float) -> "ConditionValueAdapter":
         self._state.append(bool(condition), float(_input))

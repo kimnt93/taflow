@@ -13,7 +13,7 @@ class GarmanKlass:
     """Compute rolling Garman-Klass OHLC volatility.
 
     ``_open``, ``high``, ``low``, and ``close`` are required aligned
-    chronological histories; four empty arrays create a fresh stream.
+    chronological histories; supply the aligned series through ``extend`` after construction.
     ``timeperiod`` defaults to 20 and controls the trailing mean. Rust owns
     the formula ``0.5*ln(H/L)^2 - (2*ln(2)-1)*ln(C/O)^2``, rolling window, and
     NaN warm-up. ``compute`` returns one aligned float array and ``value`` the
@@ -23,23 +23,16 @@ class GarmanKlass:
 
     def __init__(
         self,
-        _open: Any,
-        high: Any,
-        low: Any,
-        close: Any,
         timeperiod: int = 20,
     ) -> None:
-        """Initialize and process aligned OHLC histories.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        _open, high, low, close : object
-            Required aligned OHLC histories; empty arrays create a fresh state.
         timeperiod : int, default 20
             Positive trailing window length in bars.
         """
         self._state = _Native(int(timeperiod))
-        self.extend(_open, high, low, close)
 
     def append(
         self, _open: float, high: float, low: float, close: float

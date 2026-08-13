@@ -14,18 +14,15 @@ class SchaffTrendCycle:
 
     def __init__(
         self,
-        close: Any,
         tclength: int = 10,
         fast: int = 12,
         slow: int = 26,
         factor: float = 0.5,
     ) -> None:
-        """Initialize this adapter and process the supplied input series.
+        """Initialize an empty configured native state.
 
         Parameters
         ----------
-        close : object
-            Close-price series or the current bar close.
         tclength : object
             Schaff cycle length.
         fast : object
@@ -41,7 +38,6 @@ class SchaffTrendCycle:
             The constructor initializes the adapter and returns no value.
         """
         self._state = _Native(tclength, fast, slow, factor)
-        self.extend(close)
 
     def append(self, close: float) -> "SchaffTrendCycle":
         """Append one observation or aligned bar to the native Rust state.

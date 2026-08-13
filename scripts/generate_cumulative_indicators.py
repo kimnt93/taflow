@@ -134,14 +134,13 @@ from ._series import as_float64_series
 class {class_name}:
     """Compute the {label} in persistent Rust state.
 
-    ``_input`` is a required chronological numeric series; pass an empty array
-    for a fresh streaming state. There is no warm-up. Correctness maps to the
-    Polars ``Series.{polars_method}`` expression.
+    Construct with no arguments, then supply the chronological numeric series
+    through ``extend`` or ``append``. There is no warm-up. Correctness maps to
+    the Polars ``Series.{polars_method}`` expression.
     """
 
-    def __init__(self, _input: Any) -> None:
+    def __init__(self) -> None:
         self._state = _Native{class_name}()
-        self.extend(_input)
 
     def append(self, _input: float) -> "{class_name}":
         """Append one observation and return this indicator."""

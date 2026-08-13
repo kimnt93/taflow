@@ -11,10 +11,9 @@ class MassIndex:
     """Mass Index from EMA-smoothed high-low ranges."""
 
     def __init__(
-        self, high: Any, low: Any, ema_period: int = 9, sum_period: int = 25
+        self, ema_period: int = 9, sum_period: int = 25
     ) -> None:
         self._state = _Native(int(ema_period), int(sum_period))
-        self.extend(high, low)
 
     def append(self, high: float, low: float) -> "MassIndex":
         self._state.append(float(high), float(low))

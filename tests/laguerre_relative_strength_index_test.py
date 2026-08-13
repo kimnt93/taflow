@@ -15,8 +15,8 @@ def test_laguerre_relative_strength_index_matches_registered_wickra_oracle() -> 
 def test_lifecycle_is_bitwise_invariant() -> None:
     rng = np.random.default_rng(52519)
     close = 100.0 + rng.normal(size=431).cumsum()
-    batch = LaguerreRelativeStrengthIndex(close, 0.35)
-    chunked = LaguerreRelativeStrengthIndex([], 0.35)
+    batch = LaguerreRelativeStrengthIndex(0.35).extend(close)
+    chunked = LaguerreRelativeStrengthIndex(0.35)
     chunked.extend(close[:53]).extend(close[53:])
     np.testing.assert_array_equal(chunked.compute(), batch.compute())
 
@@ -28,9 +28,9 @@ def test_lifecycle_is_bitwise_invariant() -> None:
 
 
 def test_neutral_value_and_validation() -> None:
-    state = LaguerreRelativeStrengthIndex([], 0.0)
+    state = LaguerreRelativeStrengthIndex(0.0)
     assert state.append(42.0).value == 50.0
-    assert LaguerreRelativeStrengthIndex([], 1.0).value is None
+    assert LaguerreRelativeStrengthIndex(1.0).value is None
     for invalid_gamma in (-0.1, 1.1, np.nan, np.inf):
         with pytest.raises(ValueError):
-            LaguerreRelativeStrengthIndex([], invalid_gamma)
+            LaguerreRelativeStrengthIndex(invalid_gamma)

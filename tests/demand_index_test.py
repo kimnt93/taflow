@@ -11,14 +11,14 @@ def test_demand_index_matches_wickra_and_lifecycle() -> None:
     volume = np.array([100.0, 110.0, 120.0, 130.0, 140.0, 150.0, 160.0])
     expected = wickra.DemandIndex(3).batch(high, low, close, volume)
 
-    batch = DemandIndex(high, low, close, volume, timeperiod=3)
+    batch = DemandIndex(timeperiod=3).extend(high, low, close, volume)
     np.testing.assert_allclose(batch.compute(), expected, equal_nan=True)
     assert len(batch) == len(close)
     assert batch.value is not None
     assert np.isclose(batch.value, expected[-1])
 
     empty = np.array([], dtype=float)
-    chunked = DemandIndex(empty, empty, empty, empty, timeperiod=3)
+    chunked = DemandIndex(timeperiod=3).extend(empty, empty, empty, empty)
     chunked.extend(high[:2], low[:2], close[:2], volume[:2])
     chunked.extend(high[2:], low[2:], close[2:], volume[2:])
     np.testing.assert_array_equal(chunked.compute(), batch.compute())
@@ -31,4 +31,4 @@ def test_demand_index_matches_wickra_and_lifecycle() -> None:
 
 def test_demand_index_rejects_misaligned_input() -> None:
     with np.testing.assert_raises(ValueError):
-        DemandIndex([2.0], [0.0], [1.0], [10.0, 11.0])
+        DemandIndex().extend([2.0], [0.0], [1.0], [10.0, 11.0])

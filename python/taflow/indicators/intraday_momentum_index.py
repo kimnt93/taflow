@@ -7,9 +7,8 @@ from .._series import as_float64_series
 
 class IntradayMomentumIndex:
     """Compute rolling intraday gains divided by total candle movement."""
-    def __init__(self, open: Any, close: Any, timeperiod: int = 14) -> None:
+    def __init__(self, timeperiod: int = 14) -> None:
         self._state = _NativeIntradayMomentumIndex(timeperiod)
-        self.extend(open, close)
 
     def append(self, open: float, close: float) -> "IntradayMomentumIndex":
         self._state.append(float(open), float(close)); return self
