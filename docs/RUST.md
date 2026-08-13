@@ -22,6 +22,18 @@ taflow-metrics = { git = "https://github.com/kimnt93/taflow" }
 Constructors validate configuration and return `TaResult<Self>` or
 `MetricResult<Self>`.
 
+## Reference map
+
+| Area | Reference |
+|---|---|
+| Indicator classes | [All 393 full class names, inputs, configuration, outputs, and oracle mappings](INDICATORS.md) |
+| Metric classes | [All 57 full class names and external-oracle mappings](../verify/metrics/CORRECTNESS.md) |
+| Technical analysis streaming | [Indicator lifecycle](#indicator-lifecycle) |
+| Metric streaming | [Metric streaming](#metric-streaming) |
+| Technical analysis pipelines | [Technical analysis pipelines](#technical-analysis-pipelines) |
+| Metric pipelines | [`MetricPipeline`](#metricpipeline) |
+| Data input and output | [`Vec<f64>`, Apache Arrow, and Polars](#data-input-and-output) |
+
 ## Indicator lifecycle
 
 Rust follows the same separation as Python: constructors accept configuration,
@@ -159,7 +171,7 @@ fn bands(close: &[f64]) -> taflow::TaResult<()> {
 Use `?` to propagate errors or match on `TaError` when an application needs
 parameter-specific handling.
 
-## Metrics
+## Metric reference
 
 Metric constructors also contain configuration only. A `from_*` method binds
 the semantic input domain and ingests the initial slice:
@@ -176,9 +188,179 @@ fn sharpe(returns: &[f64], next: f64) -> taflow_metrics::MetricResult<Option<f64
 }
 ```
 
-`MetricPipeline` owns several configured metrics and fans out one selected
-returns, log-returns, equity, or period-P&L stream. See
-[Metric pipeline](METRIC_PIPELINE.md) for its domain rules and Python mapping.
+All metric states are exported under `taflow_metrics::metrics::*`. The
+[metric correctness reference](../verify/metrics/CORRECTNESS.md) lists all 57
+full class names, definitions, independent targets, and current verdicts.
+
+### Metric streaming
+
+Select the input domain once with `from_returns`, `from_log_returns`,
+`from_equity`, or `from_pnl`. An empty initial slice creates a live state;
+`append` adds one observation, `extend` adds a slice, `value` and `compute`
+return the current result, and `reset` preserves configuration while restoring
+fresh-state behavior.
+
+```rust
+use taflow_metrics::metrics::SharpeRatio;
+use taflow_metrics::NanPolicy;
+
+fn live_metric(returns: &[f64]) -> taflow_metrics::MetricResult<Option<f64>> {
+    let mut sharpe_ratio = SharpeRatio::new(252.0, 0.03, NanPolicy::Omit)?;
+    sharpe_ratio.from_returns(&[])?;
+
+    for &period_return in returns {
+        sharpe_ratio.append(period_return)?;
+    }
+
+    let current = sharpe_ratio.value();
+    sharpe_ratio.reset();
+    sharpe_ratio.extend(returns)?;
+    assert_eq!(sharpe_ratio.compute(), current);
+    Ok(current)
+}
+```
+
+## Technical analysis pipelines
+
+The Rust core currently exposes indicator states rather than a graph-owning
+pipeline type. Compose full indicator classes directly and advance each state
+in dependency order. The Python-only [`TAPipeline`](PIPELINES.md) adds named
+sources, expressions, shared-node evaluation, and dictionary outputs over
+these same native states.
+
+```rust
+use taflow::indicators::ExponentialMovingAverage;
+use taflow::stream::StreamingIndicator;
+
+fn moving_average_spread(close: &[f64]) -> taflow::TaResult<Vec<f64>> {
+    let mut fast_moving_average = ExponentialMovingAverage::new(12)?;
+    let mut slow_moving_average = ExponentialMovingAverage::new(26)?;
+    let mut spread = Vec::with_capacity(close.len());
+
+    for &price in close {
+        let fast_value = fast_moving_average.append(price);
+        let slow_value = slow_moving_average.append(price);
+        spread.push(match (fast_value, slow_value) {
+            (Some(fast_value), Some(slow_value)) => fast_value - slow_value,
+            _ => f64::NAN,
+        });
+    }
+
+    Ok(spread)
+}
+```
+
+## `MetricPipeline`
+
+The native `MetricPipeline` owns several configured metric states and fans out
+one selected returns, log-returns, equity, or period-profit-and-loss stream.
+
+```rust
+use taflow_metrics::metrics::{SharpeRatio, SortinoRatio};
+use taflow_metrics::{MetricPipeline, NanPolicy};
+
+fn metric_report(
+    returns: &[f64],
+) -> taflow_metrics::MetricResult<Vec<(String, Option<f64>)>> {
+    let mut metric_pipeline = MetricPipeline::new();
+    metric_pipeline
+        .add(
+            "sharpe_ratio",
+            SharpeRatio::new(252.0, 0.03, NanPolicy::Omit)?,
+        )?
+        .add(
+            "sortino_ratio",
+            SortinoRatio::new(252.0, 0.0, NanPolicy::Omit)?,
+        )?
+        .from_returns(returns)?;
+
+    Ok(metric_pipeline
+        .compute()
+        .into_iter()
+        .map(|(name, value)| (name.to_owned(), value))
+        .collect())
+}
+```
+
+See the [`MetricPipeline` guide](METRIC_PIPELINE.md) for input-domain rules,
+supported metric classes, continuation, and reset behavior.
+
+## Data input and output
+
+The core crates deliberately depend on slices and caller-owned `Vec` output,
+so applications can interoperate with their chosen container libraries without
+making Polars or Apache Arrow mandatory TAFlow dependencies.
+
+### Rust vectors
+
+Borrow a `Vec<f64>` as a slice and write directly into another reusable
+`Vec<f64>`:
+
+```rust
+use taflow::indicators::SimpleMovingAverage;
+use taflow::stream::StreamingIndicator;
+
+fn vector_output(close: &Vec<f64>) -> taflow::TaResult<Vec<f64>> {
+    let mut simple_moving_average = SimpleMovingAverage::new(10)?;
+    let mut output = Vec::with_capacity(close.len());
+    simple_moving_average.extend_slice_into(close.as_slice(), &mut output);
+    Ok(output)
+}
+```
+
+### Apache Arrow
+
+A null-free `Float64Array` exposes its values as a contiguous slice. Moving the
+output `Vec<f64>` into a `Float64Array` reuses its allocation.
+
+```rust
+use arrow_array::{Array, Float64Array};
+use taflow::indicators::SimpleMovingAverage;
+use taflow::stream::StreamingIndicator;
+
+fn arrow_output(close: &Float64Array) -> taflow::TaResult<Float64Array> {
+    assert_eq!(close.null_count(), 0, "TAFlow inputs must not contain Arrow nulls");
+
+    let mut simple_moving_average = SimpleMovingAverage::new(10)?;
+    let mut output = Vec::with_capacity(close.len());
+    simple_moving_average.extend_slice_into(close.values(), &mut output);
+    Ok(Float64Array::from(output))
+}
+```
+
+Use Arrow nulls only after defining an application-level null policy. TAFlow
+uses `f64::NAN` for aligned indicator warm-up, which is distinct from an Arrow
+validity bitmap.
+
+### Polars
+
+Rechunk a `Float64` `Series` before borrowing a contiguous slice. `cont_slice`
+rejects nulls or a non-contiguous layout; constructing the result `Series` from
+the output vector transfers it to Polars.
+
+```rust
+use polars::prelude::*;
+use taflow::indicators::SimpleMovingAverage;
+use taflow::stream::StreamingIndicator;
+
+fn polars_output(close: &Series) -> PolarsResult<Series> {
+    let close = close.rechunk();
+    let close = close.f64()?;
+    let values = close.cont_slice()?;
+
+    let mut simple_moving_average =
+        SimpleMovingAverage::new(10).expect("the fixed period is valid");
+    let mut output = Vec::with_capacity(values.len());
+    simple_moving_average.extend_slice_into(values, &mut output);
+    Ok(Series::new("simple_moving_average_10".into(), output))
+}
+```
+
+Polars and Apache Arrow are application dependencies, not features of the
+`taflow` or `taflow-metrics` crates. See the current
+[Polars `Series` documentation](https://docs.rs/polars/latest/polars/series/struct.Series.html)
+and [Apache Arrow `Float64Array` documentation](https://docs.rs/arrow-array/latest/arrow_array/type.Float64Array.html)
+for container-specific version details.
 
 ## Modules and names
 
@@ -187,6 +369,7 @@ returns, log-returns, equity, or period-P&L stream. See
 - Moving-average selection: `taflow::MaType`
 - Indicator errors: `taflow::{TaError, TaResult}`
 - Metrics: `taflow_metrics::metrics::*`
+- Metric pipeline: `taflow_metrics::MetricPipeline`
 - Metric errors and input policy: `taflow_metrics::{MetricError, MetricResult,
   NanPolicy}`
 
