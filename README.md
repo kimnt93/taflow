@@ -111,33 +111,50 @@ See the [Python guide](docs/PYTHON.md) and [Rust guide](docs/RUST.md) for the
 complete lifecycle, multi-input and multi-output examples, pipelines, metrics,
 errors, and warm-up behavior.
 
-## Documentation
+## Python documentation
 
-| Document | Contents |
-|---|---|
-| [Python API](docs/PYTHON.md) | Installation, indicator lifecycle, streaming, outputs, pipelines, metrics, and data adapters |
-| [Rust API](docs/RUST.md) | Crate setup, state lifecycle, bulk methods, multi-output values, errors, and metrics |
-| [Indicator catalog](docs/INDICATORS.md) | All 393 classes, input order, constructor configuration, and oracle mapping |
-| [Streaming](docs/STREAMING.md) | Warm-up, continuation, chunk invariance, reset, and per-tick behavior |
-| [Pipelines](docs/PIPELINES.md) | Causal Python graphs, expressions, evaluation, and limitations |
-| [Metric pipeline](docs/METRIC_PIPELINE.md) | Metric input domains, fan-out, lifecycle, and results |
-| [Data input/output](docs/DATA.md) | NumPy, lists, pandas, Polars, Arrow, and custom adapters |
-| [Correctness](verify/CORRECTNESS.md) | External evidence for all 393 registered indicators |
-| [Benchmark](verify/BENCHMARK.md) | Per-indicator vector timings and reference-library versions |
-| [Performance](docs/PERFORMANCE.md) | Kernel design, runtime dispatch, and optimization decisions |
+- [Python guide](docs/PYTHON.md) — installation, class lifecycle, outputs,
+  metrics, and data adapters.
+- [Indicator class reference](docs/INDICATORS.md) — all 393 full class names,
+  ordered inputs, constructor configuration, outputs, and oracle mappings.
+- [Streaming lifecycle](docs/STREAMING.md) — warm-up, continuation, chunk
+  invariance, reset, and per-tick behavior.
+- [`TAPipeline` reference](docs/PIPELINES.md) — causal graphs, expressions,
+  evaluation, and limitations.
+- [`MetricPipeline` reference](docs/METRIC_PIPELINE.md) — metric input
+  domains, fan-out, lifecycle, and results.
+- [Data input and output](docs/DATA.md) — NumPy, Python lists, pandas, Polars,
+  Arrow, and custom adapters.
+
+## Rust documentation
+
+- [Rust guide](docs/RUST.md) — crate setup, state lifecycle, bulk methods,
+  multi-output value types, errors, and all 57 metric classes.
+- [Indicator class reference](docs/INDICATORS.md) — the shared inventory of
+  full class names, configuration, ordered inputs, outputs, and oracle mappings.
+- [Streaming lifecycle](docs/STREAMING.md) — persistent-state behavior shared
+  by the Rust states and Python adapters.
 
 ## Indicators, metrics, and pipelines
 
 | Surface | Coverage | API |
 |---|---:|---|
-| [Indicators](docs/INDICATORS.md) | 393 canonical classes, including all 161 TA-Lib functions | Configure a class, then use `extend`, `append`, `value`, `compute`, and `reset` |
-| Metrics | 57 strategy, risk, trade, and portfolio metrics | Import standalone states from `taflow.metrics` and select the input domain with `from_returns`, `from_log_returns`, `from_equity`, or `from_pnl` |
-| [Indicator pipeline](docs/PIPELINES.md) | Causal graphs of sources, indicators, expressions, and named outputs | `TAPipeline` shares stateful nodes across historical `extend` and live `append` evaluation |
-| [Metric pipeline](docs/METRIC_PIPELINE.md) | Multiple compatible metrics over one normalized input stream | `MetricPipeline` provides named fan-out, aligned lifecycle operations, and dictionary results |
+| [Indicator classes](docs/INDICATORS.md) | 393 canonical classes, including all 161 TA-Lib functions | Configure a class, then use `extend`, `append`, `value`, `compute`, and `reset` |
+| [Metric classes](docs/PYTHON.md#metrics) | 57 strategy, risk, trade, and portfolio metrics; see the [Rust metric reference](docs/RUST.md#metrics) for native usage | Import standalone states from `taflow.metrics` and select the input domain with `from_returns`, `from_log_returns`, `from_equity`, or `from_pnl` |
+| [`TAPipeline`](docs/PIPELINES.md) | Causal graphs of sources, indicators, expressions, and named outputs | Shares stateful nodes across historical `extend` and live `append` evaluation |
+| [`MetricPipeline`](docs/METRIC_PIPELINE.md) | Multiple compatible metrics over one normalized input stream | Provides named fan-out, aligned lifecycle operations, and dictionary results |
 
 The standalone class APIs are ideal for one calculation at a time. The two
 pipeline APIs coordinate several calculations while keeping each indicator or
 metric as the sole owner of its numerical state.
+
+## Evaluation
+
+| Evaluation | Indicator classes | Metric classes |
+|---|---|---|
+| Correctness | [External-oracle results for all 393 indicator classes](verify/CORRECTNESS.md) | [External-oracle results for all 57 metric classes](verify/metrics/CORRECTNESS.md) |
+| Benchmark | [Correctness-gated indicator timings](verify/BENCHMARK.md) | [Correctness-gated metric timings](verify/metrics/BENCHMARK.md) |
+| Performance | [Kernel design, runtime dispatch, and optimization decisions](docs/PERFORMANCE.md) | Native persistent states and `MetricPipeline` fan-out are covered by the metric benchmark report |
 
 ## Repository layout
 
