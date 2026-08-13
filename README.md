@@ -8,6 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/indicators-393-blue" alt="393 indicators" />
+  <img src="https://img.shields.io/badge/metrics-57-blue" alt="57 metrics" />
   <img src="https://img.shields.io/badge/TA--Lib_parity-161-blue" alt="161 TA-Lib functions" />
   <img src="https://img.shields.io/badge/correctness-393%2F393_MATCH-brightgreen" alt="393/393 externally matched" />
   <img src="https://img.shields.io/badge/unsafe-zero-brightgreen" alt="zero unsafe" />
@@ -15,11 +16,11 @@
   <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT" />
 </p>
 
-TAFlow provides 393 canonical indicator classes as native Rust states and
-Python adapters. It covers the complete 161-function TA-Lib surface plus
-rolling statistics, EWM operators, volatility estimators, market structure,
-patterns, signals, and portfolio metrics—without linking to TA-Lib or another
-C library.
+TAFlow provides 393 canonical indicator classes and 57 strategy and portfolio
+metrics as native Rust states with Python adapters. It covers the complete
+161-function TA-Lib surface plus rolling statistics, EWM operators, volatility
+estimators, market structure, patterns, and signals—without linking to TA-Lib
+or another C library.
 
 ## Features
 
@@ -125,32 +126,18 @@ errors, and warm-up behavior.
 | [Benchmark](verify/BENCHMARK.md) | Per-indicator vector timings and reference-library versions |
 | [Performance](docs/PERFORMANCE.md) | Kernel design, runtime dispatch, and optimization decisions |
 
-## Benchmark summary
+## Indicators, metrics, and pipelines
 
-The 2026-08-13 correctness-gated run measured all 393 indicators against the
-same external implementation used for correctness. The table summarizes native
-kernel speedup (`reference time / TAFlow time`); values above 1× favor TAFlow.
-Because the reference set mixes compiled TA-Lib/NumPy kernels with Python
-libraries, the aggregate median is descriptive rather than a claim that every
-indicator has the same competitor.
+| Surface | Coverage | API |
+|---|---:|---|
+| [Indicators](docs/INDICATORS.md) | 393 canonical classes, including all 161 TA-Lib functions | Configure a class, then use `extend`, `append`, `value`, `compute`, and `reset` |
+| Metrics | 57 strategy, risk, trade, and portfolio metrics | Import standalone states from `taflow.metrics` and select the input domain with `from_returns`, `from_log_returns`, `from_equity`, or `from_pnl` |
+| [Indicator pipeline](docs/PIPELINES.md) | Causal graphs of sources, indicators, expressions, and named outputs | `TAPipeline` shares stateful nodes across historical `extend` and live `append` evaluation |
+| [Metric pipeline](docs/METRIC_PIPELINE.md) | Multiple compatible metrics over one normalized input stream | `MetricPipeline` provides named fan-out, aligned lifecycle operations, and dictionary results |
 
-| Bars | Median speedup | Indicators at or above 1× |
-|---:|---:|---:|
-| 1,000 | 0.98× | 195 / 393 |
-| 10,000 | 0.36× | 136 / 393 |
-| 100,000 | 0.27× | 132 / 393 |
-
-The full report records every class, oracle, environment version, repeated
-sample, and 1/5/10-thread warm-state matrix in
-[`verify/BENCHMARK.md`](verify/BENCHMARK.md) and
-[`verify/evidence/benchmark/`](verify/evidence/benchmark/).
-
-```bash
-make check                   # Python tests plus all external oracle checks
-make test                    # Rust workspace tests plus Python tests
-make bench                   # full correctness-gated benchmark
-make bench ARGS="EMA ATR"    # selected indicators
-```
+The standalone class APIs are ideal for one calculation at a time. The two
+pipeline APIs coordinate several calculations while keeping each indicator or
+metric as the sole owner of its numerical state.
 
 ## Repository layout
 
