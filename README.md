@@ -117,6 +117,8 @@ errors, and warm-up behavior.
   metrics, and data adapters.
 - [Indicator class reference](docs/INDICATORS.md) — all 393 full class names,
   ordered inputs, constructor configuration, outputs, and oracle mappings.
+- [Metric class reference](docs/METRICS.md) — all 57 full class names with
+  Python defaults, Rust parameters, semantic inputs, outputs, and definitions.
 - [Streaming lifecycle](docs/STREAMING.md) — warm-up, continuation, chunk
   invariance, reset, and per-tick behavior.
 - [`TAPipeline` reference](docs/PIPELINES.md) — causal graphs, expressions,
@@ -132,8 +134,8 @@ errors, and warm-up behavior.
   native integration.
 - [Indicator class reference](docs/INDICATORS.md) — all 393 full class names,
   configuration, ordered inputs, outputs, and oracle mappings.
-- [Metric class reference](verify/metrics/CORRECTNESS.md) — all 57 full class
-  names, definitions, external targets, and current verdicts.
+- [Metric class reference](docs/METRICS.md) — all 57 full class names with
+  Python defaults, explicit Rust parameters, semantic inputs, and definitions.
 - [Technical analysis streaming](docs/RUST.md#indicator-lifecycle) — scalar
   updates, bulk slices, warm-up, continuation, and caller-owned output.
 - [Metric streaming](docs/RUST.md#metric-streaming) — semantic input selection,
@@ -150,7 +152,7 @@ errors, and warm-up behavior.
 | Surface | Coverage | API |
 |---|---:|---|
 | [Indicator classes](docs/INDICATORS.md) | 393 canonical classes, including all 161 TA-Lib functions | Configure a class, then use `extend`, `append`, `value`, `compute`, and `reset` |
-| [Metric classes](docs/PYTHON.md#metrics) | 57 strategy, risk, trade, and portfolio metrics; see the [Rust metric reference](docs/RUST.md#metric-reference) for native usage | Import standalone states from `taflow.metrics` and select the input domain with `from_returns`, `from_log_returns`, `from_equity`, or `from_pnl` |
+| [Metric classes](docs/METRICS.md) | 57 strategy, risk, trade, and portfolio metrics with complete Python defaults and Rust parameters | Import standalone states from `taflow.metrics` and select the documented semantic input domain before streaming or computing |
 | [`TAPipeline`](docs/PIPELINES.md) | Causal graphs of sources, indicators, expressions, and named outputs | Shares stateful nodes across historical `extend` and live `append` evaluation |
 | [`MetricPipeline`](docs/METRIC_PIPELINE.md) | Multiple compatible metrics over one normalized input stream | Provides named fan-out, aligned lifecycle operations, and dictionary results |
 

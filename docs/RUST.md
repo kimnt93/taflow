@@ -27,7 +27,7 @@ Constructors validate configuration and return `TaResult<Self>` or
 | Area | Reference |
 |---|---|
 | Indicator classes | [All 393 full class names, inputs, configuration, outputs, and oracle mappings](INDICATORS.md) |
-| Metric classes | [All 57 full class names and external-oracle mappings](../verify/metrics/CORRECTNESS.md) |
+| Metric classes | [All 57 full class names, complete Python defaults, explicit Rust parameters, inputs, outputs, and definitions](METRICS.md) |
 | Technical analysis streaming | [Indicator lifecycle](#indicator-lifecycle) |
 | Metric streaming | [Metric streaming](#metric-streaming) |
 | Technical analysis pipelines | [Technical analysis pipelines](#technical-analysis-pipelines) |
@@ -189,8 +189,9 @@ fn sharpe(returns: &[f64], next: f64) -> taflow_metrics::MetricResult<Option<f64
 ```
 
 All metric states are exported under `taflow_metrics::metrics::*`. The
-[metric correctness reference](../verify/metrics/CORRECTNESS.md) lists all 57
-full class names, definitions, independent targets, and current verdicts.
+generated [metric class reference](METRICS.md) lists all 57 full class names in
+alphabetical order with complete Python defaults, explicit Rust constructor
+and semantic-input parameters, outputs, minimum observations, and definitions.
 
 ### Metric streaming
 

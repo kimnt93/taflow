@@ -139,6 +139,10 @@ result = pipe.extend({"high": high, "low": low, "close": close})
 See [Pipelines](PIPELINES.md) for evaluation rules, live `append`, reset, and
 the current constraints around chained warm-up and multi-output nodes.
 
+The generated [indicator class reference](INDICATORS.md) lists every full
+class name with its complete constructor defaults, ordered `extend` inputs,
+and corresponding Rust constructor parameters.
+
 ## Metrics
 
 Metrics also separate configuration from input selection. Select the semantic
@@ -162,12 +166,19 @@ value = sharpe.compute()
 metrics. See [Metric pipeline](METRIC_PIPELINE.md) for supported domains and
 the complete lifecycle.
 
+The generated [metric class reference](METRICS.md) is sorted by full class
+name and lists all 57 Python constructors with default values, every supported
+semantic input signature, the corresponding Rust signatures, outputs, minimum
+observations, and definitions.
+
 ## Finding a class
 
-The generated [indicator catalog](INDICATORS.md) lists every canonical class,
-external name, ordered `extend` inputs, constructor configuration, outputs,
-and category. The same classes are exported from both `taflow` and
-`taflow.indicators`.
+The generated [indicator class reference](INDICATORS.md) and
+[metric class reference](METRICS.md) list the canonical full class names in
+alphabetical order. Both references include complete Python parameters and
+defaults alongside their explicit Rust constructor parameters. Indicator
+classes are exported from both `taflow` and `taflow.indicators`; metric classes
+are exported from `taflow.metrics`.
 
 ## Verification
 

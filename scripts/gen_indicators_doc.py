@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Regenerate docs/INDICATORS.md from the installed package.
+"""Regenerate the shared Python and Rust indicator API reference.
 
-Signatures are introspected from the live classes so the reference cannot
-drift from the implementation. TA-Lib names and input lists come from the
-verification harness's benchmark metadata.
+Python signatures are introspected from the live classes and Rust constructor
+signatures are read from the canonical implementation files. TA-Lib names and
+ordered input lists come from the verification registry.
 
     python scripts/gen_indicators_doc.py
 """
@@ -36,22 +36,6 @@ SERIES = {
     "session_id",
 }
 
-CATEGORIES = [
-    "Moving averages & overlap",
-    "Momentum & trend",
-    "Volatility & bands",
-    "Volume",
-    "Price transforms",
-    "Rolling & statistical operators",
-    "Cycle (Hilbert transform)",
-    "Math transforms",
-    "Candlestick patterns",
-    "Market structure & sessions",
-    "Quant & econometrics",
-    "Signal & series operators",
-]
-
-
 def load_metadata():
     """Return canonical indicator metadata from the verification registry."""
     return {
@@ -64,174 +48,72 @@ def load_metadata():
     }
 
 
-def signature(cls, inputs):
+def python_signature(callable_object, *, drop_self=False):
+    """Return a complete public signature without the return annotation."""
+
     try:
-        params = list(inspect.signature(cls.__init__).parameters.values())[1:]
+        signature = inspect.signature(callable_object, eval_str=True)
     except (TypeError, ValueError):
-        return None
-    cfg = (
-        ", ".join(
-            f"{p.name}={p.default!r}"
-            if p.default is not inspect.Parameter.empty
-            else p.name
-            for p in params
-        )
-        or "—"
+        return "—"
+    if drop_self:
+        parameters = tuple(signature.parameters.values())
+        if parameters and parameters[0].name == "self":
+            signature = signature.replace(parameters=parameters[1:])
+    rendered = str(signature)
+    return rendered.rsplit(" -> ", 1)[0]
+
+
+def snake_case(name):
+    """Derive the canonical module filename from a full class name."""
+
+    first = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", first).lower()
+
+
+def rust_method_signature(class_name, method_name):
+    """Read one exact method parameter list from a canonical Rust class."""
+
+    path = (
+        ROOT
+        / "crates"
+        / "taflow-core"
+        / "src"
+        / "indicators"
+        / f"{snake_case(class_name)}.rs"
     )
-    return {
-        "cfg": cfg,
-        "inputs": ", ".join(inputs) or "—",
-    }
+    if not path.exists():
+        return "—"
+    source = path.read_text()
+    visibility = r"pub\s+" if method_name == "new" else r"(?:pub\s+)?"
+    match = re.search(
+        rf"{visibility}fn\s+{re.escape(method_name)}\s*\(", source
+    )
+    if match is None:
+        return "—"
+    start = source.index("(", match.start())
+    depth = 0
+    end = None
+    for index in range(start, len(source)):
+        if source[index] == "(":
+            depth += 1
+        elif source[index] == ")":
+            depth -= 1
+            if depth == 0:
+                end = index
+                break
+    if end is None:
+        raise ValueError(f"unclosed {method_name} signature in {path}")
+    parameters = re.sub(r"\s+", " ", source[start + 1 : end]).strip()
+    parameters = re.sub(r"\s*,\s*", ", ", parameters)
+    parameters = parameters.rstrip(", ")
+    return f"{method_name}({parameters})"
 
 
-def category(name, talib):
-    checks = [
-        ("Candlestick patterns", name.startswith("Candle")),
-        (
-            "Math transforms",
-            name.startswith("Math") or talib in {"ADD", "SUB", "MULT", "DIV"},
-        ),
-        ("Cycle (Hilbert transform)", name.startswith("HilbertTransform")),
-        (
-            "Rolling & statistical operators",
-            name.startswith("Rolling") or name.startswith("ExponentiallyWeighted"),
-        ),
-        (
-            "Moving averages & overlap",
-            any(
-                k in name
-                for k in (
-                    "MovingAverage",
-                    "Ema",
-                    "Sma",
-                    "McGinley",
-                    "Vidya",
-                    "Jurik",
-                    "Trima",
-                    "Kama",
-                    "Mama",
-                    "TripleExponential",
-                    "DoubleExponential",
-                    "ZeroLag",
-                    "Arnaud",
-                    "Hull",
-                )
-            ),
-        ),
-        (
-            "Volume",
-            any(
-                k in name
-                for k in (
-                    "Volume",
-                    "Obv",
-                    "Amihud",
-                    "Klinger",
-                    "Accumulation",
-                    "Force",
-                    "EaseOfMovement",
-                    "ChaikinMoneyFlow",
-                    "MoneyFlow",
-                )
-            ),
-        ),
-        (
-            "Volatility & bands",
-            any(
-                k in name
-                for k in (
-                    "TrueRange",
-                    "Volatility",
-                    "Bands",
-                    "Keltner",
-                    "Donchian",
-                    "Ulcer",
-                    "Parkinson",
-                    "GarmanKlass",
-                    "RogersSatchell",
-                    "YangZhang",
-                    "Squeeze",
-                    "Supertrend",
-                    "CloseToCloseSigma",
-                )
-            ),
-        ),
-        (
-            "Market structure & sessions",
-            any(
-                k in name
-                for k in (
-                    "OrderBlock",
-                    "Liquidity",
-                    "FairValueGap",
-                    "Swing",
-                    "BreakOfStructure",
-                    "PremiumDiscount",
-                    "EqualHighs",
-                    "Retracement",
-                    "Fibonacci",
-                    "PreviousHighLow",
-                    "InsideBar",
-                    "OutsideBar",
-                    "HigherHigh",
-                    "LowerLow",
-                    "GapUp",
-                    "GapDown",
-                    "OpeningRange",
-                    "Session",
-                    "PivotPoints",
-                )
-            ),
-        ),
-        (
-            "Quant & econometrics",
-            any(
-                k in name
-                for k in (
-                    "Kalman",
-                    "Ornstein",
-                    "SpreadZScore",
-                    "FracDiff",
-                    "RollSpread",
-                    "Hurst",
-                    "FractalDimension",
-                    "HedgeRatio",
-                    "CumulativeSumControlChart",
-                )
-            ),
-        ),
-        (
-            "Signal & series operators",
-            any(
-                k in name
-                for k in (
-                    "Cumulative",
-                    "Crossover",
-                    "Crossunder",
-                    "Rising",
-                    "Falling",
-                    "BarsSince",
-                    "ValueWhen",
-                    "Lag",
-                    "SignalDelay",
-                    "SignedPower",
-                    "TimeSeriesRank",
-                    "Drawdown",
-                    "HighestSince",
-                    "LowestSince",
-                    "DecayLinear",
-                    "LogReturn",
-                    "EntryExit",
-                    "PositionHold",
-                )
-            ),
-        ),
-        ("Price transforms", any(k in name for k in ("Price", "HeikinAshi"))),
-    ]
-    for label, hit in checks:
-        if hit:
-            return label
-    return "Momentum & trend"
+def code(value):
+    """Render one Markdown table cell as inline code."""
+
+    escaped = value.replace("|", "\\|")
+    return f"`{escaped}`"
 
 
 def main():
@@ -239,30 +121,33 @@ def main():
     rows = []
     for name in sorted(meta):
         cls = meta[name]["class"]
-        sig = signature(cls, meta[name]["inputs"])
-        if sig is None:
-            continue
-        entry = dict(sig)
-        entry["cls"] = name
-        entry["talib"] = meta.get(name, {}).get("talib")
-        entry["cat"] = category(name, entry["talib"] or "")
-        rows.append(entry)
+        rows.append(
+            {
+                "cls": name,
+                "talib": meta[name]["talib"],
+                "inputs": ", ".join(meta[name]["inputs"]) or "—",
+                "python_constructor": python_signature(cls),
+                "python_append": python_signature(cls.append, drop_self=True),
+                "python_extend": python_signature(cls.extend, drop_self=True),
+                "rust_constructor": rust_method_signature(name, "new"),
+                "rust_append": rust_method_signature(name, "append"),
+            }
+        )
 
-    grouped = {}
-    for row in rows:
-        grouped.setdefault(row["cat"], []).append(row)
     talib_n = sum(1 for r in rows if r["talib"])
 
     out = [
-        "# TAFlow Python indicator reference\n",
+        "# TAFlow indicator reference\n",
         f"**{len(rows)}** classes — **{talib_n}** with a TA-Lib equivalent, "
         f"**{len(rows) - talib_n}** extended operators with no TA-Lib counterpart.\n",
         "> Generated by `scripts/gen_indicators_doc.py` from the installed package. "
         "Do not edit by hand.\n",
-        "This catalog documents Python constructor and `extend` signatures. "
-        "Rust callers should begin with [the Rust API guide](RUST.md); canonical "
-        "class names and oracle mappings are shared by both languages.\n",
-        "## The shared contract\n",
+        "Classes are sorted alphabetically by their full canonical names. Python "
+        "signatures are introspected from the installed adapters; Rust signatures "
+        "come from each canonical implementation file. Python defaults are shown "
+        "verbatim. Rust has no default arguments, so every Rust constructor "
+        "parameter is explicit.\n",
+        "## Python usage\n",
         """Every class behaves the same way:
 
 ```python
@@ -281,7 +166,26 @@ Outputs are `float64` arrays the same length as the input, `NaN` through
 warm-up. Multi-output indicators return a tuple. Candle patterns return
 `int32` scores (`0`, `±100`).
 """,
-        "### Input and configuration order\n",
+        "## Rust usage\n",
+        """```rust
+use taflow::indicators::SimpleMovingAverage;
+use taflow::stream::StreamingIndicator;
+
+fn calculate_simple_moving_average(
+    close: &[f64],
+) -> taflow::TaResult<Vec<f64>> {
+    let mut simple_moving_average = SimpleMovingAverage::new(30)?;
+    let mut output = Vec::with_capacity(close.len());
+    simple_moving_average.extend_slice_into(close, &mut output);
+    Ok(output)
+}
+```
+
+Rust constructors require every configuration parameter. Single-input classes
+implement `StreamingIndicator`; multi-input and multi-output classes expose
+equivalent inherent `append`, `value`, `reset`, and bulk methods.
+""",
+        "## Parameter reference contract\n",
         """Every constructor accepts configuration only. Historical series are
 passed to ``extend`` in the documented input order. Configuration values have
 defaults unless the algorithm cannot define one semantically:
@@ -293,31 +197,23 @@ SimpleMovingAverage(timeperiod=30).extend(close)
 MoneyFlowIndex(timeperiod=14).extend(high, low, close, volume)
 ```
 
-The `Input order` and `Constructor configuration` columns below are
-authoritative: they are introspected from the live ``extend`` and constructor
-signatures. Passing data by keyword always works.
+The Python constructor, `append`, and `extend` columns contain the complete public
+parameter lists, including annotations, keyword-only markers, and default
+values. The Rust constructor and `append` columns contain their exact explicit
+parameters. Passing Python data by keyword always works.
 """,
-        "Correctness is reported in [../verify/CORRECTNESS.md](../verify/CORRECTNESS.md); "
-        "throughput is in [../verify/BENCHMARK.md](../verify/BENCHMARK.md).\n",
-        "## Contents\n",
+        "## Alphabetical class reference\n",
+        "| Class | External name | Input order | Python constructor | Python `append` | Python `extend` | Rust constructor | Rust `append` |",
+        "|---|---|---|---|---|---|---|---|",
     ]
-    for cat in CATEGORIES:
-        if cat in grouped:
-            anchor = re.sub(r"[^a-z0-9 -]", "", cat.lower()).replace(" ", "-")
-            out.append(f"- [{cat}](#{anchor}) — {len(grouped[cat])}")
+    for row in rows:
+        out.append(
+            f"| `{row['cls']}` | {row['talib'] or '—'} | `({row['inputs']})` | "
+            f"{code(row['python_constructor'])} | {code(row['python_append'])} | "
+            f"{code(row['python_extend'])} | {code(row['rust_constructor'])} | "
+            f"{code(row['rust_append'])} |"
+        )
     out.append("")
-    for cat in CATEGORIES:
-        if cat not in grouped:
-            continue
-        out.append(f"## {cat}\n")
-        out.append("| Class | TA-Lib | Input order | Constructor configuration |")
-        out.append("|---|---|---|---|")
-        for row in sorted(grouped[cat], key=lambda r: r["cls"]):
-            out.append(
-                f"| `{row['cls']}` | {row['talib'] or '—'} | `({row['inputs']})` "
-                f"| `({row['cfg']})` |"
-            )
-        out.append("")
 
     target = ROOT / "docs/INDICATORS.md"
     target.write_text("\n".join(out))

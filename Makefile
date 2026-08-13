@@ -69,8 +69,9 @@ bench: ## Benchmark against TA-Lib; narrow with ARGS="SMA MAX"
 
 # ------------------------------------------------------------- housekeeping ----
 
-docs: ## Regenerate docs/INDICATORS.md from the installed package
-	$(PYTHON) scripts/gen_indicators_doc.py
+docs: ## Regenerate the indicator and metric API references
+	uv run python scripts/gen_indicators_doc.py
+	uv run python scripts/gen_metrics_doc.py
 
 fmt: ## Format Rust sources
 	cargo fmt --all
