@@ -160,41 +160,41 @@ impl CandleMatHold {
                 .sum::<f64>()
         };
         let mut sums = [0.0, seed(3), seed(2), seed(1), seed(0)];
-        for i in LOOKBACK..len {
-            let a = i - 4;
-            let b = i - 3;
-            let cnd = i - 2;
-            let d = i - 1;
-            let long = ca_realbody_scalar(BODY_LONG, sums[4], open[a], close[a]);
-            let short0 = ca_realbody_scalar(BODY_SHORT, sums[3], open[b], close[b]);
-            let short1 = ca_realbody_scalar(BODY_SHORT, sums[2], open[cnd], close[cnd]);
-            let short2 = ca_realbody_scalar(BODY_SHORT, sums[1], open[d], close[d]);
-            output[start + i] = (real_body(open[a], close[a]) > long
-                && real_body(open[b], close[b]) < short0
-                && real_body(open[cnd], close[cnd]) < short1
-                && real_body(open[d], close[d]) < short2
-                && candle_color(open[a], close[a]) == 1
-                && candle_color(open[b], close[b]) == -1
-                && candle_color(open[i], close[i]) == 1
-                && open[b].min(close[b]) > open[a].max(close[a])
-                && open[cnd].min(close[cnd]) < close[a]
-                && open[d].min(close[d]) < close[a]
-                && open[cnd].min(close[cnd]) > close[a] - real_body(open[a], close[a]) * 0.5
-                && open[d].min(close[d]) > close[a] - real_body(open[a], close[a]) * 0.5
-                && open[cnd].max(close[cnd]) < open[b]
-                && open[d].max(close[d]) < open[cnd].max(close[cnd])
-                && open[i] > close[d]
-                && close[i] > high[b].max(high[cnd]).max(high[d]))
-                as i32
+        for (((slot, open), high), close) in output[start + LOOKBACK..]
+            .iter_mut()
+            .zip(open.windows(LOOKBACK + 1))
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(close.windows(LOOKBACK + 1))
+        {
+            let long = ca_realbody_scalar(BODY_LONG, sums[4], open[10], close[10]);
+            let short0 = ca_realbody_scalar(BODY_SHORT, sums[3], open[11], close[11]);
+            let short1 = ca_realbody_scalar(BODY_SHORT, sums[2], open[12], close[12]);
+            let short2 = ca_realbody_scalar(BODY_SHORT, sums[1], open[13], close[13]);
+            *slot = (real_body(open[10], close[10]) > long
+                && real_body(open[11], close[11]) < short0
+                && real_body(open[12], close[12]) < short1
+                && real_body(open[13], close[13]) < short2
+                && candle_color(open[10], close[10]) == 1
+                && candle_color(open[11], close[11]) == -1
+                && candle_color(open[14], close[14]) == 1
+                && open[11].min(close[11]) > open[10].max(close[10])
+                && open[12].min(close[12]) < close[10]
+                && open[13].min(close[13]) < close[10]
+                && open[12].min(close[12]) > close[10] - real_body(open[10], close[10]) * 0.5
+                && open[13].min(close[13]) > close[10] - real_body(open[10], close[10]) * 0.5
+                && open[12].max(close[12]) < open[11]
+                && open[13].max(close[13]) < open[12].max(close[12])
+                && open[14] > close[13]
+                && close[14] > high[11].max(high[12]).max(high[13])) as i32
                 * 100;
-            sums[4] += cr_realbody_scalar(open[a], close[a])
-                - cr_realbody_scalar(open[i - 14], close[i - 14]);
-            sums[3] += cr_realbody_scalar(open[b], close[b])
-                - cr_realbody_scalar(open[i - 13], close[i - 13]);
-            sums[2] += cr_realbody_scalar(open[cnd], close[cnd])
-                - cr_realbody_scalar(open[i - 12], close[i - 12]);
-            sums[1] += cr_realbody_scalar(open[d], close[d])
-                - cr_realbody_scalar(open[i - 11], close[i - 11]);
+            sums[4] +=
+                cr_realbody_scalar(open[10], close[10]) - cr_realbody_scalar(open[0], close[0]);
+            sums[3] +=
+                cr_realbody_scalar(open[11], close[11]) - cr_realbody_scalar(open[1], close[1]);
+            sums[2] +=
+                cr_realbody_scalar(open[12], close[12]) - cr_realbody_scalar(open[2], close[2]);
+            sums[1] +=
+                cr_realbody_scalar(open[13], close[13]) - cr_realbody_scalar(open[3], close[3]);
         }
         self.body_sum = sums;
         self.candles.extend((len - LOOKBACK..len).map(|i| Candle {

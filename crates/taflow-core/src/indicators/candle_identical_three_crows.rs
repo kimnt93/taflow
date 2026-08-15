@@ -113,10 +113,8 @@ impl CandleIdenticalThreeCrows {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// the bounded trailing state without replaying the input. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -139,15 +137,80 @@ impl CandleIdenticalThreeCrows {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 12;
+        if !self.candles.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        let start = output.len();
+        output.resize(start + len, 0);
+        let range = |i: usize| cr_highlow_scalar(high[i], low[i]);
+        let mut shadow_sum = [0.0; 3];
+        for k in 0..3 {
+            shadow_sum[k] = (k..10 + k).fold(0.0, |sum, i| sum + range(i));
         }
+        let mut equal_sum = [
+            (5..10).fold(0.0, |sum, i| sum + range(i)),
+            (6..11).fold(0.0, |sum, i| sum + range(i)),
+        ];
+        for ((((opens, highs), lows), closes), out) in open
+            .windows(13)
+            .zip(high.windows(13))
+            .zip(low.windows(13))
+            .zip(close.windows(13))
+            .zip(output[start + LOOKBACK..].iter_mut())
+        {
+            let a = Candle {
+                o: opens[10],
+                h: highs[10],
+                l: lows[10],
+                c: closes[10],
+            };
+            let b = Candle {
+                o: opens[11],
+                h: highs[11],
+                l: lows[11],
+                c: closes[11],
+            };
+            let cur = Candle {
+                o: opens[12],
+                h: highs[12],
+                l: lows[12],
+                c: closes[12],
+            };
+            let shadow0 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum[0], a.h, a.l);
+            let shadow1 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum[1], b.h, b.l);
+            let shadow2 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum[2], cur.h, cur.l);
+            let equal0 = ca_highlow_scalar(EQUAL, equal_sum[0], a.h, a.l);
+            let equal1 = ca_highlow_scalar(EQUAL, equal_sum[1], b.h, b.l);
+            *out = (a.color() == -1
+                && b.color() == -1
+                && cur.color() == -1
+                && b.c < a.c
+                && cur.c < b.c
+                && a.lower() < shadow0
+                && b.lower() < shadow1
+                && cur.lower() < shadow2
+                && (b.o - a.c).abs() <= equal0
+                && (cur.o - b.c).abs() <= equal1) as i32
+                * -100;
+            shadow_sum[0] += cr_highlow_scalar(a.h, a.l) - cr_highlow_scalar(highs[0], lows[0]);
+            shadow_sum[1] += cr_highlow_scalar(b.h, b.l) - cr_highlow_scalar(highs[1], lows[1]);
+            shadow_sum[2] += cr_highlow_scalar(cur.h, cur.l) - cr_highlow_scalar(highs[2], lows[2]);
+            equal_sum[0] += cr_highlow_scalar(a.h, a.l) - cr_highlow_scalar(highs[5], lows[5]);
+            equal_sum[1] += cr_highlow_scalar(b.h, b.l) - cr_highlow_scalar(highs[6], lows[6]);
+        }
+        self.shadow_sum = shadow_sum;
+        self.equal_sum = equal_sum;
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

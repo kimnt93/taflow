@@ -70,10 +70,8 @@ impl CandleUpDownSideGapThreeMethods {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// the bounded trailing state without replaying the input. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -96,23 +94,52 @@ impl CandleUpDownSideGapThreeMethods {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 2;
+        if !self.candles.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        let start = output.len();
+        output.resize(start + len, 0);
+        for ((opens, closes), out) in open
+            .windows(3)
+            .zip(close.windows(3))
+            .zip(output[start + LOOKBACK..].iter_mut())
+        {
+            let first = Candle {
+                open: opens[0],
+                close: closes[0],
+            };
+            let second = Candle {
+                open: opens[1],
+                close: closes[1],
+            };
+            let current_open = opens[2];
+            let current_close = closes[2];
+            let first_color = if first.close >= first.open { 1 } else { -1 };
+            let second_color = if second.close >= second.open { 1 } else { -1 };
+            let current_color = if current_close >= current_open { 1 } else { -1 };
+            let base = first_color == second_color
+                && current_color != first_color
+                && current_open > second.open.min(second.close)
+                && current_open < second.open.max(second.close)
+                && current_close > first.open.min(first.close)
+                && current_close < first.open.max(first.close);
+            let bull = base
+                && first_color == 1
+                && second.open.min(second.close) > first.open.max(first.close);
+            let bear = base
+                && first_color == -1
+                && second.open.max(second.close) < first.open.min(first.close);
+            *out = (bull as i32) * 100 - (bear as i32) * 100;
         }
-        // Every field of this state is a function of the last `BULK_REPLAY_BARS`
-        // bars at most (deepest candle window is 10-bar average + 4 offset), so
-        // replaying that tail from empty reproduces the full-run state exactly,
-        // including `value` (set by the final `append`).
-        let replay = len.min(BULK_REPLAY_BARS);
-        for i in (len - replay)..len {
-            self.append(open[i], high[i], low[i], close[i]);
-        }
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            open: open[i],
+            close: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

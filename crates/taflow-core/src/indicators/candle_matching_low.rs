@@ -77,10 +77,8 @@ impl CandleMatchingLow {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// the bounded trailing state without replaying the input. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -103,15 +101,53 @@ impl CandleMatchingLow {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 6;
+        if !self.candles.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut equal_sum = high[..5]
+            .iter()
+            .zip(&low[..5])
+            .fold(0.0, |sum, (&h, &l)| sum + cr_highlow_scalar(h, l));
+        for ((((opens, highs), lows), closes), out) in open
+            .windows(LOOKBACK + 1)
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(low.windows(LOOKBACK + 1))
+            .zip(close.windows(LOOKBACK + 1))
+            .zip(output[start + LOOKBACK..].iter_mut())
+        {
+            let prev = Candle {
+                o: opens[5],
+                h: highs[5],
+                l: lows[5],
+                c: closes[5],
+            };
+            let cur = Candle {
+                o: opens[6],
+                h: highs[6],
+                l: lows[6],
+                c: closes[6],
+            };
+            let equal = ca_highlow_scalar(EQUAL, equal_sum, prev.h, prev.l);
+            *out = (prev.color() == -1 && cur.color() == -1 && (cur.c - prev.c).abs() <= equal)
+                as i32
+                * 100;
+            equal_sum += cr_highlow_scalar(prev.h, prev.l) - cr_highlow_scalar(highs[0], lows[0]);
         }
+        self.equal_sum = equal_sum;
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

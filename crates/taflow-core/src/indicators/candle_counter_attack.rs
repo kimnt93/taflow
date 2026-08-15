@@ -98,10 +98,8 @@ impl CandleCounterAttack {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// the bounded trailing state without replaying the input. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -124,15 +122,70 @@ impl CandleCounterAttack {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 11;
+        if !self.candles.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut equal_sum = high[5..10]
+            .iter()
+            .zip(&low[5..10])
+            .fold(0.0, |sum, (&h, &l)| sum + cr_highlow_scalar(h, l));
+        let mut body_prev_sum = open[..10]
+            .iter()
+            .zip(&close[..10])
+            .fold(0.0, |sum, (&o, &c)| sum + cr_realbody_scalar(o, c));
+        let mut body_cur_sum = open[1..11]
+            .iter()
+            .zip(&close[1..11])
+            .fold(0.0, |sum, (&o, &c)| sum + cr_realbody_scalar(o, c));
+        for ((((opens, highs), lows), closes), out) in open
+            .windows(12)
+            .zip(high.windows(12))
+            .zip(low.windows(12))
+            .zip(close.windows(12))
+            .zip(output[start + LOOKBACK..].iter_mut())
+        {
+            let prev = Candle {
+                o: opens[10],
+                h: highs[10],
+                l: lows[10],
+                c: closes[10],
+            };
+            let cur = Candle {
+                o: opens[11],
+                h: highs[11],
+                l: lows[11],
+                c: closes[11],
+            };
+            let equal = ca_highlow_scalar(EQUAL, equal_sum, prev.h, prev.l);
+            let body_prev = ca_realbody_scalar(BODY_LONG, body_prev_sum, prev.o, prev.c);
+            let body_cur = ca_realbody_scalar(BODY_LONG, body_cur_sum, cur.o, cur.c);
+            *out = (prev.color() != cur.color()
+                && prev.body() > body_prev
+                && cur.body() > body_cur
+                && (cur.c - prev.c).abs() <= equal) as i32
+                * cur.color()
+                * 100;
+            equal_sum += cr_highlow_scalar(prev.h, prev.l) - cr_highlow_scalar(highs[5], lows[5]);
+            body_prev_sum +=
+                cr_realbody_scalar(prev.o, prev.c) - cr_realbody_scalar(opens[0], closes[0]);
+            body_cur_sum +=
+                cr_realbody_scalar(cur.o, cur.c) - cr_realbody_scalar(opens[1], closes[1]);
         }
+        self.equal_sum = equal_sum;
+        self.body_sum = [body_cur_sum, body_prev_sum];
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 
