@@ -35,12 +35,12 @@ impl RelativeStrengthIndex {
     }
 
     #[inline]
-    fn current_value(&self) -> f64 {
-        let sum = self.average_gain + self.average_loss;
+    fn calculate_value(average_gain: f64, average_loss: f64) -> f64 {
+        let sum = average_gain + average_loss;
         if sum.abs() < 1.0e-14 {
             0.0
         } else {
-            100.0 * (self.average_gain / sum)
+            100.0 * (average_gain / sum)
         }
     }
 }
@@ -72,7 +72,7 @@ impl StreamingIndicator for RelativeStrengthIndex {
             self.average_gain = (self.average_gain * (period - 1.0) + gain) / period;
             self.average_loss = (self.average_loss * (period - 1.0) + loss) / period;
         }
-        self.value = Some(self.current_value());
+        self.value = Some(Self::calculate_value(self.average_gain, self.average_loss));
         self.value
     }
 
@@ -92,8 +92,40 @@ impl StreamingIndicator for RelativeStrengthIndex {
 
     fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
         output.reserve(inputs.len());
-        for &input in inputs {
-            output.push(self.append(input).unwrap_or(f64::NAN));
+        let mut index = 0;
+        while index < inputs.len() && self.value.is_none() {
+            output.push(self.append(inputs[index]).unwrap_or(f64::NAN));
+            index += 1;
         }
+        if index == inputs.len() {
+            return;
+        }
+
+        let period = self.period as f64;
+        let period_minus_one = period - 1.0;
+        let mut previous_input = self.previous_input.expect("RSI is seeded");
+        let mut average_gain = self.average_gain;
+        let mut average_loss = self.average_loss;
+        let mut latest = self.value.expect("RSI is seeded");
+
+        for &input in &inputs[index..] {
+            let change = input - previous_input;
+            let (gain, loss) = if change > 0.0 {
+                (change, 0.0)
+            } else {
+                (0.0, -change)
+            };
+            average_gain = (average_gain * period_minus_one + gain) / period;
+            average_loss = (average_loss * period_minus_one + loss) / period;
+            latest = Self::calculate_value(average_gain, average_loss);
+            output.push(latest);
+            previous_input = input;
+        }
+
+        self.previous_input = Some(previous_input);
+        self.changes += inputs.len() - index;
+        self.average_gain = average_gain;
+        self.average_loss = average_loss;
+        self.value = Some(latest);
     }
 }

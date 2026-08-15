@@ -93,11 +93,9 @@ impl CandleHaramiCross {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// From a pristine state this runs directly over the slices and rebuilds
+    /// the rolling sums and bounded candle tail once after the loop. A
+    /// non-pristine state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
     ///
@@ -119,15 +117,72 @@ impl CandleHaramiCross {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 11;
+        if !self.candles.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let output_start = output.len();
+        output.resize(output_start + len, 0);
+        let mut body_long_sum = open[..10]
+            .iter()
+            .zip(&close[..10])
+            .fold(0.0, |sum, (&open, &close)| {
+                sum + cr_realbody_scalar(open, close)
+            });
+        let mut body_doji_sum = high[1..11]
+            .iter()
+            .zip(&low[1..11])
+            .fold(0.0, |sum, (&high, &low)| sum + cr_highlow_scalar(high, low));
+
+        for (((open_window, high_window), low_window), (close_window, output)) in open
+            .windows(LOOKBACK + 1)
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(low.windows(LOOKBACK + 1))
+            .zip(
+                close
+                    .windows(LOOKBACK + 1)
+                    .zip(&mut output[output_start + LOOKBACK..]),
+            )
+        {
+            let previous_open = open_window[10];
+            let previous_close = close_window[10];
+            let current_open = open_window[11];
+            let current_close = close_window[11];
+            let long = ca_realbody_scalar(BODY_LONG, body_long_sum, previous_open, previous_close);
+            let doji = ca_highlow_scalar(BODY_DOJI, body_doji_sum, high_window[11], low_window[11]);
+            *output = (((previous_close - previous_open).abs() > long
+                && (current_close - current_open).abs() <= doji
+                && current_open.max(current_close) < previous_open.max(previous_close)
+                && current_open.min(current_close) > previous_open.min(previous_close))
+                as i32)
+                * if previous_close >= previous_open {
+                    -100
+                } else {
+                    100
+                };
+
+            body_long_sum += cr_realbody_scalar(previous_open, previous_close)
+                - cr_realbody_scalar(open_window[0], close_window[0]);
+            body_doji_sum += cr_highlow_scalar(high_window[11], low_window[11])
+                - cr_highlow_scalar(high_window[1], low_window[1]);
         }
+
+        let tail = len - LOOKBACK;
+        self.candles.extend(
+            open[tail..]
+                .iter()
+                .zip(&high[tail..])
+                .zip(&low[tail..])
+                .zip(&close[tail..])
+                .map(|(((&o, &h), &l), &c)| Candle { o, h, l, c }),
+        );
+        self.body_long_sum = body_long_sum;
+        self.body_doji_sum = body_doji_sum;
+        self.value = Some(output[output_start + len - 1]);
         Ok(())
     }
 

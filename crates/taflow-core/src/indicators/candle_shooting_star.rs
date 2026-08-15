@@ -1,8 +1,7 @@
 //! Incremental Shooting Star candlestick recognition (CDLSHOOTINGSTAR).
 use crate::error::TaResult;
 use crate::stream::pattern::*;
-use std::collections::VecDeque;
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 struct Candle {
     o: f64,
     h: f64,
@@ -43,7 +42,9 @@ impl Candle {
 ///
 /// An aligned result with TA-Lib-compatible validation and warm-up values.
 pub struct CandleShootingStar {
-    candles: VecDeque<Candle>,
+    candles: [Candle; 11],
+    head: usize,
+    len: usize,
     body_sum: f64,
     shadow_vs_sum: f64,
     value: Option<i32>,
@@ -61,7 +62,9 @@ impl CandleShootingStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(11),
+            candles: [Candle::default(); 11],
+            head: 0,
+            len: 0,
             body_sum: 0.0,
             shadow_vs_sum: 0.0,
             value: None,
@@ -74,16 +77,14 @@ impl CandleShootingStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
-        // Deque holds bars i-11..=i-1; bar j maps to index 11 - (i - j).
-        let value = if self.candles.len() == 11 {
-            let prev = self.candles[10]; // bar i-1
+        let value = if self.len == 11 {
+            let prev = self.candles[(self.head + 10) % 11];
+            let evicted = self.candles[(self.head + 1) % 11];
             let body = ca_realbody_scalar(BODY_SHORT, self.body_sum, o, c);
             let vs = ca_highlow_scalar(SHADOW_VERY_SHORT, self.shadow_vs_sum, h, l);
             // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_sum +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[1].o, self.candles[1].c);
-            self.shadow_vs_sum +=
-                cr_highlow_scalar(h, l) - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
+            self.body_sum += cr_realbody_scalar(o, c) - cr_realbody_scalar(evicted.o, evicted.c);
+            self.shadow_vs_sum += cr_highlow_scalar(h, l) - cr_highlow_scalar(evicted.h, evicted.l);
             Some(
                 (cur.body() < body
                     && cur.upper() > cur.body()
@@ -93,29 +94,30 @@ impl CandleShootingStar {
             )
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
-            let i = self.candles.len();
+            let i = self.len;
             if (1..11).contains(&i) {
                 self.body_sum += cr_realbody_scalar(o, c);
                 self.shadow_vs_sum += cr_highlow_scalar(h, l);
             }
             None
         };
-        if self.candles.len() == 11 {
-            self.candles.pop_front();
+        if self.len == 11 {
+            self.candles[self.head] = cur;
+            self.head = (self.head + 1) % 11;
+        } else {
+            self.candles[(self.head + self.len) % 11] = cur;
+            self.len += 1;
         }
-        self.candles.push_back(cur);
         self.value = value;
         value
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
-    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
-    /// batch prologue).
+    /// From a pristine state this runs directly over the slices and rebuilds
+    /// the bounded candle ring once after the loop. A non-pristine state falls
+    /// back to the per-bar loop. Either route is bit-identical to calling
+    /// `append` once per bar (warm-up `None` becomes `0`, matching the batch
+    /// prologue).
     ///
     /// # Parameters
     ///
@@ -134,16 +136,48 @@ impl CandleShootingStar {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 11;
+        if self.len != 0 || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut body_sum = (1..11).fold(0.0, |sum, i| sum + cr_realbody_scalar(open[i], close[i]));
+        let mut shadow_sum = (1..11).fold(0.0, |sum, i| sum + cr_highlow_scalar(high[i], low[i]));
+        for i in LOOKBACK..len {
+            let body = (close[i] - open[i]).abs();
+            output[start + i] = ((body
+                < ca_realbody_scalar(BODY_SHORT, body_sum, open[i], close[i])
+                && high[i] - open[i].max(close[i]) > body
+                && open[i].min(close[i]) - low[i]
+                    < ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum, high[i], low[i])
+                && open[i].min(close[i]) > open[i - 1].max(close[i - 1]))
+                as i32)
+                * -100;
+            body_sum += cr_realbody_scalar(open[i], close[i])
+                - cr_realbody_scalar(open[i - 10], close[i - 10]);
+            shadow_sum +=
+                cr_highlow_scalar(high[i], low[i]) - cr_highlow_scalar(high[i - 10], low[i - 10]);
         }
+
+        self.body_sum = body_sum;
+        self.shadow_vs_sum = shadow_sum;
+        for (slot, i) in (len - LOOKBACK..len).enumerate() {
+            self.candles[slot] = Candle {
+                o: open[i],
+                h: high[i],
+                l: low[i],
+                c: close[i],
+            };
+        }
+        self.head = 0;
+        self.len = LOOKBACK;
+        self.value = Some(output[start + len - 1]);
         Ok(())
     }
 
@@ -157,7 +191,8 @@ impl CandleShootingStar {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.candles.clear();
+        self.head = 0;
+        self.len = 0;
         self.body_sum = 0.0;
         self.shadow_vs_sum = 0.0;
         self.value = None;

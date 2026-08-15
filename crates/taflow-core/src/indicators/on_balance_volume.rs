@@ -42,9 +42,22 @@ impl OnBalanceVolume {
             });
         }
         output.reserve(close.len());
+        let mut previous_close = self.previous_close;
+        let mut total = self.total;
         for index in 0..close.len() {
-            output.push(self.append(close[index], volume[index]));
+            let current_close = close[index];
+            match previous_close {
+                None => total = volume[index],
+                Some(previous) if current_close > previous => total += volume[index],
+                Some(previous) if current_close < previous => total -= volume[index],
+                Some(_) => {}
+            }
+            previous_close = Some(current_close);
+            output.push(total);
         }
+        self.previous_close = previous_close;
+        self.total = total;
+        self.value = previous_close.map(|_| total);
         Ok(())
     }
 

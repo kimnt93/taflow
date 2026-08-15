@@ -97,13 +97,10 @@ impl CandleUniqueThreeRiver {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
-    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
-    /// batch prologue).
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// its bounded trailing state once. A non-pristine state falls back to the
+    /// per-bar loop. Either route is bit-identical to calling `append` once per
+    /// bar (warm-up `None` becomes `0`, matching the batch prologue).
     ///
     /// # Parameters
     ///
@@ -149,17 +146,19 @@ impl CandleUniqueThreeRiver {
             .zip(low.windows(LOOKBACK + 1))
             .zip(close.windows(LOOKBACK + 1))
         {
-            let long = ca_realbody_scalar(BODY_LONG, long_sum, open[10], close[10]);
-            let short = ca_realbody_scalar(BODY_SHORT, short_sum, open[12], close[12]);
-            *slot = (candle_color(open[10], close[10]) == -1
-                && real_body(open[10], close[10]) > long
-                && candle_color(open[11], close[11]) == -1
+            let base = !(close[10] >= open[10])
+                && !(close[11] >= open[11])
                 && close[11] > close[10]
                 && open[11] <= open[10]
                 && low[11] < low[10]
-                && candle_color(open[12], close[12]) == 1
-                && real_body(open[12], close[12]) < short
-                && open[12] > low[11]) as i32
+                && close[12] >= open[12]
+                && open[12] > low[11];
+            *slot = (base
+                && real_body(open[10], close[10])
+                    > ca_realbody_scalar(BODY_LONG, long_sum, open[10], close[10])
+                && real_body(open[12], close[12])
+                    < ca_realbody_scalar(BODY_SHORT, short_sum, open[12], close[12]))
+                as i32
                 * 100;
             long_sum +=
                 cr_realbody_scalar(open[10], close[10]) - cr_realbody_scalar(open[0], close[0]);

@@ -1,20 +1,50 @@
 use super::rolling_variance::RollingVariance;
 use crate::stream::StreamingIndicator;
 
-#[test]
-fn scalar_bulk_and_reset_are_invariant() {
-    let input: Vec<f64> = (0..96).map(|i| (i as f64 * 0.13).cos()).collect();
-    let mut scalar = RollingVariance::new(9, 1.0).unwrap();
-    let scalar_out: Vec<f64> = input
-        .iter()
-        .map(|&x| scalar.append(x).unwrap_or(f64::NAN))
-        .collect();
-    let mut bulk = RollingVariance::new(9, 1.0).unwrap();
-    let mut bulk_out = Vec::new();
-    bulk.extend_slice_into(&input, &mut bulk_out);
-    for (a, b) in scalar_out.iter().zip(&bulk_out) {
-        assert!(a.to_bits() == b.to_bits() || (a.is_nan() && b.is_nan()));
+fn assert_bits_equal(actual: &[f64], expected: &[f64]) {
+    assert_eq!(actual.len(), expected.len());
+    for (actual, expected) in actual.iter().zip(expected) {
+        assert_eq!(actual.to_bits(), expected.to_bits());
     }
-    bulk.reset();
-    assert_eq!(bulk.value(), None);
+}
+
+#[test]
+fn scalar_bulk_all_splits_continuation_and_reset_are_bitwise_invariant() {
+    let input: Vec<f64> = (0..129)
+        .map(|index| 100.0 + (index as f64 * 0.13).cos() * 0.07 + index as f64 * 0.0003)
+        .collect();
+
+    for period in [2, 5, 14, 30] {
+        let mut scalar = RollingVariance::new(period, 1.0).unwrap();
+        let expected: Vec<f64> = input
+            .iter()
+            .map(|&value| scalar.append(value).unwrap_or(f64::NAN))
+            .collect();
+
+        for split in 0..=input.len() {
+            let mut bulk = RollingVariance::new(period, 2.5).unwrap();
+            let mut actual = Vec::new();
+            bulk.extend_slice_into(&input[..split], &mut actual);
+            bulk.extend_slice_into(&input[split..], &mut actual);
+            assert_bits_equal(&actual, &expected);
+            assert_eq!(
+                bulk.value().map(f64::to_bits),
+                scalar.value().map(f64::to_bits)
+            );
+
+            let mut expected_continuation = scalar.clone();
+            assert_eq!(
+                bulk.append(99.75).map(f64::to_bits),
+                expected_continuation.append(99.75).map(f64::to_bits)
+            );
+        }
+
+        let mut replay = RollingVariance::new(period, 1.0).unwrap();
+        let mut replay_output = Vec::new();
+        replay.extend_slice_into(&input, &mut replay_output);
+        replay.reset();
+        replay_output.clear();
+        replay.extend_slice_into(&input, &mut replay_output);
+        assert_bits_equal(&replay_output, &expected);
+    }
 }

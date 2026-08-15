@@ -53,30 +53,42 @@ impl TriangularMovingAverage {
 impl StreamingIndicator for TriangularMovingAverage {
     type Output = f64;
 
-    /// Bulk kernel: runs the first SMA's bulk path into a scratch buffer and
-    /// feeds the emitted suffix through the second SMA's bulk path, exactly
-    /// mirroring the `sma1.append(..).and_then(|v| sma2.append(v))` chain.
-    /// Bit-identical to per-bar [`Self::append`] in outputs and state.
+    /// Bulk kernel that streams first-stage averages directly into stage two.
+    ///
+    /// A bounded first-stage prologue displaces any prior ring contents in
+    /// scalar order. Its steady recurrence then evicts directly from `inputs`,
+    /// avoiding a full-size intermediate allocation while leaving both SMA
+    /// states bit-identical to scalar replay.
     fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
-        if inputs.is_empty() {
-            return;
-        }
         let n = inputs.len();
-        output.reserve(n);
-        // Bars before `sma1` warms up never reach `sma2` (matches and_then).
-        // `sma1` emits its first value on the append that fills its window,
-        // i.e. at index `warmup_remaining - 1` (0 when already warm).
-        let first_valid = self.sma1.warmup_remaining().saturating_sub(1).min(n);
-        let mut stage1 = Vec::with_capacity(n);
-        self.sma1.extend_slice_into(inputs, &mut stage1);
-        for _ in 0..first_valid {
-            output.push(f64::NAN);
-        }
-        if first_valid == n {
-            self.value = None;
+        if n == 0 {
             return;
         }
-        self.sma2.extend_slice_into(&stage1[first_valid..], output);
+        let period = self.sma1.period();
+        output.reserve(n);
+
+        let prologue = n.min(period);
+        for &input in &inputs[..prologue] {
+            output.push(self.append(input).unwrap_or(f64::NAN));
+        }
+        if n <= period {
+            return;
+        }
+
+        let period_f = period as f64;
+        let mut sum = self.sma1.raw_sum();
+        for index in period..n {
+            sum -= inputs[index - period];
+            sum += inputs[index];
+            let first = sum / period_f;
+            output.push(self.sma2.append(first).unwrap_or(f64::NAN));
+        }
+
+        self.sma1.window_mut().clear();
+        for &input in &inputs[n - period..] {
+            self.sma1.window_mut().push(input);
+        }
+        self.sma1.store_bulk_state(sum, Some(sum / period_f));
         self.value = self.sma2.value();
     }
 

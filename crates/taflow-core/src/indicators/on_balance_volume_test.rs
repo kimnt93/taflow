@@ -43,3 +43,61 @@ fn lifecycle_bulk_validation_and_continuation_are_bitwise_consistent() {
         .is_err());
     assert_eq!(bulk, before);
 }
+
+#[test]
+fn bulk_all_splits_and_reset_are_bitwise_scalar_equivalent() {
+    let close: Vec<_> = (0..129)
+        .map(|index| 100.0 + (index as f64 * 0.31).sin())
+        .collect();
+    let volume: Vec<_> = (0..129)
+        .map(|index| 10.0 + ((index * 17) % 31) as f64)
+        .collect();
+    let mut scalar = OnBalanceVolume::new().unwrap();
+    let expected: Vec<_> = close
+        .iter()
+        .zip(&volume)
+        .map(|(&close, &volume)| scalar.append(close, volume))
+        .collect();
+    let scalar_value = scalar.value();
+
+    for split in 0..=close.len() {
+        let mut state = OnBalanceVolume::new().unwrap();
+        let mut actual = Vec::new();
+        state
+            .extend_slices_into(&close[..split], &volume[..split], &mut actual)
+            .unwrap();
+        state
+            .extend_slices_into(&close[split..], &volume[split..], &mut actual)
+            .unwrap();
+        assert_eq!(
+            actual
+                .iter()
+                .map(|value| value.to_bits())
+                .collect::<Vec<_>>(),
+            expected
+                .iter()
+                .map(|value| value.to_bits())
+                .collect::<Vec<_>>()
+        );
+        assert_eq!(
+            state.value().map(f64::to_bits),
+            scalar_value.map(f64::to_bits)
+        );
+    }
+
+    scalar.reset();
+    let mut replay = Vec::new();
+    scalar
+        .extend_slices_into(&close, &volume, &mut replay)
+        .unwrap();
+    assert_eq!(
+        replay
+            .iter()
+            .map(|value| value.to_bits())
+            .collect::<Vec<_>>(),
+        expected
+            .iter()
+            .map(|value| value.to_bits())
+            .collect::<Vec<_>>()
+    );
+}

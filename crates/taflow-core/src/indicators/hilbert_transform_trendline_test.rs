@@ -18,3 +18,39 @@ fn bulk_and_reset_replay_match() {
     }
     assert_eq!(state.value(), final_value);
 }
+
+#[test]
+fn every_two_chunk_split_and_continuation_match_scalar_replay() {
+    let input: Vec<f64> = (0..128)
+        .map(|index| 100.0 + (index as f64 * 0.15).sin())
+        .collect();
+    let mut scalar = HilbertTransformTrendline::new();
+    let expected: Vec<_> = input
+        .iter()
+        .map(|&value| scalar.append(value).unwrap_or(f64::NAN))
+        .collect();
+    let expected_next = scalar.append(101.25);
+
+    for split in 0..=input.len() {
+        let mut chunked = HilbertTransformTrendline::new();
+        let mut actual = Vec::new();
+        chunked.extend_slice_into(&input[..split], &mut actual);
+        chunked.extend_slice_into(&input[split..], &mut actual);
+        assert_eq!(
+            actual
+                .iter()
+                .map(|value| value.to_bits())
+                .collect::<Vec<_>>(),
+            expected
+                .iter()
+                .map(|value| value.to_bits())
+                .collect::<Vec<_>>(),
+            "split {split}"
+        );
+        assert_eq!(
+            chunked.append(101.25).map(f64::to_bits),
+            expected_next.map(f64::to_bits),
+            "continuation split {split}"
+        );
+    }
+}

@@ -1,7 +1,5 @@
 //! Incremental Spinning Top candlestick recognition (CDLSPINNINGTOP).
 
-use std::collections::VecDeque;
-
 use crate::error::TaResult;
 use crate::stream::pattern::*;
 /// Incremental CDLSPINNINGTOP state using TA-Lib's ten-bar short-body average.
@@ -10,7 +8,9 @@ use crate::stream::pattern::*;
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct CandleSpinningTop {
-    bodies: VecDeque<f64>,
+    bodies: [f64; 10],
+    head: usize,
+    len: usize,
     sum: f64,
     value: Option<i32>,
 }
@@ -27,7 +27,9 @@ impl CandleSpinningTop {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            bodies: VecDeque::with_capacity(10),
+            bodies: [0.0; 10],
+            head: 0,
+            len: 0,
             sum: 0.0,
             value: None,
         }
@@ -39,7 +41,7 @@ impl CandleSpinningTop {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
         let body = (close - open).abs();
-        let value = if self.bodies.len() == 10 {
+        let value = if self.len == 10 {
             Some(
                 (body < self.sum / 10.0
                     && high - open.max(close) > body
@@ -49,26 +51,27 @@ impl CandleSpinningTop {
         } else {
             None
         };
-        if self.bodies.len() == 10 {
+        if self.len == 10 {
             // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
-            let old = self.bodies.pop_front().expect("window is full");
+            let old = self.bodies[self.head];
             self.sum += body - old;
+            self.bodies[self.head] = body;
+            self.head = (self.head + 1) % 10;
         } else {
             self.sum += body;
+            self.bodies[(self.head + self.len) % 10] = body;
+            self.len += 1;
         }
-        self.bodies.push_back(body);
         self.value = value;
         value
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
-    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
-    /// batch prologue).
+    /// From a pristine state this runs directly over the slices and rebuilds
+    /// the bounded body window once after the loop. A non-pristine state falls
+    /// back to the per-bar loop. Either route is bit-identical to calling
+    /// `append` once per bar (warm-up `None` becomes `0`, matching the batch
+    /// prologue).
     ///
     /// # Parameters
     ///
@@ -87,16 +90,41 @@ impl CandleSpinningTop {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.bodies.is_empty() {
+        const LOOKBACK: usize = 10;
+        if self.len != 0 || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut sum = open[..LOOKBACK]
+            .iter()
+            .zip(&close[..LOOKBACK])
+            .fold(0.0, |sum, (&open, &close)| sum + (close - open).abs());
+        for i in LOOKBACK..len {
+            let body = (close[i] - open[i]).abs();
+            output[start + i] = ((body < sum / 10.0
+                && high[i] - open[i].max(close[i]) > body
+                && open[i].min(close[i]) - low[i] > body) as i32)
+                * if close[i] >= open[i] { 100 } else { -100 };
+            sum += body - (close[i - LOOKBACK] - open[i - LOOKBACK]).abs();
         }
+
+        for (slot, (&open, &close)) in open[len - LOOKBACK..]
+            .iter()
+            .zip(&close[len - LOOKBACK..])
+            .enumerate()
+        {
+            self.bodies[slot] = (close - open).abs();
+        }
+        self.head = 0;
+        self.len = LOOKBACK;
+        self.sum = sum;
+        self.value = Some(output[start + len - 1]);
         Ok(())
     }
 
@@ -110,7 +138,8 @@ impl CandleSpinningTop {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.bodies.clear();
+        self.head = 0;
+        self.len = 0;
         self.sum = 0.0;
         self.value = None;
     }

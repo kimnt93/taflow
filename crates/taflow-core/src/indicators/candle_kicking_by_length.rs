@@ -114,13 +114,10 @@ impl CandleKickingByLength {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
-    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
-    /// batch prologue).
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// its bounded trailing state once. A non-pristine state falls back to the
+    /// per-bar loop. Either route is bit-identical to calling `append` once per
+    /// bar (warm-up `None` becomes `0`, matching the batch prologue).
     ///
     /// # Parameters
     ///
@@ -139,16 +136,97 @@ impl CandleKickingByLength {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 11;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut shadow_prev = high[..10]
+            .iter()
+            .zip(&low[..10])
+            .map(|(&high, &low)| cr_highlow_scalar(high, low))
+            .sum::<f64>();
+        let mut shadow_cur = high[1..11]
+            .iter()
+            .zip(&low[1..11])
+            .map(|(&high, &low)| cr_highlow_scalar(high, low))
+            .sum::<f64>();
+        let mut body_prev = open[..10]
+            .iter()
+            .zip(&close[..10])
+            .map(|(&open, &close)| cr_realbody_scalar(open, close))
+            .sum::<f64>();
+        let mut body_cur = open[1..11]
+            .iter()
+            .zip(&close[1..11])
+            .map(|(&open, &close)| cr_realbody_scalar(open, close))
+            .sum::<f64>();
+        for ((((slot, open), high), low), close) in output[start + LOOKBACK..]
+            .iter_mut()
+            .zip(open.windows(LOOKBACK + 1))
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(low.windows(LOOKBACK + 1))
+            .zip(close.windows(LOOKBACK + 1))
+        {
+            let prev_white = close[10] >= open[10];
+            let cur_white = close[11] >= open[11];
+            let has_gap = prev_white != cur_white
+                && ((!prev_white && cur_white && low[11] > high[10])
+                    || (prev_white && !cur_white && high[11] < low[10]));
+            let hit = has_gap && {
+                let prev_shadow_threshold =
+                    ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_prev, high[10], low[10]);
+                let cur_shadow_threshold =
+                    ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_cur, high[11], low[11]);
+                real_body(open[10], close[10])
+                    > ca_realbody_scalar(BODY_LONG, body_prev, open[10], close[10])
+                    && upper_shadow(open[10], high[10], close[10]) < prev_shadow_threshold
+                    && lower_shadow(open[10], low[10], close[10]) < prev_shadow_threshold
+                    && real_body(open[11], close[11])
+                        > ca_realbody_scalar(BODY_LONG, body_cur, open[11], close[11])
+                    && upper_shadow(open[11], high[11], close[11]) < cur_shadow_threshold
+                    && lower_shadow(open[11], low[11], close[11]) < cur_shadow_threshold
+            };
+            *slot = if hit {
+                let color = if real_body(open[11], close[11]) > real_body(open[10], close[10]) {
+                    if cur_white {
+                        1
+                    } else {
+                        -1
+                    }
+                } else if prev_white {
+                    1
+                } else {
+                    -1
+                };
+                color * 100
+            } else {
+                0
+            };
+            shadow_prev +=
+                cr_highlow_scalar(high[10], low[10]) - cr_highlow_scalar(high[0], low[0]);
+            shadow_cur += cr_highlow_scalar(high[11], low[11]) - cr_highlow_scalar(high[1], low[1]);
+            body_prev +=
+                cr_realbody_scalar(open[10], close[10]) - cr_realbody_scalar(open[0], close[0]);
+            body_cur +=
+                cr_realbody_scalar(open[11], close[11]) - cr_realbody_scalar(open[1], close[1]);
         }
+        self.shadow_sum = [shadow_cur, shadow_prev];
+        self.body_sum = [body_cur, body_prev];
+        self.candles
+            .extend((len - LOOKBACK..len).map(|index| Candle {
+                o: open[index],
+                h: high[index],
+                l: low[index],
+                c: close[index],
+            }));
+        self.value = output.last().copied();
         Ok(())
     }
 

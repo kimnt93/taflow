@@ -6,7 +6,8 @@ use crate::error::TaResult;
 
 use crate::stream::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 
-/// Steady-state EMA recurrence used by [`ExponentialMovingAverage::extend_slice`].
+/// Steady-state EMA recurrence used by
+/// [`ExponentialMovingAverage::extend_slice_into`].
 ///
 /// A free function so it can carry `#[multiversion]`: a portable build without
 /// runtime dispatch lowers `mul_add` to a libm `fma()` call. `mul_add` is an
@@ -14,11 +15,11 @@ use crate::stream::{invalid_period, SimpleMovingAverage, StreamingIndicator};
 /// returns bit-identical values.
 #[allow(unexpected_cfgs)]
 #[multiversion(targets("x86_64+avx2+fma", "x86_64+avx", "x86_64+sse4.2"))]
-fn ema_steady_loop(inputs: &[f64], k: f64, seed: f64, outputs: &mut Vec<Option<f64>>) -> f64 {
+fn ema_steady_loop(inputs: &[f64], k: f64, seed: f64, outputs: &mut Vec<f64>) -> f64 {
     let mut previous = seed;
     for &input in inputs {
         previous = k.mul_add(input - previous, previous);
-        outputs.push(Some(previous));
+        outputs.push(previous);
     }
     previous
 }
@@ -91,32 +92,37 @@ impl ExponentialMovingAverage {
         self.samples += appended;
         self.value = Some(value);
     }
-
-    /// Extends an empty state through the optimized contiguous bulk path.
-    ///
-    /// Partial and continued chunks use `append` so chunk boundaries preserve
-    /// the exact recurrence state.
-    pub fn extend_slice(&mut self, inputs: &[f64]) -> Vec<Option<f64>> {
-        if self.samples != 0 || inputs.len() < self.period {
-            return inputs.iter().map(|&input| self.append(input)).collect();
-        }
-
-        let mut outputs = Vec::with_capacity(inputs.len());
-        outputs.resize(self.period - 1, None);
-
-        let seed = crate::simd::sum_f64(&inputs[..self.period]) / self.period as f64;
-        outputs.push(Some(seed));
-
-        let previous = ema_steady_loop(&inputs[self.period..], self.k, seed, &mut outputs);
-
-        self.samples = inputs.len();
-        self.value = Some(previous);
-        outputs
-    }
 }
 
 impl StreamingIndicator for ExponentialMovingAverage {
     type Output = f64;
+
+    /// Bulk initialization writes aligned `f64` output directly, avoiding the
+    /// former intermediate `Vec<Option<f64>>` and adapter conversion pass.
+    /// Continued and short chunks replay [`Self::append`] so every split leaves
+    /// exactly the same seed and recurrence state as scalar execution.
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        if inputs.is_empty() {
+            return;
+        }
+        output.reserve(inputs.len());
+        if self.samples != 0 || inputs.len() < self.period {
+            output.extend(
+                inputs
+                    .iter()
+                    .map(|&input| self.append(input).unwrap_or(f64::NAN)),
+            );
+            return;
+        }
+
+        output.resize(output.len() + self.period - 1, f64::NAN);
+        let seed = crate::simd::sum_f64(&inputs[..self.period]) / self.period as f64;
+        output.push(seed);
+        let previous = ema_steady_loop(&inputs[self.period..], self.k, seed, output);
+
+        self.samples = inputs.len();
+        self.value = Some(previous);
+    }
 
     fn append(&mut self, input: f64) -> Option<f64> {
         self.samples += 1;

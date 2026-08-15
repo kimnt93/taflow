@@ -1,9 +1,6 @@
 //! Persistent `Crossunder` state.
 
-use super::*;
 use crate::error::{TaError, TaResult};
-use crate::stream::operator_states::*;
-use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `Crossunder`.
@@ -37,6 +34,46 @@ impl Crossunder {
         self.previous_right = Some(right);
         self.value = Some(value);
         value
+    }
+    /// Append aligned slices using one direct comparison pass.
+    pub fn extend_slices_into(
+        &mut self,
+        left: &[f64],
+        right: &[f64],
+        output: &mut Vec<f64>,
+    ) -> TaResult<()> {
+        let len = left.len();
+        if right.len() != len {
+            return Err(TaError::LengthMismatch {
+                expected: len,
+                got: right.len(),
+            });
+        }
+        if len == 0 {
+            return Ok(());
+        }
+
+        output.reserve(len);
+        output.push(match (self.previous_left, self.previous_right) {
+            (Some(previous_left), Some(previous_right))
+                if previous_left >= previous_right && left[0] < right[0] =>
+            {
+                1.0
+            }
+            _ => 0.0,
+        });
+        output.extend(
+            left.windows(2)
+                .zip(right.windows(2))
+                .map(|(left_pair, right_pair)| {
+                    f64::from(left_pair[0] >= right_pair[0] && left_pair[1] < right_pair[1])
+                }),
+        );
+
+        self.previous_left = Some(left[len - 1]);
+        self.previous_right = Some(right[len - 1]);
+        self.value = output.last().copied();
+        Ok(())
     }
     /// Return the latest computed result, if warm-up is complete.
     ///

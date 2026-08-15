@@ -45,12 +45,39 @@ impl Lag {
 
     /// Append a slice into `output` with `NaN` at warm-up positions.
     pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
-        output.reserve(input.len());
-        output.extend(
-            input
-                .iter()
-                .map(|&input| self.append(input).unwrap_or(f64::NAN)),
-        );
+        if input.is_empty() {
+            return;
+        }
+        let output_start = output.len();
+        output.resize(output_start + input.len(), f64::NAN);
+
+        let retained = self.values.len();
+        let warmup = self.timeperiod - retained;
+        let retained_output_start = warmup.min(input.len());
+        let retained_outputs = input.len().min(self.timeperiod).saturating_sub(warmup);
+        for (&value, output) in self
+            .values
+            .iter()
+            .take(retained_outputs)
+            .zip(&mut output[output_start + retained_output_start..])
+        {
+            *output = value;
+        }
+        if input.len() > self.timeperiod {
+            output[output_start + self.timeperiod..]
+                .copy_from_slice(&input[..input.len() - self.timeperiod]);
+        }
+        self.value = (retained + input.len() > self.timeperiod)
+            .then(|| output[output_start + input.len() - 1]);
+
+        if input.len() >= self.timeperiod {
+            self.values.clear();
+            self.values.extend(&input[input.len() - self.timeperiod..]);
+        } else {
+            let overflow = (retained + input.len()).saturating_sub(self.timeperiod);
+            self.values.drain(..overflow);
+            self.values.extend(input);
+        }
     }
 
     /// Returns the latest delayed value, or `None` during warm-up.

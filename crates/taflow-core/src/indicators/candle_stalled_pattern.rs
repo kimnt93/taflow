@@ -155,16 +155,89 @@ impl CandleStalledPattern {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 12;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let real_body_seed = |from: usize| {
+            open[from..from + 10]
+                .iter()
+                .zip(&close[from..from + 10])
+                .fold(0.0, |sum, (&o, &c)| sum + cr_realbody_scalar(o, c))
+        };
+        let high_low_seed = |from: usize, period: usize| {
+            high[from..from + period]
+                .iter()
+                .zip(&low[from..from + period])
+                .fold(0.0, |sum, (&h, &l)| sum + cr_highlow_scalar(h, l))
+        };
+        let mut body_long_sum = [real_body_seed(0), real_body_seed(1)];
+        let mut body_short_sum = real_body_seed(2);
+        let mut shadow_sum = high_low_seed(1, 10);
+        let mut near_sum = [high_low_seed(5, 5), high_low_seed(6, 5)];
+
+        for ((((slot, open), high), low), close) in output[start + LOOKBACK..]
+            .iter_mut()
+            .zip(open.windows(LOOKBACK + 1))
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(low.windows(LOOKBACK + 1))
+            .zip(close.windows(LOOKBACK + 1))
+        {
+            let long0 = ca_realbody_scalar(BODY_LONG, body_long_sum[0], open[10], close[10]);
+            let long1 = ca_realbody_scalar(BODY_LONG, body_long_sum[1], open[11], close[11]);
+            let short = ca_realbody_scalar(BODY_SHORT, body_short_sum, open[12], close[12]);
+            let shadow = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum, high[11], low[11]);
+            let near0 = ca_highlow_scalar(NEAR, near_sum[0], high[10], low[10]);
+            let near1 = ca_highlow_scalar(NEAR, near_sum[1], high[11], low[11]);
+            let body0 = real_body(open[10], close[10]);
+            let body1 = real_body(open[11], close[11]);
+            let body2 = real_body(open[12], close[12]);
+            *slot = (candle_color(open[10], close[10]) == 1
+                && candle_color(open[11], close[11]) == 1
+                && candle_color(open[12], close[12]) == 1
+                && close[11] > close[10]
+                && close[12] > close[11]
+                && body0 > long0
+                && body1 > long1
+                && upper_shadow(open[11], high[11], close[11]) < shadow
+                && open[11] > open[10]
+                && open[11] <= close[10] + near0
+                && body2 < short
+                && open[12] >= close[11] - body2 - near1) as i32
+                * -100;
+
+            body_long_sum[0] +=
+                cr_realbody_scalar(open[10], close[10]) - cr_realbody_scalar(open[0], close[0]);
+            body_long_sum[1] +=
+                cr_realbody_scalar(open[11], close[11]) - cr_realbody_scalar(open[1], close[1]);
+            body_short_sum +=
+                cr_realbody_scalar(open[12], close[12]) - cr_realbody_scalar(open[2], close[2]);
+            shadow_sum += cr_highlow_scalar(high[11], low[11]) - cr_highlow_scalar(high[1], low[1]);
+            near_sum[0] +=
+                cr_highlow_scalar(high[10], low[10]) - cr_highlow_scalar(high[5], low[5]);
+            near_sum[1] +=
+                cr_highlow_scalar(high[11], low[11]) - cr_highlow_scalar(high[6], low[6]);
         }
+
+        self.body_long_sum = body_long_sum;
+        self.body_short_sum = body_short_sum;
+        self.shadow_sum = shadow_sum;
+        self.near_sum = near_sum;
+        self.candles
+            .extend((len - LOOKBACK..len).map(|index| Candle {
+                o: open[index],
+                h: high[index],
+                l: low[index],
+                c: close[index],
+            }));
+        self.value = output.last().copied();
         Ok(())
     }
 

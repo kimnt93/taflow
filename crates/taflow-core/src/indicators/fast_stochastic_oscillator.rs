@@ -68,11 +68,10 @@ impl FastStochasticOscillator {
         self.value
     }
 
-    /// Bulk kernel: vHGW sliding extrema for the fast %K window (via the
-    /// `RollingMaximum`/`RollingMinimum` bulk paths, which also rebuild their deques),
-    /// then the fast %D sub-state is driven per emitted bar exactly as
-    /// [`Self::append`] does. Outputs and post-run state are bit-identical to
-    /// per-bar [`Self::append`]; warm-up bars are NaN.
+    /// Bulk kernel: vHGW sliding extrema are written into the final output
+    /// buffers as temporary maxima/minima, then transformed in place to fast
+    /// %K/%D. This avoids two full-size scratch allocations while rebuilding
+    /// extrema and moving-average state exactly as scalar replay does.
     pub fn extend_slices_into(
         &mut self,
         high: &[f64],
@@ -88,21 +87,18 @@ impl FastStochasticOscillator {
             });
         }
         let n = high.len();
-        fastk_out.reserve(n);
-        fastd_out.reserve(n);
         let period = self.highest.period();
         let consumed = self.highest.count();
-        let mut highest = Vec::with_capacity(n);
-        let mut lowest = Vec::with_capacity(n);
-        self.highest.extend_slice_into(high, &mut highest);
-        self.lowest.extend_slice_into(low, &mut lowest);
+        let fastk_start = fastk_out.len();
+        let fastd_start = fastd_out.len();
+        self.highest.extend_slice_into(high, fastk_out);
+        self.lowest.extend_slice_into(low, fastd_out);
         for index in 0..n {
             if consumed + index + 1 < period {
-                fastk_out.push(f64::NAN);
-                fastd_out.push(f64::NAN);
                 continue;
             }
-            let (highest, lowest) = (highest[index], lowest[index]);
+            let highest = fastk_out[fastk_start + index];
+            let lowest = fastd_out[fastd_start + index];
             let divisor = (highest - lowest) / 100.0;
             let fastk = if divisor.abs() >= 1.0e-14 {
                 (close[index] - lowest) / divisor
@@ -115,12 +111,12 @@ impl FastStochasticOscillator {
                 .map(|fastd| FastStochasticOscillatorValue { fastk, fastd });
             match self.value {
                 Some(value) => {
-                    fastk_out.push(value.fastk);
-                    fastd_out.push(value.fastd);
+                    fastk_out[fastk_start + index] = value.fastk;
+                    fastd_out[fastd_start + index] = value.fastd;
                 }
                 None => {
-                    fastk_out.push(f64::NAN);
-                    fastd_out.push(f64::NAN);
+                    fastk_out[fastk_start + index] = f64::NAN;
+                    fastd_out[fastd_start + index] = f64::NAN;
                 }
             }
         }

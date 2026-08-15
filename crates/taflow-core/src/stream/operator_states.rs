@@ -345,59 +345,6 @@ pub(crate) fn non_zero(difference: f64) -> f64 {
     }
 }
 
-/// Rolling window sum with pandas `rolling(period).sum()` semantics: NaN
-/// inputs are skipped and the output appears once `period` non-NaN values are
-/// in the window (used for the Vortex true-range and movement sums).
-#[derive(Debug, Clone)]
-struct RollingSum {
-    period: usize,
-    window: Window,
-    count: usize,
-    sum: f64,
-    value: Option<f64>,
-}
-
-impl RollingSum {
-    pub(crate) fn new(period: usize) -> TaResult<Self> {
-        if period == 0 {
-            return Err(TaError::InvalidParameter {
-                name: "timeperiod",
-                value: period.to_string(),
-                reason: "must be >= 1",
-            });
-        }
-        Ok(Self {
-            period,
-            window: Window::new(period)?,
-            count: 0,
-            sum: 0.0,
-            value: None,
-        })
-    }
-
-    pub(crate) fn append(&mut self, x: f64) -> Option<f64> {
-        if let Some(old) = self.window.push(x) {
-            if !old.is_nan() {
-                self.sum -= old;
-                self.count -= 1;
-            }
-        }
-        if !x.is_nan() {
-            self.sum += x;
-            self.count += 1;
-        }
-        self.value = (self.count >= self.period).then_some(self.sum);
-        self.value
-    }
-
-    pub(crate) fn reset(&mut self) {
-        self.window.clear();
-        self.count = 0;
-        self.sum = 0.0;
-        self.value = None;
-    }
-}
-
 /// ROC → SMA pair used by KST: `(close − close[roc]) / close[roc]` fed into an
 /// SMA once the shift window is warm.
 #[derive(Debug, Clone)]

@@ -25,3 +25,34 @@ fn scalar_bulk_and_reset_are_invariant() {
     bulk.reset();
     assert_eq!(bulk.value(), None);
 }
+
+#[test]
+fn every_two_chunk_split_and_continuation_match_scalar_replay() {
+    let input: Vec<f64> = (0..96)
+        .map(|i| 100.0 + (i as f64 * 0.23).sin() + i as f64 * 0.01)
+        .collect();
+    let mut scalar =
+        StochasticRelativeStrengthIndex::new(14, 5, 3, MaType::SimpleMovingAverage).unwrap();
+    let expected: Vec<_> = input.iter().map(|&value| scalar.append(value)).collect();
+    let expected_continuation = scalar.append(103.75);
+
+    for split in 0..=input.len() {
+        let mut chunked =
+            StochasticRelativeStrengthIndex::new(14, 5, 3, MaType::SimpleMovingAverage).unwrap();
+        let (mut fastk, mut fastd) = (Vec::new(), Vec::new());
+        chunked.extend_slices_into(&input[..split], &mut fastk, &mut fastd);
+        chunked.extend_slices_into(&input[split..], &mut fastk, &mut fastd);
+        for (index, value) in expected.iter().enumerate() {
+            match value {
+                Some(value) => {
+                    assert_eq!(fastk[index].to_bits(), value.fastk.to_bits());
+                    assert_eq!(fastd[index].to_bits(), value.fastd.to_bits());
+                }
+                None => assert!(fastk[index].is_nan() && fastd[index].is_nan()),
+            }
+        }
+
+        let continuation = chunked.append(103.75);
+        assert_eq!(continuation, expected_continuation, "split {split}");
+    }
+}

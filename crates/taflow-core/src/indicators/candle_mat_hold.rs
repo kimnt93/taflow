@@ -170,20 +170,30 @@ impl CandleMatHold {
             let short0 = ca_realbody_scalar(BODY_SHORT, sums[3], open[11], close[11]);
             let short1 = ca_realbody_scalar(BODY_SHORT, sums[2], open[12], close[12]);
             let short2 = ca_realbody_scalar(BODY_SHORT, sums[1], open[13], close[13]);
-            *slot = (real_body(open[10], close[10]) > long
-                && real_body(open[11], close[11]) < short0
-                && real_body(open[12], close[12]) < short1
-                && real_body(open[13], close[13]) < short2
+            let body0 = real_body(open[10], close[10]);
+            let body1 = real_body(open[11], close[11]);
+            let body2 = real_body(open[12], close[12]);
+            let body3 = real_body(open[13], close[13]);
+            let upper0 = open[10].max(close[10]);
+            let lower1 = open[11].min(close[11]);
+            let lower2 = open[12].min(close[12]);
+            let upper2 = open[12].max(close[12]);
+            let lower3 = open[13].min(close[13]);
+            let upper3 = open[13].max(close[13]);
+            *slot = (body0 > long
+                && body1 < short0
+                && body2 < short1
+                && body3 < short2
                 && candle_color(open[10], close[10]) == 1
                 && candle_color(open[11], close[11]) == -1
                 && candle_color(open[14], close[14]) == 1
-                && open[11].min(close[11]) > open[10].max(close[10])
-                && open[12].min(close[12]) < close[10]
-                && open[13].min(close[13]) < close[10]
-                && open[12].min(close[12]) > close[10] - real_body(open[10], close[10]) * 0.5
-                && open[13].min(close[13]) > close[10] - real_body(open[10], close[10]) * 0.5
-                && open[12].max(close[12]) < open[11]
-                && open[13].max(close[13]) < open[12].max(close[12])
+                && lower1 > upper0
+                && lower2 < close[10]
+                && lower3 < close[10]
+                && lower2 > close[10] - body0 * 0.5
+                && lower3 > close[10] - body0 * 0.5
+                && upper2 < open[11]
+                && upper3 < upper2
                 && open[14] > close[13]
                 && close[14] > high[11].max(high[12]).max(high[13])) as i32
                 * 100;

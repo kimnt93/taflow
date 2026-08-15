@@ -1,12 +1,13 @@
 //! Incremental Belt Hold candlestick recognition (CDLBELTHOLD).
 use crate::error::TaResult;
 use crate::stream::pattern::*;
-use std::collections::VecDeque;
 /// Stateful CandleBeltHold candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
 pub struct CandleBeltHold {
-    b: VecDeque<f64>,
-    r: VecDeque<f64>,
+    bodies: [f64; 10],
+    ranges: [f64; 10],
+    head: usize,
+    len: usize,
     bs: f64,
     rs: f64,
     value: Option<i32>,
@@ -24,22 +25,14 @@ impl CandleBeltHold {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            b: VecDeque::with_capacity(10),
-            r: VecDeque::with_capacity(10),
+            bodies: [0.0; 10],
+            ranges: [0.0; 10],
+            head: 0,
+            len: 0,
             bs: 0.,
             rs: 0.,
             value: None,
         }
-    }
-    fn push(q: &mut VecDeque<f64>, s: &mut f64, v: f64) {
-        if q.len() == 10 {
-            // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
-            let old = q.pop_front().unwrap();
-            *s += v - old;
-        } else {
-            *s += v;
-        }
-        q.push_back(v);
     }
     /// Computes or updates `append` through the native Rust kernel.
     ///
@@ -51,7 +44,7 @@ impl CandleBeltHold {
         let range = h - l;
         let upper = h - o.max(c);
         let lower = o.min(c) - l;
-        let v = if self.b.len() == 10 {
+        let v = if self.len == 10 {
             let long = body > self.bs / 10.0;
             let lim = ca_highlow_scalar(SHADOW_VERY_SHORT, self.rs, h, l);
             Some(if long && c >= o && lower < lim {
@@ -64,8 +57,20 @@ impl CandleBeltHold {
         } else {
             None
         };
-        Self::push(&mut self.b, &mut self.bs, body);
-        Self::push(&mut self.r, &mut self.rs, range);
+        if self.len == 10 {
+            self.bs += body - self.bodies[self.head];
+            self.rs += range - self.ranges[self.head];
+            self.bodies[self.head] = body;
+            self.ranges[self.head] = range;
+            self.head = (self.head + 1) % 10;
+        } else {
+            let slot = (self.head + self.len) % 10;
+            self.bs += body;
+            self.rs += range;
+            self.bodies[slot] = body;
+            self.ranges[slot] = range;
+            self.len += 1;
+        }
         self.value = v;
         v
     }
@@ -96,7 +101,7 @@ impl CandleBeltHold {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
         const LOOKBACK: usize = 10;
-        if !self.b.is_empty() || len <= LOOKBACK {
+        if self.len != 0 || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
@@ -129,8 +134,12 @@ impl CandleBeltHold {
         }
         self.bs = bs;
         self.rs = rs;
-        self.b.extend((len - LOOKBACK..len).map(body));
-        self.r.extend((len - LOOKBACK..len).map(range));
+        for (slot, i) in (len - LOOKBACK..len).enumerate() {
+            self.bodies[slot] = body(i);
+            self.ranges[slot] = range(i);
+        }
+        self.head = 0;
+        self.len = LOOKBACK;
         self.value = output.last().copied();
         Ok(())
     }
@@ -145,8 +154,8 @@ impl CandleBeltHold {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.b.clear();
-        self.r.clear();
+        self.head = 0;
+        self.len = 0;
         self.bs = 0.0;
         self.rs = 0.0;
         self.value = None;

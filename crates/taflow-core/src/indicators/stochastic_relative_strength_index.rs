@@ -28,6 +28,7 @@ pub struct StochasticRelativeStrengthIndexValue {
 pub struct StochasticRelativeStrengthIndex {
     rsi: RelativeStrengthIndex,
     stochastic: FastStochasticOscillator,
+    rsi_scratch: Vec<f64>,
     value: Option<StochasticRelativeStrengthIndexValue>,
 }
 
@@ -42,6 +43,7 @@ impl StochasticRelativeStrengthIndex {
         Ok(Self {
             rsi: RelativeStrengthIndex::new(timeperiod)?,
             stochastic: FastStochasticOscillator::new(fastk_period, fastd_period, fastd_matype)?,
+            rsi_scratch: Vec::new(),
             value: None,
         })
     }
@@ -73,20 +75,27 @@ impl StochasticRelativeStrengthIndex {
     ) {
         fastk_out.reserve(inputs.len());
         fastd_out.reserve(inputs.len());
-        let mut warmed = Vec::with_capacity(inputs.len());
+        self.rsi_scratch.clear();
+        self.rsi_scratch.reserve(inputs.len());
         for &input in inputs {
             if let Some(rsi) = self.rsi.append(input) {
-                warmed.push(rsi);
+                self.rsi_scratch.push(rsi);
             }
         }
         // RSI warm-up is a strict prefix, so the NaN bars are exactly the
         // leading `inputs.len() - warmed.len()` positions.
-        for _ in 0..(inputs.len() - warmed.len()) {
+        for _ in 0..(inputs.len() - self.rsi_scratch.len()) {
             fastk_out.push(f64::NAN);
             fastd_out.push(f64::NAN);
         }
         self.stochastic
-            .extend_slices_into(&warmed, &warmed, &warmed, fastk_out, fastd_out)
+            .extend_slices_into(
+                &self.rsi_scratch,
+                &self.rsi_scratch,
+                &self.rsi_scratch,
+                fastk_out,
+                fastd_out,
+            )
             .expect("identical slice lengths");
         self.value = self
             .stochastic
@@ -106,6 +115,7 @@ impl StochasticRelativeStrengthIndex {
     pub fn reset(&mut self) {
         self.rsi.reset();
         self.stochastic.reset();
+        self.rsi_scratch.clear();
         self.value = None;
     }
 }

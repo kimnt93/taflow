@@ -1,7 +1,5 @@
 //! Incremental Hilbert Transform dominant cycle period (HT_DCPERIOD).
 
-use std::collections::VecDeque;
-
 use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
@@ -14,7 +12,8 @@ const LOOKBACK: usize = 32;
 /// values, and exposes the current result through its public API.
 pub struct HilbertTransformDominantCyclePeriod {
     index: usize,
-    prices: VecDeque<f64>,
+    prices: [f64; 3],
+    price_index: usize,
     period_wma_sub: f64,
     period_wma_sum: f64,
     trailing_wma_value: f64,
@@ -51,7 +50,8 @@ impl HilbertTransformDominantCyclePeriod {
     pub fn new() -> Self {
         Self {
             index: 0,
-            prices: VecDeque::with_capacity(4),
+            prices: [0.0; 3],
+            price_index: 0,
             period_wma_sub: 0.0,
             period_wma_sum: 0.0,
             trailing_wma_value: 0.0,
@@ -76,7 +76,7 @@ impl HilbertTransformDominantCyclePeriod {
 
     fn next_smoothed(&mut self, input: f64) -> Option<f64> {
         if self.index < 3 {
-            self.prices.push_back(input);
+            self.prices[self.index] = input;
             if self.index == 2 {
                 self.period_wma_sub = self.prices[0];
                 self.period_wma_sub += self.prices[1];
@@ -90,8 +90,9 @@ impl HilbertTransformDominantCyclePeriod {
         self.period_wma_sub += input;
         self.period_wma_sub -= self.trailing_wma_value;
         self.period_wma_sum += input * 4.0;
-        self.trailing_wma_value = self.prices.pop_front().expect("WMA is initialized");
-        self.prices.push_back(input);
+        self.trailing_wma_value = self.prices[self.price_index];
+        self.prices[self.price_index] = input;
+        self.price_index = (self.price_index + 1) % 3;
         let smoothed = self.period_wma_sum * 0.1;
         self.period_wma_sum -= self.period_wma_sub;
         Some(smoothed)
@@ -173,6 +174,14 @@ impl HilbertTransformDominantCyclePeriod {
         self.smooth_period = 0.33 * self.period + 0.67 * self.smooth_period;
         self.value = (today >= LOOKBACK).then_some(self.smooth_period);
         self.value
+    }
+
+    /// Append a price slice into an aligned output history.
+    pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        output.reserve(input.len());
+        for &value in input {
+            output.push(self.append(value).unwrap_or(f64::NAN));
+        }
     }
 
     /// Computes or updates `value` through the native Rust kernel.

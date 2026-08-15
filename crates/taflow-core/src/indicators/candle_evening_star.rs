@@ -167,13 +167,16 @@ impl CandleEveningStar {
             let long = ca_realbody_scalar(BODY_LONG, body_long_sum, a.o, a.c);
             let short = ca_realbody_scalar(BODY_SHORT, body_short_sum, b.o, b.c);
             let short2 = ca_realbody_scalar(BODY_SHORT, body_short2_sum, cur.o, cur.c);
+            let a_body = a.body();
+            let b_body = b.body();
+            let current_body = cur.body();
             *out = (a.color() == 1
-                && a.body() > long
-                && b.body() <= short
+                && a_body > long
+                && b_body <= short
                 && b.o.min(b.c) > a.o.max(a.c)
                 && cur.color() == -1
-                && cur.body() > short2
-                && cur.c < a.c - a.body() * 0.3) as i32
+                && current_body > short2
+                && cur.c < a.c - a_body * 0.3) as i32
                 * -100;
             body_long_sum += cr_realbody_scalar(a.o, a.c) - cr_realbody_scalar(opens[0], closes[0]);
             body_short_sum +=

@@ -15,10 +15,12 @@ fn scalar_bulk_reset_and_validation_are_bitwise_identical() {
                     .unwrap_or(f64::NAN)
             })
             .collect();
+        let scalar_value = scalar_state.value();
+        let expected_next = scalar_state.append(7.25, -3.5);
 
         for chunk in [1_usize, 10, 97, high.len()] {
             let mut bulk_state = AroonOscillator::new(period).unwrap();
-            let mut bulk = Vec::new();
+            let mut bulk = vec![17.0];
             let mut offset = 0;
             while offset < high.len() {
                 let end = (offset + chunk).min(high.len());
@@ -27,10 +29,15 @@ fn scalar_bulk_reset_and_validation_are_bitwise_identical() {
                     .unwrap();
                 offset = end;
             }
-            for (actual, expected) in bulk.iter().zip(&scalar) {
+            assert_eq!(bulk[0].to_bits(), 17.0_f64.to_bits());
+            for (actual, expected) in bulk[1..].iter().zip(&scalar) {
                 assert_eq!(actual.to_bits(), expected.to_bits());
             }
-            assert_eq!(bulk_state.value(), scalar_state.value());
+            assert_eq!(bulk_state.value(), scalar_value);
+            assert_eq!(
+                bulk_state.append(7.25, -3.5).map(f64::to_bits),
+                expected_next.map(f64::to_bits)
+            );
         }
 
         scalar_state.reset();

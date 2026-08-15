@@ -156,8 +156,13 @@ impl CandleBreakaway {
         let cur_close_s = &close[PROLOGUE..];
         let old_open_s = &open[..len - PROLOGUE];
         let old_close_s = &close[..len - PROLOGUE];
+        let b_high_s = &high[PROLOGUE - 3..len - 3];
+        let b_low_s = &low[PROLOGUE - 3..len - 3];
+        let c_high_s = &high[PROLOGUE - 2..len - 2];
+        let c_low_s = &low[PROLOGUE - 2..len - 2];
+        let d_high_s = &high[PROLOGUE - 1..len - 1];
+        let d_low_s = &low[PROLOGUE - 1..len - 1];
         for k in 0..scores.len() {
-            let i = k + PROLOGUE;
             // Bars i-4 (`a`), i-3 (`b`), i-2 (`c`), i-1 (`d`) and i (current).
             // The high/low reads of bars i-3..i-1 are loaded lazily: `base`
             // almost never holds, so they stay off the hot path exactly as in
@@ -182,9 +187,9 @@ impl CandleBreakaway {
                     > ca_realbody_scalar(BODY_LONG, body_long_sum, a_open, a_close);
             let hit = base && {
                 let (b_open, b_high, b_low, b_close) =
-                    (open[i - 3], high[i - 3], low[i - 3], close[i - 3]);
-                let (c_high, c_low) = (high[i - 2], low[i - 2]);
-                let (d_high, d_low) = (high[i - 1], low[i - 1]);
+                    (b_open_s[k], b_high_s[k], b_low_s[k], b_close_s[k]);
+                let (c_high, c_low) = (c_high_s[k], c_low_s[k]);
+                let (d_high, d_low) = (d_high_s[k], d_low_s[k]);
                 if a_white {
                     b_open.min(b_close) > a_open.max(a_close)
                         && c_high > b_high

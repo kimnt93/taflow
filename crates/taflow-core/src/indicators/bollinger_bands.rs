@@ -216,10 +216,10 @@ impl BollingerBands {
         upper_out.reserve(n);
         middle_out.reserve(n);
         lower_out.reserve(n);
-        let mut push = |value: Option<BollingerBandsValue>,
-                        upper_out: &mut Vec<f64>,
-                        middle_out: &mut Vec<f64>,
-                        lower_out: &mut Vec<f64>| match value {
+        let push = |value: Option<BollingerBandsValue>,
+                    upper_out: &mut Vec<f64>,
+                    middle_out: &mut Vec<f64>,
+                    lower_out: &mut Vec<f64>| match value {
             Some(value) => {
                 upper_out.push(value.upper);
                 middle_out.push(value.middle);
@@ -231,13 +231,40 @@ impl BollingerBands {
                 lower_out.push(f64::NAN);
             }
         };
-        let period = match &self.core {
+        let period = match &mut self.core {
             BollingerBandsCore::Sma(core) => core.period,
-            BollingerBandsCore::Dispatch { .. } => {
-                for &input in inputs {
-                    let value = self.append(input);
-                    push(value, upper_out, middle_out, lower_out);
+            BollingerBandsCore::Dispatch { middle, deviation } => {
+                if n == 0 {
+                    return;
                 }
+                // Drive each configured state through its monomorphic bulk
+                // kernel. `upper_out` temporarily receives deviation values,
+                // then is transformed in place, avoiding an O(n) scratch Vec.
+                let start = upper_out.len();
+                debug_assert_eq!(middle_out.len(), start);
+                debug_assert_eq!(lower_out.len(), start);
+                middle.extend_slice_into(inputs, middle_out);
+                deviation.extend_slice_into(inputs, upper_out);
+                lower_out.reserve(n);
+                let deviations_up = self.deviations_up;
+                let deviations_down = self.deviations_down;
+                let last_deviation = upper_out[start + n - 1];
+                for index in start..start + n {
+                    let middle = middle_out[index];
+                    let deviation = upper_out[index];
+                    upper_out[index] = middle + deviations_up * deviation;
+                    lower_out.push(middle - deviations_down * deviation);
+                }
+                self.value = if middle.is_warm() && deviation.value().is_some() {
+                    let middle = middle_out[start + n - 1];
+                    Some(BollingerBandsValue {
+                        upper: upper_out[start + n - 1],
+                        middle,
+                        lower: middle - deviations_down * last_deviation,
+                    })
+                } else {
+                    None
+                };
                 return;
             }
         };

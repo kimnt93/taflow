@@ -3,8 +3,6 @@
 //! SAR keeps only the current direction, extreme point, acceleration factor,
 //! projected stop, and previous bar required by TA-Lib's reversal recurrence.
 
-use crate::TaResult;
-
 /// Incremental Parabolic SAR with a one-bar lookback.
 #[derive(Debug, Clone)]
 /// Persistent Rust state or aligned output type for `ParabolicSar`.
@@ -143,28 +141,85 @@ impl ParabolicSar {
 
     /// Bulk kernel over aligned high/low slices.
     ///
-    /// The recurrence is inherently serial, so the only bulk win is splitting
-    /// the warm-up prologue from a branch-free steady loop that runs the very
-    /// same `advance` step; outputs and exit state stay bit-identical to
-    /// repeated `append`.
+    /// The recurrence is inherently serial, so the bulk path splits the
+    /// warm-up prologue from a monomorphic steady loop, keeps recurrence fields
+    /// in locals, and writes state back once. Its statement order matches
+    /// `append`, leaving outputs and exit state bit-identical to scalar replay.
     pub fn extend_slice_into(&mut self, high: &[f64], low: &[f64], output: &mut Vec<f64>) {
         let len = high.len().min(low.len());
-        output.reserve(len);
+        let output_start = output.len();
+        output.resize(output_start + len, f64::NAN);
         let mut index = 0;
         while index < len && !self.initialized {
-            output.push(self.append(high[index], low[index]).unwrap_or(f64::NAN));
+            output[output_start + index] = self.append(high[index], low[index]).unwrap_or(f64::NAN);
             index += 1;
         }
-        while index < len {
-            let (high, low) = (high[index], low[index]);
-            let previous_high = self.previous_high;
-            let previous_low = self.previous_low;
-            self.previous_high = high;
-            self.previous_low = low;
-            self.advance(high, low, previous_high, previous_low);
-            output.push(self.value.expect("an initialized SAR always has a value"));
-            index += 1;
+        if index == len {
+            return;
         }
+
+        let acceleration = self.acceleration;
+        let maximum = self.maximum;
+        let mut is_long = self.is_long;
+        let mut sar = self.sar;
+        let mut extreme = self.extreme;
+        let mut factor = self.factor;
+        let mut previous_high = self.previous_high;
+        let mut previous_low = self.previous_low;
+        let mut value = self.value.expect("an initialized SAR always has a value");
+
+        for ((&high, &low), output) in high[index..len]
+            .iter()
+            .zip(&low[index..len])
+            .zip(&mut output[output_start + index..])
+        {
+            if is_long {
+                if low <= sar {
+                    is_long = false;
+                    sar = extreme.max(previous_high).max(high);
+                    value = sar;
+                    factor = acceleration;
+                    extreme = low;
+                    sar += factor * (extreme - sar);
+                    sar = sar.max(previous_high).max(high);
+                } else {
+                    value = sar;
+                    if high > extreme {
+                        extreme = high;
+                        factor = (factor + acceleration).min(maximum);
+                    }
+                    sar += factor * (extreme - sar);
+                    sar = sar.min(previous_low).min(low);
+                }
+            } else if high >= sar {
+                is_long = true;
+                sar = extreme.min(previous_low).min(low);
+                value = sar;
+                factor = acceleration;
+                extreme = high;
+                sar += factor * (extreme - sar);
+                sar = sar.min(previous_low).min(low);
+            } else {
+                value = sar;
+                if low < extreme {
+                    extreme = low;
+                    factor = (factor + acceleration).min(maximum);
+                }
+                sar += factor * (extreme - sar);
+                sar = sar.max(previous_high).max(high);
+            }
+            previous_high = high;
+            previous_low = low;
+            *output = value;
+        }
+
+        self.is_long = is_long;
+        self.sar = sar;
+        self.extreme = extreme;
+        self.factor = factor;
+        self.previous_high = previous_high;
+        self.previous_low = previous_low;
+        self.value = Some(value);
     }
 }
 

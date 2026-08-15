@@ -57,6 +57,20 @@ fn relative_strength_index_bulk_chunking_and_reset_are_bitwise_invariant() {
             );
         }
 
+        let split_input = &input[..257];
+        let mut split_batch = RelativeStrengthIndex::new(period).unwrap();
+        let mut split_expected = Vec::new();
+        split_batch.extend_slice_into(split_input, &mut split_expected);
+        let continuation = split_batch.append(103.25).map(f64::to_bits);
+        for split in 0..=split_input.len() {
+            let mut chunked = RelativeStrengthIndex::new(period).unwrap();
+            let mut actual = Vec::new();
+            chunked.extend_slice_into(&split_input[..split], &mut actual);
+            chunked.extend_slice_into(&split_input[split..], &mut actual);
+            assert_same_bits(&actual, &split_expected);
+            assert_eq!(chunked.append(103.25).map(f64::to_bits), continuation);
+        }
+
         batch.reset();
         assert_eq!(batch.value(), None);
         let mut replay = Vec::new();

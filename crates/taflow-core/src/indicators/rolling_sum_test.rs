@@ -1,20 +1,53 @@
 use super::rolling_sum::RollingSum;
 use crate::stream::StreamingIndicator;
 
-#[test]
-fn scalar_bulk_and_reset_are_invariant() {
-    let input: Vec<f64> = (0..96).map(|i| i as f64 * 0.5).collect();
-    let mut scalar = RollingSum::new(7).unwrap();
-    let scalar_out: Vec<f64> = input
-        .iter()
-        .map(|&x| scalar.append(x).unwrap_or(f64::NAN))
-        .collect();
-    let mut bulk = RollingSum::new(7).unwrap();
-    let mut bulk_out = Vec::new();
-    bulk.extend_slice_into(&input, &mut bulk_out);
-    for (a, b) in scalar_out.iter().zip(&bulk_out) {
-        assert!(a.to_bits() == b.to_bits() || (a.is_nan() && b.is_nan()));
+fn assert_bits_equal(actual: &[f64], expected: &[f64]) {
+    assert_eq!(actual.len(), expected.len());
+    for (actual, expected) in actual.iter().zip(expected) {
+        assert_eq!(actual.to_bits(), expected.to_bits());
     }
-    bulk.reset();
-    assert_eq!(bulk.value(), None);
+}
+
+#[test]
+fn scalar_bulk_chunks_continuation_and_reset_are_bitwise_invariant() {
+    let input: Vec<f64> = (0..257)
+        .map(|index| (index as f64 * 0.173).sin() * 11.0 + index as f64 * 0.031)
+        .collect();
+
+    for period in [1, 2, 7, 30] {
+        let mut scalar = RollingSum::new(period).unwrap();
+        let expected: Vec<f64> = input
+            .iter()
+            .map(|&value| scalar.append(value).unwrap_or(f64::NAN))
+            .collect();
+
+        let mut bulk = RollingSum::new(period).unwrap();
+        let mut actual = Vec::new();
+        bulk.extend_slice_into(&input, &mut actual);
+        assert_bits_equal(&actual, &expected);
+        assert_eq!(
+            bulk.value().map(f64::to_bits),
+            scalar.value().map(f64::to_bits)
+        );
+        assert_eq!(
+            bulk.append(-3.25).map(f64::to_bits),
+            scalar.append(-3.25).map(f64::to_bits)
+        );
+
+        let mut chunked = RollingSum::new(period).unwrap();
+        let mut chunked_output = Vec::new();
+        chunked.extend_slice_into(&input[..3], &mut chunked_output);
+        chunked.extend_slice_into(&input[3..41], &mut chunked_output);
+        chunked.extend_slice_into(&input[41..], &mut chunked_output);
+        assert_bits_equal(&chunked_output, &expected);
+
+        bulk.reset();
+        let mut replay = Vec::new();
+        bulk.extend_slice_into(&input, &mut replay);
+        assert_bits_equal(&replay, &expected);
+        assert_eq!(
+            bulk.value().map(f64::to_bits),
+            expected.last().map(|v| v.to_bits())
+        );
+    }
 }

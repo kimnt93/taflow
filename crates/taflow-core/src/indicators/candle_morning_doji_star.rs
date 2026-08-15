@@ -1,8 +1,7 @@
 //! Incremental Morning Doji Star candlestick recognition (CDLMORNINGDOJISTAR).
 use crate::error::TaResult;
 use crate::stream::pattern::*;
-use std::collections::VecDeque;
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 struct Candle {
     o: f64,
     h: f64,
@@ -24,7 +23,9 @@ impl Candle {
 /// Stateful CandleMorningDojiStar candle recognizer.
 /// Consumes causal OHLC bars and returns an aligned pattern score.
 pub struct CandleMorningDojiStar {
-    candles: VecDeque<Candle>,
+    candles: [Candle; 12],
+    head: usize,
+    len: usize,
     body_long_sum: f64,
     body_doji_sum: f64,
     body_short_sum: f64,
@@ -43,7 +44,9 @@ impl CandleMorningDojiStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            candles: VecDeque::with_capacity(12),
+            candles: [Candle::default(); 12],
+            head: 0,
+            len: 0,
             body_long_sum: 0.0,
             body_doji_sum: 0.0,
             body_short_sum: 0.0,
@@ -57,20 +60,21 @@ impl CandleMorningDojiStar {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn append(&mut self, o: f64, h: f64, l: f64, c: f64) -> Option<i32> {
         let cur = Candle { o, h, l, c };
-        // Deque holds bars i-12..=i-1; bar j maps to index 12 - (i - j).
-        let value = if self.candles.len() == 12 {
-            let a = self.candles[10]; // bar i-2
-            let b = self.candles[11]; // bar i-1
+        let value = if self.len == 12 {
+            let oldest = self.candles[self.head];
+            let second = self.candles[(self.head + 1) % 12];
+            let third = self.candles[(self.head + 2) % 12];
+            let a = self.candles[(self.head + 10) % 12];
+            let b = self.candles[(self.head + 11) % 12];
             let long = ca_realbody_scalar(BODY_LONG, self.body_long_sum, a.o, a.c);
             let doji = ca_highlow_scalar(BODY_DOJI, self.body_doji_sum, b.h, b.l);
             let short = ca_realbody_scalar(BODY_SHORT, self.body_short_sum, o, c);
             // Slide sums exactly like the batch loop: sum += cr(bar) - cr(bar - 10).
-            self.body_long_sum += cr_realbody_scalar(a.o, a.c)
-                - cr_realbody_scalar(self.candles[0].o, self.candles[0].c);
-            self.body_doji_sum += cr_highlow_scalar(b.h, b.l)
-                - cr_highlow_scalar(self.candles[1].h, self.candles[1].l);
-            self.body_short_sum +=
-                cr_realbody_scalar(o, c) - cr_realbody_scalar(self.candles[2].o, self.candles[2].c);
+            self.body_long_sum +=
+                cr_realbody_scalar(a.o, a.c) - cr_realbody_scalar(oldest.o, oldest.c);
+            self.body_doji_sum +=
+                cr_highlow_scalar(b.h, b.l) - cr_highlow_scalar(second.h, second.l);
+            self.body_short_sum += cr_realbody_scalar(o, c) - cr_realbody_scalar(third.o, third.c);
             Some(
                 (a.color() == -1
                     && a.body() > long
@@ -83,7 +87,7 @@ impl CandleMorningDojiStar {
             )
         } else {
             // Warm-up: seed the sums exactly like the batch prologue.
-            let i = self.candles.len();
+            let i = self.len;
             if i < 10 {
                 self.body_long_sum += cr_realbody_scalar(o, c);
             }
@@ -95,10 +99,13 @@ impl CandleMorningDojiStar {
             }
             None
         };
-        if self.candles.len() == 12 {
-            self.candles.pop_front();
+        if self.len == 12 {
+            self.candles[self.head] = cur;
+            self.head = (self.head + 1) % 12;
+        } else {
+            self.candles[(self.head + self.len) % 12] = cur;
+            self.len += 1;
         }
-        self.candles.push_back(cur);
         self.value = value;
         value
     }
@@ -130,7 +137,7 @@ impl CandleMorningDojiStar {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         const LOOKBACK: usize = 12;
-        if !self.candles.is_empty() || len <= LOOKBACK {
+        if self.len != 0 || len <= LOOKBACK {
             output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
@@ -183,12 +190,16 @@ impl CandleMorningDojiStar {
         self.body_long_sum = long_sum;
         self.body_doji_sum = doji_sum;
         self.body_short_sum = short_sum;
-        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
-            o: open[i],
-            h: high[i],
-            l: low[i],
-            c: close[i],
-        }));
+        for (slot, i) in (len - LOOKBACK..len).enumerate() {
+            self.candles[slot] = Candle {
+                o: open[i],
+                h: high[i],
+                l: low[i],
+                c: close[i],
+            };
+        }
+        self.head = 0;
+        self.len = LOOKBACK;
         self.value = output.last().copied();
         Ok(())
     }
@@ -203,7 +214,8 @@ impl CandleMorningDojiStar {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.candles.clear();
+        self.head = 0;
+        self.len = 0;
         self.body_long_sum = 0.0;
         self.body_doji_sum = 0.0;
         self.body_short_sum = 0.0;

@@ -137,10 +137,8 @@ impl CandleThreeWhiteSoldiers {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs directly over the slices and rebuilds
+    /// the rolling sums and bounded candle tail once after the loop. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -163,15 +161,125 @@ impl CandleThreeWhiteSoldiers {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 12;
+        if !self.candles.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let output_start = output.len();
+        output.resize(output_start + len, 0);
+        let mut shadow_sum = [0.0; 3];
+        for (offset, sum) in shadow_sum.iter_mut().enumerate() {
+            *sum = high[offset..offset + 10]
+                .iter()
+                .zip(&low[offset..offset + 10])
+                .fold(0.0, |sum, (&high, &low)| sum + cr_highlow_scalar(high, low));
         }
+        let mut near_sum = [0.0; 2];
+        let mut far_sum = [0.0; 2];
+        for offset in 0..2 {
+            let sum = high[6 + offset..11 + offset]
+                .iter()
+                .zip(&low[6 + offset..11 + offset])
+                .fold(0.0, |sum, (&high, &low)| sum + cr_highlow_scalar(high, low));
+            near_sum[offset] = sum;
+            far_sum[offset] = sum;
+        }
+        let mut body_short_sum = open[2..12]
+            .iter()
+            .zip(&close[2..12])
+            .fold(0.0, |sum, (&open, &close)| {
+                sum + cr_realbody_scalar(open, close)
+            });
+
+        for (((open_window, high_window), low_window), (close_window, output)) in open
+            .windows(LOOKBACK + 1)
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(low.windows(LOOKBACK + 1))
+            .zip(
+                close
+                    .windows(LOOKBACK + 1)
+                    .zip(&mut output[output_start + LOOKBACK..]),
+            )
+        {
+            let a = Candle {
+                o: open_window[10],
+                h: high_window[10],
+                l: low_window[10],
+                c: close_window[10],
+            };
+            let b = Candle {
+                o: open_window[11],
+                h: high_window[11],
+                l: low_window[11],
+                c: close_window[11],
+            };
+            let current = Candle {
+                o: open_window[12],
+                h: high_window[12],
+                l: low_window[12],
+                c: close_window[12],
+            };
+            let shadow0 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum[0], a.h, a.l);
+            let shadow1 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum[1], b.h, b.l);
+            let shadow2 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum[2], current.h, current.l);
+            let near1 = ca_highlow_scalar(NEAR, near_sum[0], b.h, b.l);
+            let near2 = ca_highlow_scalar(NEAR, near_sum[1], current.h, current.l);
+            let far1 = ca_highlow_scalar(FAR, far_sum[0], b.h, b.l);
+            let far2 = ca_highlow_scalar(FAR, far_sum[1], current.h, current.l);
+            let body_short = ca_realbody_scalar(BODY_SHORT, body_short_sum, current.o, current.c);
+            *output = ((a.color() == 1
+                && b.color() == 1
+                && current.color() == 1
+                && b.c > a.c
+                && current.c > b.c
+                && a.upper() < shadow0
+                && b.upper() < shadow1
+                && current.upper() < shadow2
+                && b.o > a.o
+                && b.o <= a.c + near1
+                && current.o > b.o
+                && current.o <= b.c + near2
+                && b.body() > a.body() - far1
+                && current.body() > b.body() - far2
+                && current.body() > body_short) as i32)
+                * 100;
+
+            shadow_sum[0] +=
+                cr_highlow_scalar(a.h, a.l) - cr_highlow_scalar(high_window[0], low_window[0]);
+            shadow_sum[1] +=
+                cr_highlow_scalar(b.h, b.l) - cr_highlow_scalar(high_window[1], low_window[1]);
+            shadow_sum[2] += cr_highlow_scalar(current.h, current.l)
+                - cr_highlow_scalar(high_window[2], low_window[2]);
+            near_sum[0] +=
+                cr_highlow_scalar(b.h, b.l) - cr_highlow_scalar(high_window[6], low_window[6]);
+            near_sum[1] += cr_highlow_scalar(current.h, current.l)
+                - cr_highlow_scalar(high_window[7], low_window[7]);
+            far_sum[0] +=
+                cr_highlow_scalar(b.h, b.l) - cr_highlow_scalar(high_window[6], low_window[6]);
+            far_sum[1] += cr_highlow_scalar(current.h, current.l)
+                - cr_highlow_scalar(high_window[7], low_window[7]);
+            body_short_sum += cr_realbody_scalar(current.o, current.c)
+                - cr_realbody_scalar(open_window[2], close_window[2]);
+        }
+
+        let tail = len - LOOKBACK;
+        self.candles.extend(
+            open[tail..]
+                .iter()
+                .zip(&high[tail..])
+                .zip(&low[tail..])
+                .zip(&close[tail..])
+                .map(|(((&o, &h), &l), &c)| Candle { o, h, l, c }),
+        );
+        self.shadow_sum = shadow_sum;
+        self.near_sum = near_sum;
+        self.far_sum = far_sum;
+        self.body_short_sum = body_short_sum;
+        self.value = Some(output[output_start + len - 1]);
         Ok(())
     }
 

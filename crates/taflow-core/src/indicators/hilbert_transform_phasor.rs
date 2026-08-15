@@ -1,7 +1,5 @@
 //! Incremental Hilbert Transform phasor components (HT_PHASOR).
 
-use std::collections::VecDeque;
-
 use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
@@ -25,7 +23,8 @@ pub struct HilbertTransformPhasorValue {
 /// values, and exposes the current result through its public API.
 pub struct HilbertTransformPhasor {
     index: usize,
-    prices: VecDeque<f64>,
+    prices: [f64; 3],
+    price_index: usize,
     wma_sub: f64,
     wma_sum: f64,
     trailing: f64,
@@ -61,7 +60,8 @@ impl HilbertTransformPhasor {
     pub fn new() -> Self {
         Self {
             index: 0,
-            prices: VecDeque::with_capacity(4),
+            prices: [0.0; 3],
+            price_index: 0,
             wma_sub: 0.0,
             wma_sum: 0.0,
             trailing: 0.0,
@@ -85,7 +85,7 @@ impl HilbertTransformPhasor {
 
     fn smooth(&mut self, input: f64) -> Option<f64> {
         if self.index < 3 {
-            self.prices.push_back(input);
+            self.prices[self.index] = input;
             if self.index == 2 {
                 self.wma_sub = self.prices[0];
                 self.wma_sub += self.prices[1];
@@ -99,8 +99,9 @@ impl HilbertTransformPhasor {
         self.wma_sub += input;
         self.wma_sub -= self.trailing;
         self.wma_sum += input * 4.0;
-        self.trailing = self.prices.pop_front().expect("WMA is initialized");
-        self.prices.push_back(input);
+        self.trailing = self.prices[self.price_index];
+        self.prices[self.price_index] = input;
+        self.price_index = (self.price_index + 1) % 3;
         let value = self.wma_sum * 0.1;
         self.wma_sum -= self.wma_sub;
         Some(value)
@@ -168,6 +169,29 @@ impl HilbertTransformPhasor {
             quadrature,
         });
         self.value
+    }
+
+    /// Append a price slice into aligned in-phase and quadrature histories.
+    pub fn extend_slice_into(
+        &mut self,
+        input: &[f64],
+        inphase: &mut Vec<f64>,
+        quadrature: &mut Vec<f64>,
+    ) {
+        inphase.reserve(input.len());
+        quadrature.reserve(input.len());
+        for &value in input {
+            match self.append(value) {
+                Some(value) => {
+                    inphase.push(value.inphase);
+                    quadrature.push(value.quadrature);
+                }
+                None => {
+                    inphase.push(f64::NAN);
+                    quadrature.push(f64::NAN);
+                }
+            }
+        }
     }
 
     /// Computes or updates `value` through the native Rust kernel.

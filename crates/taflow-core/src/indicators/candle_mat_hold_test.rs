@@ -14,3 +14,53 @@ fn lifecycle_and_reset_are_causal() {
     state.reset();
     assert_eq!(state.value(), None);
 }
+
+#[test]
+fn bulk_chunks_and_continuation_match_scalar() {
+    let open: Vec<f64> = (0..141)
+        .map(|i| 75.0 + (i as f64 * 0.23).sin() * 2.5)
+        .collect();
+    let close: Vec<f64> = open
+        .iter()
+        .enumerate()
+        .map(|(i, &value)| value + (i as f64 * 0.29).cos() * 0.9)
+        .collect();
+    let high: Vec<f64> = open
+        .iter()
+        .zip(&close)
+        .map(|(&o, &c)| o.max(c) + 1.0)
+        .collect();
+    let low: Vec<f64> = open
+        .iter()
+        .zip(&close)
+        .map(|(&o, &c)| o.min(c) - 1.0)
+        .collect();
+    let mut scalar = CandleMatHold::new();
+    let expected: Vec<_> = (0..open.len())
+        .map(|i| {
+            scalar
+                .append(open[i], high[i], low[i], close[i])
+                .unwrap_or(0)
+        })
+        .collect();
+    let expected_value = scalar.value();
+    let expected_next = scalar.append(78.0, 81.0, 77.0, 80.0);
+    for size in [1, 15, open.len()] {
+        let mut bulk = CandleMatHold::new();
+        let mut actual = Vec::new();
+        for start in (0..open.len()).step_by(size) {
+            let end = (start + size).min(open.len());
+            bulk.extend_slices_into(
+                &open[start..end],
+                &high[start..end],
+                &low[start..end],
+                &close[start..end],
+                &mut actual,
+            )
+            .unwrap();
+        }
+        assert_eq!(actual, expected);
+        assert_eq!(bulk.value(), expected_value);
+        assert_eq!(bulk.append(78.0, 81.0, 77.0, 80.0), expected_next);
+    }
+}

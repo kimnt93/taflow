@@ -4,7 +4,6 @@
 //! transforms, dominant-cycle estimate, cycle-length price average, and final
 //! four-value weighted trendline without recomputing prior bars.
 
-use crate::error::{TaError, TaResult};
 use crate::stream::cycle::{do_hilbert_even, do_hilbert_odd, HilbertVars};
 
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;

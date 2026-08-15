@@ -71,10 +71,8 @@ impl CandleRickshawman {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs directly over the slices and rebuilds
+    /// the rolling sums and bounded range windows once after the loop. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -97,15 +95,69 @@ impl CandleRickshawman {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.body_ranges.is_empty() {
+        const LOOKBACK: usize = 10;
+        if !self.body_ranges.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let output_start = output.len();
+        output.resize(output_start + len, 0);
+        let mut body_sum = high[..LOOKBACK]
+            .iter()
+            .zip(&low[..LOOKBACK])
+            .fold(0.0, |sum, (&high, &low)| sum + high - low);
+        let mut near_sum = high[5..LOOKBACK]
+            .iter()
+            .zip(&low[5..LOOKBACK])
+            .fold(0.0, |sum, (&high, &low)| sum + high - low);
+
+        for (((open_window, high_window), low_window), (close_window, output)) in open
+            .windows(LOOKBACK + 1)
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(low.windows(LOOKBACK + 1))
+            .zip(
+                close
+                    .windows(LOOKBACK + 1)
+                    .zip(&mut output[output_start + LOOKBACK..]),
+            )
+        {
+            let current_open = open_window[LOOKBACK];
+            let current_high = high_window[LOOKBACK];
+            let current_low = low_window[LOOKBACK];
+            let current_close = close_window[LOOKBACK];
+            let range = current_high - current_low;
+            let body = (current_close - current_open).abs();
+            let midpoint = current_low + range / 2.0;
+            let near = ca_highlow_scalar(NEAR, near_sum, current_high, current_low);
+            *output = ((body <= ca_highlow_scalar(BODY_DOJI, body_sum, current_high, current_low)
+                && current_open.min(current_close) - current_low > body
+                && current_high - current_open.max(current_close) > body
+                && current_open.min(current_close) <= midpoint + near
+                && current_open.max(current_close) >= midpoint - near)
+                as i32)
+                * 100;
+            body_sum += range - (high_window[0] - low_window[0]);
+            near_sum += range - (high_window[5] - low_window[5]);
         }
+
+        self.body_ranges.extend(
+            high[len - LOOKBACK..]
+                .iter()
+                .zip(&low[len - LOOKBACK..])
+                .map(|(&high, &low)| high - low),
+        );
+        self.near_ranges.extend(
+            high[len - 5..]
+                .iter()
+                .zip(&low[len - 5..])
+                .map(|(&high, &low)| high - low),
+        );
+        self.body_sum = body_sum;
+        self.near_sum = near_sum;
+        self.value = Some(output[output_start + len - 1]);
         Ok(())
     }
 

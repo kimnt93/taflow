@@ -96,11 +96,9 @@ impl CandleHangingMan {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
+    /// From a pristine state this runs directly over the slices and rebuilds
+    /// the rolling sums and bounded candle tail once after the loop. A
+    /// non-pristine state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
     ///
@@ -122,15 +120,79 @@ impl CandleHangingMan {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 11;
+        if !self.candles.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let output_start = output.len();
+        output.resize(output_start + len, 0);
+        let mut body_sum = open[1..11]
+            .iter()
+            .zip(&close[1..11])
+            .fold(0.0, |sum, (&open, &close)| {
+                sum + cr_realbody_scalar(open, close)
+            });
+        let mut shadow_sum = high[1..11]
+            .iter()
+            .zip(&low[1..11])
+            .fold(0.0, |sum, (&high, &low)| sum + cr_highlow_scalar(high, low));
+        let mut near_sum = high[5..10]
+            .iter()
+            .zip(&low[5..10])
+            .fold(0.0, |sum, (&high, &low)| sum + cr_highlow_scalar(high, low));
+
+        for (((open_window, high_window), low_window), (close_window, output)) in open
+            .windows(LOOKBACK + 1)
+            .zip(high.windows(LOOKBACK + 1))
+            .zip(low.windows(LOOKBACK + 1))
+            .zip(
+                close
+                    .windows(LOOKBACK + 1)
+                    .zip(&mut output[output_start + LOOKBACK..]),
+            )
+        {
+            let current_open = open_window[11];
+            let current_high = high_window[11];
+            let current_low = low_window[11];
+            let current_close = close_window[11];
+            let body = (current_close - current_open).abs();
+            let body_threshold =
+                ca_realbody_scalar(BODY_SHORT, body_sum, current_open, current_close);
+            let shadow_threshold =
+                ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum, current_high, current_low);
+            let near_threshold = ca_highlow_scalar(NEAR, near_sum, high_window[10], low_window[10]);
+            *output = ((body < body_threshold
+                && current_open.min(current_close) - current_low > body
+                && current_high - current_open.max(current_close) < shadow_threshold
+                && current_open.min(current_close) >= high_window[10] - near_threshold)
+                as i32)
+                * -100;
+
+            body_sum += cr_realbody_scalar(current_open, current_close)
+                - cr_realbody_scalar(open_window[1], close_window[1]);
+            shadow_sum += cr_highlow_scalar(current_high, current_low)
+                - cr_highlow_scalar(high_window[1], low_window[1]);
+            near_sum += cr_highlow_scalar(high_window[10], low_window[10])
+                - cr_highlow_scalar(high_window[5], low_window[5]);
         }
+
+        let tail = len - LOOKBACK;
+        self.candles.extend(
+            open[tail..]
+                .iter()
+                .zip(&high[tail..])
+                .zip(&low[tail..])
+                .zip(&close[tail..])
+                .map(|(((&o, &h), &l), &c)| Candle { o, h, l, c }),
+        );
+        self.body_sum = body_sum;
+        self.shadow_vs_sum = shadow_sum;
+        self.near_sum = near_sum;
+        self.value = Some(output[output_start + len - 1]);
         Ok(())
     }
 

@@ -58,13 +58,10 @@ impl CandleHighWave {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
-    /// state falls back to the per-bar loop. Either route is bit-identical to
-    /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
-    /// batch prologue).
+    /// From a pristine state this runs a direct rolling-sum slice kernel and
+    /// reconstructs only its bounded tail state. A non-pristine state falls
+    /// back to the per-bar loop. Either route is bit-identical to calling
+    /// `append` once per bar (warm-up `None` becomes `0`).
     ///
     /// # Parameters
     ///
@@ -83,16 +80,42 @@ impl CandleHighWave {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.bodies.is_empty() {
+        const LOOKBACK: usize = 10;
+        if !self.bodies.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut sum = open[..LOOKBACK]
+            .iter()
+            .zip(&close[..LOOKBACK])
+            .fold(0.0, |sum, (&open, &close)| sum + (close - open).abs());
+        for index in LOOKBACK..len {
+            let body = (close[index] - open[index]).abs();
+            let upper = high[index] - open[index].max(close[index]);
+            let lower = open[index].min(close[index]) - low[index];
+            output[start + index] = (body < sum / 10.0 && upper > body * 2.0 && lower > body * 2.0)
+                as i32
+                * if close[index] >= open[index] {
+                    100
+                } else {
+                    -100
+                };
+            sum += body - (close[index - LOOKBACK] - open[index - LOOKBACK]).abs();
         }
+        self.sum = sum;
+        self.bodies.extend(
+            open[len - LOOKBACK..]
+                .iter()
+                .zip(&close[len - LOOKBACK..])
+                .map(|(&open, &close)| (close - open).abs()),
+        );
+        self.value = output.last().copied();
         Ok(())
     }
 

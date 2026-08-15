@@ -1,7 +1,5 @@
 //! Incremental Closing Marubozu candlestick recognition (CDLCLOSINGMARUBOZU).
 
-use std::collections::VecDeque;
-
 use crate::error::TaResult;
 use crate::stream::pattern::*;
 /// Incremental CDLCLOSINGMARUBOZU state using TA-Lib's rolling body and range averages.
@@ -10,9 +8,11 @@ use crate::stream::pattern::*;
 /// The state consumes chronological inputs causally, preserves warm-up
 /// values, and exposes the current result through its public API.
 pub struct CandleClosingMarubozu {
-    bodies: VecDeque<f64>,
+    bodies: [f64; 10],
     body_sum: f64,
-    ranges: VecDeque<f64>,
+    ranges: [f64; 10],
+    head: usize,
+    len: usize,
     range_sum: f64,
     value: Option<i32>,
 }
@@ -31,28 +31,20 @@ impl CandleClosingMarubozu {
     /// Returns the computed value, aligned history, or a validation error.
     pub fn new() -> Self {
         Self {
-            bodies: VecDeque::with_capacity(10),
+            bodies: [0.0; 10],
             body_sum: 0.0,
-            ranges: VecDeque::with_capacity(10),
+            ranges: [0.0; 10],
+            head: 0,
+            len: 0,
             range_sum: 0.0,
             value: None,
         }
-    }
-    fn push(window: &mut VecDeque<f64>, sum: &mut f64, value: f64) {
-        if window.len() == 10 {
-            // Slide exactly like the batch loop: sum += cr(new) - cr(evicted).
-            let old = window.pop_front().expect("window is full");
-            *sum += value - old;
-        } else {
-            *sum += value;
-        }
-        window.push_back(value);
     }
     /// Appends OHLC data and returns a signed closing-marubozu signal after warmup.
     pub fn append(&mut self, open: f64, high: f64, low: f64, close: f64) -> Option<i32> {
         let body = (close - open).abs();
         let range = high - low;
-        let output = if self.bodies.len() == 10 && self.ranges.len() == 10 {
+        let output = if self.len == 10 {
             let long_body = body > self.body_sum / 10.0;
             let threshold = ca_highlow_scalar(SHADOW_VERY_SHORT, self.range_sum, high, low);
             let bull = long_body && close >= open && high - open.max(close) < threshold;
@@ -61,8 +53,20 @@ impl CandleClosingMarubozu {
         } else {
             None
         };
-        Self::push(&mut self.bodies, &mut self.body_sum, body);
-        Self::push(&mut self.ranges, &mut self.range_sum, range);
+        if self.len == 10 {
+            self.body_sum += body - self.bodies[self.head];
+            self.range_sum += range - self.ranges[self.head];
+            self.bodies[self.head] = body;
+            self.ranges[self.head] = range;
+            self.head = (self.head + 1) % 10;
+        } else {
+            let slot = (self.head + self.len) % 10;
+            self.body_sum += body;
+            self.range_sum += range;
+            self.bodies[slot] = body;
+            self.ranges[slot] = range;
+            self.len += 1;
+        }
         self.value = output;
         output
     }
@@ -93,7 +97,7 @@ impl CandleClosingMarubozu {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
         const LOOKBACK: usize = 10;
-        if !self.bodies.is_empty() || len <= LOOKBACK {
+        if self.len != 0 || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
@@ -120,8 +124,12 @@ impl CandleClosingMarubozu {
         }
         self.body_sum = body_sum;
         self.range_sum = range_sum;
-        self.bodies.extend((len - LOOKBACK..len).map(body));
-        self.ranges.extend((len - LOOKBACK..len).map(range));
+        for (slot, i) in (len - LOOKBACK..len).enumerate() {
+            self.bodies[slot] = body(i);
+            self.ranges[slot] = range(i);
+        }
+        self.head = 0;
+        self.len = LOOKBACK;
         self.value = output.last().copied();
         Ok(())
     }
@@ -136,9 +144,9 @@ impl CandleClosingMarubozu {
     }
     /// Reset the persistent state and clear the latest value.
     pub fn reset(&mut self) {
-        self.bodies.clear();
+        self.head = 0;
+        self.len = 0;
         self.body_sum = 0.0;
-        self.ranges.clear();
         self.range_sum = 0.0;
         self.value = None;
     }

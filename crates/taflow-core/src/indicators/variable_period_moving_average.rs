@@ -23,6 +23,8 @@ pub struct VariablePeriodMovingAverage {
     lookback: usize,
     count: usize,
     states: Vec<PeriodState>,
+    scratch: Vec<f64>,
+    selected_scratch: Vec<usize>,
     value: Option<f64>,
 }
 
@@ -55,6 +57,8 @@ impl VariablePeriodMovingAverage {
             lookback,
             count: 0,
             states,
+            scratch: Vec::new(),
+            selected_scratch: Vec::new(),
             value: None,
         })
     }
@@ -104,9 +108,50 @@ impl VariablePeriodMovingAverage {
                 got: periods.len(),
             });
         }
-        output.reserve(input.len());
-        for (&value, &period) in input.iter().zip(periods) {
-            output.push(self.append(value, period).unwrap_or(f64::NAN));
+        if input.is_empty() {
+            return Ok(());
+        }
+
+        let output_start = output.len();
+        output.resize(output_start + input.len(), f64::NAN);
+        let initial_count = self.count;
+        self.selected_scratch.clear();
+        self.selected_scratch.reserve(periods.len());
+        self.selected_scratch.extend(periods.iter().map(|&period| {
+            (period as usize).clamp(self.min_period, self.max_period) - self.min_period
+        }));
+
+        // Advance one configured MA at a time. This keeps the exact state that
+        // scalar replay would leave behind while moving dispatcher selection
+        // out of the per-bar hot loop and allowing every concrete MA to use
+        // its own slice kernel.
+        for (slot, period_state) in self.states.iter_mut().enumerate() {
+            let input_offset = period_state.start_index.saturating_sub(initial_count);
+            if input_offset >= input.len() {
+                continue;
+            }
+
+            self.scratch.clear();
+            period_state
+                .state
+                .extend_slice_into(&input[input_offset..], &mut self.scratch);
+
+            for local_index in input_offset..input.len() {
+                let global_index = initial_count + local_index;
+                if global_index < self.lookback {
+                    continue;
+                }
+                if self.selected_scratch[local_index] == slot {
+                    output[output_start + local_index] = self.scratch[local_index - input_offset];
+                }
+            }
+        }
+
+        self.count += input.len();
+        if self.count > self.lookback {
+            self.value = Some(output[output_start + input.len() - 1]);
+        } else {
+            self.value = None;
         }
         Ok(())
     }
@@ -122,6 +167,8 @@ impl VariablePeriodMovingAverage {
         for period_state in &mut self.states {
             period_state.state.reset();
         }
+        self.scratch.clear();
+        self.selected_scratch.clear();
         self.value = None;
     }
 }

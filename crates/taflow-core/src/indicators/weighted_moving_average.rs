@@ -52,6 +52,49 @@ impl WeightedMovingAverage {
 impl StreamingIndicator for WeightedMovingAverage {
     type Output = f64;
 
+    /// Append a slice with the O(1) TA-Lib weighted-sum recurrence.
+    ///
+    /// A bounded scalar prologue displaces any prior window. The steady loop
+    /// then reads evictions from the input slice and rebuilds the ring once,
+    /// preserving scalar arithmetic order and exact continuation state.
+    fn extend_slice_into(&mut self, inputs: &[f64], output: &mut Vec<f64>) {
+        let n = inputs.len();
+        if n == 0 {
+            return;
+        }
+        let period = self.period;
+        output.reserve(n);
+
+        let prologue = n.min(period);
+        for &input in &inputs[..prologue] {
+            output.push(self.append(input).unwrap_or(f64::NAN));
+        }
+        if n <= period {
+            return;
+        }
+
+        let period_f = period as f64;
+        let mut sum = self.sum;
+        let mut weighted_sum = self.weighted_sum;
+        let mut value = self.value;
+        for index in period..n {
+            let previous_sum = sum;
+            weighted_sum += period_f * inputs[index] - previous_sum;
+            sum += inputs[index] - inputs[index - period];
+            let current = weighted_sum / self.divider;
+            output.push(current);
+            value = Some(current);
+        }
+
+        self.window.clear();
+        for &input in &inputs[n - period..] {
+            self.window.push(input);
+        }
+        self.sum = sum;
+        self.weighted_sum = weighted_sum;
+        self.value = value;
+    }
+
     fn append(&mut self, input: f64) -> Option<f64> {
         if self.window.is_full() {
             let previous_sum = self.sum;

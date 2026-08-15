@@ -23,11 +23,14 @@ impl MathTan {
 
     /// Transform a slice into `output` while preserving scalar replay order.
     pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
-        output.reserve(input.len());
-        output.extend(input.iter().map(|&input| {
-            self.append(input)
-                .expect("pointwise transforms have no warm-up")
-        }));
+        let start = output.len();
+        output.resize(start + input.len(), 0.0);
+        for (slot, &input) in output[start..].iter_mut().zip(input) {
+            *slot = input.tan();
+        }
+        if !input.is_empty() {
+            self.value = Some(output[start + input.len() - 1]);
+        }
     }
 
     /// Return the latest result, or `None` before the first value.
