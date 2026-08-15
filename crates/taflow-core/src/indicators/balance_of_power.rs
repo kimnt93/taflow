@@ -45,8 +45,18 @@ impl BalanceOfPower {
             }
         }
         output.reserve(len);
-        for index in 0..len {
-            output.push(self.append(open[index], high[index], low[index], close[index]));
+        output.extend(open.iter().zip(high).zip(low).zip(close).map(
+            |(((&open, &high), &low), &close)| {
+                let range = high - low;
+                if range > 0.0 {
+                    (close - open) / range
+                } else {
+                    0.0
+                }
+            },
+        ));
+        if let Some(&value) = output.last().filter(|_| len != 0) {
+            self.value = Some(value);
         }
         Ok(())
     }

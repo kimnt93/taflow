@@ -43,8 +43,14 @@ impl TypicalPrice {
             });
         }
         output.reserve(len);
-        for index in 0..len {
-            output.push(self.append(high[index], low[index], close[index]));
+        output.extend(
+            high.iter()
+                .zip(low)
+                .zip(close)
+                .map(|((&high, &low), &close)| (high + low + close) * (1.0 / 3.0)),
+        );
+        if let Some(&value) = output.last().filter(|_| len != 0) {
+            self.value = Some(value);
         }
         Ok(())
     }

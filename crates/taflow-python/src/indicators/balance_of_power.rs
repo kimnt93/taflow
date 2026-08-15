@@ -37,18 +37,11 @@ impl BalanceOfPower {
             low.as_slice()?,
             close.as_slice()?,
         );
-        if [high.len(), low.len(), close.len()]
-            .iter()
-            .any(|&len| len != open.len())
-        {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
         py.allow_threads(|| {
-            for (((&o, &h), &l), &c) in open.iter().zip(high).zip(low).zip(close) {
-                self.append(o, h, l, c);
-            }
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(open, high, low, close, &mut self.outputs)
+        })
+        .map_err(|error| PyValueError::new_err(error.to_string()))
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
         PyArray1::from_vec(py, self.outputs.clone())

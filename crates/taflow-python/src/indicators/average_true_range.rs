@@ -32,18 +32,11 @@ impl AverageTrueRange {
         close: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
         let (high, low, close) = (high.as_slice()?, low.as_slice()?, close.as_slice()?);
-        if [low.len(), close.len()]
-            .iter()
-            .any(|&len| len != high.len())
-        {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
         py.allow_threads(|| {
-            for ((&h, &l), &c) in high.iter().zip(low).zip(close) {
-                self.append(h, l, c);
-            }
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(high, low, close, &mut self.outputs)
+        })
+        .map_err(|error| PyValueError::new_err(error.to_string()))
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
         PyArray1::from_vec(py, self.outputs.clone())

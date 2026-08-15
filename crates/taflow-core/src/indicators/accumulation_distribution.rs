@@ -42,8 +42,14 @@ impl AccumulationDistribution {
             }
         }
         output.reserve(len);
+        let mut total = self.total;
         for index in 0..len {
-            output.push(self.append(high[index], low[index], close[index], volume[index]));
+            total += money_flow_volume(high[index], low[index], close[index], volume[index]);
+            output.push(total);
+        }
+        if len != 0 {
+            self.total = total;
+            self.value = Some(total);
         }
         Ok(())
     }

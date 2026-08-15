@@ -36,8 +36,9 @@ impl MedianPrice {
             });
         }
         output.reserve(len);
-        for index in 0..len {
-            output.push(self.append(high[index], low[index]));
+        output.extend(high.iter().zip(low).map(|(&high, &low)| (high + low) * 0.5));
+        if let Some(&value) = output.last().filter(|_| len != 0) {
+            self.value = Some(value);
         }
         Ok(())
     }

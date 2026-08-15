@@ -35,15 +35,11 @@ impl Aroon {
         low: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
         let (high, low) = (high.as_slice()?, low.as_slice()?);
-        if high.len() != low.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
         py.allow_threads(|| {
-            for (&h, &l) in high.iter().zip(low) {
-                self.append(h, l);
-            }
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(high, low, &mut self.downs, &mut self.ups)
+        })
+        .map_err(|error| PyValueError::new_err(error.to_string()))
     }
     fn compute<'py>(
         &self,

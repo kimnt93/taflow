@@ -30,15 +30,11 @@ impl OnBalanceVolume {
         volume: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
         let (close, volume) = (close.as_slice()?, volume.as_slice()?);
-        if close.len() != volume.len() {
-            return Err(PyValueError::new_err("inputs must have equal lengths"));
-        }
         py.allow_threads(|| {
-            for (&c, &v) in close.iter().zip(volume) {
-                self.append(c, v);
-            }
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(close, volume, &mut self.outputs)
+        })
+        .map_err(|error| PyValueError::new_err(error.to_string()))
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
         PyArray1::from_vec(py, self.outputs.clone())
