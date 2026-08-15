@@ -25,11 +25,7 @@ impl FallingOperator {
     }
     fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
         let input = input.as_slice()?;
-        py.allow_threads(|| {
-            input.iter().for_each(|&value| {
-                self.append(value);
-            })
-        });
+        py.allow_threads(|| self.inner.extend_slice_into(input, &mut self.outputs));
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

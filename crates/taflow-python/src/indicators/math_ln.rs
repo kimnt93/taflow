@@ -1,7 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
 use taflow::indicators::MathLn as State;
-use taflow::stream::StreamingIndicator;
 #[pyclass]
 pub struct MathLn {
     inner: State,

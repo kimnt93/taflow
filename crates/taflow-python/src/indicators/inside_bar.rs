@@ -1,6 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
-use taflow::stream::InsideBar;
+use taflow::indicators::InsideBar;
 #[pyclass]
 pub struct InsideBarOperator {
     inner: InsideBar,
@@ -32,11 +32,10 @@ impl InsideBarOperator {
                 "inputs must have equal lengths",
             ));
         }
-        py.allow_threads(|| {
-            high.iter().zip(low).for_each(|(&h, &l)| {
-                self.append(h, l);
-            })
-        });
+        let inner = &mut self.inner;
+        let outputs = &mut self.outputs;
+        py.allow_threads(|| inner.extend_slices_into(high, low, outputs))
+            .map_err(|error| pyo3::exceptions::PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

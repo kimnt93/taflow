@@ -1,9 +1,8 @@
 use crate::conversion::to_py_array;
-use crate::state_api::{extend_from_options, push_option, py_value_error};
+use crate::state_api::{push_option, py_value_error};
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::indicators;
 use taflow::indicators::DirectionalMovementIndex as State;
 
 #[pyclass]
@@ -42,17 +41,11 @@ impl DirectionalMovementIndex {
                 "high, low, and close must have equal lengths",
             ));
         }
-        let outputs = &mut self.outputs;
         py.allow_threads(|| {
-            outputs.extend(
-                high.iter()
-                    .zip(low)
-                    .zip(close)
-                    .map(|((&high, &low), &close)| {
-                        self.inner.append(high, low, close).unwrap_or(f64::NAN)
-                    }),
-            )
-        });
+            self.inner
+                .extend_slices_into(high, low, close, &mut self.outputs)
+        })
+        .map_err(py_value_error)?;
         Ok(())
     }
 

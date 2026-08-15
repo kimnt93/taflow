@@ -1,7 +1,6 @@
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
 use taflow::indicators::MathCbrt as State;
-use taflow::stream::StreamingIndicator;
 #[pyclass]
 pub struct MathCbrt {
     inner: State,

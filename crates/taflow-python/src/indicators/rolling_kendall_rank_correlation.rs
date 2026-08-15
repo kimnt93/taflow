@@ -31,11 +31,8 @@ impl RollingKendallRankCorrelation {
         if x.len() != y.len() {
             return Err(PyValueError::new_err("x and y must have equal lengths"));
         }
-        py.allow_threads(|| {
-            for (&a, &b) in x.iter().zip(y) {
-                self.append(a, b);
-            }
-        });
+        py.allow_threads(|| self.inner.extend_slices_into(x, y, &mut self.output))
+            .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

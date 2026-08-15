@@ -27,13 +27,7 @@ impl HilbertTransformDominantCyclePeriod {
         let input = input.as_slice()?;
         let outputs = &mut self.outputs;
         let inner = &mut self.inner;
-        py.allow_threads(|| {
-            outputs.extend(
-                input
-                    .iter()
-                    .map(|&input| inner.append(input).unwrap_or(f64::NAN)),
-            );
-        });
+        py.allow_threads(|| inner.extend_slice_into(input, outputs));
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> Py<PyArray1<f64>> {

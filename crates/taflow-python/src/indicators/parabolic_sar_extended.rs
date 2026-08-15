@@ -1,9 +1,8 @@
 use crate::conversion::to_py_array;
-use crate::state_api::{extend_from_options, push_option, py_value_error};
+use crate::state_api::push_option;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use taflow::indicators;
 
 #[pyclass]
 pub struct ParabolicSarExtended {
@@ -56,15 +55,7 @@ impl ParabolicSarExtended {
         if high.len() != low.len() {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
-        let outputs = &mut self.outputs;
-        py.allow_threads(|| {
-            extend_from_options(
-                outputs,
-                high.iter()
-                    .zip(low)
-                    .map(|(&high, &low)| self.inner.append(high, low)),
-            )
-        });
+        py.allow_threads(|| self.inner.extend_slice_into(high, low, &mut self.outputs));
         Ok(())
     }
 

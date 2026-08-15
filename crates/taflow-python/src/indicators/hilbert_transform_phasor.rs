@@ -33,11 +33,10 @@ impl HilbertTransformPhasor {
     }
     fn extend(&mut self, py: Python<'_>, input: PyReadonlyArray1<f64>) -> PyResult<()> {
         let input = input.as_slice()?;
-        py.allow_threads(|| {
-            for &input in input {
-                self.append(input);
-            }
-        });
+        let inner = &mut self.inner;
+        let inphase = &mut self.inphase;
+        let quadrature = &mut self.quadrature;
+        py.allow_threads(|| inner.extend_slice_into(input, inphase, quadrature));
         Ok(())
     }
     fn compute(&self, py: Python<'_>) -> (Py<PyArray1<f64>>, Py<PyArray1<f64>>) {

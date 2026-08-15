@@ -62,9 +62,9 @@ impl BollingerBands {
         Bound<'py, PyArray1<f64>>,
     ) {
         (
-            PyArray1::from_vec(py, self.upper.clone()),
-            PyArray1::from_vec(py, self.middle.clone()),
-            PyArray1::from_vec(py, self.lower.clone()),
+            PyArray1::from_slice(py, &self.upper),
+            PyArray1::from_slice(py, &self.middle),
+            PyArray1::from_slice(py, &self.lower),
         )
     }
 

@@ -1,3 +1,4 @@
+use crate::state_api::py_value_error;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
 use taflow::stream::Crossunder;
@@ -29,17 +30,11 @@ impl CrossunderOperator {
         right: PyReadonlyArray1<f64>,
     ) -> PyResult<()> {
         let (left, right) = (left.as_slice()?, right.as_slice()?);
-        if left.len() != right.len() {
-            return Err(pyo3::exceptions::PyValueError::new_err(
-                "inputs must have equal lengths",
-            ));
-        }
         py.allow_threads(|| {
-            left.iter().zip(right).for_each(|(&a, &b)| {
-                self.append(a, b);
-            })
-        });
-        Ok(())
+            self.inner
+                .extend_slices_into(left, right, &mut self.outputs)
+        })
+        .map_err(py_value_error)
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {
         PyArray1::from_vec(py, self.outputs.clone())
