@@ -46,6 +46,41 @@ impl LaggedValue {
         Some((input, previous))
     }
 
+    /// Extend a pristine delay line with a full slice without routing every
+    /// observation through the ring. Returns `false` when scalar replay is
+    /// required (a warmed state or a slice that does not clear warm-up).
+    pub(crate) fn extend_from_empty_into<F>(
+        &mut self,
+        input: &[f64],
+        output: &mut Vec<f64>,
+        mut transform: F,
+    ) -> bool
+    where
+        F: FnMut(f64, f64) -> f64,
+    {
+        let period = self.buf.len();
+        if self.len != 0 || input.len() <= period {
+            return false;
+        }
+
+        output.reserve(input.len());
+        output.extend(std::iter::repeat_n(f64::NAN, period));
+        output.extend(
+            input[period..]
+                .iter()
+                .zip(&input[..input.len() - period])
+                .map(|(&current, &previous)| transform(current, previous)),
+        );
+
+        let start = input.len() - period;
+        for (index, &value) in input[start..].iter().enumerate() {
+            self.buf[(start + index) % period] = value;
+        }
+        self.cursor = input.len() % period;
+        self.len = period;
+        true
+    }
+
     pub(crate) fn reset(&mut self) {
         self.cursor = 0;
         self.len = 0;

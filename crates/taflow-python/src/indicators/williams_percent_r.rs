@@ -38,10 +38,10 @@ impl WilliamsPercentR {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
         py.allow_threads(|| {
-            for ((&high, &low), &close) in high.iter().zip(low).zip(close) {
-                self.append(high, low, close);
-            }
-        });
+            self.inner
+                .extend_slices_into(high, low, close, &mut self.outputs)
+        })
+        .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
 

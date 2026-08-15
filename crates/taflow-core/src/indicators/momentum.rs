@@ -32,6 +32,13 @@ impl Momentum {
 
     /// Appends a slice and NaN-fills its aligned warm-up positions.
     pub fn extend_slice_into(&mut self, input: &[f64], output: &mut Vec<f64>) {
+        if self
+            .lag
+            .extend_from_empty_into(input, output, |current, previous| current - previous)
+        {
+            self.value = output.last().copied();
+            return;
+        }
         output.reserve(input.len());
         output.extend(
             input

@@ -1,5 +1,5 @@
 use crate::error::TaResult;
-use crate::stream::rolling_extrema::{MonotonicArgmax, MonotonicArgmin};
+use crate::stream::rolling_extrema::{tracked_index_rescan_into, MonotonicArgmax, MonotonicArgmin};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RollingMinMaxIndexValue {
@@ -38,6 +38,21 @@ impl RollingMinMaxIndex {
         min_out: &mut Vec<f64>,
         max_out: &mut Vec<f64>,
     ) {
+        let period = self.maximum.period();
+        if self.maximum.count() == 0 && inputs.len() >= period {
+            let min_start = min_out.len();
+            let max_start = max_out.len();
+            min_out.resize(min_start + inputs.len(), 0.0);
+            max_out.resize(max_start + inputs.len(), 0.0);
+            let minimum =
+                tracked_index_rescan_into::<false>(inputs, period, &mut min_out[min_start..]);
+            let maximum =
+                tracked_index_rescan_into::<true>(inputs, period, &mut max_out[max_start..]);
+            self.minimum.rebuild_from_full_run(inputs, minimum);
+            self.maximum.rebuild_from_full_run(inputs, maximum);
+            self.value = Some(RollingMinMaxIndexValue { minimum, maximum });
+            return;
+        }
         min_out.reserve(inputs.len());
         max_out.reserve(inputs.len());
         for &input in inputs {

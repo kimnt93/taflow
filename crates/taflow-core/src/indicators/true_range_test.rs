@@ -24,6 +24,22 @@ fn scalar_bulk_reset_and_validation_are_bitwise_identical() {
     for (actual, expected) in bulk.iter().zip(&scalar) {
         assert_eq!(actual.to_bits(), expected.to_bits());
     }
+    let mut chunked_state = TrueRange::new().unwrap();
+    let mut chunked = Vec::new();
+    chunked_state
+        .extend_slices_into(&high[..2], &low[..2], &close[..2], &mut chunked)
+        .unwrap();
+    chunked_state
+        .extend_slices_into(&high[2..], &low[2..], &close[2..], &mut chunked)
+        .unwrap();
+    assert_eq!(
+        chunked
+            .iter()
+            .map(|value| value.to_bits())
+            .collect::<Vec<_>>(),
+        bulk.iter().map(|value| value.to_bits()).collect::<Vec<_>>()
+    );
+    assert_eq!(chunked_state.value(), scalar_state.value());
     let before = bulk.len();
     assert!(scalar_state
         .extend_slices_into(&high, &low[..3], &close, &mut bulk)

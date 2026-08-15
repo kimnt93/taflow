@@ -46,10 +46,10 @@ impl AccumulationDistributionOscillator {
             return Err(PyValueError::new_err("inputs must have equal lengths"));
         }
         py.allow_threads(|| {
-            for (((&h, &l), &c), &v) in high.iter().zip(low).zip(close).zip(volume) {
-                self.append(h, l, c, v);
-            }
-        });
+            self.inner
+                .extend_slices_into(high, low, close, volume, &mut self.outputs)
+        })
+        .map_err(|error| PyValueError::new_err(error.to_string()))?;
         Ok(())
     }
     fn compute<'py>(&self, py: Python<'py>) -> Bound<'py, PyArray1<f64>> {

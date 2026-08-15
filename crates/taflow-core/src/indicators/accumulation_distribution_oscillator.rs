@@ -85,13 +85,56 @@ impl AccumulationDistributionOscillator {
                 });
             }
         }
-        output.reserve(len);
-        for index in 0..len {
-            output.push(
-                self.append(high[index], low[index], close[index], volume[index])
-                    .unwrap_or(f64::NAN),
-            );
+        if len == 0 {
+            return Ok(());
         }
+        output.reserve(len);
+        let mut index = self.index;
+        let mut accumulation_distribution = self.accumulation_distribution;
+        let mut value = self.value;
+        let mut offset = 0;
+
+        let (mut fast_average, mut slow_average) = match (self.fast_average, self.slow_average) {
+            (Some(fast), Some(slow)) => (fast, slow),
+            _ => {
+                accumulation_distribution +=
+                    money_flow_volume(high[0], low[0], close[0], volume[0]);
+                let seeded = accumulation_distribution;
+                if index >= self.lookback {
+                    value = Some(0.0);
+                }
+                output.push(value.unwrap_or(f64::NAN));
+                index += 1;
+                offset = 1;
+                (seeded, seeded)
+            }
+        };
+
+        for position in offset..len {
+            accumulation_distribution += money_flow_volume(
+                high[position],
+                low[position],
+                close[position],
+                volume[position],
+            );
+            fast_average = self
+                .fast_smoothing
+                .mul_add(accumulation_distribution - fast_average, fast_average);
+            slow_average = self
+                .slow_smoothing
+                .mul_add(accumulation_distribution - slow_average, slow_average);
+            if index >= self.lookback {
+                value = Some(fast_average - slow_average);
+            }
+            output.push(value.unwrap_or(f64::NAN));
+            index += 1;
+        }
+
+        self.index = index;
+        self.accumulation_distribution = accumulation_distribution;
+        self.fast_average = Some(fast_average);
+        self.slow_average = Some(slow_average);
+        self.value = value;
         Ok(())
     }
 

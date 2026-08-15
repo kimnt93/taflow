@@ -43,12 +43,31 @@ impl TrueRange {
                 });
             }
         }
-        output.reserve(len);
-        for index in 0..len {
-            output.push(
-                self.append(high[index], low[index], close[index])
-                    .unwrap_or(f64::NAN),
-            );
+        if len == 0 {
+            return Ok(());
+        }
+        let output_start = output.len();
+        output.resize(output_start + len, f64::NAN);
+        let appended = &mut output[output_start..];
+        let had_previous = self.previous_close;
+        if let Some(previous) = had_previous {
+            appended[0] = (high[0] - low[0])
+                .max((high[0] - previous).abs())
+                .max((low[0] - previous).abs());
+        }
+        for (((slot, &high), &low), &previous) in appended[1..]
+            .iter_mut()
+            .zip(&high[1..])
+            .zip(&low[1..])
+            .zip(&close[..len - 1])
+        {
+            *slot = (high - low)
+                .max((high - previous).abs())
+                .max((low - previous).abs());
+        }
+        self.previous_close = close.last().copied();
+        if had_previous.is_some() || len > 1 {
+            self.value = output.last().copied();
         }
         Ok(())
     }
