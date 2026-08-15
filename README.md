@@ -22,6 +22,18 @@ metrics as native Rust states with Python adapters. It covers the complete
 estimators, market structure, patterns, and signals—without linking to TA-Lib
 or another C library.
 
+## Why TAFlow
+
+- **More coverage:** 393 indicators—including all 161 TA-Lib functions—plus 57
+  strategy, risk, trade, and portfolio metrics.
+- **Verified correctness:** all 393 indicators match independent external
+  oracles in the [correctness report](verify/CORRECTNESS.md).
+- **High speed:** correctness-gated benchmarks reach up to **13,765× faster**
+  at 100k rows than the corresponding reference library; results vary by
+  calculation and workload. See the [benchmark report](verify/BENCHMARK.md).
+- **Built for real time:** persistent Rust states use the same API for bulk
+  history and per-tick updates, without recomputing the full series.
+
 ## Features
 
 - First-class Rust crate and native-backed Python package.
