@@ -99,16 +99,47 @@ impl CandleTriStar {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 12;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut doji_sum = high[..10]
+            .iter()
+            .zip(&low[..10])
+            .map(|(&h, &l)| cr_highlow_scalar(h, l))
+            .sum::<f64>();
+        for i in LOOKBACK..len {
+            let a = i - 2;
+            let b = i - 1;
+            let doji = ca_highlow_scalar(BODY_DOJI, doji_sum, high[a], low[a]);
+            let base = real_body(open[a], close[a]) <= doji
+                && real_body(open[b], close[b]) <= doji
+                && real_body(open[i], close[i]) <= doji;
+            let bear = base
+                && open[b].min(close[b]) > open[a].max(close[a])
+                && open[i].max(close[i]) < open[b].max(close[b]);
+            let bull = base
+                && open[b].max(close[b]) < open[a].min(close[a])
+                && open[i].min(close[i]) > open[b].min(close[b]);
+            output[start + i] = (bull as i32) * 100 - (bear as i32) * 100;
+            doji_sum +=
+                cr_highlow_scalar(high[a], low[a]) - cr_highlow_scalar(high[i - 12], low[i - 12]);
         }
+        self.body_doji_sum = doji_sum;
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

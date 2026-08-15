@@ -173,16 +173,98 @@ impl CandleRiseFallThreeMethods {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 14;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let seed = |from: usize| {
+            open[from..from + 10]
+                .iter()
+                .zip(&close[from..from + 10])
+                .map(|(&o, &c)| cr_realbody_scalar(o, c))
+                .sum::<f64>()
+        };
+        let mut long_sum = [seed(4), seed(0)];
+        let mut short_sum = [seed(1), seed(2), seed(3)];
+        for i in LOOKBACK..len {
+            let a = i - 4;
+            let b = i - 3;
+            let cnd = i - 2;
+            let d = i - 1;
+            let long0 = ca_realbody_scalar(BODY_LONG, long_sum[0], open[i], close[i]);
+            let long4 = ca_realbody_scalar(BODY_LONG, long_sum[1], open[a], close[a]);
+            let short0 = ca_realbody_scalar(BODY_SHORT, short_sum[0], open[b], close[b]);
+            let short1 = ca_realbody_scalar(BODY_SHORT, short_sum[1], open[cnd], close[cnd]);
+            let short2 = ca_realbody_scalar(BODY_SHORT, short_sum[2], open[d], close[d]);
+            let mut value = 0;
+            if real_body(open[a], close[a]) > long4 && real_body(open[i], close[i]) > long0 {
+                let middle = real_body(open[b], close[b]) < short0
+                    && real_body(open[cnd], close[cnd]) < short1
+                    && real_body(open[d], close[d]) < short2;
+                let bull = candle_color(open[a], close[a]) == 1
+                    && middle
+                    && candle_color(open[b], close[b]) == -1
+                    && candle_color(open[cnd], close[cnd]) == -1
+                    && candle_color(open[d], close[d]) == -1
+                    && close[b] < close[a]
+                    && close[cnd] < close[b]
+                    && close[d] < close[cnd]
+                    && low[b] > low[a]
+                    && low[cnd] > low[a]
+                    && low[d] > low[a]
+                    && high[b] < high[a]
+                    && high[cnd] < high[a]
+                    && high[d] < high[a]
+                    && candle_color(open[i], close[i]) == 1
+                    && open[i] > close[d]
+                    && close[i] > close[a];
+                let bear = candle_color(open[a], close[a]) == -1
+                    && middle
+                    && candle_color(open[b], close[b]) == 1
+                    && candle_color(open[cnd], close[cnd]) == 1
+                    && candle_color(open[d], close[d]) == 1
+                    && close[b] > close[a]
+                    && close[cnd] > close[b]
+                    && close[d] > close[cnd]
+                    && high[b] < high[a]
+                    && high[cnd] < high[a]
+                    && high[d] < high[a]
+                    && low[b] > low[a]
+                    && low[cnd] > low[a]
+                    && low[d] > low[a]
+                    && candle_color(open[i], close[i]) == -1
+                    && open[i] < close[d]
+                    && close[i] < close[a];
+                value = (bull as i32) * 100 - (bear as i32) * 100;
+            }
+            output[start + i] = value;
+            long_sum[1] += cr_realbody_scalar(open[a], close[a])
+                - cr_realbody_scalar(open[i - 14], close[i - 14]);
+            long_sum[0] += cr_realbody_scalar(open[i], close[i])
+                - cr_realbody_scalar(open[i - 10], close[i - 10]);
+            short_sum[0] += cr_realbody_scalar(open[b], close[b])
+                - cr_realbody_scalar(open[i - 13], close[i - 13]);
+            short_sum[1] += cr_realbody_scalar(open[cnd], close[cnd])
+                - cr_realbody_scalar(open[i - 12], close[i - 12]);
+            short_sum[2] += cr_realbody_scalar(open[d], close[d])
+                - cr_realbody_scalar(open[i - 11], close[i - 11]);
         }
+        self.body_long_sum = long_sum;
+        self.body_short_sum = short_sum;
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

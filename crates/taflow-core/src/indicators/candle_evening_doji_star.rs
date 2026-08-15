@@ -129,16 +129,64 @@ impl CandleEveningDojiStar {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 12;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut long_sum = open[..10]
+            .iter()
+            .zip(&close[..10])
+            .map(|(&o, &c)| cr_realbody_scalar(o, c))
+            .sum::<f64>();
+        let mut doji_sum = high[1..11]
+            .iter()
+            .zip(&low[1..11])
+            .map(|(&h, &l)| cr_highlow_scalar(h, l))
+            .sum::<f64>();
+        let mut short_sum = open[2..12]
+            .iter()
+            .zip(&close[2..12])
+            .map(|(&o, &c)| cr_realbody_scalar(o, c))
+            .sum::<f64>();
+        for i in LOOKBACK..len {
+            let a = i - 2;
+            let b = i - 1;
+            let long = ca_realbody_scalar(BODY_LONG, long_sum, open[a], close[a]);
+            let doji = ca_highlow_scalar(BODY_DOJI, doji_sum, high[b], low[b]);
+            let short = ca_realbody_scalar(BODY_SHORT, short_sum, open[i], close[i]);
+            output[start + i] = (candle_color(open[a], close[a]) == 1
+                && real_body(open[a], close[a]) > long
+                && real_body(open[b], close[b]) <= doji
+                && open[b].min(close[b]) > open[a].max(close[a])
+                && candle_color(open[i], close[i]) == -1
+                && real_body(open[i], close[i]) > short
+                && close[i] < close[a] - real_body(open[a], close[a]) * 0.3)
+                as i32
+                * -100;
+            long_sum += cr_realbody_scalar(open[a], close[a])
+                - cr_realbody_scalar(open[i - 12], close[i - 12]);
+            doji_sum +=
+                cr_highlow_scalar(high[b], low[b]) - cr_highlow_scalar(high[i - 11], low[i - 11]);
+            short_sum += cr_realbody_scalar(open[i], close[i])
+                - cr_realbody_scalar(open[i - 10], close[i - 10]);
         }
+        self.body_long_sum = long_sum;
+        self.body_doji_sum = doji_sum;
+        self.body_short_sum = short_sum;
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

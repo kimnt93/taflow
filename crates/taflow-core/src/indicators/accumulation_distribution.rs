@@ -41,11 +41,18 @@ impl AccumulationDistribution {
                 });
             }
         }
-        output.reserve(len);
+        let start = output.len();
+        output.resize(start + len, 0.0);
         let mut total = self.total;
-        for index in 0..len {
-            total += money_flow_volume(high[index], low[index], close[index], volume[index]);
-            output.push(total);
+        for ((((slot, &high), &low), &close), &volume) in output[start..]
+            .iter_mut()
+            .zip(high)
+            .zip(low)
+            .zip(close)
+            .zip(volume)
+        {
+            total += money_flow_volume(high, low, close, volume);
+            *slot = total;
         }
         if len != 0 {
             self.total = total;

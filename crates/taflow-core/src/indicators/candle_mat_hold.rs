@@ -141,16 +141,68 @@ impl CandleMatHold {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 14;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let seed = |from: usize| {
+            open[from..from + 10]
+                .iter()
+                .zip(&close[from..from + 10])
+                .map(|(&o, &c)| cr_realbody_scalar(o, c))
+                .sum::<f64>()
+        };
+        let mut sums = [0.0, seed(3), seed(2), seed(1), seed(0)];
+        for i in LOOKBACK..len {
+            let a = i - 4;
+            let b = i - 3;
+            let cnd = i - 2;
+            let d = i - 1;
+            let long = ca_realbody_scalar(BODY_LONG, sums[4], open[a], close[a]);
+            let short0 = ca_realbody_scalar(BODY_SHORT, sums[3], open[b], close[b]);
+            let short1 = ca_realbody_scalar(BODY_SHORT, sums[2], open[cnd], close[cnd]);
+            let short2 = ca_realbody_scalar(BODY_SHORT, sums[1], open[d], close[d]);
+            output[start + i] = (real_body(open[a], close[a]) > long
+                && real_body(open[b], close[b]) < short0
+                && real_body(open[cnd], close[cnd]) < short1
+                && real_body(open[d], close[d]) < short2
+                && candle_color(open[a], close[a]) == 1
+                && candle_color(open[b], close[b]) == -1
+                && candle_color(open[i], close[i]) == 1
+                && open[b].min(close[b]) > open[a].max(close[a])
+                && open[cnd].min(close[cnd]) < close[a]
+                && open[d].min(close[d]) < close[a]
+                && open[cnd].min(close[cnd]) > close[a] - real_body(open[a], close[a]) * 0.5
+                && open[d].min(close[d]) > close[a] - real_body(open[a], close[a]) * 0.5
+                && open[cnd].max(close[cnd]) < open[b]
+                && open[d].max(close[d]) < open[cnd].max(close[cnd])
+                && open[i] > close[d]
+                && close[i] > high[b].max(high[cnd]).max(high[d]))
+                as i32
+                * 100;
+            sums[4] += cr_realbody_scalar(open[a], close[a])
+                - cr_realbody_scalar(open[i - 14], close[i - 14]);
+            sums[3] += cr_realbody_scalar(open[b], close[b])
+                - cr_realbody_scalar(open[i - 13], close[i - 13]);
+            sums[2] += cr_realbody_scalar(open[cnd], close[cnd])
+                - cr_realbody_scalar(open[i - 12], close[i - 12]);
+            sums[1] += cr_realbody_scalar(open[d], close[d])
+                - cr_realbody_scalar(open[i - 11], close[i - 11]);
         }
+        self.body_sum = sums;
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

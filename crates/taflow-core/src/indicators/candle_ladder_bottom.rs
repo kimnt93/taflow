@@ -120,16 +120,52 @@ impl CandleLadderBottom {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 14;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut shadow_sum = high[3..13]
+            .iter()
+            .zip(&low[3..13])
+            .map(|(&h, &l)| cr_highlow_scalar(h, l))
+            .sum::<f64>();
+        for i in LOOKBACK..len {
+            let a = i - 4;
+            let b = i - 3;
+            let cnd = i - 2;
+            let d = i - 1;
+            let shadow = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow_sum, high[d], low[d]);
+            output[start + i] = (candle_color(open[a], close[a]) == -1
+                && candle_color(open[b], close[b]) == -1
+                && candle_color(open[cnd], close[cnd]) == -1
+                && candle_color(open[d], close[d]) == -1
+                && open[a] > open[b]
+                && open[b] > open[cnd]
+                && close[a] > close[b]
+                && close[b] > close[cnd]
+                && upper_shadow(open[d], high[d], close[d]) > shadow
+                && candle_color(open[i], close[i]) == 1
+                && open[i] > open[d]
+                && close[i] > high[d]) as i32
+                * 100;
+            shadow_sum +=
+                cr_highlow_scalar(high[d], low[d]) - cr_highlow_scalar(high[i - 11], low[i - 11]);
         }
+        self.shadow_sum = shadow_sum;
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 

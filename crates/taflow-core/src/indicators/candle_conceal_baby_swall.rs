@@ -128,16 +128,59 @@ impl CandleConcealBabySwall {
         output: &mut Vec<i32>,
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
-        output.reserve(len);
-        if !self.candles.is_empty() {
+        const LOOKBACK: usize = 13;
+        if !self.candles.is_empty() || len <= LOOKBACK {
+            output.reserve(len);
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+
+        let start = output.len();
+        output.resize(start + len, 0);
+        let mut shadow0 = high[..10]
+            .iter()
+            .zip(&low[..10])
+            .map(|(&h, &l)| cr_highlow_scalar(h, l))
+            .sum::<f64>();
+        let mut shadow1 = high[1..11]
+            .iter()
+            .zip(&low[1..11])
+            .map(|(&h, &l)| cr_highlow_scalar(h, l))
+            .sum::<f64>();
+        for i in LOOKBACK..len {
+            let a = i - 3;
+            let b = i - 2;
+            let cnd = i - 1;
+            let s0 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow0, high[a], low[a]);
+            let s1 = ca_highlow_scalar(SHADOW_VERY_SHORT, shadow1, high[b], low[b]);
+            output[start + i] = (candle_color(open[a], close[a]) == -1
+                && candle_color(open[b], close[b]) == -1
+                && candle_color(open[cnd], close[cnd]) == -1
+                && candle_color(open[i], close[i]) == -1
+                && upper_shadow(open[a], high[a], close[a]) < s0
+                && lower_shadow(open[a], low[a], close[a]) < s0
+                && upper_shadow(open[b], high[b], close[b]) < s1
+                && lower_shadow(open[b], low[b], close[b]) < s1
+                && open[cnd].max(close[cnd]) < open[b].min(close[b])
+                && high[cnd] > close[b]
+                && open[i] >= high[cnd]
+                && close[i] <= low[cnd]) as i32
+                * 100;
+            shadow0 +=
+                cr_highlow_scalar(high[a], low[a]) - cr_highlow_scalar(high[i - 13], low[i - 13]);
+            shadow1 +=
+                cr_highlow_scalar(high[b], low[b]) - cr_highlow_scalar(high[i - 12], low[i - 12]);
         }
+        self.shadow_sum = [shadow0, shadow1];
+        self.candles.extend((len - LOOKBACK..len).map(|i| Candle {
+            o: open[i],
+            h: high[i],
+            l: low[i],
+            c: close[i],
+        }));
+        self.value = output.last().copied();
         Ok(())
     }
 
