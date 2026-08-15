@@ -43,10 +43,8 @@ impl CandleEngulfing {
     }
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// the one-bar trailing state without replaying the input. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -69,15 +67,29 @@ impl CandleEngulfing {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if self.previous.is_some() {
+        const LOOKBACK: usize = 1;
+        if self.previous.is_some() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        let start = output.len();
+        output.resize(start + len, 0);
+        for ((opens, closes), out) in open
+            .windows(2)
+            .zip(close.windows(2))
+            .zip(output[start + LOOKBACK..].iter_mut())
+        {
+            let bullish = closes[0] < opens[0] && closes[1] >= opens[0] && opens[1] <= closes[0];
+            let bearish = closes[0] >= opens[0]
+                && closes[1] < opens[1]
+                && opens[1] >= closes[0]
+                && closes[1] <= opens[0];
+            *out = (bullish as i32) * 100 - (bearish as i32) * 100;
         }
+        self.previous = Some((open[len - 1], close[len - 1]));
+        self.value = output.last().copied();
         Ok(())
     }
 

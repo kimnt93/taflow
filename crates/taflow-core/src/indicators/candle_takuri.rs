@@ -76,10 +76,8 @@ impl CandleTakuri {
 
     /// Bulk-append aligned OHLC slices, pushing one score per bar into `output`.
     ///
-    /// From a pristine state this runs the incremental batch kernel over the
-    /// slices and then replays only the trailing bars through `append` to
-    /// rebuild the window-bounded streaming state; the replayed scores are
-    /// discarded because the batch pass already emitted them. A non-pristine
+    /// From a pristine state this runs a direct slice kernel and reconstructs
+    /// the bounded trailing state without replaying the input. A non-pristine
     /// state falls back to the per-bar loop. Either route is bit-identical to
     /// calling `append` once per bar (warm-up `None` becomes `0`, matching the
     /// batch prologue).
@@ -102,15 +100,35 @@ impl CandleTakuri {
     ) -> TaResult<()> {
         let len = validate_ohlc(open, high, low, close)?;
         output.reserve(len);
-        if !self.bodies.is_empty() {
+        const LOOKBACK: usize = 10;
+        if !self.bodies.is_empty() || len <= LOOKBACK {
             for i in 0..len {
                 output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
             }
             return Ok(());
         }
-        for i in 0..len {
-            output.push(self.append(open[i], high[i], low[i], close[i]).unwrap_or(0));
+        let range = |i: usize| high[i] - low[i];
+        let mut body_sum = (0..LOOKBACK).fold(0.0, |sum, i| sum + range(i));
+        let mut range_sum = body_sum;
+        let start = output.len();
+        output.resize(start + len, 0);
+        for i in LOOKBACK..len {
+            let body = (close[i] - open[i]).abs();
+            let upper = high[i] - open[i].max(close[i]);
+            let lower = open[i].min(close[i]) - low[i];
+            output[start + i] = (body <= ca_highlow_scalar(BODY_DOJI, body_sum, high[i], low[i])
+                && upper < ca_highlow_scalar(SHADOW_VERY_SHORT, range_sum, high[i], low[i])
+                && lower > body * 2.0) as i32
+                * 100;
+            let current_range = range(i);
+            body_sum += current_range - range(i - LOOKBACK);
+            range_sum += current_range - range(i - LOOKBACK);
         }
+        self.body_sum = body_sum;
+        self.range_sum = range_sum;
+        self.bodies.extend((len - LOOKBACK..len).map(range));
+        self.ranges.extend((len - LOOKBACK..len).map(range));
+        self.value = output.last().copied();
         Ok(())
     }
 
