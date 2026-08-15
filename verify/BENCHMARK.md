@@ -12,7 +12,7 @@ Reference libraries: [TA-Lib](https://ta-lib.org/), [Wickra](https://pypi.org/pr
 | AbsolutePriceOscillator | TA-Lib 0.7.1 | 8.61× | 2.06× | 1.53× |
 | AccelerationBands | TA-Lib 0.7.1 | 4.78× | 1.36× | 0.88× |
 | AccumulationDistribution | TA-Lib 0.7.1 | 7.67× | 1.49× | 0.61× |
-| AccumulationDistributionOscillator | TA-Lib 0.7.1 | 10.37× | 1.34× | 0.62× |
+| AccumulationDistributionOscillator | TA-Lib 0.7.1 | 9.36× | 2.30× | 1.19× |
 | AdaptiveCycle | Wickra 0.9.9 | 3.11× | 1.81× | 1.66× |
 | Amihud | Wickra 0.9.9 | 70.19× | 57.10× | 58.92× |
 | AnchoredVolumeWeightedAveragePrice | NumPy 2.4.6 | 168.36× | 206.35× | 180.78× |
@@ -238,7 +238,7 @@ Reference libraries: [TA-Lib](https://ta-lib.org/), [Wickra](https://pypi.org/pr
 | MesaAdaptiveMovingAverage | TA-Lib 0.7.1 | 1.72× | 1.05× | 1.07× |
 | MinusDirectionalIndicator | TA-Lib 0.7.1 | 3.47× | 0.88× | 0.62× |
 | MinusDirectionalMovement | TA-Lib 0.7.1 | 6.90× | 1.51× | 1.06× |
-| Momentum | TA-Lib 0.7.1 | 12.72× | 2.01× | 0.42× |
+| Momentum | TA-Lib 0.7.1 | 24.89× | 8.39× | 1.89× |
 | MoneyFlowIndex | TA-Lib 0.7.1 | 6.90× | 2.54× | 1.97× |
 | MovingAverage | TA-Lib 0.7.1 | 11.91× | 2.61× | 1.20× |
 | MovingAverageConvergenceDivergence | TA-Lib 0.7.1 | 10.86× | 3.69× | 4.49× |
@@ -247,7 +247,7 @@ Reference libraries: [TA-Lib](https://ta-lib.org/), [Wickra](https://pypi.org/pr
 | MovingAverageEnvelope | Wickra 0.9.9 | 23.68× | 18.07× | 20.23× |
 | NegativeVolumeIndex | Wickra 0.9.9 | 47.03× | 17.01× | 13.20× |
 | NewHighsNewLows | Wickra 0.9.9 | 2547.27× | 3531.47× | 3718.05× |
-| NormalizedAverageTrueRange | TA-Lib 0.7.1 | 4.98× | 1.42× | 0.98× |
+| NormalizedAverageTrueRange | TA-Lib 0.7.1 | 5.98× | 1.52× | 1.13× |
 | OnBalanceVolume | TA-Lib 0.7.1 | 10.77× | 1.73× | 0.98× |
 | OpeningRange | NumPy 2.4.6 | 77.30× | 94.35× | 105.13× |
 | OrderBlock | NumPy 2.4.6 | 133.33× | 148.46× | 148.60× |
@@ -270,10 +270,10 @@ Reference libraries: [TA-Lib](https://ta-lib.org/), [Wickra](https://pypi.org/pr
 | PreviousHighLow | NumPy 2.4.6 | 47.00× | 61.92× | 63.36× |
 | ProjectionBands | NumPy 2.4.6 | 5.21× | 1.91× | 1.57× |
 | QuartileBands | Wickra 0.9.9 | 13.06× | 9.00× | 9.83× |
-| RateOfChange | TA-Lib 0.7.1 | 13.18× | 2.51× | 0.81× |
-| RateOfChangePercent | TA-Lib 0.7.1 | 12.52× | 2.53× | 0.80× |
-| RateOfChangeRatio | TA-Lib 0.7.1 | 14.39× | 2.56× | 0.83× |
-| RateOfChangeRatioPercent | TA-Lib 0.7.1 | 13.48× | 2.54× | 0.74× |
+| RateOfChange | TA-Lib 0.7.1 | 21.37× | 6.97× | 2.59× |
+| RateOfChangePercent | TA-Lib 0.7.1 | 21.27× | 6.76× | 2.53× |
+| RateOfChangeRatio | TA-Lib 0.7.1 | 21.33× | 6.78× | 2.45× |
+| RateOfChangeRatioPercent | TA-Lib 0.7.1 | 21.95× | 6.86× | 2.78× |
 | RectangleRange | Wickra 0.9.9 | 29.08× | 15.66× | 14.74× |
 | RelativeMomentumIndex | Wickra 0.9.9 | 23.69× | 7.56× | 5.98× |
 | RelativeStrengthIndex | TA-Lib 0.7.1 | 4.87× | 1.16× | 0.80× |
@@ -315,7 +315,7 @@ Reference libraries: [TA-Lib](https://ta-lib.org/), [Wickra](https://pypi.org/pr
 | RollingMidpoint | TA-Lib 0.7.1 | 6.92× | 2.17× | 1.89× |
 | RollingMidprice | TA-Lib 0.7.1 | 7.50× | 2.54× | 1.78× |
 | RollingMinMax | TA-Lib 0.7.1 | 7.38× | 2.71× | 2.04× |
-| RollingMinMaxIndex | TA-Lib 0.7.1 | 2.32× | 0.58× | 0.43× |
+| RollingMinMaxIndex | TA-Lib 0.7.1 | 4.74× | 1.51× | 1.27× |
 | RollingMinimum | TA-Lib 0.7.1 | 10.91× | 3.64× | 2.56× |
 | RollingMinimumIndex | TA-Lib 0.7.1 | 8.00× | 1.88× | 1.35× |
 | RollingMode | NumPy 2.4.6 | 0.20× | 0.05× | 0.04× |
@@ -375,7 +375,7 @@ Reference libraries: [TA-Lib](https://ta-lib.org/), [Wickra](https://pypi.org/pr
 | TripleExponentialMovingAverage | TA-Lib 0.7.1 | 6.97× | 2.44× | 1.92× |
 | TripleExponentialRateOfChange | TA-Lib 0.7.1 | 9.10× | 3.61× | 2.69× |
 | TripleTopBottom | Wickra 0.9.9 | 33.12× | 13.86× | 16.19× |
-| TrueRange | TA-Lib 0.7.1 | 6.72× | 1.09× | 0.35× |
+| TrueRange | TA-Lib 0.7.1 | 17.02× | 3.85× | 1.03× |
 | TrueStrengthIndex | Wickra 0.9.9 | 25.67× | 8.73× | 6.78× |
 | TwiggsMoneyFlow | Wickra 0.9.9 | 25.98× | 15.66× | 14.49× |
 | TypicalPrice | TA-Lib 0.7.1 | 25.61× | 6.94× | 1.72× |
@@ -397,7 +397,7 @@ Reference libraries: [TA-Lib](https://ta-lib.org/), [Wickra](https://pypi.org/pr
 | WeightedClose | TA-Lib 0.7.1 | 24.44× | 6.56× | 1.73× |
 | WeightedMovingAverage | TA-Lib 0.7.1 | 9.01× | 1.54× | 0.75× |
 | WilliamsAccumulationDistribution | Wickra 0.9.9 | 40.68× | 18.40× | 15.76× |
-| WilliamsPercentR | TA-Lib 0.7.1 | 1.82× | 0.42× | 0.30× |
+| WilliamsPercentR | TA-Lib 0.7.1 | 5.52× | 1.92× | 1.70× |
 | YangZhang | Wickra 0.9.9 | 7.92× | 4.40× | 4.18× |
 | ZeroLagExponentialMovingAverage | Wickra 0.9.9 | 25.68× | 10.83× | 8.84× |
 | ZigZag | Wickra 0.9.9 | 68.47× | 46.80× | 49.62× |
