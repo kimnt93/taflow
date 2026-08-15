@@ -1,6 +1,6 @@
 # Metrics correctness
 
-Generated: 2026-08-12
+Generated: 2026-08-15
 
 Every TAFlow value below came from a configured canonical instance, its input method, and `compute()`.
 
