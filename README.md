@@ -1,8 +1,8 @@
 <p align="center">
   <h1 align="center">TAFlow</h1>
   <p align="center">
-    Persistent technical analysis for Rust and Python, with configuration-only
-    construction and causal streaming updates.
+    Persistent technical analysis for Rust and Python, with O(1) per-tick
+    updates where the formula permits.
   </p>
 </p>
 
